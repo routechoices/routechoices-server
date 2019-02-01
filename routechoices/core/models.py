@@ -216,10 +216,9 @@ class Event(models.Model):
                 protocol,
                 site.domain,
                 reverse(
-                    'site:event_data_view',
+                    'api:event_rg_data',
                     kwargs={
-                        'club_slug': self.club.slug,
-                        'slug': self.slug
+                        'aid': self.aid,
                     }
                 ),
             ),
@@ -229,10 +228,9 @@ class Event(models.Model):
                 protocol,
                 site.domain,
                 reverse(
-                    'site:event_map_view',
+                    'api:event_map_download',
                     kwargs={
-                        'club_slug': self.club.slug,
-                        'slug': self.slug
+                        'aid': self.aid,
                     }
                 ),
                 self.map.modification_date.timestamp()
@@ -252,13 +250,7 @@ class Event(models.Model):
         )
 
     def get_absolute_map_url(self):
-        return reverse(
-            'site:event_map_view',
-            kwargs={
-                'club_slug': self.club.slug,
-                'slug': self.slug
-            }
-        )
+        return
 
     def get_absolute_export_url(self):
         return reverse(
@@ -351,7 +343,8 @@ class Competitor(models.Model):
         if next_competitor:
             qs = qs.filter(datetime__lt=next_competitor.start_time)
         if self.event.end_date:
-            qs.filter(datetime__lt=self.event.end_date)
+            qs = qs.filter(datetime__lt=self.event.end_date)
+        qs = qs.filter(datetime__lt=now())
         return qs.order_by('datetime').annotate(competitor=Value(self.id, models.IntegerField()))
 
     @property
@@ -374,10 +367,8 @@ class Competitor(models.Model):
 
     def get_absolute_gpx_url(self):
         return reverse(
-            'site:competitor_gpx_view',
+            'api:competitor_gpx_download',
             kwargs={
-                'club_slug': self.event.club.slug,
-                'slug': self.event.slug,
                 'aid': self.aid,
             }
         )
