@@ -210,7 +210,7 @@ def traccar_api_gw(request):
         device.add_location(float(lat), float(lon), int(float(tim)))
     else:
         raise ValidationError('Missing lat, lon or timestamp argument')
-    return Response()
+    return Response({'status': 'ok'})
 
 
 @api_view(['POST'])
@@ -233,7 +233,7 @@ def pwa_api_gw(request):
             )
     else:
         raise ValidationError('Missing raw_data argument')
-    return Response()
+    return Response({'status': 'ok', 'n': len(locations)})
 
 
 class DataRenderer(renderers.BaseRenderer):
