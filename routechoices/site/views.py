@@ -238,7 +238,7 @@ def gps_seuranta_proxy(request):
 
 @api_view(['POST'])
 def get_device_id(request):
-    device = Device.object.create()
+    device = Device.objects.create()
     return Response({'device_id': device.aid})
 
 
