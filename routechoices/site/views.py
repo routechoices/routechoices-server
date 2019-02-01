@@ -23,6 +23,7 @@ from rest_framework.response import Response
 
 
 from routechoices.core.models import Event, Location, Device, Club, Competitor
+from routechoices.lib.gps_data_encoder import GeoLocationSeries
 
 
 def x_accel_redirect(dummy_request, path, filename='',
@@ -199,7 +200,7 @@ def event_data_view(request, club_slug, slug):
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
-        raise ValidationError('Use Traccar App or the official Tracker web app')
+        raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
     device = get_object_or_404(Device, aid=device_id)
     lat = request.query_params.get('lat')
@@ -209,6 +210,29 @@ def traccar_api_gw(request):
         device.add_location(float(lat), float(lon), int(float(tim)))
     else:
         raise ValidationError('Missing lat, lon or timestamp argument')
+    return Response()
+
+
+@api_view(['POST'])
+def pwa_api_gw(request):
+    device_id = request.POST.get('id')
+    if not device_id:
+        raise ValidationError(
+            'Use the official Routechoices.com Tracker web app'
+        )
+    device = get_object_or_404(Device, aid=device_id)
+
+    raw_data = request.POST.get('raw_data')
+    if raw_data:
+        locations = GeoLocationSeries(raw_data)
+        for location in locations:
+            device.add_location(
+                location.coordinates.latitude,
+                location.coordinates.longitude,
+                location.timestamp
+            )
+    else:
+        raise ValidationError('Missing raw_data argument')
     return Response()
 
 
