@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<video poster="{% static 'background.jpg'%}" class="bg_video" playsinline autoplay muted loop>
+  <source src="{% static 'background.mp4'%}" type="video/mp4">
+  <source src="{% static 'background.webm'%}" type="video/webm">
+</video>
+<div class="video_cover"></div>
+<div class="row">
+    <h1 class="video_text_overlay">Live GPS tracking solution for your orienteering events.</h1>
+</div>
+{% endblock %}

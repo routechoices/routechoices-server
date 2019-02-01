@@ -3,9 +3,11 @@ import urllib
 from itertools import chain
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, \
     HttpResponseForbidden, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.timezone import now
 
 from rest_framework import generics, permissions, renderers
 from rest_framework.decorators import api_view, renderer_classes
@@ -18,7 +20,7 @@ from rest_framework.exceptions import (
 from rest_framework.response import Response
 
 
-from routechoices.core.models import Event, Location, Device
+from routechoices.core.models import Event, Location, Device, Club, Competitor
 
 
 def x_accel_redirect(dummy_request, path, filename='',
@@ -47,12 +49,35 @@ def x_accel_redirect(dummy_request, path, filename='',
     return response
 
 
-def home_view(request):
-    return HttpResponse('hello world')
+def events_view(request):
+    event_list = Event.objects.all()
+    paginator = Paginator(event_list, 25)
+    page = request.GET.get('page')
+    events = paginator.get_page(page)
+    return render(
+        request,
+        'site/event_list.html',
+        {'events': events}
+    )
 
 
 def club_view(request, slug):
-    return HttpResponse('hello ' + slug)
+    club = get_object_or_404(
+        Club,
+        slug__iexact=slug
+    )
+    event_list = Event.objects.filter(club=club)
+    paginator = Paginator(event_list, 25)
+    page = request.GET.get('page')
+    events = paginator.get_page(page)
+    return render(
+        request,
+        'site/event_list_for_club.html',
+        {
+            'club': club,
+            'events': events
+        }
+    )
 
 
 def event_view(request, club_slug, slug):
@@ -71,6 +96,43 @@ def event_view(request, club_slug, slug):
     )
 
 
+def event_export_view(request, club_slug, slug):
+    event = get_object_or_404(
+        Event,
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+        start_date__lt=now()
+    )
+
+    return render(
+        request,
+        'site/event_export.html',
+        {
+            'event': event,
+        }
+    )
+
+
+def competitor_gpx_view(request, club_slug, slug, aid):
+    competitor = get_object_or_404(
+        Competitor,
+        event__club__slug__iexact=club_slug,
+        event__slug__iexact=slug,
+        aid=aid,
+        start_time__lt=now()
+    )
+    gpx_data = competitor.gpx
+    response = HttpResponse(
+        gpx_data,
+        content_type='application/gpx+xml'
+    )
+    response['Content-Disposition'] = 'attachment; filename="{}.gpx"'.format(
+        competitor.event.name.replace('\\', '_').replace('"', '\\"') + ' - ' +
+        competitor.name
+    )
+    return response
+
+
 def event_map_view(request, club_slug, slug):
     event = get_object_or_404(
         Event,
@@ -85,7 +147,7 @@ def event_map_view(request, club_slug, slug):
     return x_accel_redirect(
         request,
         file_path,
-        filename='{}.{}'.format(slug, event.map.mime_type[6:]),
+        filename='{}.{}'.format(event.map.name, event.map.mime_type[6:]),
         mime=event.map.mime_type
     )
 
@@ -101,10 +163,16 @@ def event_data_view(request, club_slug, slug):
     if event.hidden:
         raise PermissionDenied()
     competitors = event.competitors.all()
-    competitor_values = competitors.values_list('id', 'name', 'short_name')
+    competitor_values = competitors.values_list(
+        'id',
+        'name',
+        'short_name',
+        'aid'
+    )
     competitor_data = {}
     for c in competitor_values:
         competitor_data[c[0]] = {
+            'aid': c[3],
             'name': c[1],
             'short_name': c[2]
         }
@@ -115,7 +183,7 @@ def event_data_view(request, club_slug, slug):
     locations = sorted(locations, key=lambda l: l.datetime)
     for location in locations:
         response_data.append({
-            'id': location.competitor,
+            'id': competitor_data[location.competitor]['aid'],
             'name': competitor_data[location.competitor]['name'],
             'lat': location.latitude,
             'lon': location.longitude,

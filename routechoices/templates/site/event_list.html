@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="row">
+  <div>
+      <h1>Events</h1>
+  </div>
+
+  <div>
+    <table class="table table-striped">
+      <tr><th>Event</th><th>Date</th><th>Export</th><th>Club</th></tr>
+      {% for event in events %}
+      <tr>
+        <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
+        <td>{{ event.start_date|date:'Y-m-d H:i:s \U\T\C' }}</td>
+        <td>{% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %} {% if event.map and not event.hidden %}<a class="btn btn-xs btn-primary" href="{{ event.get_absolute_map_url }}"><i class="fa fa-globe"></i> Map</a>{% endif %}</td>
+        <td><a href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <nav aria-label="...">
+    <ul class="pager">
+    <li class="previous{% if not events.has_previous %} disabled{% endif %}"><a href="{% if events.has_previous %}?page={{ events.previous_page_number }}{% endif %}"><span aria-hidden="true">&larr;</span> Newer</a></li>
+    <li class="next{% if not events.has_next %} disabled{% endif %}"><a href="{% if events.has_next %}?page={{ events.next_page_number }}{% endif %}">Older <span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+  </nav>
+</div>
+{% endblock %}

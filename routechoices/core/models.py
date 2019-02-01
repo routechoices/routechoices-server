@@ -3,6 +3,8 @@ import datetime
 import re
 from urllib.parse import urlencode
 
+import gpxpy
+import gpxpy.gpx
 import pytz
 from PIL import Image
 from django.conf import settings
@@ -43,6 +45,14 @@ class Club(models.Model):
     name = models.CharField(max_length=255)
     slug = models.CharField(max_length=50, validators=[validate_nice_slug, ])
     admins = models.ManyToManyField(User)
+
+    def get_absolute_url(self):
+        return reverse(
+            'site:club_view',
+            kwargs={
+                'slug': self.slug
+            }
+        )
 
     def __str__(self):
         return self.name
@@ -232,6 +242,33 @@ class Event(models.Model):
             )
         return '{}://map.routegadget.net/?{}'.format(protocol, urlencode(args))
 
+    def get_absolute_url(self):
+        return reverse(
+            'site:event_view',
+            kwargs={
+                'club_slug': self.club.slug,
+                'slug': self.slug
+            }
+        )
+
+    def get_absolute_map_url(self):
+        return reverse(
+            'site:event_map_view',
+            kwargs={
+                'club_slug': self.club.slug,
+                'slug': self.slug
+            }
+        )
+
+    def get_absolute_export_url(self):
+        return reverse(
+            'site:event_export_view',
+            kwargs={
+                'club_slug': self.club.slug,
+                'slug': self.slug
+            }
+        )
+
     def __str__(self):
         return self.name
 
@@ -295,6 +332,10 @@ class Competitor(models.Model):
     start_time = models.DateTimeField()
 
     @property
+    def started(self):
+        return self.start_time > now()
+
+    @property
     def locations(self):
         from_date = self.event.start_date
         if self.start_time:
@@ -313,6 +354,34 @@ class Competitor(models.Model):
             qs.filter(datetime__lt=self.event.end_date)
         return qs.order_by('datetime').annotate(competitor=Value(self.id, models.IntegerField()))
 
+    @property
+    def gpx(self):
+        gpx = gpxpy.gpx.GPX()
+        gpx_track = gpxpy.gpx.GPXTrack()
+        gpx.tracks.append(gpx_track)
+
+        gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        for location in self.locations:
+            gpx_segment.points.append(
+                gpxpy.gpx.GPXTrackPoint(
+                    location.latitude,
+                    location.longitude,
+                    time=location.datetime
+                )
+            )
+        gpx_track.segments.append(gpx_segment)
+        return gpx.to_xml()
+
+    def get_absolute_gpx_url(self):
+        return reverse(
+            'site:competitor_gpx_view',
+            kwargs={
+                'club_slug': self.event.club.slug,
+                'slug': self.event.slug,
+                'aid': self.aid,
+            }
+        )
+
     def clean(self):
         if self.start_time and self.start_time < self.event.start_date:
             raise ValidationError('Competitor cannot start before the event')
@@ -323,7 +392,7 @@ class Competitor(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['start_time']
+        ordering = ['start_time', 'name']
         verbose_name = 'competitor'
         verbose_name_plural = 'competitors'
 

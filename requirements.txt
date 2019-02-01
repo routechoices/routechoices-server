@@ -3,3 +3,4 @@ pillow
 django-cors-headers
 requests
 djangorestframework
+gpxpy
