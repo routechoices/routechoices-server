@@ -1,0 +1,354 @@
+import base64
+import datetime
+import re
+from urllib.parse import urlencode
+
+import pytz
+from PIL import Image
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+from django.db import models
+from django.db.models import Value
+from django.urls import reverse
+from django.utils.timezone import now
+
+from routechoices.lib.validators import (
+     validate_nice_slug,
+     validate_latitude,
+     validate_longitude,
+     validate_corners_coordinates
+)
+from routechoices.lib.helper import random_key, short_random_key
+from routechoices.lib.storages import OverwriteImageStorage
+
+
+class Club(models.Model):
+    aid = models.CharField(
+         default=random_key,
+         max_length=12,
+         editable=False,
+         unique=True,
+    )
+    creator = models.ForeignKey(
+         User,
+         related_name='+',
+         null=True,
+         on_delete=models.SET_NULL,
+    )
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255)
+    slug = models.CharField(max_length=50, validators=[validate_nice_slug, ])
+    admins = models.ManyToManyField(User)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'club'
+        verbose_name_plural = 'clubs'
+
+
+def map_upload_path(instance=None, file_name=None):
+    import os.path
+    tmp_path = [
+        'maps'
+    ]
+    if file_name:
+        pass
+    basename = instance.aid
+    tmp_path.append(basename[0])
+    tmp_path.append(basename[1])
+    tmp_path.append(basename)
+    return os.path.join(*tmp_path)
+
+
+class Map(models.Model):
+    aid = models.CharField(
+        default=random_key,
+        max_length=12,
+        editable=False,
+        unique=True,
+    )
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
+    club = models.ForeignKey(
+        Club,
+        related_name='maps',
+        on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=255)
+    image = models.ImageField(
+        upload_to=map_upload_path,
+        height_field='height',
+        width_field='width',
+        storage=OverwriteImageStorage(),
+    )
+    height = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        editable=False
+    )
+    width = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    corners_coordinates = models.CharField(
+        max_length=255,
+        help_text='Latitude and longitude of map corners separated by commas'
+        'in following order Top Left, Top right, Bottom Right, Bottom left. '
+        'eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073',
+        validators=[validate_corners_coordinates]
+    )
+
+    @property
+    def path(self):
+        return map_upload_path(instance=self)
+
+    @property
+    def data(self):
+        with self.image.open('rb') as fp:
+            data = fp.read()
+        return data
+
+    @property
+    def mime_type(self):
+        img = Image.open(self.image.open())
+        self.image.close()
+        return 'image/{}'.format(img.format.lower())
+
+    @property
+    def data_uri(self):
+        return 'data:{};base64,{}'.format(
+            self.mime_type,
+            base64.b64encode(self.data).decode('utf-8')
+        )
+
+    @data_uri.setter
+    def data_uri(self, value):
+        if not value:
+            raise ValueError('Value can not be null')
+        data_matched = re.match(
+            r'^data:image/(?P<format>jpeg|png|gif);base64,'
+            r'(?P<data_b64>(?:[A-Za-z0-9+/]{4})*'
+            r'(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$',
+            value
+        )
+        if data_matched:
+            self.image.save(
+                'filename',
+                ContentFile(
+                    base64.b64decode(data_matched.group('data_b64'))
+                ),
+                save=False
+            )
+            self.image.close()
+        else:
+            raise ValueError('Not a base 64 encoded data URI of an image')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['-creation_date']
+        verbose_name = 'map'
+        verbose_name_plural = 'maps'
+
+
+class Event(models.Model):
+    aid = models.CharField(
+         default=random_key,
+         max_length=12,
+         editable=False,
+         unique=True,
+    )
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
+    club = models.ForeignKey(
+         Club,
+         related_name='events',
+         on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=255)
+    slug = models.CharField(max_length=50, validators=[validate_nice_slug, ])
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True, blank=True)
+    map = models.ForeignKey(
+        Map,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    @property
+    def hidden(self):
+        return self.start_date > now()
+
+    @property
+    def is_live(self):
+        if self.end_date:
+            return self.start_date <= now() <= self.end_date
+        else:
+            return self.start_date <= now()
+    @property
+    def rg_url(self):
+        site = Site.objects.get_current()
+        protocol = 'http' if settings.DEBUG else 'https'
+        args = {
+            'title': self.name,
+            'liveurl' if self.is_live else 'replayurl': '{}://{}{}?'.format(
+                protocol,
+                site.domain,
+                reverse(
+                    'site:event_data_view',
+                    kwargs={
+                        'club_slug': self.club.slug,
+                        'slug': self.slug
+                    }
+                ),
+            ),
+        }
+        if self.map is not None:
+            args['mapurl'] = '{}://{}{}?{}'.format(
+                protocol,
+                site.domain,
+                reverse(
+                    'site:event_map_view',
+                    kwargs={
+                        'club_slug': self.club.slug,
+                        'slug': self.slug
+                    }
+                ),
+                self.map.modification_date.timestamp()
+            )
+            args['mapurl'] += '?_{}_'.format(
+                self.map.corners_coordinates.replace(',', '_')
+            )
+        return '{}://map.routegadget.net/?{}'.format(protocol, urlencode(args))
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.competitors.filter(start_time=self.start_date) \
+            .update(start_time = self.start_date)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['-start_date']
+        unique_together = (('club', 'slug'),)
+        verbose_name = 'event'
+        verbose_name_plural = 'events'
+
+
+class Device(models.Model):
+    aid = models.CharField(
+        default=short_random_key,
+        max_length=12,
+        unique=True,
+    )
+
+    def __str__(self):
+        return self.aid
+
+    def add_location(self, lat, lon, timestamp=None):
+        if timestamp is not None:
+            ts_datetime = datetime.datetime \
+                .utcfromtimestamp(timestamp) \
+                .replace(tzinfo=pytz.utc)
+        else:
+            ts_datetime = now()
+        return Location.objects.create(
+            device=self,
+            latitude=lat,
+            longitude=lon,
+            datetime=ts_datetime
+        )
+
+    class Meta:
+        ordering = ['aid']
+        verbose_name = 'device'
+        verbose_name_plural = 'devices'
+
+
+class Competitor(models.Model):
+    aid = models.CharField(
+        default=random_key,
+        max_length=12,
+        editable=False,
+        unique=True,
+    )
+    event = models.ForeignKey(
+        Event,
+        related_name='competitors',
+        on_delete=models.CASCADE,
+    )
+    device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=64)
+    short_name = models.CharField(max_length=32, null=True, blank=True)
+    start_time = models.DateTimeField()
+
+    @property
+    def locations(self):
+        from_date = self.event.start_date
+        if self.start_time:
+            from_date = self.start_time
+        next_competitor = Competitor.objects.filter(
+            device=self.device,
+            start_time__gt=from_date
+        ).order_by('start_time').first()
+        qs = Location.objects.filter(
+            device=self.device,
+            datetime__gte=from_date
+        )
+        if next_competitor:
+            qs = qs.filter(datetime__lt=next_competitor.start_time)
+        if self.event.end_date:
+            qs.filter(datetime__lt=self.event.end_date)
+        return qs.order_by('datetime').annotate(competitor=Value(self.id, models.IntegerField()))
+
+    def clean(self):
+        if self.start_time and self.start_time < self.event.start_date:
+            raise ValidationError('Competitor cannot start before the event')
+
+    def save(self, *args, **kwargs):
+        if not self.start_time:
+            self.start_time = self.event.start_date
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['start_time']
+        verbose_name = 'competitor'
+        verbose_name_plural = 'competitors'
+
+
+class Location(models.Model):
+    device = models.ForeignKey(
+        Device,
+        related_name='locations',
+        on_delete=models.CASCADE,
+    )
+    latitude = models.FloatField(validators=[validate_latitude, ])
+    longitude = models.FloatField(validators=[validate_longitude, ])
+    datetime = models.DateTimeField(default=now)
+
+    @property
+    def timestamp(self):
+        return self.datetime.timestamp()
+
+    @timestamp.setter
+    def timestamp(self, ts):
+        self.datetime = datetime.datetime\
+            .utcfromtimestamp(ts)\
+            .replace(tzinfo=pytz.utc)
+
+    class Meta:
+        ordering = ['-datetime', 'device']
+        verbose_name = 'location'
+        verbose_name_plural = 'locations'

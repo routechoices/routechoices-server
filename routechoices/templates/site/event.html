@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+<style>
+.roboto {
+    font-family: 'Roboto Mono', monospace;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div>
+      <h3>/<a href="{% url 'site:club_view' event.club.slug %}">{{ event.club.slug }}</a>/<a href="{% url 'site:event_view' event.club.slug event.slug %}">{{ event.slug }}</a></h3>
+    <h2>{{ event.name }}{% if event.is_live %} <span class="label label-danger">Live</span>{% else %} <span class="label label-default">Replay</span>{% endif %}</h2>
+  </div>
+
+  <div>
+        {% if event.hidden %}
+        <div class="col" style="margin-top:30px">
+          <p>
+            <span class="alert alert-danger">Event will be visible in <span id="hidden-countdown">{{ event.hidden_until|date:'Y-m-d\TH:i:s\Z' }}</span>.
+          </p>
+        </div>
+        {% else %}
+        <iframe id="rg" src="{{ event.rg_url }}" height="500px" width="100%">Your browser doesn't support iframes</iframe>
+        <p>
+          <a href="{{ event.rg_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" role="button">View FullSreen Map</a>
+        </p>
+        {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+{% if event.hidden %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment.min.js" integrity="sha256-DELCOgoVsZqjT78lDC7zcX+YFp+PEjh1k23mBMoDBwo=" crossorigin="anonymous"></script>
+<script>
+    $(function(){
+        $('#hidden-countdown').each(function(i, el){
+            var ts = $(el).text();
+            var date = moment(new Date(ts));
+
+            (function displayCoutdown(){
+              $(el).text(moment.duration(date.diff(moment())).humanize());
+              if(date > moment()) {
+                  setTimeout(displayCoutdown, 1e3)
+              } else {
+                  window.location.reload()
+              }
+            })()
+        })
+    });
+</script>
+{% endif %}
+{% endblock %}
