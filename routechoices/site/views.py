@@ -1,7 +1,9 @@
+import re
 import time
 import urllib
 from itertools import chain
 
+import requests
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, \
@@ -208,3 +210,38 @@ def traccar_api_gw(request):
     else:
         raise ValidationError('Missing lat, lon or timestamp argument')
     return Response()
+
+
+class DataRenderer(renderers.BaseRenderer):
+    media_type = 'application/download'
+    format = 'raw'
+    charset = None
+    render_style = 'binary'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
+
+
+GPS_SEURANTA_URL_RE = r'^https?://(gps|www)\.tulospalvelu\.fi/gps/(.*)$'
+
+
+@api_view(['GET'])
+@renderer_classes((DataRenderer, ))
+def gps_seuranta_proxy(request):
+    url = request.GET.get('url')
+    if not url or not re.match(GPS_SEURANTA_URL_RE, url):
+        raise ValidationError('Not a gps seuranta url')
+    response = requests.get(url)
+
+    return Response(response.content)
+
+
+@api_view(['POST'])
+def get_device_id(request):
+    device = Device.object.create()
+    return Response({'device_id': device.aid})
+
+
+@api_view(['GET'])
+def get_time(request):
+    return Response({'time': time.time()})
