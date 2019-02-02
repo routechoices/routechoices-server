@@ -7,19 +7,37 @@ services:
       - "8000:8000"
     volumes:
       - ./src:/src
-      - ./config/nginx:/etc/nginx/conf.d
+      - ./nginx:/etc/nginx/conf.d
+      - ./static:/static
+      - ./media:/media
     depends_on:
       - web
   web:
-    build: .
+    environment:
+      DATABASE_URL: postgres://app_user:changeme@db/app_db
+      REDIS_URL: redis://redis
+      DJANGO_MANAGEPY_MIGRATE: on
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     container_name: dz01
     depends_on:
       - db
     volumes:
       - ./src:/src
+      - ./static:/static
+      - ./media:/media
     expose:
       - "8000"
+    links:
+      - db
   db:
     image: postgres:latest
     container_name: pz01
-    
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: changeme
+    restart: always
+    expose:
+      - "5432"
