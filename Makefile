@@ -20,7 +20,7 @@ shell-nginx:
 	docker exec -ti nz01 bash
 
 shell-web:
-	docker exec -ti dz01 bash
+	docker exec -ti dz01 /bin/sh
 
 shell-db:
 	docker exec -ti pz01 bash

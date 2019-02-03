@@ -22,18 +22,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" integrity="sha384-PDjg2ZdS3khPzd53i18+7tzB32JVQfFMrTXYo21RqPgUmEVAPwIhxOUF/8sP79CS" crossorigin="anonymous"></script>
     <script>
 window.addEventListener("load", function(){
-window.cookieconsent.initialise({
-  "palette": {
-    "popup": {
-      "background": "#eb6c44",
-      "text": "#ffffff"
+  window.cookieconsent.initialise({
+    "palette": {
+      "popup": {
+        "background": "#eb6c44",
+        "text": "#ffffff"
+      },
+      "button": {
+        "background": "#f5d948"
+      }
     },
-    "button": {
-      "background": "#f5d948"
-    }
-  },
-  "theme": "edgeless"
-})});
+    position: 'bottom-left',
+  })
+});
     </script>
     <link rel="stylesheet" href="{% static 'css/site.css' %}" />
     {% block extra_head %}
@@ -63,6 +64,7 @@ window.cookieconsent.initialise({
             <li><a href="{% url 'site:events_view'%}">Events</a></li>
             <li><a href="https://tracker.routechoices.com/">Tracker</a></li>
             <li><a href="{% url 'site:contact_view'%}">Contact</a></li>
+            <li>{% if user.is_authenticated %}<a href="{% url 'account_logout'%}">Logout</a>{% else %}<a href="{% url 'account_login'%}">Login</a>{% endif %}</li>
           </ul>
         </div>
       </div>
@@ -77,7 +79,7 @@ window.cookieconsent.initialise({
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-notify/0.2.0/js/bootstrap-notify.min.js" integrity="sha384-lNP1sUoj+f3onvsTRKaYlQwPNoyEhr+IiTZFPHFz1r2UCX9Hze0+J93KELhetifu" crossorigin="anonymous"></script>
     {% if messages %}
     <script>
-      {% for message in messages %}$('.top-right').notify({message: { text: '{{message|escapejs}}' }}).show();
+      {% for message in messages %}$('.bottom-right').notify({message: { text: '{{message|escapejs}}' }}).show();
       {% endfor %}
     </script>
     {% endif %}

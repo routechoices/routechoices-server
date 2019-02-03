@@ -8,11 +8,11 @@ done
 
 >&2 echo "Postgres is up - continuing"
 
-if [ "x$DJANGO_MANAGEPY_MIGRATE" = 'xon' ]; then
+if [ "x$DJANGO_MANAGEPY_MIGRATE" = 'xtrue' ]; then
     /venv/bin/python manage.py migrate --noinput
-Fi
+fi
 
-if [ "x$DJANGO_MANAGEPY_COLLECTSTATIC" = 'xon' ]; then
+if [ "x$DJANGO_MANAGEPY_COLLECTSTATIC" = 'xtrue' ]; then
     /venv/bin/python manage.py collectstatic --noinput
 fi
 

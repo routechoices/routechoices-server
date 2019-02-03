@@ -6,17 +6,16 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./src:/src
+      - ./:/app/
       - ./nginx:/etc/nginx/conf.d
-      - ./static:/static
-      - ./media:/media
     depends_on:
       - web
   web:
     environment:
       DATABASE_URL: postgres://app_user:changeme@db/app_db
       REDIS_URL: redis://redis
-      DJANGO_MANAGEPY_MIGRATE: on
+      DJANGO_MANAGEPY_MIGRATE: 'on'
+      DJANGO_MANAGEPY_COLLECTSTATIC: 'on'
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -24,9 +23,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./src:/src
-      - ./static:/static
-      - ./media:/media
+      - ./:/app/
     expose:
       - "8000"
     links:

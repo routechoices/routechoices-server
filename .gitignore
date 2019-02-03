@@ -12,6 +12,7 @@ MANIFEST
 *.save.*
 *.idea
 media/*
+static/*
 htmlcov/*
 env/*
-config/local_settings.py
+routechoices/local_settings.py

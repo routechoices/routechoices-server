@@ -28,6 +28,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,7 +52,10 @@ INSTALLED_APPS = [
 
     'routechoices',
     'routechoices.core',
-    'routechoices.site'
+    'routechoices.site',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 ]
 
 MIDDLEWARE = [
@@ -82,11 +93,14 @@ WSGI_APPLICATION = 'routechoices.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'app_db',
+        'USER': 'app_user',
+        'PASSWORD': 'changeme',
+        'HOST': 'db',
+        'PORT': '',
     }
 }
 
@@ -234,6 +248,15 @@ SLUG_BLACKLIST = [
     'widgets', 'wiki', 'wpad', 'write', 'www', 'www-data', 'www1', 'www2',
     'www3', 'www4', 'you', 'yourname', 'yourusername', 'zlib', 'traccar',
 ]
+
+
+ACCOUNT_ADAPTER = 'routechoices.lib.account_adapter.NoNewUsersAccountAdapter'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_USERNAME_BLACKLIST = SLUG_BLACKLIST
+ACCOUNT_USERNAME_REQUIRED = False
 
 
 try:

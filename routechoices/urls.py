@@ -18,7 +18,9 @@ from django.conf.urls import include, url
 
 
 urlpatterns = [
+    url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(('routechoices.api.urls', 'site'), namespace='api')),
+    url(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
+    url(r'^dashboard/', include(('routechoices.dashboard.urls', 'dashboard'), namespace='dashboard')),
     url(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
 ]

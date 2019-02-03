@@ -1,30 +1,17 @@
-import re
-import time
-import urllib.parse
-from itertools import chain
-
-import requests
-from django.conf import settings
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseNotFound, \
-    HttpResponseForbidden, StreamingHttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import now
 
-from rest_framework import generics, permissions, renderers, status
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.exceptions import (
-    ValidationError,
-    NotFound,
-    NotAuthenticated,
-    PermissionDenied
-)
-from rest_framework.response import Response
+from routechoices.core.models import Event, Club
 
 
-from routechoices.core.models import Event, Location, Device, Club, Competitor
-from routechoices.lib.gps_data_encoder import GeoLocationSeries
-
+def home_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard:home_view')
+    return render(
+        request,
+        'site/home.html',
+    )
 
 
 def events_view(request):

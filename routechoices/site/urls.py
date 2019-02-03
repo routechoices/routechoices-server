@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from routechoices.site import views
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='site/home.html'), name='home_view'),
+    url(r'^$', views.home_view, name='home_view'),
     url(r'^contact/?$', TemplateView.as_view(template_name='site/contact.html'), name='contact_view'),
     url(r'^events/?$', views.events_view, name='events_view'),
     url(r'^(?P<slug>[0-9a-zA-Z_-]+)/?$', views.club_view, name='club_view'),

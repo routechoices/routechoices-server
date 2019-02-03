@@ -4,3 +4,6 @@ django-cors-headers
 requests
 djangorestframework
 gpxpy
+uwsgi
+psycopg2-binary
+django-allauth
