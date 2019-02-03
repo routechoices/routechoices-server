@@ -7,11 +7,13 @@ from itertools import chain
 import requests
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from routechoices.core.models import Event, Location, Device, Competitor
+from routechoices.core.models import Event, Location, Device, Competitor, Map, \
+    Club
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 
 from rest_framework import renderers, status

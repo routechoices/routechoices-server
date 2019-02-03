@@ -1,0 +1,17 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Edit Map</h1>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+        <p>To help you figuring out the corners coordinates of your map <a href="/calibrate_map.html">click here</a></p>
+    </div>
+</div>
+{% endblock %}

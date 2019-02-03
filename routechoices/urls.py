@@ -16,11 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import include, url
 
+from routechoices.dashboard.views import dashboard_map_download
+
+admin.site.site_header = "Routechoices.com Admin"
+admin.site.site_title = "Routechoices.com Admin Site"
+admin.site.index_title = "Welcome to Routechoices.com Administration Site"
 
 urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
     url(r'^dashboard/', include(('routechoices.dashboard.urls', 'dashboard'), namespace='dashboard')),
+    url(
+        r'^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
+        r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]+)',
+        dashboard_map_download,
+        name='dashboard_map_download',
+    ),
     url(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
 ]

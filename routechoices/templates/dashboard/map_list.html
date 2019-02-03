@@ -1,0 +1,24 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
+        <h1>Your maps</h1>
+        {% if not maps %}
+            <p>You haven't created any map yet.</p>
+        {% else %}
+        <table class="table table-striped">
+            <tr><th>Name</th><th>Club</th></tr>
+            {% for map in maps %}
+            <tr>
+                <td><a href="{% url 'dashboard:map_edit_view' id=map.aid %}">{{ map.name }}</a></td>
+                <td>{{ map.club }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

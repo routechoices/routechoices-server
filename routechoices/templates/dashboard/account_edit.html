@@ -1,0 +1,12 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <a href="{% url 'account_email' %}">Edit your email addresses</a><br/>
+        <a href="{% url 'account_set_password' %}">Change your password</a><br/>
+    </div>
+</div>
+{% endblock %}

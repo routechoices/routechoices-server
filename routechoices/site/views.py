@@ -77,4 +77,3 @@ def event_export_view(request, club_slug, slug):
         }
     )
 
-

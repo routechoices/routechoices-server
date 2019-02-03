@@ -1,0 +1,21 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary">Create new club</a>
+        <h1>Your clubs</h1>
+        {% if not clubs %}
+            <p>You haven't created any club yet.</p>
+        {% else %}
+        <table class="table table-striped">
+            <tr><th>Name</th></tr>
+            {% for club in clubs %}
+            <tr><td><a href="{% url 'dashboard:club_edit_view' id=club.aid %}">{{ club.name }}</a></td></tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

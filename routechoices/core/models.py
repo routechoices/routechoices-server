@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
+from django.core.validators import validate_slug
 from django.db import models
 from django.db.models import Value
 from django.urls import reverse
@@ -42,8 +43,13 @@ class Club(models.Model):
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=255)
-    slug = models.CharField(max_length=50, validators=[validate_nice_slug, ])
+    name = models.CharField(max_length=255, unique=True)
+    slug = models.CharField(
+        max_length=50,
+        validators=[validate_nice_slug, ],
+        unique=True,
+        help_text='This the text that will be used in the urls of your events'
+    )
     admins = models.ManyToManyField(User)
 
     def get_absolute_url(self):
@@ -110,7 +116,7 @@ class Map(models.Model):
     )
     corners_coordinates = models.CharField(
         max_length=255,
-        help_text='Latitude and longitude of map corners separated by commas'
+        help_text='Latitude and longitude of map corners separated by commas '
         'in following order Top Left, Top right, Bottom Right, Bottom left. '
         'eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073',
         validators=[validate_corners_coordinates]
@@ -185,9 +191,14 @@ class Event(models.Model):
          on_delete=models.CASCADE
     )
     name = models.CharField(max_length=255)
-    slug = models.CharField(max_length=50, validators=[validate_nice_slug, ])
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True)
+    slug = models.CharField(
+        max_length=50,
+        validators=[validate_nice_slug, ],
+        db_index=True,
+        help_text='This the text that will be used in the urls of your events'
+    )
+    start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
+    end_date = models.DateTimeField(verbose_name='End Date (UTC)', null=True, blank=True)
     map = models.ForeignKey(
         Map,
         related_name='+',
@@ -277,10 +288,12 @@ class Event(models.Model):
 
 
 class Device(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
     aid = models.CharField(
         default=short_random_key,
         max_length=12,
         unique=True,
+        validators=[validate_slug, ]
     )
 
     def __str__(self):

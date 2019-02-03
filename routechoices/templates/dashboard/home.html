@@ -1,62 +1,92 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" integrity="sha256-yMjaV542P+q1RnH6XByCPDfUFhmOafWbeLPmqKh11zo=" crossorigin="anonymous" />
+<style>
+@media screen and (max-width: 767px) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all .25s ease-out;
+         -o-transition: all .25s ease-out;
+            transition: all .25s ease-out;
+  }
+
+  .row-offcanvas-left {
+    left: 0;
+  }
+
+  .row-offcanvas-left
+  .sidebar-offcanvas {
+    left: -50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left.active {
+    left: 50%; /* 6 columns */
+  }
+
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%; /* 6 columns */
+  }
+}
+</style>
+{% block sub_extra_head %}{% endblock %}
+{% endblock %}
+
 {% block content %}
-  <div class="row row-offcanvas row-offcanvas-right">
+  <div class="row row-offcanvas row-offcanvas-left">
     <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
       <div class="list-group">
-        <a href="#" class="list-group-item active">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
-        <a href="#" class="list-group-item">Link</a>
+        <a href="{% url 'dashboard:account_edit_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}">Account</a>
+        <a href="{% url 'dashboard:club_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:club_list_view' %}active{% endif %}">Clubs</a>
+        <a href="{% url 'dashboard:map_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}">Maps</a>
+        <a href="{% url 'dashboard:event_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}">Events</a>
       </div>
     </div><!--/.sidebar-offcanvas-->
     <div class="col-xs-12 col-sm-9">
-      <p class="pull-right visible-xs">
-        <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
-      </p>
-      <div class="jumbotron">
-        <h1>Hello, world!</h1>
-        <p>This is an example to show the potential of an offcanvas layout pattern in Bootstrap. Try some responsive-range viewport sizes to see it in action.</p>
-      </div>
       <div class="row">
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-        <div class="col-xs-6 col-lg-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!--/.col-xs-6.col-lg-4-->
-      </div><!--/row-->
+        <div class="col-xs-12 col-sm-9">
+          <p class="pull-left visible-xs">
+            <button type="button" class="btn btn-default btn-xs" data-toggle="offcanvas"><i class="fa fa-bars"></i></button>
+          </p>
+
+      </div>
+      {% block sub_content %}
+        <div class="jumbotron">
+          <h3>Welcome to your dashboard.</h3>
+        </div>
+      {% endblock %}
     </div><!--/.col-xs-12.col-sm-9-->
   </div><!--/row-->
+{% endblock %}
+
+{% block extra_body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js" integrity="sha256-5YmaxAwMjIpMrVlK84Y/+NjCpKnFYa8bWWBbUHSBGfU=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $(function () {
+    $('.datetimepicker').map(function(i, el) {
+      var options = {
+          useCurrent: false,
+          format: 'YYYY-MM-DD HH:mm'
+      }
+      $el = $(el);
+      if($el.val()) {
+        options.date = moment($el.val());
+      }
+      $el.datetimepicker(options);
+    })
+  });
+</script>
+<script>
+$(document).ready(function () {
+  $('[data-toggle="offcanvas"]').click(function () {
+    $('.row-offcanvas').toggleClass('active')
+  });
+});
+</script>
+
+{% block sub_extra_body %}{% endblock %}
 {% endblock %}
