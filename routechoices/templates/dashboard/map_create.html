@@ -9,9 +9,18 @@
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form form %}
+            <p id="calibration_help" class="hidden">To help you figuring out the corners coordinates of your map <a target="_blank" href="{% url 'dashboard:calibration_view' %}">Click Here</a></p>
             <input type="submit" value="Submit" class="btn btn-primary">
         </form>
-        <!-- <p>To help you figuring out the corners coordinates of your map <a href="/calibrate_map.html">click here</a></p> -->
     </div>
 </div>
+{% endblock %}
+{% block sub_extra_body %}
+<script>
+    $(function(){
+        $('#id_image').on('change', function(){
+            $('#calibration_help').removeClass('hidden')
+        });
+    })
+</script>
 {% endblock %}

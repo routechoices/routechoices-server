@@ -6,6 +6,7 @@ from routechoices.dashboard import views
 urlpatterns = [
     url(r'^$', views.home_view, name='home_view'),
     url(r'^account/?$', views.account_edit_view, name='account_edit_view'),
+    url(r'^calibrate_map/?$', views.calibration_view, name='calibration_view'),
     url(r'^club/?$', views.club_list_view, name='club_list_view'),
 
     url(r'^club/new/?$', views.club_create_view, name='club_create_view'),

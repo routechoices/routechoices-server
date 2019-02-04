@@ -39,7 +39,6 @@ window.addEventListener("load", function(){
     {% block extra_head %}
     {% endblock %}
     <style>
-
     </style>
   </head>
   <body>
@@ -62,7 +61,7 @@ window.addEventListener("load", function(){
           <ul class="nav navbar-nav navbar-right">
             <li><a href="{% url 'site:home_view'%}">Home</a></li>
             <li><a href="{% url 'site:events_view'%}">Events</a></li>
-            <li><a href="https://tracker.routechoices.com/">Tracker</a></li>
+            <li><a href="{% url 'site:tracker_view'%}">Tracker</a></li>
             <li><a href="{% url 'site:contact_view'%}">Contact</a></li>
             <li>{% if user.is_authenticated %}<a href="{% url 'account_logout'%}">Logout</a>{% else %}<a href="{% url 'account_login'%}">Login</a>{% endif %}</li>
           </ul>
@@ -73,6 +72,16 @@ window.addEventListener("load", function(){
     {% block content %}
     {% endblock %}
     </div>
+    {% block footer %}
+    <footer class="page-footer font-small blue pt-4">
+        <!-- Copyright -->
+        <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
+          <a href="/"> {{  site.name }}</a>
+        </div>
+        <!-- Copyright -->
+    </footer>
+    <!-- Footer -->
+    {% endblock %}
     {% endblock %}
     {% bootstrap_javascript jquery=1 %}
     <script>

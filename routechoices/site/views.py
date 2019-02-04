@@ -14,6 +14,13 @@ def home_view(request):
     )
 
 
+def tracker_view(request):
+    return render(
+        request,
+        'site/tracker.html',
+    )
+
+
 def events_view(request):
     event_list = Event.objects.all()
     paginator = Paginator(event_list, 25)

@@ -1,5 +1,6 @@
 {% extends "dashboard/home.html" %}
 {% load staticfiles %}
+{% load bootstrap3 %}
 
 {% block sub_content %}
 <div class="row">
@@ -18,6 +19,7 @@
             </tr>
             {% endfor %}
         </table>
+        {% bootstrap_pagination maps extra=request.GET.urlencode %}
         {% endif %}
     </div>
 </div>

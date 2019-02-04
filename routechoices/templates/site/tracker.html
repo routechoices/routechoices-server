@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    <style>
+      .roboto {
+        font-family: 'Roboto Mono', monospace;
+      }
+    </style>
+{% endblock %}
+
+{% block content %}
+      <div class="container">
+        <div class="row">
+          <h1>GPS Tracker</h1>
+          <p>Your Device Identifier <span class="label label-default roboto devId" style="font-size: 1.2em"></span></p>
+          <p style="margin-top:2em">
+            <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal"><i class="fa fa-rocket"></i> Tracking with the App (recommended)</a>
+            <a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the Webapp</a>
+          </p>
+        </div>
+      </div>
+      <div class="modal fade" id="traccar-modal" tabindex="-1" role="dialog" aria-labelledby="traccar-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="traccar-modal-label">Tracking App</h4>
+            </div>
+            <div class="modal-body">
+              <p>
+                Download the Traccar Client for Android or IPhone.
+              </p>
+              <p>
+                <a href="https://play.google.com/store/apps/details?id=org.traccar.client">Traccar Client for Android</a> - <a href="https://itunes.apple.com/us/app/traccar-client/id843156974">Traccar Client for IOS</a>
+              </p>
+              <p>
+                Open the app and enter the following settings:
+                <ul class="well">
+                    <li>Device identifier: <code class="devId roboto"></code></li>
+                    <li>Server URL: <code>https://www.routechoices.com/api/traccar</code></li>
+                    <li>Location Accuracy: <code>High</code></li>
+                    <li>Frequency: <code>1</code></li>
+                    <li>Distance: <code>0</code></li>
+                    <li>Angle: <code>0</code></li>
+                </ul>
+            </p>
+             <p>Before you start running, start the service. That's it...</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="schedule-start-modal" tabindex="-1" role="dialog" aria-labelledby="schedule-start-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="schedule-start-modal-label">Schedule start</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="start-delay-input">Minutes before start</label>
+                <input type="integer" class="form-control" id="start-delay-input" placeholder="5" value="5">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" id="start-btn">Start now</button>
+              <button type="button" class="btn btn-primary" id="start-schedule-btn">Schedule</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="streaming-modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h4 class="modal-title" id="streaming-modal-label">Streaming Position</h4>
+                  </div>
+                  <div class="modal-body">
+                      <div id="streaming-info-div"></div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" id="stop-streaming-btn">Stop</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="modal fade" id="error-modal" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                   <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                      <h4 class="modal-title" id="error-modal-label">Error</h4>
+                  </div>
+                  <div class="modal-body">
+                      <div id="error-modal-msg"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+{% endblock %}
+
+{% block extra_body %}
+    <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
+    <script type="text/javascript" src="{% static '/js/positioning.js' %}"></script>
+    <script>
+var clock = ServerClock({url: '/api/time/'});
+var liveDelay = 15;
+var watchPositionId = null;
+var isGpsSwitchedOn = false;
+var countdownTimeoutId = null;
+var broadcastBuffer = PositionArchive();
+var devId = null;
+var wakeLockObj;
+var wakeLockRequest;
+
+
+var getServerUrl = function() {
+  return '/';
+};
+
+var onPressStart = function(delay) {
+  delay = delay || 0;
+  var start_time = +new Date() + delay;
+  console.log('start');
+  $('#schedule-start-modal').modal('hide');
+  $('#streaming-modal').modal('show');
+  (function countDownStart() {
+    if (+new Date() < start_time) {
+      countdownTimeoutId = setTimeout(countDownStart, 500);
+      $('#streaming-info-div').text("Starting in " + Math.round((start_time - new Date())/1e3) + "s");
+    } else {
+      startStreaming();
+      $('#streaming-info-div').text("Streaming");
+    }
+  })();
+};
+
+var startStreaming = function() {
+  isGpsSwitchedOn = true;
+  if(wakeLockObj) wakeLockRequest = wakeLockObj.createRequest();
+  watchPositionId = navigator.geolocation.watchPosition(
+    onPositionUpdate,
+    onPositionError,
+    {
+      enableHighAccuracy: true,
+      timeout: 999,
+      maximumAge: 1000
+    }
+  );
+  (function positionRequestor() {
+    navigator.geolocation.getCurrentPosition(
+      onPositionUpdate,
+      onPositionError,
+      {
+        enableHighAccuracy: true,
+        timeout: 999,
+        maximumAge: 1000
+      }
+    );
+    if (isGpsSwitchedOn) {
+      setTimeout(positionRequestor, 1e3);
+    }
+  })();
+
+  (function positionArchivePusher() {
+    pushPositionArchive();
+    if (isGpsSwitchedOn) {
+      setTimeout(positionArchivePusher, 1e3);
+    }
+  })();
+
+  window.onbeforeunload = function (e) {
+    e = e || window.event;
+    var msg = 'Are you sure you want to close?'
+    if (e) {
+        e.returnValue = msg;
+    }
+    return msg;
+  };
+};
+
+var pushPositionArchive = function(force){
+  force = force || false;
+  // Push data when Archive max age == competition delay - Xs
+  var tks = broadcastBuffer.exportTks(),
+      now = +clock.now();
+  if (tks !== '') {
+    $('#streaming-info-div').text("Uploading in "+ Math.round((liveDelay * 1e3 - 1e3 - broadcastBuffer.getAge(now)) / 1e3) + " seconds");
+  } else {
+    $('#streaming-info-div').text("Fetching accurate position")
+  }
+  if (tks !== '' && (force || (broadcastBuffer.getAge(now) > (liveDelay * 1e3 - 1e3)))){
+    $('#streaming-info-div').text("Uploading Positions");
+    $.ajax({
+      type: 'POST',
+      url: getServerUrl() + 'api/pwa',
+      dataType:'json',
+      data: {
+        id: devId,
+        raw_data: tks
+      }
+    })
+    .done(function(response){
+      broadcastBuffer.eraseInterval(-Infinity, now);
+      $('#streaming-info-div').text("Buffering Positions");
+    })
+    .fail(function(){
+      $('#streaming-info-div').text("Broadcast failed...");
+    });
+  }
+};
+
+var stopStreaming = function() {
+  clearTimeout(countdownTimeoutId);
+  toggleWakeLock()
+  $('#streaming-modal').modal('hide');
+  if(wakeLockRequest){
+    wakeLockRequest.cancel();
+    wakeLockRequest = null;
+  }
+  if(isGpsSwitchedOn){
+    isGpsSwitchedOn = false;
+    pushPositionArchive(true);
+    navigator.geolocation.clearWatch(watchPositionId);
+  }
+  window.onbeforeunload = function(){}
+};
+
+var onPositionUpdate = function(position) {
+  console.log(position)
+  last_position = {
+    timestamp:+position.timestamp+clock.getDrift(),
+    coords:{
+      latitude:position.coords.latitude,
+      longitude:position.coords.longitude,
+      accuracy:position.coords.accuracy
+    }
+  };
+  var pos = Position(last_position);
+  if(position.coords.accuracy < 50) {
+    broadcastBuffer.add(pos);
+    pushPositionArchive();
+  }
+}
+
+var getDeviceId = function() {
+  return localStorage.getItem('devId');
+}
+
+var setDeviceId = function(devId) {
+    localStorage.setItem('devId', devId);
+    devId = devId;
+    $(".devId").text(devId);
+}
+
+var onPositionError = function(e) {
+  console.log(e);
+  if(e.code === 1){
+    stopStreaming();
+    $('#error-modal-msg').text("You must allow location service for this site!");
+    $('#error-modal').modal('show');
+  }
+}
+
+$(function() {
+  $('.error-message').hide();
+  $('#start-btn')
+  .on('click', function(e){
+    e.preventDefault();
+    onPressStart();
+  });
+  $('#start-schedule-btn')
+  .on('click', function(e){
+    e.preventDefault();
+    var delay = parseFloat($('#start-delay-input').val())*60*1e3;
+    onPressStart(delay);
+  });
+  $('#stop-streaming-btn')
+  .on('click',  function(e){
+    e.preventDefault();
+    stopStreaming();
+  });
+
+  if ('getWakeLock' in navigator) {
+    try {
+      // Create a wake lock for the type we want.
+      wakeLockObj = navigator.getWakeLock('system');
+      console.log('ok getWakeLock', wakeLockObj);
+    } catch (ex) {
+      console.error('error getWakeLock', err);
+    }
+  }
+
+  devId = getDeviceId();
+  if (!devId) {
+    $.ajax({
+      type: 'POST',
+      url: getServerUrl() + 'api/device_id/',
+      dataType: 'json',
+    }).done(function(response) {
+      setDeviceId(response.device_id)
+    }).fail(function() {
+      $('#error-modal-msg').text("Couldn't connect to API server");
+      $('#error-modal').modal('show');
+    })
+  } else {
+    $(".devId").text(devId);
+  }
+});
+
+    </script>
+{% endblock %}

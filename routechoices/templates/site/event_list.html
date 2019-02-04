@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load bootstrap3 %}
 
 {% block content %}
 <div class="row">
@@ -20,11 +21,6 @@
       {% endfor %}
     </table>
   </div>
-  <nav aria-label="...">
-    <ul class="pager">
-    <li class="previous{% if not events.has_previous %} disabled{% endif %}"><a href="{% if events.has_previous %}?page={{ events.previous_page_number }}{% endif %}"><span aria-hidden="true">&larr;</span> Newer</a></li>
-    <li class="next{% if not events.has_next %} disabled{% endif %}"><a href="{% if events.has_next %}?page={{ events.next_page_number }}{% endif %}">Older <span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
-  </nav>
+  {% bootstrap_pagination events extra=request.GET.urlencode %}
 </div>
 {% endblock %}

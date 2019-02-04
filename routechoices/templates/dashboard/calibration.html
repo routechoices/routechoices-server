@@ -1,58 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Calibrate Map</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-notify/0.2.0/css/bootstrap-notify.min.css" integrity="sha384-rIFdr6vaDVnewbIAdD3sc4BX5FNL4HJG2Y57IJLcefY2xRj3C/qYvtZla9HFkOqM" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="/static/css/site.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calibrate Map</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous" />
+<style>
+    html {
+      height: 100%;
+      box-sizing: border-box;
+    }
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100%;
+      padding-bottom: 4em;
+    }
+    footer {
+      position: absolute;
+      bottom: 0;
+      margin-top: 30em;
+      background-color: #eee;
+      color: #000;
+      padding: 0.5em 0;
+    }
+.leaflet_map {
+    height: 600px;
+    background: #f5f5f5;
+    border: 1px solid #000;
+    margin-bottom: 5px;
+}
+.map_preview {
+   position: relative;
+   width: 100%;
+   padding: 15px 0;
+}
+.map_preview img {
+   border: 1px solid #000;
+   border-radius: 5px;
+   max-width: 100%;
+}
+.map_preview .location {
+    position: absolute;
+   top: 20px;
+   left: 5px;
+   width: 45px;
+   margin: 0;
+}
+.map_preview h2 {
+   position: absolute;
+   top: 60px;
+   left: 0px;
+   width: 100%;
+   margin: 0;
+}
+.map_preview h2 span {
+   color: white;
+   font: bold 15px/30px Helvetica, Sans-Serif;
+   letter-spacing: -1px;
+   background: rgb(0, 0, 0); /* fallback color */
+   background: rgba(0, 0, 0, 0.7);
+   padding: 0 10px 0 30px;
+   margin: 0;
+}
+</style>
 </head>
 <body>
 <div class="container">
-    <h1>Upload Map</h1>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="alert alert-info" role="alert">
-            <span id="help_text"></span>
-        </div>
-      </div>
-    </div>
-    <form method="POST" action="" enctype="multipart/form-data">
-    <div id="step2">
-        <div class="row">
-          <div class="col-md-6">
-            <div id="raster_map" class="leaflet_map"></div>
-          </div>
-          <div class="col-md-6">
-            <div id="tile_map" class="leaflet_map"></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <a href="#" id="reset_raster_markers_button" class="btn btn-default" role="button">Delete Your Map Reference Points</a>
-            <a href="#" id="reset_world_markers_button" class="btn btn-default" role="button">Delete World Map Reference Points</a>
-            <a href="#" id="to_step3_button" class="btn btn-primary disabled" role="button">Preview Map</a>
-          </div>
-        </div>
-    </div>
-    <div id="step3" class="hidden">
-        <div class="row">
-            <div class="col-md-12">
-                <div id="preview_map" class="leaflet_map"></div>
-            </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <a href="#" id="back_step2_button" class="btn btn-primary">Back</a>
-            <a href="#" id="to_step4_button" class="btn btn-danger">Validate Calibration</a>
-          </div>
-        </div>
-    </div>
-    </form>
+<h1>Upload Map</h1>
+<div class="row">
+<div class="col-md-12">
+<div class="alert alert-info" role="alert">
+<span id="help_text"></span>
 </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+</div>
+</div>
+<form method="POST" action="" enctype="multipart/form-data">
+<div id="step2">
+<div class="row">
+<div class="col-md-6">
+<div id="raster_map" class="leaflet_map"></div>
+</div>
+<div class="col-md-6">
+<div id="tile_map" class="leaflet_map"></div>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
+<a href="#" id="reset_raster_markers_button" class="btn btn-danger" role="button">Delete Your Map Reference Points</a>
+<a href="#" id="reset_world_markers_button" class="btn btn-danger" role="button">Delete World Map Reference Points</a>
+<a href="#" id="to_step3_button" class="btn btn-primary disabled" role="button">Preview Map</a>
+</div>
+</div>
+</div>
+<div id="step3" class="d-none">
+<div class="row">
+<div class="col-md-12">
+<div id="preview_map" class="leaflet_map"></div>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
+<a href="#" id="back_step2_button" class="btn btn-primary">Back</a>
+<a href="#" id="to_step4_button" class="btn btn-danger">Validate Calibration</a>
+</div>
+</div>
+</div>
+</form>
+</div>
+<footer class="container-fluid text-center">
+<span>&copy <script>document.write(new Date().getFullYear())</script> {{  site.name }}</span>
+</footer>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="anonymous"></script>
 <script src="https://cdn.rawgit.com/ScanEx/Leaflet.imageTransform/b236ca1c/src/L.ImageTransform.js"></script>
@@ -188,7 +253,8 @@ $(function(){
     }
 
     function loadImage() {
-        var imageInput = window.opener.document.querySelector('#mapImage');
+        var imageInput = window.opener.document.querySelector('#id_image');
+        var imageURL = $(imageInput).parent().children('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {
@@ -201,6 +267,16 @@ $(function(){
                 img.src = e.target.result;
             };
             fr.readAsDataURL(imageInput.files[0]);
+        } else if (imageURL) {
+            var img = new Image();
+            img.addEventListener("load", function () {
+                $('#help_text').text(help_texts[0]);
+                display_raster_map(img);
+                display_world_map();
+            });
+            img.src = imageURL;
+        } else {
+            window.close();
         }
     }
 
@@ -351,8 +427,8 @@ $(function(){
     $('#to_step3_button').on('click', function(e){
         e.preventDefault();
         compute_calib_string();
-        $('#step2').addClass('hidden');
-        $('#step3').removeClass('hidden');
+        $('#step2').addClass('d-none');
+        $('#step3').removeClass('d-none');
         $('#help_text').text(help_texts[1]);
         display_preview_map();
     });
@@ -360,16 +436,24 @@ $(function(){
         e.preventDefault();
         map_c.remove();
         $('#help_text').text(help_texts[0]);
-        $('#step3').addClass('hidden');
-        $('#step2').removeClass('hidden');
+        $('#step3').addClass('d-none');
+        $('#step2').removeClass('d-none');
     });
 
     $('#to_step4_button').on('click', function(e){
         e.preventDefault();
-        window.opener.document.querySelector('#cornersCoords').value = calib_string;
+        var el = window.opener.document.querySelector('#id_corners_coordinates');
+        el.value = calib_string;
+        var event = document.createEvent('Event');
+        event.initEvent('input', true, true);
+        el.dispatchEvent(event);
         window.close();
     });
-    loadImage()
+    if(!window.opener) {
+        window.location.href = '/';
+    } else {
+        loadImage()
+    }
 })
 </script>
 </body>

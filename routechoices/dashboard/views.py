@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
@@ -7,12 +8,21 @@ from routechoices.core.models import Club, Map, Event, Device
 from routechoices.dashboard.forms import ClubForm, MapForm, EventForm, \
     CompetitorFormSet
 
+DEFAULT_PAGE_SIZE = 25
 
 @login_required
 def home_view(request):
     return render(
         request,
         'dashboard/home.html',
+    )
+
+
+@login_required
+def calibration_view(request):
+    return render(
+        request,
+        'dashboard/calibration.html',
     )
 
 
@@ -28,11 +38,15 @@ def account_edit_view(request):
 def club_list_view(request):
     club_list = Club.objects.filter(admins=request.user)
 
+    paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get('page')
+    clubs = paginator.get_page(page)
+
     return render(
         request,
         'dashboard/club_list.html',
         {
-            'clubs': club_list
+            'clubs': clubs
         }
     )
 
@@ -117,11 +131,15 @@ def map_list_view(request):
         .values_list('id', flat=True)
     map_list = Map.objects.filter(club_id__in=club_list)
 
+    paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get('page')
+    maps = paginator.get_page(page)
+
     return render(
         request,
         'dashboard/map_list.html',
         {
-            'maps': map_list
+            'maps': maps
         }
     )
 
@@ -204,11 +222,15 @@ def event_list_view(request):
     club_list = Club.objects.filter(admins=request.user)
     event_list = Event.objects.filter(club__in=club_list)
 
+    paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get('page')
+    events = paginator.get_page(page)
+
     return render(
         request,
         'dashboard/event_list.html',
         {
-            'events': event_list
+            'events': events
         }
     )
 
