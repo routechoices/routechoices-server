@@ -1,4 +1,4 @@
-{% load staticfiles %}<!DOCTYPE html>
+{% load staticfiles %}{% load bootstrap3 %}<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,8 +15,7 @@
     <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
     <meta name="theme-color" content="#ffffff">
     <title>{% block head_title %}{{site.name}}{% endblock %}</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-notify/0.2.0/css/bootstrap-notify.min.css" integrity="sha384-rIFdr6vaDVnewbIAdD3sc4BX5FNL4HJG2Y57IJLcefY2xRj3C/qYvtZla9HFkOqM" crossorigin="anonymous">
+    {% bootstrap_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" integrity="sha384-6iYDyQZuuNT7DcPJGXx241czdv2+GDGUcXRiqw1iXrjgYMTorSetxFP3JCMQMwnR" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" integrity="sha384-PDjg2ZdS3khPzd53i18+7tzB32JVQfFMrTXYo21RqPgUmEVAPwIhxOUF/8sP79CS" crossorigin="anonymous"></script>
@@ -44,6 +43,7 @@ window.addEventListener("load", function(){
     </style>
   </head>
   <body>
+    {% bootstrap_messages %}
     {% block body %}
     <div class='notifications top-right'></div>
     <!-- Fixed navbar -->
@@ -74,15 +74,7 @@ window.addEventListener("load", function(){
     {% endblock %}
     </div>
     {% endblock %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-notify/0.2.0/js/bootstrap-notify.min.js" integrity="sha384-lNP1sUoj+f3onvsTRKaYlQwPNoyEhr+IiTZFPHFz1r2UCX9Hze0+J93KELhetifu" crossorigin="anonymous"></script>
-    {% if messages %}
-    <script>
-      {% for message in messages %}$('.bottom-right').notify({message: { text: '{{message|escapejs}}' }}).show();
-      {% endfor %}
-    </script>
-    {% endif %}
+    {% bootstrap_javascript jquery=1 %}
     <script>
         function getCookie(name) {
             var cookieValue = null;

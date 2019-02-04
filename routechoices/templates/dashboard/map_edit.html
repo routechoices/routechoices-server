@@ -1,6 +1,6 @@
 {% extends "dashboard/home.html" %}
 {% load staticfiles %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {% block sub_content %}
 <div class="row">
@@ -8,7 +8,7 @@
         <h1>Edit Map</h1>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form|bootstrap }}
+            {% bootstrap_form form %}
             <input type="submit" value="Submit" class="btn btn-primary">
             <a href="{% url 'dashboard:map_delete_view' id=map.aid %}" class="btn btn-danger">Delete</a>
         </form>

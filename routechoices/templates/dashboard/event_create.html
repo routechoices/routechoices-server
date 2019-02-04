@@ -1,6 +1,10 @@
 {% extends "dashboard/home.html" %}
 {% load staticfiles %}
-{% load bootstrap %}
+{% load bootstrap3 %}
+
+{%  block sub_extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+{%  endblock %}
 
 {% block sub_content %}
 <div class="row">
@@ -8,9 +12,75 @@
         <h1>Create Event</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ form|bootstrap }}
+            {% bootstrap_form form %}
+
+            <h3>Competitors</h3>
+            <table class="table">
+            {{ formset.management_form }}
+            {% for form in formset %}
+               {% if forloop.first %}
+                    <thead>
+                    <tr>
+                        {% for field in form.visible_fields %}
+                            <th>{{ field.label|capfirst }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                {% endif %}
+                <tr class="formset_row">
+                    {% for field in form.visible_fields %}
+                        <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+                            {% endif %}
+                            {% bootstrap_field field show_label=False %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </table>
+
             <input type="submit" value="Submit" class="btn btn-primary">
         </form>
     </div>
 </div>
 {% endblock %}
+
+{%  block sub_extra_body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.js" integrity="sha256-qXy62i6QCXbyVrY23yCZqyk4/H+a3R7T9I6AyV2VZ7A=" crossorigin="anonymous"></script>
+<script>
+    $("label[for$='DELETE']").parents('.form-group').hide()
+    $('.formset_row').formset({
+        addText: 'Add Competitor',
+        addCssClass: 'btn btn-primary',
+        deleteText: '<i class="fa fa-trash fa-2x"></i>',
+        prefix: 'competitor_set'
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<script>
+$("select[name$='device']").selectize({
+    valueField: 'id',
+    labelField: 'aid',
+    searchField: 'aid',
+    multiple: true,
+    create: false,
+    load: function(query, callback) {
+        if (!query.length || query.length < 2) return callback();
+        $.ajax({
+            url: '/api/device/search/?q=' + encodeURIComponent(query),
+            type: 'GET',
+            error: function() {
+                callback();
+            },
+            success: function(res) {
+                callback(res.results);
+            }
+        });
+    }
+});
+</script>
+{%  endblock %}

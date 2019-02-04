@@ -1,6 +1,6 @@
 {% extends "dashboard/home.html" %}
 {% load staticfiles %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {%  block sub_extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
@@ -12,7 +12,7 @@
         <h1>Edit Club</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ form|bootstrap }}
+            {% bootstrap_form form %}
             <input type="submit" value="Submit" class="btn btn-primary">
             <a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>
         </form>

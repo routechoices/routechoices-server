@@ -171,6 +171,16 @@ def user_search(request):
     return Response({'results': [{'id': u[0], 'username': u[1]} for u in users]})
 
 
+@api_view(['GET'])
+def device_search(request):
+    devices = []
+    q = request.GET.get('q')
+    if q and len(q) > 2:
+        devices = Device.objects.filter(aid__startswith=q)\
+            .values_list('id', 'aid')[:10]
+    return Response({'results': [{'id': d[0], 'aid': d[1]} for d in devices]})
+
+
 def event_map_download(request, aid):
     event = get_object_or_404(Event, aid__iexact=aid)
     if not event.map:

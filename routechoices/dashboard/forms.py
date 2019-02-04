@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, DateTimeInput
+from django.forms import ModelForm, DateTimeInput, inlineformset_factory
 
-from routechoices.core.models import Club, Map, Event
+from routechoices.core.models import Club, Map, Event, Competitor
 
 
 class ClubForm(ModelForm):
@@ -27,5 +27,28 @@ class EventForm(ModelForm):
 
     def clean(self):
         super().clean()
-        if self.cleaned_data.get('end_date') and self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
+        start_date = self.cleaned_data['start_date']
+        end_date = self.cleaned_data.get('end_date')
+        if end_date and end_date < start_date:
             raise ValidationError('Start Date must be before End Date')
+        club = self.cleaned_data['club']
+        map = self.cleaned_data['map']
+        if map and club != map.club:
+            raise ValidationError('Pick a map from the organizer club')
+
+
+class CompetitorForm(ModelForm):
+    class Meta:
+        model = Competitor
+        fields = ('event', 'device', 'name', 'short_name', 'start_time')
+        widgets = {
+            'start_time': DateTimeInput(attrs={'class': 'datetimepicker'}),
+        }
+
+
+CompetitorFormSet = inlineformset_factory(
+    Event,
+    Competitor,
+    form=CompetitorForm,
+    extra=1
+)

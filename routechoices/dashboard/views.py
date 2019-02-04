@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
-from routechoices.core.models import Club, Map, Event
-from routechoices.dashboard.forms import ClubForm, MapForm, EventForm
+from routechoices.core.models import Club, Map, Event, Device
+from routechoices.dashboard.forms import ClubForm, MapForm, EventForm, \
+    CompetitorFormSet
 
 
 @login_required
@@ -222,19 +223,26 @@ def event_create_view(request):
         form = EventForm(request.POST)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
+        formset = CompetitorFormSet(request.POST)
         # check whether it's valid:
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             event = form.save()
+            formset.instance = event
+            formset.save()
             return redirect('dashboard:event_list_view')
     else:
         form = EventForm()
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
+        formset = CompetitorFormSet()
+        for cform in formset.forms:
+            cform.fields['device'].queryset = Device.objects.none()
     return render(
         request,
         'dashboard/event_create.html',
         {
             'form': form,
+            'formset': formset,
         }
     )
 
@@ -248,26 +256,37 @@ def event_edit_view(request, id):
         aid=id,
         club__in=club_list
     )
+    device_id = event.competitors.all().values_list('device', flat=True)
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, instance=event)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
+        formset = CompetitorFormSet(
+            request.POST,
+            instance=event,
+        )
         # check whether it's valid:
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.instance = event
+            formset.save()
             return redirect('dashboard:event_list_view')
     else:
         form = EventForm(instance=event)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
+        formset = CompetitorFormSet(instance=event)
+        for cform in formset.forms:
+            cform.fields['device'].queryset = Device.objects.filter(id__in=device_id)
     return render(
         request,
         'dashboard/event_edit.html',
         {
             'event': event,
             'form': form,
+            'formset': formset,
         }
     )
 

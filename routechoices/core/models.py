@@ -335,7 +335,7 @@ class Competitor(models.Model):
     device = models.ForeignKey(Device, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=64)
     short_name = models.CharField(max_length=32, null=True, blank=True)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(null=True, blank=True)
 
     @property
     def started(self):
@@ -388,7 +388,7 @@ class Competitor(models.Model):
         )
 
     def clean(self):
-        if self.start_time and self.start_time < self.event.start_date:
+        if self.start_time and self.event.start_date and self.start_time < self.event.start_date:
             raise ValidationError('Competitor cannot start before the event')
 
     def save(self, *args, **kwargs):
