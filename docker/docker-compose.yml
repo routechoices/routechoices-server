@@ -1,0 +1,39 @@
+version: '2'  
+services:
+  db:
+    image: postgres:latest
+    container_name: pz01
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: changeme
+    restart: always
+    expose:
+      - "5432"
+  nginx:
+    image: nginx:latest
+    container_name: nz01
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/app/
+      - ../nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
+  web:
+    environment:
+      DATABASE_URL: postgres://app_user:changeme@db/app_db
+    stop_signal: SIGINT
+    build:
+      context: ..
+      dockerfile: docker/django.dockerfile
+    container_name: dz01
+    depends_on:
+      - db
+    volumes:
+      - ../:/app/:rw
+    expose:
+      - "8000"
+    links:
+      - db
+    user: ${USERID}:${GROUPID}
