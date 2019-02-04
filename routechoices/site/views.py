@@ -21,6 +21,13 @@ def tracker_view(request):
     )
 
 
+def map_view(request):
+    return render(
+        request,
+        'site/race_viewer.html',
+    )
+
+
 def events_view(request):
     event_list = Event.objects.all()
     paginator = Paginator(event_list, 25)

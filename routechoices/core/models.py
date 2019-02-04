@@ -250,7 +250,7 @@ class Event(models.Model):
             args['mapurl'] += '?_{}_'.format(
                 self.map.corners_coordinates.replace(',', '_')
             )
-        return '{}://map.routegadget.net/?{}'.format(protocol, urlencode(args))
+        return '/map?{}'.format(urlencode(args))
 
     def get_absolute_url(self):
         return reverse(

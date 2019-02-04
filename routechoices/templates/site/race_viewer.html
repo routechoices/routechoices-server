@@ -1,0 +1,691 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css" integrity="sha256-YR4HrDE479EpYZgeTkQfgVJq08+277UXxMLbi/YP69o=" crossorigin="anonymous" />
+<style>
+  /*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+
+
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/*
+ * Sidebar
+ */
+
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 90px;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+}
+
+.time_bar{
+    position: absolute;
+    padding-top: 15px;
+    bottom: 0px;
+    left: 0px;
+    height: 90px;
+    background-color: #e5e5e5;
+}
+
+@media only screen
+and (max-device-width : 500px) {
+  .time_bar{
+    height: 120px;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+    position: fixed;
+    top: 51px;
+    bottom: 90px;
+    right: 0px;
+    left: 0px;
+}
+.main .page-header {
+  margin-top: 0;
+}
+
+.runner-icon{
+    color: #000;
+     /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #000;
+}
+
+.runner-icon span{
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0 15px;
+    white-space: nowrap;
+}
+@media (max-device-width : 767px){
+  .time_bar{
+    height: 120px;
+  }
+  .main {
+    bottom: 120px;
+  }
+  .sidebar {
+    bottom: 120px;
+  }
+}
+</style>
+{% endblock %}
+
+
+{% block body %}
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'site:home_view'%}"><span><img src="{% static 'img/logo.svg' %}" alt="_" height="20px"></span> {{site.name}}</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'site:home_view'%}">Home</a></li>
+            <li><a href="{% url 'site:events_view'%}">Events</a></li>
+            <li><a href="{% url 'site:tracker_view'%}">Tracker</a></li>
+            <li><a href="{% url 'site:contact_view'%}">Contact</a></li>
+            <li>{% if user.is_authenticated %}<a href="{% url 'account_logout'%}">Logout</a>{% else %}<a href="{% url 'account_login'%}">Login</a>{% endif %}</li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+<div class="container-fluid">
+  <div class="row">
+    <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar">
+      
+    </div>
+    <div id="map" class="col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main"></div>
+  </div>
+  <div class="row">  
+    <div class="col-xs-12 time_bar">
+      <div>
+        <div class="btn-group hidden-sm hidden-md hidden-lg">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="runners_show_button"><i class="fa fa-users"></i></a>
+        </div>
+        
+        <div class="btn-group" id="view_mods_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="live_button">Live</a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="replay_button">Replay</a>
+        </div>
+        
+        <div class="btn-group" id="replay_mode_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default active" id="real_time_button">Real Time</a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="mass_start_button">Mass start</a>
+        </div>
+        
+        <div class="btn-group" id="replay_control_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="prev_button"><i class="fa fa-backward"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="play_pause_button"><i class="fa fa-play"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="next_button"><i class="fa fa-forward"></i></a>
+        </div>
+        
+      </div>
+      <div style="padding-top:5px;">
+        <div id="full_progress_bar" class="progress" style="cursor: pointer">
+          <div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <span id="progress_bar_text" style="color:#666;padding:5px"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% bootstrap_javascript jquery=1 %}
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js" integrity="sha256-6BZRSENq3kxI4YYBDqJ23xg0r1GwTHEpvp3okdaIqBw=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js" integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data.min.js" integrity="sha256-15jnh2lee6Li94j6XCbw8PRzNZe29O/W9i97yXVyRmA=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/positioning.js' %}"></script>
+<script>
+var clock = ServerClock({url: '/api/time'});
+var map = null;
+var isLiveMode = false;
+var liveUrl = null;
+var isRealTime = true;
+var replayOffset = 0;
+var competition = null;
+var openStreetMap = null;
+var competitorList = [];
+var competitorRoutes = {};
+var routesLastFetched = -Infinity;
+var timeOffsetSec = 0;
+var playbackRate = 1;
+var playbackPaused = true;
+var prevDisplayRefresh = 0;
+var tailLength = 60;
+var isCurrentlyFetchingRoutes = false;
+var currentTime = 0;
+
+var COLORS = new function(){
+    var colors = ["#09F","#3D0","#F09","#D30","#30D","#DD0","#2DD","#D00","#D33","#00D","#DD2","#BFB"],
+        $t = this;
+    $t.cnt = -1;
+    $t.get = function(){
+        this.cnt++;
+        if( this.cnt==colors.length )this.cnt = 0;
+        return colors[this.cnt];
+    };
+    return $t;
+};
+
+var load_competition = function(competition_id){
+  $.ajax({
+    url: "/api/competition/"+competition_id
+  }).done(
+    on_load_competition
+  ).fail(
+    function(){
+      alert('Could not load competition');
+    }
+  );
+}
+
+var is_competition_live = function(){
+    var start = + new Date(competition.start_date);
+    var end = + new Date(competition.end_date);
+    var now = + clock.now();
+    return (start < now && now < end);
+}
+
+var has_competition_started = function(){
+    var start = +new Date(competition.start_date);
+    var now = +clock.now();
+    return start < now;
+}
+
+var on_load_competition = function(response){
+  competition = response;
+  map.setView(
+    [competition.latitude, competition.longitude],
+    competition.zoom
+  );
+  if(competition.map.display_mode === "map"){
+    map.removeLayer(open_street_map);
+  }else if(competition.map.background_tile_url !== ""){
+    map.removeLayer(open_street_map);
+    L.tileLayer(
+      competition.map.background_tile_url,
+      {maxZoom: 18}
+    ).addTo(map);
+  }
+  if(competition.map.display_mode === "map" || competition.map.display_mode === "map+bck"){
+    var anchors = [
+        [competition.map.top_left_lat, competition.map.top_left_lng],
+        [competition.map.top_right_lat, competition.map.top_right_lng],
+        [competition.map.bottom_right_lat, competition.map.bottom_right_lng],
+        [competition.map.bottom_left_lat, competition.map.bottom_left_lng]
+    ];
+    var transformedImage = L.imageTransform(competition.map.public_url, anchors);
+    transformedImage.addTo(map);
+  }
+  check_race_started();
+}
+
+var check_race_started = function(){
+  if(has_competition_started()){
+    $("#before_race_modal").hide();
+    if(is_competition_live()){
+      select_live_mode();
+    } else {
+      $("#live_button").hide();
+      selectReplayMode();
+    }
+    fetch_competitor_list();
+    fetch_competitor_routes();
+  }else{
+    window.setTimeout(check_race_started, 1000);
+  }
+}
+
+var select_live_mode = function(e){
+  if(e !== undefined){
+    e.preventDefault();
+  }
+  if(is_live_mode){
+    return;
+  }
+  $("#live_button").addClass('active');
+  $("#replay_button").removeClass('active');
+  $("#replay_mode_buttons").hide();
+  $("#replay_control_buttons").hide();
+  time_offset_s = -competition.live_delay;
+  is_live_mode=true;
+
+  (function while_live(){
+    if(+clock.now()-routes_last_fetched > -time_offset_s*1e3 && !is_currently_fetching_routes){
+      fetch_competitor_routes();
+    }
+    current_time = +clock.now()-5*1e3+time_offset_s*1e3;
+    draw_competitors();
+    if(is_live_mode){
+      setTimeout(while_live, 100);
+    }
+  })()
+}
+
+var selectReplayMode = function(e){
+  if(e !== undefined){
+    e.preventDefault();
+  }
+  if(!isLiveMode && $("#replay_button").hasClass('active')){
+    return;
+  }
+  $("#live_button").removeClass('active');
+  $("#replay_button").addClass('active');
+  $("#replay_mode_buttons").show();
+  $("#replay_control_buttons").show();
+  isLiveMode = false;
+  prevShownTime = +new Date(/*competition.start_date*/);
+  playback_paused = true;
+  playback_rate = 1;
+  prev_display_refresh = +clock.now();
+  (function whileReplay(){
+    /*
+    if(is_competition_live() && +clock.now()-routes_last_fetched > -time_offset_s*1e3 && !is_currently_fetching_routes){
+      //fetch_competitor_routes();
+    }
+    var actual_playback_rate = playback_paused?0:playback_rate;
+    current_time = prevShownTime + (+clock.now() - prev_display_refresh)*actual_playback_rate;
+    current_time = Math.min(+clock.now(), current_time, +new Date(competition.end_date));
+    //draw_competitors();
+    prevShownTime = current_time;
+    prev_display_refresh = +clock.now();
+    if(!isLiveMode){
+      setTimeout(while_replay, 100);
+    }
+    */
+  })()
+}
+
+var fetch_competitor_list = function(url){
+  url = url || "/api/competitor";
+  var data={};
+  if(url == "/api/competitor"){
+    data.competition_id = competition.id;
+    data.results_per_page = 1000;
+    data.approval_status = 'approved';
+  }
+  $.ajax({
+    url: url,
+    data: data
+  }).done(function(response){
+    var results;
+    if(response.previous === null){
+      results = [];
+    }else{
+      results = competitor_list;
+    }
+    results = results.concat(response.results)
+    competitor_list = results;
+    if(response.next === null){
+      display_competitor_list();
+    } else {
+      fetch_competitor_list(response.next);
+    }
+  }).fail(function(){
+
+  });
+};
+
+var fetch_competitor_routes = function(url){
+  is_currently_fetching_routes = true;
+  url = url || "/api/route";
+  var data = {};
+  if(url == "/api/route"){
+    data.competition_id = competition.id;
+    if(routes_last_fetched!= -Infinity){
+      data.created_after = routes_last_fetched/1e3;
+    }
+  }
+  $.ajax({
+    url: url,
+    data: data
+  }).done(function(response){
+    $.each(response.results, function(ii, route_data){
+      var route = PositionArchive.fromTks(route_data.encoded_data);
+      if(competitor_routes[route_data.competitor]!==undefined){
+        $.each(route.getArray(), function(jj, position){
+          competitor_routes[route_data.competitor].add(position);
+        });
+      } else {
+        competitor_routes[route_data.competitor] = route;
+      }
+    });
+    if(response.next === null){
+      routes_last_fetched = +clock.now();
+      is_currently_fetching_routes = false;
+    } else {
+      fetch_competitor_routes(response.next);
+    }
+  }).fail(function(){
+    is_currently_fetching_routes = false;
+  });
+};
+
+var display_competitor_list = function(){
+    var list_div = $('<ul/>');
+    list_div.addClass('media-list');
+    $.each(competitor_list, function(ii, competitor){
+      competitor.color = competitor.color || COLORS.get();
+      competitor.is_shown = competitor.is_shown || true;
+      var div = $('<li/>');
+      div.addClass('media').html('\
+        <div class="media-left"><i class="media-object fa fa-circle fa-3x" style="color:'+competitor.color+'"></i></div>\
+        <div class="media-body"><b>'+competitor.name+'</b><br/>\
+          <div class="btn-group btn-group-xs" role="group">\
+            <button type="button" class="toggle_competitor_btn btn btn-default"><i class="fa fa-toggle-on"></i></button>\
+            <button type="button" class="center_competitor_btn btn btn-default"><i class="fa fa-map-marker"></i></button>\
+            <!-- <button type="button" class="competitor_options_btn btn btn-default"><i class="fa fa-cog"></i></button> -->\
+          </div>\
+        </div>')
+      $(div).find('.toggle_competitor_btn').on('click', function(e){
+        e.preventDefault();
+        var icon = $(this).find('i');
+        if(icon.hasClass('fa-toggle-on')){
+          icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+          competitor.is_shown = false;
+          map.removeLayer(competitor.map_marker);
+          map.removeLayer(competitor.name_marker);
+          map.removeLayer(competitor.tail);
+          competitor.map_marker = null;
+          competitor.name_marker = null;
+          competitor.tail = null;
+        }else{
+          icon.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+          competitor.is_shown = true;
+        }
+      })
+      $(div).find('.center_competitor_btn').on('click', function(){
+        zoom_on_competitor(competitor);
+      })
+      list_div.append(div);
+      competitor.div = div;
+    });
+
+    $('#sidebar').html('');
+    $('#sidebar').append(list_div);
+}
+
+var zoom_on_competitor = function(compr){
+  var route = competitor_routes[compr.id];
+  var time_t = current_time;
+  if(!is_real_time){
+    time_t += +new Date(compr.start_time) - new Date(competition.start_date);
+  }
+  var loc = route.getByTime(time_t);
+  map.setView([loc.coords.latitude, loc.coords.longitude]);
+}
+var get_progress_bar_text = function(){
+    var result = '';
+    var viewed_time = current_time;
+    if(!is_real_time){
+        viewed_time -= new Date(competition.start_date);
+        var t = viewed_time/1e3;
+        to2digits = function(x){return ('0'+Math.floor(x)).slice(-2);},
+        result += t > 3600 ? Math.floor(t/3600) + ':': '';
+        result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60);
+    }else{
+        result = moment(+new Date(viewed_time)).tz(competition.timezone).format('HH:mm:ss');
+    }
+    return result;
+}
+var draw_competitors = function(){
+  // play/pause button
+  if(playback_paused){
+    var html = '<i class="fa fa-play"></i> x'+playback_rate;
+    if($('#play_pause_button').html() != html){
+      $('#play_pause_button').html(html);
+    }
+  } else {
+    var html = '<i class="fa fa-pause"></i> x'+playback_rate;
+    if($('#play_pause_button').html() != html){
+      $('#play_pause_button').html(html);
+    }
+  }
+  // progress bar
+  var perc = is_live_mode ? 100 : (current_time-new Date(competition.start_date))/(Math.min(+clock.now(), new Date(competition.end_date))-new Date(competition.start_date))*100
+  $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
+  $('#progress_bar_text').html(get_progress_bar_text());
+  $.each(competitor_list, function(ii, competitor){
+    if(!competitor.is_shown){
+      return;
+    }
+    var route = competitor_routes[competitor.id]
+    if(route != undefined){
+      var viewed_time = current_time;
+      if(!is_live_mode && !is_real_time && competitor.start_time){
+        viewed_time += new Date(competitor.start_time) - new Date(competition.start_date);
+      }
+      var loc = route.getByTime(viewed_time);
+      if(!isNaN(loc.coords.latitude)){
+        if(competitor.map_marker == undefined){
+          competitor.map_marker = L.circleMarker([loc.coords.latitude, loc.coords.longitude],
+                                                 {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75});
+          competitor.name_marker = L.marker([loc.coords.latitude, loc.coords.longitude],
+                                            {icon: L.divIcon({className: 'runner-icon',
+                                                              html: '<span style="-webkit-text-fill-color: '+competitor.color+';">'+competitor.short_name+'</span>'})
+                                            });
+          competitor.map_marker.addTo(map);
+          competitor.name_marker.addTo(map);
+        }else{
+          competitor.map_marker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
+          competitor.name_marker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
+        }
+      }
+      var tail = route.extractInterval(viewed_time-tail_length*1e3, viewed_time);
+      var tail_latlng = [];
+      $.each(tail.getArray(), function(jj, pos){
+        if(!isNaN(pos.coords.latitude)){
+          tail_latlng.push([pos.coords.latitude, pos.coords.longitude]);
+        }
+      })
+      if(competitor.tail == undefined){
+        competitor.tail = L.polyline(tail_latlng, {color: competitor.color, opacity: 0.75});
+        competitor.tail.addTo(map);
+      }else{
+        competitor.tail.setLatLngs(tail_latlng);
+      }
+    }
+  })
+}
+
+function getParameterByName(name) {
+  try {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+  catch(err) {
+    return '';
+  }
+}
+
+function addRavaMap(a,b,c,d,src,txt){
+  var anchors = [a, b, c, d];
+  var ravaimage = new L.ImageTransform(
+    src,
+    anchors
+  ).addTo(map);
+  map.fitBounds(anchors)
+}
+
+$(function() {
+  $("#before_race_modal").modal('show').on('hide.bs.modal', function(e){
+      e.preventDefault();
+  });
+  map = L.map('map', {
+    center: [15, 0],
+    zoom: 3
+  });
+  open_street_map = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18
+  });
+  open_street_map.addTo(map);
+
+  $('#runners_show_button').on('click', function(e){
+    e.preventDefault();
+    if($('#sidebar').hasClass('hidden-xs')){
+      $('#sidebar').removeClass('hidden-xs').addClass('col-xs-12');
+      $('#map').addClass('hidden-xs').removeClass('col-xs-12');
+    }else{
+      $('#sidebar').addClass('hidden-xs').removeClass('col-xs-12');
+      $('#map').removeClass('hidden-xs').addClass('col-xs-12');
+    }
+  })
+
+  $('#live_button').on('click', select_live_mode);
+  $('#replay_button').on('click', selectReplayMode);
+  $('#play_pause_button').on('click', press_play_pause_button);
+  $('#next_button').on('click', function(e){
+    e.preventDefault();
+    playback_rate = playback_rate*2;
+  });
+  $('#prev_button').on('click', function(e){
+    e.preventDefault();
+    playback_rate = Math.max(1, playback_rate/2);
+  });
+  $('#real_time_button').on('click', function(e){
+    e.preventDefault();
+    is_real_time=true;
+    $('#real_time_button').addClass('active');
+    $('#mass_start_button').removeClass('active');
+  });
+  $('#mass_start_button').on('click', function(e){
+    e.preventDefault();
+    is_real_time=false;
+    $('#real_time_button').removeClass('active');
+    $('#mass_start_button').addClass('active');
+  });
+  $('#full_progress_bar').on('click', press_progress_bar)
+
+  if(getParameterByName('liveurl').length>5){
+    isLiveMode = true;
+    liveUrl = getParameterByName('liveurl');
+  }
+  if(getParameterByName('replayurl').length>5){
+    isLiveMode = false;
+    liveUrl = getParameterByName('replayurl');
+    $("#live_button").addClass('disabled');
+  }
+
+  selectReplayMode()
+  if(liveUrl) {
+    console.log(liveUrl);
+    //startFetchingData();
+  }
+
+  if(getParameterByName('mapurl').indexOf('http')>-1){
+    var urlarr=getParameterByName('mapurl').split(',').reverse();
+    for (var m=0;m<urlarr.length && m<61;m++){
+      var site=urlarr[m];
+      if(site.indexOf('?')>0 ){
+        var stemp=site.substring(site.lastIndexOf('?'));
+        site=site.substring(0,site.lastIndexOf('?'));
+        stemp=stemp.split('_');
+      }else{
+        var stemp=site.split('_');
+      }
+      addRavaMap([1*stemp[1],1*stemp[2]],[1*stemp[3],1*stemp[4]],[1*stemp[5],1*stemp[6]],[1*stemp[7],1*stemp[8]],site,'Map image from a remote site.<br>'+site);
+      map.panTo([0.5*(1*stemp[1]+1*stemp[5]),0.5*(1*stemp[2]+1*stemp[6])]);
+    }
+  }
+})
+
+var press_play_pause_button = function(e){
+  e.preventDefault();
+  playback_paused = !playback_paused;
+}
+
+var press_progress_bar = function(e){
+  var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width();
+  current_time = +new Date(competition.start_date)+(Math.min(clock.now(), +new Date(competition.end_date))-new Date(competition.start_date))*perc;
+  prev_shown_time = current_time;
+}
+</script>
+{% endblock %}
+
