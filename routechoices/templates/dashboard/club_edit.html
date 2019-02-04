@@ -2,6 +2,10 @@
 {% load staticfiles %}
 {% load bootstrap %}
 
+{%  block sub_extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+{%  endblock %}
+
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
@@ -10,7 +14,34 @@
             {% csrf_token %}
             {{ form|bootstrap }}
             <input type="submit" value="Submit" class="btn btn-primary">
+            <a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>
         </form>
     </div>
 </div>
 {% endblock %}
+
+{% block sub_extra_body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<script>
+$('#id_admins').selectize({
+    valueField: 'id',
+    labelField: 'username',
+    searchField: 'username',
+    multiple: true,
+    create: false,
+    load: function(query, callback) {
+        if (!query.length || query.length < 2) return callback();
+        $.ajax({
+            url: '/api/user/search/?q=' + encodeURIComponent(query),
+            type: 'GET',
+            error: function() {
+                callback();
+            },
+            success: function(res) {
+                callback(res.results);
+            }
+        });
+    }
+});
+</script>
+{%  endblock %}

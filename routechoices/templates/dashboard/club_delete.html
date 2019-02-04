@@ -5,12 +5,10 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
-        <h1>Edit Event</h1>
+        <h1>Delete Club {{ club.name }}?</h1>
         <form action="" method="post">
             {% csrf_token %}
-            {{ form|bootstrap }}
-            <input type="submit" value="Submit" class="btn btn-primary">
-            <a href="{% url 'dashboard:event_delete_view' id=event.aid %}" class="btn btn-danger">Delete</a>
+            <input type="submit" value="Delete" class="btn btn-danger">
         </form>
     </div>
 </div>

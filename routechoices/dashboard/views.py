@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
@@ -45,11 +46,11 @@ def club_create_view(request):
             club = form.save(commit=False)
             club.creator = request.user
             club.save()
-            club.admins.add(request.user)
-            club.save()
+            form.save_m2m()
             return redirect('dashboard:club_list_view')
     else:
         form = ClubForm()
+        form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
     return render(
         request,
         'dashboard/club_create.html',
@@ -72,16 +73,38 @@ def club_edit_view(request, id):
         form = ClubForm(request.POST, instance=club)
         # check whether it's valid:
         if form.is_valid():
-            form.save()
+            club = form.save()
             return redirect('dashboard:club_list_view')
     else:
         form = ClubForm(instance=club)
+        form.fields['admins'].queryset = User.objects.filter(id__in=club.admins.all())
     return render(
         request,
         'dashboard/club_edit.html',
         {
             'club': club,
             'form': form,
+        }
+    )
+
+
+@login_required
+def club_delete_view(request, id):
+    club = get_object_or_404(
+        Club,
+        aid=id,
+        admins=request.user
+    )
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        club.delete()
+        return redirect('dashboard:club_list_view')
+    return render(
+        request,
+        'dashboard/club_delete.html',
+        {
+            'club': club,
         }
     )
 
@@ -151,6 +174,26 @@ def map_edit_view(request, id):
         {
             'map': map,
             'form': form,
+        }
+    )
+
+
+@login_required
+def map_delete_view(request, id):
+    club_list = Club.objects.filter(admins=request.user)
+    map = get_object_or_404(
+        Map,
+        aid=id,
+        club__in=club_list
+    )
+    if request.method == 'POST':
+        map.delete()
+        return redirect('dashboard:map_list_view')
+    return render(
+        request,
+        'dashboard/map_delete.html',
+        {
+            'map': map,
         }
     )
 
@@ -228,6 +271,26 @@ def event_edit_view(request, id):
         }
     )
 
+
+@login_required
+def event_delete_view(request, id):
+    club_list = Club.objects.filter(admins=request.user)
+    event = get_object_or_404(
+        Event,
+        aid=id,
+        club__in=club_list
+    )
+
+    if request.method == 'POST':
+        event.delete()
+        return redirect('dashboard:event_list_view')
+    return render(
+        request,
+        'dashboard/event_delete.html',
+        {
+            'event': event,
+        }
+    )
 
 
 @login_required

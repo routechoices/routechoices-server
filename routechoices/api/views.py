@@ -8,6 +8,7 @@ import requests
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
@@ -158,6 +159,16 @@ def get_device_id(request):
 @api_view(['GET'])
 def get_time(request):
     return Response({'time': time.time()})
+
+
+@api_view(['GET'])
+def user_search(request):
+    users = []
+    q = request.GET.get('q')
+    if q and len(q) > 2:
+        users = User.objects.filter(username__icontains=q)\
+            .values_list('id', 'username')[:10]
+    return Response({'results': [{'id': u[0], 'username': u[1]} for u in users]})
 
 
 def event_map_download(request, aid):

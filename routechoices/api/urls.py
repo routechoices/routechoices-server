@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^gps_seuranta_proxy/?$', views.gps_seuranta_proxy, name='gps_seuranta_proxy'),
     url(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
     url(r'^time/?$', views.get_time, name='time_api'),
+    url(r'^user/search/?$', views.user_search, name='user_search_api'),
     url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
     url(r'^events/(?P<aid>[0-9a-zA-Z_-]+)/map/?$', views.event_map_download, name='event_map_download'),
     url(r'^events/(?P<aid>[0-9a-zA-Z_-]+)/rg_data/?$', views.event_rg_data, name='event_rg_data'),

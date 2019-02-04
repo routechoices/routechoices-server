@@ -25,4 +25,4 @@ Copy database from production:
 
 Copy media from production:
 
-    $ rsync -avz wf:/home/rphl/webapps/routechoices/media media/
+    $ rsync -avz wf:/home/rphl/webapps/routechoices/media ./

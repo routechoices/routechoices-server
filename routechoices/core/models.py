@@ -168,7 +168,7 @@ class Map(models.Model):
             raise ValueError('Not a base 64 encoded data URI of an image')
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.club)
 
     class Meta:
         ordering = ['-creation_date']
@@ -204,7 +204,8 @@ class Event(models.Model):
         related_name='+',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        help_text="Preferably use a map from the organizing club",
     )
 
     @property
