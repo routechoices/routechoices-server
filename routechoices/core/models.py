@@ -283,7 +283,7 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['-start_date']
-        unique_together = (('club', 'slug'),)
+        unique_together = (('club', 'slug'), ('club', 'name'))
         verbose_name = 'event'
         verbose_name_plural = 'events'
 
