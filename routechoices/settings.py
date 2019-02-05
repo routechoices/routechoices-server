@@ -242,7 +242,7 @@ SLUG_BLACKLIST = [
     'subdomain', 'subscribe', 'sudo', 'super', 'superuser', 'support', 'survey',
     'sync', 'sysadmin', 'system', 'tablet', 'tag', 'tags', 'team', 'telnet',
     'terms', 'terms-of-use', 'test', 'testimonials', 'theme', 'themes', 'today',
-    'tools', 'topic', 'topics', 'tour', 'tracker',
+    'tools', 'topic', 'topics', 'tos', 'tour', 'tracker',
     'training', 'translate', 'translations',
     'trending', 'trial', 'true', 'umac-128', 'umac-128-etm', 'umac-64',
     'umac-64-etm', 'undefined', 'unfollow', 'unsubscribe', 'update', 'upgrade',
