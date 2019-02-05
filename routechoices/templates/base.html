@@ -76,7 +76,7 @@ window.addEventListener("load", function(){
     <footer class="page-footer font-small blue pt-4">
         <!-- Copyright -->
         <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
-          <a href="/"> {{  site.name }}</a>
+            <a href="/"> {{  site.name }}</a> - <a href="{% url 'site:tos_view' %}">Terms of Service</a> - <a href="{% url 'site:privacy_policy_view' %}">Privacy Policy</a>
         </div>
         <!-- Copyright -->
     </footer>
