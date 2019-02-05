@@ -1,4 +1,4 @@
-{% load staticfiles %}{% load bootstrap3 %}<!DOCTYPE html>
+{% load staticfiles %}{% load bootstrap3 %}{% load raven %}<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -83,6 +83,8 @@ window.addEventListener("load", function(){
     <!-- Footer -->
     {% endblock %}
     {% endblock %}
+    <script src="{% static '/vendor/raven-3.27.0/raven.js' %}"></script>
+    <script>Raven.config('{% sentry_public_dsn %}').install()</script>
     {% bootstrap_javascript jquery=1 %}
     <script>
         function getCookie(name) {

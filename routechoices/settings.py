@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'bootstrap3',
+
+    'raven.contrib.django.raven_compat',
 ]
 
 MIDDLEWARE = [
