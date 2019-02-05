@@ -1,10 +1,12 @@
 Changelog
 =========
 
-v2019020501
+
+v2019020502
 -----------
 
-Add Privacy Policy page
+Dashboard
+- Allow to add competitor without device id
 
 
 v2019020501
