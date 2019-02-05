@@ -575,6 +575,24 @@ $(function() {
   });
   $('#full_progress_bar').on('click', pressProgressBar)
 
+  var thumb = document.querySelector('#full_progress_bar');
+  thumb.onmousedown = function(event) {
+      event.preventDefault(); // prevent selection start (browser action)
+
+      document.addEventListener('mousemove', pressProgressBar);
+      document.addEventListener('mouseup', onMouseUp);
+
+      function onMouseUp() {
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', pressProgressBar);
+      }
+
+  };
+  thumb.ondragstart = function() {
+      return false;
+  };
+
+
   {% if event.is_live %}
   isLiveEvent = true;
   {% else %}
