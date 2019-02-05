@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v201902DDxx
+-----------
+
+Event Viewer
+- Add dragging functionality on event scrollbar
+
+
 v2019020500
 -----------
 
