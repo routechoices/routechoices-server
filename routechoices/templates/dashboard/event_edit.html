@@ -3,7 +3,7 @@
 {% load bootstrap3 %}
 
 {%  block sub_extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
 {%  endblock %}
 
 {% block sub_content %}
@@ -51,7 +51,7 @@
 {% endblock %}
 
 {%  block sub_extra_body %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.js" integrity="sha256-qXy62i6QCXbyVrY23yCZqyk4/H+a3R7T9I6AyV2VZ7A=" crossorigin="anonymous"></script>
+<script src="{% static '/vendor/jquery-formset-1.3/jquery.formset.js' %}"></script>
 <script>
     $("label[for$='DELETE']").parents('.form-group').hide()
     $('.formset_row').formset({
@@ -61,7 +61,7 @@
         prefix: 'competitor_set'
     });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
 <script>
 $("select[name$='device']").selectize({
     valueField: 'id',

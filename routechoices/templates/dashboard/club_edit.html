@@ -3,7 +3,7 @@
 {% load bootstrap3 %}
 
 {%  block sub_extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css" integrity="sha256-ze/OEYGcFbPRmvCnrSeKbRTtjG4vGLHXgOqsyLFTRjg=" crossorigin="anonymous" />
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
 {%  endblock %}
 
 {% block sub_content %}
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block sub_extra_body %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+<script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
 <script>
 $('#id_admins').selectize({
     valueField: 'id',

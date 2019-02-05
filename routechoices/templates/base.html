@@ -16,9 +16,9 @@
     <meta name="theme-color" content="#ffffff">
     <title>{% block head_title %}{{site.name}}{% endblock %}</title>
     {% bootstrap_css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" integrity="sha384-6iYDyQZuuNT7DcPJGXx241czdv2+GDGUcXRiqw1iXrjgYMTorSetxFP3JCMQMwnR" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" integrity="sha384-PDjg2ZdS3khPzd53i18+7tzB32JVQfFMrTXYo21RqPgUmEVAPwIhxOUF/8sP79CS" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
+    <link rel="stylesheet" href="{%  static '/vendor/cookieconsent-3.0.3/cookieconsent.min.css' %}">
+    <script src="{%  static '/vendor/cookieconsent-3.0.3/cookieconsent.min.js' %}"></script>
     <script>
 window.addEventListener("load", function(){
   window.cookieconsent.initialise({

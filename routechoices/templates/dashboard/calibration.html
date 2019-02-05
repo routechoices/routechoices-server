@@ -1,35 +1,12 @@
-<!DOCTYPE html>
+{% load staticfiles %}{% load bootstrap3 %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calibrate Map</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="anonymous" />
+{% bootstrap_css %}
+<link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
 <style>
-    html {
-      height: 100%;
-      box-sizing: border-box;
-    }
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit;
-    }
-    body {
-      position: relative;
-      margin: 0;
-      min-height: 100%;
-      padding-bottom: 4em;
-    }
-    footer {
-      position: absolute;
-      bottom: 0;
-      margin-top: 30em;
-      background-color: #eee;
-      color: #000;
-      padding: 0.5em 0;
-    }
 .leaflet_map {
     height: 600px;
     background: #f5f5f5;
@@ -99,7 +76,7 @@
 </div>
 </div>
 </div>
-<div id="step3" class="d-none">
+<div id="step3" class="hidden">
 <div class="row">
 <div class="col-md-12">
 <div id="preview_map" class="leaflet_map"></div>
@@ -114,13 +91,16 @@
 </div>
 </form>
 </div>
-<footer class="container-fluid text-center">
-<span>&copy <script>document.write(new Date().getFullYear())</script> {{  site.name }}</span>
-</footer>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="anonymous"></script>
-<script src="https://cdn.rawgit.com/ScanEx/Leaflet.imageTransform/b236ca1c/src/L.ImageTransform.js"></script>
+ <footer class="page-footer font-small blue pt-4">
+     <!-- Copyright -->
+     <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
+         <a href="/"> {{  site.name }}</a>
+     </div>
+     <!-- Copyright -->
+ </footer>
+{% bootstrap_javascript jquery=1 %}
+<script src="{%  static '/vendor/leaflet-1.4.0/leaflet.js' %}"></script>
+<script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script>
 SpheroidProjection = (function(){
     var p = "prototype",
@@ -427,8 +407,8 @@ $(function(){
     $('#to_step3_button').on('click', function(e){
         e.preventDefault();
         compute_calib_string();
-        $('#step2').addClass('d-none');
-        $('#step3').removeClass('d-none');
+        $('#step2').addClass('hidden');
+        $('#step3').removeClass('hidden');
         $('#help_text').text(help_texts[1]);
         display_preview_map();
     });
@@ -436,8 +416,8 @@ $(function(){
         e.preventDefault();
         map_c.remove();
         $('#help_text').text(help_texts[0]);
-        $('#step3').addClass('d-none');
-        $('#step2').removeClass('d-none');
+        $('#step3').addClass('hidden');
+        $('#step2').removeClass('hidden');
     });
 
     $('#to_step4_button').on('click', function(e){
