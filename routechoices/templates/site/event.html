@@ -570,6 +570,9 @@ $(function() {
   $('#mass_start_button').on('click', function(e){
     e.preventDefault();
     isRealTime=false;
+    currentTime = getCompetitionStartDate();
+    prevShownTime = currentTime;
+
     $('#real_time_button').removeClass('active');
     $('#mass_start_button').addClass('active');
   });
