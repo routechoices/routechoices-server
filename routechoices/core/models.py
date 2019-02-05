@@ -18,6 +18,7 @@ from django.db.models import Value
 from django.urls import reverse
 from django.utils.timezone import now
 
+from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
      validate_nice_slug,
      validate_latitude,
@@ -250,7 +251,7 @@ class Event(models.Model):
             args['mapurl'] += '?_{}_'.format(
                 self.map.corners_coordinates.replace(',', '_')
             )
-        return '/map?{}'.format(urlencode(args))
+        return '{}://map.routegadget.net/?{}'.format(protocol, urlencode(args))
 
     def get_absolute_url(self):
         return reverse(
@@ -360,6 +361,14 @@ class Competitor(models.Model):
             qs = qs.filter(datetime__lt=self.event.end_date)
         qs = qs.filter(datetime__lt=now())
         return qs.order_by('datetime').annotate(competitor=Value(self.id, models.IntegerField()))
+
+    @property
+    def encoded_data(self):
+        data = []
+        for loc in self.locations:
+            data.append(GeoLocation(loc.timestamp, (loc.latitude, loc.longitude)))
+        return str(GeoLocationSeries(data))
+
 
     @property
     def gpx(self):

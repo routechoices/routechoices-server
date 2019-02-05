@@ -21,13 +21,6 @@ def tracker_view(request):
     )
 
 
-def map_view(request):
-    return render(
-        request,
-        'site/race_viewer.html',
-    )
-
-
 def events_view(request):
     event_list = Event.objects.all()
     paginator = Paginator(event_list, 25)
@@ -63,7 +56,8 @@ def event_view(request, club_slug, slug):
     event = get_object_or_404(
         Event,
         club__slug__iexact=club_slug,
-        slug__iexact=slug
+        slug__iexact=slug,
+        start_date__lt=now(),
     )
 
     return render(

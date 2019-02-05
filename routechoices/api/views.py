@@ -51,11 +51,29 @@ def x_accel_redirect(request, path, filename='',
 
 
 @api_view(['GET'])
+def event_data(request, aid):
+    t0 = time.time()
+    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    competitors = event.competitors.all()
+
+    nb_points = 0
+    results = []
+    for c in competitors:
+        nb_points += c.locations.count()
+        results.append({
+            'id': c.aid,
+            'encoded_data': c.encoded_data,
+            'name': c.name,
+            'short_name': c.short_name,
+            'start_time': c.start_time,
+        })
+    return Response({'competitors': results, 'nb_points': nb_points, 'duration': (time.time()-t0)})
+
+
+@api_view(['GET'])
 def event_rg_data(request, aid):
     t0 = time.time()
-    event = get_object_or_404(Event, aid=aid)
-    if event.hidden:
-        raise PermissionDenied()
+    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
     competitors = event.competitors.all()
     competitor_values = competitors.values_list(
         'id',

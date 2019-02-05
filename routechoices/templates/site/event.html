@@ -1,51 +1,605 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load bootstrap3 %}
 
-{% block content %}
-<div class="row">
-  <div>
-    <h2>{{ event.name }}{% if event.is_live %} <span class="label label-danger">Live</span>{% else %} <span class="label label-default">Replay</span>{% endif %}</h2>
-    <h4>https://{{ site.domain }}/<a href="{% url 'site:club_view' event.club.slug %}">{{ event.club.slug }}</a>/<a href="{% url 'site:event_view' event.club.slug event.slug %}">{{ event.slug }}</a></h4>
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css" integrity="sha256-YR4HrDE479EpYZgeTkQfgVJq08+277UXxMLbi/YP69o=" crossorigin="anonymous" />
+<style>
+  /*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+
+
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/*
+ * Sidebar
+ */
+
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 90px;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+}
+
+.time_bar{
+    position: absolute;
+    padding-top: 15px;
+    bottom: 0px;
+    left: 0px;
+    height: 90px;
+    background-color: #e5e5e5;
+}
+
+@media only screen
+and (max-device-width : 500px) {
+  .time_bar{
+    height: 120px;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+    position: fixed;
+    top: 51px;
+    bottom: 90px;
+    right: 0px;
+    left: 0px;
+}
+.main .page-header {
+  margin-top: 0;
+}
+
+.runner-icon{
+    color: #000;
+     /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #000;
+}
+
+.runner-icon span{
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0 15px;
+    white-space: nowrap;
+}
+@media (max-device-width : 767px){
+  .time_bar{
+    height: 120px;
+  }
+  .main {
+    bottom: 120px;
+  }
+  .sidebar {
+    bottom: 120px;
+  }
+}
+</style>
+{% endblock %}
+
+
+{% block body %}
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'site:home_view'%}"><span><img src="{% static 'img/logo.svg' %}" alt="_" height="20px"></span> {{site.name}}</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'site:home_view'%}">Home</a></li>
+            <li><a href="{% url 'site:events_view'%}">Events</a></li>
+            <li><a href="{% url 'site:tracker_view'%}">Tracker</a></li>
+            <li><a href="{% url 'site:contact_view'%}">Contact</a></li>
+            <li>{% if user.is_authenticated %}<a href="{% url 'account_logout'%}">Logout</a>{% else %}<a href="{% url 'account_login'%}">Login</a>{% endif %}</li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+<div class="container-fluid">
+  <div class="row">
+    <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar">
+      
+    </div>
+    <div id="map" class="col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main"></div>
   </div>
-
-  <div>
-        {% if event.hidden %}
-        <div class="col" style="margin-top:30px">
-          <p>
-            <span class="alert alert-danger">Event will be visible in <span id="hidden-countdown">{{ event.start_date|date:'Y-m-d\TH:i:s\Z' }}</span>.
-          </p>
+  <div class="row">  
+    <div class="col-xs-12 time_bar">
+      <div>
+        <div class="btn-group hidden-sm hidden-md hidden-lg">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="runners_show_button"><i class="fa fa-users"></i></a>
         </div>
-        {% else %}
-        <div class="embed-responsive embed-responsive-16by9">
-          <iframe id="rg" src="{{ event.rg_url }}">Your browser doesn't support iframes</iframe>
+        
+        <div class="btn-group" id="view_mods_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="live_button">Live</a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="replay_button">Replay</a>
         </div>
-        <p>
-          <a href="{{ event.rg_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" role="button">View FullSreen Map</a>
-        </p>
-        {% endif %}
+        
+        <div class="btn-group" id="replay_mode_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default active" id="real_time_button">Real Time</a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="mass_start_button">Mass start</a>
+        </div>
+        
+        <div class="btn-group" id="replay_control_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="prev_button"><i class="fa fa-backward"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="play_pause_button"><i class="fa fa-play"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-default" id="next_button"><i class="fa fa-forward"></i></a>
+        </div>
+        
+      </div>
+      <div style="padding-top:5px;">
+        <div id="full_progress_bar" class="progress" style="cursor: pointer">
+          <div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <span id="progress_bar_text" style="color:#666;padding:5px"></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_body %}
-{% if event.hidden %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment.min.js" integrity="sha256-DELCOgoVsZqjT78lDC7zcX+YFp+PEjh1k23mBMoDBwo=" crossorigin="anonymous"></script>
+{% bootstrap_javascript jquery=1 %}
 <script>
-    $(function(){
-        $('#hidden-countdown').each(function(i, el){
-            var ts = $(el).text();
-            var date = moment(new Date(ts));
-
-            (function displayCoutdown(){
-              $(el).text(moment.duration(date.diff(moment())).humanize());
-              if(date > moment()) {
-                  setTimeout(displayCoutdown, 1e3)
-              } else {
-                  window.location.reload()
-              }
-            })()
-        })
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
     });
 </script>
-{% endif %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js" integrity="sha256-6BZRSENq3kxI4YYBDqJ23xg0r1GwTHEpvp3okdaIqBw=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js" integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data.min.js" integrity="sha256-15jnh2lee6Li94j6XCbw8PRzNZe29O/W9i97yXVyRmA=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/positioning.js' %}"></script>
+<script>
+var clock = ServerClock({url: '/api/time'});
+var map = null;
+var isLiveMode = false;
+var liveUrl = null;
+var isLiveEvent = false;
+var isRealTime = true;
+var openStreetMap = null;
+var competitorList = [];
+var competitorRoutes = {};
+var routesLastFetched = -Infinity;
+var timeOffsetSec = 0;
+var playbackRate = 1;
+var playbackPaused = true;
+var prevDisplayRefresh = 0;
+var tailLength = 60;
+var isCurrentlyFetchingRoutes = false;
+var currentTime = 0;
+var lastNbPoints = 0;
+
+var COLORS = new function(){
+    var colors = ["#09F","#3D0","#F09","#D30","#30D","#DD0","#2DD","#D00","#D33","#00D","#DD2","#BFB"],
+        $t = this;
+    $t.cnt = -1;
+    $t.get = function(i){
+        this.cnt++;
+        if( this.cnt == colors.length )this.cnt = 0;
+        return colors[i||this.cnt];
+    };
+    return $t;
+};
+
+var onStart = function(){
+  if(isLiveEvent){
+    selectLiveMode();
+  } else {
+    $("#live_button").hide();
+    selectReplayMode();
+  }
+  fetchCompetitorRoutes();
+};
+
+var selectLiveMode = function(e){
+  if(e !== undefined){
+    e.preventDefault();
+  }
+  if(isLiveMode){
+    return;
+  }
+  $("#live_button").addClass('active');
+  $("#replay_button").removeClass('active');
+  $("#replay_mode_buttons").hide();
+  $("#replay_control_buttons").hide();
+  timeOffsetSec = -30;
+  isLiveMode=true;
+
+  (function whileLive(){
+    if (+clock.now()-routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes) {
+      fetchCompetitorRoutes();
+    }
+    currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3;
+    drawCompetitors();
+    if (isLiveMode) {
+      setTimeout(whileLive, 101);
+    }
+  })()
+}
+
+var selectReplayMode = function(e){
+  if(e !== undefined){
+    e.preventDefault();
+  }
+  if(!isLiveMode && $("#replay_button").hasClass('active')){
+    return;
+  }
+  $("#live_button").removeClass('active');
+  $("#replay_button").addClass('active');
+  $("#replay_mode_buttons").show();
+  $("#replay_control_buttons").show();
+  isLiveMode = false;
+  prevShownTime = +new Date(getCompetitionStartDate());
+  playbackPaused = true;
+  playbackRate = 1;
+  prevDisplayRefresh = +clock.now();
+  (function whileReplay(){
+    if(isLiveEvent && + clock.now() - routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes){
+      fetchCompetitorRoutes();
+    }
+    var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
+    currentTime = prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate;
+    currentTime = Math.min(+clock.now(), currentTime, +new Date(getCompetitionEndDate()));
+    drawCompetitors();
+    prevShownTime = currentTime;
+    prevDisplayRefresh = +clock.now();
+    if(!isLiveMode){
+      setTimeout(whileReplay, 101);
+    }
+  })()
+}
+
+var fetchCompetitorRoutes = function(url){
+  isCurrentlyFetchingRoutes = true;
+  url = url || liveUrl;
+  var data = {lastNbPoints};
+  $.ajax({
+    url: url,
+    data: data
+  }).done(function(response){
+    response.competitors.forEach(function(competitor){
+      var route = PositionArchive.fromTks(competitor.encoded_data);
+      competitorRoutes[competitor.id] = route;
+    });
+    updateCompetitorList(response.competitors);
+    displayCompetitorList();
+    routesLastFetched = +clock.now();
+    lastNbPoints = response.nb_points;
+    isCurrentlyFetchingRoutes = false;
+  }).fail(function(){
+    isCurrentlyFetchingRoutes = false;
+  });
+};
+
+var updateCompetitorList = function(newList) {
+    newList.forEach(updateCompetitor)
+}
+
+var updateCompetitor = function(newData) {
+    var idx = competitorList.findIndex(function(c){return c.id == newData.id})
+    if (idx != -1) {
+        var c = competitorList[idx];
+        Object.keys(newData).forEach(function(k){
+            c[k] = newData[k];
+        })
+        competitorList[idx] = c;
+    } else {
+        competitorList.push(newData);
+    }
+}
+
+var displayCompetitorList = function(){
+    var listDiv = $('<ul/>');
+    listDiv.addClass('media-list');
+    competitorList.forEach(function(competitor, ii){
+      competitor.color = competitor.color || COLORS.get(ii);
+      competitor.isShown = typeof competitor.isShown === "undefined" ? true : competitor.isShown;
+      var div = $('<li/>');
+      div.addClass('media').html('\
+        <div class="media-left"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
+        <div class="media-body"><b>'+competitor.name+'</b><br/>\
+          <div class="btn-group btn-group-xs" role="group">\
+            <button type="button" class="toggle_competitor_btn btn btn-default"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
+            <button type="button" class="center_competitor_btn btn btn-default"><i class="fa fa-map-marker"></i></button>\
+          </div>\
+        </div>')
+      $(div).find('.toggle_competitor_btn').on('click', function(e){
+        e.preventDefault();
+        var icon = $(this).find('i');
+        if(icon.hasClass('fa-toggle-on')){
+          icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+          competitor.isShown = false;
+          map.removeLayer(competitor.mapMarker);
+          map.removeLayer(competitor.nameMarker);
+          map.removeLayer(competitor.tail);
+          competitor.mapMarker = null;
+          competitor.nameMarker = null;
+          competitor.tail = null;
+          updateCompetitor(competitor);
+        }else{
+          icon.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+          competitor.isShown = true;
+          updateCompetitor(competitor);
+        }
+      });
+      $(div).find('.center_competitor_btn').on('click', function(){
+        zoomOnCompetitor(competitor);
+      });
+      listDiv.append(div);
+      competitor.div = div;
+    });
+
+    $('#sidebar').html('');
+    $('#sidebar').append(listDiv);
+}
+
+var getCompetitionStartDate = function() {
+    var res = +clock.now();
+    competitorList.forEach(function(c){
+        var route = competitorRoutes[c.id];
+        res = res>route.getByIndex(0).timestamp?route.getByIndex(0).timestamp: res;
+    })
+    return res
+}
+var getCompetitionEndDate = function() {
+    var res = new Date(0);
+    competitorList.forEach(function(c){
+        var route = competitorRoutes[c.id];
+        var idx = route.getPositionsCount()-1;
+        res = res<route.getByIndex(idx).timestamp?route.getByIndex(idx).timestamp: res;
+    })
+    return res
+}
+
+var zoomOnCompetitor = function(compr){
+  var route = competitorRoutes[compr.id];
+  var timeT = currentTime;
+  if(!isRealTime){
+    timeT += +new Date(compr.start_time) - new Date(getCompetitionStartDate());
+  }
+  var loc = route.getByTime(timeT);
+  map.setView([loc.coords.latitude, loc.coords.longitude]);
+}
+var getProgressBarText = function(){
+    var result = '';
+    var viewedTime = currentTime;
+    if(!isRealTime){
+        viewedTime -= new Date(getCompetitionStartDate());
+        var t = viewedTime/1e3;
+        to2digits = function(x){return ('0'+Math.floor(x)).slice(-2);},
+        result += t > 3600 ? Math.floor(t/3600) + ':': '';
+        result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60);
+    }else{
+        result = moment(+new Date(viewedTime)).format('HH:mm:ss');
+    }
+    return result;
+}
+var drawCompetitors = function(){
+  // play/pause button
+  if(playbackPaused){
+    var html = '<i class="fa fa-play"></i> x'+playbackRate;
+    if($('#play_pause_button').html() != html){
+      $('#play_pause_button').html(html);
+    }
+  } else {
+    var html = '<i class="fa fa-pause"></i> x'+playbackRate;
+    if($('#play_pause_button').html() != html){
+      $('#play_pause_button').html(html);
+    }
+  }
+  // progress bar
+  var perc = isLiveMode ? 100 : (currentTime-new Date(getCompetitionStartDate()))/(Math.min(+clock.now(), new Date(getCompetitionEndDate()))-new Date(getCompetitionStartDate())) * 100
+  $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
+  $('#progress_bar_text').html(getProgressBarText());
+  competitorList.forEach(function(competitor){
+    if(!competitor.isShown){
+      return;
+    }
+    var route = competitorRoutes[competitor.id];
+    if(route != undefined){
+      var viewedTime = currentTime;
+      if(!isLiveMode && !isRealTime && competitor.start_time){
+        viewedTime += new Date(competitor.start_time) - new Date(getCompetitionStartDate());
+      }
+      var loc = route.getByTime(viewedTime);
+      if(!isNaN(loc.coords.latitude)){
+        if(competitor.mapMarker == undefined){
+          competitor.mapMarker = L.circleMarker([loc.coords.latitude, loc.coords.longitude],
+                                                 {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75});
+          competitor.nameMarker = L.marker([loc.coords.latitude, loc.coords.longitude],
+                                            {icon: L.divIcon({className: 'runner-icon',
+                                                              html: '<span style="-webkit-text-fill-color: '+competitor.color+';">'+competitor.short_name+'</span>'})
+                                            });
+          competitor.mapMarker.addTo(map);
+          competitor.nameMarker.addTo(map);
+        }else{
+          competitor.mapMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
+          competitor.nameMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
+        }
+      }
+      var tail = route.extractInterval(viewedTime - tailLength * 1e3, viewedTime);
+      var tailLatLng = [];
+      tail.getArray().forEach(function(pos){
+        if(!isNaN(pos.coords.latitude)){
+          tailLatLng.push([pos.coords.latitude, pos.coords.longitude]);
+        }
+      })
+      if(competitor.tail == undefined){
+        competitor.tail = L.polyline(tailLatLng, {color: competitor.color, opacity: 0.75, weight: 5});
+        competitor.tail.addTo(map);
+      }else{
+        competitor.tail.setLatLngs(tailLatLng);
+      }
+    }
+  })
+}
+
+function getParameterByName(name) {
+  try {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+  catch(err) {
+    return '';
+  }
+}
+
+function addRasterMap(a,b,c,d,src,txt){
+  var anchors = [a, b, c, d];
+  new L.ImageTransform(
+    src,
+    anchors
+  ).addTo(map);
+  map.fitBounds(anchors)
+}
+
+$(function() {
+  $("#before_race_modal").modal('show').on('hide.bs.modal', function(e){
+      e.preventDefault();
+  });
+  map = L.map('map', {
+    center: [15, 0],
+    zoom: 3
+  });
+  openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18
+  });
+  openStreetMap.addTo(map);
+
+  $('#runners_show_button').on('click', function(e){
+    e.preventDefault();
+    if($('#sidebar').hasClass('hidden-xs')){
+      $('#sidebar').removeClass('hidden-xs').addClass('col-xs-12');
+      $('#map').addClass('hidden-xs').removeClass('col-xs-12');
+    }else{
+      $('#sidebar').addClass('hidden-xs').removeClass('col-xs-12');
+      $('#map').removeClass('hidden-xs').addClass('col-xs-12');
+    }
+  })
+
+  $('#live_button').on('click', selectLiveMode);
+  $('#replay_button').on('click', selectReplayMode);
+  $('#play_pause_button').on('click', pressPlayPauseButton);
+  $('#next_button').on('click', function(e){
+    e.preventDefault();
+    playbackRate = playbackRate*2;
+  });
+  $('#prev_button').on('click', function(e){
+    e.preventDefault();
+    playbackRate = Math.max(1, playbackRate/2);
+  });
+  $('#real_time_button').on('click', function(e){
+    e.preventDefault();
+    isRealTime=true;
+    $('#real_time_button').addClass('active');
+    $('#mass_start_button').removeClass('active');
+  });
+  $('#mass_start_button').on('click', function(e){
+    e.preventDefault();
+    isRealTime=false;
+    $('#real_time_button').removeClass('active');
+    $('#mass_start_button').addClass('active');
+  });
+  $('#full_progress_bar').on('click', pressProgressBar)
+
+  {% if event.is_live %}
+  isLiveEvent = true;
+  {% else %}
+  isLiveEvent = false;
+  {% endif %}
+  liveUrl = '{% url 'api:event_data' aid=event.aid %}'
+  {% if event.map %}
+  var mapUrl = '{% url 'api:event_map_download' aid=event.aid %}'
+  var stemp= '{{ event.map.corners_coordinates }}'.split(',');
+  addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl);
+  {% endif %}
+
+  onStart()
+})
+
+var pressPlayPauseButton = function(e){
+  e.preventDefault();
+  playbackPaused = !playbackPaused;
+}
+
+var pressProgressBar = function(e){
+  var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width();
+  currentTime = +new Date(getCompetitionStartDate())+(Math.min(clock.now(), +new Date(getCompetitionEndDate()))-new Date(getCompetitionStartDate()))*perc;
+  prevShownTime = currentTime;
+}
+</script>
 {% endblock %}
+
