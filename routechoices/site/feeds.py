@@ -9,6 +9,8 @@ class LiveEventsFeed(Feed):
     link = '/events/'
     description = "Updates on changes and additions to the live events list."
 
+
+
     def items(self):
         return Event.objects.filter(start_date__lt=now())[:25]
 
@@ -17,3 +19,6 @@ class LiveEventsFeed(Feed):
 
     def item_description(self, item):
         return 'Live GPS Tracking of {} by {}'.format(item.name, item.club)
+
+    def item_pubdate(self, item):
+        return item.start_date
