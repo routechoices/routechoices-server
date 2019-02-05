@@ -2,6 +2,15 @@ Changelog
 =========
 
 
+v2019020503
+-----------
+
+Add RSS feed of live events
+Add sitemap.xml
+Do not use external CDN
+Add sentry support
+
+
 v2019020502
 -----------
 
