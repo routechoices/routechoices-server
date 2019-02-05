@@ -4,6 +4,12 @@ Changelog
 v2019020501
 -----------
 
+Add Privacy Policy page
+
+
+v2019020501
+-----------
+
 Event Viewer
 - Add dragging functionality on event scrollbar
 - Fix issue when switching to mass start mode displaying negative time
