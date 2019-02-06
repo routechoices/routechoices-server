@@ -6,17 +6,16 @@
 <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
 <style>
-  /*
- * Base structure
- */
+/* oswald-regular - latin_latin-ext */
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oswald Regular'), local('Oswald-Regular'),
+       url("{% static '/fonts/oswald-v16-latin_latin-ext-regular.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url("{% static '/fonts/oswald-v16-latin_latin-ext-regular.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
 
-/* Move down content because we have a fixed navbar that is 50px tall */
-
-
-
-/*
- * Global add-ons
- */
 
 .sub-header {
   padding-bottom: 10px;
