@@ -244,7 +244,7 @@ var stopStreaming = function() {
 
 var onPositionUpdate = function(position) {
   console.log(position)
-  last_position = {
+  var last_position = {
     timestamp:+position.timestamp+clock.getDrift(),
     coords:{
       latitude:position.coords.latitude,
