@@ -15,12 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import include, url
+from django.contrib.sitemaps.views import sitemap
 
 from routechoices.dashboard.views import dashboard_map_download
+from routechoices.site.sitemaps import (
+    EventsSitemap,
+    ClubsSitemap,
+    EventsExportSitemap,
+    StaticViewSitemap,
+    DynamicViewSitemap,
+)
+
 
 admin.site.site_header = "Routechoices.com Admin"
 admin.site.site_title = "Routechoices.com Admin Site"
 admin.site.index_title = "Welcome to Routechoices.com Administration Site"
+
+sitemaps = {
+    'events': EventsSitemap,
+    'events_export': EventsExportSitemap,
+    'clubs': ClubsSitemap,
+    'static': StaticViewSitemap,
+    'dynamic': DynamicViewSitemap,
+}
 
 urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
@@ -33,5 +50,8 @@ urlpatterns = [
         dashboard_map_download,
         name='dashboard_map_download',
     ),
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    url('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,
+        {'sitemaps': sitemaps}, name='sitemap'),
     url(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
 ]
