@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2019020600
+-----------
+
+Fix bug in tracker
+Get rid of google font for self hosted solution
+
 
 v2019020503
 -----------
