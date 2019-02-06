@@ -229,7 +229,6 @@ var pushPositionArchive = function(force){
 
 var stopStreaming = function() {
   clearTimeout(countdownTimeoutId);
-  toggleWakeLock()
   $('#streaming-modal').modal('hide');
   if(wakeLockRequest){
     wakeLockRequest.cancel();
