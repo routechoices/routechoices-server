@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2019020700
+-----------
+
+Fix bug in tracker preventing streaming position
+
+
 v2019020600
 -----------
 
