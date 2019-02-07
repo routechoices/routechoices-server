@@ -327,8 +327,10 @@ var fetchCompetitorRoutes = function(url){
     data: data
   }).done(function(response){
     response.competitors.forEach(function(competitor){
-      var route = PositionArchive.fromTks(competitor.encoded_data);
-      competitorRoutes[competitor.id] = route;
+      if(competitor.encoded_data) {
+        var route = PositionArchive.fromTks(competitor.encoded_data);
+        competitorRoutes[competitor.id] = route;
+      }
     });
     updateCompetitorList(response.competitors);
     displayCompetitorList();
@@ -378,9 +380,12 @@ var displayCompetitorList = function(){
         if(icon.hasClass('fa-toggle-on')){
           icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
           competitor.isShown = false;
-          map.removeLayer(competitor.mapMarker);
-          map.removeLayer(competitor.nameMarker);
-          map.removeLayer(competitor.tail);
+          if(competitor.mapMarker)
+            map.removeLayer(competitor.mapMarker);
+          if(competitor.nameMarker)
+            map.removeLayer(competitor.nameMarker);
+          if(competitor.tail)
+            map.removeLayer(competitor.tail);
           competitor.mapMarker = null;
           competitor.nameMarker = null;
           competitor.tail = null;
@@ -422,6 +427,7 @@ var getCompetitionEndDate = function() {
 
 var zoomOnCompetitor = function(compr){
   var route = competitorRoutes[compr.id];
+  if(!route) return
   var timeT = currentTime;
   if(!isRealTime){
     timeT += +new Date(compr.start_time) - new Date(getCompetitionStartDate());
@@ -465,13 +471,13 @@ var drawCompetitors = function(){
       return;
     }
     var route = competitorRoutes[competitor.id];
-    if(route != undefined){
+    if(route !== undefined){
       var viewedTime = currentTime;
       if(!isLiveMode && !isRealTime && competitor.start_time){
         viewedTime += new Date(competitor.start_time) - new Date(getCompetitionStartDate());
       }
       var loc = route.getByTime(viewedTime);
-      if(!isNaN(loc.coords.latitude)){
+      if(loc && !isNaN(loc.coords.latitude)){
         if(competitor.mapMarker == undefined){
           competitor.mapMarker = L.circleMarker([loc.coords.latitude, loc.coords.longitude],
                                                  {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75});

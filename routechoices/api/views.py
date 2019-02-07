@@ -1,3 +1,4 @@
+import logging
 import os.path
 import re
 import time
@@ -104,11 +105,13 @@ def event_rg_data(request, aid):
     response_data.append({'n': len(locations), 'duration': time.time()-t0})
     return Response(response_data)
 
+logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
+        logger.error('No traccar_id')
         raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
     device = get_object_or_404(Device, aid=device_id)
@@ -118,6 +121,12 @@ def traccar_api_gw(request):
     if lat and lon and tim:
         device.add_location(float(lat), float(lon), int(float(tim)))
     else:
+        if not lat:
+            logger.error('No lat')
+        if not lon:
+            logger.error('No lon')
+        if not tim:
+            logger.error('No timestamp')
         raise ValidationError('Missing lat, lon or timestamp argument')
     return Response({'status': 'ok'})
 
