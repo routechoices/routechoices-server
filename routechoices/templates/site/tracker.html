@@ -127,9 +127,6 @@ var isGpsSwitchedOn = false;
 var countdownTimeoutId = null;
 var broadcastBuffer = PositionArchive();
 var devId = null;
-var wakeLockObj;
-var wakeLockRequest;
-
 
 var getServerUrl = function() {
   return '/';
@@ -154,7 +151,6 @@ var onPressStart = function(delay) {
 
 var startStreaming = function() {
   isGpsSwitchedOn = true;
-  if(wakeLockObj) wakeLockRequest = wakeLockObj.createRequest();
   watchPositionId = navigator.geolocation.watchPosition(
     onPositionUpdate,
     onPositionError,
@@ -188,7 +184,7 @@ var startStreaming = function() {
 
   window.onbeforeunload = function (e) {
     e = e || window.event;
-    var msg = 'Are you sure you want to close?'
+    var msg = 'Are you sure you want to close?';
     if (e) {
         e.returnValue = msg;
     }
@@ -230,10 +226,6 @@ var pushPositionArchive = function(force){
 var stopStreaming = function() {
   clearTimeout(countdownTimeoutId);
   $('#streaming-modal').modal('hide');
-  if(wakeLockRequest){
-    wakeLockRequest.cancel();
-    wakeLockRequest = null;
-  }
   if(isGpsSwitchedOn){
     isGpsSwitchedOn = false;
     pushPositionArchive(true);
@@ -296,16 +288,6 @@ $(function() {
     e.preventDefault();
     stopStreaming();
   });
-
-  if ('getWakeLock' in navigator) {
-    try {
-      // Create a wake lock for the type we want.
-      wakeLockObj = navigator.getWakeLock('system');
-      console.log('ok getWakeLock', wakeLockObj);
-    } catch (ex) {
-      console.error('error getWakeLock', err);
-    }
-  }
 
   devId = getDeviceId();
   if (!devId) {
