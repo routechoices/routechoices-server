@@ -15,6 +15,7 @@
             {% bootstrap_form form %}
 
             <h3>Competitors</h3>
+            {% bootstrap_formset_errors formset %}
             <table class="table">
             {{ formset.management_form }}
             {% for form in formset %}

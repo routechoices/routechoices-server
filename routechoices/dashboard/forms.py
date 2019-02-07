@@ -50,5 +50,7 @@ CompetitorFormSet = inlineformset_factory(
     Event,
     Competitor,
     form=CompetitorForm,
-    extra=1
+    extra=1,
+    min_num=1,
+    validate_min=True
 )
