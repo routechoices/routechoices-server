@@ -411,7 +411,9 @@ var getCompetitionStartDate = function() {
     var res = +clock.now();
     competitorList.forEach(function(c){
         var route = competitorRoutes[c.id];
-        res = res>route.getByIndex(0).timestamp?route.getByIndex(0).timestamp: res;
+        if(route) {
+            res = res>route.getByIndex(0).timestamp?route.getByIndex(0).timestamp: res;
+        }
     })
     return res
 }
@@ -419,8 +421,10 @@ var getCompetitionEndDate = function() {
     var res = new Date(0);
     competitorList.forEach(function(c){
         var route = competitorRoutes[c.id];
-        var idx = route.getPositionsCount()-1;
-        res = res<route.getByIndex(idx).timestamp?route.getByIndex(idx).timestamp: res;
+        if(route) {
+            var idx = route.getPositionsCount()-1;
+            res = res<route.getByIndex(idx).timestamp?route.getByIndex(idx).timestamp: res;
+        }
     })
     return res
 }
