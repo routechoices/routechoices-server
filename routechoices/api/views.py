@@ -14,8 +14,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from routechoices.core.models import Event, Location, Device, Competitor, Map, \
-    Club
+from routechoices.core.models import Event, Location, Device, Competitor
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 
 from rest_framework import renderers, status
@@ -26,6 +25,8 @@ from rest_framework.exceptions import (
     PermissionDenied
 )
 from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 
 def x_accel_redirect(request, path, filename='',
@@ -105,7 +106,6 @@ def event_rg_data(request, aid):
     response_data.append({'n': len(locations), 'duration': time.time()-t0})
     return Response(response_data)
 
-logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 def traccar_api_gw(request):
@@ -189,6 +189,7 @@ def get_time(request):
 
 
 @api_view(['GET'])
+@login_required
 def user_search(request):
     users = []
     q = request.GET.get('q')
@@ -199,6 +200,7 @@ def user_search(request):
 
 
 @api_view(['GET'])
+@login_required
 def device_search(request):
     devices = []
     q = request.GET.get('q')

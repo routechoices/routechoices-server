@@ -336,12 +336,18 @@ def event_delete_view(request, id):
 
 @login_required
 def dashboard_map_download(request, id, *args, **kwargs):
-    club_list = Club.objects.filter(admins=request.user)
-    map = get_object_or_404(
-        Map,
-        aid=id,
-        club__in=club_list
-    )
+    if request.user.is_superuser:
+        map = get_object_or_404(
+            Map,
+            aid=id,
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        map = get_object_or_404(
+            Map,
+            aid=id,
+            club__in=club_list
+        )
     file_path = map.path
     return x_accel_redirect(
         request,
