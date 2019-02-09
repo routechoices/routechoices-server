@@ -252,11 +252,19 @@ var onPositionUpdate = function(position) {
 }
 
 var getDeviceId = function() {
-  return localStorage.getItem('devId');
+    try {
+        return localStorage.getItem('devId');
+    catch(e) {
+        console.log('No localStorage')
+    }
 }
 
 var setDeviceId = function(devId) {
-    localStorage.setItem('devId', devId);
+    try {
+        localStorage.setItem('devId', devId);
+    catch(e) {
+        console.log('No localStorage')
+    }
     devId = devId;
     $(".devId").text(devId);
 }
