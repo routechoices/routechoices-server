@@ -245,7 +245,7 @@ var COLORS = new function(){
     $t.get = function(i){
         this.cnt++;
         if( this.cnt == colors.length )this.cnt = 0;
-        return colors[i||this.cnt];
+        return colors[(i % color.length) || this.cnt];
     };
     return $t;
 };
