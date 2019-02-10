@@ -64,6 +64,11 @@ class Club(models.Model):
     def __str__(self):
         return self.name
 
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude)
+        if Club.objects.filter(slug__iexact=self.slug).exists():
+            raise ValidationError('Club with this slug already exists.')
+
     class Meta:
         ordering = ['name']
         verbose_name = 'club'
@@ -177,6 +182,16 @@ class Map(models.Model):
         verbose_name_plural = 'maps'
 
 
+PRIVACY_PUBLIC ='public'
+PRIVACY_SECRET ='secret'
+PRIVACY_PRIVATE ='private'
+PRIVACY_CHOICES = (
+    (PRIVACY_PUBLIC, 'Public'),
+    (PRIVACY_SECRET, 'Secret'),
+    (PRIVACY_PRIVATE, 'Private'),
+)
+
+
 class Event(models.Model):
     aid = models.CharField(
          default=random_key,
@@ -200,6 +215,11 @@ class Event(models.Model):
     )
     start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
     end_date = models.DateTimeField(verbose_name='End Date (UTC)', null=True, blank=True)
+    privacy = models.CharField(
+        max_length=8,
+        choices=PRIVACY_CHOICES,
+        default=PRIVACY_PUBLIC
+    )
     map = models.ForeignKey(
         Map,
         related_name='+',
@@ -276,6 +296,13 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude)
+        if Event.objects.filter(club__slug__iexact=self.club.slug,
+                                slug__iexact=self.slug).exists():
+            raise ValidationError('Event with this Club and Slug already exists.')
+
 
     def save(self, *args, **kwargs):
         self.competitors.filter(start_time=self.start_date) \

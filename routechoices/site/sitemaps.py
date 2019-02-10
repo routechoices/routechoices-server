@@ -1,7 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 from django.utils.timezone import now
-from routechoices.core.models import Event, Club
+from routechoices.core.models import Event, Club, PRIVACY_PUBLIC
 
 
 class EventsSitemap(Sitemap):
@@ -10,7 +10,10 @@ class EventsSitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return Event.objects.filter(start_date__lt=now())
+        return Event.objects.filter(
+            start_date__lt=now(),
+            privacy=PRIVACY_PUBLIC,
+        )
 
     def lastmod(self, obj):
         return obj.modification_date
@@ -22,7 +25,10 @@ class EventsExportSitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return Event.objects.filter(start_date__lt=now())
+        return Event.objects.filter(
+            start_date__lt=now(),
+            privacy=PRIVACY_PUBLIC,
+        )
 
     def location(self, item):
         return item.get_absolute_export_url()

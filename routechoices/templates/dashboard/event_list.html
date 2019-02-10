@@ -14,15 +14,19 @@
             <tr>
                 <th>Name</th>
                 <th>Start Date (UTC)</th>
+                <th>Privacy</th>
                 <th>Is Live</th>
                 <th>Club</th>
+                <th>Link</th>
             </tr>
             {% for event in events %}
             <tr>
                 <td><a href="{% url 'dashboard:event_edit_view' id=event.aid %}">{{ event.name }}</a></td>
                 <td>{{ event.start_date|date:'Y-m-d H:i:s' }}</a></td>
+                <td>{{ event.get_privacy_display }}</a></td>
                 <td>{{ event.is_live }}</a></td>
                 <td>{{ event.club }}</td>
+                <td>{% if not event.hidden %}<a href="{{ event.get_absolute_url }}">Open</a>{% endif %}</td>
             </tr>
             {% endfor %}
         </table>

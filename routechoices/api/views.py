@@ -14,7 +14,13 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from routechoices.core.models import Event, Location, Device, Competitor
+from routechoices.core.models import (
+    Event,
+    Location,
+    Device,
+    Competitor,
+    PRIVACY_PRIVATE,
+)
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 
 from rest_framework import renderers, status
@@ -25,6 +31,7 @@ from rest_framework.exceptions import (
     PermissionDenied
 )
 from rest_framework.response import Response
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +63,10 @@ def x_accel_redirect(request, path, filename='',
 def event_data(request, aid):
     t0 = time.time()
     event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied
     competitors = event.competitors.all()
 
     nb_points = 0
@@ -69,13 +80,21 @@ def event_data(request, aid):
             'short_name': c.short_name,
             'start_time': c.start_time,
         })
-    return Response({'competitors': results, 'nb_points': nb_points, 'duration': (time.time()-t0)})
+    return Response({
+        'competitors': results,
+        'nb_points': nb_points,
+        'duration': (time.time()-t0)
+    })
 
 
 @api_view(['GET'])
 def event_rg_data(request, aid):
     t0 = time.time()
     event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied
     competitors = event.competitors.all()
     competitor_values = competitors.values_list(
         'id',
@@ -211,11 +230,13 @@ def device_search(request):
 
 
 def event_map_download(request, aid):
-    event = get_object_or_404(Event, aid__iexact=aid)
+    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
     if not event.map:
         raise NotFound()
-    if event.hidden:
-        raise PermissionDenied()
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied
     file_path = event.map.path
     return x_accel_redirect(
         request,
@@ -231,6 +252,11 @@ def competitor_gpx_download(request, aid):
         aid=aid,
         start_time__lt=now()
     )
+    event = competitor.event
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied
     gpx_data = competitor.gpx
     response = HttpResponse(
         gpx_data,

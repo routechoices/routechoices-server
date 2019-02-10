@@ -4,7 +4,7 @@ from django.contrib.syndication.views import Feed
 from django.urls import reverse
 from django.utils.timezone import now
 
-from routechoices.core.models import Event
+from routechoices.core.models import Event, PRIVACY_PUBLIC
 
 
 class LiveEventsFeed(Feed):
@@ -20,7 +20,10 @@ class LiveEventsFeed(Feed):
         return reverse('site:events_view')
 
     def items(self):
-        return Event.objects.filter(start_date__lt=now())[:25]
+        return Event.objects.filter(
+            start_date__lt=now(),
+            privacy=PRIVACY_PUBLIC,
+        )[:25]
 
     def item_title(self, item):
         return item.name
