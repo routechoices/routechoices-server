@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v2019021000
+-----------
+
+- Event privacy setting
+- Avoid confusing Device ID
+- JS Bugs
+
+
 v2019020700
 -----------
 
