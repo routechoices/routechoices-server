@@ -4,7 +4,7 @@ import struct
 
 import requests
 
-from routechoices.lib.random_strings import generate_random_alphabet_digit
+from routechoices.lib.random_strings import generate_random_string
 
 
 def random_key():
@@ -17,7 +17,8 @@ def random_key():
 
 
 def short_random_key():
-    return generate_random_alphabet_digit(str_len=6)
+    alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    return generate_random_string(alphabet, 6)
 
 
 def get_country_from_coords(lat,lon):
