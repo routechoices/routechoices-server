@@ -15,7 +15,7 @@
     <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
     <meta name="theme-color" content="#ffffff">
     <title>{% block head_title %}{{site.name}}{% endblock %}</title>
-    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static '/vendor/bootstrap-3.4.0/css/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
     <link rel="stylesheet" href="{%  static '/vendor/cookieconsent-3.0.3/cookieconsent.min.css' %}">
     <script src="{%  static '/vendor/cookieconsent-3.0.3/cookieconsent.min.js' %}"></script>
@@ -85,7 +85,9 @@ window.addEventListener("load", function(){
     {% endblock %}
     <script src="{% static '/vendor/raven-3.27.0/raven.js' %}"></script>
     <script>Raven.config('{% sentry_public_dsn %}').install()</script>
-    {% bootstrap_javascript jquery=1 %}
+    <script src="{% static '/vendor/jquery-1.11.1/jquery.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap-3.4.0/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '/vendor/instant-page-1.0.0/instant-page.js' %}"></script>
     <script>
         function getCookie(name) {
             var cookieValue = null;
