@@ -3,7 +3,6 @@
 {% load bootstrap3 %}
 
 {% block extra_head %}
-<link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
@@ -183,36 +182,8 @@ and (max-device-width : 500px) {
     </div>
   </div>
 </div>
-{% bootstrap_javascript jquery=1 %}
-<script>
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-</script>
+{% endblock %}
+{% block extra_body %}
 <script src="{% static '/vendor/leaflet-1.4.0/leaflet.js' %}"></script>
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>

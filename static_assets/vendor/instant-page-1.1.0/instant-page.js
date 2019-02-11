@@ -1,4 +1,4 @@
-/*! instant.page v1.0.0 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
+/*! instant.page v1.1.0 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
 
 let urlToPreload
 let mouseoverTimer
@@ -98,11 +98,11 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (!allowQueryString && urlObject.search) {
+  if (!allowQueryString && urlObject.search && !('instant' in linkElement.dataset)) {
     return
   }
 
-  if (urlObject.pathname + urlObject.search == location.pathname + location.search && urlObject.hash) {
+  if (urlObject.hash && urlObject.pathname + urlObject.search == location.pathname + location.search) {
     return
   }
 
