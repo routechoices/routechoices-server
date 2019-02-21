@@ -66,7 +66,10 @@ class Club(models.Model):
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
-        if Club.objects.filter(slug__iexact=self.slug).exists():
+        qs = Club.objects.filter(slug__iexact=self.slug)
+        if self.id:
+            qs = qs.exclude(id=self.id)
+        if qs.exists():
             raise ValidationError('Club with this slug already exists.')
 
     class Meta:
@@ -299,8 +302,13 @@ class Event(models.Model):
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
-        if Event.objects.filter(club__slug__iexact=self.club.slug,
-                                slug__iexact=self.slug).exists():
+        qs = Event.objects.filter(
+            club__slug__iexact=self.club.slug,
+            slug__iexact=self.slug
+        )
+        if self.id:
+            qs = qs.exclude(id=self.id)
+        if qs.exists():
             raise ValidationError('Event with this Club and Slug already exists.')
 
 
@@ -436,6 +444,9 @@ class Competitor(models.Model):
         if not self.start_time:
             self.start_time = self.event.start_date
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ['start_time', 'name']

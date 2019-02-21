@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, DateTimeInput, inlineformset_factory
+from django.core.validators import FileExtensionValidator
+from django.forms import Form, ModelForm, DateTimeInput, inlineformset_factory, \
+    ModelChoiceField, FileField
 
 from routechoices.core.models import Club, Map, Event, Competitor
 
@@ -45,6 +47,11 @@ class CompetitorForm(ModelForm):
         widgets = {
             'start_time': DateTimeInput(attrs={'class': 'datetimepicker'}),
         }
+
+
+class UploadGPXForm(Form):
+    competitor = ModelChoiceField(queryset=Competitor.objects.all())
+    gpx_file = FileField(validators=[FileExtensionValidator(allowed_extensions=['gpx'])])
 
 
 CompetitorFormSet = inlineformset_factory(

@@ -1,14 +1,21 @@
+import logging
+
+import gpxpy
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
-from routechoices.core.models import Club, Map, Event, Device
+from routechoices.core.models import Club, Map, Event, Device, Location
 from routechoices.dashboard.forms import ClubForm, MapForm, EventForm, \
-    CompetitorFormSet
+    CompetitorFormSet, UploadGPXForm
 
+
+logger = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = 25
+
 
 @login_required
 def home_view(request):
@@ -354,4 +361,71 @@ def dashboard_map_download(request, id, *args, **kwargs):
         file_path,
         filename='{}.{}'.format(map.name, map.mime_type[6:]),
         mime=map.mime_type
+    )
+
+
+@login_required
+def event_gpx_upload_view(request, id):
+    club_list = Club.objects.filter(admins=request.user)
+    event = get_object_or_404(
+        Event,
+        aid=id,
+        club__in=club_list
+    )
+    competitors = event.competitors.all()
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = UploadGPXForm(request.POST, request.FILES)
+        form.fields['competitor'].queryset = competitors
+        # check whether it's valid:
+        if form.is_valid():
+            error = None
+            try:
+                gpx_file = form.cleaned_data['gpx_file'].read().decode('utf8')
+            except UnicodeDecodeError:
+                error = "Couldn't decode file"
+            if not error:
+                try:
+                    gpx = gpxpy.parse(gpx_file)
+                except Exception:
+                    error = "Couldn't parse file"
+            if not error:
+                device = Device.objects.create()
+                device.aid += '_GPX'
+                device.save()
+                points = []
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        for point in segment.points:
+                            points.append(
+                                Location(
+                                    device=device,
+                                    datetime=point.time,
+                                    latitude=point.latitude,
+                                    longitude=point.longitude,
+                                )
+                            )
+                Location.objects.bulk_create(points)
+                competitor = form.cleaned_data['competitor']
+                competitor.device = device
+                competitor.save()
+            if error:
+                messages.error(error)
+            else:
+                messages.success(
+                    request,
+                    'The upload of the GPX file was successful'
+                )
+                return redirect('dashboard:event_edit_view', id=event.aid)
+
+    else:
+        form = UploadGPXForm()
+        form.fields['competitor'].queryset = competitors
+    return render(
+        request,
+        'dashboard/event_gpx_upload.html',
+        {
+            'event': event,
+            'form': form,
+        }
     )

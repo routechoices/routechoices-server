@@ -17,7 +17,7 @@
                 <th>Privacy</th>
                 <th>Is Live</th>
                 <th>Club</th>
-                <th>Link</th>
+                <th>Actions</th>
             </tr>
             {% for event in events %}
             <tr>
@@ -26,7 +26,7 @@
                 <td>{{ event.get_privacy_display }}</a></td>
                 <td>{{ event.is_live }}</a></td>
                 <td>{{ event.club }}</td>
-                <td>{% if not event.hidden %}<a href="{{ event.get_absolute_url }}">Open</a>{% endif %}</td>
+                <td>{% if not event.hidden %}<a href="{{ event.get_absolute_url }}" class="btn btn-primary">View</a> <a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-default">Upload GPX routes</a>{% endif %}</td>
             </tr>
             {% endfor %}
         </table>
