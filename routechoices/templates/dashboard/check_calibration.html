@@ -1,0 +1,173 @@
+{% load staticfiles %}{% load bootstrap3 %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calibrate Map</title>
+{% bootstrap_css %}
+<link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
+<style>
+.leaflet_map {
+    height: 600px;
+    background: #f5f5f5;
+    border: 1px solid #000;
+    margin-bottom: 5px;
+}
+.map_preview {
+   position: relative;
+   width: 100%;
+   padding: 15px 0;
+}
+.map_preview img {
+   border: 1px solid #000;
+   border-radius: 5px;
+   max-width: 100%;
+}
+.map_preview .location {
+    position: absolute;
+   top: 20px;
+   left: 5px;
+   width: 45px;
+   margin: 0;
+}
+.map_preview h2 {
+   position: absolute;
+   top: 60px;
+   left: 0px;
+   width: 100%;
+   margin: 0;
+}
+.map_preview h2 span {
+   color: white;
+   font: bold 15px/30px Helvetica, Sans-Serif;
+   letter-spacing: -1px;
+   background: rgb(0, 0, 0); /* fallback color */
+   background: rgba(0, 0, 0, 0.7);
+   padding: 0 10px 0 30px;
+   margin: 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Check Map Calibration</h1>
+<div class="row">
+<div>
+<div class="row">
+<div class="col-md-12">
+<div id="preview_map" class="leaflet_map"></div>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
+<a href="#" id="back_button" class="btn btn-primary">Close</a>
+</div>
+</div>
+</div>
+</div>
+ <footer class="page-footer font-small blue pt-4">
+     <!-- Copyright -->
+     <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
+         <a href="/"> {{  site.name }}</a>
+     </div>
+     <!-- Copyright -->
+ </footer>
+{% bootstrap_javascript jquery=1 %}
+<script src="{%  static '/vendor/leaflet-1.4.0/leaflet.js' %}"></script>
+<script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+<script>
+$(function(){
+    var map = null;
+    var raster_map_image;
+    var corners_latlng = [];
+    var calib_string = null;
+
+    function loadImage() {
+        var imageInput = window.opener.document.querySelector('#id_image');
+        var imageURL = $(imageInput).parent().children('a').attr('href');
+        if (imageInput.files && imageInput.files[0]) {
+            var fr = new FileReader();
+            fr.onload = function (e) {
+                var img = new Image();
+                img.addEventListener("load", function () {
+                    raster_map_image = img;
+                    display_preview_map();
+                });
+                img.src = e.target.result;
+            };
+            fr.readAsDataURL(imageInput.files[0]);
+        } else if (imageURL) {
+            var img = new Image();
+            img.addEventListener("load", function () {
+                raster_map_image = img;
+                display_preview_map();
+            });
+            img.src = imageURL;
+        } else {
+            window.close();
+        }
+    }
+
+    function isValidCalibString(s){
+        return s.match(/^(\-?\d+\.\d+,){7}\-?\d+\.\d+$/)
+
+    }
+
+    function loadCalibString() {
+        var el = window.opener.document.querySelector('#id_corners_coordinates');
+        calib_string = el.value;
+        if (!calib_string || !isValidCalibString) {
+            window.close();
+            return
+        }
+        var vals = calib_string.split(',').map(function(x){return parseFloat(x)})
+        corners_latlng = [
+            {lat: vals[0], lng: vals[1]},
+            {lat: vals[2], lng: vals[3]},
+            {lat: vals[4], lng: vals[5]},
+            {lat: vals[6], lng: vals[7]},
+        ]
+    }
+
+    function display_preview_map(){
+        map = L.map('preview_map');
+
+        L.TileLayer.Common = L.TileLayer.extend({initialize: function(options){L.TileLayer.prototype.initialize.call(this, this.url, options);}});
+        L.TileLayer['osm'] = L.TileLayer.Common.extend({url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', options:{attribution: '\u0026copy\u003B \u003Ca href\u003D\u0022http://openstreetmap.org\u0022\u003EOpenStreetMap\u003C/a\u003E contributors, \u003Ca href\u003D\u0022http://creativecommons.org/licenses/by\u002Dsa/2.0/\u0022\u003ECC\u002DBY\u002DSA\u003C/a\u003E'}});
+        L.TileLayer['gmap-street'] = L.TileLayer.Common.extend({url: 'https://mt0.google.com/vt/x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', options:{attribution: '\u0026copy\u003B Google'}});
+        L.TileLayer['finland-topo'] = L.TileLayer.Common.extend({url: 'http://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', options:{attribution: '\u0026copy\u003B National Land Survey of Finland'}});
+        L.TileLayer['mapant'] = L.TileLayer.Common.extend({url: 'https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', options:{attribution: 'MapAnt and National Land Survey of Finland'}});
+
+        var baseLayers = {};
+        var defaultLayer = new L.TileLayer['osm'];
+
+        baseLayers["Open Street Map"] = defaultLayer;
+        baseLayers["Google Map Street"] = new L.TileLayer['gmap-street'];
+        baseLayers["Finland Topo"] = new L.TileLayer['finland-topo'];
+        baseLayers["MapAnt"] = new L.TileLayer['mapant'];
+
+        map.addLayer(defaultLayer);
+        map.addControl(new L.Control.Layers(baseLayers))
+        var bounds = corners_latlng;
+
+        var transformedImage = L.imageTransform(raster_map_image.src, bounds , {opacity: 0.7});
+        transformedImage.addTo(map);
+
+        map.fitBounds(bounds)
+    }
+
+    $('#back_button').on('click', function(e){
+        e.preventDefault();
+        window.close();
+    });
+
+    if(!window.opener) {
+        window.location.href = '/';
+    } else {
+        loadCalibString();
+        loadImage()
+    }
+})
+</script>
+</body>
+</html>

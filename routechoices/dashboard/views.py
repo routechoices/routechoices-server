@@ -34,6 +34,14 @@ def calibration_view(request):
 
 
 @login_required
+def check_calibration_view(request):
+    return render(
+        request,
+        'dashboard/check_calibration.html',
+    )
+
+
+@login_required
 def account_edit_view(request):
     return render(
         request,
