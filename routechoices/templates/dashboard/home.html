@@ -32,7 +32,6 @@
   }
 }
 </style>
-{% block sub_extra_head %}{% endblock %}
 {% endblock %}
 
 {% block content %}
@@ -51,14 +50,16 @@
           <p class="pull-left visible-xs">
             <button type="button" class="btn btn-default btn-xs" data-toggle="offcanvas"><i class="fa fa-bars"></i></button>
           </p>
-
-      </div>
-      {% block sub_content %}
-        <div class="jumbotron">
-          <h3>Welcome to your dashboard.</h3>
         </div>
-      {% endblock %}
-    </div><!--/.col-xs-12.col-sm-9-->
+        <div class="col-xs-12 col-sm-9">
+          {% block sub_content %}
+          <div class="jumbotron">
+            <h3>Welcome to your dashboard.</h3>
+          </div>
+        {% endblock %}
+        </div>
+      </div><!--/.col-xs-12.col-sm-9-->
+    </div>
   </div><!--/row-->
 {% endblock %}
 
@@ -87,6 +88,4 @@ $(document).ready(function () {
   });
 });
 </script>
-
-{% block sub_extra_body %}{% endblock %}
 {% endblock %}

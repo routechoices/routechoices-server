@@ -5,11 +5,11 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
-        <h1>Upload competitors GPX</h1>
+        <h1>Upload competitor GPX</h1>
         <form enctype="multipart/form-data" action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <input type="submit" value="Save" class="btn btn-primary">
+            <input type="submit" value="Upload" class="btn btn-primary">
         </form>
     </div>
 </div>

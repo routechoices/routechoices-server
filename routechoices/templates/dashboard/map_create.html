@@ -18,7 +18,9 @@
     </div>
 </div>
 {% endblock %}
-{% block sub_extra_body %}
+
+{% block extra_body %}
+{{ block.super }}
 <script>
     $(function(){
         $('#id_image').on('change', function(){

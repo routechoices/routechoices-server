@@ -2,7 +2,8 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 
-{%  block sub_extra_head %}
+{%  block extra_head %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
 {%  endblock %}
 
@@ -50,7 +51,8 @@
 </div>
 {% endblock %}
 
-{%  block sub_extra_body %}
+{%  block extra_body %}
+{{ block.super }}
 <script src="{% static '/vendor/jquery-formset-1.3/jquery.formset.js' %}"></script>
 <script>
     $("label[for$='DELETE']").parents('.form-group').hide()
