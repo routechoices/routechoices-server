@@ -9,3 +9,5 @@ psycopg2-binary
 django-allauth
 django-bootstrap3
 raven
+lxml
+cssselect

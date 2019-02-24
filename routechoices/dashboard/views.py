@@ -1,17 +1,22 @@
 import logging
+import requests
+import tempfile
+import zipfile
 
 import gpxpy
+import os
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
 from routechoices.core.models import Club, Map, Event, Device, Location
 from routechoices.dashboard.forms import ClubForm, MapForm, EventForm, \
-    CompetitorFormSet, UploadGPXForm
-
+    CompetitorFormSet, UploadGPXForm, UploadKmzForm
+from routechoices.lib.kmz import extract_ground_overlay_info
 
 logger = logging.getLogger(__name__)
 DEFAULT_PAGE_SIZE = 25
@@ -176,6 +181,116 @@ def map_create_view(request):
     return render(
         request,
         'dashboard/map_create.html',
+        {
+            'form': form,
+        }
+    )
+
+
+@login_required
+def map_kmz_upload_view(request):
+    club_list = Club.objects.filter(admins=request.user)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = UploadKmzForm(request.POST, request.FILES)
+        form.fields['club'].queryset = club_list
+        # check whether it's valid:
+        if form.is_valid():
+            file = form.cleaned_data['file']
+            error = None
+            if file.name.lower().endswith('.kml'):
+                try:
+                    kml = file.read()
+                    name, image_path, corners_coords = extract_ground_overlay_info(
+                        kml
+                    )
+                    if not image_path.startswith('http://') and \
+                            not image_path.startswith('https://'):
+                        raise Exception('Fishy KML')
+
+                    dest = tempfile.NamedTemporaryFile(delete=False)
+                    headers = requests.utils.default_headers()
+                    headers.update(
+                        {
+                            'User-Agent': 'Python3/Requests/Routechoices.com',
+                        }
+                    )
+                    r = requests.get(image_path, headers=headers)
+                    if r.status_code != 200:
+                        raise Exception('Could not reach image source')
+                    dest.write(r.content)
+                    map = Map(
+                        name=name,
+                        club=form.cleaned_data['club'],
+                        corners_coordinates=corners_coords,
+                    )
+                    image_file = File(open(dest.name, 'rb'))
+                    map.image.save('file', image_file, save=True)
+                    dest.close()
+                except Exception as e:
+                    error = 'An error occured while extracting the map from ' \
+                            'your file ({})'.format(str(e))
+            elif file.name.lower().endswith('.kmz'):
+                try:
+                    dest = tempfile.mkdtemp('_kmz')
+                    zf = zipfile.ZipFile(file)
+                    zf.extractall(dest)
+                    with open(os.path.join(dest, 'doc.kml'), 'r') as f:
+                        kml = f.read().encode('utf8')
+                    name, image_path, corners_coords = extract_ground_overlay_info(
+                        kml
+                    )
+                    if image_path.startswith('http://') or \
+                            image_path.startswith('https://'):
+                        dest = tempfile.NamedTemporaryFile(delete=False)
+                        headers = requests.utils.default_headers()
+                        headers.update(
+                            {
+                                'User-Agent': 'Python3/Requests/Routechoices.com',
+                            }
+                        )
+                        r = requests.get(image_path, headers=headers)
+                        if r.status_code != 200:
+                            raise Exception('Could not reach image source')
+                        dest.write(r.content)
+                        image_file = File(open(dest.name, 'rb'))
+                        map = Map(
+                            name=name,
+                            club=form.cleaned_data['club'],
+                            corners_coordinates=corners_coords,
+                        )
+                        map.image.save('file', image_file, save=True)
+                        dest.close()
+                    else:
+                        image_path = os.path.abspath(
+                            os.path.join(dest, image_path)
+                        )
+                        if not image_path.startswith(dest):
+                            raise Exception('Fishy KMZ')
+                        image_file = File(open(image_path, 'rb'))
+                        map = Map(
+                            name=name,
+                            club=form.cleaned_data['club'],
+                            corners_coordinates=corners_coords,
+                        )
+                        map.image.save('file', image_file ,save=True)
+                except Exception:
+                    error = 'An error occured while extracting the map from ' \
+                            'your file'
+            if error:
+                messages.error(request, error)
+            else:
+                messages.success(
+                    request,
+                    'The import of the map was successful'
+                )
+                return redirect('dashboard:map_list_view')
+    else:
+        form = UploadKmzForm()
+        form.fields['club'].queryset = club_list
+    return render(
+        request,
+        'dashboard/map_kmz_upload.html',
         {
             'form': form,
         }
@@ -418,7 +533,7 @@ def event_gpx_upload_view(request, id):
                 competitor.device = device
                 competitor.save()
             if error:
-                messages.error(error)
+                messages.error(request, error)
             else:
                 messages.success(
                     request,

@@ -16,6 +16,7 @@ urlpatterns = [
 
     url(r'^map/?$', views.map_list_view, name='map_list_view'),
     url(r'^map/new/?$', views.map_create_view, name='map_create_view'),
+    url(r'^map/upload_kmz/?$', views.map_kmz_upload_view, name='map_upload_kmz_view'),
     url(r'^map/(?P<id>[A-Za-z0-9_-]+)/?$', views.map_edit_view, name='map_edit_view'),
     url(r'^map/(?P<id>[A-Za-z0-9_-]+)/delete/?$', views.map_delete_view, name='map_delete_view'),
 

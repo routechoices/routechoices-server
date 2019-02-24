@@ -17,6 +17,7 @@ RUN set -ex \
             pcre-dev \
             postgresql-dev \
             build-base python-dev py-pip jpeg-dev zlib-dev \
+            libxslt-dev \
     && pyvenv /venv \
     && /venv/bin/pip install -U pip \
     && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir -r /requirements.txt" \

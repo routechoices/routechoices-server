@@ -54,6 +54,14 @@ class UploadGPXForm(Form):
     gpx_file = FileField(validators=[FileExtensionValidator(allowed_extensions=['gpx'])])
 
 
+class UploadKmzForm(Form):
+    club = ModelChoiceField(queryset=Club.objects.all())
+    file = FileField(
+        label='KML/KMZ file',
+        validators=[FileExtensionValidator(allowed_extensions=['kmz', 'kml'])]
+    )
+
+
 CompetitorFormSet = inlineformset_factory(
     Event,
     Competitor,
