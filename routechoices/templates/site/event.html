@@ -292,7 +292,7 @@ var selectReplayMode = function(e){
 var fetchCompetitorRoutes = function(url){
   isCurrentlyFetchingRoutes = true;
   url = url || liveUrl;
-  var data = {lastNbPoints};
+  var data = {lastNbPoints: lastNbPoints};
   $.ajax({
     url: url,
     data: data
