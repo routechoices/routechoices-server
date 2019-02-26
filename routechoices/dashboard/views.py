@@ -227,9 +227,9 @@ def map_kmz_upload_view(request):
                     image_file = File(open(dest.name, 'rb'))
                     map.image.save('file', image_file, save=True)
                     dest.close()
-                except Exception as e:
+                except Exception:
                     error = 'An error occured while extracting the map from ' \
-                            'your file ({})'.format(str(e))
+                            'your file'
             elif file.name.lower().endswith('.kmz'):
                 try:
                     dest = tempfile.mkdtemp('_kmz')
