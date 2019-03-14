@@ -255,8 +255,6 @@ SLUG_BLACKLIST = [
     'www3', 'www4', 'you', 'yourname', 'yourusername', 'zlib', 'traccar',
 ]
 
-
-ACCOUNT_ADAPTER = 'routechoices.lib.account_adapter.NoNewUsersAccountAdapter'
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"
