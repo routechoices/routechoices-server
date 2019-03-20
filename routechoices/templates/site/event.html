@@ -182,6 +182,20 @@ and (max-device-width : 500px) {
     </div>
   </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+         <h2 class="modal-title">Event not yet started</h2>
+      </div>
+      <div class="modal-body">
+        <h4>Event start on {{event.start_date}} UTC</h4>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
 {% endblock %}
 {% block extra_body %}
 <script src="{% static '/vendor/leaflet-1.4.0/leaflet.js' %}"></script>
@@ -574,7 +588,15 @@ $(function() {
       return false;
   };
 
-
+  {% if event.hidden %}
+  $('#eventNotStartedModal').modal({backdrop:'static', keyboard: false, });
+  var startDate = new Date('{{event.start_date|date:'c'}}');
+  window.setInterval(function(){
+    if(new Date() > startDate) {
+      location.reload();
+    }
+  }, 1e3);
+  {% else %}
   {% if event.is_live %}
   isLiveEvent = true;
   {% else %}
@@ -587,7 +609,8 @@ $(function() {
   addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl);
   {% endif %}
 
-  onStart()
+  onStart();
+  {% endif %}
 })
 
 var pressPlayPauseButton = function(e){

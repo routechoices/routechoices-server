@@ -311,12 +311,6 @@ class Event(models.Model):
         if qs.exists():
             raise ValidationError('Event with this Club and Slug already exists.')
 
-
-    def save(self, *args, **kwargs):
-        self.competitors.filter(start_time=self.start_date) \
-            .update(start_time = self.start_date)
-        super().save(*args, **kwargs)
-
     class Meta:
         ordering = ['-start_date']
         unique_together = (('club', 'slug'), ('club', 'name'))
@@ -435,10 +429,6 @@ class Competitor(models.Model):
                 'aid': self.aid,
             }
         )
-
-    def clean(self):
-        if self.start_time and self.event.start_date and self.start_time < self.event.start_date:
-            raise ValidationError('Competitor cannot start before the event')
 
     def save(self, *args, **kwargs):
         if not self.start_time:

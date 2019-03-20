@@ -4,7 +4,17 @@ import struct
 
 import requests
 
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_aware, make_aware
+
 from routechoices.lib.random_strings import generate_random_string
+
+
+def get_aware_datetime(date_str):
+    ret = parse_datetime(date_str)
+    if not is_aware(ret):
+        ret = make_aware(ret)
+    return ret
 
 
 def random_key():

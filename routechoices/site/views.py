@@ -63,13 +63,11 @@ def event_view(request, club_slug, slug):
         Event,
         club__slug__iexact=club_slug,
         slug__iexact=slug,
-        start_date__lt=now(),
     )
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
-
 
     return render(
         request,

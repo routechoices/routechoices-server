@@ -4,6 +4,7 @@ from django.forms import Form, ModelForm, DateTimeInput, inlineformset_factory, 
     ModelChoiceField, FileField
 
 from routechoices.core.models import Club, Map, Event, Competitor
+from routechoices.lib.helper import get_aware_datetime
 
 
 class ClubForm(ModelForm):
@@ -47,6 +48,20 @@ class CompetitorForm(ModelForm):
         widgets = {
             'start_time': DateTimeInput(attrs={'class': 'datetimepicker'}),
         }
+
+    def clean_start_time(self):
+        start = self.cleaned_data.get('start_time')
+        event_start = get_aware_datetime(self.data.get('start_date'))
+        event_end = self.data.get('end_date')
+        if event_end:
+            event_end = get_aware_datetime(event_end)
+        if start and ((not event_end and event_start > start)
+                      or (event_end
+                          and (event_start > start
+                               or start > event_end))):
+            raise ValidationError(
+                'Competitor start time should be during the event time'
+            )
 
 
 class UploadGPXForm(Form):

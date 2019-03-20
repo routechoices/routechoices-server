@@ -20,6 +20,7 @@
             <table class="table">
             {{ formset.management_form }}
             {% for form in formset %}
+               {% bootstrap_form_errors form type='non_fields' %}
                {% if forloop.first %}
                     <thead>
                     <tr>
