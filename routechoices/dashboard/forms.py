@@ -62,6 +62,7 @@ class CompetitorForm(ModelForm):
             raise ValidationError(
                 'Competitor start time should be during the event time'
             )
+        return start
 
 
 class UploadGPXForm(Form):
