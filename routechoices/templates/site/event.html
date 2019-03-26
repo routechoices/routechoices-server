@@ -283,7 +283,7 @@ var selectReplayMode = function(e){
   $("#replay_mode_buttons").show();
   $("#replay_control_buttons").show();
   isLiveMode = false;
-  prevShownTime = +new Date(getCompetitionStartDate());
+  prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
   playbackRate = 1;
   prevDisplayRefresh = +clock.now();
@@ -292,8 +292,8 @@ var selectReplayMode = function(e){
       fetchCompetitorRoutes();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
-    currentTime = prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate;
-    currentTime = Math.min(+clock.now(), currentTime, +new Date(getCompetitionEndDate()));
+    currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate);
+    currentTime = Math.min(+clock.now(), currentTime, getCompetitionEndDate());
     drawCompetitors();
     prevShownTime = currentTime;
     prevDisplayRefresh = +clock.now();
@@ -419,7 +419,7 @@ var zoomOnCompetitor = function(compr){
   if(!route) return
   var timeT = currentTime;
   if(!isRealTime){
-    timeT += +new Date(compr.start_time) - new Date(getCompetitionStartDate());
+    timeT += +new Date(compr.start_time) - getCompetitionStartDate();
   }
   var loc = route.getByTime(timeT);
   map.setView([loc.coords.latitude, loc.coords.longitude]);
@@ -428,7 +428,7 @@ var getProgressBarText = function(){
     var result = '';
     var viewedTime = currentTime;
     if(!isRealTime){
-        viewedTime -= new Date(getCompetitionStartDate());
+        viewedTime -= getCompetitionStartDate();
         var t = viewedTime/1e3;
         to2digits = function(x){return ('0'+Math.floor(x)).slice(-2);},
         result += t > 3600 ? Math.floor(t/3600) + ':': '';
@@ -452,7 +452,7 @@ var drawCompetitors = function(){
     }
   }
   // progress bar
-  var perc = isLiveMode ? 100 : (currentTime-new Date(getCompetitionStartDate()))/(Math.min(+clock.now(), new Date(getCompetitionEndDate()))-new Date(getCompetitionStartDate())) * 100
+  var perc = isLiveMode ? 100 : (currentTime-getCompetitionStartDate())/(Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * 100
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
   $('#progress_bar_text').html(getProgressBarText());
   competitorList.forEach(function(competitor){
@@ -463,7 +463,7 @@ var drawCompetitors = function(){
     if(route !== undefined){
       var viewedTime = currentTime;
       if(!isLiveMode && !isRealTime && competitor.start_time){
-        viewedTime += new Date(competitor.start_time) - new Date(getCompetitionStartDate());
+        viewedTime += new Date(competitor.start_time) - getCompetitionStartDate();
       }
       var loc = route.getByTime(viewedTime);
       if(loc && !isNaN(loc.coords.latitude)){
@@ -620,7 +620,7 @@ var pressPlayPauseButton = function(e){
 
 var pressProgressBar = function(e){
   var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width();
-  currentTime = +new Date(getCompetitionStartDate())+(Math.min(clock.now(), +new Date(getCompetitionEndDate()))-new Date(getCompetitionStartDate()))*perc;
+  currentTime = getCompetitionStartDate()+(Math.min(clock.now(), getCompetitionEndDate())-getCompetitionStartDate())*perc;
   prevShownTime = currentTime;
 }
 </script>
