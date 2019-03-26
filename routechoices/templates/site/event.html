@@ -190,7 +190,7 @@ and (max-device-width : 500px) {
          <h2 class="modal-title">Event not yet started</h2>
       </div>
       <div class="modal-body">
-        <h4>Event start on {{event.start_date}} UTC</h4>
+        <h4>Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -591,6 +591,10 @@ $(function() {
   {% if event.hidden %}
   $('#eventNotStartedModal').modal({backdrop:'static', keyboard: false, });
   var startDate = new Date('{{event.start_date|date:'c'}}');
+  $('.date-utc').each(function(i, el){
+    $el = $(el);
+    $el.text(moment.utc($el.data('date')).local().format('MMMM Do, YYYY, HH:mm:ss'));
+  });
   window.setInterval(function(){
     if(new Date() > startDate) {
       location.reload();
