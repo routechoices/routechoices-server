@@ -10,7 +10,7 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
-        <h1>Create Event</h1>
+        <h1>Create Event <small><span class="utc-offset"></span></small></h1>
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}

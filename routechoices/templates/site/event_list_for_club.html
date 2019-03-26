@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load bootstrap3 %}
 
 {% block content %}
 <div class="row">
@@ -9,21 +10,28 @@
 
   <div>
     <table class="table table-striped">
-      <tr><th>Event</th><th>Date (UTC)</th><th>Export</th></tr>
+      <tr><th>Event</th><th>Date</th><th>Export</th></tr>
       {% for event in club.events.all %}
       <tr>
         <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
-        <td>{{ event.start_date|date:'Y-m-d H:i:s' }}</td>
+        <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span></td>
         <td>{% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %} {% if event.map and not event.hidden %}<a class="btn btn-xs btn-primary" href="{% url 'api:event_map_download' event.aid %}"><i class="fa fa-globe"></i> Map</a>{% endif %}</td>
       </tr>
       {% endfor %}
     </table>
   </div>
-  <nav aria-label="...">
-    <ul class="pager">
-    <li class="previous{% if not events.has_previous %} disabled{% endif %}"><a href="{% if events.has_previous %}?page={{ events.previous_page_number }}{% endif %}"><span aria-hidden="true">&larr;</span> Newer</a></li>
-    <li class="next{% if not events.has_next %} disabled{% endif %}"><a href="{% if events.has_next %}?page={{ events.next_page_number }}{% endif %}">Older <span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
-  </nav>
+  {% bootstrap_pagination events extra=request.GET.urlencode %}
 </div>
+{% endblock %}
+
+{% block extra_body %}
+<script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
+<script>
+$(function(){
+    $('.date-utc').each(function(i, el){
+        $el = $(el);
+        $el.text(moment.utc($el.data('date')).local().format('YYYY-MM-DD HH:mm'));
+    });
+})
+</script>
 {% endblock %}

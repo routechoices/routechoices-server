@@ -1,7 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-from django.forms import Form, ModelForm, DateTimeInput, inlineformset_factory, \
-    ModelChoiceField, FileField
+from django.forms import (
+    Form,
+    ModelForm,
+    DateTimeInput,
+    inlineformset_factory,
+    ModelChoiceField,
+    FileField,
+    DateTimeField,
+)
 
 from routechoices.core.models import Club, Map, Event, Competitor
 from routechoices.lib.helper import get_aware_datetime
@@ -42,6 +49,7 @@ class EventForm(ModelForm):
 
 
 class CompetitorForm(ModelForm):
+
     class Meta:
         model = Competitor
         fields = ('event', 'device', 'name', 'short_name', 'start_time')

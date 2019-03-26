@@ -370,7 +370,11 @@ class Competitor(models.Model):
     )
     name = models.CharField(max_length=64)
     short_name = models.CharField(max_length=32, null=True, blank=True)
-    start_time = models.DateTimeField(null=True, blank=True)
+    start_time = models.DateTimeField(
+        verbose_name='Start time (UTC)',
+        null=True,
+        blank=True
+    )
 
     @property
     def started(self):
