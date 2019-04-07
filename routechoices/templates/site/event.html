@@ -387,9 +387,37 @@ var displayCompetitorList = function(){
       listDiv.append(div);
       competitor.div = div;
     });
-
+    var mainDiv = $('<div/>');
+    mainDiv.append(
+      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+        $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
+      )
+    )
+    mainDiv.append(listDiv);
     $('#sidebar').html('');
-    $('#sidebar').append(listDiv);
+    $('#sidebar').append(mainDiv);
+}
+
+var displayOptions = function() {
+    var mainDiv = $('<div/>');
+    mainDiv.append(
+      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+        $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-times"></i>').on('click', displayCompetitorList)
+      )
+    );
+    mainDiv.append(
+      $('<div"/>').html(
+        '<h4>Tails</h4>' +
+        '<label for="tailLength">Length in seconds</label>' +
+        '<input type="number" min="0" name="tailLength" id="tailLengthInput" value="'+ tailLength +'"/>'
+      )
+    );
+    $(mainDiv).find('#tailLengthInput').on('input', function(e){
+      var newLength = Math.max(0, parseInt(e.target.value));
+      tailLength = newLength;
+    });
+    $('#sidebar').html('');
+    $('#sidebar').append(mainDiv);
 }
 
 var getCompetitionStartDate = function() {
