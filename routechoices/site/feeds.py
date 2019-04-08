@@ -21,7 +21,6 @@ class LiveEventsFeed(Feed):
 
     def items(self):
         return Event.objects.filter(
-            start_date__lt=now(),
             privacy=PRIVACY_PUBLIC,
         )[:25]
 
