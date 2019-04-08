@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
-from django.utils.timezone import now
 
 from routechoices.core.models import Event, PRIVACY_PUBLIC
 
