@@ -33,6 +33,8 @@ class EventAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
+        'last_location',
+        'location_count',
     )
 
 

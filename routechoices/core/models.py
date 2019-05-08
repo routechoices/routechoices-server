@@ -344,6 +344,19 @@ class Device(models.Model):
             datetime=ts_datetime
         )
 
+    @property
+    def location_count(self):
+        return Location.objects.filter(device=self).count()
+
+    @property
+    def last_location(self):
+        last_loc = Location.objects.filter(
+            device=self
+        ).order_by('-datetime').first()
+        if last_loc:
+            return last_loc.datetime
+        return None
+
     class Meta:
         ordering = ['aid']
         verbose_name = 'device'
