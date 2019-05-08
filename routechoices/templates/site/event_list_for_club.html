@@ -11,7 +11,7 @@
   <div>
     <table class="table table-striped">
       <tr><th>Event</th><th>Date</th><th>Export</th></tr>
-      {% for event in club.events.all %}
+      {% for event in events %}
       <tr>
         <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
         <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span></td>

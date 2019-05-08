@@ -222,6 +222,7 @@ var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
 var currentTime = 0;
 var lastNbPoints = 0;
+var optionDisplayed = false;
 
 var COLORS = new function(){
     var colors = ["#09F","#3D0","#F09","#D30","#30D","#DD0","#2DD","#D00","#D33","#00D","#DD2","#BFB"],
@@ -345,11 +346,14 @@ var updateCompetitor = function(newData) {
 }
 
 var displayCompetitorList = function(){
+    if (optionDisplayed){
+      return;
+    }
     var listDiv = $('<ul/>');
     listDiv.addClass('media-list');
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || COLORS.get(ii);
-      competitor.isShown = typeof competitor.isShown === "undefined" ? true : competitor.isShown;
+      competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown;
       var div = $('<li/>');
       div.addClass('media').html('\
         <div class="media-left"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
@@ -365,12 +369,15 @@ var displayCompetitorList = function(){
         if(icon.hasClass('fa-toggle-on')){
           icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
           competitor.isShown = false;
-          if(competitor.mapMarker)
+          if(competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker);
-          if(competitor.nameMarker)
+          }
+          if(competitor.nameMarker) {
             map.removeLayer(competitor.nameMarker);
-          if(competitor.tail)
+          }
+          if(competitor.tail) {
             map.removeLayer(competitor.tail);
+          }
           competitor.mapMarker = null;
           competitor.nameMarker = null;
           competitor.tail = null;
@@ -399,22 +406,33 @@ var displayCompetitorList = function(){
 }
 
 var displayOptions = function() {
+    optionDisplayed = true;
     var mainDiv = $('<div/>');
     mainDiv.append(
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
-        $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-times"></i>').on('click', displayCompetitorList)
+        $('<button class="btn btn-default btn-xs"/>')
+        .html('<i class="fa fa-times"></i>')
+        .on('click', function(){
+          optionDisplayed = false;
+          displayCompetitorList();
+        })
       )
     );
     mainDiv.append(
       $('<div"/>').html(
         '<h4>Tails</h4>' +
-        '<label for="tailLength">Length in seconds</label>' +
-        '<input type="number" min="0" name="tailLength" id="tailLengthInput" value="'+ tailLength +'"/>'
+        '<div class="form-group">' +
+        '<label for="tailLengthInput">Length in seconds</label>' +
+        '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
+        '</div>'
       )
     );
     $(mainDiv).find('#tailLengthInput').on('input', function(e){
-      var newLength = Math.max(0, parseInt(e.target.value));
-      tailLength = newLength;
+      var v = parseInt(e.target.value);
+      if (isNaN(v)) {
+        v = 0;
+      }
+      tailLength = Math.max(0, v);
     });
     $('#sidebar').html('');
     $('#sidebar').append(mainDiv);
@@ -496,16 +514,25 @@ var drawCompetitors = function(){
       var loc = route.getByTime(viewedTime);
       if(loc && !isNaN(loc.coords.latitude)){
         if(competitor.mapMarker == undefined){
-          competitor.mapMarker = L.circleMarker([loc.coords.latitude, loc.coords.longitude],
-                                                 {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75});
-          competitor.nameMarker = L.marker([loc.coords.latitude, loc.coords.longitude],
-                                            {icon: L.divIcon({className: 'runner-icon',
-                                                              html: '<span style="-webkit-text-fill-color: '+competitor.color+';">'+competitor.short_name+'</span>'})
-                                            });
+          competitor.mapMarker = L.circleMarker(
+            [loc.coords.latitude, loc.coords.longitude],
+            {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75}
+          );
           competitor.mapMarker.addTo(map);
+        } else {
+          competitor.mapMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
+        }
+        if(competitor.nameMarker == undefined){
+          var runnerIcon = L.divIcon({
+            className: 'runner-icon',
+            html: '<span style="-webkit-text-fill-color: '+competitor.color+';">'+competitor.short_name+'</span>'
+          });
+          competitor.nameMarker = L.marker(
+            [loc.coords.latitude, loc.coords.longitude],
+            {icon: runnerIcon}
+          );
           competitor.nameMarker.addTo(map);
         }else{
-          competitor.mapMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
           competitor.nameMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
         }
       }
@@ -568,6 +595,7 @@ $(function() {
     }else{
       $('#sidebar').addClass('hidden-xs').removeClass('col-xs-12');
       $('#map').removeClass('hidden-xs').addClass('col-xs-12');
+      map.invalidateSize()
     }
   })
 
