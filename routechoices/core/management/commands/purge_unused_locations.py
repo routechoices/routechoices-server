@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
-from routechoices.core.models import Location, Event, Device
+from django.core.management.base import BaseCommand
+from routechoices.core.models import Location, Event
 
 from datetime import timedelta
 from django.utils.timezone import now
