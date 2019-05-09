@@ -196,6 +196,7 @@ def map_kmz_upload_view(request):
         form.fields['club'].queryset = club_list
         # check whether it's valid:
         if form.is_valid():
+            new_map = None
             file = form.cleaned_data['file']
             error = None
             if file.name.lower().endswith('.kml'):
@@ -219,13 +220,13 @@ def map_kmz_upload_view(request):
                     if r.status_code != 200:
                         raise Exception('Could not reach image source')
                     dest.write(r.content)
-                    map = Map(
+                    new_map = Map(
                         name=name,
                         club=form.cleaned_data['club'],
                         corners_coordinates=corners_coords,
                     )
                     image_file = File(open(dest.name, 'rb'))
-                    map.image.save('file', image_file, save=True)
+                    new_map.image.save('file', image_file, save=True)
                     dest.close()
                 except Exception:
                     error = 'An error occured while extracting the map from ' \
@@ -254,12 +255,12 @@ def map_kmz_upload_view(request):
                             raise Exception('Could not reach image source')
                         dest.write(r.content)
                         image_file = File(open(dest.name, 'rb'))
-                        map = Map(
+                        new_map = Map(
                             name=name,
                             club=form.cleaned_data['club'],
                             corners_coordinates=corners_coords,
                         )
-                        map.image.save('file', image_file, save=True)
+                        new_map.image.save('file', image_file, save=True)
                         dest.close()
                     else:
                         image_path = os.path.abspath(
@@ -268,15 +269,18 @@ def map_kmz_upload_view(request):
                         if not image_path.startswith(dest):
                             raise Exception('Fishy KMZ')
                         image_file = File(open(image_path, 'rb'))
-                        map = Map(
+                        new_map = Map(
                             name=name,
                             club=form.cleaned_data['club'],
                             corners_coordinates=corners_coords,
                         )
-                        map.image.save('file', image_file ,save=True)
+                        new_map.image.save('file', image_file ,save=True)
                 except Exception:
                     error = 'An error occured while extracting the map from ' \
                             'your file'
+            if new_map:
+                new_map.strip_exif()
+                new_map.save()
             if error:
                 messages.error(request, error)
             else:

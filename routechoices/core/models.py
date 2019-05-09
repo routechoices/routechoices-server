@@ -1,6 +1,7 @@
 import base64
 import datetime
 import re
+from io import BytesIO
 from urllib.parse import urlencode
 
 import gpxpy
@@ -11,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
 from django.db.models import Value
@@ -175,6 +176,22 @@ class Map(models.Model):
             self.image.close()
         else:
             raise ValueError('Not a base 64 encoded data URI of an image')
+
+    def strip_exif(self):
+        with Image.open(self.image.file) as image:
+            data = image.getdata()
+            image_without_exif = Image.new(image.mode, image.size)
+            image_without_exif.putdata(data)
+            out_buffer = BytesIO()
+            image_without_exif.save(out_buffer, image.format.lower())
+        f_new = File(out_buffer, name=self.image.name)
+        self.image.save(
+            'filename',
+            f_new,
+            save=False,
+        )
+        self.image.close()
+        return f_new
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.club)
