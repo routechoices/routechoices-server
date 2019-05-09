@@ -14,6 +14,8 @@
 <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
 {% if not event.hidden and event.map %}
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% url 'api:event_map_download' aid=event.aid %}" />
+{% else %}
+<meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% endif %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
 <style>
