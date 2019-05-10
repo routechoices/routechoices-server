@@ -24,10 +24,39 @@
         <div class="row">
           <h1>GPS Tracker</h1>
           <p>Your Device Identifier <span class="label label-default roboto devId" style="font-size: 1.2em"></span></p>
+          <p>You can upload your location to provide live GPS tracking in three way. We recommend the Garmin watch app, then the phone app, if not possible the webapp running in your browser is still possible.</p>
           <p style="margin-top:2em">
-            <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal"><i class="fa fa-rocket"></i> Tracking with the App (recommended)</a>
-            <a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the Webapp</a>
+            <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal"><i class="fa fa-clock-o"></i> Tracking with a Garmin&reg; watch</a>
+            <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal"><i class="fa fa-mobile-phone"></i> Tracking with a smart phone</a>
+            <a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the webapp</a>
           </p>
+        </div>
+      </div>
+      <div class="modal fade" id="garmin-modal" tabindex="-1" role="dialog" aria-labelledby="garmin-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="garmin-modal-label">Garmin Tracking App</h4>
+            </div>
+            <div class="modal-body">
+              <p>
+                Download the {{ site.name }} Live Tracker app from the Connect IQ store.
+              </p>
+              <p>
+                <a href="https://apps.garmin.com/en-US/apps/50396179-a687-4720-a0d9-c5f1e9b2485b">{{ site.name }} Live Tracker on Connect IQ store</a>
+              </p>
+              <p>
+                Once installed, run the app on your watch to start streaming your location, a new device ID will be displayed on the main screen.
+             </p>
+             <p>
+               Note that if your watch does not support 4G LTE network, you have to carry a phone with the Garmin connect app connected to the watch in order to provide an internet connection.
+             </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal fade" id="traccar-modal" tabindex="-1" role="dialog" aria-labelledby="traccar-modal-label" aria-hidden="true">
