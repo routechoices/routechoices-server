@@ -45,7 +45,7 @@
             {% endfor %}
             </table>
 
-            <input type="submit" value="Submit" class="btn btn-primary">
+            <input type="submit" value="Submit" class="btn btn-primary" id="submit-btn">
         </form>
     </div>
 </div>
@@ -58,32 +58,39 @@
     $("label[for$='DELETE']").parents('.form-group').hide()
     $('.formset_row').formset({
         addText: 'Add Competitor',
-        addCssClass: 'btn btn-primary',
+        addCssClass: 'btn btn-primary add-competitor-btn',
         deleteText: '<i class="fa fa-trash fa-2x"></i>',
-        prefix: 'competitor_set'
+        prefix: 'competitors'
     });
 </script>
 <script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
 <script>
-$("select[name$='device']").selectize({
-    valueField: 'id',
-    labelField: 'aid',
-    searchField: 'aid',
-    multiple: true,
-    create: false,
-    load: function(query, callback) {
-        if (!query.length || query.length < 2) return callback();
-        $.ajax({
-            url: '/api/device/search/?q=' + encodeURIComponent(query),
-            type: 'GET',
-            error: function() {
-                callback();
-            },
-            success: function(res) {
-                callback(res.results);
-            }
-        });
-    }
-});
+function selectizeDeviceInput(){
+    $("select[name$='device']").selectize({
+        valueField: 'id',
+        labelField: 'aid',
+        searchField: 'aid',
+        multiple: true,
+        create: false,
+        load: function(query, callback) {
+            if (!query.length || query.length < 2) return callback();
+            $.ajax({
+                url: '/api/device/search/?q=' + encodeURIComponent(query),
+                type: 'GET',
+                error: function() {
+                    callback();
+                },
+                success: function(res) {
+                    callback(res.results);
+                }
+            });
+        }
+    });
+}
+$(function(){
+    $('.add-competitor-btn').on('click', function(){
+        selectizeDeviceInput()
+    })
+})
 </script>
 {%  endblock %}

@@ -386,6 +386,9 @@ def event_create_view(request):
             formset.instance = event
             formset.save()
             return redirect('dashboard:event_list_view')
+        else:
+            for cform in formset.forms:
+                cform.fields['device'].queryset = Device.objects.none()
     else:
         form = EventForm()
         form.fields['club'].queryset = club_list
@@ -429,6 +432,9 @@ def event_edit_view(request, id):
             formset.instance = event
             formset.save()
             return redirect('dashboard:event_list_view')
+        else:
+            for cform in formset.forms:
+                cform.fields['device'].queryset = Device.objects.filter(id__in=device_id)
     else:
         form = EventForm(instance=event)
         form.fields['club'].queryset = club_list
