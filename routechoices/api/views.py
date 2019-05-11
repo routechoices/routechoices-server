@@ -66,7 +66,7 @@ def event_data(request, aid):
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied
+            raise PermissionDenied()
     competitors = event.competitors.all()
 
     nb_points = 0
@@ -94,7 +94,7 @@ def event_rg_data(request, aid):
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied
+            raise PermissionDenied()
     competitors = event.competitors.all()
     competitor_values = competitors.values_list(
         'id',
@@ -229,6 +229,7 @@ def device_search(request):
     return Response({'results': [{'id': d[0], 'aid': d[1]} for d in devices]})
 
 
+@api_view(['GET'])
 def event_map_download(request, aid):
     event = get_object_or_404(Event, aid=aid, start_date__lt=now())
     if not event.map:
@@ -236,7 +237,7 @@ def event_map_download(request, aid):
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied
+            raise PermissionDenied()
     file_path = event.map.path
     return x_accel_redirect(
         request,
@@ -246,6 +247,7 @@ def event_map_download(request, aid):
     )
 
 
+@api_view(['GET'])
 def competitor_gpx_download(request, aid):
     competitor = get_object_or_404(
         Competitor,
@@ -256,7 +258,7 @@ def competitor_gpx_download(request, aid):
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied
+            raise PermissionDenied()
     gpx_data = competitor.gpx
     response = HttpResponse(
         gpx_data,

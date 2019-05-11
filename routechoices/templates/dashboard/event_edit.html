@@ -46,6 +46,17 @@
             {% endfor %}
             </table>
 
+            <label for="csv_input">Import competitor from CSV</label>
+            <input type="file" name="csv_input" id="csv_input" accept="text/csv"/>
+            <div class="help-block">
+                Follow the following format for your CSV:<br/>
+                Column A - Full name / displayed in the menu on the left during the event /<br/>
+                Column B - Shortname / displayed next to the marker on the live event /<br/>
+                Column C - Start time for the competitor in the following format (2014-05-31 08:57:00). Make sure this column is formatted as Text.<br/>
+                Column D - The ID of the GPS device
+            </div>
+            <hr/>
+
             <input type="submit" value="Save" class="btn btn-primary">
             <a href="{% url 'dashboard:event_delete_view' id=event.aid %}" class="btn btn-danger">Delete</a>
         </form>
@@ -60,32 +71,96 @@
     $("label[for$='DELETE']").parents('.form-group').hide()
     $('.formset_row').formset({
         addText: 'Add Competitor',
-        addCssClass: 'btn btn-primary',
+        addCssClass: 'btn btn-primary add-competitor-btn',
         deleteText: '<i class="fa fa-trash fa-2x"></i>',
-        prefix: 'competitor_set'
+        prefix: 'competitors'
     });
 </script>
 <script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
 <script>
-$("select[name$='device']").selectize({
-    valueField: 'id',
-    labelField: 'aid',
-    searchField: 'aid',
-    multiple: true,
-    create: false,
-    load: function(query, callback) {
-        if (!query.length || query.length < 2) return callback();
-        $.ajax({
-            url: '/api/device/search/?q=' + encodeURIComponent(query),
-            type: 'GET',
-            error: function() {
-                callback();
-            },
-            success: function(res) {
-                callback(res.results);
-            }
-        });
+function selectizeDeviceInput(){
+    $("select[name$='device']").selectize({
+        valueField: 'id',
+        labelField: 'aid',
+        searchField: 'aid',
+        multiple: true,
+        create: false,
+        load: function(query, callback) {
+            if (!query.length || query.length < 2) return callback();
+            $.ajax({
+                url: '/api/device/search/?q=' + encodeURIComponent(query),
+                type: 'GET',
+                error: function() {
+                    callback();
+                },
+                success: function(res) {
+                    callback(res.results);
+                }
+            });
+        }
+    });
+}
+$(function(){
+    selectizeDeviceInput()
+    $('.add-competitor-btn').on('click', function(){
+        selectizeDeviceInput()
+    })
+})
+</script>
+<script src="{% static '/vendor/papaparse-5.0.0-beta/papaparse.min.js' %}"></script>
+<script>
+function onCsvParsed(result){
+    document.getElementById("csv_input").value = "";
+    var errors = false;
+    if (result.errors.length>0) {
+        errors = true;
     }
-});
+    if(!errors) {
+        result.data.forEach(function(l){
+            var empty = false;
+            if(l.length==1 && l[0] == "") {
+                empty = true;
+            }
+            if(!empty && l.length != 3 && l.length != 4) {
+                errors = true;
+            } else {
+                if(!empty && !l[2].match(/^\d{4}-[01]\d-[0-3]\d[ T][0-2]\d:[0-5]\d(:[0-5]\d)?Z?$/)){
+                    errors = true;
+                }
+            }
+        })
+    }
+    if(errors){
+        alert('Could not parse this file');
+        return
+    }
+    // clear empty lines
+    $('.formset_row').each(function(j, e){
+        if($(e).find('input').filter(
+            function(i, el){
+                return $(el).attr('type')!='hidden' && el.value != ''
+            }).length == 0) {
+            $(e).find('.delete-row').click()
+        }
+    })
+    result.data.forEach(function(l) {
+        $('.add-competitor-btn').click();
+        if(l.length!=1) {
+            var inputs = $('.formset_row').last().find('input');
+            if (l.length > 3) {
+                inputs[2].value = l[3]
+            }
+            inputs[3].value = l[0];
+            inputs[4].value = l[1];
+            inputs[5].value = l[2];
+        }
+    });
+    $('.add-competitor-btn').click();
+}
+$(function(){
+    $('#csv_input').change(function(){
+        Papa.parse($('#csv_input')[0].files[0], {complete: onCsvParsed});
+    })
+})
 </script>
 {%  endblock %}

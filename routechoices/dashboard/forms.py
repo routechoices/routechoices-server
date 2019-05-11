@@ -1,4 +1,8 @@
+from io import BytesIO
+
+from PIL import Image
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.validators import FileExtensionValidator
 from django.forms import (
     Form,
@@ -7,7 +11,6 @@ from django.forms import (
     inlineformset_factory,
     ModelChoiceField,
     FileField,
-    DateTimeField,
 )
 
 from routechoices.core.models import Club, Map, Event, Competitor
@@ -24,6 +27,20 @@ class MapForm(ModelForm):
     class Meta:
         model = Map
         fields = ['club', 'name', 'image', 'corners_coordinates']
+
+    def clean_image(self):
+        f_orig = self.cleaned_data['image']
+        fn = f_orig.name
+        with Image.open(f_orig.file) as image:
+            data = image.getdata()
+            image_without_exif = Image.new(image.mode, image.size)
+            image_without_exif.putdata(data)
+            out_buffer = BytesIO()
+            image_without_exif.save(out_buffer, image.format.lower())
+        f_new = File(out_buffer, name=fn)
+        return f_new
+
+
 
 
 class EventForm(ModelForm):

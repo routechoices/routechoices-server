@@ -2,7 +2,21 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 
+{% block head_title %}{{ site.name }} | {{ event.name }}{% endblock %}
+
 {% block extra_head %}
+<meta name="description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}"/>
+<meta property="og:title" content="{{ event.name }}" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:site_name" content="{{ site.name }}" />
+<meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}" />
+<meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
+{% if not event.hidden and event.map %}
+<meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% url 'api:event_map_download' aid=event.aid %}" />
+{% else %}
+<meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
+{% endif %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
