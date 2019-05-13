@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row">
   <div>
-      <h1>Events for {{ club.name }}</h1>
+      <h1>Events by {{ club.name }} <a href="{% url 'site:club_feed' club.slug %}"><i class="fa fa-rss"></i></a></h1>
   </div>
 
   <div>
