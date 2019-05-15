@@ -43,7 +43,6 @@ def validate_nice_slug(slug):
     if slug in settings.SLUG_BLACKLIST:
         raise ValidationError(_('Forbidden slug.'))
 
-custom_username_validators = [validate_nice_slug, ]
 
 def validate_image_data_uri(value):
     if not value:
@@ -70,4 +69,4 @@ def validate_corners_coordinates(val):
             )
 
 
-custom_username_validators = [validate_nice_slug]
+custom_username_validators = [validate_nice_slug, ]

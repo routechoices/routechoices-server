@@ -477,23 +477,23 @@ def event_delete_view(request, id):
 @login_required
 def dashboard_map_download(request, id, *args, **kwargs):
     if request.user.is_superuser:
-        map = get_object_or_404(
+        raster_map = get_object_or_404(
             Map,
             aid=id,
         )
     else:
         club_list = Club.objects.filter(admins=request.user)
-        map = get_object_or_404(
+        raster_map = get_object_or_404(
             Map,
             aid=id,
             club__in=club_list
         )
-    file_path = map.path
+    file_path = raster_map.path
     return x_accel_redirect(
         request,
         file_path,
-        filename='{}.{}'.format(map.name, map.mime_type[6:]),
-        mime=map.mime_type
+        filename='{}.{}'.format(raster_map.name, raster_map.mime_type[6:]),
+        mime=raster_map.mime_type
     )
 
 
