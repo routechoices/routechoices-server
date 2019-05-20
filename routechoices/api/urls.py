@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^user/search/?$', views.user_search, name='user_search_api'),
     url(r'^device/search/?$', views.device_search, name='device_search_api'),
     url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
+    url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
     url(r'^events/(?P<aid>[0-9a-zA-Z_-]+)/map/?$', views.event_map_download, name='event_map_download'),
     url(r'^events/(?P<aid>[0-9a-zA-Z_-]+)/rg_data/?$', views.event_rg_data, name='event_rg_data'),
     url(r'^events/(?P<aid>[0-9a-zA-Z_-]+)/data/?$', views.event_data, name='event_data'),

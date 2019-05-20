@@ -151,6 +151,24 @@ def traccar_api_gw(request):
 
 
 @api_view(['POST'])
+def garmin_api_gw(request):
+    device_id = request.data.get('device_id')
+    if not device_id:
+        logger.error('No device_id')
+        raise ValidationError('Use Garmin App from Connect IQ store')
+    device = get_object_or_404(Device, aid=device_id)
+    lats = request.data.get('latitudes').split(',')
+    lons = request.query_params.get('longitudes').split(',')
+    times = request.query_params.get('timestamps').split(',')
+    if len(lats) != len(lons) != len(times):
+        raise ValidationError('Data error')
+    for i in range(len(times)):
+        if times[i] and lats[i] and lons[i]:
+            device.add_location(float(lats[i]), float(lons[i]), int(float(times[i])))
+    return Response({'status': 'ok'})
+
+
+@api_view(['POST'])
 def pwa_api_gw(request):
     device_id = request.POST.get('id')
     if not device_id:
