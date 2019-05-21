@@ -178,6 +178,8 @@ class Map(models.Model):
             raise ValueError('Not a base 64 encoded data URI of an image')
 
     def strip_exif(self):
+        if self.image.closed:
+            self.image.open()
         with Image.open(self.image.file) as image:
             is_jpeg = image.format.lower() == 'jpeg'
             if not is_jpeg:

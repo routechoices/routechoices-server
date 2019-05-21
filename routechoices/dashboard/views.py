@@ -226,11 +226,11 @@ def map_kmz_upload_view(request):
                         corners_coordinates=corners_coords,
                     )
                     image_file = File(open(dest.name, 'rb'))
-                    new_map.image.save('file', image_file, save=True)
+                    new_map.image.save('file', image_file, save=False)
                     dest.close()
                 except Exception:
                     error = 'An error occured while extracting the map from ' \
-                            'your file'
+                            'your file.'
             elif file.name.lower().endswith('.kmz'):
                 try:
                     dest = tempfile.mkdtemp('_kmz')
@@ -274,10 +274,10 @@ def map_kmz_upload_view(request):
                             club=form.cleaned_data['club'],
                             corners_coordinates=corners_coords,
                         )
-                        new_map.image.save('file', image_file ,save=True)
+                        new_map.image.save('file', image_file, save=False)
                 except Exception:
                     error = 'An error occured while extracting the map from ' \
-                            'your file'
+                            'your file.'
             if new_map:
                 new_map.strip_exif()
                 new_map.save()

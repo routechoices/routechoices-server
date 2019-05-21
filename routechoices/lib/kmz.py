@@ -42,7 +42,7 @@ def extract_ground_overlay_info(kml):
         try:
             name = doc.cssselect('name')[0].text_content()
             href = go.cssselect('Icon href')[0].text_content()
-            latlon_box = go.cssselect('LatLonBox')
+            latlon_box = go.cssselect('LatLonBox')[0]
             if len(latlon_box) > 0:
                 north = float(latlon_box.cssselect('north')[0].text_content())
                 east = float(latlon_box.cssselect('east')[0].text_content())

@@ -14,3 +14,18 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+<script>
+    $(function(){
+        $('#id_file').attr('accept', '.kml, .kmz')
+        $('#id_file').on('change', function(){
+            if(this.files[0].size > 1e7){
+                alert("File is too big!");
+                this.value = "";
+            }
+        });
+    })
+</script>
+{% endblock %}
