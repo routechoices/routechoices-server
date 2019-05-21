@@ -179,6 +179,9 @@ class Map(models.Model):
 
     def strip_exif(self):
         with Image.open(self.image.file) as image:
+            is_jpeg = image.format.lower() == 'jpeg'
+            if not is_jpeg:
+                return
             data = image.getdata()
             image_without_exif = Image.new(image.mode, image.size)
             image_without_exif.putdata(data)
@@ -191,7 +194,6 @@ class Map(models.Model):
             save=False,
         )
         self.image.close()
-        return f_new
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.club)

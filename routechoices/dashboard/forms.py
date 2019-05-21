@@ -32,12 +32,15 @@ class MapForm(ModelForm):
         f_orig = self.cleaned_data['image']
         fn = f_orig.name
         with Image.open(f_orig.file) as image:
+            is_jpeg = image.format.lower() == 'jpeg'
             data = image.getdata()
             image_without_exif = Image.new(image.mode, image.size)
             image_without_exif.putdata(data)
             out_buffer = BytesIO()
             image_without_exif.save(out_buffer, image.format.lower())
         f_new = File(out_buffer, name=fn)
+        if not is_jpeg:
+            return File(f_orig.file, name=fn)
         return f_new
 
 
