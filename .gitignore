@@ -17,3 +17,5 @@ static/*
 htmlcov/*
 env/*
 routechoices/local_settings.py
+cypress/screenshots/*
+cypress/videos/*
