@@ -252,6 +252,10 @@ class Event(models.Model):
         blank=True,
         help_text="Preferably use a map from the organizing club",
     )
+    open_registration = models.BooleanField(
+        default=False,
+        help_text="Participant can register themselves to the event through a webpage.",
+    )
 
     @property
     def hidden(self):
@@ -263,6 +267,11 @@ class Event(models.Model):
             return self.start_date <= now() <= self.end_date
         else:
             return self.start_date <= now()
+
+    @property
+    def ended(self):
+        return self.end_date and self.end_date < now()
+
     @property
     def rg_url(self):
         site = Site.objects.get_current()

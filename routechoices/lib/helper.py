@@ -123,3 +123,22 @@ def general_2d_projection(x1s, y1s, x1d, y1d,
 def project(m, x, y):
     v = multiply_matrix_vector(m, [x, y, 1])
     return v[0] / v[2], v[1] / v[2]
+
+
+def initial_of_name(name):
+    """Converts a name to initials and surname.
+
+    Ensures all initials are capitalised, even if the
+    first names aren't.
+
+    Examples:
+
+      >>> initial_of_name('Ram Chandra Giri')
+      'R.C.Giri'
+      >>> initial_of_name('Ram chandra Giri')
+      'R.C.Giri'
+
+    """
+    parts = name.split()
+    initials = [part[0].upper() for part in parts[:-1]]
+    return '.'.join(initials + [parts[-1]])

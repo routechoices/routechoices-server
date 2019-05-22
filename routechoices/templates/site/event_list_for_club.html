@@ -15,7 +15,11 @@
       <tr>
         <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
         <td>{% if event.is_live %}<span class="label label-default">LIVE</span>{% else %}<span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>{% endif %}</td>
-        <td>{% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %} {% if event.map and not event.hidden %}<a class="btn btn-xs btn-primary" href="{% url 'api:event_map_download' event.aid %}"><i class="fa fa-globe"></i> Map</a>{% endif %}</td>
+        <td>
+            {% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %}
+            {% if event.map and not event.hidden %}&nbsp;<a class="btn btn-xs btn-primary" href="{% url 'api:event_map_download' event.aid %}"><i class="fa fa-globe"></i> Map</a>{% endif %}
+            {% if not event.ended and event.open_registration %}&nbsp;<a href="{% url 'site:event_registration_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
+        </td>
       </tr>
       {% endfor %}
     </table>

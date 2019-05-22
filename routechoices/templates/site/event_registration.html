@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{%  block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
+{%  endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Register for event {{ event.name }} by {{ event.club.name }}</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <input type="submit" value="Register" class="btn btn-primary">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
+<script src="{% static '/vendor/bootstrap-datetime-picker-4.17.47/bootstrap-datetimepicker.min.js' %}"></script>
+<script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
+<script>
+  $(function () {
+    var offset = moment().utcOffset();
+    var offsetText = (offset > 0 ? '+' : '-') +
+        ('0' + Math.floor(Math.abs(offset / 60))).slice(-2) + ':' +
+        ('0' + Math.round(offset % 60)).slice(-2);
+    $('.utc-offset').text('(UTC Offset ' + offsetText + ')');
+    $('.datetimepicker').map(function(i, el) {
+      var options = {
+          useCurrent: false,
+          format: 'YYYY-MM-DD HH:mm'
+      }
+      $el = $(el);
+      if($el.val()) {
+        options.date = moment($el.val());
+      }
+      $el.datetimepicker(options);
+    })
+  });
+</script>
+<script>
+Selectize.define('preserve_on_blur', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onBlur = (function(e) {
+        var original = self.onBlur;
+
+        return function(e) {
+            // Capture the current input value
+            var $input = this.$control_input;
+            var inputValue = $input.val();
+
+            // Do the default actions
+            original.apply(this, e);
+
+            // Set the value back
+            var searchResults = this.currentResults.items;
+
+            // If there's only one search result, auto select it
+            if (searchResults.length == 1 && inputValue != "") {
+                if (!self.items[0] || self.items[0] != searchResults[0].id) {
+                    this.addItem(searchResults[0].id, true);
+                }
+            } else {
+                // If there's zero or multiple results, just keep the typed text
+                this.setTextboxValue(inputValue);
+            }
+        };
+    })();
+} );
+</script>
+<script>
+function selectizeDeviceInput(){
+    $("select[name$='device']").selectize({
+        valueField: 'id',
+        labelField: 'aid',
+        searchField: 'aid',
+        multiple: true,
+        create: false,
+        plugins: [ 'preserve_on_blur' ],
+        load: function(query, callback) {
+            if (!query.length || query.length < 2) return callback();
+            $.ajax({
+                url: '/api/device/search/?q=' + encodeURIComponent(query),
+                type: 'GET',
+                error: function() {
+                    callback();
+                },
+                success: function(res) {
+                    callback(res.results);
+                }
+            });
+        }
+    });
+}
+$(function(){
+    selectizeDeviceInput();
+})
+</script>
+{% endblock %}

@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^(?P<slug>[0-9a-zA-Z_-]+)/feed/?$', feeds.club_live_event_feed, name='club_feed'),
     url(r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/?$', views.event_view, name='event_view'),
     url(r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/export/?$', views.event_export_view, name='event_export_view'),
+    url(r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/register/?$', views.event_registration_view, name='event_registration_view'),
 ]
