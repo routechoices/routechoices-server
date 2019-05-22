@@ -555,10 +555,9 @@ var drawCompetitors = function(){
           }
           competitor.mapMarker = null;
           competitor.nameMarker = null;
-          return;
       }
       var loc = route.getByTime(viewedTime);
-      if(loc && !isNaN(loc.coords.latitude)){
+      if(loc && !isNaN(loc.coords.latitude) && hasPointLast30sec){
         if(competitor.mapMarker == undefined){
           competitor.mapMarker = L.circleMarker(
             [loc.coords.latitude, loc.coords.longitude],
