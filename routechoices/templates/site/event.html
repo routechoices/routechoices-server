@@ -582,17 +582,29 @@ var drawCompetitors = function(){
         }
       }
       var tail = route.extractInterval(viewedTime - tailLength * 1e3, viewedTime);
-      var tailLatLng = [];
-      tail.getArray().forEach(function(pos){
-        if(!isNaN(pos.coords.latitude)){
-          tailLatLng.push([pos.coords.latitude, pos.coords.longitude]);
-        }
-      })
-      if(competitor.tail == undefined){
-        competitor.tail = L.polyline(tailLatLng, {color: competitor.color, opacity: 0.75, weight: 5});
-        competitor.tail.addTo(map);
-      }else{
-        competitor.tail.setLatLngs(tailLatLng);
+      var hasPointInTail = route.hasPointInInterval(viewedTime - tailLength * 1e3, viewedTime);
+      if(!hasPointInTail){
+          if(competitor.tail) {
+            map.removeLayer(competitor.tail);
+          }
+          competitor.tail = null;
+      } else {
+          var tailLatLng = [];
+          tail.getArray().forEach(function (pos) {
+              if (!isNaN(pos.coords.latitude)) {
+                  tailLatLng.push([pos.coords.latitude, pos.coords.longitude]);
+              }
+          });
+          if (competitor.tail == undefined) {
+              competitor.tail = L.polyline(tailLatLng, {
+                  color: competitor.color,
+                  opacity: 0.75,
+                  weight: 5
+              });
+              competitor.tail.addTo(map);
+          } else {
+              competitor.tail.setLatLngs(tailLatLng);
+          }
       }
     }
   })
