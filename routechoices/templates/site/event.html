@@ -216,7 +216,7 @@ and (max-device-width : 500px) {
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/positioning.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
 <script>
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
   if (this === null) {
@@ -535,6 +535,7 @@ var drawCompetitors = function(){
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
   $('#progress_bar_text').html(getProgressBarText());
   competitorList.forEach(function(competitor){
+
     if(!competitor.isShown){
       return;
     }
@@ -543,6 +544,22 @@ var drawCompetitors = function(){
       var viewedTime = currentTime;
       if(!isLiveMode && !isRealTime && competitor.start_time){
         viewedTime += new Date(competitor.start_time) - getCompetitionStartDate();
+      }
+      var hasPointLast30sec = route.hasPointInInterval(viewedTime - 30 * 1e3, viewedTime);
+      if(!hasPointLast30sec){
+          if(competitor.mapMarker) {
+            map.removeLayer(competitor.mapMarker);
+          }
+          if(competitor.nameMarker) {
+            map.removeLayer(competitor.nameMarker);
+          }
+          if(competitor.tail) {
+            map.removeLayer(competitor.tail);
+          }
+          competitor.mapMarker = null;
+          competitor.nameMarker = null;
+          competitor.tail = null;
+          return;
       }
       var loc = route.getByTime(viewedTime);
       if(loc && !isNaN(loc.coords.latitude)){
