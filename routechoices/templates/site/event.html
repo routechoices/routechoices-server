@@ -553,12 +553,8 @@ var drawCompetitors = function(){
           if(competitor.nameMarker) {
             map.removeLayer(competitor.nameMarker);
           }
-          if(competitor.tail) {
-            map.removeLayer(competitor.tail);
-          }
           competitor.mapMarker = null;
           competitor.nameMarker = null;
-          competitor.tail = null;
           return;
       }
       var loc = route.getByTime(viewedTime);
