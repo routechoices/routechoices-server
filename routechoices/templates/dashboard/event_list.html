@@ -28,8 +28,8 @@
                 <td>{{ event.club }}</td>
                 <td>
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary">Open</a>
-                    {% if not event.ended and event.open_registration %} <a href="{% url 'site:event_registration_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default">Registration page</a>{% endif %}
-                    {% if not event.hidden %} <a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-default">Upload GPX routes</a>{% endif %}
+                    {% if not event.ended and event.open_registration %} <a href="{% url 'site:event_registration_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default">Registration Page</a>{% endif %}
+                    {% if event.ended and event.allow_route_upload %} <a href="{% url 'site:event_route_upload_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default">Route Upload Page</a>{% endif %}
                 </td>
             </tr>
             {% endfor %}

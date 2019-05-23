@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^event/new/?$', views.event_create_view, name='event_create_view'),
     url(r'^event/(?P<id>[A-Za-z0-9_-]+)/?$', views.event_edit_view, name='event_edit_view'),
     url(r'^event/(?P<id>[A-Za-z0-9_-]+)/delete/?$', views.event_delete_view, name='event_delete_view'),
-    url(r'^event/(?P<id>[A-Za-z0-9_-]+)/upload_gpx/?$', views.event_gpx_upload_view, name='event_gpx_upload_view'),
+    url(r'^event/(?P<id>[A-Za-z0-9_-]+)/upload_route/?$', views.event_route_upload_view, name='event_gpx_upload_view'),
 ]

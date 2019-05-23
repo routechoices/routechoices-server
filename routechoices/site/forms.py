@@ -1,12 +1,20 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, DateTimeInput, HiddenInput, ModelChoiceField
+from django.core.validators import FileExtensionValidator
+from django.forms import ModelForm, DateTimeInput, HiddenInput, \
+    ModelChoiceField, Form, CharField, FileField
 
 from routechoices.core.models import Competitor, Event, Device
 from routechoices.lib.helper import get_aware_datetime
 
 
+class UploadGPXForm(Form):
+    name = CharField(max_length=64, required=True)
+    gpx_file = FileField(validators=[FileExtensionValidator(allowed_extensions=['gpx'])])
+
+
 class CompetitorForm(ModelForm):
     device = ModelChoiceField(required=True, queryset=Device.objects.all())
+
     class Meta:
         model = Competitor
         fields = ('event', 'device', 'name', 'start_time')

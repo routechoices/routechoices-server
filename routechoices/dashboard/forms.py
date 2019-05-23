@@ -44,13 +44,11 @@ class MapForm(ModelForm):
         return f_new
 
 
-
-
 class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = ['club', 'name', 'slug', 'privacy', 'open_registration',
-                  'start_date', 'end_date', 'map']
+                  'allow_route_upload', 'start_date', 'end_date', 'map']
         widgets = {
             'start_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
             'end_date': DateTimeInput(attrs={'class': 'datetimepicker'})

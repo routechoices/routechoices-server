@@ -498,7 +498,7 @@ def dashboard_map_download(request, id, *args, **kwargs):
 
 
 @login_required
-def event_gpx_upload_view(request, id):
+def event_route_upload_view(request, id):
     club_list = Club.objects.filter(admins=request.user)
     event = get_object_or_404(
         Event,
@@ -525,6 +525,7 @@ def event_gpx_upload_view(request, id):
             if not error:
                 device = Device.objects.create()
                 device.aid += '_GPX'
+                device.is_gpx = True
                 device.save()
                 points = []
                 for track in gpx.tracks:

@@ -15,7 +15,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
 
-            <h3>Competitors {% if not event.hidden %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-default">Upload GPX routes</a>{% endif %}</h3>
+            <h3>Competitors {% if not event.hidden %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
             {% bootstrap_formset_errors formset %}
             <table class="table">
             {{ formset.management_form }}
@@ -70,7 +70,7 @@
 <script>
     $("label[for$='DELETE']").parents('.form-group').hide()
     $('.formset_row').formset({
-        addText: 'Add Competitor',
+        addText: '<i class="fa fa-plus-circle"></i> Add Competitor',
         addCssClass: 'btn btn-primary add-competitor-btn',
         deleteText: '<i class="fa fa-trash fa-2x"></i>',
         prefix: 'competitors'

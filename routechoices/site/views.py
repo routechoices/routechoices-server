@@ -1,3 +1,4 @@
+import gpxpy
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -10,9 +11,9 @@ from routechoices.core.models import (
     Club,
     PRIVACY_PUBLIC,
     PRIVACY_PRIVATE,
-    Device)
+    Device, Location, Competitor)
 from routechoices.lib.helper import initial_of_name
-from routechoices.site.forms import CompetitorForm
+from routechoices.site.forms import CompetitorForm, UploadGPXForm
 
 
 def home_view(request):
@@ -137,10 +138,89 @@ def event_registration_view(request, club_slug, slug):
     else:
         form = CompetitorForm(initial={'event': event})
         form.fields['device'].queryset = Device.objects.none()
-    form.fields['device'].label = "Device ID"
+    form.fields['device'].label = "Live Streaming Device ID"
     return render(
         request,
         'site/event_registration.html',
+        {
+            'event': event,
+            'form': form,
+        }
+    )
+
+
+def event_route_upload_view(request, club_slug, slug):
+    event = Event.objects.all().filter(
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+        allow_route_upload=True,
+    ).filter(
+        end_date__isnull=False,
+        end_date__lt=now()
+    ).first()
+    if not event:
+        raise Http404()
+    if request.method == 'POST':
+        form = UploadGPXForm(request.POST, request.FILES)
+        # check whether it's valid:
+        if form.is_valid():
+            error = None
+            try:
+                gpx_file = form.cleaned_data['gpx_file'].read().decode('utf8')
+            except UnicodeDecodeError:
+                error = "Couldn't decode file"
+            if not error:
+                try:
+                    gpx = gpxpy.parse(gpx_file)
+                except Exception:
+                    error = "Couldn't parse file"
+            if not error:
+                device = Device.objects.create()
+                device.aid += '_GPX'
+                device.is_gpx = True
+                device.save()
+                points = []
+                start_time = None
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        for point in segment.points:
+                            points.append(
+                                Location(
+                                    device=device,
+                                    datetime=point.time,
+                                    latitude=point.latitude,
+                                    longitude=point.longitude,
+                                )
+                            )
+                            if not start_time:
+                                start_time = point.time
+                Location.objects.bulk_create(points)
+                competitor_name = form.cleaned_data['name']
+                competitor = Competitor.objects.create(
+                    event=event,
+                    name=competitor_name,
+                    short_name=initial_of_name(competitor_name),
+                    device=device,
+                )
+                if event.start_date <= start_time <= event.end_date:
+                    competitor.start_time = start_time
+                competitor.save()
+            messages.success(
+                request,
+                'You successfully uploaded your route for this event.'
+            )
+            return redirect(
+                'site:event_route_upload_view',
+                **{
+                    'club_slug': event.club.slug,
+                    'slug': event.slug,
+                }
+            )
+    else:
+        form = UploadGPXForm()
+    return render(
+        request,
+        'site/event_route_upload.html',
         {
             'event': event,
             'form': form,

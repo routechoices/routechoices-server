@@ -254,7 +254,11 @@ class Event(models.Model):
     )
     open_registration = models.BooleanField(
         default=False,
-        help_text="Participant can register themselves to the event through a webpage.",
+        help_text="Participants can register themselves to the event.",
+    )
+    allow_route_upload = models.BooleanField(
+        default=False,
+        help_text="Participants can upload their routes after the event.",
     )
 
     @property
@@ -356,6 +360,7 @@ class Device(models.Model):
         unique=True,
         validators=[validate_slug, ]
     )
+    is_gpx = models.BooleanField(default=False)
 
     def __str__(self):
         return self.aid
