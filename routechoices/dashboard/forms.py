@@ -109,6 +109,6 @@ CompetitorFormSet = inlineformset_factory(
     Competitor,
     form=CompetitorForm,
     extra=1,
-    min_num=1,
+    min_num=0,
     validate_min=True
 )
