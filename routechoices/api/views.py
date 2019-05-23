@@ -242,7 +242,7 @@ def device_search(request):
     devices = []
     q = request.GET.get('q')
     if q and len(q) > 2:
-        devices = Device.objects.filter(aid__startswith=q)\
+        devices = Device.objects.filter(aid__startswith=q, is_gpx=False) \
             .values_list('id', 'aid')[:10]
     return Response({'results': [{'id': d[0], 'aid': d[1]} for d in devices]})
 
