@@ -82,32 +82,56 @@ $(function(){
     var corners_latlng = [];
     var calib_string = null;
 
+    function resetOrientation(src, callback) {
+        var img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = function() {
+            var width = img.width,
+                height = img.height,
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext("2d");
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0);
+            // export base64
+            callback(canvas.toDataURL('image/jpeg', 0.4));
+        }
+        img.src = src;
+    }
+
     function loadImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
         var imageURL = $(imageInput).parent().children('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {
-                var img = new Image();
-                img.addEventListener("load", function () {
-                    raster_map_image = img;
-                    display_preview_map();
-                });
-                img.src = e.target.result;
+                resetOrientation(
+                    e.target.result,
+                    function(imgDataURI) {
+                        var img = new Image();
+                        img.onload = function () {
+                            $('#help_text').text(help_texts[0]);
+                            display_raster_map(img);
+                            display_world_map();
+                        };
+                        img.src = imgDataURI;
+                    }
+                );
             };
             fr.readAsDataURL(imageInput.files[0]);
         } else if (imageURL) {
             var img = new Image();
             img.addEventListener("load", function () {
-                raster_map_image = img;
-                display_preview_map();
+                $('#help_text').text(help_texts[0]);
+                display_raster_map(img);
+                display_world_map();
             });
             img.src = imageURL;
         } else {
             window.close();
         }
     }
-
+    
     function isValidCalibString(s){
         return s.match(/^(\-?\d+\.\d+,){7}\-?\d+\.\d+$/)
 
