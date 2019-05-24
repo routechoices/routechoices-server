@@ -244,7 +244,7 @@ $(function(){
             canvas.height = height;
             ctx.drawImage(img, 0, 0);
             // export base64
-            callback(canvas.toDataURL());
+            callback(canvas.toDataURL('image/jpeg', 0.4));
         }
         img.src = src;
     }
