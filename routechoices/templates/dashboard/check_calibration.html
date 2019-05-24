@@ -110,9 +110,8 @@ $(function(){
                     function(imgDataURI) {
                         var img = new Image();
                         img.onload = function () {
-                            $('#help_text').text(help_texts[0]);
-                            display_raster_map(img);
-                            display_world_map();
+                            raster_map_image = img;
+                            display_preview_map();
                         };
                         img.src = imgDataURI;
                     }
@@ -122,9 +121,8 @@ $(function(){
         } else if (imageURL) {
             var img = new Image();
             img.addEventListener("load", function () {
-                $('#help_text').text(help_texts[0]);
-                display_raster_map(img);
-                display_world_map();
+                raster_map_image = img;
+                display_preview_map();
             });
             img.src = imageURL;
         } else {
