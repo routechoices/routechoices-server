@@ -45,6 +45,8 @@ def events_view(request):
 
 
 def club_view(request, slug):
+    if slug in ( 'api', 'admin', 'dashboard',):
+        return redirect('/{}/'.format(slug))
     club = get_object_or_404(
         Club,
         slug__iexact=slug

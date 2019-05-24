@@ -264,6 +264,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = '2'
 ACCOUNT_USERNAME_VALIDATORS ='routechoices.lib.validators.custom_username_validators'
 
+APPEND_SLASH = True
 
 try:
     from .local_settings import *

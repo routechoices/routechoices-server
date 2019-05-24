@@ -1,9 +1,9 @@
 from django.conf.urls import url
-from django.views.generic import TemplateView
 
 from routechoices.api import views
 
 urlpatterns = [
+    url(r'', views.api_root, name='api_root'),
     url(r'^device_id/?$', views.get_device_id, name='device_id_api'),
     url(r'^gps_seuranta_proxy/?$', views.gps_seuranta_proxy, name='gps_seuranta_proxy'),
     url(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),

@@ -60,6 +60,11 @@ def x_accel_redirect(request, path, filename='',
 
 
 @api_view(['GET'])
+def api_root(request):
+    return Response()
+
+
+@api_view(['GET'])
 def event_data(request, aid):
     t0 = time.time()
     event = get_object_or_404(Event, aid=aid, start_date__lt=now())
