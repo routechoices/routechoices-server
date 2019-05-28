@@ -28,8 +28,6 @@ class CompetitorForm(ModelForm):
         event = Event.objects.get(id=self.data.get('event'))
         event_start = event.start_date
         event_end = event.end_date
-        if event_end:
-            event_end = get_aware_datetime(event_end)
         if start and ((not event_end and event_start > start)
                       or (event_end
                           and (event_start > start
