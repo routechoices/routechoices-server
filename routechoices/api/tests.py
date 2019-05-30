@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from routechoices.core.models import Location
+from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 
 
 class ApiTestCase(APITestCase):
@@ -73,3 +74,19 @@ class ApiTestCase(APITestCase):
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         nb_points = Location.objects.filter(device__aid=dev_id).count()
         self.assertEquals(nb_points, 2)
+
+    def test_pwa_api_gw(self):
+        url = self.reverse_and_check('api:pwa_api_gw', '/api/pwa')
+        dev_id = self.get_device_id()
+        t = time.time()
+        gps_encoded = GeoLocationSeries([])
+        gps_encoded.insert(GeoLocation(t, [1.1, 2.2]))
+        gps_encoded.insert(GeoLocation(t + 1, [1.2, 2.1]))
+        gps_encoded.insert(GeoLocation(t + 2, [1.3, 2.0]))
+        res = self.client.post(url, {
+            'id': dev_id,
+            'raw_data': str(gps_encoded)
+        })
+        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        nb_points = Location.objects.filter(device__aid=dev_id).count()
+        self.assertEquals(nb_points, 3)
