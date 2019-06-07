@@ -30,7 +30,8 @@ RUN set -ex \
     )" \
     && apk add --virtual .python-rundeps $runDeps \
     && apk del .build-deps \
-    && apk add --no-cache --virtual .psql postgresql-client
+    && apk add --no-cache --virtual .psql postgresql-client \
+    && apk add --no-cache --virtual .deps libjpeg libjpeg-turbo libxslt
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /app/
