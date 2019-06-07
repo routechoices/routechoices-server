@@ -1,5 +1,6 @@
 import base64
 import datetime
+import hashlib
 import re
 from io import BytesIO
 from urllib.parse import urlencode
@@ -196,6 +197,13 @@ class Map(models.Model):
             save=False,
         )
         self.image.close()
+
+    @property
+    def hash(self):
+        hash = hashlib.sha256()
+        hash.update(self.data_uri.encode('utf-8'))
+        hash.update(self.corners_coordinates.encode('utf-8'))
+        return base64.b64encode(hash.digest()).decode('utf-8')
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.club)

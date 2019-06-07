@@ -93,6 +93,26 @@ def event_data(request, aid):
 
 
 @api_view(['GET'])
+def event_map_details(request, aid):
+    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    if not event.map:
+        return Response({
+            'hash': '',
+            'last_mod': '',
+            'corners_coordinates': '',
+        })
+    map = event.map
+    return Response({
+        'hash': map.hash,
+        'last_mod': map.modification_date,
+        'corners_coordinates': map.corners_coordinates,
+    })
+
+@api_view(['GET'])
 def event_rg_data(request, aid):
     t0 = time.time()
     event = get_object_or_404(Event, aid=aid, start_date__lt=now())

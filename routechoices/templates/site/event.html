@@ -256,6 +256,10 @@ var isCurrentlyFetchingRoutes = false;
 var currentTime = 0;
 var lastNbPoints = 0;
 var optionDisplayed = false;
+var mapDetailsUrl = null;
+var mapHash = '';
+var mapUrl = null;
+var rasterMap = null;
 
 var COLORS = new function(){
     var colors = ["#09F","#3D0","#F09","#D30","#30D","#DD0","#2DD","#D00","#D33","#00D","#DD2","#BFB"],
@@ -296,6 +300,7 @@ var selectLiveMode = function(e){
   (function whileLive(){
     if (+clock.now()-routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes();
+      fetchMapDetails();
     }
     currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3;
     drawCompetitors();
@@ -360,7 +365,23 @@ var fetchCompetitorRoutes = function(url){
     isCurrentlyFetchingRoutes = false;
   });
 };
-
+var fetchMapDetails = function() {
+  $.ajax({
+    url: mapDetailsUrl
+  }).done(function(response){
+    if (mapHash != response.hash) {
+      mapHash = response.hash;
+      if (mapHash != '') {
+        var lastMod = + new Date(response.last_mod);
+        var stemp = response.corners_coordinates.split(',');
+        removeRasterMap();
+        addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl + '?t=' + lastMod);
+      } else {
+        removeRasterMap();
+      }
+    }
+  })
+}
 var updateCompetitorList = function(newList) {
     newList.forEach(updateCompetitor)
 }
@@ -621,13 +642,22 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(a,b,c,d,src,txt){
+function addRasterMap(a, b, c, d, src, fit=false){
   var anchors = [a, b, c, d];
-  new L.ImageTransform(
+  rasterMap = new L.ImageTransform(
     src,
     anchors
   ).addTo(map);
-  map.fitBounds(anchors)
+  if(fit) {
+    map.fitBounds(anchors)
+  }
+}
+
+function removeRasterMap() {
+  if (rasterMap) {
+    map.removeLayer(rasterMap);
+    rasterMap = null;
+  }
 }
 
 $(function() {
@@ -719,11 +749,13 @@ $(function() {
   {% else %}
   isLiveEvent = false;
   {% endif %}
-  liveUrl = '{% url 'api:event_data' aid=event.aid %}'
+  liveUrl = '{% url 'api:event_data' aid=event.aid %}';
+  mapDetailsUrl = '{% url 'api:event_map_details' aid=event.aid %}';
+  mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
+  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}'
   {% if event.map %}
-  var mapUrl = '{% url 'api:event_map_download' aid=event.aid %}'
   var stemp= '{{ event.map.corners_coordinates }}'.split(',');
-  addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl);
+  addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);
   {% endif %}
 
   onStart();
