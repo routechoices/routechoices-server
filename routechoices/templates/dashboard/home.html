@@ -39,6 +39,7 @@
     <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
       <div class="list-group">
         <a href="{% url 'dashboard:account_edit_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}">Account</a>
+        <a href="{% url 'dashboard:device_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}">Devices</a>
         <a href="{% url 'dashboard:club_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:club_list_view' %}active{% endif %}">Clubs</a>
         <a href="{% url 'dashboard:map_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}">Maps</a>
         <a href="{% url 'dashboard:event_list_view' %}" class="list-group-item {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}">Events</a>

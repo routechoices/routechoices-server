@@ -1,0 +1,22 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary">Add new device</a>
+        <h1>Your Devices</h1>
+        {% if not devices %}
+            <p>You haven't added any devices as yours yet.</p>
+        {% else %}
+        <table class="table table-striped">
+            {% for device in devices %}
+            <tr><td><span class="label label-default" style="font-size: 1.5em">{{ device.aid }}</span></td><td><a class="btn btn-danger" href="{% url 'dashboard:device_remove_view' id=device.aid %}">Remove</a></td></tr>
+            {% endfor %}
+        </table>
+        {% bootstrap_pagination devices extra=request.GET.urlencode %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

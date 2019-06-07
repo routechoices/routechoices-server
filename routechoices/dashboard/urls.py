@@ -8,8 +8,12 @@ urlpatterns = [
     url(r'^account/?$', views.account_edit_view, name='account_edit_view'),
     url(r'^calibrate_map/?$', views.calibration_view, name='calibration_view'),
     url(r'^check_calibration/?$', views.check_calibration_view, name='check_calibration_view'),
-    url(r'^club/?$', views.club_list_view, name='club_list_view'),
 
+    url(r'^device/?$', views.device_list_view, name='device_list_view'),
+    url(r'^device/add/?$', views.device_add_view, name='device_add_view'),
+    url(r'^device/(?P<id>[A-Za-z0-9_-]+)/remove/?$', views.device_remove_view, name='device_remove_view'),
+
+    url(r'^club/?$', views.club_list_view, name='club_list_view'),
     url(r'^club/new/?$', views.club_create_view, name='club_create_view'),
     url(r'^club/(?P<id>[A-Za-z0-9_-]+)/?$', views.club_edit_view, name='club_edit_view'),
     url(r'^club/(?P<id>[A-Za-z0-9_-]+)/delete/?$', views.club_delete_view, name='club_delete_view'),

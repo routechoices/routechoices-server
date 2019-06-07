@@ -1,0 +1,84 @@
+{% extends "dashboard/home.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{%  block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
+{%  endblock %}
+
+{% block sub_content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Add your device</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+<script src="{%  static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>
+<script>
+Selectize.define('preserve_on_blur', function(options) {
+    var self = this;
+
+    options.text = options.text || function(option) {
+            return option[this.settings.labelField];
+        };
+
+    this.onBlur = (function(e) {
+        var original = self.onBlur;
+
+        return function(e) {
+            // Capture the current input value
+            var $input = this.$control_input;
+            var inputValue = $input.val();
+
+            // Do the default actions
+            original.apply(this, e);
+
+            // Set the value back
+            var searchResults = this.currentResults.items;
+
+            // If there's only one search result, auto select it
+            if (searchResults.length == 1 && inputValue != "") {
+                if (!self.items[0] || self.items[0] != searchResults[0].id) {
+                    this.addItem(searchResults[0].id, true);
+                }
+            } else {
+                // If there's zero or multiple results, just keep the typed text
+                this.setTextboxValue(inputValue);
+            }
+        };
+    })();
+} );
+</script>
+<script>
+$('#id_device').selectize({
+    valueField: 'id',
+    labelField: 'aid',
+    searchField: 'aid',
+    multiple: true,
+    create: false,
+    plugins: [ 'preserve_on_blur' ],
+    load: function(query, callback) {
+        if (!query.length || query.length < 2) return callback();
+        $.ajax({
+            url: '/api/device/search/?q=' + encodeURIComponent(query),
+            type: 'GET',
+            error: function() {
+                callback();
+            },
+            success: function(res) {
+                callback(res.results);
+            }
+        });
+    }
+});
+</script>
+{%  endblock %}

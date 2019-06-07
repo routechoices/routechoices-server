@@ -10,12 +10,18 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
-from routechoices.core.models import Club, Map, Event, Device, Location
-from routechoices.dashboard.forms import ClubForm, MapForm, EventForm, \
-    CompetitorFormSet, UploadGPXForm, UploadKmzForm
+from routechoices.core.models import (
+    Club, Map, Event, Device, Location,
+    DeviceOwnership
+)
+from routechoices.dashboard.forms import (
+    ClubForm, MapForm, EventForm,
+    CompetitorFormSet, UploadGPXForm, UploadKmzForm, DeviceForm
+)
 from routechoices.lib.kmz import extract_ground_overlay_info
 
 logger = logging.getLogger(__name__)
@@ -55,6 +61,75 @@ def account_edit_view(request):
 
 
 @login_required
+def device_list_view(request):
+    device_list = Device.objects.filter(owners=request.user)
+
+    paginator = Paginator(device_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get('page')
+    devices = paginator.get_page(page)
+
+    return render(
+        request,
+        'dashboard/device_list.html',
+        {
+            'devices': devices
+        }
+    )
+
+
+@login_required
+def device_add_view(request):
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = DeviceForm(request.POST)
+        # check whether it's valid:
+        form.fields['device'].queryset = Device.objects.exclude(
+            owners=request.user
+        )
+        if form.is_valid():
+            device = form.cleaned_data['device']
+            ownership = DeviceOwnership()
+            ownership.user = request.user
+            ownership.device = device
+            ownership.save()
+            return redirect('dashboard:device_list_view')
+    else:
+        form = DeviceForm()
+        form.fields['device'].queryset = Device.objects.none()
+    return render(
+        request,
+        'dashboard/device_add.html',
+        {
+            'form': form,
+        }
+    )
+
+
+@login_required
+def device_remove_view(request, id):
+    ownership = DeviceOwnership.objects \
+    .select_related('device') \
+    .filter(
+        device__aid=id,
+        user=request.user
+    ).first()
+
+    if not ownership:
+        raise Http404('No such device owned by you.')
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        ownership.delete()
+        return redirect('dashboard:device_list_view')
+    return render(
+        request,
+        'dashboard/device_remove.html',
+        {
+            'device': ownership.device,
+        }
+    )
+
+@login_required
 def club_list_view(request):
     club_list = Club.objects.filter(admins=request.user)
 
@@ -85,7 +160,7 @@ def club_create_view(request):
             return redirect('dashboard:club_list_view')
     else:
         form = ClubForm()
-        form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
+    form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
     return render(
         request,
         'dashboard/club_create.html',
@@ -112,7 +187,7 @@ def club_edit_view(request, id):
             return redirect('dashboard:club_list_view')
     else:
         form = ClubForm(instance=club)
-        form.fields['admins'].queryset = User.objects.filter(id__in=club.admins.all())
+    form.fields['admins'].queryset = User.objects.filter(id__in=club.admins.all())
     return render(
         request,
         'dashboard/club_edit.html',

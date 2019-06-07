@@ -425,6 +425,8 @@ class DeviceOwnership(models.Model):
     )
     creation_date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = (('device', 'user'), )
 
 class Competitor(models.Model):
     aid = models.CharField(

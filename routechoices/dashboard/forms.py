@@ -13,7 +13,7 @@ from django.forms import (
     FileField,
 )
 
-from routechoices.core.models import Club, Map, Event, Competitor
+from routechoices.core.models import Club, Map, Event, Competitor, Device
 from routechoices.lib.helper import get_aware_datetime
 
 
@@ -21,6 +21,14 @@ class ClubForm(ModelForm):
     class Meta:
         model = Club
         fields = ['name', 'slug', 'admins']
+
+
+class DeviceForm(Form):
+    device = ModelChoiceField(
+        label="Device ID",
+        help_text="Enter the device ID used by your tracker",
+        queryset=Device.objects.all(),
+    )
 
 
 class MapForm(ModelForm):
