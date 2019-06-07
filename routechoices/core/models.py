@@ -369,6 +369,12 @@ class Device(models.Model):
         validators=[validate_slug, ]
     )
     is_gpx = models.BooleanField(default=False)
+    owners = models.ManyToManyField(
+        User,
+        through='DeviceOwnership',
+        related_name='devices',
+        through_fields=('device', 'user'),
+    )
 
     def __str__(self):
         return self.aid
@@ -404,6 +410,20 @@ class Device(models.Model):
         ordering = ['aid']
         verbose_name = 'device'
         verbose_name_plural = 'devices'
+
+
+class DeviceOwnership(models.Model):
+    device = models.ForeignKey(
+        Device,
+        related_name='ownerships',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User,
+        related_name='ownerships',
+        on_delete=models.CASCADE
+    )
+    creation_date = models.DateTimeField(auto_now_add=True)
 
 
 class Competitor(models.Model):
