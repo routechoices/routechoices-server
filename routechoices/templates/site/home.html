@@ -3,6 +3,7 @@
 
 {% block content %}
 <video poster="{% static 'background.jpg'%}" class="bg_video" playsinline autoplay muted loop>
+  <source src="{% static 'background.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
   <source src="{% static 'background.mp4'%}" type="video/mp4">
   <source src="{% static 'background.webm'%}" type="video/webm">
 </video>
