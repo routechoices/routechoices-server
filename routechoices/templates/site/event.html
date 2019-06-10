@@ -217,6 +217,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
+<script type="text/javascript" src="{% static '/vendor/cooleur-0.0.1/cooleur.js' %}"></script>
 <script>
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
   if (this === null) {
@@ -260,18 +261,6 @@ var mapDetailsUrl = null;
 var mapHash = '';
 var mapUrl = null;
 var rasterMap = null;
-
-var COLORS = new function(){
-    var colors = ["#09F","#3D0","#F09","#D30","#30D","#DD0","#2DD","#D00","#D33","#00D","#DD2","#BFB"],
-        $t = this;
-    $t.cnt = -1;
-    $t.get = function(i){
-        this.cnt++;
-        if( this.cnt == colors.length )this.cnt = 0;
-        return colors[(i % colors.length) || this.cnt];
-    };
-    return $t;
-};
 
 var onStart = function(){
   if(isLiveEvent){
@@ -406,7 +395,7 @@ var displayCompetitorList = function(){
     var listDiv = $('<ul/>');
     listDiv.addClass('media-list');
     competitorList.forEach(function(competitor, ii){
-      competitor.color = competitor.color || COLORS.get(ii);
+      competitor.color = competitor.color || Cooleur.candyColor(ii + 1);
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown;
       var div = $('<li/>');
       div.addClass('media').html('\

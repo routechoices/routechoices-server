@@ -2,8 +2,6 @@ from django.core.management.base import BaseCommand
 from routechoices.core.models import Map
 
 
-
-
 class Command(BaseCommand):
     help = 'Strip map images from exif data'
 
