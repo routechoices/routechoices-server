@@ -7,6 +7,7 @@ import requests
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
 
+from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
 
 
@@ -49,24 +50,76 @@ def get_country_from_coords(lat,lon):
 
 
 def solve_affine_matrix(r1, s1, t1, r2, s2, t2, r3, s3, t3):
-    a = (((t2 - t3) * (s1 - s2)) - ((t1 - t2) * (s2 - s3))) \
-        / (((r2 - r3) * (s1 - s2)) - ((r1 - r2) * (s2 - s3)))
-    b = (((t2 - t3) * (r1 - r2)) - ((t1 - t2) * (r2 - r3))) \
-        / (((s2 - s3) * (r1 - r2)) - ((s1 - s2) * (r2 - r3)))
+    a = (((t2 - t3) * (s1 - s2)) - ((t1 - t2) * (s2 - s3))) / (((r2 - r3) * (s1 - s2)) - ((r1 - r2) * (s2 - s3)))
+    b = (((t2 - t3) * (r1 - r2)) - ((t1 - t2) * (r2 - r3))) / (((s2 - s3) * (r1 - r2)) - ((s1 - s2) * (r2 - r3)))
     c = t1 - (r1 * a) - (s1 * b)
-    return a, b, c
+    return [a, b, c]
 
 
-def derive_affine_transform(a0, a1, b0, b1, c0, c1):
+def derive_affine_transform(a1, b1, c1, a0, b0, c0):
+    e = 1e-15
+    a0['x'] -= e
+    a0['y'] += e
+    b0['x'] += e
+    b0['y'] -= e
+    a1['x'] += e
+    a1['y'] += e
+    b1['x'] -= e
+    b1['y'] -= e
     x = solve_affine_matrix(
-        a0.x, a0.y, a1.x,
-        b0.x, b0.y, b1.x,
-        c0.x, c0.y, c1.x)
+        a0['x'], a0['y'], a1['x'],
+        b0['x'], b0['y'], b1['x'],
+        c0['x'], c0['y'], c1['x']
+    )
     y = solve_affine_matrix(
-        a0.x, a0.y, a1.y,
-        b0.x, b0.y, b1.y,
-        c0.x, c0.y, c1.y)
+        a0['x'], a0['y'], a1['y'],
+        b0['x'], b0['y'], b1['y'],
+        c0['x'], c0['y'], c1['y']
+    )
     return tuple(x + y)
+
+
+def three_point_calibration_to_corners(calibration_string, width, height):
+    cal_pts_raw = calibration_string.split('|')
+    cal_pts = [
+     {
+         'lng': float(cal_pts_raw[0]), 'lat': float(cal_pts_raw[1]),
+         'x': float(cal_pts_raw[2]), 'y': float(cal_pts_raw[3])
+     },
+     {
+         'lng': float(cal_pts_raw[4]), 'lat': float(cal_pts_raw[5]),
+         'x': float(cal_pts_raw[6]), 'y': float(cal_pts_raw[7])
+     },
+     {
+         'lng': float(cal_pts_raw[8]), 'lat': float(cal_pts_raw[9]),
+         'x': float(cal_pts_raw[10]), 'y': float(cal_pts_raw[11])
+     }
+    ]
+    proj = GlobalMercator()
+    cal_pts_meter = [
+      proj.latlon_to_meters(cal_pts[0]),
+      proj.latlon_to_meters(cal_pts[1]),
+      proj.latlon_to_meters(cal_pts[2])
+    ]
+    xy_to_coords_coeffs = derive_affine_transform(*cal_pts_meter, *cal_pts)
+
+    def map_xy_to_latlon(xy):
+        x = xy['x'] * xy_to_coords_coeffs[0] + xy['y'] * xy_to_coords_coeffs[1] + xy_to_coords_coeffs[2]
+        y = xy['x'] * xy_to_coords_coeffs[3] + xy['y'] * xy_to_coords_coeffs[4] + xy_to_coords_coeffs[5]
+        return proj.meters_to_latlon({'x': x, 'y': y})
+
+    corners = [
+      map_xy_to_latlon({'x': 0, 'y': 0}),
+      map_xy_to_latlon({'x': width, 'y': 0}),
+      map_xy_to_latlon({'x': width, 'y': height}),
+      map_xy_to_latlon({'x': 0, 'y': height}),
+    ]
+    return [
+        round(corners[0]['lat'], 5), round(corners[0]['lng'], 5),
+        round(corners[1]['lat'], 5), round(corners[1]['lng'], 5),
+        round(corners[2]['lat'], 5), round(corners[2]['lng'], 5),
+        round(corners[3]['lat'], 5), round(corners[3]['lng'], 5),
+    ]
 
 
 def adjugate_matrix(m):

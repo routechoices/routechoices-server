@@ -11,6 +11,7 @@ MANIFEST
 *.save
 *.save.*
 *.idea
+*.vscode
 *.bak
 media/*
 static/*
