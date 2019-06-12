@@ -108,7 +108,8 @@ class Command(BaseCommand):
                 d = pt.split(',')
                 if not device_map.get(int(d[0])):
                     device_map[int(d[0])] = Device.objects.create(
-                        aid=short_random_key() + '_LOG'
+                        aid=short_random_key() + '_LOG',
+                        is_gpx=True,
                     )
                 locs.append(
                     Location(

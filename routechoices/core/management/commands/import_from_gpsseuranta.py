@@ -145,7 +145,8 @@ class Command(BaseCommand):
                     dev_id, _ = dev_id.split('_', 1)
                 if not device_map.get(dev_id):
                     device_map[dev_id] = Device.objects.create(
-                        aid=short_random_key() + '_SEU'
+                        aid=short_random_key() + '_SEU',
+                        is_gpx=True,
                     )
                 dev = device_map[dev_id]
                 pts, event_start_date, event_end_date = self.decode_track_line(
