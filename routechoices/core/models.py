@@ -2,6 +2,7 @@ import base64
 import datetime
 import hashlib
 import re
+import time
 from io import BytesIO
 from urllib.parse import urlencode
 
@@ -87,7 +88,7 @@ def map_upload_path(instance=None, file_name=None):
     ]
     if file_name:
         pass
-    basename = instance.aid
+    basename = instance.aid + '_' + str(int(time.time()))
     tmp_path.append(basename[0])
     tmp_path.append(basename[1])
     tmp_path.append(basename)
@@ -135,7 +136,7 @@ class Map(models.Model):
 
     @property
     def path(self):
-        return map_upload_path(instance=self)
+        return self.image.path
 
     @property
     def data(self):
@@ -427,6 +428,7 @@ class DeviceOwnership(models.Model):
 
     class Meta:
         unique_together = (('device', 'user'), )
+
 
 class Competitor(models.Model):
     aid = models.CharField(
