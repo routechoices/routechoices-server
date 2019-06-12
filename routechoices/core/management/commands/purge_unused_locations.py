@@ -2,7 +2,21 @@ from django.core.management.base import BaseCommand
 from routechoices.core.models import Location, Event
 
 from datetime import timedelta
+from django.db.backends.signals import connection_created
 from django.utils.timezone import now
+
+
+def set_timeout_on_new_conn(sender, connection, **kwargs):
+    """
+        Rig django to set statement timeout for each new connection based on the config
+    """
+    timeout_to_set = 120000     # Set timeout to 2 minutes
+
+    with connection.cursor() as cursor:
+        cursor.execute("set statement_timeout={0}".format(timeout_to_set))
+
+
+connection_created.connect(set_timeout_on_new_conn)
 
 
 class Command(BaseCommand):
