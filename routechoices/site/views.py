@@ -186,16 +186,17 @@ def event_route_upload_view(request, club_slug, slug):
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
-                            points.append(
-                                Location(
-                                    device=device,
-                                    datetime=point.time,
-                                    latitude=point.latitude,
-                                    longitude=point.longitude,
+                            if point.time and point.latitude and point.longitude:
+                                points.append(
+                                    Location(
+                                        device=device,
+                                        datetime=point.time,
+                                        latitude=point.latitude,
+                                        longitude=point.longitude,
+                                    )
                                 )
-                            )
-                            if not start_time:
-                                start_time = point.time
+                                if not start_time:
+                                    start_time = point.time
                 Location.objects.bulk_create(points)
                 competitor_name = form.cleaned_data['name']
                 competitor = Competitor.objects.create(

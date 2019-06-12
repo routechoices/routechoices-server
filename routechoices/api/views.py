@@ -5,6 +5,7 @@ import time
 import urllib.parse
 from itertools import chain
 
+import arrow
 import requests
 
 from django.conf import settings
@@ -34,6 +35,7 @@ from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
+API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
 
 
 def x_accel_redirect(request, path, filename='',
@@ -162,8 +164,18 @@ def traccar_api_gw(request):
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
+    try:
+        lat = float(lat)
+        lon = float(lon)
+        tim = int(float(tim))
+    except ValueError:
+        logger.error('Wrong data format')
+        raise ValidationError('Invalid data format')
+    if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
+        logger.error('Too old position')
+        raise ValidationError('Position too old to add from API')
     if lat and lon and tim:
-        device.add_location(float(lat), float(lon), int(float(tim)))
+        device.add_location(lat, lon, tim)
     else:
         if not lat:
             logger.error('No lat')
@@ -187,9 +199,25 @@ def garmin_api_gw(request):
     times = request.data.get('timestamps', '').split(',')
     if len(lats) != len(lons) != len(times):
         raise ValidationError('Data error')
+    locs = []
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
-            device.add_location(float(lats[i]), float(lons[i]), int(float(times[i])))
+            try:
+                lat = float(lats[i])
+                lon = float(lons[i])
+                tim = int(float(times[i]))
+            except ValueError:
+                continue
+            if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
+                continue
+            locs.append(Location(
+                device=device,
+                latitude=lat,
+                longitude=lon,
+                datetime=arrow.get(tim).datetime
+            ))
+    if locs:
+        Location.objects.bulk_create(locs)
     return Response({'status': 'ok'})
 
 
@@ -201,19 +229,23 @@ def pwa_api_gw(request):
             'Use the official Routechoices.com Tracker web app'
         )
     device = get_object_or_404(Device, aid=device_id)
-
+    locs = []
     raw_data = request.POST.get('raw_data')
-    if raw_data:
-        locations = GeoLocationSeries(raw_data)
-        for location in locations:
-            device.add_location(
-                location.coordinates.latitude,
-                location.coordinates.longitude,
-                location.timestamp
-            )
-    else:
+    if not raw_data:
         raise ValidationError('Missing raw_data argument')
-    return Response({'status': 'ok', 'n': len(locations)})
+    locations = GeoLocationSeries(raw_data)
+    for location in locations:
+        if abs(time.time() - int(location.timestamp)) > API_LOCATION_TIMESTAMP_MAX_AGE:
+            continue
+        locs.append(Location(
+            device=device,
+            latitude=location.coordinates.latitude,
+            longitude=location.coordinates.longitude,
+            datetime=arrow.get(int(location.timestamp)).datetime
+        ))
+    if locs:
+        Location.objects.bulk_create(locs)
+    return Response({'status': 'ok', 'n': len(locs)})
 
 
 class DataRenderer(renderers.BaseRenderer):
