@@ -261,6 +261,7 @@ var mapDetailsUrl = null;
 var mapHash = '';
 var mapUrl = null;
 var rasterMap = null;
+var searchText = null;
 
 var onStart = function(){
   if(isLiveEvent){
@@ -392,7 +393,7 @@ var displayCompetitorList = function(){
     if (optionDisplayed){
       return;
     }
-    var listDiv = $('<ul/>');
+    var listDiv = $('<ul id="listCompetitor"/>');
     listDiv.addClass('media-list');
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || Cooleur.candyColor(ii + 1);
@@ -434,22 +435,42 @@ var displayCompetitorList = function(){
       $(div).find('.center_competitor_btn').on('click', function(){
         zoomOnCompetitor(competitor);
       });
-      listDiv.append(div);
+      if(searchText === null || searchText === '' || competitor.name.toLowerCase().search(searchText) != -1) {
+        listDiv.append(div);
+      }
       competitor.div = div;
     });
-    var mainDiv = $('<div/>');
-    mainDiv.append(
-      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
-        $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
-      )
-    )
-    mainDiv.append(listDiv);
-    $('#sidebar').html('');
-    $('#sidebar').append(mainDiv);
+    if(searchText === null) {
+      var mainDiv = $('<div id="competitorSidebar"/>');
+      mainDiv.append(
+        $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+          $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
+        )
+      );
+      if(competitorList.length > 10) {
+        mainDiv.append(
+          $('<input class="form-control" placeholder="Search Competitors" val="'+searchText+'"/>').on('keyup', filterCompetitorList)
+        );
+      }
+      mainDiv.append(listDiv);
+      $('#sidebar').html('');
+      $('#sidebar').append(mainDiv);
+    } else {
+      $('#listCompetitor').remove();
+      var mainDiv = $('#competitorSidebar');
+      mainDiv.append(listDiv);
+    }
+}
+
+var filterCompetitorList = function(e) {
+    var inputVal = $(e.target).val();
+    searchText = inputVal.toLowerCase();
+    displayCompetitorList();
 }
 
 var displayOptions = function() {
     optionDisplayed = true;
+    searchText = null;
     var mainDiv = $('<div/>');
     mainDiv.append(
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
