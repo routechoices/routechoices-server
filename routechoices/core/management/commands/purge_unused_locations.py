@@ -43,11 +43,10 @@ class Command(BaseCommand):
                         filter_args['datetime__lte'] = event.end_date
                     qs = qs.exclude(**filter_args)
         if force:
-            count = qs.count()
-            qs.delete()
+            deleted_count, _ = qs.delete()
             self.stdout.write(
                 self.style.SUCCESS(
-                    'Successfully removed %d Locations' % count
+                    'Successfully removed %d Locations' % deleted_count
                 )
             )
         else:
