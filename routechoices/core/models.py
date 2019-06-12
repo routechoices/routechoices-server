@@ -136,7 +136,7 @@ class Map(models.Model):
 
     @property
     def path(self):
-        return self.image.path
+        return self.image.path[len(settings.MEDIA_ROOT) + 1:]
 
     @property
     def data(self):

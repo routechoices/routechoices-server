@@ -40,7 +40,7 @@ API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
 
 def x_accel_redirect(request, path, filename='',
                      mime='application/force-download'):
-    if settings.DEBUG:
+    if settings.DEBUG and False:
         from wsgiref.util import FileWrapper
         path = os.path.join(settings.MEDIA_ROOT, path)
         if not os.path.exists(path):
