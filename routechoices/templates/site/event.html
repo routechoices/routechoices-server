@@ -484,6 +484,11 @@ var displayOptions = function() {
     );
     mainDiv.append(
       $('<div"/>').html(
+        '<h4>Competitors</h4>' +
+        '<div>' +
+        '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> Hide All</button>' +
+        '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> Show All</button>' +
+        '</div>' +
         '<h4>Tails</h4>' +
         '<div class="form-group">' +
         '<label for="tailLengthInput">Length in seconds</label>' +
@@ -498,6 +503,31 @@ var displayOptions = function() {
       }
       tailLength = Math.max(0, v);
     });
+    $(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
+      competitorList.forEach(function(competitor){
+        competitor.isShown = false;
+        if(competitor.mapMarker) {
+          map.removeLayer(competitor.mapMarker);
+        }
+        if(competitor.nameMarker) {
+          map.removeLayer(competitor.nameMarker);
+        }
+        if(competitor.tail) {
+          map.removeLayer(competitor.tail);
+        }
+        competitor.mapMarker = null;
+        competitor.nameMarker = null;
+        competitor.tail = null;
+        updateCompetitor(competitor);
+      })
+    });
+    $(mainDiv).find('#showAllCompetitorBtn').on('click', function(){
+      competitorList.forEach(function(competitor){
+        competitor.isShown = true;
+        updateCompetitor(competitor);
+      })
+    });
+
     $('#sidebar').html('');
     $('#sidebar').append(mainDiv);
 }
