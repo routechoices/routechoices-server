@@ -188,10 +188,18 @@ class Command(BaseCommand):
 
         for c_raw in event_data['COMPETITOR']:
             c_data = c_raw.strip().split('|')
-            start_time = arrow.get(
-                c_data[1] + c_data[2],
-                'YYYYMMDDHHmmss'
-            ).shift(
+            start_time_raw = c_data[1] + c_data[2]
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(
+                    c_data[1] + c_data[2],
+                   'YYYYMMDDHHmm'
+                )
+            else:
+                start_time = arrow.get(
+                    c_data[1] + c_data[2],
+                   'YYYYMMDDHHmmss'
+                )
+            start_time = start_time.shift(
                 minutes=-int(event_data.get('TIMEZONE', 0))
             ).datetime
             Competitor.objects.create(
