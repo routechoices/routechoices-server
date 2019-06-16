@@ -68,27 +68,35 @@ class Command(BaseCommand):
         map_model.save()
         return map_model
 
-    def decode_track_line(self, device, data, timezone_offset, min_date=None, max_date=None):
+    def decode_track_line(self, device, data, min_date=None, max_date=None):
         ls = []
         if not data:
-            return [], min_date, max_date
+            return ls, min_date, max_date
         o_pt = data[0].split('_')
+        if o_pt[0] == '*' or o_pt[1] == '*' or o_pt[2] == '*':
+            return ls, min_date, max_date
         prev_loc = Location(
             device=device,
-            datetime=arrow.get(int(o_pt[0]) + 1136073600 + int(timezone_offset) * 60).datetime,
+            datetime=arrow.get(int(o_pt[0]) + 1136073600).datetime,
             longitude=int(o_pt[1]) * 2.0 / 1e5,
             latitude=int(o_pt[2]) * 1.0 / 1e5,
         )
         ls.append(prev_loc)
         if min_date is None or prev_loc.datetime < min_date:
             min_date = prev_loc.datetime
-        if max_date is None or prev_loc.datetime > min_date:
+        if max_date is None or prev_loc.datetime > max_date:
             max_date = prev_loc.datetime
         for p in data[1:]:
             if len(p) < 3:
                 continue
             if '_' in p:
                 pt = p.split('_')
+                if pt[0] == '*':
+                    pt[0] = 0
+                if pt[1] == '*':
+                    pt[1] = 0
+                if pt[2] == '*':
+                    pt[2] = 0
                 dt = int(pt[0])
                 dlng = int(pt[1])
                 dlat = int(pt[2])
@@ -107,7 +115,7 @@ class Command(BaseCommand):
             prev_loc = new_loc
             if prev_loc.datetime < min_date:
                 min_date = prev_loc.datetime
-            if prev_loc.datetime > min_date:
+            if prev_loc.datetime > max_date:
                 max_date = prev_loc.datetime
         return ls, min_date, max_date
 
@@ -152,7 +160,6 @@ class Command(BaseCommand):
                 pts, event_start_date, event_end_date = self.decode_track_line(
                     dev,
                     d[1:],
-                    event_data.get('TIMEZONE', 0),
                     event_start_date,
                     event_end_date,
                 )
@@ -206,7 +213,7 @@ class Command(BaseCommand):
                 name=c_data[3],
                 short_name=c_data[4],
                 start_time=start_time,
-                device=device_map[c_data[0]],
+                device=device_map.get(c_data[0]),
                 event=event,
             )
         return event
