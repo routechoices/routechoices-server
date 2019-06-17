@@ -17,7 +17,7 @@
 {% else %}
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% endif %}
-<link rel="stylesheet" href="{% static '/vendor/leaflet-1.4.0/leaflet.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-1.5.1/leaflet.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
 @font-face {
@@ -157,9 +157,7 @@ and (max-device-width : 500px) {
     </nav>
 <div class="container-fluid">
   <div class="row">
-    <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar">
-      
-    </div>
+    <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar"></div>
     <div id="map" class="col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main"></div>
   </div>
   <div class="row">  
@@ -212,7 +210,7 @@ and (max-device-width : 500px) {
 
 {% endblock %}
 {% block extra_body %}
-<script src="{% static '/vendor/leaflet-1.4.0/leaflet.js' %}"></script>
+<script src="{% static '/vendor/leaflet-1.5.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
