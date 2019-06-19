@@ -409,6 +409,7 @@ var displayCompetitorList = function(){
             <button type="button" class="toggle_competitor_btn btn btn-default"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
             <button type="button" class="center_competitor_btn btn btn-default"><i class="fa fa-map-marker"></i></button>\
           </div>\
+          <span><small class="speedometer"></small></span>\
         </div>')
       $(div).find('.toggle_competitor_btn').on('click', function(e){
         e.preventDefault();
@@ -442,6 +443,7 @@ var displayCompetitorList = function(){
         listDiv.append(div);
       }
       competitor.div = div;
+      competitor.speedometer = div.find('.speedometer');
     });
     if(searchText === null) {
       var mainDiv = $('<div id="competitorSidebar"/>');
@@ -670,8 +672,33 @@ var drawCompetitors = function(){
               competitor.tail.setLatLngs(tailLatLng);
           }
       }
+      var tail30s = route.extractInterval(viewedTime - 30 * 1e3, viewedTime);
+      var hasPointInTail = route.hasPointInInterval(viewedTime - 30 * 1e3, viewedTime);
+      if(!hasPointInTail){
+          competitor.speedometer.text('');
+      } else {
+          var distance = 0;
+          var prevPos = null;
+          tail30s.getArray().forEach(function (pos) {
+              if (prevPos && !isNaN(pos.coords.latitude)) {
+                  distance += pos.distance(prevPos);
+              }
+              prevPos = pos;
+          });
+          var speed = 30 / distance * 1000;
+          competitor.speedometer.text(formatSpeed(speed));
+      }
     }
   })
+}
+
+function formatSpeed(s){
+  var min = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  if (min > 99) {
+    return '';
+  }
+  return min + '\'' + ('0' + sec).slice(-2) + '"/km';
 }
 
 function getParameterByName(name) {
