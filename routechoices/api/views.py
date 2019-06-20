@@ -294,7 +294,6 @@ def user_search(request):
 
 
 @api_view(['GET'])
-@login_required
 def device_search(request):
     devices = []
     q = request.GET.get('q')
