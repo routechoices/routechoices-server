@@ -712,7 +712,10 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(a, b, c, d, src, fit=false){
+function addRasterMap(a, b, c, d, src, fit) {
+  if (fit === undefined) {
+    fit = false;
+  }
   var anchors = [a, b, c, d];
   rasterMap = new L.ImageTransform(
     src,
