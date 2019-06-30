@@ -10,7 +10,7 @@ def set_timeout_on_new_conn(sender, connection, **kwargs):
     """
         Rig django to set statement timeout for each new connection based on the config
     """
-    timeout_to_set = 120000     # Set timeout to 2 minutes
+    timeout_to_set = 300000     # Set timeout to 5 minutes
 
     with connection.cursor() as cursor:
         cursor.execute("set statement_timeout={0}".format(timeout_to_set))
@@ -27,7 +27,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         force = options['force']
-        qs = Location.objects.filter(datetime__lt=now() - timedelta(days=14))
+        qs = Location.objects.filter(
+            datetime__lt=now() - timedelta(days=14),
+        )
         events = Event.objects.all()
         for event in events:
             for competitor in event.competitors.all():
