@@ -92,7 +92,8 @@ def event_data(request, aid):
     return Response({
         'competitors': results,
         'nb_points': nb_points,
-        'duration': (time.time()-t0)
+        'duration': (time.time()-t0),
+        'timestamp': arrow.utcnow().timestamp,
     })
 
 
