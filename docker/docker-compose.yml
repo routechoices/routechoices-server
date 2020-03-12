@@ -14,7 +14,7 @@ services:
     image: nginx:latest
     container_name: nz01
     ports:
-      - "8000:8000"
+      - "9000:9000"
     volumes:
       - ../:/app/
       - ../nginx:/etc/nginx/conf.d
@@ -32,6 +32,8 @@ services:
       - db
     volumes:
       - ../:/app/:rw
+    ports:
+      - "8000:8000"
     expose:
       - "8000"
     links:

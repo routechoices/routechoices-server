@@ -14,9 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.conf.urls import include, url
+from django.conf.urls import url
+from django.urls import include, path
 from django.contrib.sitemaps.views import sitemap
-
+from django.conf import settings
 from routechoices.dashboard.views import dashboard_map_download
 from routechoices.site.sitemaps import (
     EventsSitemap,

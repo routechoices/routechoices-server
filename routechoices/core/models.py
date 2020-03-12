@@ -1,5 +1,6 @@
 import base64
 import datetime
+import json
 import hashlib
 import re
 import time
@@ -30,6 +31,8 @@ from routechoices.lib.validators import (
 )
 from routechoices.lib.helper import random_key, short_random_key
 from routechoices.lib.storages import OverwriteImageStorage
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Club(models.Model):
@@ -376,6 +379,17 @@ class Device(models.Model):
         related_name='devices',
         through_fields=('device', 'user'),
     )
+    locations_raw = models.TextField(blank=True, null=True)
+
+    @property
+    def locations(self):
+        if not self.locations_raw:
+            return {'timestamps':[], 'latitudes': [], 'longitudes': []}
+        return json.loads(self.locations_raw)
+
+    @locations.setter
+    def locations(self, locs):
+        self.locations_raw = json.dumps(locs)
 
     def __str__(self):
         return self.aid
@@ -387,12 +401,12 @@ class Device(models.Model):
                 .replace(tzinfo=pytz.utc)
         else:
             ts_datetime = now()
-        return Location.objects.create(
-            device=self,
-            latitude=lat,
-            longitude=lon,
-            datetime=ts_datetime
-        )
+        locs = self.locations
+        locs['timestamps'].append(ts_datetime.timestamp())
+        locs['latitudes'].append(lat)
+        locs['longitudes'].append(lon)
+        self.locations = locs
+        self.save()
 
     @property
     def location_count(self):
@@ -462,6 +476,10 @@ class Competitor(models.Model):
 
     @property
     def locations(self):
+        if self.device:
+            qs = self.device.locations
+        else:
+            return []
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
@@ -469,22 +487,35 @@ class Competitor(models.Model):
             device=self.device,
             start_time__gt=from_date
         ).order_by('start_time').first()
-        qs = Location.objects.filter(
-            device=self.device,
-            datetime__gte=from_date
-        )
-        if next_competitor:
-            qs = qs.filter(datetime__lt=next_competitor.start_time)
-        if self.event.end_date:
-            qs = qs.filter(datetime__lt=self.event.end_date)
-        qs = qs.filter(datetime__lt=now())
-        return qs.order_by('datetime').annotate(competitor=Value(self.id, models.IntegerField()))
+        
 
-    @property
-    def encoded_data(self):
+        end_date = now()
+        if next_competitor:
+            end_date = min(
+                next_competitor.start_time,
+                end_date
+            )
+        if self.event.end_date:
+            end_date = min(
+                self.event.end_date,
+                end_date
+            )
+            
+        locs = [
+            {
+                'timestamp': i[1],  
+                'latitude': qs['latitudes'][i[0]],  
+                'longitude': qs['longitudes'][i[0]],  
+                'competitor': self.id,
+            }            
+            for i in sorted(enumerate(qs['timestamps']), key=lambda x:x[1]) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
+        ]
+        return locs
+
+    def encode_data(self, locs):
         data = []
-        for loc in self.locations:
-            data.append(GeoLocation(loc.timestamp, (loc.latitude, loc.longitude)))
+        for loc in locs:
+            data.append(GeoLocation(loc['timestamp'], (loc['latitude'], loc['longitude'])))
         return str(GeoLocationSeries(data))
 
 
@@ -531,7 +562,6 @@ class Competitor(models.Model):
 class Location(models.Model):
     device = models.ForeignKey(
         Device,
-        related_name='locations',
         on_delete=models.CASCADE,
     )
     latitude = models.FloatField(validators=[validate_latitude, ])

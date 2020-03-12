@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.views.decorators.cache import cache_page
 
 from routechoices.core.models import (
     Event,
@@ -66,23 +67,25 @@ def api_root(request):
     return Response()
 
 
+@cache_page(15)
 @api_view(['GET'])
 def event_data(request, aid):
     t0 = time.time()
-    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    event = get_object_or_404(Event.objects.select_related('club').prefetch_related('competitors'), aid=aid, start_date__lt=now())
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    competitors = event.competitors.all()
+    competitors = event.competitors.select_related('device').all()
 
     nb_points = 0
     results = []
     for c in competitors:
-        nb_points += c.locations.count()
+        locations = c.locations
+        nb_points += len(locations)
         results.append({
             'id': c.aid,
-            'encoded_data': c.encoded_data,
+            'encoded_data': c.encode_data(locations),
             'name': c.name,
             'short_name': c.short_name,
             'start_time': c.start_time,
@@ -136,18 +139,18 @@ def event_rg_data(request, aid):
             'name': c[1],
             'short_name': c[2]
         }
-    locations = Location.objects.none()
+    locations = []
     for competitor in competitors:
         locations = list(chain(locations, competitor.locations))
     response_data = []
-    locations = sorted(locations, key=lambda l: l.datetime)
+    locations = sorted(locations, key=lambda l: l['timestamp'])
     for location in locations:
         response_data.append({
             'id': competitor_data[location.competitor]['aid'],
             'name': competitor_data[location.competitor]['name'],
-            'lat': location.latitude,
-            'lon': location.longitude,
-            'sec': location.timestamp,
+            'lat': location['latitude'],
+            'lon': location['longitude'],
+            'sec': location['timestamp'],
         })
     response_data.append({'n': len(locations), 'duration': time.time()-t0})
     return Response(response_data)
@@ -164,6 +167,7 @@ def traccar_api_gw(request):
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
+
     try:
         lat = float(lat)
         lon = float(lon)

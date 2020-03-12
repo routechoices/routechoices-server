@@ -266,6 +266,13 @@ ACCOUNT_USERNAME_VALIDATORS ='routechoices.lib.validators.custom_username_valida
 
 APPEND_SLASH = True
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
+
 try:
     from .local_settings import *
 except ImportError:
