@@ -426,7 +426,7 @@ class Device(models.Model):
             }            
             for i in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
         ]
-        return locs[-1]
+        return '%r' % locs[-1]
 
     class Meta:
         ordering = ['aid']
