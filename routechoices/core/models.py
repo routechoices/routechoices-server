@@ -394,7 +394,7 @@ class Device(models.Model):
     def __str__(self):
         return self.aid
 
-    def add_location(self, lat, lon, timestamp=None):
+    def add_location(self, lat, lon, timestamp=None, save=True):
         if timestamp is not None:
             ts_datetime = datetime.datetime \
                 .utcfromtimestamp(timestamp) \
@@ -406,20 +406,27 @@ class Device(models.Model):
         locs['latitudes'].append(lat)
         locs['longitudes'].append(lon)
         self.locations = locs
-        self.save()
+        if save:
+            self.save()
 
     @property
     def location_count(self):
-        return Location.objects.filter(device=self).count()
+        return len(self.locations['timestamps'])
 
     @property
     def last_location(self):
-        last_loc = Location.objects.filter(
-            device=self
-        ).order_by('-datetime').first()
-        if last_loc:
-            return last_loc.datetime
-        return None
+        if self.location_count == 0:
+            return None
+        locations = self.locations
+        locs = [
+            {
+                'timestamp': i[1],  
+                'latitude': locations['latitudes'][i[0]],  
+                'longitude': locations['longitudes'][i[0]],
+            }            
+            for i in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
+        ]
+        return '%r' % locs[-1]
 
     class Meta:
         ordering = ['aid']

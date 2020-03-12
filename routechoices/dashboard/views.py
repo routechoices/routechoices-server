@@ -15,7 +15,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
 from routechoices.core.models import (
-    Club, Map, Event, Device, Location,
+    Club, Map, Event, Device,
     DeviceOwnership
 )
 from routechoices.dashboard.forms import (
@@ -607,15 +607,13 @@ def event_route_upload_view(request, id):
                     for segment in track.segments:
                         for point in segment.points:
                             if point.time and point.latitude and point.longitude:
-                                points.append(
-                                    Location(
-                                        device=device,
-                                        datetime=point.time,
-                                        latitude=point.latitude,
-                                        longitude=point.longitude,
-                                    )
+                                device.add_location(
+                                    point.latitude,
+                                    point.longitude,
+                                    point.time.timestamp()
+                                    save=False
                                 )
-                Location.objects.bulk_create(points)
+                device.save()
                 competitor = form.cleaned_data['competitor']
                 competitor.device = device
                 competitor.save()
