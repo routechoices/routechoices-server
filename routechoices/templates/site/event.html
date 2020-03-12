@@ -258,6 +258,7 @@ var prevDisplayRefresh = 0;
 var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
 var currentTime = 0;
+var lastDataTs = 0;
 var lastNbPoints = 0;
 var optionDisplayed = false;
 var mapDetailsUrl = null;
@@ -338,7 +339,7 @@ var selectReplayMode = function(e){
 var fetchCompetitorRoutes = function(url){
   isCurrentlyFetchingRoutes = true;
   url = url || liveUrl;
-  var data = {lastNbPoints: lastNbPoints};
+  var data = {lastDataTs: Math.round(lastDataTs/15)*15};
   $.ajax({
     url: url,
     data: data
@@ -352,7 +353,7 @@ var fetchCompetitorRoutes = function(url){
     updateCompetitorList(response.competitors);
     displayCompetitorList();
     routesLastFetched = +clock.now();
-    lastNbPoints = response.nb_points;
+    lastDataTsl = response.timestamp;
     isCurrentlyFetchingRoutes = false;
   }).fail(function(){
     isCurrentlyFetchingRoutes = false;
