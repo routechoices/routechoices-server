@@ -11,7 +11,7 @@ from routechoices.core.models import (
     Club,
     PRIVACY_PUBLIC,
     PRIVACY_PRIVATE,
-    Device, Location, Competitor)
+    Device, Competitor)
 from routechoices.lib.helper import initial_of_name
 from routechoices.site.forms import CompetitorForm, UploadGPXForm
 
@@ -181,23 +181,19 @@ def event_route_upload_view(request, club_slug, slug):
                 device.aid += '_GPX'
                 device.is_gpx = True
                 device.save()
-                points = []
+                points = {'timestamps': [], 'latitudes': [], 'longitudes': []}
                 start_time = None
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
                             if point.time and point.latitude and point.longitude:
-                                points.append(
-                                    Location(
-                                        device=device,
-                                        datetime=point.time,
-                                        latitude=point.latitude,
-                                        longitude=point.longitude,
-                                    )
-                                )
+                                points['timestamps'].append(point.time.timestamp())
+                                points['latitudes'].append(point.latitude)
+                                points['longitudes'].append(point.longitude)
                                 if not start_time:
                                     start_time = point.time
-                Location.objects.bulk_create(points)
+                device.locations = points
+                device.save()
                 competitor_name = form.cleaned_data['name']
                 competitor = Competitor.objects.create(
                     event=event,

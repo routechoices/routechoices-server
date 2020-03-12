@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from routechoices.core.models import Location
+from routechoices.core.models import Device
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 
 
@@ -55,7 +55,7 @@ class ApiTestCase(APITestCase):
                 t
             ))
         self.assertEquals(res.status_code, status.HTTP_200_OK)
-        nb_points = Location.objects.filter(device__aid=dev_id).count()
+        nb_points = len(Device.objects.get(aid=dev_id).locations['timestamps'])
         self.assertEquals(nb_points, 1)
 
     def test_garmin_api_gw(self):
@@ -72,7 +72,7 @@ class ApiTestCase(APITestCase):
             }
         )
         self.assertEquals(res.status_code, status.HTTP_200_OK)
-        nb_points = Location.objects.filter(device__aid=dev_id).count()
+        nb_points = len(Device.objects.get(aid=dev_id).locations['timestamps'])
         self.assertEquals(nb_points, 2)
 
     def test_pwa_api_gw(self):
@@ -88,5 +88,5 @@ class ApiTestCase(APITestCase):
             'raw_data': str(gps_encoded)
         })
         self.assertEquals(res.status_code, status.HTTP_200_OK)
-        nb_points = Location.objects.filter(device__aid=dev_id).count()
+        nb_points = len(Device.objects.get(aid=dev_id).locations['timestamps'])
         self.assertEquals(nb_points, 3)

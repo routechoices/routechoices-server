@@ -18,7 +18,6 @@ from django.views.decorators.cache import cache_page
 
 from routechoices.core.models import (
     Event,
-    Location,
     Device,
     Competitor,
     PRIVACY_PRIVATE,
@@ -203,7 +202,7 @@ def garmin_api_gw(request):
     times = request.data.get('timestamps', '').split(',')
     if len(lats) != len(lons) != len(times):
         raise ValidationError('Data error')
-    locs = []
+
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
             try:
@@ -214,14 +213,9 @@ def garmin_api_gw(request):
                 continue
             if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
                 continue
-            locs.append(Location(
-                device=device,
-                latitude=lat,
-                longitude=lon,
-                datetime=arrow.get(tim).datetime
-            ))
-    if locs:
-        Location.objects.bulk_create(locs)
+            device.add_location(lat, lon, tim, save=False)
+    if len(times) > 0:
+        device.save()
     return Response({'status': 'ok'})
 
 
@@ -233,7 +227,6 @@ def pwa_api_gw(request):
             'Use the official Routechoices.com Tracker web app'
         )
     device = get_object_or_404(Device, aid=device_id)
-    locs = []
     raw_data = request.POST.get('raw_data')
     if not raw_data:
         raise ValidationError('Missing raw_data argument')
@@ -241,15 +234,15 @@ def pwa_api_gw(request):
     for location in locations:
         if abs(time.time() - int(location.timestamp)) > API_LOCATION_TIMESTAMP_MAX_AGE:
             continue
-        locs.append(Location(
-            device=device,
-            latitude=location.coordinates.latitude,
-            longitude=location.coordinates.longitude,
-            datetime=arrow.get(int(location.timestamp)).datetime
-        ))
-    if locs:
-        Location.objects.bulk_create(locs)
-    return Response({'status': 'ok', 'n': len(locs)})
+        device.add_location(
+            location.coordinates.latitude,
+            location.coordinates.longitude,
+            int(location.timestamp)
+            save=False
+        )
+    if len(locations) > 0:
+        device.save()
+    return Response({'status': 'ok', 'n': len(locations)})
 
 
 class DataRenderer(renderers.BaseRenderer):
