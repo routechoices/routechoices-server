@@ -237,7 +237,7 @@ def pwa_api_gw(request):
         device.add_location(
             location.coordinates.latitude,
             location.coordinates.longitude,
-            int(location.timestamp)
+            int(location.timestamp),
             save=False
         )
     if len(locations) > 0:

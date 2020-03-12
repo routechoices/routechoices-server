@@ -610,7 +610,7 @@ def event_route_upload_view(request, id):
                                 device.add_location(
                                     point.latitude,
                                     point.longitude,
-                                    point.time.timestamp()
+                                    point.time.timestamp(),
                                     save=False
                                 )
                 device.save()
