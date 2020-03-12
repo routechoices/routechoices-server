@@ -1,3 +1,4 @@
+import arrow
 import base64
 import datetime
 import json
@@ -533,12 +534,13 @@ class Competitor(models.Model):
         gpx.tracks.append(gpx_track)
 
         gpx_segment = gpxpy.gpx.GPXTrackSegment()
-        for location in self.locations:
+        locs = self.locations
+        for location in locs:
             gpx_segment.points.append(
                 gpxpy.gpx.GPXTrackPoint(
-                    location.latitude,
-                    location.longitude,
-                    time=location.datetime
+                    location['latitude'],
+                    location['longitude'],
+                    time=arrow.get(location['timestamp']).datetime
                 )
             )
         gpx_track.segments.append(gpx_segment)
