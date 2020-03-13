@@ -353,7 +353,7 @@ var fetchCompetitorRoutes = function(url){
     updateCompetitorList(response.competitors);
     displayCompetitorList();
     routesLastFetched = +clock.now();
-    lastDataTsl = response.timestamp;
+    lastDataTs = response.timestamp;
     isCurrentlyFetchingRoutes = false;
   }).fail(function(){
     isCurrentlyFetchingRoutes = false;
