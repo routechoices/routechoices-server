@@ -187,20 +187,15 @@ class Map(models.Model):
         if self.image.closed:
             self.image.open()
         with Image.open(self.image.file) as image:
-            is_jpeg = image.format.lower() == 'jpeg'
-            if not is_jpeg:
-                return
-            data = image.getdata()
-            image_without_exif = Image.new(image.mode, image.size)
-            image_without_exif.putdata(data)
+            rgb_img = image.convert('RGB')
             out_buffer = BytesIO()
-            image_without_exif.save(out_buffer, image.format.lower())
-        f_new = File(out_buffer, name=self.image.name)
-        self.image.save(
-            'filename',
-            f_new,
-            save=False,
-        )
+            rgb_img.save(out_buffer, 'JPEG', quality=60, dpi=(300, 300))
+            f_new = File(out_buffer, name=self.image.name)
+            self.image.save(
+                'filename',
+                f_new,
+                save=False,
+            )
         self.image.close()
 
     @property
