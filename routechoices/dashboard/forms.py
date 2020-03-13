@@ -41,6 +41,8 @@ class MapForm(ModelForm):
         fn = f_orig.name
         with Image.open(f_orig.file) as image:
             rgb_img = image.convert('RGB')
+            if image.size[0] > 2000 or image.size[1] > 2000:
+                rgb_img.thumbnail((2000, 2000), Image.ANTIALIAS)
             out_buffer = BytesIO()
             rgb_img.save(out_buffer, 'JPEG', quality=60)
             f_new = File(out_buffer, name=fn)
