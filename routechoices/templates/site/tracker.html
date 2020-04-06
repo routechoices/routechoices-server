@@ -23,12 +23,12 @@
       <div class="container">
         <div class="row">
           <h1>GPS Tracker</h1>
-          <p>Your Device Identifier <span class="label label-default roboto devId" style="font-size: 1.2em"></span></p>
-          <p>You can upload your location to provide live GPS tracking in three way. We recommend the Garmin watch app, then the phone app, if not possible the webapp running in your browser is still possible.</p>
+          <!--<p>Your Device Identifier <span class="label label-default roboto devId" style="font-size: 1.2em"></span></p>-->
+          <p>You can upload your location to provide live GPS tracking in two way. For best accuracy we recommend the Garmin watch app, otherwise use the phone app.</p>
           <p style="margin-top:2em">
             <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal"><i class="fa fa-clock-o"></i> Tracking with a Garmin&reg; watch</a>
             <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal"><i class="fa fa-mobile-phone"></i> Tracking with a smart phone</a>
-            <a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the webapp</a>
+            <!--<a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the webapp</a>-->
           </p>
         </div>
       </div>
@@ -67,6 +67,7 @@
               <h4 class="modal-title" id="traccar-modal-label">Tracking App</h4>
             </div>
             <div class="modal-body">
+              <p>On your phone enable high accuracy location then,</p>
               <p>
                 Download the Traccar Client for Android or IPhone.
               </p>
@@ -282,7 +283,7 @@ var onPositionUpdate = function(position) {
 
 var getDeviceId = function() {
     try {
-        return localStorage.getItem('devId');
+        return localStorage.getItem('devIdv2');
     } catch(e) {
         console.log('No localStorage')
     }
@@ -290,7 +291,7 @@ var getDeviceId = function() {
 
 var setDeviceId = function(devId) {
     try {
-        localStorage.setItem('devId', devId);
+        localStorage.setItem('devIdv2', devId);
     } catch(e) {
         console.log('No localStorage')
     }
@@ -325,7 +326,26 @@ $(function() {
     e.preventDefault();
     stopStreaming();
   });
-
+  $('#traccar-btn')
+  .on('click', function(e){
+    e.preventDefault();
+    devId = getDeviceId();
+    if (!devId) {
+      $.ajax({
+        type: 'POST',
+        url: getServerUrl() + 'api/device_id/',
+        dataType: 'json',
+      }).done(function(response) {
+        setDeviceId(response.device_id)
+      }).fail(function() {
+        $('#error-modal-msg').text("Couldn't connect to API server");
+        $('#error-modal').modal('show');
+      })
+    } else {
+      $(".devId").text(devId);
+    }
+  });
+  /*
   devId = getDeviceId();
   if (!devId) {
     $.ajax({
@@ -340,7 +360,7 @@ $(function() {
     })
   } else {
     $(".devId").text(devId);
-  }
+  }*/
 });
 
     </script>
