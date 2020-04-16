@@ -35,13 +35,17 @@ class Command(BaseCommand):
             valid_indexes = []
             for idx, timestamp in enumerate(locs['timestamps']):
                 is_valid = False
+                if timestamp >= two_weeks_ago.timestamp():
+                    is_valid = True
                 for p in periods_used:
-                    if timestamp >= two_weeks_ago.timestamp() or p[0].timestamp() < timestamp < p[1].timestamp():
+                    if timestamp >= two_weeks_ago.timestamp() or p[0].timestamp() <= timestamp <= p[1].timestamp():
                         is_valid = True
                         break
                 if is_valid:
                     valid_indexes.append(idx)
             device_deleted_loc_count = len(locs['timestamps']) - len(valid_indexes)
+            if device_deleted_loc_count:
+                self.stdout.write('Device %s, extra %d locations' % (device.aid, device_deleted_loc_count))
             deleted_count += device_deleted_loc_count
             if force and device_deleted_loc_count:
                 new_locs = {
