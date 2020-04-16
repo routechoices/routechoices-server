@@ -18,6 +18,7 @@ class Command(BaseCommand):
         devices = Device.objects.all()
         for device in devices:
             periods_used = []
+            two_weeks_ago = now() - timedelta(days=14)
             competitors = device.competitor_set.all()
             for competitor in competitors:
                 event = competitor.event
@@ -26,16 +27,16 @@ class Command(BaseCommand):
                     start = competitor.start_time
                 end = None
                 if event.end_date:
-                    end = min(event.end_date, now() - timedelta(days=14))
+                    end = min(event.end_date, two_weeks_ago)
                 else:
-                    end = now() - timedelta(days=14)
+                    end = two_weeks_ago
                 periods_used.append((start, end))
             locs = device.locations
             valid_indexes = []
             for idx, timestamp in enumerate(locs['timestamps']):
                 is_valid = False
                 for p in periods_used:
-                    if p[0].timestamp() < timestamp < p[1].timestamp():
+                    if timestamp >= two_weeks_ago.timestamp() or p[0].timestamp() < timestamp < p[1].timestamp():
                         is_valid = True
                         break
                 if is_valid:
