@@ -610,7 +610,7 @@ var drawCompetitors = function(){
     if(route !== undefined){
       var viewedTime = currentTime;
       if(!isLiveMode && !isRealTime && competitor.start_time){
-        viewedTime += new Date(competitor.start_time) - getCompetitionStartDate();
+        viewedTime += Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
       }
       var hasPointLast30sec = route.hasPointInInterval(viewedTime - 30 * 1e3, viewedTime);
       if(!hasPointLast30sec){
