@@ -21,8 +21,8 @@ Take a note of the production database password:
 
 Copy database from production:
 
-    $ ssh wf pg_dump -Fc -h localhost -p 5432 -U rphl routechoices > postgres.bak
+    $ ssh routechoices.com pg_dump -Fc -h localhost -p 5432 -U rphl routechoices > postgres.bak
 
 Copy media from production:
 
-    $ rsync -avz wf:/home/rphl/webapps/routechoices/media ./
+    $ rsync -avz routechoices.com:/apps/routechoices.com/media ./
