@@ -99,7 +99,8 @@
      <!-- Copyright -->
  </footer>
 {% bootstrap_javascript jquery=1 %}
-<script src="{%  static '/vendor/leaflet-1.5.1/leaflet.js' %}"></script>
+<script src="{% static '/vendor/leaflet-1.5.1/leaflet.js' %}"></script>
+<script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
 <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script>
 SpheroidProjection = (function(){
@@ -233,23 +234,10 @@ $(function(){
     }
 
     function resetOrientation(src, callback) {
-        var img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = function() {
-            var width = img.width,
-                height = img.height,
-                canvas = document.createElement('canvas'),
-                ctx = canvas.getContext("2d");
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0);
-            // export base64
-            callback(canvas.toDataURL('image/jpeg', 0.4));
-        }
-        img.src = src;
+        loadImage(src, function(d) { callback(d.toDataURL('image/jpeg', 0.4)) }, {orientation: 1});
     }
 
-    function loadImage() {
+    function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
         var imageURL = $(imageInput).parent().children('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
@@ -458,7 +446,7 @@ $(function(){
     if(!window.opener) {
         window.location.href = '/';
     } else {
-        loadImage()
+        loadMapImage()
     }
 })
 </script>
