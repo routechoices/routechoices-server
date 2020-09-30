@@ -87,7 +87,7 @@ $(function(){
         loadImage(src, function(d) { callback(d.toDataURL('image/jpeg', 0.4)) }, {orientation: 1});
     }
 
-    function loadImage() {
+    function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
         var imageURL = $(imageInput).parent().children('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
@@ -177,7 +177,7 @@ $(function(){
         window.location.href = '/';
     } else {
         loadCalibString();
-        loadImage()
+        loadMapImage()
     }
 })
 </script>
