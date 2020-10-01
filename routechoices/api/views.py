@@ -23,6 +23,7 @@ from routechoices.core.models import (
     ImeiDevice,
     PRIVACY_PRIVATE,
 )
+from routechoices.lib.helper import short_random_key
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
 
