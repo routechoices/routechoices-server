@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from routechoices.core.models import Club, Competitor, Device, Event, Map
+from routechoices.core.models import Club, Competitor, Device, Event, Map, ImeiDevice
 
 
 class ClubAdmin(admin.ModelAdmin):
@@ -33,8 +33,15 @@ class EventAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
+        'creation_date',
         'last_location',
         'location_count',
+    )
+
+class ImeiDeviceAdmin(admin.ModelAdmin):
+    list_display = (
+        'imei',
+        'device'
     )
 
 
@@ -48,5 +55,6 @@ class MapAdmin(admin.ModelAdmin):
 
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
+admin.site.register(ImeiDevice, ImeiDeviceAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Map, MapAdmin)

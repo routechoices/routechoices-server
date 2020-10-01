@@ -34,8 +34,10 @@ services:
       - ../:/app/:rw
     ports:
       - "8000:8000"
+      - "2000:2000"
     expose:
       - "8000"
+      - "2000"
     links:
       - db
     user: ${USERID}:${GROUPID}

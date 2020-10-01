@@ -273,6 +273,8 @@ CACHES = {
     }
 }
 
+TMT250_PORT = 2000
+
 try:
     from .local_settings import *
 except ImportError:

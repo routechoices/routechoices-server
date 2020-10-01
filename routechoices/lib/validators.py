@@ -8,25 +8,39 @@ from django.utils.translation import ugettext_lazy as _
 
 FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
 
+def validate_imei(number):
+    """Check if the number provided is a valid IMEI (or IMEISV) number."""
+    matched = re.match(r'^\d{14,16}$', number)
+    if not matched:
+        raise ValidationError(_('Invalid IMEI'))
+
 
 def validate_latitude(value):
     if isinstance(value, (float, int)):
         value = str(value)
-    value = Decimal(value)
-    if value < -90 or value > 90:
-        raise ValidationError(_('latitude out of range -90.0 90.0'))
+    try:
+        value = Decimal(value)
+    except Exception:
+        raise ValidationError(_('not a number'))
+    else:
+        if value < -90 or value > 90:
+            raise ValidationError(_('latitude out of range -90.0 90.0'))
 
 
 def validate_longitude(value):
     if isinstance(value, (float, int)):
         value = str(value)
-    value = Decimal(value)
-    if value < -180 or value > 180:
-        raise ValidationError(_('longitude out of range -180.0 180.0'))
+    try:
+        value = Decimal(value)
+    except Exception:
+        raise ValidationError(_('not a number'))
+    else:
+        if value < -180 or value > 180:
+            raise ValidationError(_('longitude out of range -180.0 180.0'))
 
 
 def validate_nice_slug(slug):
-    if re.search('[^-a-zA-Z0-9_]', slug):
+    if re.search(r'[^-a-zA-Z0-9_]', slug):
         raise ValidationError(_('Only alphanumeric characters, '
                                 'hyphens and underscores are allowed.'))
     if len(slug) < 1:

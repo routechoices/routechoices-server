@@ -17,6 +17,8 @@ class Command(BaseCommand):
         deleted_count = 0
         devices = Device.objects.all()
         for device in devices:
+            locs = device.locations
+            device.remove_duplicates(force)
             periods_used = []
             two_weeks_ago = now() - timedelta(days=14)
             competitors = device.competitor_set.all()
@@ -31,7 +33,6 @@ class Command(BaseCommand):
                 else:
                     end = two_weeks_ago
                 periods_used.append((start, end))
-            locs = device.locations
             valid_indexes = []
             for idx, timestamp in enumerate(locs['timestamps']):
                 is_valid = False

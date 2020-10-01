@@ -12,3 +12,4 @@ django-bootstrap3
 raven
 lxml
 cssselect
+tornado

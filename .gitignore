@@ -17,6 +17,9 @@ media/*
 static/*
 htmlcov/*
 env/*
+var/*
+log/*
+logs/*
 routechoices/local_settings.py
 cypress/screenshots/*
 cypress/videos/*

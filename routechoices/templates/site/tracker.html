@@ -23,12 +23,13 @@
       <div class="container">
         <div class="row">
           <h1>GPS Tracker</h1>
-          <!--<p>Your Device Identifier <span class="label label-default roboto devId" style="font-size: 1.2em"></span></p>-->
-          <p>You can upload your location to provide live GPS tracking in two way. For best accuracy we recommend the Garmin watch app, otherwise use the phone app.</p>
+          <p>You can upload your location to provide live GPS tracking in two way. For best accuracy we recommend the Garmin watch app, otherwise use the phone app.</p> 
+          <p>Each method will generate a unique Device ID that you can communicate to the organizer.</p>
           <p style="margin-top:2em">
             <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal"><i class="fa fa-clock-o"></i> Tracking with a Garmin&reg; watch</a>
+            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal"><i class="fa fa-globe"></i> Tracking with a Teltonika GPS tracking device</a>
             <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal"><i class="fa fa-mobile-phone"></i> Tracking with a smart phone</a>
-            <!--<a role="button" class="btn btn-danger" id="schedule-start-btn" data-toggle="modal" data-target="#schedule-start-modal"><i class="fa fa-chrome"></i> Tracking with the webapp</a>-->
+            
           </p>
         </div>
       </div>
@@ -44,13 +45,13 @@
                 Download the {{ site.name }} Live Tracker app from the Connect IQ store.
               </p>
               <p>
-                <a href="https://apps.garmin.com/en-US/apps/50396179-a687-4720-a0d9-c5f1e9b2485b">{{ site.name }} Live Tracker on Connect IQ store</a>
+                 <a href="https://apps.garmin.com/en-US/apps/50396179-a687-4720-a0d9-c5f1e9b2485b" target="_blank"><i class="fa fa-external-link"></i> Connect IQ store</a>
               </p>
               <p>
                 Once installed, run the app on your watch to start streaming your location, a new device ID will be displayed on the main screen.
              </p>
              <p>
-               Note that if your watch does not support 4G LTE network, you have to carry a phone with the Garmin connect app connected to the watch in order to provide an internet connection.
+               Note that if your watch does not support 4G LTE network, you have to carry a phone with the Garmin connect app connected to the watch via Bluetooth in order to provide an internet connection.
              </p>
             </div>
             <div class="modal-footer">
@@ -77,7 +78,7 @@
               <p>
                 Open the app and enter the following settings:
                 <ul class="well">
-                    <li>Device identifier: <code class="devId roboto"></code></li>
+                    <li>Device identifier: <code class="devId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
                     <li>Server URL: <code>https://www.routechoices.com/api/traccar</code></li>
                     <li>Location Accuracy: <code>High</code></li>
                     <li>Frequency: <code>1</code></li>
@@ -93,42 +94,46 @@
           </div>
         </div>
       </div>
-      <div class="modal fade" id="schedule-start-modal" tabindex="-1" role="dialog" aria-labelledby="schedule-start-modal-label" aria-hidden="true">
+
+      <div class="modal fade" id="tmt250-modal" tabindex="-1" role="dialog" aria-labelledby="tmt250-modal-label" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-              <h4 class="modal-title" id="schedule-start-modal-label">Schedule start</h4>
+              <h4 class="modal-title" id="tmt250-modal-label">Tracking App</h4>
             </div>
             <div class="modal-body">
-              <div class="form-group">
-                <label for="start-delay-input">Minutes before start</label>
-                <input type="integer" class="form-control" id="start-delay-input" placeholder="5" value="5">
+              <p>
+                Use the configuration tool from teltonika to configure the GPRS options as follow
+                <ul class="well">
+                    <li>Domain: <code>routechoices.com</code></li>
+                    <li>Port: <code>2000</code></li>
+                </ul>
+            </p>
+            <p>Enable motion events with timeout of 1 seconds</p>
+            <h3>Get a device Id for your Tracker</h3>
+            <form id="imeiForm">
+              <div class="form-group" id=IMEIDiv>
+                <label for="IMEI">Email address</label>
+                <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
+                <small id="IMEIHelp" class="form-text text-muted">This is used to link your physical device with or system.</small>
+                <div id="imeiErrorMsg" class="invalid-feedback hidden">
+                  <i class="fa fa-warning"></i> Invalid IMEI
+                </div>
               </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <br/>
+            <ul id="imeiDevId" class="well hidden" >
+              <li>IMEI <code id="imeiRes"></code></li>
+              <li>Device identifier: <code class="imeiDevId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
+            </ul>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-danger" id="start-btn">Start now</button>
-              <button type="button" class="btn btn-primary" id="start-schedule-btn">Schedule</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="modal fade" id="streaming-modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-          <div class="modal-dialog">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h4 class="modal-title" id="streaming-modal-label">Streaming Position</h4>
-                  </div>
-                  <div class="modal-body">
-                      <div id="streaming-info-div"></div>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" id="stop-streaming-btn">Stop</button>
-                  </div>
-              </div>
-          </div>
       </div>
 
       <div class="modal fade" id="error-modal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -147,139 +152,12 @@
 {% endblock %}
 
 {% block extra_body %}
-    <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
-    <script type="text/javascript" src="{% static '/js/positioning.js' %}"></script>
     <script>
-var clock = ServerClock({url: '/api/time/'});
-var liveDelay = 15;
-var watchPositionId = null;
-var isGpsSwitchedOn = false;
-var countdownTimeoutId = null;
-var broadcastBuffer = PositionArchive();
 var devId = null;
 
 var getServerUrl = function() {
   return '/';
 };
-
-var onPressStart = function(delay) {
-  delay = delay || 0;
-  var start_time = +new Date() + delay;
-  console.log('start');
-  $('#schedule-start-modal').modal('hide');
-  $('#streaming-modal').modal('show');
-  (function countDownStart() {
-    if (+new Date() < start_time) {
-      countdownTimeoutId = setTimeout(countDownStart, 500);
-      $('#streaming-info-div').text("Starting in " + Math.round((start_time - new Date())/1e3) + "s");
-    } else {
-      startStreaming();
-      $('#streaming-info-div').text("Streaming");
-    }
-  })();
-};
-
-var startStreaming = function() {
-  isGpsSwitchedOn = true;
-  watchPositionId = navigator.geolocation.watchPosition(
-    onPositionUpdate,
-    onPositionError,
-    {
-      enableHighAccuracy: true,
-      timeout: 999,
-      maximumAge: 1000
-    }
-  );
-  (function positionRequestor() {
-    navigator.geolocation.getCurrentPosition(
-      onPositionUpdate,
-      onPositionError,
-      {
-        enableHighAccuracy: true,
-        timeout: 999,
-        maximumAge: 1000
-      }
-    );
-    if (isGpsSwitchedOn) {
-      setTimeout(positionRequestor, 1e3);
-    }
-  })();
-
-  (function positionArchivePusher() {
-    pushPositionArchive();
-    if (isGpsSwitchedOn) {
-      setTimeout(positionArchivePusher, 1e3);
-    }
-  })();
-
-  window.onbeforeunload = function (e) {
-    e = e || window.event;
-    var msg = 'Are you sure you want to close?';
-    if (e) {
-        e.returnValue = msg;
-    }
-    return msg;
-  };
-};
-
-var pushPositionArchive = function(force){
-  force = force || false;
-  // Push data when Archive max age == competition delay - Xs
-  var tks = broadcastBuffer.exportTks(),
-      now = +clock.now();
-  if (tks !== '') {
-    $('#streaming-info-div').text("Uploading in "+ Math.round((liveDelay * 1e3 - 1e3 - broadcastBuffer.getAge(now)) / 1e3) + " seconds");
-  } else {
-    $('#streaming-info-div').text("Fetching accurate position")
-  }
-  if (tks !== '' && (force || (broadcastBuffer.getAge(now) > (liveDelay * 1e3 - 1e3)))){
-    $('#streaming-info-div').text("Uploading Positions");
-    $.ajax({
-      type: 'POST',
-      url: getServerUrl() + 'api/pwa',
-      dataType:'json',
-      data: {
-        id: devId,
-        raw_data: tks
-      }
-    })
-    .done(function(response){
-      broadcastBuffer.eraseInterval(-Infinity, now);
-      $('#streaming-info-div').text("Buffering Positions");
-    })
-    .fail(function(){
-      $('#streaming-info-div').text("Broadcast failed...");
-    });
-  }
-};
-
-var stopStreaming = function() {
-  clearTimeout(countdownTimeoutId);
-  $('#streaming-modal').modal('hide');
-  if(isGpsSwitchedOn){
-    isGpsSwitchedOn = false;
-    pushPositionArchive(true);
-    navigator.geolocation.clearWatch(watchPositionId);
-  }
-  window.onbeforeunload = function(){}
-};
-
-var onPositionUpdate = function(position) {
-  console.log(position)
-  var last_position = {
-    timestamp:+position.timestamp+clock.getDrift(),
-    coords:{
-      latitude:position.coords.latitude,
-      longitude:position.coords.longitude,
-      accuracy:position.coords.accuracy
-    }
-  };
-  var pos = Position(last_position);
-  if(position.coords.accuracy < 50) {
-    broadcastBuffer.add(pos);
-    pushPositionArchive();
-  }
-}
 
 var getDeviceId = function() {
     try {
@@ -299,33 +177,8 @@ var setDeviceId = function(devId) {
     $(".devId").text(devId);
 }
 
-var onPositionError = function(e) {
-  console.log(e);
-  if(e.code === 1){
-    stopStreaming();
-    $('#error-modal-msg').text("You must allow location service for this site!");
-    $('#error-modal').modal('show');
-  }
-}
-
 $(function() {
   $('.error-message').hide();
-  $('#start-btn')
-  .on('click', function(e){
-    e.preventDefault();
-    onPressStart();
-  });
-  $('#start-schedule-btn')
-  .on('click', function(e){
-    e.preventDefault();
-    var delay = parseFloat($('#start-delay-input').val())*60*1e3;
-    onPressStart(delay);
-  });
-  $('#stop-streaming-btn')
-  .on('click',  function(e){
-    e.preventDefault();
-    stopStreaming();
-  });
   $('#traccar-btn')
   .on('click', function(e){
     e.preventDefault();
@@ -345,22 +198,25 @@ $(function() {
       $(".devId").text(devId);
     }
   });
-  /*
-  devId = getDeviceId();
-  if (!devId) {
+  $('#imeiForm').on('submit', function(e) {
+    e.preventDefault();
+    $('#imeiRes').text($('#IMEI').val())
     $.ajax({
       type: 'POST',
-      url: getServerUrl() + 'api/device_id/',
+      url: getServerUrl() + 'api/imei/',
       dataType: 'json',
+      data: {imei: $('#IMEI').val()}
     }).done(function(response) {
-      setDeviceId(response.device_id)
+      $('#IMEIDiv').removeClass('has-error')
+      $('#imeiDevId').removeClass('hidden')
+      $('.imeiDevId').text(response.device_id);
+      $('#imeiErrorMsg').addClass('hidden');
     }).fail(function() {
-      $('#error-modal-msg').text("Couldn't connect to API server");
-      $('#error-modal').modal('show');
+      $('#imeiErrorMsg').removeClass('hidden');
+      $('#IMEIDiv').addClass('has-error')
+      $('#imeiDevId').addClass('hidden')
     })
-  } else {
-    $(".devId").text(devId);
-  }*/
+  })
 });
 
     </script>

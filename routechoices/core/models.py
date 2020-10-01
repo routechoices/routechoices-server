@@ -28,7 +28,8 @@ from routechoices.lib.validators import (
      validate_nice_slug,
      validate_latitude,
      validate_longitude,
-     validate_corners_coordinates
+     validate_corners_coordinates,
+     validate_imei,
 )
 from routechoices.lib.helper import random_key, short_random_key
 from routechoices.lib.storages import OverwriteImageStorage
@@ -399,6 +400,11 @@ class Device(models.Model):
         return self.aid
 
     def add_location(self, lat, lon, timestamp=None, save=True):
+        try:
+            validate_latitude(lat)
+            validate_longitude(lon)
+        except Exception:
+            return
         if timestamp is not None:
             ts_datetime = datetime.datetime \
                 .utcfromtimestamp(timestamp) \
@@ -406,16 +412,31 @@ class Device(models.Model):
         else:
             ts_datetime = now()
         locs = self.locations
-        locs['timestamps'].append(ts_datetime.timestamp())
-        locs['latitudes'].append(lat)
-        locs['longitudes'].append(lon)
-        self.locations = locs
-        if save:
-            self.save()
+        if ts_datetime.timestamp() not in locs['timestamps']:
+            locs['timestamps'].append(ts_datetime.timestamp())
+            locs['latitudes'].append(lat)
+            locs['longitudes'].append(lon)
+            self.locations = locs
+            if save:
+                self.save()
 
     @property
     def location_count(self):
         return len(self.locations['timestamps'])
+
+    def remove_duplicates(self, save=True):
+        locations = self.locations
+        timestamps = set()
+        locs = {'timestamps':[], 'latitudes': [], 'longitudes': []}
+        for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1]):
+            if timestamp not in timestamps:
+                timestamps.add(timestamp)
+                locs['timestamps'].append(timestamp)
+                locs['latitudes'].append(locations['latitudes'][idx])
+                locs['longitudes'].append(locations['longitudes'][idx])
+        self.locations = locs
+        if save:
+            self.save()
 
     @property
     def last_location(self):
@@ -436,6 +457,33 @@ class Device(models.Model):
         ordering = ['aid']
         verbose_name = 'device'
         verbose_name_plural = 'devices'
+
+def get_new_device():
+    d = Device(aid=short_random_key()+'_i')
+    d.save()
+    return d
+
+class ImeiDevice(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
+    imei = models.CharField(
+        max_length=32,
+        unique=True,
+        validators=[validate_imei, ]
+    )
+    device = models.OneToOneField(
+        Device,
+        related_name='physical_device',
+        on_delete=models.CASCADE,
+        default=get_new_device
+    )
+
+    def __str__(self):
+        return self.imei
+
+    class Meta:
+        ordering = ['imei']
+        verbose_name = 'imei device'
+        verbose_name_plural = 'imei devices'
 
 
 class DeviceOwnership(models.Model):

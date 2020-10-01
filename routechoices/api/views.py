@@ -20,9 +20,11 @@ from routechoices.core.models import (
     Event,
     Device,
     Competitor,
+    ImeiDevice,
     PRIVACY_PRIVATE,
 )
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
+from routechoices.lib.validators import validate_imei
 
 from rest_framework import renderers, status
 from rest_framework.decorators import api_view, renderer_classes
@@ -273,6 +275,19 @@ def gps_seuranta_proxy(request):
 def get_device_id(request):
     device = Device.objects.create()
     return Response({'device_id': device.aid})
+
+
+@api_view(['POST'])
+def get_device_for_imei(request):
+    imei = request.POST.get('imei')
+    if not imei:
+        raise ValidationError('No imei')
+    try:
+        validate_imei(imei)
+    except Exception:
+        raise ValidationError('Invalid imei')
+    idevice, created = ImeiDevice.objects.get_or_create(imei=imei)
+    return Response({'device_id': idevice.device.aid})
 
 
 @api_view(['GET'])
