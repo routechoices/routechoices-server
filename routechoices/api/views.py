@@ -286,7 +286,14 @@ def get_device_for_imei(request):
         validate_imei(imei)
     except Exception:
         raise ValidationError('Invalid imei')
-    idevice, created = ImeiDevice.objects.get_or_create(imei=imei)
+    idevice = None
+    try:
+        idevice = ImeiDevice.objects.get(imei=imei)
+    except ImeiDevice.DoesNotExist:
+        d = Device(aid=short_random_key()+'_i')
+        d.save()
+        idevice = ImeiDevice(imei=imei, device=d)
+        idevice.save() 
     return Response({'device_id': idevice.device.aid})
 
 

@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='imeidevice',
             name='device',
-            field=models.OneToOneField(default=routechoices.core.models.get_new_device, on_delete=django.db.models.deletion.CASCADE, related_name='physical_device', to='core.device'),
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='physical_device', to='core.device'),
         ),
     ]

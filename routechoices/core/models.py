@@ -458,11 +458,6 @@ class Device(models.Model):
         verbose_name = 'device'
         verbose_name_plural = 'devices'
 
-def get_new_device():
-    d = Device(aid=short_random_key()+'_i')
-    d.save()
-    return d
-
 class ImeiDevice(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     imei = models.CharField(
@@ -473,8 +468,7 @@ class ImeiDevice(models.Model):
     device = models.OneToOneField(
         Device,
         related_name='physical_device',
-        on_delete=models.CASCADE,
-        default=get_new_device
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
