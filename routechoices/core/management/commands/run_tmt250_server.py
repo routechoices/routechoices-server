@@ -164,4 +164,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         server = TMT250Server()
         server.listen(settings.TMT250_PORT)
-        IOLoop.current().start()
+        try:
+            IOLoop.current().start()
+        except KeyboardInterrupt:
+            pass
