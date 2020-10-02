@@ -64,7 +64,7 @@ window.addEventListener("load", function(){
             <li><a href="{% url 'site:tracker_view'%}">Tracker</a></li>
             <li><a href="{% url 'site:contact_view'%}">Contact us</a></li>
             <li>{% if user.is_authenticated %}<a href="{% url 'account_logout'%}">Logout</a>{% else %}<a href="{% url 'account_login'%}">Login</a>{% endif %}</li>
-            <li>{% if not user.is_authenticated %}<a href="{% url 'account_signup'%}">Sign up</a>{% endif %}</li>
+            <li>{% if not user.is_authenticated %}<a href="{% url 'account_signup'%}">Sign up for free</a>{% endif %}</li>
           </ul>
         </div>
       </div>
