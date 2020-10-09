@@ -91,7 +91,11 @@ class TMT250Connection():
         except StreamClosedError:
             return
         imei_len = (data[0] << 8) + data[1]
-        imei = data[2:].decode('ascii')
+        imei = ''
+        try:
+            imei = data[2:].decode('ascii')
+        except Exception:
+            pass
         if imei_len != len(imei):
             print('invalid identification %s, %s, %d' % (self.address, imei, imei_len))
             await self.stream.write(pack('>H', 0))
@@ -130,7 +134,7 @@ class TMT250Connection():
             try:
                 data_len = await self.stream.read_into(data, partial=True)
                 await self._on_read_line(data[:data_len])
-            except StreamClosedError:
+            except Exception:
                 return False
             return True
 
