@@ -412,8 +412,9 @@ class Device(models.Model):
         else:
             ts_datetime = now()
         locs = self.locations
-        if ts_datetime.timestamp() not in locs['timestamps']:
-            locs['timestamps'].append(ts_datetime.timestamp())
+        ts = int(ts_datetime.timestamp())
+        if ts not in locs['timestamps']:
+            locs['timestamps'].append(ts)
             locs['latitudes'].append(lat)
             locs['longitudes'].append(lon)
             self.locations = locs
@@ -429,9 +430,10 @@ class Device(models.Model):
         timestamps = set()
         locs = {'timestamps':[], 'latitudes': [], 'longitudes': []}
         for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1]):
-            if timestamp not in timestamps:
-                timestamps.add(timestamp)
-                locs['timestamps'].append(timestamp)
+            timestamp_int = int(timestamp)
+            if timestamp_int not in timestamps:
+                timestamps.add(timestamp_int)
+                locs['timestamps'].append(timestamp_int)
                 locs['latitudes'].append(locations['latitudes'][idx])
                 locs['longitudes'].append(locations['longitudes'][idx])
         self.locations = locs
@@ -445,11 +447,11 @@ class Device(models.Model):
         locations = self.locations
         locs = [
             {
-                'timestamp': i[1],  
-                'latitude': locations['latitudes'][i[0]],  
-                'longitude': locations['longitudes'][i[0]],
+                'timestamp': timestamp,  
+                'latitude': locations['latitudes'][idx],  
+                'longitude': locations['longitudes'][idx],
             }            
-            for i in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
+            for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
         ]
         return '%r' % locs[-1]
 
