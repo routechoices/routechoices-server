@@ -24,7 +24,8 @@ class TMT250Decoder():
         self.packet = {}
 
     def generate_response(self, success=True):
-        return pack('>i', self.packet['num_data'] if success else 0)
+        s = self.packet['num_data'] if success else 0
+        return pack('>i', s)
 
     def decode_alv(self, data):
         self.packet['zeroes'] = unpack('>i', data[:4])[0]
@@ -120,18 +121,18 @@ class TMT250Connection():
             assert(zeroes == 0)
             self.packet_length = unpack('>i', data[4:8])[0] + 4
             if len(data) - 8 >= self.packet_length:
-                await self._on_full_data(data)
+                self.buffer = data
             else:
                 self.waiting_for_content = True
                 self.buffer = bytes(data)
         elif self.packet_length > len(self.buffer):
-             self.buffer += bytes(data)
+            self.buffer += bytes(data)
         if self.packet_length <= len(self.buffer):
             await self._on_full_data(self.buffer)
 
     async def _on_write_complete(self):
         if not self.stream.reading():
-            data = bytearray(b'0'*1234)
+            data = bytearray(b'0'*2000)
             try:
                 data_len = await self.stream.read_into(data, partial=True)
                 print('%s is sending %d bytes' % (self.imei, data_len))
