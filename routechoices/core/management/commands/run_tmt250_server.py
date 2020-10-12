@@ -50,10 +50,10 @@ class TMT250Decoder():
 
             n2 = buffer[pointer]
             pointer += 1 +3 * n2
-            
+
             n4 = buffer[pointer]
             pointer += 1 + 5 * n4
-            
+
             n8 = buffer[pointer]
             pointer += 1 + 9 * n8
             self.packet['records'].append({
@@ -84,7 +84,7 @@ class TMT250Connection():
             data_len = await self.stream.read_into(data, partial=True)
             if(data_len < 3):
                 print('too little data %s', self.address)
-                await self.stream.write(pack('>H', 0))
+                await self.stream.write(pack('b', 0))
                 self.stream.close()
                 return
             data = data[:data_len]
@@ -98,18 +98,19 @@ class TMT250Connection():
             pass
         if imei_len != len(imei):
             print('invalid identification %s, %s, %d' % (self.address, imei, imei_len))
-            await self.stream.write(pack('>H', 0))
+            await self.stream.write(pack('b', 0))
             self.stream.close()
             return
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
             print('imei not registered %s, %s' % (self.address, imei))
-            await self.stream.write(pack('>H', 0))
+            await self.stream.write(pack('b', 0))
             self.stream.close()
             return
         self.imei = imei
-        await self.stream.write(pack('>H', 1))
+        await self.stream.write(pack('b', 1))
         print('%s is connected' % (self.imei))
+
         while await self._on_write_complete():
             pass
 
@@ -127,19 +128,21 @@ class TMT250Connection():
              self.buffer += bytes(data)
         if self.packet_length <= len(self.buffer):
             await self._on_full_data(self.buffer)
-    
+
     async def _on_write_complete(self):
         if not self.stream.reading():
             data = bytearray(b'0'*1234)
             try:
                 data_len = await self.stream.read_into(data, partial=True)
+                print('%s is sending %d bytes' % (self.imei, data_len))
                 await self._on_read_line(data[:data_len])
             except Exception:
+                print('exception reading data')
                 return False
-            return True
+        return True
 
     def _on_close(self):
-        print('client quit %s', self.address)
+        print('client quit', self.address)
 
     async def _on_full_data(self, data):
         try:
@@ -152,7 +155,7 @@ class TMT250Connection():
                 self.db_device.add_location(r['latlon'][0], r['latlon'][1], r['timestamp'], save=False)
             await sync_to_async(self.db_device.save, thread_sensitive=True)()
             self.waiting_for_content = True
-        
+
             await self.stream.write(self.decoder.generate_response())
 
 
