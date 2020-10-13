@@ -69,7 +69,6 @@ class TMT250Connection():
     def __init__(self, stream, address):
         print('received a new connection from %s', address)
         self.imei = None
-        self.waiting_for_content = False
         self.address = address
         self.stream = stream
         self.stream.set_close_callback(self._on_close)
@@ -80,7 +79,7 @@ class TMT250Connection():
 
     async def start_listening(self):
         print('start listening from %s', self.address)
-        data = bytearray(b'0'*1234)
+        data = bytearray(b'0' * 1024)
         try:
             data_len = await self.stream.read_into(data, partial=True)
             if(data_len < 3):
@@ -116,23 +115,18 @@ class TMT250Connection():
             pass
 
     async def _on_read_line(self, data):
-        if not self.waiting_for_content:
-            zeroes = unpack('>i', data[:4])[0]
-            assert(zeroes == 0)
-            self.packet_length = unpack('>i', data[4:8])[0] + 4
-            if len(data) - 8 >= self.packet_length:
-                self.buffer = data
-            else:
-                self.waiting_for_content = True
-                self.buffer = bytes(data)
-        elif self.packet_length > len(self.buffer):
-            self.buffer += bytes(data)
-        if self.packet_length <= len(self.buffer):
-            await self._on_full_data(self.buffer)
+        zeroes = unpack('>i', data[:4])[0]
+        try:
+             assert(zeroes == 0)
+        except AssertionError:
+             return
+        self.packet_length = unpack('>i', data[4:8])[0] + 4
+        self.buffer = bytes(data)
+        await self._on_full_data(self.buffer)
 
     async def _on_write_complete(self):
         if not self.stream.reading():
-            data = bytearray(b'0'*2000)
+            data = bytearray(b'0' * 2048)
             try:
                 data_len = await self.stream.read_into(data, partial=True)
                 print('%s is sending %d bytes' % (self.imei, data_len))
