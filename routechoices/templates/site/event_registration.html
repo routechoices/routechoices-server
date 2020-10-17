@@ -4,6 +4,7 @@
 
 {%  block extra_head %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/bootstrap-datetime-picker-4.17.47/bootstrap-datetimepicker.min.css' %}" />
 <link rel="stylesheet" href="{% static '/vendor/selectize-0.12.6/selectize.bootstrap3.css' %}" />
 {%  endblock %}
 
@@ -34,7 +35,7 @@
     $('.datetimepicker').map(function(i, el) {
       var options = {
           useCurrent: false,
-          format: 'YYYY-MM-DD HH:mm'
+          format: 'YYYY-MM-DDTHH:mm:00Z'
       }
       $el = $(el);
       if($el.val()) {

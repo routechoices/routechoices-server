@@ -21,12 +21,16 @@ class UploadGPXForm(Form):
 class CompetitorForm(ModelForm):
     device = ModelChoiceField(required=True, queryset=Device.objects.all())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_time'].label = "Start time"
+
     class Meta:
         model = Competitor
         fields = ('event', 'device', 'name', 'start_time')
         widgets = {
             'event': HiddenInput(),
-            'start_time': DateTimeInput(attrs={'class': 'datetimepicker'}),
+            'start_time': DateTimeInput(attrs={'title': 'Start time', 'placeholder': 'Start time', 'class': 'datetimepicker'}),
         }
 
     def clean_start_time(self):

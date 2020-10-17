@@ -453,7 +453,24 @@ class Device(models.Model):
             }            
             for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
         ]
-        return '%r' % locs[-1]
+        return locs[-1]
+
+    @property
+    def last_date_viewed(self):
+        ll = self.last_location
+        if not ll:
+            return None
+        t = ll['timestamp']
+        return datetime.datetime \
+            .utcfromtimestamp(t) \
+            .replace(tzinfo=pytz.utc)
+
+    @property
+    def last_position(self):
+        ll = self.last_location
+        if not ll:
+            return None
+        return ll['latitude'], ll['longitude']
 
     class Meta:
         ordering = ['aid']

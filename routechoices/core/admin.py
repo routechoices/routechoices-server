@@ -34,9 +34,16 @@ class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
         'creation_date',
-        'last_location',
+        'last_date_viewed',
+        'last_position',
         'location_count',
     )
+    actions = ['clean_positions']
+
+    def clean_positions(self, request, queryset):
+        for obj in queryset:
+            obj.remove_duplicates()
+    clean_positions.short_description = "Remove duplicate positions from storage"
 
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
