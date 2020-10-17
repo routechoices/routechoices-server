@@ -39,7 +39,7 @@ class DeviceAdmin(admin.ModelAdmin):
         'location_count',
     )
     actions = ['clean_positions']
-
+    search_fields = ('aid', )
     def clean_positions(self, request, queryset):
         for obj in queryset:
             obj.remove_duplicates()
