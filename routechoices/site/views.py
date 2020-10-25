@@ -157,8 +157,7 @@ def event_route_upload_view(request, club_slug, slug):
         slug__iexact=slug,
         allow_route_upload=True,
     ).filter(
-        end_date__isnull=False,
-        end_date__lt=now()
+        start_date__lte=now()
     ).first()
     if not event:
         raise Http404()

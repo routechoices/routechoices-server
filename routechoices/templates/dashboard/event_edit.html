@@ -15,7 +15,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
 
-            <h3>Competitors {% if not event.hidden %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
+            <h3>Competitors {% if event.started %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
             {% bootstrap_formset_errors formset %}
             <table class="table">
             {{ formset.management_form }}

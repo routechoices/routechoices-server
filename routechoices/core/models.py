@@ -281,6 +281,10 @@ class Event(models.Model):
     @property
     def hidden(self):
         return self.start_date > now()
+    
+    @property
+    def started(self):
+        return self.start_date <= now()
 
     @property
     def is_live(self):
