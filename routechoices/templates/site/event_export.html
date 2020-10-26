@@ -14,7 +14,7 @@
       <tr>
         <td>{{ competitor.name }}</a></td>
         <td>{{ competitor.start_time|date:'Y-m-d H:i:s \U\T\C' }}</td>
-        <td>{% if not event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %}</td>
+        <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %}</td>
       </tr>
       {% endfor %}
     </table>
