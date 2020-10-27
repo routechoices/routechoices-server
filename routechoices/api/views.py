@@ -102,7 +102,7 @@ def event_data(request, aid):
 
 @api_view(['GET'])
 def event_map_details(request, aid):
-    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    event = get_object_or_404(Event.objects.all().select_related('club', 'map'), aid=aid, start_date__lt=now())
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -113,50 +113,12 @@ def event_map_details(request, aid):
             'last_mod': '',
             'corners_coordinates': '',
         })
-    map = event.map
+    rmap = event.map
     return Response({
-        'hash': map.hash,
-        'last_mod': map.modification_date,
-        'corners_coordinates': map.corners_coordinates,
+        'hash': rmap.hash,
+        'last_mod': rmap.modification_date,
+        'corners_coordinates': rmap.corners_coordinates,
     })
-
-@api_view(['GET'])
-def event_rg_data(request, aid):
-    t0 = time.time()
-    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
-    if event.privacy == PRIVACY_PRIVATE:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied()
-    competitors = event.competitors.all()
-    competitor_values = competitors.values_list(
-        'id',
-        'name',
-        'short_name',
-        'aid'
-    )
-    competitor_data = {}
-    for c in competitor_values:
-        competitor_data[c[0]] = {
-            'aid': c[3],
-            'name': c[1],
-            'short_name': c[2]
-        }
-    locations = []
-    for competitor in competitors:
-        locations = list(chain(locations, competitor.locations))
-    response_data = []
-    locations = sorted(locations, key=lambda l: l['timestamp'])
-    for location in locations:
-        response_data.append({
-            'id': competitor_data[location.competitor]['aid'],
-            'name': competitor_data[location.competitor]['name'],
-            'lat': location['latitude'],
-            'lon': location['longitude'],
-            'sec': location['timestamp'],
-        })
-    response_data.append({'n': len(locations), 'duration': time.time()-t0})
-    return Response(response_data)
 
 
 @api_view(['GET', 'POST'])
@@ -326,7 +288,11 @@ def device_search(request):
 
 @api_view(['GET'])
 def event_map_download(request, aid):
-    event = get_object_or_404(Event, aid=aid, start_date__lt=now())
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=aid,
+        start_date__lt=now()
+    )
     if not event.map:
         raise NotFound()
     if event.privacy == PRIVACY_PRIVATE:
@@ -345,7 +311,7 @@ def event_map_download(request, aid):
 @api_view(['GET'])
 def competitor_gpx_download(request, aid):
     competitor = get_object_or_404(
-        Competitor,
+        Competitor.objects.all().select_related('event', 'event__club'),
         aid=aid,
         start_time__lt=now()
     )

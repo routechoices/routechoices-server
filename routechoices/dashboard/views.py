@@ -224,7 +224,7 @@ def map_list_view(request):
     club_list = Club.objects\
         .filter(admins=request.user)\
         .values_list('id', flat=True)
-    map_list = Map.objects.filter(club_id__in=club_list)
+    map_list = Map.objects.filter(club_id__in=club_list).select_related('club')
 
     paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
@@ -429,7 +429,7 @@ def map_delete_view(request, id):
 @login_required
 def event_list_view(request):
     club_list = Club.objects.filter(admins=request.user)
-    event_list = Event.objects.filter(club__in=club_list)
+    event_list = Event.objects.filter(club__in=club_list).select_related('club')
 
     paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')

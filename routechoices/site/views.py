@@ -33,7 +33,7 @@ def tracker_view(request):
 
 
 def events_view(request):
-    event_list = Event.objects.filter(privacy=PRIVACY_PUBLIC)
+    event_list = Event.objects.filter(privacy=PRIVACY_PUBLIC).select_related('map', 'club')
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -51,7 +51,7 @@ def club_view(request, slug):
         Club,
         slug__iexact=slug
     )
-    event_list = Event.objects.filter(club=club, privacy=PRIVACY_PUBLIC)
+    event_list = Event.objects.filter(club=club, privacy=PRIVACY_PUBLIC).select_related('map', 'club')
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -67,7 +67,7 @@ def club_view(request, slug):
 
 def event_view(request, club_slug, slug):
     event = get_object_or_404(
-        Event,
+        Event.objects.all().prefetch_related('competitors'),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )

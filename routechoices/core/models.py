@@ -297,40 +297,6 @@ class Event(models.Model):
     def ended(self):
         return self.end_date and self.end_date < now()
 
-    @property
-    def rg_url(self):
-        site = Site.objects.get_current()
-        protocol = 'http' if settings.DEBUG else 'https'
-        args = {
-            'title': self.name,
-            'liveurl' if self.is_live else 'replayurl': '{}://{}{}?'.format(
-                protocol,
-                site.domain,
-                reverse(
-                    'api:event_rg_data',
-                    kwargs={
-                        'aid': self.aid,
-                    }
-                ),
-            ),
-        }
-        if self.map is not None:
-            args['mapurl'] = '{}://{}{}?{}'.format(
-                protocol,
-                site.domain,
-                reverse(
-                    'api:event_map_download',
-                    kwargs={
-                        'aid': self.aid,
-                    }
-                ),
-                self.map.modification_date.timestamp()
-            )
-            args['mapurl'] += '?_{}_'.format(
-                self.map.corners_coordinates.replace(',', '_')
-            )
-        return '{}://map.routegadget.net/?{}'.format(protocol, urlencode(args))
-
     def get_absolute_url(self):
         return reverse(
             'site:event_view',
@@ -559,8 +525,7 @@ class Competitor(models.Model):
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
-        next_competitor = Competitor.objects.filter(
-            device=self.device,
+        next_competitor = self.device.competitor_set.filter(
             start_time__gt=from_date
         ).order_by('start_time').first()
         
