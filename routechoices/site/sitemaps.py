@@ -10,7 +10,7 @@ class EventsSitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return Event.objects.filter(
+        return Event.objects.select_related('club').filter(
             privacy=PRIVACY_PUBLIC,
         )
 
@@ -24,7 +24,7 @@ class EventsExportSitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return Event.objects.filter(
+        return Event.objects.select_related('club').filter(
             start_date__lt=now(),
             privacy=PRIVACY_PUBLIC,
         )

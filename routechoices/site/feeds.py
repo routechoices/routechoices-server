@@ -19,7 +19,7 @@ class LiveEventsFeed(Feed):
         return reverse('site:events_view')
 
     def items(self):
-        return Event.objects.filter(
+        return Event.objects.select_related('club').filter(
             privacy=PRIVACY_PUBLIC,
         )[:25]
 
@@ -49,7 +49,7 @@ class ClubLiveEventsFeed(Feed):
         return reverse('site:club_view', kwargs={'slug': obj.slug})
 
     def items(self, obj):
-        return Event.objects.filter(
+        return Event.objects.select_related('club').filter(
             privacy=PRIVACY_PUBLIC,
             club=obj,
         )[:25]
