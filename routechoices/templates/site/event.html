@@ -105,7 +105,7 @@ and (max-device-width : 500px) {
 .runner-icon{
     color: #000;
      /* Will override color (regardless of order) */
-    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-width: .3px;
     -webkit-text-stroke-color: #000;
 }
 
@@ -626,9 +626,19 @@ var drawCompetitors = function(){
       var loc = route.getByTime(viewedTime);
       if(loc && !isNaN(loc.coords.latitude) && hasPointLast30sec){
         if(competitor.mapMarker == undefined){
-          competitor.mapMarker = L.circleMarker(
+          var svgRect = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="<-color->"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>';
+          svgRect = svgRect.replace('<-color->', competitor.color)
+          var pulseIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect).replace('#','%23'),
+            iconSize: [40, 40],
+            shadowSize: [40, 40],
+            iconAnchor: [20, 20],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0]
+          });
+          competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
-            {weight:5, radius: 7, color: competitor.color, fill: false, fillOpacity:0, opacity: 0.75}
+            {icon: pulseIcon}
           );
           competitor.mapMarker.addTo(map);
         } else {
