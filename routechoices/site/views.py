@@ -33,7 +33,9 @@ def tracker_view(request):
 
 
 def events_view(request):
-    event_list = Event.objects.filter(privacy=PRIVACY_PUBLIC).select_related('map', 'club')
+    event_list = Event.objects.filter(
+        privacy=PRIVACY_PUBLIC
+    ).select_related('map', 'club')
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -45,13 +47,16 @@ def events_view(request):
 
 
 def club_view(request, slug):
-    if slug in ( 'api', 'admin', 'dashboard',):
+    if slug in ('api', 'admin', 'dashboard',):
         return redirect('/{}/'.format(slug))
     club = get_object_or_404(
         Club,
         slug__iexact=slug
     )
-    event_list = Event.objects.filter(club=club, privacy=PRIVACY_PUBLIC).select_related('map', 'club')
+    event_list = Event.objects.filter(
+        club=club,
+        privacy=PRIVACY_PUBLIC
+    ).select_related('map', 'club')
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -185,8 +190,12 @@ def event_route_upload_view(request, club_slug, slug):
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
-                            if point.time and point.latitude and point.longitude:
-                                points['timestamps'].append(point.time.timestamp())
+                            if point.time \
+                                    and point.latitude \
+                                    and point.longitude:
+                                points['timestamps'].append(
+                                    point.time.timestamp()
+                                )
                                 points['latitudes'].append(point.latitude)
                                 points['longitudes'].append(point.longitude)
                                 if not start_time:

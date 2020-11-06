@@ -13,7 +13,7 @@ def get_loggator_club():
     club, created = Club.objects.get_or_create(
         slug='loggator',
         defaults={
-            'name':'Loggator'
+            'name': 'Loggator'
         }
     )
     if created:
@@ -79,8 +79,10 @@ class Command(BaseCommand):
             slug=event_data['event']['slug'],
             defaults={
                 'name': event_data['event']['name'],
-                'start_date': arrow.get(event_data['event']['start_date']).datetime,
-                'end_date': arrow.get(event_data['event']['end_date']).datetime,
+                'start_date':
+                    arrow.get(event_data['event']['start_date']).datetime,
+                'end_date':
+                    arrow.get(event_data['event']['end_date']).datetime,
             }
         )
         if not created:
@@ -130,8 +132,6 @@ class Command(BaseCommand):
                 event=event,
             )
         return event
-
-
 
     def handle(self, *args, **options):
         club = get_loggator_club()

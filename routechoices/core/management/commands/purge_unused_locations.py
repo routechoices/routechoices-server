@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
-from routechoices.core.models import Location, Event, Device
 
 from datetime import timedelta
-from django.db.backends.signals import connection_created
 from django.utils.timezone import now
+
+from routechoices.core.models import Device
 
 
 class Command(BaseCommand):
@@ -39,20 +39,29 @@ class Command(BaseCommand):
                 if timestamp >= two_weeks_ago.timestamp():
                     is_valid = True
                 for p in periods_used:
-                    if timestamp >= two_weeks_ago.timestamp() or p[0].timestamp() <= timestamp <= p[1].timestamp():
+                    if p[0].timestamp() <= timestamp <= p[1].timestamp() \
+                            or timestamp >= two_weeks_ago.timestamp():
                         is_valid = True
                         break
                 if is_valid:
                     valid_indexes.append(idx)
-            device_deleted_loc_count = len(locs['timestamps']) - len(valid_indexes)
-            if device_deleted_loc_count:
-                self.stdout.write('Device %s, extra %d locations' % (device.aid, device_deleted_loc_count))
-            deleted_count += device_deleted_loc_count
-            if force and device_deleted_loc_count:
+            dev_del_loc_count = len(locs['timestamps']) - len(valid_indexes)
+            if dev_del_loc_count:
+                self.stdout.write(
+                    'Device %s, extra %d locations' % (
+                        device.aid,
+                        dev_del_loc_count
+                    )
+                )
+            deleted_count += dev_del_loc_count
+            if force and dev_del_loc_count:
                 new_locs = {
-                    'timestamps': [locs['timestamps'][i] for i in valid_indexes],
-                    'latitudes': [locs['latitudes'][i] for i in valid_indexes],
-                    'longitudes': [locs['longitudes'][i] for i in valid_indexes],
+                    'timestamps':
+                        [locs['timestamps'][i] for i in valid_indexes],
+                    'latitudes':
+                        [locs['latitudes'][i] for i in valid_indexes],
+                    'longitudes':
+                        [locs['longitudes'][i] for i in valid_indexes],
                 }
                 device.locations = new_locs
                 device.save()

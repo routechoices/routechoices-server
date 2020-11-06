@@ -3,7 +3,6 @@ import os.path
 import re
 import time
 import urllib.parse
-from itertools import chain
 
 import arrow
 import requests
@@ -73,7 +72,11 @@ def api_root(request):
 @api_view(['GET'])
 def event_data(request, aid):
     t0 = time.time()
-    event = get_object_or_404(Event.objects.select_related('club').prefetch_related('competitors'), aid=aid, start_date__lt=now())
+    event = get_object_or_404(
+        Event.objects.select_related('club').prefetch_related('competitors'),
+        aid=aid,
+        start_date__lt=now()
+    )
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -102,7 +105,11 @@ def event_data(request, aid):
 
 @api_view(['GET'])
 def event_map_details(request, aid):
-    event = get_object_or_404(Event.objects.all().select_related('club', 'map'), aid=aid, start_date__lt=now())
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=aid,
+        start_date__lt=now()
+    )
     if event.privacy == PRIVACY_PRIVATE:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -198,7 +205,8 @@ def pwa_api_gw(request):
         raise ValidationError('Missing raw_data argument')
     locations = GeoLocationSeries(raw_data)
     for location in locations:
-        if abs(time.time() - int(location.timestamp)) > API_LOCATION_TIMESTAMP_MAX_AGE:
+        dtime = abs(time.time() - int(location.timestamp))
+        if dtime > API_LOCATION_TIMESTAMP_MAX_AGE:
             continue
         device.add_location(
             location.coordinates.latitude,
@@ -256,7 +264,7 @@ def get_device_for_imei(request):
         d = Device(aid=short_random_key()+'_i')
         d.save()
         idevice = ImeiDevice(imei=imei, device=d)
-        idevice.save() 
+        idevice.save()
     return Response({'device_id': idevice.device.aid})
 
 
@@ -273,7 +281,9 @@ def user_search(request):
     if q and len(q) > 2:
         users = User.objects.filter(username__icontains=q)\
             .values_list('id', 'username')[:10]
-    return Response({'results': [{'id': u[0], 'username': u[1]} for u in users]})
+    return Response({
+        'results': [{'id': u[0], 'username': u[1]} for u in users]
+    })
 
 
 @api_view(['GET'])

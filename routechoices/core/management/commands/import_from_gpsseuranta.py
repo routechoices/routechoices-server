@@ -101,7 +101,9 @@ class Command(BaseCommand):
                 dlng = int(pt[1])
                 dlat = int(pt[2])
             else:
-                chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                chars = \
+                    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' + \
+                    'abcdefghijklmnopqrstuvwxyz'
                 dt = chars.index(p[0]) - 31
                 dlng = chars.index(p[1]) - 31
                 dlat = chars.index(p[2]) - 31
@@ -125,7 +127,7 @@ class Command(BaseCommand):
         if r.status_code != 200:
             raise EventImportError('API returned error code')
         event_raw_data = r.text
-        event_data = {'COMPETITOR':[]}
+        event_data = {'COMPETITOR': []}
         for line in event_raw_data.split('\n'):
             try:
                 key, val = line.strip().split(':')
@@ -182,7 +184,12 @@ class Command(BaseCommand):
         event_map_data = event_data.get('CALIBRATION')
         event_map = None
         try:
-            event_map = self.import_map(club, event_map_data, event_data['RACENAME'], event_id)
+            event_map = self.import_map(
+                club,
+                event_map_data,
+                event_data['RACENAME'],
+                event_id
+            )
         except MapImportError:
             pass
 
@@ -199,12 +206,12 @@ class Command(BaseCommand):
             if len(start_time_raw) == 12:
                 start_time = arrow.get(
                     c_data[1] + c_data[2],
-                   'YYYYMMDDHHmm'
+                    'YYYYMMDDHHmm'
                 )
             else:
                 start_time = arrow.get(
                     c_data[1] + c_data[2],
-                   'YYYYMMDDHHmmss'
+                    'YYYYMMDDHHmmss'
                 )
             start_time = start_time.shift(
                 minutes=-int(event_data.get('TIMEZONE', 0))

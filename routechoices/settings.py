@@ -132,11 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
-USE_I18N = True
 
 USE_L10N = True
 
@@ -263,8 +259,6 @@ ACCOUNT_USERNAME_BLACKLIST = SLUG_BLACKLIST
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = '2'
 ACCOUNT_USERNAME_VALIDATORS ='routechoices.lib.validators.custom_username_validators'
-
-APPEND_SLASH = True
 
 CACHES = {
     'default': {

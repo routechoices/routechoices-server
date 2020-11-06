@@ -5,7 +5,8 @@ import uuid
 
 def generate_random_string(base_string_character, string_size=10):
     """
-    Common function to generate a string_size length random string based on the first parameter.
+    Common function to generate a string_size length random string based on
+    the first parameter.
     """
     ret_str = ''
     # Select random character for string_size times.
@@ -44,7 +45,8 @@ def generate_random_alphabet_digit(str_len=10):
 def generate_random_alphabet_digit_with_special_number(digit_number=5,
                                                        alphabet_number=5):
     """
-    Generate random string with specified digit count and alphabet character count.
+    Generate random string with specified digit count and alphabet
+    character count.
     """
     # Generate specified length digit string.
     digit_str = generate_random_digit(digit_number)
@@ -55,7 +57,8 @@ def generate_random_alphabet_digit_with_special_number(digit_number=5,
     # Convert above string to list.
     tmp_str_list = list(tmp_str)
     tmp_str_len = len(tmp_str)
-    # Scatter characters order in the string list and return a new ordered string list.
+    # Scatter characters order in the string list and return a new 
+    # ordered string list.
     ret = random.sample(tmp_str_list, tmp_str_len)
     # Convert string list back to a string.
     ret = str(ret)

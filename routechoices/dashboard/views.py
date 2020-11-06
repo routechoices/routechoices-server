@@ -1,10 +1,12 @@
-import logging
-import requests
+import os
+
 import tempfile
 import zipfile
 
+import requests
+
 import gpxpy
-import os
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -24,7 +26,7 @@ from routechoices.dashboard.forms import (
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
 
-logger = logging.getLogger(__name__)
+
 DEFAULT_PAGE_SIZE = 25
 
 
@@ -108,11 +110,12 @@ def device_add_view(request):
 @login_required
 def device_remove_view(request, id):
     ownership = DeviceOwnership.objects \
-    .select_related('device') \
-    .filter(
-        device__aid=id,
-        user=request.user
-    ).first()
+        .select_related('device') \
+        .filter(
+            device__aid=id,
+            user=request.user
+        ) \
+        .first()
 
     if not ownership:
         raise Http404('No such device owned by you.')
@@ -128,6 +131,7 @@ def device_remove_view(request, id):
             'device': ownership.device,
         }
     )
+
 
 @login_required
 def club_list_view(request):
@@ -187,7 +191,9 @@ def club_edit_view(request, id):
             return redirect('dashboard:club_list_view')
     else:
         form = ClubForm(instance=club)
-    form.fields['admins'].queryset = User.objects.filter(id__in=club.admins.all())
+    form.fields['admins'].queryset = User.objects.filter(
+            id__in=club.admins.all()
+        )
     return render(
         request,
         'dashboard/club_edit.html',
@@ -248,7 +254,7 @@ def map_create_view(request):
         form.fields['club'].queryset = club_list
         # check whether it's valid:
         if form.is_valid():
-            map = form.save()
+            form.save()
             return redirect('dashboard:map_list_view')
     else:
         form = MapForm()
@@ -277,9 +283,8 @@ def map_kmz_upload_view(request):
             if file.name.lower().endswith('.kml'):
                 try:
                     kml = file.read()
-                    name, image_path, corners_coords = extract_ground_overlay_info(
-                        kml
-                    )
+                    name, image_path, corners_coords = \
+                        extract_ground_overlay_info(kml)
                     if not image_path.startswith('http://') and \
                             not image_path.startswith('https://'):
                         raise Exception('Fishy KML')
@@ -313,16 +318,17 @@ def map_kmz_upload_view(request):
                     zf.extractall(dest)
                     with open(os.path.join(dest, 'doc.kml'), 'r') as f:
                         kml = f.read().encode('utf8')
-                    name, image_path, corners_coords = extract_ground_overlay_info(
-                        kml
-                    )
+                    name, image_path, corners_coords = \
+                        extract_ground_overlay_info(kml)
+
                     if image_path.startswith('http://') or \
                             image_path.startswith('https://'):
                         dest = tempfile.NamedTemporaryFile(delete=False)
                         headers = requests.utils.default_headers()
                         headers.update(
                             {
-                                'User-Agent': 'Python3/Requests/Routechoices.com',
+                                'User-Agent':
+                                    'Python3/Requests/Routechoices.com',
                             }
                         )
                         r = requests.get(image_path, headers=headers)
@@ -429,7 +435,9 @@ def map_delete_view(request, id):
 @login_required
 def event_list_view(request):
     club_list = Club.objects.filter(admins=request.user)
-    event_list = Event.objects.filter(club__in=club_list).select_related('club')
+    event_list = Event.objects.filter(
+        club__in=club_list
+    ).select_related('club')
 
     paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
@@ -509,14 +517,18 @@ def event_edit_view(request, id):
             return redirect('dashboard:event_list_view')
         else:
             for cform in formset.forms:
-                cform.fields['device'].queryset = Device.objects.filter(id__in=device_id)
+                cform.fields['device'].queryset = Device.objects.filter(
+                    id__in=device_id
+                )
     else:
         form = EventForm(instance=event)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(instance=event)
         for cform in formset.forms:
-            cform.fields['device'].queryset = Device.objects.filter(id__in=device_id)
+            cform.fields['device'].queryset = Device.objects.filter(
+                id__in=device_id
+            )
     return render(
         request,
         'dashboard/event_edit.html',
@@ -602,11 +614,12 @@ def event_route_upload_view(request, id):
                 device.aid += '_GPX'
                 device.is_gpx = True
                 device.save()
-                points = []
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
-                            if point.time and point.latitude and point.longitude:
+                            if point.time \
+                                    and point.latitude \
+                                    and point.longitude:
                                 device.add_location(
                                     point.latitude,
                                     point.longitude,

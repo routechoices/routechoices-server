@@ -32,7 +32,7 @@ def short_random_key():
     return generate_random_string(alphabet, 6)
 
 
-def get_country_from_coords(lat,lon):
+def get_country_from_coords(lat, lon):
     api_url = "http://api.geonames.org/countryCode"
     values = {
         'type': 'json',
@@ -50,8 +50,10 @@ def get_country_from_coords(lat,lon):
 
 
 def solve_affine_matrix(r1, s1, t1, r2, s2, t2, r3, s3, t3):
-    a = (((t2 - t3) * (s1 - s2)) - ((t1 - t2) * (s2 - s3))) / (((r2 - r3) * (s1 - s2)) - ((r1 - r2) * (s2 - s3)))
-    b = (((t2 - t3) * (r1 - r2)) - ((t1 - t2) * (r2 - r3))) / (((s2 - s3) * (r1 - r2)) - ((s1 - s2) * (r2 - r3)))
+    a = (((t2 - t3) * (s1 - s2)) - ((t1 - t2) * (s2 - s3))) \
+        / (((r2 - r3) * (s1 - s2)) - ((r1 - r2) * (s2 - s3)))
+    b = (((t2 - t3) * (r1 - r2)) - ((t1 - t2) * (r2 - r3))) \
+        / (((s2 - s3) * (r1 - r2)) - ((s1 - s2) * (r2 - r3)))
     c = t1 - (r1 * a) - (s1 * b)
     return [a, b, c]
 
@@ -104,8 +106,10 @@ def three_point_calibration_to_corners(calibration_string, width, height):
     xy_to_coords_coeffs = derive_affine_transform(*cal_pts_meter, *cal_pts)
 
     def map_xy_to_latlon(xy):
-        x = xy['x'] * xy_to_coords_coeffs[0] + xy['y'] * xy_to_coords_coeffs[1] + xy_to_coords_coeffs[2]
-        y = xy['x'] * xy_to_coords_coeffs[3] + xy['y'] * xy_to_coords_coeffs[4] + xy_to_coords_coeffs[5]
+        x = xy['x'] * xy_to_coords_coeffs[0] + xy['y'] \
+            * xy_to_coords_coeffs[1] + xy_to_coords_coeffs[2]
+        y = xy['x'] * xy_to_coords_coeffs[3] + xy['y'] \
+            * xy_to_coords_coeffs[4] + xy_to_coords_coeffs[5]
         return proj.meters_to_latlon({'x': x, 'y': y})
 
     corners = [
@@ -164,10 +168,8 @@ def basis_to_points(x1, y1, x2, y2, x3, y3, x4, y4):
     ])
 
 
-def general_2d_projection(x1s, y1s, x1d, y1d,
-                        x2s, y2s, x2d, y2d,
-                        x3s, y3s, x3d, y3d,
-                        x4s, y4s, x4d, y4d):
+def general_2d_projection(x1s, y1s, x1d, y1d, x2s, y2s, x2d, y2d, x3s, y3s,
+                          x3d, y3d, x4s, y4s, x4d, y4d):
     s = basis_to_points(x1s, y1s, x2s, y2s, x3s, y3s, x4s, y4s)
     d = basis_to_points(x1d, y1d, x2d, y2d, x3d, y3d, x4d, y4d)
     return multiply_matrices(d, adjugate_matrix(s))

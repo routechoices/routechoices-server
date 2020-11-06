@@ -105,7 +105,9 @@ class CompetitorForm(ModelForm):
 
 class UploadGPXForm(Form):
     competitor = ModelChoiceField(queryset=Competitor.objects.all())
-    gpx_file = FileField(validators=[FileExtensionValidator(allowed_extensions=['gpx'])])
+    gpx_file = FileField(
+        validators=[FileExtensionValidator(allowed_extensions=['gpx'])]
+    )
 
 
 class UploadKmzForm(Form):

@@ -15,7 +15,9 @@ from routechoices.core.models import Competitor, Event, Device
 
 class UploadGPXForm(Form):
     name = CharField(max_length=64, required=True)
-    gpx_file = FileField(validators=[FileExtensionValidator(allowed_extensions=['gpx'])])
+    gpx_file = FileField(
+        validators=[FileExtensionValidator(allowed_extensions=['gpx'])]
+    )
 
 
 class CompetitorForm(ModelForm):
@@ -30,7 +32,11 @@ class CompetitorForm(ModelForm):
         fields = ('event', 'device', 'name', 'start_time')
         widgets = {
             'event': HiddenInput(),
-            'start_time': DateTimeInput(attrs={'title': 'Start time', 'placeholder': 'Start time', 'class': 'datetimepicker'}),
+            'start_time': DateTimeInput(attrs={
+                'title': 'Start time',
+                'placeholder': 'Start time',
+                'class': 'datetimepicker'
+            }),
         }
 
     def clean_start_time(self):

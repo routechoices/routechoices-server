@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from routechoices.core.models import Club, Competitor, Device, Event, Map, ImeiDevice
+from routechoices.core.models import (
+    Club,
+    Competitor,
+    Device,
+    Event,
+    ImeiDevice,
+    Map
+)
 
 
 class ClubAdmin(admin.ModelAdmin):
@@ -40,10 +47,14 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     actions = ['clean_positions']
     search_fields = ('aid', )
+
     def clean_positions(self, request, queryset):
         for obj in queryset:
             obj.remove_duplicates()
-    clean_positions.short_description = "Remove duplicate positions from storage"
+
+    clean_positions.short_description = \
+        "Remove duplicate positions from storage"
+
 
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (

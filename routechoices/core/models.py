@@ -6,7 +6,6 @@ import hashlib
 import re
 import time
 from io import BytesIO
-from urllib.parse import urlencode
 
 import gpxpy
 import gpxpy.gpx
@@ -14,12 +13,10 @@ import pytz
 from PIL import Image
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
-from django.db.models import Value
 from django.urls import reverse
 from django.utils.timezone import now
 
@@ -47,6 +44,7 @@ class Club(models.Model):
     creator = models.ForeignKey(
          User,
          related_name='+',
+         blank=True,
          null=True,
          on_delete=models.SET_NULL,
     )
@@ -61,6 +59,14 @@ class Club(models.Model):
     )
     admins = models.ManyToManyField(User)
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'club'
+        verbose_name_plural = 'clubs'
+
+    def __str__(self):
+        return self.name
+
     def get_absolute_url(self):
         return reverse(
             'site:club_view',
@@ -69,9 +75,6 @@ class Club(models.Model):
             }
         )
 
-    def __str__(self):
-        return self.name
-
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Club.objects.filter(slug__iexact=self.slug)
@@ -79,11 +82,6 @@ class Club(models.Model):
             qs = qs.exclude(id=self.id)
         if qs.exists():
             raise ValidationError('Club with this slug already exists.')
-
-    class Meta:
-        ordering = ['name']
-        verbose_name = 'club'
-        verbose_name_plural = 'clubs'
 
 
 def map_upload_path(instance=None, file_name=None):
@@ -138,6 +136,14 @@ class Map(models.Model):
         'eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073',
         validators=[validate_corners_coordinates]
     )
+
+    class Meta:
+        ordering = ['-creation_date']
+        verbose_name = 'map'
+        verbose_name_plural = 'maps'
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.club)
 
     @property
     def path(self):
@@ -209,23 +215,15 @@ class Map(models.Model):
 
     @property
     def hash(self):
-        hash = hashlib.sha256()
-        hash.update(self.data_uri.encode('utf-8'))
-        hash.update(self.corners_coordinates.encode('utf-8'))
-        return base64.b64encode(hash.digest()).decode('utf-8')
-
-    def __str__(self):
-        return '{} ({})'.format(self.name, self.club)
-
-    class Meta:
-        ordering = ['-creation_date']
-        verbose_name = 'map'
-        verbose_name_plural = 'maps'
+        h = hashlib.sha256()
+        h.update(self.data_uri.encode('utf-8'))
+        h.update(self.corners_coordinates.encode('utf-8'))
+        return base64.b64encode(h.digest()).decode('utf-8')
 
 
-PRIVACY_PUBLIC ='public'
-PRIVACY_SECRET ='secret'
-PRIVACY_PRIVATE ='private'
+PRIVACY_PUBLIC = 'public'
+PRIVACY_SECRET = 'secret'
+PRIVACY_PRIVATE = 'private'
 PRIVACY_CHOICES = (
     (PRIVACY_PUBLIC, 'Public'),
     (PRIVACY_SECRET, 'Secret'),
@@ -255,7 +253,11 @@ class Event(models.Model):
         help_text='This the text that will be used in the urls of your events'
     )
     start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
-    end_date = models.DateTimeField(verbose_name='End Date (UTC)', null=True, blank=True)
+    end_date = models.DateTimeField(
+        verbose_name='End Date (UTC)',
+        null=True,
+        blank=True
+    )
     privacy = models.CharField(
         max_length=8,
         choices=PRIVACY_CHOICES,
@@ -278,24 +280,14 @@ class Event(models.Model):
         help_text="Participants can upload their routes after the event.",
     )
 
-    @property
-    def hidden(self):
-        return self.start_date > now()
-    
-    @property
-    def started(self):
-        return self.start_date <= now()
+    class Meta:
+        ordering = ['-start_date']
+        unique_together = (('club', 'slug'), ('club', 'name'))
+        verbose_name = 'event'
+        verbose_name_plural = 'events'
 
-    @property
-    def is_live(self):
-        if self.end_date:
-            return self.start_date <= now() <= self.end_date
-        else:
-            return self.start_date <= now()
-
-    @property
-    def ended(self):
-        return self.end_date and self.end_date < now()
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse(
@@ -318,8 +310,24 @@ class Event(models.Model):
             }
         )
 
-    def __str__(self):
-        return self.name
+    @property
+    def hidden(self):
+        return self.start_date > now()
+
+    @property
+    def started(self):
+        return self.start_date <= now()
+
+    @property
+    def is_live(self):
+        if self.end_date:
+            return self.start_date <= now() <= self.end_date
+        else:
+            return self.start_date <= now()
+
+    @property
+    def ended(self):
+        return self.end_date and self.end_date < now()
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
@@ -330,13 +338,9 @@ class Event(models.Model):
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
-            raise ValidationError('Event with this Club and Slug already exists.')
-
-    class Meta:
-        ordering = ['-start_date']
-        unique_together = (('club', 'slug'), ('club', 'name'))
-        verbose_name = 'event'
-        verbose_name_plural = 'events'
+            raise ValidationError(
+                'Event with this Club and Slug already exists.'
+            )
 
 
 class Device(models.Model):
@@ -354,20 +358,25 @@ class Device(models.Model):
         related_name='devices',
         through_fields=('device', 'user'),
     )
-    locations_raw = models.TextField(blank=True, null=True)
+    locations_raw = models.TextField(blank=True, default='')
+
+    class Meta:
+        ordering = ['aid']
+        verbose_name = 'device'
+        verbose_name_plural = 'devices'
+
+    def __str__(self):
+        return self.aid
 
     @property
     def locations(self):
         if not self.locations_raw:
-            return {'timestamps':[], 'latitudes': [], 'longitudes': []}
+            return {'timestamps': [], 'latitudes': [], 'longitudes': []}
         return json.loads(self.locations_raw)
 
     @locations.setter
     def locations(self, locs):
         self.locations_raw = json.dumps(locs)
-
-    def __str__(self):
-        return self.aid
 
     def add_location(self, lat, lon, timestamp=None, save=True):
         try:
@@ -398,8 +407,11 @@ class Device(models.Model):
     def remove_duplicates(self, save=True):
         locations = self.locations
         timestamps = set()
-        locs = {'timestamps':[], 'latitudes': [], 'longitudes': []}
-        for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1]):
+        locs = {'timestamps': [], 'latitudes': [], 'longitudes': []}
+        for idx, timestamp in sorted(
+                    enumerate(locations['timestamps']),
+                    key=lambda x: x[1]
+                ):
             timestamp_int = int(timestamp)
             if timestamp_int not in timestamps:
                 timestamps.add(timestamp_int)
@@ -417,11 +429,13 @@ class Device(models.Model):
         locations = self.locations
         locs = [
             {
-                'timestamp': timestamp,  
-                'latitude': locations['latitudes'][idx],  
+                'timestamp': timestamp,
+                'latitude': locations['latitudes'][idx],
                 'longitude': locations['longitudes'][idx],
-            }            
-            for idx, timestamp in sorted(enumerate(locations['timestamps']), key=lambda x:x[1])
+            } for idx, timestamp in sorted(
+                enumerate(locations['timestamps']),
+                key=lambda x:x[1]
+            )
         ]
         return locs[-1]
 
@@ -442,10 +456,6 @@ class Device(models.Model):
             return None
         return ll['latitude'], ll['longitude']
 
-    class Meta:
-        ordering = ['aid']
-        verbose_name = 'device'
-        verbose_name_plural = 'devices'
 
 class ImeiDevice(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
@@ -460,13 +470,13 @@ class ImeiDevice(models.Model):
         on_delete=models.CASCADE
     )
 
-    def __str__(self):
-        return self.imei
-
     class Meta:
         ordering = ['imei']
         verbose_name = 'imei device'
         verbose_name_plural = 'imei devices'
+
+    def __str__(self):
+        return self.imei
 
 
 class DeviceOwnership(models.Model):
@@ -500,17 +510,31 @@ class Competitor(models.Model):
     )
     device = models.ForeignKey(
         Device,
+        related_name='competitor_set',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     name = models.CharField(max_length=64)
-    short_name = models.CharField(max_length=32, null=True, blank=True)
+    short_name = models.CharField(max_length=32)
     start_time = models.DateTimeField(
         verbose_name='Start time (UTC)',
         null=True,
         blank=True
     )
+
+    class Meta:
+        ordering = ['start_time', 'name']
+        verbose_name = 'competitor'
+        verbose_name_plural = 'competitors'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.start_time:
+            self.start_time = self.event.start_date
+        super().save(*args, **kwargs)
 
     @property
     def started(self):
@@ -528,7 +552,6 @@ class Competitor(models.Model):
         next_competitor = self.device.competitor_set.filter(
             start_time__gt=from_date
         ).order_by('start_time').first()
-        
 
         end_date = now()
         if next_competitor:
@@ -541,24 +564,30 @@ class Competitor(models.Model):
                 self.event.end_date,
                 end_date
             )
-            
+
         locs = [
             {
-                'timestamp': i[1],  
-                'latitude': qs['latitudes'][i[0]],  
-                'longitude': qs['longitudes'][i[0]],  
+                'timestamp': i[1],
+                'latitude': qs['latitudes'][i[0]],
+                'longitude': qs['longitudes'][i[0]],
                 'competitor': self.id,
-            }            
-            for i in sorted(enumerate(qs['timestamps']), key=lambda x:x[1]) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
+            } for i in sorted(
+                enumerate(qs['timestamps']),
+                key=lambda x:x[1]
+            ) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
         ]
         return locs
 
     def encode_data(self, locs):
         data = []
         for loc in locs:
-            data.append(GeoLocation(loc['timestamp'], (loc['latitude'], loc['longitude'])))
+            data.append(
+                GeoLocation(
+                    loc['timestamp'],
+                    (loc['latitude'], loc['longitude'])
+                )
+            )
         return str(GeoLocationSeries(data))
-
 
     @property
     def gpx(self):
@@ -586,41 +615,3 @@ class Competitor(models.Model):
                 'aid': self.aid,
             }
         )
-
-    def save(self, *args, **kwargs):
-        if not self.start_time:
-            self.start_time = self.event.start_date
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['start_time', 'name']
-        verbose_name = 'competitor'
-        verbose_name_plural = 'competitors'
-
-
-class Location(models.Model):
-    device = models.ForeignKey(
-        Device,
-        on_delete=models.CASCADE,
-    )
-    latitude = models.FloatField(validators=[validate_latitude, ])
-    longitude = models.FloatField(validators=[validate_longitude, ])
-    datetime = models.DateTimeField(default=now)
-
-    @property
-    def timestamp(self):
-        return self.datetime.timestamp()
-
-    @timestamp.setter
-    def timestamp(self, ts):
-        self.datetime = datetime.datetime\
-            .utcfromtimestamp(ts)\
-            .replace(tzinfo=pytz.utc)
-
-    class Meta:
-        ordering = ['-datetime', 'device']
-        verbose_name = 'location'
-        verbose_name_plural = 'locations'

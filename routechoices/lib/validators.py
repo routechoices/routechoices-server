@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
 
+
 def validate_imei(number):
     """Check if the number provided is a valid IMEI (or IMEISV) number."""
     matched = re.match(r'^\d{14,16}$', number)

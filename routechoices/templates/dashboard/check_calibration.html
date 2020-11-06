@@ -68,7 +68,7 @@
  <footer class="page-footer font-small blue pt-4">
      <!-- Copyright -->
      <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
-         <a href="/"> {{  site.name }}</a>
+         <a href="{% url 'site:home_view' %}"> {{  site.name }}</a>
      </div>
      <!-- Copyright -->
  </footer>
@@ -174,7 +174,7 @@ $(function(){
     });
 
     if(!window.opener) {
-        window.location.href = '/';
+        window.location.href = "{% url 'site:home_view' %}";
     } else {
         loadCalibString();
         loadMapImage()

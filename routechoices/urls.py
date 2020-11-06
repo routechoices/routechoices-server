@@ -44,7 +44,13 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
-    url(r'^dashboard/', include(('routechoices.dashboard.urls', 'dashboard'), namespace='dashboard')),
+    url(
+        r'^dashboard/',
+        include(
+            ('routechoices.dashboard.urls', 'dashboard'),
+            namespace='dashboard'
+        )
+    ),
     url(
         r'^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
         r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',

@@ -1,15 +1,14 @@
 # coding=utf-8
 from struct import unpack, pack
 from asgiref.sync import sync_to_async
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from tornado.tcpserver import TCPServer
 from tornado.iostream import StreamClosedError
-from tornado import gen
 from tornado.ioloop import IOLoop
 
-from routechoices.core.models import Device 
+from routechoices.core.models import Device
 
 
 def _get_device(imei):
@@ -50,7 +49,7 @@ class TMT250Decoder():
             pointer += 27 + n1 * 2
 
             n2 = buffer[pointer]
-            pointer += 1 +3 * n2
+            pointer += 1 + 3 * n2
 
             n4 = buffer[pointer]
             pointer += 1 + 5 * n4
@@ -97,11 +96,18 @@ class TMT250Connection():
         except Exception:
             pass
         if imei_len != len(imei):
-            print('invalid identification %s, %s, %d' % (self.address, imei, imei_len))
+            print('invalid identification %s, %s, %d' % (
+                self.address,
+                imei,
+                imei_len
+            ))
             await self.stream.write(pack('b', 0))
             self.stream.close()
             return
-        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        self.db_device = await sync_to_async(
+            _get_device,
+            thread_sensitive=True
+        )(imei)
         if not self.db_device:
             print('imei not registered %s, %s' % (self.address, imei))
             await self.stream.write(pack('b', 0))
@@ -117,9 +123,9 @@ class TMT250Connection():
     async def _on_read_line(self, data):
         zeroes = unpack('>i', data[:4])[0]
         try:
-             assert(zeroes == 0)
+            assert(zeroes == 0)
         except AssertionError:
-             return
+            return
         self.packet_length = unpack('>i', data[4:8])[0] + 4
         self.buffer = bytes(data)
         await self._on_full_data(self.buffer)
@@ -147,7 +153,12 @@ class TMT250Connection():
             await self.stream.write(self.decoder.generate_response(False))
         else:
             for r in decoded.get('records', []):
-                self.db_device.add_location(r['latlon'][0], r['latlon'][1], r['timestamp'], save=False)
+                self.db_device.add_location(
+                    r['latlon'][0],
+                    r['latlon'][1],
+                    r['timestamp'],
+                    save=False
+                )
             await sync_to_async(self.db_device.save, thread_sensitive=True)()
             self.waiting_for_content = True
 
