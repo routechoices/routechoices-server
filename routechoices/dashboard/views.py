@@ -470,15 +470,21 @@ def event_create_view(request):
             formset.save()
             return redirect('dashboard:event_list_view')
         else:
+            devices = Device.objects.none()
+            if request.user.is_authenticated:
+                devices = request.user.devices.all()
             for cform in formset.forms:
-                cform.fields['device'].queryset = Device.objects.none()
+                cform.fields['device'].queryset = devices
     else:
         form = EventForm()
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet()
+        devices = Device.objects.none()
+        if request.user.is_authenticated:
+            devices = request.user.devices.all()
         for cform in formset.forms:
-            cform.fields['device'].queryset = Device.objects.none()
+            cform.fields['device'].queryset = devices
     return render(
         request,
         'dashboard/event_create.html',
@@ -498,8 +504,12 @@ def event_edit_view(request, id):
         aid=id,
         club__in=club_list
     )
-    device_id = event.competitors.all().values_list('device', flat=True)
-
+    comp_devices_id = event.competitors.all().values_list('device', flat=True)
+    own_devices = Device.objects.none()
+    if request.user.is_authenticated:
+        own_devices = request.user.devices.all()
+    own_devices_id = own_devices.values_list('id', flat=True)
+    all_devices = list(comp_devices_id) + list(own_devices_id)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, instance=event)
@@ -518,7 +528,7 @@ def event_edit_view(request, id):
         else:
             for cform in formset.forms:
                 cform.fields['device'].queryset = Device.objects.filter(
-                    id__in=device_id
+                    id__in=all_devices
                 )
     else:
         form = EventForm(instance=event)
@@ -527,7 +537,7 @@ def event_edit_view(request, id):
         formset = CompetitorFormSet(instance=event)
         for cform in formset.forms:
             cform.fields['device'].queryset = Device.objects.filter(
-                id__in=device_id
+                id__in=all_devices
             )
     return render(
         request,

@@ -141,10 +141,16 @@ def event_registration_view(request, club_slug, slug):
                 }
             )
         else:
-            form.fields['device'].queryset = Device.objects.none()
+            devices = Device.objects.none()
+            if request.user.is_authenticated:
+                devices = request.user.devices.all()
+            form.fields['device'].queryset = devices
     else:
         form = CompetitorForm(initial={'event': event})
-        form.fields['device'].queryset = Device.objects.none()
+        devices = Device.objects.none()
+        if request.user.is_authenticated:
+            devices = request.user.devices.all()
+        form.fields['device'].queryset = devices
     form.fields['device'].label = "Live Streaming Device ID"
     return render(
         request,
