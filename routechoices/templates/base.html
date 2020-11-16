@@ -123,8 +123,23 @@ window.addEventListener("load", function(){
     <!-- Footer -->
     {% endblock %}
     {% endblock %}
-    <script src="{% static '/vendor/raven-3.27.0/raven.js' %}"></script>
-    <script>Raven.config('{% sentry_public_dsn %}').install()</script>
+    <script
+      src="https://browser.sentry-cdn.com/5.27.4/bundle.min.js"
+      integrity="sha384-yUnxX3o5D7+yEEIKDXlpygg+0Q2LdyklXwZVWUjc6fohGisYvhpyQbRvNYaDGtvU"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://browser.sentry-cdn.com/5.27.4/bundle.tracing.min.js"
+      integrity="sha384-C4FnDB434rh858hdUT1O7fV7zJMZAUKKtHMBPeJjZZrlnf0lmZkWDMV+rAHEq+6b"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+    Sentry.init({
+      dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
+      integrations: [new Sentry.Integrations.BrowserTracing()],
+      tracesSampleRate: 0.05,
+    });
+    </script>
     <script src="{% static '/vendor/jquery-1.11.1/jquery.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap-3.4.0/js/bootstrap.min.js' %}"></script>
     <!--<script src="{% static '/vendor/instant-page-1.1.0/instant-page.js' %}"></script>-->
