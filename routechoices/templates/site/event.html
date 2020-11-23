@@ -560,6 +560,18 @@ var getCompetitionEndDate = function() {
     })
     return res
 }
+var getCompetitorsMaxDuration = function() {
+    var res = 0;
+    competitorList.forEach(function(c){
+        var route = competitorRoutes[c.id];
+        if(route) {
+            var idx = route.getPositionsCount()-1;
+            var dur = route.getByIndex(idx).timestamp - (+new Date(c.start_time) || getCompetitionStartDate());
+            res = res < dur ? dur : res;
+        }
+    })
+    return res
+}
 
 var zoomOnCompetitor = function(compr){
   var route = competitorRoutes[compr.id];
@@ -599,7 +611,12 @@ var drawCompetitors = function(){
     }
   }
   // progress bar
-  var perc = isLiveMode ? 100 : (currentTime-getCompetitionStartDate())/(Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * 100
+  var perc = 0;
+  if (isRealTime) {
+    perc = isLiveMode ? 100 : (currentTime-getCompetitionStartDate())/(Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * 100
+  } else {
+    perc = (currentTime-getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100;
+  }
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
   $('#progress_bar_text').html(getProgressBarText());
   competitorList.forEach(function(competitor){
@@ -857,7 +874,11 @@ var pressPlayPauseButton = function(e){
 
 var pressProgressBar = function(e){
   var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width();
-  currentTime = getCompetitionStartDate()+(Math.min(clock.now(), getCompetitionEndDate())-getCompetitionStartDate())*perc;
+  if (isRealTime) {
+    currentTime = getCompetitionStartDate()+(Math.min(clock.now(), getCompetitionEndDate())-getCompetitionStartDate())*perc;
+  } else {
+    currentTime = getCompetitionStartDate() + getCompetitorsMaxDuration() * perc;
+  }
   prevShownTime = currentTime;
 }
 </script>
