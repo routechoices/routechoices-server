@@ -13,5 +13,6 @@ raven
 lxml
 cssselect
 tornado
+django-background-tasks
 sneak @ git+https://github.com/zapier/django-sneak.git@b45d9ec3fea414084162a39836b29cbecf139560
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git

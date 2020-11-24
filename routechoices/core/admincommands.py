@@ -9,7 +9,7 @@ class ImportFromGpsseuranta(AdminCommand):
         event_id = forms.CharField()
 
     def get_command_arguments(self, forms_data, user):
-        return [forms_data['event_id']], {}
+        return [forms_data['event_id']], {'task': True}
 
 
 class ImportFromLoggator(AdminCommand):
@@ -18,4 +18,4 @@ class ImportFromLoggator(AdminCommand):
         event_id = forms.CharField()
 
     def get_command_arguments(self, forms_data, user):
-        return [forms_data['event_id']], {}
+        return [forms_data['event_id']], {'task': True}
