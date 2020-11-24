@@ -4,24 +4,9 @@ from PIL import Image
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-from routechoices.core.models import Map, Club, Event, Device, Competitor, \
-    Location
+from routechoices.core.models import Map, Club, Event, Device, Competitor
 from routechoices.lib.helper import short_random_key, \
     three_point_calibration_to_corners
-
-
-def get_gpsseuranta_club():
-    admins = User.objects.filter(is_superuser=True)
-    club, created = Club.objects.get_or_create(
-        slug='gpsseuranta',
-        defaults={
-            'name': 'GPS Seuranta'
-        }
-    )
-    if created:
-        club.admins.set(admins)
-        club.save()
-    return club
 
 
 GPSSEURANTA_EVENT_URL = 'http://www.tulospalvelu.fi/gps/'
@@ -37,6 +22,19 @@ class MapImportError(Exception):
 
 class Command(BaseCommand):
     help = 'Import race from GPS Seuranta'
+
+    def get_gpsseuranta_club(self):
+        admins = User.objects.filter(is_superuser=True)
+        club, created = Club.objects.get_or_create(
+            slug='gpsseuranta',
+            defaults={
+                'name': 'GPS Seuranta'
+            }
+        )
+        if created:
+            club.admins.set(admins)
+            club.save()
+        return club
 
     def add_arguments(self, parser):
         parser.add_argument('event_ids', nargs='+', type=str)
@@ -69,23 +67,27 @@ class Command(BaseCommand):
         return map_model
 
     def decode_track_line(self, device, data, min_date=None, max_date=None):
-        ls = []
         if not data:
-            return ls, min_date, max_date
+            return min_date, max_date
         o_pt = data[0].split('_')
         if o_pt[0] == '*' or o_pt[1] == '*' or o_pt[2] == '*':
-            return ls, min_date, max_date
-        prev_loc = Location(
-            device=device,
-            datetime=arrow.get(int(o_pt[0]) + 1136073600).datetime,
-            longitude=int(o_pt[1]) * 2.0 / 1e5,
-            latitude=int(o_pt[2]) * 1.0 / 1e5,
+            return min_date, max_date
+        t = arrow.get(int(o_pt[0]) + 1136073600).datetime
+        prev_loc = {
+            'lat': int(o_pt[2]) * 1.0 / 1e5,
+            'lon': int(o_pt[1]) * 2.0 / 1e5,
+            'datetime': t,
+        }
+        device.add_location(
+            prev_loc['lat'],
+            prev_loc['lon'],
+            t.timestamp(),
+            False
         )
-        ls.append(prev_loc)
-        if min_date is None or prev_loc.datetime < min_date:
-            min_date = prev_loc.datetime
-        if max_date is None or prev_loc.datetime > max_date:
-            max_date = prev_loc.datetime
+        if min_date is None or t < min_date:
+            min_date = t
+        if max_date is None or t > max_date:
+            max_date = t
         for p in data[1:]:
             if len(p) < 3:
                 continue
@@ -107,19 +109,26 @@ class Command(BaseCommand):
                 dt = chars.index(p[0]) - 31
                 dlng = chars.index(p[1]) - 31
                 dlat = chars.index(p[2]) - 31
-            new_loc = Location(
-                device=device,
-                datetime=arrow.get(prev_loc.timestamp + dt).datetime,
-                longitude=((prev_loc.longitude * 50000) + dlng) / 50000,
-                latitude=((prev_loc.latitude * 100000) + dlat) / 100000,
+            t = arrow.get(prev_loc['datetime'].timestamp() + dt).datetime
+
+            prev_loc = {
+                'lat': ((prev_loc['lat'] * 100000) + dlat) / 100000,
+                'lon': ((prev_loc['lon'] * 50000) + dlng) / 50000,
+                'datetime': t,
+            }
+
+            device.add_location(
+                prev_loc['lat'],
+                prev_loc['lon'],
+                t.timestamp(),
+                False
             )
-            ls.append(new_loc)
-            prev_loc = new_loc
-            if prev_loc.datetime < min_date:
-                min_date = prev_loc.datetime
-            if prev_loc.datetime > max_date:
-                max_date = prev_loc.datetime
-        return ls, min_date, max_date
+
+            if t < min_date:
+                min_date = t
+            if t > max_date:
+                max_date = t
+        return min_date, max_date
 
     def import_single_event(self, club, event_id):
         event_url = GPSSEURANTA_EVENT_URL + event_id + '/init.txt'
@@ -138,7 +147,6 @@ class Command(BaseCommand):
             except ValueError:
                 continue
 
-        locs = []
         event_start_date = None
         event_end_date = None
         device_map = {}
@@ -159,13 +167,12 @@ class Command(BaseCommand):
                         is_gpx=True,
                     )
                 dev = device_map[dev_id]
-                pts, event_start_date, event_end_date = self.decode_track_line(
+                event_start_date, event_end_date = self.decode_track_line(
                     dev,
                     d[1:],
                     event_start_date,
                     event_end_date,
                 )
-                locs += pts
 
         event, created = Event.objects.get_or_create(
             club=club,
@@ -197,9 +204,6 @@ class Command(BaseCommand):
             event.map = event_map
             event.save()
 
-        if locs:
-            Location.objects.bulk_create(locs)
-
         for c_raw in event_data['COMPETITOR']:
             c_data = c_raw.strip().split('|')
             start_time_raw = c_data[1] + c_data[2]
@@ -223,13 +227,17 @@ class Command(BaseCommand):
                 device=device_map.get(c_data[0]),
                 event=event,
             )
+            dev = device_map.get(c_data[0])
+            if dev:
+                dev.save()
         return event
 
     def handle(self, *args, **options):
-        club = get_gpsseuranta_club()
+        club = self.get_gpsseuranta_club()
         for event_id in options['event_ids']:
             try:
+                self.stdout.write('Importing event %s' % event_id)
                 self.import_single_event(club, event_id)
             except EventImportError:
-                print('Could not import event %s' % event_id)
+                self.stderr.write('Could not import event %s' % event_id)
                 continue

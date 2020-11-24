@@ -3,24 +3,8 @@ import arrow
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-from routechoices.core.models import Map, Club, Event, Device, Competitor, \
-    Location
+from routechoices.core.models import Map, Club, Event, Device, Competitor
 from routechoices.lib.helper import short_random_key
-
-
-def get_loggator_club():
-    admins = User.objects.filter(is_superuser=True)
-    club, created = Club.objects.get_or_create(
-        slug='loggator',
-        defaults={
-            'name': 'Loggator'
-        }
-    )
-    if created:
-        club.admins.set(admins)
-        club.save()
-    return club
-
 
 LOGGATOR_EVENT_URL = 'https://loggator.com/api/events/'
 
@@ -38,6 +22,19 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('event_ids', nargs='+', type=str)
+
+    def get_loggator_club(self):
+        admins = User.objects.filter(is_superuser=True)
+        club, created = Club.objects.get_or_create(
+            slug='loggator',
+            defaults={
+                'name': 'Loggator'
+            }
+        )
+        if created:
+            club.admins.set(admins)
+            club.save()
+        return club
 
     def import_map(self, club, map_data, name):
         map_url = map_data['url']
@@ -100,7 +97,6 @@ class Command(BaseCommand):
                 event.map = event_map
                 event.save()
 
-        locs = []
         device_map = {}
         r = requests.get(event_data['tracks'])
         if r.status_code == 200:
@@ -113,15 +109,12 @@ class Command(BaseCommand):
                         aid=short_random_key() + '_LOG',
                         is_gpx=True,
                     )
-                locs.append(
-                    Location(
-                        device=device_map[int(d[0])],
-                        latitude=float(d[1]),
-                        longitude=float(d[2]),
-                        datetime=arrow.get(int(d[4])).datetime
-                    )
+                device_map[int(d[0])].add_location(
+                    float(d[1]),
+                    float(d[2]),
+                    arrow.get(int(d[4])).datetime.timestamp(),
+                    False
                 )
-            Location.objects.bulk_create(locs)
 
         for c_data in event_data['competitors']:
             Competitor.objects.create(
@@ -131,13 +124,17 @@ class Command(BaseCommand):
                 device=device_map.get(c_data['device_id']),
                 event=event,
             )
+            dev = device_map.get(c_data['device_id'])
+            if dev:
+                dev.save()
         return event
 
     def handle(self, *args, **options):
-        club = get_loggator_club()
+        club = self.get_loggator_club()
         for event_id in options['event_ids']:
             try:
+                self.stdout.write('Importing event %s' % event_id)
                 self.import_single_event(club, event_id)
             except EventImportError:
-                print('Could not import event %s' % event_id)
+                self.stderr.write('Could not import event %s' % event_id)
                 continue
