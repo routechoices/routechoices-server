@@ -57,8 +57,9 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-
+    'background_task',
     'bootstrap3',
+    'admincommand',
 
     'raven.contrib.django.raven_compat',
 ]
