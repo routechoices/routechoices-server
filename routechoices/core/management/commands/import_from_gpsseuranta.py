@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from routechoices.core.tasks import import_single_event_from_gps_seuranta
-
-
-class EventImportError(Exception):
-    pass
+from routechoices.core.tasks import (
+    import_single_event_from_gps_seuranta,
+    EventImportError,
+)
 
 
 class Command(BaseCommand):
