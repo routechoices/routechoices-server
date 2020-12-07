@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="{{ site.name }}" />
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}" />
 <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
-{% if not event.hidden and event.map %}
+{% if event.started and event.map %}
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% url 'api:event_map_download' aid=event.aid %}" />
 {% else %}
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
@@ -266,6 +266,7 @@ var isLiveMode = false;
 var liveUrl = null;
 var isLiveEvent = false;
 var isRealTime = true;
+var isCustomStart = false;
 var openStreetMap = null;
 var competitorList = [];
 var competitorRoutes = {};
@@ -397,6 +398,25 @@ var fetchMapDetails = function() {
 }
 var updateCompetitorList = function(newList) {
     newList.forEach(updateCompetitor)
+}
+
+var setCustomStart = function (latlng) {
+  competitorList.forEach(function(c){
+    var minDist = Infinity;
+    var minDistT = null;
+    var route = competitorRoutes[c.id];
+    if(route) {
+      var length = route.getPositionsCount();
+      for (var i = 0; i < length; i++) {
+        dist = route.getByIndex(i).distance({coords: {latitude: latlng.lat, longitude: latlng.lng}});
+        if (dist < minDist) {
+          minDist = dist;
+          minDistT = route.getByIndex(i).timestamp;
+        }
+      }
+      c.custom_offset = minDistT;
+    }
+  })
 }
 
 var updateCompetitor = function(newData) {
@@ -578,14 +598,26 @@ var getCompetitionEndDate = function() {
     })
     return res
 }
-var getCompetitorsMaxDuration = function() {
+var getCompetitorsMaxDuration = function(customOffset=false) {
     var res = 0;
     competitorList.forEach(function(c){
         var route = competitorRoutes[c.id];
         if(route) {
             var idx = route.getPositionsCount()-1;
-            var dur = route.getByIndex(idx).timestamp - (+new Date(c.start_time) || getCompetitionStartDate());
+
+            var dur = route.getByIndex(idx).timestamp - ((customOffset ? +new Date(c.custom_offset) : +new Date(c.start_time)) || getCompetitionStartDate());
             res = res < dur ? dur : res;
+        }
+    })
+    return res
+}
+var getCompetitorsMinCustomOffset = function() {
+    var res = 0;
+    competitorList.forEach(function(c){
+        var route = competitorRoutes[c.id];
+        if(route) {
+          var off = (c.custom_offset - c.start_time) || 0;
+          res = res < off ? off : res;
         }
     })
     return res
@@ -596,7 +628,11 @@ var zoomOnCompetitor = function(compr){
   if(!route) return
   var timeT = currentTime;
   if(!isRealTime){
-    timeT += +new Date(compr.start_time) - getCompetitionStartDate();
+    if (isCustomStart) {
+      timeT += +new Date(compr.custom_offset) - getCompetitionStartDate();
+    } else {
+      timeT += +new Date(compr.start_time) - getCompetitionStartDate();
+    }
   }
   var loc = route.getByTime(timeT);
   map.setView([loc.coords.latitude, loc.coords.longitude]);
@@ -604,13 +640,17 @@ var zoomOnCompetitor = function(compr){
 var getProgressBarText = function(){
     var result = '';
     var viewedTime = currentTime;
-    if(!isRealTime){
-        viewedTime -= getCompetitionStartDate();
-        var t = viewedTime/1e3;
+    if (!isRealTime) {
+        if (isCustomStart) {
+          viewedTime -= getCompetitorsMinCustomOffset() + getCompetitionStartDate();
+        } else {
+          viewedTime -= getCompetitionStartDate();
+        }
+        var t = viewedTime / 1e3;
         to2digits = function(x){return ('0'+Math.floor(x)).slice(-2);},
         result += t > 3600 ? Math.floor(t/3600) + ':': '';
         result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60);
-    }else{
+    } else {
         result = moment(+new Date(viewedTime)).format('HH:mm:ss');
     }
     return result;
@@ -633,7 +673,11 @@ var drawCompetitors = function(){
   if (isRealTime) {
     perc = isLiveMode ? 100 : (currentTime-getCompetitionStartDate())/(Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * 100
   } else {
-    perc = (currentTime-getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100;
+    if (isCustomStart) {
+      perc = (currentTime-(getCompetitionStartDate()+getCompetitorsMinCustomOffset())) / getCompetitorsMaxDuration(true) * 100;
+    } else {
+      perc = (currentTime-getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100;
+    }
   }
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
   $('#progress_bar_text').html(getProgressBarText());
@@ -645,8 +689,11 @@ var drawCompetitors = function(){
     var route = competitorRoutes[competitor.id];
     if(route !== undefined){
       var viewedTime = currentTime;
-      if(!isLiveMode && !isRealTime && competitor.start_time){
+      if(!isLiveMode && !isRealTime && !isCustomStart && competitor.start_time){
         viewedTime += Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
+      }
+      if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
+        viewedTime += Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
       }
       var hasPointLast30sec = route.hasPointInInterval(viewedTime - 30 * 1e3, viewedTime);
       if(!hasPointLast30sec){
@@ -829,12 +876,30 @@ $(function() {
   $('#mass_start_button').on('click', function(e){
     e.preventDefault();
     isRealTime=false;
+    isCustomStart = false;
+
     currentTime = getCompetitionStartDate();
     prevShownTime = currentTime;
 
     $('#real_time_button').removeClass('active');
     $('#mass_start_button').addClass('active');
   });
+  map.doubleClickZoom.disable(); 
+
+  map.on('dblclick', function(e) {
+    e.originalEvent.preventDefault();
+    if (!isLiveMode) {
+      isRealTime = false;
+      isCustomStart = true;
+
+      $('#real_time_button').removeClass('active');
+      $('#mass_start_button').removeClass('active');
+      setCustomStart(e.latlng)
+      currentTime = getCompetitionStartDate()-getCompetitorsMaxDuration();
+      prevShownTime = currentTime;
+    }
+  })
+
   $('#full_progress_bar').on('click', pressProgressBar)
 
   var thumb = document.querySelector('#full_progress_bar');
@@ -894,6 +959,8 @@ var pressProgressBar = function(e){
   var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width();
   if (isRealTime) {
     currentTime = getCompetitionStartDate()+(Math.min(clock.now(), getCompetitionEndDate())-getCompetitionStartDate())*perc;
+  } else if (isCustomStart) {
+    currentTime = getCompetitionStartDate() + getCompetitorsMinCustomOffset() + getCompetitorsMaxDuration(true) * perc;
   } else {
     currentTime = getCompetitionStartDate() + getCompetitorsMaxDuration() * perc;
   }

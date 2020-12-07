@@ -152,7 +152,7 @@ def traccar_api_gw(request):
         })
 
     if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
-        logger.error('Too old position')
+        logger.debug('Too old position')
         return Response({
             'status': 'error',
             'message': 'Position too old to add from API'
