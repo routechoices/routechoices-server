@@ -83,10 +83,13 @@ class ApiTestCase(APITestCase):
         gps_encoded.insert(GeoLocation(t, [1.1, 2.2]))
         gps_encoded.insert(GeoLocation(t + 1, [1.2, 2.1]))
         gps_encoded.insert(GeoLocation(t + 2, [1.3, 2.0]))
-        res = self.client.post(url, {
-            'id': dev_id,
-            'raw_data': str(gps_encoded)
-        })
+        res = self.client.post(
+            url,
+            {
+                'id': dev_id,
+                'raw_data': str(gps_encoded)
+            }
+        )
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         nb_points = len(Device.objects.get(aid=dev_id).locations['timestamps'])
         self.assertEquals(nb_points, 3)

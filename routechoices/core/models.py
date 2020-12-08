@@ -6,6 +6,7 @@ import hashlib
 import re
 import time
 from io import BytesIO
+from decimal import Decimal
 
 import gpxpy
 import gpxpy.gpx
@@ -392,6 +393,10 @@ class Device(models.Model):
             ts_datetime = now()
         locs = self.locations
         ts = int(ts_datetime.timestamp())
+        if isinstance(lat, Decimal):
+            lat = float(lat)
+        if isinstance(lon, Decimal):
+            lon = float(lon)
         if ts not in locs['timestamps']:
             locs['timestamps'].append(ts)
             locs['latitudes'].append(lat)
