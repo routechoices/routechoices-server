@@ -23,12 +23,12 @@
       <div class="container">
         <div class="row">
           <h1>GPS Tracker</h1>
-          <p>You can upload your location to provide live GPS tracking in two way. For best accuracy we recommend the Garmin watch app or a Teltonika tracker, otherwise use the smartphone app.</p>
+          <p>You can upload your location to provide live GPS tracking in two way. We recommend the smartphone app or a Teltonika tracker, otherwise use the Garmin watch app.</p>
           <p>Each method will generate a unique Device ID that you can communicate to the organizer.</p>
           <p style="margin-top:2em">
-            <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>
-            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a Teltonika GPS tracker</a>
             <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a smartphone</a>
+            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a Teltonika GPS tracker</a>
+            <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>
             
           </p>
         </div>
@@ -68,7 +68,6 @@
               <h4 class="modal-title" id="traccar-modal-label">Tracking App</h4>
             </div>
             <div class="modal-body">
-              <p>On your phone enable high accuracy location then,</p>
               <p>
                 Download the Traccar Client for Android or IPhone.
               </p>
@@ -84,9 +83,29 @@
                     <li>Frequency: <code>1</code></li>
                     <li>Distance: <code>0</code></li>
                     <li>Angle: <code>0</code></li>
+                    <li>Offline buffering: <code>on</code></li>
+                    <li>Wake lock: <code>on</code></li>
                 </ul>
             </p>
              <p>Before you start running, start the service. That's it...</p>
+             <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone.</p>
+             <p>Note: Both Apple and Google are trying to restrict background processes to give user better battery life, but it affects application like Traccar Client which require persistent background execution. Common issues to check for:
+              <ul>
+                <li>
+                  On iOS if you swipe app off the screen, operating system actually kills the process and app will no longer be able to report.
+                </li>
+                <li>
+                  Make sure that in iOS settings background execution is allowed and Traccar Client has permission to always access location services.
+                </li>
+                <li>
+                  On recent versions of Android make sure that you have added Traccar Client to battery optimization exceptions.
+                </li>
+                <li>
+                  Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
+                </li>
+              </ul>
+            </p>
+             <p>For more troubleshooting see <a href="https://www.traccar.org/client-troubleshooting/">Traccar troubleshooting page</a></p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

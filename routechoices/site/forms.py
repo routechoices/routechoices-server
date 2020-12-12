@@ -9,6 +9,7 @@ from django.forms import (
     ModelChoiceField,
     ModelForm,
 )
+from django.urls import reverse
 
 from routechoices.core.models import Competitor, Event, Device
 
@@ -25,7 +26,9 @@ class CompetitorForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_time'].label = "Start time"
+        self.fields['start_time'].label = "Start time (Optional)"
+        self.fields['device'].help_text = 'Get your device ID from the <a href= \
+            "%s">tracker page</a>' % reverse('site:tracker_view')
 
     class Meta:
         model = Competitor
