@@ -132,7 +132,7 @@ def event_map_details(request, aid):
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
-        logger.error('No traccar_id')
+        logger.debug('No traccar_id')
         raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
     device = get_object_or_404(Device, aid=device_id)
@@ -145,7 +145,7 @@ def traccar_api_gw(request):
         lon = float(lon)
         tim = int(float(tim))
     except ValueError:
-        logger.error('Wrong data format')
+        logger.debug('Wrong data format')
         return Response({
             'status': 'error',
             'message': 'Invalid data format'
@@ -162,11 +162,11 @@ def traccar_api_gw(request):
         device.add_location(lat, lon, tim)
         return Response({'status': 'ok'})
     if not lat:
-        logger.error('No lat')
+        logger.debug('No lat')
     if not lon:
-        logger.error('No lon')
+        logger.debug('No lon')
     if not tim:
-        logger.error('No timestamp')
+        logger.debug('No timestamp')
     return Response({
         'status': 'error',
         'message': 'Missing lat, lon, or time'
@@ -177,7 +177,7 @@ def traccar_api_gw(request):
 def garmin_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
-        logger.error('No device_id')
+        logger.debug('No device_id')
         raise ValidationError('Use Garmin App from Connect IQ store')
     device = get_object_or_404(Device, aid=device_id)
     lats = request.data.get('latitudes', '').split(',')
