@@ -191,10 +191,28 @@ function onCsvParsed(result){
     });
     $('.add-competitor-btn').click();
 }
+
+function showLocalTime(el) {
+    var val = $(el).val();
+    if (val) {
+        var stillUtc = moment.utc(val).toDate();
+        var local = moment(stillUtc).local().format('YYYY-MM-DD HH:mm:ss');
+        $(el).parent().find('.local_time').text(local + ' Local time')
+    } else {
+        $(el).parent().find('.local_time').text('')
+    }
+}
+
 $(function(){
     $('#csv_input').change(function(){
         Papa.parse($('#csv_input')[0].files[0], {complete: onCsvParsed});
     })
+    $('.datetimepicker').each(function(idx, el){
+        showLocalTime(el);
+        $(el).on('dp.change', function(e) {
+            showLocalTime(e.target);
+        });
+    });
 })
 </script>
 {%  endblock %}

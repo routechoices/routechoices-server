@@ -57,6 +57,12 @@ class MapForm(ModelForm):
 
 
 class EventForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_date'].help_text = \
+            '<span class="local_time"></span>'
+        self.fields['end_date'].help_text = '<span class="local_time"></span>'
+
     class Meta:
         model = Event
         fields = ['club', 'name', 'slug', 'privacy', 'open_registration',
@@ -79,6 +85,10 @@ class EventForm(ModelForm):
 
 
 class CompetitorForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_time'].help_text = \
+            '<span class="local_time"></span>'
 
     class Meta:
         model = Competitor
