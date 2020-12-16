@@ -10,6 +10,7 @@ from django.forms import (
     ModelForm,
 )
 from django.urls import reverse
+from django.utils.timezone import now
 
 from routechoices.core.models import Competitor, Event, Device
 
@@ -42,6 +43,14 @@ class CompetitorForm(ModelForm):
             }),
         }
 
+    def clean(self):
+        event = Event.objects.get(id=self.data.get('event'))
+        event_end = event.end_date
+        if now() > event_end:
+            raise ValidationError(
+                'Competition ended, registration is not posible anymore'
+            )
+
     def clean_start_time(self):
         start = self.cleaned_data.get('start_time')
         event = Event.objects.get(id=self.data.get('event'))
@@ -54,4 +63,6 @@ class CompetitorForm(ModelForm):
             raise ValidationError(
                 'Competitor start time should be during the event time'
             )
+        elif not start and event_start < now():
+            start = now()
         return start
