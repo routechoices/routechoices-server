@@ -91,14 +91,20 @@ and (max-device-width : 500px) {
  * Main content
  */
 
-.main {
+ .main {
     position: fixed;
     top: 51px;
     bottom: 90px;
     right: 0px;
     left: 0px;
 }
-.main .page-header {
+.main-alerts {
+    position: fixed;
+    top: 51px;
+    right: 0px;
+    left: 0px;
+}
+.main .page-header .main-alerts{
   margin-top: 0;
 }
 
@@ -126,6 +132,20 @@ and (max-device-width : 500px) {
   .sidebar {
     bottom: 120px;
   }
+}
+
+.close {
+    margin-bottom: 3px;
+}
+
+/* REQUIRED */
+.page-alerts {
+    margin-bottom: 20px;
+}
+
+.page-alerts .page-alert {
+    border-radius: 0;
+    margin-bottom: 0;
 }
 </style>
 {% endblock %}
@@ -155,10 +175,17 @@ and (max-device-width : 500px) {
         </div>
       </div>
     </nav>
+
 <div class="container-fluid">
   <div class="row">
     <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar"></div>
     <div id="map" class="col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main"></div>
+    <div class="page-alerts col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main-alerts">
+      <div class="alert alert-info page-alert" id="alert-2">
+          <button type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          <strong>Heads up!</strong> <span id="alert-text"></span>
+      </div>
+    </div>
   </div>
   <div class="row">  
     <div class="col-xs-12 time_bar">
@@ -286,6 +313,8 @@ var mapHash = '';
 var mapUrl = null;
 var rasterMap = null;
 var searchText = null;
+var noticeUrl = null;
+var prevNotice = new Date(0);
 
 var onStart = function(){
   if(isLiveEvent){
@@ -315,6 +344,7 @@ var selectLiveMode = function(e){
     if (+clock.now()-routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes();
       fetchMapDetails();
+      fetchNotice();
     }
     currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3;
     drawCompetitors();
@@ -393,6 +423,18 @@ var fetchMapDetails = function() {
       } else {
         removeRasterMap();
       }
+    }
+  })
+};
+var fetchNotice = function() {
+  $.ajax({
+    url: noticeUrl
+  }).done(function(response){
+    if (response.updated && new Date(response.updated) > prevNotice) {
+      prevNotice = new Date(response.updated);
+      $('#alert-text').html(response.text);
+      $('.page-alerts').show();
+      $('.page-alert').slideDown();
     }
   })
 }
@@ -827,7 +869,18 @@ function removeRasterMap() {
   }
 }
 
+function checkNotice() {
+  $.ajax()
+}
+
 $(function() {
+  $('.page-alerts').hide();
+
+  $('.page-alert .close').click(function(e) {
+    e.preventDefault();
+    $(this).closest('.page-alert').slideUp();
+  });
+
   $("#before_race_modal").modal('show').on('hide.bs.modal', function(e){
       e.preventDefault();
   });
@@ -940,7 +993,8 @@ $(function() {
   liveUrl = '{% url 'api:event_data' aid=event.aid %}';
   mapDetailsUrl = '{% url 'api:event_map_details' aid=event.aid %}';
   mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
-  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}'
+  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}';
+  noticeUrl = '{% url 'api:event_notice' aid=event.aid %}';
   {% if event.map %}
   var stemp= '{{ event.map.corners_coordinates }}'.split(',');
   addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);

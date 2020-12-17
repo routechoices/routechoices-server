@@ -17,12 +17,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from routechoices.api.views import x_accel_redirect
 from routechoices.core.models import (
-    Club, Map, Event, Device,
-    DeviceOwnership
+    Club,
+    Map,
+    Event,
+    Device,
+    DeviceOwnership,
+    Notice,
 )
 from routechoices.dashboard.forms import (
     ClubForm, MapForm, EventForm,
-    CompetitorFormSet, UploadGPXForm, UploadKmzForm, DeviceForm
+    CompetitorFormSet, UploadGPXForm,
+    UploadKmzForm, DeviceForm, NoticeForm,
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
 
@@ -463,11 +468,15 @@ def event_create_view(request):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(request.POST)
+        notice_form = NoticeForm(request.POST)
         # check whether it's valid:
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and formset.is_valid() and notice_form.is_valid():
             event = form.save()
             formset.instance = event
             formset.save()
+            notice = notice_form.save(commit=False)
+            notice.event = event
+            notice.save()
             return redirect('dashboard:event_list_view')
         else:
             devices = Device.objects.none()
@@ -480,6 +489,7 @@ def event_create_view(request):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet()
+        notice_form = NoticeForm()
         devices = Device.objects.none()
         if request.user.is_authenticated:
             devices = request.user.devices.all()
@@ -491,6 +501,7 @@ def event_create_view(request):
         {
             'form': form,
             'formset': formset,
+            'notice_form': notice_form,
         }
     )
 
@@ -500,7 +511,7 @@ def event_edit_view(request, id):
     club_list = Club.objects.filter(admins=request.user)
     map_list = Map.objects.filter(club__in=club_list)
     event = get_object_or_404(
-        Event,
+        Event.objects.all().prefetch_related('notice', 'competitors'),
         aid=id,
         club__in=club_list
     )
@@ -519,11 +530,27 @@ def event_edit_view(request, id):
             request.POST,
             instance=event,
         )
+        args = {}
+        if event.has_notice:
+            args = {'instance': event.notice}
+        notice_form = NoticeForm(request.POST, **args)
         # check whether it's valid:
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and formset.is_valid() and notice_form.is_valid():
             form.save()
             formset.instance = event
             formset.save()
+            prev_text = ''
+            if event.has_notice:
+                notice_form.instance = event.notice
+                event.notice.refresh_from_db()
+                prev_text = event.notice.text
+            if prev_text != notice_form.cleaned_data['text']:
+                if not event.has_notice:
+                    notice = Notice(event=event)
+                else:
+                    notice = event.notice
+                notice.text = notice_form.cleaned_data['text']
+                notice.save()
             return redirect('dashboard:event_list_view')
         else:
             for cform in formset.forms:
@@ -535,6 +562,10 @@ def event_edit_view(request, id):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(instance=event)
+        args = {}
+        if event.has_notice:
+            args = {'instance': event.notice}
+        notice_form = NoticeForm(**args)
         for cform in formset.forms:
             cform.fields['device'].queryset = Device.objects.filter(
                 id__in=all_devices
@@ -546,6 +577,7 @@ def event_edit_view(request, id):
             'event': event,
             'form': form,
             'formset': formset,
+            'notice_form': notice_form,
         }
     )
 

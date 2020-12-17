@@ -12,8 +12,10 @@ from django.forms import (
     ModelChoiceField,
     FileField,
 )
+from django.db import transaction
+from django.utils.safestring import mark_safe
 
-from routechoices.core.models import Club, Map, Event, Competitor, Device
+from routechoices.core.models import Club, Map, Event, Competitor, Device, Notice
 from routechoices.lib.helper import get_aware_datetime
 
 
@@ -82,6 +84,12 @@ class EventForm(ModelForm):
         map = self.cleaned_data['map']
         if map and club != map.club:
             raise ValidationError('Pick a map from the organizer club')
+
+
+class NoticeForm(ModelForm):
+    class Meta:
+        model = Notice
+        fields = ('text', )
 
 
 class CompetitorForm(ModelForm):

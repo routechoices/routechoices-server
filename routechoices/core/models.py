@@ -343,6 +343,24 @@ class Event(models.Model):
                 'Event with this Club and Slug already exists.'
             )
 
+    @property
+    def has_notice(self):
+        return hasattr(self, 'notice')
+
+
+class Notice(models.Model):
+    modification_date = models.DateTimeField(auto_now=True)
+    event = models.OneToOneField(
+        Event,
+        related_name='notice',
+        on_delete=models.CASCADE
+    )
+    text = models.CharField(
+        max_length=280,
+        blank=True,
+        help_text='This will be displayed one the event page.',
+    )
+
 
 class Device(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)

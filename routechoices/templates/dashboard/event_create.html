@@ -14,6 +14,9 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
+            <hr/>
+            <h3>Notification</h3>
+            {% bootstrap_form notice_form %}
 
             <h3>Competitors</h3>
             {% bootstrap_formset_errors formset %}
@@ -55,7 +58,6 @@
                 Column D - The ID of the GPS device
             </div>
             <hr/>
-
             <input type="submit" value="Submit" class="btn btn-primary" id="submit-btn">
         </form>
     </div>

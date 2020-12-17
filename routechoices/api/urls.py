@@ -33,6 +33,11 @@ urlpatterns = [
         name='event_map_details'
     ),
     url(
+        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/notice/?$',
+        views.event_notice,
+        name='event_notice'
+    ),
+    url(
         r'^competitor/(?P<aid>[0-9a-zA-Z_-]+)/gpx$',
         views.competitor_gpx_download,
         name='competitor_gpx_download'

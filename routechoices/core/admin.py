@@ -6,7 +6,8 @@ from routechoices.core.models import (
     Device,
     Event,
     ImeiDevice,
-    Map
+    Map,
+    Notice,
 )
 
 
@@ -27,6 +28,13 @@ class CompetitorInline(admin.TabularInline):
     list_filter = ('event', 'device', )
 
 
+class NoticeInline(admin.TabularInline):
+    model = Notice
+    fields = (
+        'text',
+    )
+
+
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -34,7 +42,7 @@ class EventAdmin(admin.ModelAdmin):
         'start_date',
     )
     list_filter = ('club', )
-    inlines = [CompetitorInline, ]
+    inlines = [CompetitorInline, NoticeInline]
 
 
 class DeviceAdmin(admin.ModelAdmin):

@@ -128,6 +128,21 @@ def event_map_details(request, aid):
     })
 
 
+@api_view(['GET'])
+def event_notice(request, aid):
+    event = get_object_or_404(
+        Event.objects.all().select_related('notice'),
+        aid=aid,
+        start_date__lt=now()
+    )
+    if event.notice:
+        return Response({
+            'updated': event.notice.modification_date,
+            'text': event.notice.text,
+        })
+    return Response({})
+
+
 @api_view(['GET', 'POST'])
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
