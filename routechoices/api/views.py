@@ -135,7 +135,7 @@ def event_notice(request, aid):
         aid=aid,
         start_date__lt=now()
     )
-    if event.notice:
+    if event.has_notice:
         return Response({
             'updated': event.notice.modification_date,
             'text': event.notice.text,

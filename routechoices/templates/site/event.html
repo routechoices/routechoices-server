@@ -298,12 +298,14 @@ var openStreetMap = null;
 var competitorList = [];
 var competitorRoutes = {};
 var routesLastFetched = -Infinity;
+var noticeLastFetched = -Infinity;
 var timeOffsetSec = 0;
 var playbackRate = 1;
 var playbackPaused = true;
 var prevDisplayRefresh = 0;
 var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
+var isCurrentlyFetchingNotice = false;
 var currentTime = 0;
 var lastDataTs = 0;
 var lastNbPoints = 0;
@@ -344,7 +346,9 @@ var selectLiveMode = function(e){
     if (+clock.now()-routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes();
       fetchMapDetails();
-      fetchNotice();
+    }
+    if(((+clock.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
+      fetchNotice(); 
     }
     currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3;
     drawCompetitors();
@@ -372,7 +376,10 @@ var selectReplayMode = function(e){
   prevDisplayRefresh = +clock.now();
   (function whileReplay(){
     if(isLiveEvent && + clock.now() - routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes){
-      fetchCompetitorRoutes();
+      fetchCompetitorRoutes(); 
+    }
+    if(((+clock.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
+      fetchNotice(); 
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
     currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate);
@@ -427,14 +434,19 @@ var fetchMapDetails = function() {
   })
 };
 var fetchNotice = function() {
+  isCurrentlyFetchingNotice = true;
   $.ajax({
     url: noticeUrl
   }).done(function(response){
+    noticeLastFetched = +clock.now();
+    isCurrentlyFetchingNotice = false;
     if (response.updated && response.text && new Date(response.updated) > prevNotice) {
       prevNotice = new Date(response.updated);
       $('#alert-text').text(response.text);
       $('.page-alerts').show();
       $('.page-alert').slideDown();
+    } else {
+      isCurrentlyFetchingNotice = false;
     }
   })
 }
