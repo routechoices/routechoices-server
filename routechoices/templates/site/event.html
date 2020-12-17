@@ -430,9 +430,9 @@ var fetchNotice = function() {
   $.ajax({
     url: noticeUrl
   }).done(function(response){
-    if (response.updated && new Date(response.updated) > prevNotice) {
+    if (response.updated && response.text && new Date(response.updated) > prevNotice) {
       prevNotice = new Date(response.updated);
-      $('#alert-text').html(response.text);
+      $('#alert-text').text(response.text);
       $('.page-alerts').show();
       $('.page-alert').slideDown();
     }
