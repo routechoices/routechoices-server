@@ -1,10 +1,12 @@
+[![rphlo](https://circleci.com/gh/rphlo/routechoices.com.svg?style=shield)](https://circleci.com/gh/rphlo/routechoices.com)
+
 Routechoices.com
 ==================
 
 Live GPS Tracking Solution for orienteering events.
 
-Run in docker
--------------
+Run in docker for local development
+-----------------------------------
 
 1. `./dc build`
 2. `./dc up -d`
