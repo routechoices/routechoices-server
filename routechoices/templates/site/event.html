@@ -952,7 +952,11 @@ $(function() {
   map.doubleClickZoom.disable(); 
 
   map.on('dblclick', function(e) {
-    e.originalEvent.preventDefault();
+    try {
+      e.originalEvent.preventDefault();
+    } catch (e) {
+      // ignore
+    }
     if (!isLiveMode) {
       isRealTime = false;
       isCustomStart = true;
