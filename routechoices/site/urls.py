@@ -41,6 +41,11 @@ urlpatterns = [
         name='event_export_view'
     ),
     url(
+        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/map/?$',
+        views.event_map_view,
+        name='event_map_view'
+    ),
+    url(
         r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/register/?$',
         views.event_registration_view,
         name='event_registration_view'

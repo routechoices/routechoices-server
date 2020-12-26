@@ -338,7 +338,11 @@ def event_map_download(request, aid):
     return x_accel_redirect(
         request,
         file_path,
-        filename='{}.{}'.format(event.map.name, event.map.mime_type[6:]),
+        filename='{}_{}_.{}'.format(
+            event.map.name,
+            event.map.corners_coordinates.replace(',', '_'),
+            event.map.mime_type[6:]
+        ),
         mime=event.map.mime_type
     )
 
