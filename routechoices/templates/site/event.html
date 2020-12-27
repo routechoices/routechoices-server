@@ -18,6 +18,7 @@
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% endif %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
 @font-face {
@@ -241,6 +242,7 @@ and (max-device-width : 500px) {
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script src="{% static '/vendor/leaflet-smoothwheelzoom-2020.07.03/SmoothWheelZoom.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+<script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
 <script>
@@ -317,6 +319,8 @@ var rasterMap = null;
 var searchText = null;
 var noticeUrl = null;
 var prevNotice = new Date(0);
+var resetMassStartContextMenuItem = null;
+var setMassStartContextMenuItem = null;
 
 var onStart = function(){
   if(isLiveEvent){
@@ -334,6 +338,12 @@ var selectLiveMode = function(e){
   }
   if(isLiveMode){
     return;
+  }
+  if (setMassStartContextMenuItem) {
+     map.contextmenu.removeItem(setMassStartContextMenuItem)
+  }
+  if (resetMassStartContextMenuItem) {
+     map.contextmenu.removeItem(resetMassStartContextMenuItem)
   }
   $("#live_button").addClass('active');
   $("#replay_button").removeClass('active');
@@ -369,6 +379,12 @@ var selectReplayMode = function(e){
   $("#replay_button").addClass('active');
   $("#replay_mode_buttons").show();
   $("#replay_control_buttons").show();
+  if (!setMassStartContextMenuItem) {
+    setMassStartContextMenuItem = map.contextmenu.insertItem({
+      text: 'Mass Start from here',
+      callback: onPressCustomMassStart
+    }, 1);
+  }
   isLiveMode = false;
   prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
@@ -874,6 +890,52 @@ function addRasterMap(a, b, c, d, src, fit) {
   }
 }
 
+function centerMap (e) {
+	map.panTo(e.latlng);
+}
+
+function onPressCustomMassStart (e) {
+  if (!isLiveMode) {
+    isRealTime = false;
+    isCustomStart = true;
+
+    $('#real_time_button').removeClass('active');
+    $('#mass_start_button').removeClass('active');
+    setCustomStart(e.latlng)
+    currentTime = getCompetitionStartDate()-getCompetitorsMaxDuration();
+    prevShownTime = currentTime;
+    if (!resetMassStartContextMenuItem) {
+      resetMassStartContextMenuItem = map.contextmenu.insertItem({
+          text: 'Reset Mass Start',
+          callback: onPressResetMassStart
+      }, 1);
+    }
+  }
+}
+function onPressResetMassStart (e) {
+  isRealTime=false;
+  isCustomStart = false;
+
+  currentTime = getCompetitionStartDate();
+  prevShownTime = currentTime;
+
+  if (resetMassStartContextMenuItem) {
+    map.contextmenu.removeItem(resetMassStartContextMenuItem);
+    resetMassStartContextMenuItem = null;
+  }
+
+  $('#real_time_button').removeClass('active');
+  $('#mass_start_button').addClass('active');
+}
+
+function zoomIn (e) {
+	map.zoomIn();
+}
+
+function zoomOut (e) {
+	map.zoomOut();
+}
+
 function removeRasterMap() {
   if (rasterMap) {
     map.removeLayer(rasterMap);
@@ -901,7 +963,21 @@ $(function() {
     zoom: 3,
     scrollWheelZoom: false, // disable original zoom function
     smoothWheelZoom: true,  // enable smooth zoom
-    zoomSnap: 0
+    zoomSnap: 0,
+   	contextmenu: true,
+    contextmenuWidth: 140,
+	  contextmenuItems: [
+      {
+        text: 'Center map here',
+        callback: centerMap
+      }, '-', {
+        text: 'Zoom in',
+        callback: zoomIn
+      }, {
+        text: 'Zoom out',
+        callback: zoomOut
+      }
+    ]
   });
   openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -935,39 +1011,19 @@ $(function() {
   $('#real_time_button').on('click', function(e){
     e.preventDefault();
     isRealTime=true;
+    if (resetMassStartContextMenuItem) {
+      map.contextmenu.removeItem(resetMassStartContextMenuItem)
+    }
     $('#real_time_button').addClass('active');
     $('#mass_start_button').removeClass('active');
   });
   $('#mass_start_button').on('click', function(e){
     e.preventDefault();
-    isRealTime=false;
-    isCustomStart = false;
-
-    currentTime = getCompetitionStartDate();
-    prevShownTime = currentTime;
-
-    $('#real_time_button').removeClass('active');
-    $('#mass_start_button').addClass('active');
+    onPressResetMassStart()
   });
   map.doubleClickZoom.disable(); 
 
-  map.on('dblclick', function(e) {
-    try {
-      e.originalEvent.preventDefault();
-    } catch (e) {
-      // ignore
-    }
-    if (!isLiveMode) {
-      isRealTime = false;
-      isCustomStart = true;
-
-      $('#real_time_button').removeClass('active');
-      $('#mass_start_button').removeClass('active');
-      setCustomStart(e.latlng)
-      currentTime = getCompetitionStartDate()-getCompetitorsMaxDuration();
-      prevShownTime = currentTime;
-    }
-  })
+  map.on('dblclick', onPressCustomMassStart)
 
   $('#full_progress_bar').on('click', pressProgressBar)
 
