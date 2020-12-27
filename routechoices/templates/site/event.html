@@ -340,10 +340,12 @@ var selectLiveMode = function(e){
     return;
   }
   if (setMassStartContextMenuItem) {
-     map.contextmenu.removeItem(setMassStartContextMenuItem)
+     map.contextmenu.removeItem(setMassStartContextMenuItem);
+     setMassStartContextMenuItem = null;
   }
   if (resetMassStartContextMenuItem) {
-     map.contextmenu.removeItem(resetMassStartContextMenuItem)
+     map.contextmenu.removeItem(resetMassStartContextMenuItem);
+     resetMassStartContextMenuItem = null;
   }
   $("#live_button").addClass('active');
   $("#replay_button").removeClass('active');
@@ -1012,7 +1014,8 @@ $(function() {
     e.preventDefault();
     isRealTime=true;
     if (resetMassStartContextMenuItem) {
-      map.contextmenu.removeItem(resetMassStartContextMenuItem)
+      map.contextmenu.removeItem(resetMassStartContextMenuItem);
+      resetMassStartContextMenuItem = null;
     }
     $('#real_time_button').addClass('active');
     $('#mass_start_button').removeClass('active');
