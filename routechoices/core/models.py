@@ -118,7 +118,7 @@ class Map(models.Model):
         upload_to=map_upload_path,
         height_field='height',
         width_field='width',
-        storage=OverwriteImageStorage(),
+        storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),
     )
     height = models.PositiveIntegerField(
         null=True,
@@ -148,7 +148,7 @@ class Map(models.Model):
 
     @property
     def path(self):
-        return self.image.path[len(settings.MEDIA_ROOT) + 1:]
+        return self.image.name
 
     @property
     def data(self):
@@ -158,9 +158,7 @@ class Map(models.Model):
 
     @property
     def mime_type(self):
-        img = Image.open(self.image.open())
-        self.image.close()
-        return 'image/{}'.format(img.format.lower())
+        return 'image/jpeg'
 
     @property
     def data_uri(self):

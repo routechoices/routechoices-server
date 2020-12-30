@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
-from routechoices.api.views import x_accel_redirect
+from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
     Club,
     Map,
@@ -618,11 +618,13 @@ def dashboard_map_download(request, id, *args, **kwargs):
             club__in=club_list
         )
     file_path = raster_map.path
-    return x_accel_redirect(
+    mime_type = raster_map.mime_type
+    return serve_from_s3(
+        'routechoices-maps',
         request,
-        file_path,
-        filename='{}.{}'.format(raster_map.name, raster_map.mime_type[6:]),
-        mime=raster_map.mime_type
+        '/internal/' + file_path,
+        filename='{}.{}'.format(raster_map.name, mime_type[6:]),
+        mime=mime_type
     )
 
 

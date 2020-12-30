@@ -1,8 +1,8 @@
 version: '2'  
 services:
   db:
-    image: postgres:latest
     container_name: pz01
+    image: postgres:latest
     environment:
       POSTGRES_DB: app_db
       POSTGRES_USER: app_user
@@ -10,28 +10,44 @@ services:
     restart: always
     expose:
       - "5432"
+  minio:
+    container_name: mz01
+    image: minio/minio:latest
+    volumes:
+      - ../media:/data
+    expose:
+      - "9000"
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server /data
+  smtp:
+    container_name: sz01
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+    expose:
+      - "1025"
   nginx:
     image: nginx:latest
-    container_name: nz01
     ports:
-      - "9000:9000"
+      - "8080:8080"
     volumes:
       - ../:/app/
       - ../nginx:/etc/nginx/conf.d
-    depends_on:
+    links:
+      - minio
       - web
   web:
-    environment:
-      DATABASE_URL: postgres://app_user:changeme@db/app_db
+    container_name: dz01
     stop_signal: SIGINT
     build:
       context: ..
       dockerfile: docker/django.dockerfile
-    container_name: dz01
-    depends_on:
-      - db
     volumes:
       - ../:/app/:rw
+    environment:
+      DATABASE_URL: postgres://app_user:changeme@db/app_db
     ports:
       - "8000:8000"
       - "2000:2000"
@@ -40,4 +56,6 @@ services:
       - "2000"
     links:
       - db
+      - minio
+      - smtp
     user: ${USERID}:${GROUPID}

@@ -15,7 +15,7 @@ jobs:
     - run: ./da collectstatic
     - run: ./da createcachetable
     - run: ./dc restart web 
-    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:9000)" != "200" ]]; do sleep 5; done' || false
+    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080)" != "200" ]]; do sleep 5; done' || false
     - run: ./da test
     - run: ./da reset_db_for_tests
     - run: ./dc restart web

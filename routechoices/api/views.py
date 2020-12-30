@@ -25,6 +25,7 @@ from routechoices.core.models import (
 from routechoices.lib.helper import short_random_key
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
+from routechoices.lib.s3 import s3_object_url
 
 from rest_framework import renderers, status
 from rest_framework.decorators import api_view, renderer_classes
@@ -56,6 +57,29 @@ def x_accel_redirect(request, path, filename='',
         response['X-Accel-Redirect'] = urllib.parse.quote(path.encode('utf-8'))
         response['X-Accel-Buffering'] = 'no'
         response['Accept-Ranges'] = 'bytes'
+    response['Content-Type'] = mime
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
+        filename.replace('\\', '_').replace('"', '\\"')
+    ).encode('utf-8')
+    return response
+
+
+def serve_from_s3(bucket, request, path, filename='',
+                  mime='application/force-download'):
+    path = re.sub(r'^/internal/', '', path)
+    url = s3_object_url(path, bucket)
+    url = '/s3{}'.format(url[len(settings.AWS_S3_ENDPOINT_URL):])
+
+    response_status = status.HTTP_200_OK
+    if request.method == 'GET':
+        response_status = status.HTTP_206_PARTIAL_CONTENT
+
+    response = HttpResponse('', status=response_status)
+
+    if request.method == 'GET':
+        response['X-Accel-Redirect'] = urllib.parse.quote(url.encode('utf-8'))
+        response['X-Accel-Buffering'] = 'no'
+    response['Accept-Ranges'] = 'bytes'
     response['Content-Type'] = mime
     response['Content-Disposition'] = 'attachment; filename="{}"'.format(
         filename.replace('\\', '_').replace('"', '\\"')
@@ -334,16 +358,15 @@ def event_map_download(request, aid):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    file_path = event.map.path
-    return x_accel_redirect(
+    raster_map = event.map
+    file_path = raster_map.path
+    mime_type = raster_map.mime_type
+    return serve_from_s3(
+        'routechoices-maps',
         request,
-        file_path,
-        filename='{}_{}_.{}'.format(
-            event.map.name,
-            event.map.corners_coordinates.replace(',', '_'),
-            event.map.mime_type[6:]
-        ),
-        mime=event.map.mime_type
+        '/internal/' + file_path,
+        filename='{}.{}'.format(raster_map.name, mime_type[6:]),
+        mime=mime_type
     )
 
 

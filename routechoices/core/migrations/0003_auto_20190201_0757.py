@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('modification_date', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=255)),
-                ('image', models.ImageField(height_field='height', storage=routechoices.lib.storages.OverwriteImageStorage(), upload_to=routechoices.core.models.map_upload_path, width_field='width')),
+                ('image', models.ImageField(height_field='height', storage=routechoices.lib.storages.OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'), upload_to=routechoices.core.models.map_upload_path, width_field='width')),
                 ('height', models.PositiveIntegerField(blank=True, editable=False, null=True)),
                 ('width', models.PositiveIntegerField(blank=True, editable=False, null=True)),
                 ('corners_coordinates', models.CharField(help_text='Latitude and longitude of map corners separated by commasin following order Top Left, Top right, Bottom Right, Bottom left. eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073', max_length=255, validators=[routechoices.lib.validators.validate_corners_coordinates])),
