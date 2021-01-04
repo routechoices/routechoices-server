@@ -123,18 +123,18 @@
             </div>
             <div class="modal-body">
               <p>
-                Use the configuration tool from teltonika to setup the tracker with the following configuration file
+                Use the configuration tool from teltonika to setup the tracker with the following configuration file: (required only once)
                 <ul class="well">
                     <li><a href="{% static 'tmt250.cfg' %}"><i class="fa fa-save"></i> Configuration File for TMT250</a></li>
                 </ul>
               </p>
-              <p>Once you obtained a device id for your tracker you can turn on your tracker and its positions will be saved to the server.</p>
+              <p>Once you obtained a device id for your tracker (see below) you can turn on your tracker during your races and its positions will be saved to the server.</p>
               <h3>Get a device Id for your Tracker</h3>
               <form id="imeiForm">
                 <div class="form-group" id=IMEIDiv>
                   <label for="IMEI">IMEI</label>
                   <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
-                  <small id="IMEIHelp" class="form-text text-muted">This is used to link your physical device with or system.</small>
+                  <small id="IMEIHelp" class="form-text text-muted">This is used to link your physical device with our system.</small>
                   <div id="imeiErrorMsg" class="invalid-feedback hidden">
                     <i class="fa fa-warning"></i> Invalid IMEI
                   </div>
