@@ -365,7 +365,11 @@ def event_map_download(request, aid):
         'routechoices-maps',
         request,
         '/internal/' + file_path,
-        filename='{}.{}'.format(raster_map.name, mime_type[6:]),
+        filename='{}_{}_.{}'.format(
+            raster_map.name,
+            raster_map.corners_coordinates.replace(',', '_'),
+            mime_type[6:]
+        ),
         mime=mime_type
     )
 
