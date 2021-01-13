@@ -38,10 +38,11 @@ class NoticeInline(admin.TabularInline):
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'privacy',
         'club',
         'start_date',
     )
-    list_filter = ('club', )
+    list_filter = ('club', 'privacy')
     inlines = [CompetitorInline, NoticeInline]
 
 
@@ -75,6 +76,7 @@ class MapAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'club',
+        'creation_date',
     )
     list_filter = ('club', )
 
