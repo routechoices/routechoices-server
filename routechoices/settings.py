@@ -271,6 +271,7 @@ CACHES = {
 }
 
 TMT250_PORT = 2000
+GL200_PORT = 2002
 
 
 # The AWS region to connect to.

@@ -1,6 +1,9 @@
 # coding=utf-8
+import arrow
+
 from struct import unpack, pack
 from asgiref.sync import sync_to_async
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -171,13 +174,125 @@ class TMT250Server(TCPServer):
         await c.start_listening()
 
 
+class GL200Connection():
+    def __init__(self, stream, address):
+        print('received a new connection from %s', address)
+        self.imei = None
+        self.address = address
+        self.stream = stream
+        self.stream.set_close_callback(self._on_close)
+        self.db_device = None
+
+    async def start_listening(self):
+        print('start listening from %s', self.address)
+        imei = None
+        try:
+            data_bin = await self.stream.read_until(b'$')
+            data = data_bin.decode('ascii')
+            parts = data.split(',')
+            if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
+                    and parts[0][8:] in (
+                        'FRI', 'GEO', 'SPD', 'SOS', 'RTL',
+                        'PNL', 'NMR', 'DIS', 'DOG', 'IGL'):
+                print('received data (%s)' % data)
+                imei = parts[2]
+            elif parts[0] == '+ACK:GTHBD':
+                self.stream.write(
+                    (
+                        '+SACK:GTHBD,%s,%s$' % (parts[1], parts[5])
+                    ).encode('ascii')
+                )
+                imei = parts[2]
+        except Exception as e:
+            print(e)
+            self.stream.close()
+            return
+        if not imei:
+            print('no imei')
+            self.stream.close()
+            return
+        self.db_device = await sync_to_async(
+            _get_device,
+            thread_sensitive=True
+        )(imei)
+        if not self.db_device:
+            print('imei not registered %s, %s' % (self.address, imei))
+            self.stream.close()
+            return
+        self.imei = imei
+        print('%s is connected' % (self.imei))
+        try:
+            lon = float(parts[11])
+            lat = float(parts[12])
+            tim = arrow.get(parts[13], 'YYYYMMDDHHmmss').int_timestamp
+            await self._on_data(lat, lon, tim)
+        except Exception:
+            self.stream.close()
+            return
+        while await self._read_line():
+            pass
+
+    async def _read_line(self):
+        try:
+            data_bin = await self.stream.read_until(b'$')
+            data = data_bin.decode('ascii')
+            parts = data.split(',')
+            if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
+                    and parts[0][8:] in (
+                        'FRI', 'GEO', 'SPD', 'SOS', 'RTL',
+                        'PNL', 'NMR', 'DIS', 'DOG', 'IGL'):
+                print('received data (%s)' % data)
+                imei = parts[2]
+                if imei != self.imei:
+                    raise Exception('Cannot change IMEI while connected')
+                lon = float(parts[11])
+                lat = float(parts[12])
+                tim = arrow.get(parts[13], 'YYYYMMDDHHmmss').int_timestamp
+                await self._on_data(lat, lon, tim)
+            elif parts[0] == '+ACK:GTHBD':
+                self.stream.write(
+                    (
+                        '+SACK:GTHBD,%s,%s$' % (parts[1], parts[5])
+                    ).encode('ascii')
+                )
+        except Exception:
+            self.stream.close()
+            return
+        return True
+
+    def _on_close(self):
+        print('client quit', self.address)
+
+    async def _on_data(self, lat, lon, timestamp):
+        self.db_device.add_location(
+            lat,
+            lon,
+            timestamp,
+            save=False
+        )
+        await sync_to_async(self.db_device.save, thread_sensitive=True)()
+        print('data wrote to db')
+
+
+class GL200Server(TCPServer):
+    async def handle_stream(self, stream, address):
+        c = GL200Connection(stream, address)
+        await c.start_listening()
+
+
 class Command(BaseCommand):
     help = 'Run a tmt250 server.'
 
     def handle(self, *args, **options):
-        server = TMT250Server()
-        server.listen(settings.TMT250_PORT)
+        tmt250_server = TMT250Server()
+        tmt250_server.listen(settings.TMT250_PORT)
+        gl200_server = GL200Server()
+        gl200_server.listen(settings.GL200_PORT)
         try:
             IOLoop.current().start()
         except KeyboardInterrupt:
             pass
+
+
+# configure GL300
+# AT+GTQSS=gl300,internet,,,2,,2,routechoices.com,2002,,,,0,0,,,0001$AT+GTFRI=gl300,6,1,,,0000,2359,5,5,5,5,10,50,50,1,1,1,5,1,,0002$
