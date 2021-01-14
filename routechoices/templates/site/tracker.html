@@ -23,11 +23,11 @@
       <div class="container">
         <div class="row">
           <h1>GPS Tracker</h1>
-          <p>You can upload your location to provide live GPS tracking in two way. We recommend the smartphone app or a Teltonika tracker, otherwise use the Garmin watch app.</p>
+          <p>You can upload your location to provide live GPS tracking in two way. We recommend the smartphone app or a dedicated gps tracker, otherwise use the Garmin watch app.</p>
           <p>Each method will generate a unique Device ID that you can communicate to the organizer.</p>
           <p style="margin-top:2em">
             <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a smartphone</a>
-            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a Teltonika GPS tracker</a>
+            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
             <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>
             
           </p>
@@ -119,17 +119,30 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-              <h4 class="modal-title" id="tmt250-modal-label">Teltonika Trackers (TMT250)</h4>
+              <h4 class="modal-title" id="tmt250-modal-label">GPS Trackers</h4>
             </div>
             <div class="modal-body">
               <p>
-                Use the configuration tool from teltonika to setup the tracker with the following configuration file: (required only once)
-                <ul class="well">
-                    <li><a href="{% static 'tmt250.cfg' %}"><i class="fa fa-save"></i> Configuration File for TMT250</a></li>
+                The dedicated GPS trackers supported are:
+                <ul>
+                  <li>Teltonika TMT250</li>
+                  <li>Queclink GL200</li>
+                  <li>Queclink GL300</li>
+                  <li>Queclink GL300W</li>
+                  <li>Queclink GL300MG</li>
                 </ul>
               </p>
-              <p>Once you obtained a device id for your tracker (see below) you can turn on your tracker during your races and its positions will be saved to the server.</p>
-              <h3>Get a device Id for your Tracker</h3>
+              <p>
+                Configure your device to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
+                <ul>
+                  <li>Teltonika devices: <code>port 2000</code></li>
+                  <li>Queclink devices: <code>port 2002</code></li>
+                </ul>
+                For more detailed configurations contact us.
+              </p>
+              <p>You should then get a device ID for your tracker (see below) that you can share with events organizers.</p>
+              <p>Then simply turn on your tracker during your races and its positions will be saved to the server.</p>
+              <h3>Get a device ID for your Tracker <small>(Required only once)</small></h3>
               <form id="imeiForm">
                 <div class="form-group" id=IMEIDiv>
                   <label for="IMEI">IMEI</label>
@@ -144,7 +157,7 @@
               <br/>
               <ul id="imeiDevId" class="well hidden" >
                 <li>IMEI <code id="imeiRes"></code></li>
-                <li>Device identifier: <code class="imeiDevId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
+                <li>Device ID: <code class="imeiDevId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
               </ul>
             </div>
             <div class="modal-footer">
