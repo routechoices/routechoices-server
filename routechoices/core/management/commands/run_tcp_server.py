@@ -189,12 +189,12 @@ class GL200Connection():
         try:
             data_bin = await self.stream.read_until(b'$')
             data = data_bin.decode('ascii')
+            print('received data (%s)' % data)
             parts = data.split(',')
             if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
                     and parts[0][8:] in (
                         'FRI', 'GEO', 'SPD', 'SOS', 'RTL',
                         'PNL', 'NMR', 'DIS', 'DOG', 'IGL'):
-                print('received data (%s)' % data)
                 imei = parts[2]
             elif parts[0] == '+ACK:GTHBD':
                 self.stream.write(
@@ -236,12 +236,12 @@ class GL200Connection():
         try:
             data_bin = await self.stream.read_until(b'$')
             data = data_bin.decode('ascii')
+            print('received data (%s)' % data)
             parts = data.split(',')
             if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
                     and parts[0][8:] in (
                         'FRI', 'GEO', 'SPD', 'SOS', 'RTL',
                         'PNL', 'NMR', 'DIS', 'DOG', 'IGL'):
-                print('received data (%s)' % data)
                 imei = parts[2]
                 if imei != self.imei:
                     raise Exception('Cannot change IMEI while connected')
@@ -257,7 +257,7 @@ class GL200Connection():
                 )
         except Exception:
             self.stream.close()
-            return
+            return False
         return True
 
     def _on_close(self):
