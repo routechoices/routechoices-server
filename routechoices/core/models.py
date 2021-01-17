@@ -1,7 +1,7 @@
 import arrow
 import base64
 import datetime
-import json
+import orjson as json
 import hashlib
 import re
 import time
@@ -12,7 +12,6 @@ import gpxpy
 import gpxpy.gpx
 import pytz
 from PIL import Image
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
