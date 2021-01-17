@@ -1,7 +1,7 @@
 import arrow
 import base64
 import datetime
-import orjson as json
+import json
 import hashlib
 import re
 import time
@@ -422,7 +422,10 @@ class Device(models.Model):
 
     @property
     def location_count(self):
-        return len(self.locations['timestamps'])
+        try:
+            return len(self.locations['timestamps'])
+        except Exception:
+            return 0
 
     def remove_duplicates(self, save=True):
         locations = self.locations
