@@ -23,13 +23,19 @@
       <div class="container">
         <div class="row">
           <h1>GPS Trackers</h1>
-          <p>You can upload your location to provide live GPS tracking in two way. We recommend the smartphone app or a dedicated gps tracker, otherwise use the Garmin watch app.</p>
-          <p>Each method will generate a unique Device ID that you can communicate to the organizer.</p>
+          <div class="row" style="margin-bottom: 15px">
+            <div class="col col-md-3 col-xs-6"><img style="height: 150px" src="{% static '/img/iphone_tracker.png' %}"/></div>
+            <div class="col col-md-3 col-xs-6"><img style="height: 150px" src="{% static '/img/TMT250.png' %}"/></div>
+            <div class="col col-md-3 col-xs-6"><img style="height: 150px" src="{% static '/img/gl300.png' %}"/></div>
+            <div class="col col-md-3 col-xs-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>
+          </div>
+          <p>You can upload your location to provide live GPS tracking in three way. Using a smartphone app, using a dedicated gps tracker, or otherwise using the Garmin watch app conected to your smartphone.</p>
+          <p>For each method we need to generate for you a unique device ID that you can communicate to the organizer.</p>
+          <p>Select below your desired option:</p>
           <p style="margin-top:2em">
             <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a smartphone</a>
             <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
             <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>
-            
           </p>
         </div>
       </div>
