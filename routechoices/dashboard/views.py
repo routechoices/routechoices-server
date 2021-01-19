@@ -290,6 +290,8 @@ def map_kmz_upload_view(request):
                     kml = file.read()
                     name, image_path, corners_coords = \
                         extract_ground_overlay_info(kml)
+                    if not name:
+                        name = 'Untitled'
                     if not image_path.startswith('http://') and \
                             not image_path.startswith('https://'):
                         raise Exception('Fishy KML')
@@ -325,7 +327,8 @@ def map_kmz_upload_view(request):
                         kml = f.read().encode('utf8')
                     name, image_path, corners_coords = \
                         extract_ground_overlay_info(kml)
-
+                    if not name:
+                        name = 'Untitled'
                     if image_path.startswith('http://') or \
                             image_path.startswith('https://'):
                         dest = tempfile.NamedTemporaryFile(delete=False)
