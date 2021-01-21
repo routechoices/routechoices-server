@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from routechoices.core.models import (
     Club,
@@ -46,6 +47,22 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [CompetitorInline, NoticeInline]
 
 
+class DeviceCompetitorInline(admin.TabularInline):
+    model = Competitor
+    fields = (
+        'event',
+        'name',
+        'short_name',
+        'start_time',
+        'link'
+    )
+    readonly_fields = ('link', )
+    ordering = ('-start_time', )
+
+    def link(self, obj):
+        return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
+
+
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
@@ -56,6 +73,7 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     actions = ['clean_positions']
     search_fields = ('aid', )
+    inlines = [DeviceCompetitorInline, ]
 
     def get_queryset(self, request):
         return super().get_queryset(request).extra(
