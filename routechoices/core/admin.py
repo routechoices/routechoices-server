@@ -57,6 +57,16 @@ class DeviceAdmin(admin.ModelAdmin):
     actions = ['clean_positions']
     search_fields = ('aid', )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).extra(
+            select={'locations_raw_length': 'Length(locations_raw)'}
+        )
+
+    def location_count(self, obj):
+        return obj.location_count
+
+    location_count.admin_order_field = 'locations_raw_length'
+
     def clean_positions(self, request, queryset):
         for obj in queryset:
             obj.remove_duplicates()
