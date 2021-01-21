@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.db.models import Count
 
 from routechoices.core.models import (
     Club,
@@ -70,6 +71,7 @@ class DeviceAdmin(admin.ModelAdmin):
         'last_date_viewed',
         'last_position',
         'location_count',
+        'num_competitors',
     )
     actions = ['clean_positions']
     search_fields = ('aid', )
@@ -78,12 +80,16 @@ class DeviceAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).extra(
             select={'locations_raw_length': 'Length(locations_raw)'}
-        )
+        ).annotate(num_competitors=Count('competitor_set'))
 
     def location_count(self, obj):
         return obj.location_count
 
+    def num_competitors(self, obj):
+        return obj.num_competitors
+
     location_count.admin_order_field = 'locations_raw_length'
+    num_competitors.admin_order_field = 'num_competitors'
 
     def clean_positions(self, request, queryset):
         for obj in queryset:
