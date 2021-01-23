@@ -661,6 +661,7 @@ def event_route_upload_view(request, id):
                 device.aid += '_GPX'
                 device.is_gpx = True
                 device.save()
+                start_time = None
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
@@ -673,9 +674,13 @@ def event_route_upload_view(request, id):
                                     point.time.timestamp(),
                                     save=False
                                 )
+                                if not start_time:
+                                    start_time = point.time
                 device.save()
                 competitor = form.cleaned_data['competitor']
                 competitor.device = device
+                if event.start_date <= start_time and (not event.end_date or start_time <= event.end_date): 
+                    competitor.start_time = start_time
                 competitor.save()
             if error:
                 messages.error(request, error)
