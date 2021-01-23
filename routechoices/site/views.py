@@ -224,7 +224,7 @@ def event_route_upload_view(request, club_slug, slug):
                     short_name=initial_of_name(competitor_name),
                     device=device,
                 )
-                if event.start_date <= start_time <= event.end_date:
+                if event.start_date <= start_time and (not event.end_date or start_time <= event.end_date): 
                     competitor.start_time = start_time
                 competitor.save()
             messages.success(
