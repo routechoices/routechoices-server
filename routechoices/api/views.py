@@ -106,7 +106,7 @@ def event_data(request, aid):
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
     competitors = event.competitors.select_related('device')\
-        .all().order_by('name')
+        .all().order_by('start_time', 'name')
 
     nb_points = 0
     results = []
