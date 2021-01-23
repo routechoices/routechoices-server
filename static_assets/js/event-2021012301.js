@@ -420,7 +420,10 @@ var getCompetitionEndDate = function() {
     })
     return res
 }
-var getCompetitorsMaxDuration = function(customOffset=false) {
+var getCompetitorsMaxDuration = function(customOffset) {
+    if(customOffset === undefined) {
+      customOffset = false;
+    }
     var res = 0;
     competitorList.forEach(function(c){
         var route = competitorRoutes[c.id];
