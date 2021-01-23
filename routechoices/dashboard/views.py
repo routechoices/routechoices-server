@@ -679,7 +679,7 @@ def event_route_upload_view(request, id):
                 device.save()
                 competitor = form.cleaned_data['competitor']
                 competitor.device = device
-                if event.start_date <= start_time and (not event.end_date or start_time <= event.end_date): 
+                if start_time and event.start_date <= start_time and (not event.end_date or start_time <= event.end_date): 
                     competitor.start_time = start_time
                 competitor.save()
             if error:
