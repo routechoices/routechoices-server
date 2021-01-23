@@ -214,7 +214,7 @@ class Map(models.Model):
     @property
     def hash(self):
         h = hashlib.sha256()
-        h.update(self.data_uri.encode('utf-8'))
+        h.update(self.path.encode('utf-8'))
         h.update(self.corners_coordinates.encode('utf-8'))
         return base64.b64encode(h.digest()).decode('utf-8')
 
