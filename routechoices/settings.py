@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
 
     'corsheaders',
-    'rest_framework',
 
     'routechoices',
     'routechoices.core',
@@ -60,6 +59,8 @@ INSTALLED_APPS = [
     'background_task',
     'bootstrap3',
     'admincommand',
+
+    'rest_framework',
 
     'django_s3_storage',
 
