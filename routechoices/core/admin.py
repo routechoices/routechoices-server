@@ -15,7 +15,7 @@ from routechoices.core.models import (
 
 
 class HasLocationFilter(admin.SimpleListFilter):
-    title = 'Weither It Has Locations'
+    title = 'Wether It Has Locations'
     parameter_name = 'has_locations'
 
     def lookups(self, request, model_admin):
@@ -36,7 +36,7 @@ class HasLocationFilter(admin.SimpleListFilter):
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
-    title = 'Weither It Has Competitors'
+    title = 'Wether It Has Competitors'
     parameter_name = 'has_competitors'
 
     def lookups(self, request, model_admin):
@@ -48,28 +48,28 @@ class HasCompetitorFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'has_no_competitors':
             return queryset.filter(
-                num_competitors=0
+                competitor_count=0
             )
         elif self.value():
             return queryset.filter(
-                num_competitors__gt=0
+                competitor_count__gt=0
             )
 
 
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'num_events',
+        'name', 'event_count',
     )
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
-                num_events=Count('events')
+                event_count=Count('events')
             )
 
-    def num_events(self, obj):
-        return obj.num_events
+    def event_count(self, obj):
+        return obj.event_count
 
-    num_events.admin_order_field = 'num_events'
+    event_count.admin_order_field = 'event_count'
 
 
 class CompetitorInline(admin.TabularInline):
@@ -124,7 +124,7 @@ class DeviceAdmin(admin.ModelAdmin):
         'last_date_viewed',
         'last_position',
         'location_count',
-        'num_competitors',
+        'competitor_count',
     )
     actions = ['clean_positions']
     search_fields = ('aid', )
@@ -135,17 +135,17 @@ class DeviceAdmin(admin.ModelAdmin):
         return super().get_queryset(request).annotate(
                 locations_raw_length=Length('locations_raw')
             ).annotate(
-                num_competitors=Count('competitor_set')
+                competitor_count=Count('competitor_set')
             )
 
     def location_count(self, obj):
         return obj.location_count
 
-    def num_competitors(self, obj):
-        return obj.num_competitors
+    def competitor_count(self, obj):
+        return obj.competitor_count
 
     location_count.admin_order_field = 'locations_raw_length'
-    num_competitors.admin_order_field = 'num_competitors'
+    competitor_count.admin_order_field = 'competitor_count'
 
     def clean_positions(self, request, queryset):
         for obj in queryset:
