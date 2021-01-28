@@ -11,6 +11,7 @@ from routechoices.core.models import (
     ImeiDevice,
     Map,
     Notice,
+    MapAssignation,
 )
 
 
@@ -72,6 +73,16 @@ class ClubAdmin(admin.ModelAdmin):
     event_count.admin_order_field = 'event_count'
 
 
+class ExtraMapInline(admin.TabularInline):
+    verbose_name = "Extra Map"
+    verbose_name_plural = "Extra Maps"
+    model = MapAssignation
+    fields = (
+        'map',
+        'title',
+    )
+
+
 class CompetitorInline(admin.TabularInline):
     model = Competitor
     fields = (
@@ -80,7 +91,6 @@ class CompetitorInline(admin.TabularInline):
         'short_name',
         'start_time',
     )
-    list_filter = ('event', 'device', )
 
 
 class NoticeInline(admin.TabularInline):
@@ -98,7 +108,7 @@ class EventAdmin(admin.ModelAdmin):
         'start_date',
     )
     list_filter = ('club', 'privacy')
-    inlines = [CompetitorInline, NoticeInline]
+    inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
 
 
 class DeviceCompetitorInline(admin.TabularInline):
@@ -114,7 +124,9 @@ class DeviceCompetitorInline(admin.TabularInline):
     ordering = ('-start_time', )
 
     def link(self, obj):
-        return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
+        return mark_safe(
+            f'<a href="{obj.event.get_absolute_url()}">View on Site</a>'
+        )
 
 
 class DeviceAdmin(admin.ModelAdmin):
