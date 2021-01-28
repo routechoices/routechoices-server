@@ -35,7 +35,7 @@ def tracker_view(request):
 def events_view(request):
     event_list = Event.objects.filter(
         privacy=PRIVACY_PUBLIC
-    ).select_related('map', 'club')
+    ).select_related('map', 'club').prefetch_related('map_assignations')
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -118,6 +118,15 @@ def event_map_view(request, club_slug, slug):
         slug__iexact=slug
     )
     return redirect('api:event_map_download', aid=event.aid)
+
+
+def event_extra_map_view(request, club_slug, slug, index):
+    event = get_object_or_404(
+        Event,
+        club__slug__iexact=club_slug,
+        slug__iexact=slug
+    )
+    return redirect('api:event_extra_map_download', aid=event.aid, index=index)
 
 
 def event_registration_view(request, club_slug, slug):

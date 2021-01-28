@@ -14,6 +14,36 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
+            <h4>Extra Maps</h4>
+            <div class="help-block">Extra maps can be used for example if your route is split in mulptiple parts</div>
+            {% bootstrap_formset_errors extra_map_formset %}
+            <table class="table">
+            {{ extra_map_formset.management_form }}
+            {% for form in extra_map_formset %}
+               {% if forloop.first %}
+                    <thead>
+                    <tr>
+                        {% for field in form.visible_fields %}
+                            <th>{{ field.label|capfirst }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                {% endif %}
+                <tr class="extra_map_formset_row">
+                    {% for field in form.visible_fields %}
+                        <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+                            {% endif %}
+                            {% bootstrap_field field show_label=False %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </table>
             <hr/>
             <h3>Notification</h3>
             {% bootstrap_form notice_form %}
@@ -74,6 +104,12 @@
         addCssClass: 'btn btn-primary add-competitor-btn',
         deleteText: '<i class="fa fa-trash fa-2x"></i>',
         prefix: 'competitors'
+    });
+    $('.extra_map_formset_row').formset({
+        addText: '<i class="fa fa-plus-circle"></i> Add Map',
+        addCssClass: 'btn btn-primary add-map-btn',
+        deleteText: '<i class="fa fa-trash fa-2x"></i>',
+        prefix: 'maps'
     });
 </script>
 <script src="{% static '/vendor/selectize-0.12.6/selectize.min.js' %}"></script>

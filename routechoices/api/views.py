@@ -376,6 +376,35 @@ def event_map_download(request, aid):
 
 
 @api_view(['GET'])
+def event_extra_map_download(request, aid, index):
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=aid,
+        start_date__lt=now()
+    )
+    if event.extra_maps.all().count() < int(index) or int(index) == 0:
+        raise NotFound()
+    if event.privacy == PRIVACY_PRIVATE:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    raster_map = event.extra_maps.all()[int(index)-1]
+    file_path = raster_map.path
+    mime_type = raster_map.mime_type
+    return serve_from_s3(
+        'routechoices-maps',
+        request,
+        '/internal/' + file_path,
+        filename='{}_{}_.{}'.format(
+            raster_map.name,
+            raster_map.corners_coordinates.replace(',', '_'),
+            mime_type[6:]
+        ),
+        mime=mime_type
+    )
+
+
+@api_view(['GET'])
 def competitor_gpx_download(request, aid):
     competitor = get_object_or_404(
         Competitor.objects.all().select_related('event', 'event__club'),

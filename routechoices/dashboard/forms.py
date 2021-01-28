@@ -12,10 +12,10 @@ from django.forms import (
     ModelChoiceField,
     FileField,
 )
-from django.db import transaction
-from django.utils.safestring import mark_safe
 
-from routechoices.core.models import Club, Map, Event, Competitor, Device, Notice
+from routechoices.core.models import (
+    Club, Map, Event, Competitor, Device, Notice, MapAssignation
+)
 from routechoices.lib.helper import get_aware_datetime
 
 
@@ -92,6 +92,12 @@ class NoticeForm(ModelForm):
         fields = ('text', )
 
 
+class ExtraMapForm(ModelForm):
+    class Meta:
+        model = MapAssignation
+        fields = ('event', 'map', 'title')
+
+
 class CompetitorForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,6 +146,15 @@ CompetitorFormSet = inlineformset_factory(
     Event,
     Competitor,
     form=CompetitorForm,
+    extra=1,
+    min_num=0,
+    validate_min=True
+)
+
+ExtraMapFormSet = inlineformset_factory(
+    Event,
+    MapAssignation,
+    form=ExtraMapForm,
     extra=1,
     min_num=0,
     validate_min=True

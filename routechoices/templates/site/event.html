@@ -368,6 +368,26 @@ $(function() {
   var stemp = '{{ event.map.corners_coordinates }}'.split(',');
   addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);
   {% endif %}
+  var extraMaps = [];
+  {% if event.map_assignations.count %}
+    {% for e_map in event.map_assignations.all %}
+      extraMaps.push({
+        title:'{{e_map.title|escapejs}}',
+        hash: '{{e_map.map.hash}}',
+        url: '{% url 'api:event_extra_map_download' aid=event.aid index=forloop.counter %}',
+        stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
+      })
+    {% endfor %}
+    var extraMapLayer = {'<i class="fa fa-star"></i> Default Map': rasterMap};
+    for (var i=0; i < extraMaps.length; i++) {
+      var m = extraMaps[i];
+      extraMapLayer[m.title] = new L.ImageTransform(
+        m.url, 
+        [[1*m.stemp[0],1*m.stemp[1]],[1*m.stemp[2],1*m.stemp[3]],[1*m.stemp[4],1*m.stemp[5]],[1*m.stemp[6],1*m.stemp[7]]]
+      );
+    }
+    L.control.layers(extraMapLayer, null, {collapsed: false}).addTo(map);
+  {% endif %}
   onStart();
   {% endif %}
 })

@@ -23,6 +23,11 @@ urlpatterns = [
         name='event_map_download'
     ),
     url(
+        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/extra_map/(?P<index>\d+)?$',
+        views.event_extra_map_download,
+        name='event_extra_map_download'
+    ),
+    url(
         r'^events/(?P<aid>[0-9a-zA-Z_-]+)/data/?$',
         views.event_data,
         name='event_data'

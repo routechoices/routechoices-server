@@ -269,6 +269,12 @@ class Event(models.Model):
         blank=True,
         help_text="Preferably use a map from the organizing club",
     )
+    extra_maps = models.ManyToManyField(
+        Map,
+        through='MapAssignation',
+        related_name='+',
+        through_fields=('event', 'map'),
+    )
     open_registration = models.BooleanField(
         default=False,
         help_text="Participants can register themselves to the event.",
@@ -358,6 +364,23 @@ class Notice(models.Model):
         help_text='This will be displayed on the event page.',
     )
 
+
+class MapAssignation(models.Model):
+    event = models.ForeignKey(
+        Event,
+        related_name='map_assignations',
+        on_delete=models.CASCADE
+    )
+    map = models.ForeignKey(
+        Map,
+        related_name='map_assignations',
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = (('map', 'event'), )
+        ordering = ['id']
 
 class Device(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)

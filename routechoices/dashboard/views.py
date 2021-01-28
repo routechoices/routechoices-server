@@ -28,6 +28,7 @@ from routechoices.dashboard.forms import (
     ClubForm, MapForm, EventForm,
     CompetitorFormSet, UploadGPXForm,
     UploadKmzForm, DeviceForm, NoticeForm,
+    ExtraMapFormSet,
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
 
@@ -471,12 +472,18 @@ def event_create_view(request):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(request.POST)
+        extra_map_formset = ExtraMapFormSet(request.POST)
+        for mform in extra_map_formset.forms:
+            mform.fields['map'].queryset = map_list
         notice_form = NoticeForm(request.POST)
         # check whether it's valid:
-        if form.is_valid() and formset.is_valid() and notice_form.is_valid():
+        if form.is_valid() and formset.is_valid() and notice_form.is_valid()\
+                and extra_map_formset.is_valid():
             event = form.save()
             formset.instance = event
             formset.save()
+            extra_map_formset.instance = event
+            extra_map_formset.save()
             notice = notice_form.save(commit=False)
             notice.event = event
             notice.save()
@@ -492,6 +499,9 @@ def event_create_view(request):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet()
+        extra_map_formset = ExtraMapFormSet()
+        for mform in extra_map_formset.forms:
+            mform.fields['map'].queryset = map_list
         notice_form = NoticeForm()
         devices = Device.objects.none()
         if request.user.is_authenticated:
@@ -504,6 +514,7 @@ def event_create_view(request):
         {
             'form': form,
             'formset': formset,
+            'extra_map_formset': extra_map_formset,
             'notice_form': notice_form,
         }
     )
@@ -529,6 +540,9 @@ def event_edit_view(request, id):
         form = EventForm(request.POST, instance=event)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
+        extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
+        for mform in extra_map_formset.forms:
+            mform.fields['map'].queryset = map_list
         formset = CompetitorFormSet(
             request.POST,
             instance=event,
@@ -538,10 +552,13 @@ def event_edit_view(request, id):
             args = {'instance': event.notice}
         notice_form = NoticeForm(request.POST, **args)
         # check whether it's valid:
-        if form.is_valid() and formset.is_valid() and notice_form.is_valid():
+        if form.is_valid() and formset.is_valid() and notice_form.is_valid()\
+                and extra_map_formset.is_valid():
             form.save()
             formset.instance = event
             formset.save()
+            extra_map_formset.instance = event
+            extra_map_formset.save()
             prev_text = ''
             if event.has_notice:
                 notice_form.instance = event.notice
@@ -565,6 +582,9 @@ def event_edit_view(request, id):
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(instance=event)
+        extra_map_formset = ExtraMapFormSet(instance=event)
+        for mform in extra_map_formset.forms:
+            mform.fields['map'].queryset = map_list
         args = {}
         if event.has_notice:
             args = {'instance': event.notice}
@@ -580,6 +600,7 @@ def event_edit_view(request, id):
             'event': event,
             'form': form,
             'formset': formset,
+            'extra_map_formset': extra_map_formset,
             'notice_form': notice_form,
         }
     )
