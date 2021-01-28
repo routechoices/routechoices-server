@@ -84,7 +84,7 @@ class EventForm(ModelForm):
     def clean_map(self):
         rmap = self.cleaned_data.get('map')
         club = self.data.get('club')
-        if club and int(club) != rmap.club_id:
+        if rmap and club and int(club) != rmap.club_id:
             raise ValidationError('')
         return rmap
 
@@ -105,6 +105,8 @@ class ExtraMapForm(ModelForm):
         club = self.data.get('club')
         if club and int(club) != rmap.club_id:
             raise ValidationError('Pick a map from the club organizing')
+        if not self.data.get('map'):
+            raise ValidationError('You can not set extra maps if the map field is not set first')
         return rmap
 
 
