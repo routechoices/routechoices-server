@@ -267,7 +267,7 @@ class Event(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="Use a map from the organizing club",
+        help_text="Pick a map from the club organizing",
     )
     extra_maps = models.ManyToManyField(
         Map,

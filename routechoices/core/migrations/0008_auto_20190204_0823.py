@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='map',
-            field=models.ForeignKey(blank=True, help_text='Preferably use a map from the organizing club', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='core.Map'),
+            field=models.ForeignKey(blank=True, help_text='Pick a map from the club organizing', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='core.Map'),
         ),
     ]
