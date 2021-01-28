@@ -18,6 +18,7 @@
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% endif %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
@@ -241,6 +242,7 @@ and (max-device-width : 500px) {
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script src="{% static '/vendor/leaflet-smoothwheelzoom-2020.07.03/SmoothWheelZoom.js' %}"></script>
+<script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
@@ -261,6 +263,7 @@ $(function() {
   map = L.map('map', {
     center: [15, 0],
     zoom: 3,
+    zoomControl: false,
     scrollWheelZoom: false, // disable original zoom function
     smoothWheelZoom: true,  // enable smooth zoom
     zoomSnap: 0,
@@ -279,6 +282,8 @@ $(function() {
       }
     ]
   });
+  L.control.pan().addTo(map);
+  L.control.zoom().addTo(map);
   openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
     maxZoom: 18
@@ -362,7 +367,7 @@ $(function() {
   liveUrl = '{% url 'api:event_data' aid=event.aid %}';
   mapDetailsUrl = '{% url 'api:event_map_details' aid=event.aid %}';
   mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
-  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}';
+  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
   noticeUrl = '{% url 'api:event_notice' aid=event.aid %}';
   {% if event.map %}
   var stemp = '{{ event.map.corners_coordinates }}'.split(',');
@@ -374,11 +379,11 @@ $(function() {
       extraMaps.push({
         title:'{{e_map.title|escapejs}}',
         hash: '{{e_map.map.hash}}',
-        url: '{% url 'api:event_extra_map_download' aid=event.aid index=forloop.counter %}',
+        url: '{% url 'api:event_extra_map_download' aid=event.aid index=forloop.counter %}?map_hash={{e_map.map.hash}}',
         stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
       })
     {% endfor %}
-    var extraMapLayer = {'<i class="fa fa-star"></i> Default Map': rasterMap};
+    var extraMapLayer = {'<i class="fa fa-star"></i> Main Map': rasterMap};
     for (var i=0; i < extraMaps.length; i++) {
       var m = extraMaps[i];
       extraMapLayer[m.title] = new L.ImageTransform(
