@@ -81,9 +81,9 @@ class EventForm(ModelForm):
         if end_date and end_date < start_date:
             raise ValidationError('Start Date must be before End Date')
         club = self.cleaned_data['club']
-        map = self.cleaned_data['map']
-        if map and club != map.club:
-            raise ValidationError('Pick a map from the organizer club')
+        rmap = self.cleaned_data['map']
+        if rmap and club != rmap.club:
+            raise ValidationError('Pick a map from the club organizing')
 
 
 class NoticeForm(ModelForm):
@@ -96,6 +96,13 @@ class ExtraMapForm(ModelForm):
     class Meta:
         model = MapAssignation
         fields = ('event', 'map', 'title')
+
+    def clean(self):
+        super().clean()
+        club = self.cleaned_data['event'].club
+        rmap = self.cleaned_data['map']
+        if club != rmap.club:
+            raise ValidationError('Pick a map from the club organizing')
 
 
 class CompetitorForm(ModelForm):
