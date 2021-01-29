@@ -30,6 +30,7 @@ jobs:
           node -v
           curl -o- -L https://yarnpkg.com/install.sh | bash
           ~/.yarn/bin/yarn add cypress
+          ~/.yarn/bin/yarn add cypress-file-upload
           ~/.yarn/bin/yarn cypress install
           ~/.yarn/bin/yarn cypress run
     - store_artifacts:
