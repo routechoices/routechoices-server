@@ -23,3 +23,6 @@ logs/*
 routechoices/local_settings.py
 cypress/screenshots/*
 cypress/videos/*
+node_modules/*
+yarn.lock
+package.json
