@@ -23,3 +23,12 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import 'cypress-file-upload';
+
+Cypress.Commands.add("login", (username='admin', password='pa$$word123') => { 
+    cy.visit('/accounts/login/')
+    cy.get('#id_login')
+      .type(username)
+    cy.get('#id_password')
+      .type(password + '{enter}')
+ })
