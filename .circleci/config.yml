@@ -8,7 +8,7 @@ jobs:
       docker_layer_caching: false
     steps:
     - checkout
-    - run: mkdir -p media/maps/
+    - run: mkdir -p media/routechoices-maps/maps/
     - run: ./dc build
     - run: ./dc up -d
     - run: ./da migrate
