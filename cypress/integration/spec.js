@@ -18,6 +18,7 @@ context('Cypress tests', () => {
     cy.get('#id_slug').type('halden-sk')
     cy.get('#id_admins').next('').type('admin{enter}')
     cy.get("input[value='Submit']").click()
+    cy.url().should('include', '/dashboard/club')
 
     // Create Map
     cy.visit('/dashboard')
@@ -31,6 +32,7 @@ context('Cypress tests', () => {
     const mapFileName = 'Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg'
     cy.get('#id_image').attachFile(mapFileName)
     cy.get("input[value='Submit']").click()
+    cy.url().should('include', '/dashboard/map')
 
     // Create Event
     cy.visit('/dashboard/event')
