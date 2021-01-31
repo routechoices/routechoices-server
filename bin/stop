@@ -8,7 +8,6 @@ INI_FILE=${BASEDIR}/bin/uwsgi.ini
 if [[ -e $PID_FILE ]];
 then
   echo 'stopping'
-  kill -INT `cat $PID_FILE`
   $UWSGI --stop $PID_FILE
 else
   echo 'proccess not running'
