@@ -291,7 +291,8 @@ class Command(BaseCommand):
         try:
             IOLoop.current().start()
         except KeyboardInterrupt:
-            pass
+            tmt250_server.stop()
+            gl200_server.stop()
 
 
 # configure GL300
