@@ -21,16 +21,14 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <style>
-/* oswald-regular - latin_latin-ext */
 @font-face {
-  font-family: 'Oswald';
+  font-family: 'Exo 2';
   font-style: normal;
-  font-weight: 400;
-  src: local('Oswald Regular'), local('Oswald-Regular'),
-       url("{% static '/fonts/oswald-v16-latin_latin-ext-regular.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-       url("{% static '/fonts/oswald-v16-latin_latin-ext-regular.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-weight: 600;
+  src: local('Exo 2'), local('Exo-2'),
+       url("{% static '/fonts/exo-2-v10-600.woff2' %}") format('woff2'),
+       url("{% static '/fonts/exo-2-v10-600.woff' %}") format('woff'),
 }
-
 
 .sub-header {
   padding-bottom: 10px;
@@ -118,9 +116,9 @@ and (max-device-width : 500px) {
 }
 
 .runner-icon span{
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Exo 2', sans-serif;
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: 600;
     padding: 0 15px;
     white-space: nowrap;
 }
