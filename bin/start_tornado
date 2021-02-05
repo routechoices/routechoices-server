@@ -2,7 +2,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=$(dirname $DIR)
 PID_FILE=${BASEDIR}/var/tornado.pid
-CMD=nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server > ${BASEDIR}/log/tornado.log 2> ${BASEDIR}/log/tornado.error.log &
+CMD=nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server --cpu=1 > ${BASEDIR}/log/tornado.log 2> ${BASEDIR}/log/tornado.error.log &
 if [ -f $PID_FILE ];
 then
  pid=`cat $PID_FILE`
