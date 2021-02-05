@@ -281,7 +281,7 @@ class GL200Server(TCPServer):
 
 
 class Command(BaseCommand):
-    help = 'Run a tmt250 server.'
+    help = 'Run a tcp server for GPS trackers.'
 
     def handle(self, *args, **options):
         tmt250_server = TMT250Server()
@@ -293,7 +293,3 @@ class Command(BaseCommand):
         except KeyboardInterrupt:
             tmt250_server.stop()
             gl200_server.stop()
-
-
-# configure GL300
-# AT+GTQSS=gl300,internet,,,2,,2,routechoices.com,2002,,,,0,0,,,0001$AT+GTFRI=gl300,6,1,,,0000,2359,5,5,5,5,10,50,50,1,1,1,5,1,,0002$
