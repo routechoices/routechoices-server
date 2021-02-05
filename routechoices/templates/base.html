@@ -21,6 +21,19 @@
     {% block extra_head %}
     {% endblock %}
     <style>
+      /* oswald-regular - latin_latin-ext */
+      @font-face {
+        font-family: 'Atkinson-Hyperlegible-Bold-102';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Atkinson Hyperlegible Bold 102'), local('Atkinson-Hyperlegible-Bold-102'),
+             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+      }
+      .site-name{
+          font-family: 'Atkinson-Hyperlegible-Bold-102', sans-serif;
+          white-space: nowrap;
+      }
     </style>
   </head>
   <body>
@@ -37,7 +50,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{% url 'site:home_view'%}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="20px"></span> {{site.name}}</a>
+          <a class="navbar-brand site-name" href="{% url 'site:home_view'%}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25px"></span> {{site.name}}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -93,7 +106,7 @@
         </div>
         <div class="second-bar">
            <div class="container">
-                <h2 class="logo"><a href="{% url 'site:home_view'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="30px"> {{site.name}}</a></h2>
+                <h2 class="logo site-name"><a href="{% url 'site:home_view'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35px"> {{site.name}}</a></h2>
                 <!--<div class="social-icons">
                     <a href="#" class="twitter"><i class="fa fa-twitter"></i></a>
                     <a href="#" class="facebook"><i class="fa fa-facebook"></i></a>
