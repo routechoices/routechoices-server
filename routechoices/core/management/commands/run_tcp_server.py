@@ -292,13 +292,13 @@ class Command(BaseCommand):
         num_cpu = max(options['cpu'], 0)
         tmt250_socks = bind_sockets(settings.TMT250_PORT)
         gl200_socks = bind_sockets(settings.GL200_PORT)
-        fork_processes(num_cpu)
         tmt250_server = TMT250Server()
         gl200_server = GL200Server()
         tmt250_server.add_sockets(tmt250_socks)
         gl200_server.add_sockets(gl200_socks)
         try:
-            self.stdout.write('Started listening for GPS Devices')
+            fork_processes(num_cpu)
+            self.stdout.write('Starting listening for GPS Devices')
             IOLoop.current().start()
         except KeyboardInterrupt:
             tmt250_server.stop()
