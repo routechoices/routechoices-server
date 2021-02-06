@@ -82,6 +82,9 @@ class ExtraMapInline(admin.TabularInline):
         'title',
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('map__club')
+
 
 class CompetitorInline(admin.TabularInline):
     model = Competitor

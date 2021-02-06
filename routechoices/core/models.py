@@ -381,6 +381,7 @@ class MapAssignation(models.Model):
         unique_together = (('map', 'event'), )
         ordering = ['id']
 
+
 class Device(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     aid = models.CharField(

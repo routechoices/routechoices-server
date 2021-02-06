@@ -464,7 +464,7 @@ def event_list_view(request):
 @login_required
 def event_create_view(request):
     club_list = Club.objects.filter(admins=request.user)
-    map_list = Map.objects.filter(club__in=club_list)
+    map_list = Map.objects.filter(club__in=club_list).select_related('club')
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -523,7 +523,7 @@ def event_create_view(request):
 @login_required
 def event_edit_view(request, id):
     club_list = Club.objects.filter(admins=request.user)
-    map_list = Map.objects.filter(club__in=club_list)
+    map_list = Map.objects.filter(club__in=club_list).select_related('club')
     event = get_object_or_404(
         Event.objects.all().prefetch_related('notice', 'competitors'),
         aid=id,
@@ -573,10 +573,11 @@ def event_edit_view(request, id):
                 notice.save()
             return redirect('dashboard:event_list_view')
         else:
+            dev_qs = Device.objects.filter(
+                id__in=all_devices
+            )
             for cform in formset.forms:
-                cform.fields['device'].queryset = Device.objects.filter(
-                    id__in=all_devices
-                )
+                cform.fields['device'].queryset = dev_qs
     else:
         form = EventForm(instance=event)
         form.fields['club'].queryset = club_list
@@ -589,10 +590,11 @@ def event_edit_view(request, id):
         if event.has_notice:
             args = {'instance': event.notice}
         notice_form = NoticeForm(**args)
+        dev_qs = Device.objects.filter(
+            id__in=all_devices
+        )
         for cform in formset.forms:
-            cform.fields['device'].queryset = Device.objects.filter(
-                id__in=all_devices
-            )
+            cform.fields['device'].queryset = dev_qs
     return render(
         request,
         'dashboard/event_edit.html',
