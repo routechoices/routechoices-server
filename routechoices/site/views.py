@@ -76,7 +76,7 @@ def event_view(request, club_slug, slug):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
@@ -97,7 +97,7 @@ def event_export_view(request, club_slug, slug):
         slug__iexact=slug,
         start_date__lt=now()
     )
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied

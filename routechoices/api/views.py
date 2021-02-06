@@ -101,7 +101,7 @@ def event_data(request, aid):
         aid=aid,
         start_date__lt=now()
     )
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
@@ -135,7 +135,7 @@ def event_map_details(request, aid):
         aid=aid,
         start_date__lt=now()
     )
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
@@ -355,7 +355,7 @@ def event_map_download(request, aid):
     )
     if not event.map:
         raise NotFound()
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
@@ -384,7 +384,7 @@ def event_extra_map_download(request, aid, index):
     )
     if event.extra_maps.all().count() < int(index) or int(index) == 0:
         raise NotFound()
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
@@ -412,7 +412,7 @@ def competitor_gpx_download(request, aid):
         start_time__lt=now()
     )
     event = competitor.event
-    if event.privacy == PRIVACY_PRIVATE:
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()

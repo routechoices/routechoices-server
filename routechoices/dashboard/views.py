@@ -141,7 +141,10 @@ def device_remove_view(request, id):
 
 @login_required
 def club_list_view(request):
-    club_list = Club.objects.filter(admins=request.user)
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
 
     paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
@@ -182,11 +185,17 @@ def club_create_view(request):
 
 @login_required
 def club_edit_view(request, id):
-    club = get_object_or_404(
-        Club,
-        aid=id,
-        admins=request.user
-    )
+    if request.user.is_superuser:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+        )
+    else:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+            admins=request.user
+        )
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -212,11 +221,17 @@ def club_edit_view(request, id):
 
 @login_required
 def club_delete_view(request, id):
-    club = get_object_or_404(
-        Club,
-        aid=id,
-        admins=request.user
-    )
+    if request.user.is_superuser:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+        )
+    else:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+            admins=request.user
+        )
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -233,10 +248,13 @@ def club_delete_view(request, id):
 
 @login_required
 def map_list_view(request):
-    club_list = Club.objects\
-        .filter(admins=request.user)\
-        .values_list('id', flat=True)
-    map_list = Map.objects.filter(club_id__in=club_list).select_related('club')
+    if request.user.is_superuser:
+        map_list = Map.objects.all().select_related('club')
+    else:
+        club_list = Club.objects\
+            .filter(admins=request.user)\
+            .values_list('id', flat=True)
+        map_list = Map.objects.filter(club_id__in=club_list).select_related('club')
 
     paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
@@ -253,7 +271,10 @@ def map_list_view(request):
 
 @login_required
 def map_create_view(request):
-    club_list = Club.objects.filter(admins=request.user)
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = MapForm(request.POST, request.FILES)
@@ -276,7 +297,10 @@ def map_create_view(request):
 
 @login_required
 def map_kmz_upload_view(request):
-    club_list = Club.objects.filter(admins=request.user)
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = UploadKmzForm(request.POST, request.FILES)
@@ -393,8 +417,11 @@ def map_kmz_upload_view(request):
 
 @login_required
 def map_edit_view(request, id):
-    club_list = Club.objects.filter(admins=request.user)
-    map = get_object_or_404(
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+    rmap = get_object_or_404(
         Map,
         aid=id,
         club__in=club_list
@@ -402,20 +429,20 @@ def map_edit_view(request, id):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = MapForm(request.POST, request.FILES, instance=map)
+        form = MapForm(request.POST, request.FILES, instance=rmap)
         form.fields['club'].queryset = club_list
         # check whether it's valid:
         if form.is_valid():
             form.save()
             return redirect('dashboard:map_list_view')
     else:
-        form = MapForm(instance=map)
+        form = MapForm(instance=rmap)
         form.fields['club'].queryset = club_list
     return render(
         request,
         'dashboard/map_edit.html',
         {
-            'map': map,
+            'map': rmap,
             'form': form,
         }
     )
@@ -423,30 +450,39 @@ def map_edit_view(request, id):
 
 @login_required
 def map_delete_view(request, id):
-    club_list = Club.objects.filter(admins=request.user)
-    map = get_object_or_404(
-        Map,
-        aid=id,
-        club__in=club_list
-    )
+    if request.user.is_superuser:
+        rmap = get_object_or_404(
+            Map,
+            aid=id
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        rmap = get_object_or_404(
+            Map,
+            aid=id,
+            club__in=club_list
+        )
     if request.method == 'POST':
-        map.delete()
+        rmap.delete()
         return redirect('dashboard:map_list_view')
     return render(
         request,
         'dashboard/map_delete.html',
         {
-            'map': map,
+            'map': rmap,
         }
     )
 
 
 @login_required
 def event_list_view(request):
-    club_list = Club.objects.filter(admins=request.user)
-    event_list = Event.objects.filter(
-        club__in=club_list
-    ).select_related('club')
+    if request.user.is_superuser:
+        event_list = Event.objects.all().select_related('club')
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        event_list = Event.objects.filter(
+            club__in=club_list
+        ).select_related('club')
 
     paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
@@ -463,7 +499,10 @@ def event_list_view(request):
 
 @login_required
 def event_create_view(request):
-    club_list = Club.objects.filter(admins=request.user)
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
     map_list = Map.objects.filter(club__in=club_list).select_related('club')
 
     if request.method == 'POST':
@@ -522,7 +561,10 @@ def event_create_view(request):
 
 @login_required
 def event_edit_view(request, id):
-    club_list = Club.objects.filter(admins=request.user)
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
     map_list = Map.objects.filter(club__in=club_list).select_related('club')
     event = get_object_or_404(
         Event.objects.all().prefetch_related('notice', 'competitors'),
@@ -610,12 +652,18 @@ def event_edit_view(request, id):
 
 @login_required
 def event_delete_view(request, id):
-    club_list = Club.objects.filter(admins=request.user)
-    event = get_object_or_404(
-        Event,
-        aid=id,
-        club__in=club_list
-    )
+    if request.user.is_superuser:
+        event = get_object_or_404(
+            Event,
+            aid=id,
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        event = get_object_or_404(
+            Event,
+            aid=id,
+            club__in=club_list
+        )
 
     if request.method == 'POST':
         event.delete()
@@ -660,12 +708,18 @@ def dashboard_map_download(request, id, *args, **kwargs):
 
 @login_required
 def event_route_upload_view(request, id):
-    club_list = Club.objects.filter(admins=request.user)
-    event = get_object_or_404(
-        Event,
-        aid=id,
-        club__in=club_list
-    )
+    if request.user.is_superuser:
+        event = get_object_or_404(
+            Event,
+            aid=id,
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        event = get_object_or_404(
+            Event,
+            aid=id,
+            club__in=club_list
+        )
     competitors = event.competitors.all()
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
