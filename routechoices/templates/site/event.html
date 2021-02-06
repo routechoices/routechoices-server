@@ -110,9 +110,14 @@ and (max-device-width : 500px) {
   margin-top: 0;
 }
 
-.runner-icon{
+.runner-icon-dark{
     color: #000;
     text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff;
+}
+
+.runner-icon-light{
+    color: #000;
+    text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
 }
 
 .runner-icon span{
@@ -246,7 +251,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021012301.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021020600.js' %}"></script>
 <script>
 $(function() {
   $('.page-alerts').hide();

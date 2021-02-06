@@ -39,6 +39,14 @@ Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
   var getColor = function(i) {
     return COLORS[i % COLORS.length]
   }
+  function getContrastYIQ(hexcolor){
+    hexcolor = hexcolor.replace("#", "");
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq <= 168) ? 'dark' : 'light';
+  }
 var clock = ServerClock({url: '/api/time'});
 var map = null;
 var isLiveMode = false;
@@ -553,8 +561,8 @@ var drawCompetitors = function(){
         }
         if(competitor.nameMarker == undefined){
           var runnerIcon = L.divIcon({
-            className: 'runner-icon',
-            html: '<span style="-webkit-text-fill-color: '+competitor.color+';">'+competitor.short_name+'</span>'
+            className: 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color),
+            html: '<span style="color: '+competitor.color+';">'+competitor.short_name+'</span>'
           });
           competitor.nameMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
