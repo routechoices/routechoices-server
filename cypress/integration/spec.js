@@ -73,7 +73,7 @@ context('Cypress tests', () => {
       cy.contains('Start Date must be before End Date')
       cy.contains('Event with this Club and Slug already exists.')
       cy.contains('Event with this Club and Name already exists.')
-      cy.contains('You can not set extra maps if the map field is not set first')
+      cy.contains('Extra maps can be set only if the map field is set first')
       cy.contains('Competitor start time should be during the event time')
     })
   })

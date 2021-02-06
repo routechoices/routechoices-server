@@ -28,7 +28,7 @@ class CompetitorForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['start_time'].label = "Start time (Optional)"
-        self.fields['device'].help_text = 'Get your device ID from the <a href= \
+        self.fields['device'].help_text = 'Get a device ID from the <a href= \
             "%s">trackers page</a>' % reverse('site:tracker_view')
 
     class Meta:

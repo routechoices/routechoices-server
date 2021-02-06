@@ -149,7 +149,7 @@ def event_registration_view(request, club_slug, slug):
             competitor.save()
             messages.success(
                 request,
-                'You successfully registered for this event.'
+                'Successfully registered for this event.'
             )
             return redirect(
                 'site:event_registration_view',
@@ -242,7 +242,7 @@ def event_route_upload_view(request, club_slug, slug):
                 competitor.save()
             messages.success(
                 request,
-                'You successfully uploaded your route for this event.'
+                'Successfully uploaded route for this event.'
             )
             return redirect(
                 'site:event_route_upload_view',

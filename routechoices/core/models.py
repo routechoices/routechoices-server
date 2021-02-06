@@ -55,7 +55,7 @@ class Club(models.Model):
         max_length=50,
         validators=[validate_nice_slug, ],
         unique=True,
-        help_text='This the text that will be used in the urls of your events'
+        help_text='This will be used in the urls'
     )
     admins = models.ManyToManyField(User)
 
@@ -248,7 +248,7 @@ class Event(models.Model):
         max_length=50,
         validators=[validate_nice_slug, ],
         db_index=True,
-        help_text='This the text that will be used in the urls of your events'
+        help_text='This will be used in the url'
     )
     start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
     end_date = models.DateTimeField(
@@ -267,7 +267,6 @@ class Event(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="Pick a map from the club organizing",
     )
     extra_maps = models.ManyToManyField(
         Map,

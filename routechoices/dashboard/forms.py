@@ -28,7 +28,7 @@ class ClubForm(ModelForm):
 class DeviceForm(Form):
     device = ModelChoiceField(
         label="Device ID",
-        help_text="Enter the device ID used by your tracker",
+        help_text="Enter the device ID of the tracker",
         queryset=Device.objects.all(),
     )
 
@@ -85,7 +85,7 @@ class EventForm(ModelForm):
         rmap = self.cleaned_data.get('map')
         club = self.data.get('club')
         if rmap and club and int(club) != rmap.club_id:
-            raise ValidationError('')
+            raise ValidationError('Map must be from the organizing club')
         return rmap
 
 
@@ -104,9 +104,11 @@ class ExtraMapForm(ModelForm):
         rmap = self.cleaned_data.get('map')
         club = self.data.get('club')
         if club and int(club) != rmap.club_id:
-            raise ValidationError('Pick a map from the club organizing')
+            raise ValidationError('Map must be from the organizing club')
         if not self.data.get('map'):
-            raise ValidationError('You can not set extra maps if the map field is not set first')
+            raise ValidationError(
+                'Extra maps can be set only if the map field is set first'
+            )
         return rmap
 
 

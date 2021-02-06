@@ -124,7 +124,7 @@ def device_remove_view(request, id):
         .first()
 
     if not ownership:
-        raise Http404('No such device owned by you.')
+        raise Http404('No such device owned.')
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:

@@ -15,7 +15,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <h4>Extra Maps</h4>
-            <div class="help-block">Extra maps can be used for example if your route is split in mulptiple parts</div>
+            <div class="help-block">Extra maps can be used for example if the route is split in multiple parts</div>
             {% bootstrap_formset_errors extra_map_formset %}
             <table class="table">
             {{ extra_map_formset.management_form }}
@@ -82,7 +82,7 @@
             <label for="csv_input">Import competitor from CSV</label>
             <input type="file" name="csv_input" id="csv_input" accept="text/csv"/>
             <div class="help-block">
-                Follow the following format for your CSV:<br/>
+                Follow the following format for the CSV:<br/>
                 Column A - Full name / displayed in the menu on the left during the event /<br/>
                 Column B - Shortname / displayed next to the marker on the live event /<br/>
                 Column C - Start time for the competitor in the following format (2014-05-31 08:57:00). Make sure this column is formatted as Text.<br/>
