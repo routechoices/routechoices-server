@@ -264,6 +264,9 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = '2'
 ACCOUNT_USERNAME_VALIDATORS ='routechoices.lib.validators.custom_username_validators'
 
+EMAIL_HOST = 'smtp'
+EMAIL_PORT = 1025
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
