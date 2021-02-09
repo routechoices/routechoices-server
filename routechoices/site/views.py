@@ -1,19 +1,24 @@
 import gpxpy
+from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
+
 from routechoices.core.models import (
-    Event,
     Club,
+    Competitor,
+    Device,
+    Event,
     PRIVACY_PUBLIC,
     PRIVACY_PRIVATE,
-    Device, Competitor)
+)
 from routechoices.lib.helper import initial_of_name
-from routechoices.site.forms import CompetitorForm, UploadGPXForm
+from routechoices.site.forms import CompetitorForm, ContactForm, UploadGPXForm
 
 
 def home_view(request):
@@ -261,3 +266,25 @@ def event_route_upload_view(request, club_slug, slug):
             'form': form,
         }
     )
+
+
+def contact(request):
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = (
+                'Routechoices.com contact form - '
+                + form.cleaned_data['subject']
+            )
+            from_email = form.cleaned_data['from_email']
+            message = form.cleaned_data['message']
+            send_mail(
+                subject,
+                message,
+                from_email,
+                [settings.DEFAULT_FROM_EMAIL]
+            )
+            return redirect('site:contact_email_sent_view')
+    return render(request, "site/contact.html", {'form': form})

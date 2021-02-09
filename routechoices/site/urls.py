@@ -8,8 +8,13 @@ urlpatterns = [
     url(r'^$', views.home_view, name='home_view'),
     url(
         r'^contact/?$',
-        TemplateView.as_view(template_name='site/contact.html'),
+        views.contact,
         name='contact_view'
+    ),
+    url(
+        r'^contact/success?$',
+        TemplateView.as_view(template_name='site/contact_email_sent.html'),
+        name='contact_email_sent_view'
     ),
     url(r'^events/?$', views.events_view, name='events_view'),
     url(r'^events/feed/?$', feeds.live_event_feed, name='events_feed'),

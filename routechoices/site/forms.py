@@ -8,6 +8,8 @@ from django.forms import (
     HiddenInput,
     ModelChoiceField,
     ModelForm,
+    EmailField,
+    Textarea,
 )
 from django.urls import reverse
 from django.utils.timezone import now
@@ -66,3 +68,9 @@ class CompetitorForm(ModelForm):
         elif not start and event_start < now():
             start = now()
         return start
+
+
+class ContactForm(Form):
+    from_email = EmailField(label='Your email address', required=True)
+    subject = CharField(required=True, max_length=128)
+    message = CharField(widget=Textarea, required=True)
