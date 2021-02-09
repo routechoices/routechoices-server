@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.forms import HiddenInput
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
+from allauth.account.models import EmailAddress
 
 from routechoices.core.models import (
     Club,
@@ -287,4 +289,9 @@ def contact(request):
             return redirect('site:contact_email_sent_view')
     else:
         form = ContactForm()
+    if request.user.is_authenticated:
+        form.fields['from_email'].initial = EmailAddress.objects.get_primary(
+            request.user
+        )
+        form.fields['from_email'].widget = HiddenInput()
     return render(request, "site/contact.html", {'form': form})
