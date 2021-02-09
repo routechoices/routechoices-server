@@ -269,9 +269,7 @@ def event_route_upload_view(request, club_slug, slug):
 
 
 def contact(request):
-    if request.method == 'GET':
-        form = ContactForm()
-    else:
+    if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
             subject = (
@@ -287,4 +285,6 @@ def contact(request):
                 [settings.DEFAULT_FROM_EMAIL]
             )
             return redirect('site:contact_email_sent_view')
+    else:
+        form = ContactForm()
     return render(request, "site/contact.html", {'form': form})
