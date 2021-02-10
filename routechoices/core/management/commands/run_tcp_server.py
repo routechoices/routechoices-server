@@ -155,13 +155,14 @@ class TMT250Connection():
             print('error decoding packet')
             await self.stream.write(self.decoder.generate_response(False))
         else:
+            loc_array = []
             for r in decoded.get('records', []):
-                self.db_device.add_location(
-                    r['latlon'][0],
-                    r['latlon'][1],
-                    r['timestamp'],
-                    save=False
-                )
+                loc_array.append({
+                    'timestamp': r['timestamp'],
+                    'latitude': r['latlon'][0],
+                    'longitude': r['latlon'][1],
+                })
+            self.db_device.add_locations(loc_array, save=False)
             await sync_to_async(self.db_device.save, thread_sensitive=True)()
             self.waiting_for_content = True
 

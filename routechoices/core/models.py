@@ -435,13 +435,45 @@ class Device(models.Model):
             lat = float(lat)
         if isinstance(lon, Decimal):
             lon = float(lon)
-        if ts not in locs['timestamps']:
+        all_ts = set(locs['timestamps'])
+        if ts not in all_ts:
             locs['timestamps'].append(ts)
             locs['latitudes'].append(lat)
             locs['longitudes'].append(lon)
             self.locations = locs
             if save:
                 self.save()
+
+    def add_locations(self, loc_array, save=True):
+        new_ts = []
+        new_lat = []
+        new_lon = []
+        locs = self.locations
+        all_ts = set(locs['timestamps'])
+        for loc in loc_array:
+            ts = int(loc['timestamp'])
+            lat = loc['latitude']
+            lon = loc['longitude']
+            if ts in all_ts:
+                continue
+            try:
+                validate_latitude(lat)
+                validate_longitude(lon)
+            except Exception:
+                continue
+            if isinstance(lat, Decimal):
+                lat = float(lat)
+            if isinstance(lon, Decimal):
+                lon = float(lon)
+            new_ts.append(ts)
+            new_lat.append(lat)
+            new_lon.append(lon)
+        locs['timestamps'] += new_ts
+        locs['latitudes'] += new_lat
+        locs['longitudes'] += new_lon
+        self.locations = locs
+        if save:
+            self.save()
 
     @property
     def location_count(self):

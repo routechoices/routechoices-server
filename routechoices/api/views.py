@@ -225,7 +225,7 @@ def garmin_api_gw(request):
     times = request.data.get('timestamps', '').split(',')
     if len(lats) != len(lons) != len(times):
         raise ValidationError('Data error')
-
+    loc_array = []
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
             try:
@@ -236,9 +236,13 @@ def garmin_api_gw(request):
                 continue
             if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
                 continue
-            device.add_location(lat, lon, tim, save=False)
-    if len(times) > 0:
-        device.save()
+            loc_array.append({
+                'timestamp': tim,
+                'latitude': lat,
+                'longitude': lon,
+            })
+    if len(loc_array) > 0:
+        device.add_locations(loc_array)
     return Response({'status': 'ok'})
 
 
@@ -254,18 +258,18 @@ def pwa_api_gw(request):
     if not raw_data:
         raise ValidationError('Missing raw_data argument')
     locations = GeoLocationSeries(raw_data)
+    loc_array = []
     for location in locations:
         dtime = abs(time.time() - int(location.timestamp))
         if dtime > API_LOCATION_TIMESTAMP_MAX_AGE:
             continue
-        device.add_location(
-            location.coordinates.latitude,
-            location.coordinates.longitude,
-            int(location.timestamp),
-            save=False
-        )
-    if len(locations) > 0:
-        device.save()
+        loc_array.append({
+            'timestamp': int(location.timestamp),
+            'latitude': location.coordinates.latitude,
+            'longitude': location.coordinates.longitude,
+        })
+    if len(loc_array) > 0:
+        device.add_locations(loc_array)
     return Response({'status': 'ok', 'n': len(locations)})
 
 

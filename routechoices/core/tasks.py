@@ -100,6 +100,7 @@ def decode_track_line(device, data, min_date=None, max_date=None):
         min_date = t
     if max_date is None or t > max_date:
         max_date = t
+    loc_array = []
     for p in data[1:]:
         if len(p) < 3:
             continue
@@ -128,18 +129,16 @@ def decode_track_line(device, data, min_date=None, max_date=None):
             'lon': ((prev_loc['lon'] * 50000) + dlng) / 50000,
             'datetime': t,
         }
-
-        device.add_location(
-            prev_loc['lat'],
-            prev_loc['lon'],
-            t.timestamp(),
-            False
-        )
-
+        loc_array.append({
+            'timestamp': t.timestamp(),
+            'latitude': prev_loc['lat'],
+            'longitude': prev_loc['lon'],
+        })
         if t < min_date:
             min_date = t
         if t > max_date:
             max_date = t
+    device.add_locations(loc_array, False)
     return min_date, max_date
 
 
@@ -313,6 +312,7 @@ def import_single_event_from_loggator(event_id):
             event.save()
 
     device_map = {}
+    loc_array_map = {}
     r = requests.get(event_data['tracks'])
     if r.status_code == 200:
         tracks_raw = r.json()['data']
@@ -324,12 +324,12 @@ def import_single_event_from_loggator(event_id):
                     aid=short_random_key() + '_LOG',
                     is_gpx=True,
                 )
-            device_map[int(d[0])].add_location(
-                float(d[1]),
-                float(d[2]),
-                arrow.get(int(d[4])).datetime.timestamp(),
-                False
-            )
+                loc_array_map[int(d[0])] = []
+            loc_array_map[int(d[0])].append({
+                'timestamp': arrow.get(int(d[4])).datetime.timestamp(),
+                'latitude': float(d[1]),
+                'longitude': float(d[2]),
+            })
 
     for c_data in event_data['competitors']:
         Competitor.objects.create(
@@ -341,5 +341,5 @@ def import_single_event_from_loggator(event_id):
         )
         dev = device_map.get(c_data['device_id'])
         if dev:
-            dev.save()
+            dev.add_locations(loc_array_map.get(c_data['device_id']))
     return event
