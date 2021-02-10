@@ -14,6 +14,10 @@ from routechoices.core.models import (
     MapAssignation,
 )
 
+NO_LOCATIONS_LENGTH = len(
+    '{"timestamps": [], "latitudes": [], "longitudes": []}'
+)
+
 
 class HasLocationFilter(admin.SimpleListFilter):
     title = 'Wether It Has Locations'
@@ -28,11 +32,11 @@ class HasLocationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'has_no_locations':
             return queryset.filter(
-                locations_raw_length=53
+                locations_raw_length__lte=NO_LOCATIONS_LENGTH
             )
         elif self.value():
             return queryset.filter(
-                locations_raw_length__gt=53
+                locations_raw_length__gt=NO_LOCATIONS_LENGTH
             )
 
 
