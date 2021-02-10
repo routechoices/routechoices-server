@@ -292,6 +292,6 @@ def contact(request):
     if request.user.is_authenticated:
         form.fields['from_email'].initial = EmailAddress.objects.get_primary(
             request.user
-        )
+        ).email
         form.fields['from_email'].widget = HiddenInput()
     return render(request, "site/contact.html", {'form': form})
