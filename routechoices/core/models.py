@@ -1,7 +1,7 @@
 import arrow
 import base64
 import datetime
-import json
+import orjson as json
 import hashlib
 import re
 import time
@@ -415,7 +415,7 @@ class Device(models.Model):
 
     @locations.setter
     def locations(self, locs):
-        self.locations_raw = json.dumps(locs)
+        self.locations_raw = str(json.dumps(locs), 'utf-8')
 
     def add_location(self, lat, lon, timestamp=None, save=True):
         try:
