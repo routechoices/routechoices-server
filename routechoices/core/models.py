@@ -268,6 +268,12 @@ class Event(models.Model):
         null=True,
         blank=True,
     )
+    map_title = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text='Leave blank if you are not using extra maps',
+    )
     extra_maps = models.ManyToManyField(
         Map,
         through='MapAssignation',
@@ -378,7 +384,7 @@ class MapAssignation(models.Model):
     title = models.CharField(max_length=255)
 
     class Meta:
-        unique_together = (('map', 'event'), )
+        unique_together = (('map', 'event'), ('event', 'title'))
         ordering = ['id']
 
 

@@ -68,7 +68,8 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = ['club', 'name', 'slug', 'privacy', 'open_registration',
-                  'allow_route_upload', 'start_date', 'end_date', 'map']
+                  'allow_route_upload', 'start_date', 'end_date', 'map',
+                  'map_title']
         widgets = {
             'start_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
             'end_date': DateTimeInput(attrs={'class': 'datetimepicker'})
@@ -107,9 +108,18 @@ class ExtraMapForm(ModelForm):
             raise ValidationError('Map must be from the organizing club')
         if not self.data.get('map'):
             raise ValidationError(
-                'Extra maps can be set only if the map field is set first'
+                'Extra maps can be set only if the main map field is set first'
             )
         return rmap
+
+    def clean_title(self):
+        map_title = self.cleaned_data.get('title')
+        main_map_title = self.data.get('map_title')
+        if main_map_title and main_map_title == map_title:
+            raise ValidationError(
+                'Extra maps title can not be same as main map title'
+            )
+        return map_title
 
 
 class CompetitorForm(ModelForm):

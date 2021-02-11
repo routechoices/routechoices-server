@@ -387,7 +387,7 @@ $(function() {
         stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
       })
     {% endfor %}
-    var extraMapLayer = {'<i class="fa fa-star"></i> Main Map': rasterMap};
+    var extraMapLayer = {'{% if event.map_title %}{{ event.map_title|escapejs }}{% else %}<i class="fa fa-star"></i> Main Map{% endif %}': rasterMap};
     for (var i=0; i < extraMaps.length; i++) {
       var m = extraMaps[i];
       extraMapLayer[m.title] = new L.ImageTransform(
