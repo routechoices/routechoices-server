@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASEDIR=$(dirname $DIR)
+PID_FILE=${BASEDIR}/var/tasks.pid
+
+cd $BASEDIR
+git pull
+source $BASEDIR/env/bin/activate
+pip install -U -r requirements.txt
+./manage.py collectstatic --noinput
+./manage.py migrate --noinput
+./bin/reload
+./bin/restart_tornado
+./bin/restart_task_queue
