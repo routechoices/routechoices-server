@@ -39,6 +39,8 @@ jobs:
           ssh root@routechoices.com
           sudo -u apps /usr/bin/bash
           /apps/routechoices.com/bin/deploy
+          exit
+          logout
     - store_artifacts:
         path: cypress/videos
     - store_artifacts:
