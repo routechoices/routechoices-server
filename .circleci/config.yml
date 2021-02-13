@@ -33,6 +33,12 @@ jobs:
           ~/.yarn/bin/yarn add cypress-file-upload
           ~/.yarn/bin/yarn cypress install
           ~/.yarn/bin/yarn cypress run
+    - run:
+        name: Deploy
+        command: |
+          ssh root@routechoices.com
+          sudo -u apps /usr/bin/bash
+          /apps/routechoices.com/bin/deploy
     - store_artifacts:
         path: cypress/videos
     - store_artifacts:
