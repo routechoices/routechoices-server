@@ -10,6 +10,7 @@ from django.forms import (
     ModelForm,
     EmailField,
     Textarea,
+    BooleanField
 )
 from django.urls import reverse
 from django.utils.timezone import now
@@ -74,3 +75,12 @@ class ContactForm(Form):
     from_email = EmailField(label='Your email address', required=True)
     subject = CharField(required=True, max_length=128)
     message = CharField(widget=Textarea, required=True)
+    spam_filter = BooleanField(
+        label='Leave this box unchecked to prove you are human',
+        required=False
+    )
+
+    def clean_spam_filter(self):
+        if self.cleaned_data['spam_filter']:
+            raise ValidationError('You must prove you are human')
+        return self.cleaned_data['spam_filter']
