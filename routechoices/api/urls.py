@@ -18,6 +18,16 @@ urlpatterns = [
     url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
     url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
     url(
+        r'^events/?$',
+        views.event_list,
+        name='event_list'
+    ),
+    url(
+        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/?$',
+        views.event_detail,
+        name='event_detail'
+    ),
+    url(
         r'^events/(?P<aid>[0-9a-zA-Z_-]+)/map/?$',
         views.event_map_download,
         name='event_map_download'

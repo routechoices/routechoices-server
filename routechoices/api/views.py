@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
 from routechoices.core.models import (
@@ -21,6 +22,7 @@ from routechoices.core.models import (
     Competitor,
     ImeiDevice,
     PRIVACY_PRIVATE,
+    PRIVACY_PUBLIC,
 )
 from routechoices.lib.helper import short_random_key
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
@@ -90,6 +92,88 @@ def serve_from_s3(bucket, request, path, filename='',
 @api_view(['GET'])
 def api_root(request):
     return Response()
+
+
+@api_view(['GET'])
+def event_list(request):
+    events = Event.objects.filter(
+        privacy=PRIVACY_PUBLIC
+    ).select_related('club')
+    output = []
+    for event in events:
+        output.append({
+            "name": event.name,
+            "id": event.aid,
+            "start_date": event.start_date,
+            "end_date": (event.end_date if event.end_date else None),
+            "slug": event.slug,
+            "club": event.club.name,
+            "club_slug": event.club.slug,
+            "url": request.build_absolute_uri(event.get_absolute_url()),
+        })
+    return Response(output)
+
+
+@api_view(['GET'])
+def event_detail(request, aid):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            'club', 'notice'
+        ).prefetch_related(
+            'competitors',
+            'extra_maps',
+            'map_assignations'
+        ),
+        aid=aid,
+        start_date__lt=now()
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    output = {
+        'event': {
+            "name": event.name,
+            "id": event.aid,
+            "start_date": event.start_date,
+            "end_date": (event.end_date if event.end_date else None),
+            "slug": event.slug,
+            "club": event.club.name,
+            "club_slug": event.club.slug,
+            "url": request.build_absolute_uri(event.get_absolute_url()),
+        },
+        'competitors': [],
+        'data': request.build_absolute_uri(
+            reverse('api:event_data', kwargs={'aid': event.aid})
+        ),
+        'announcement': event.notice.text,
+        'extra_maps': [],
+    }
+    for c in event.competitors.all():
+        output['competitors'].append({
+            'id': c.aid,
+            'name': c.name,
+            'short_name': c.short_name,
+            'start_time': c.start_time,
+        })
+    for i, m in enumerate(event.map_assignations.all()):
+        output['extra_maps'].append({
+            'title': m.title,
+            'coordinates': m.map.bound,
+            'url': request.build_absolute_uri(reverse(
+                'api:event_extra_map_download',
+                kwargs={'aid': event.aid, 'index': (i+1)}
+            )),
+        })
+    output['map'] = {
+        'coordinates': event.map.bound,
+        'url': request.build_absolute_uri(
+            reverse('api:event_map_download', kwargs={'aid': event.aid})
+        ),
+        'title': event.map_title,
+    }
+
+    return Response(output)
 
 
 @cache_page(15)

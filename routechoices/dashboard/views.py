@@ -254,7 +254,9 @@ def map_list_view(request):
         club_list = Club.objects\
             .filter(admins=request.user)\
             .values_list('id', flat=True)
-        map_list = Map.objects.filter(club_id__in=club_list).select_related('club')
+        map_list = Map.objects.filter(
+            club_id__in=club_list
+        ).select_related('club')
 
     paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')

@@ -218,6 +218,16 @@ class Map(models.Model):
         h.update(self.corners_coordinates.encode('utf-8'))
         return base64.b64encode(h.digest()).decode('utf-8')
 
+    @property
+    def bound(self):
+        coords = self.corners_coordinates.split(',')
+        return {
+            'topLeft': {'lat': coords[0], 'lon': coords[1]},
+            'topRight': {'lat': coords[2], 'lon': coords[3]},
+            'bottomRight': {'lat': coords[4], 'lon': coords[5]},
+            'botttomLeft': {'lat': coords[6], 'lon': coords[7]},
+        }
+
 
 PRIVACY_PUBLIC = 'public'
 PRIVACY_SECRET = 'secret'
@@ -368,6 +378,9 @@ class Notice(models.Model):
         blank=True,
         help_text='This will be displayed on the event page.',
     )
+
+    def __str__(self):
+        return self.text
 
 
 class MapAssignation(models.Model):
