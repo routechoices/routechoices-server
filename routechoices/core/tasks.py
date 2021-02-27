@@ -326,7 +326,7 @@ def import_single_event_from_loggator(event_id):
                 )
                 loc_array_map[int(d[0])] = []
             loc_array_map[int(d[0])].append({
-                'timestamp': arrow.get(int(d[4])).datetime.timestamp(),
+                'timestamp': arrow.get(int(d[4])).timestamp(),
                 'latitude': float(d[1]),
                 'longitude': float(d[2]),
             })
