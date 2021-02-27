@@ -208,7 +208,7 @@ def event_data(request, aid):
         'competitors': results,
         'nb_points': nb_points,
         'duration': (time.time()-t0),
-        'timestamp': arrow.utcnow().int_timestamp,
+        'timestamp': arrow.utcnow().timestamp(),
     })
 
 
