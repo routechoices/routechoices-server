@@ -171,7 +171,7 @@ def event_detail(request, aid):
             reverse('api:event_map_download', kwargs={'aid': event.aid})
         ),
         'title': event.map_title,
-    }
+    } if event.map else None
 
     return Response(output)
 
