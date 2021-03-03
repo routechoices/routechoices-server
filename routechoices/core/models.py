@@ -28,7 +28,7 @@ from routechoices.lib.validators import (
      validate_corners_coordinates,
      validate_imei,
 )
-from routechoices.lib.helper import random_key, short_random_key
+from routechoices.lib.helper import random_key, short_random_key, short_random_slug
 from routechoices.lib.storages import OverwriteImageStorage
 import logging
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class Club(models.Model):
         max_length=50,
         validators=[validate_nice_slug, ],
         unique=True,
-        help_text='This will be used in the urls'
+        help_text='This is used in the urls of your events'
     )
     admins = models.ManyToManyField(User)
 
@@ -258,18 +258,19 @@ class Event(models.Model):
         max_length=50,
         validators=[validate_nice_slug, ],
         db_index=True,
-        help_text='This will be used in the url'
+        help_text='This is used to build the url of this event',
+        default=short_random_slug,
     )
     start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
     end_date = models.DateTimeField(
         verbose_name='End Date (UTC)',
         null=True,
-        blank=True
+        blank=True,
     )
     privacy = models.CharField(
         max_length=8,
         choices=PRIVACY_CHOICES,
-        default=PRIVACY_PUBLIC
+        default=PRIVACY_PUBLIC,
     )
     map = models.ForeignKey(
         Map,

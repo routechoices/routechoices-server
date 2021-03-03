@@ -32,6 +32,11 @@ def short_random_key():
     return generate_random_string(alphabet, 6)
 
 
+def short_random_slug():
+    alphabet = '23456789abcdefghijkmnopqrstuvwxyz-_'
+    return generate_random_string(alphabet, 6)
+
+
 def get_country_from_coords(lat, lon):
     api_url = "http://api.geonames.org/countryCode"
     values = {

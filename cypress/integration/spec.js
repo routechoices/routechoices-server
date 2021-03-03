@@ -25,7 +25,7 @@ context('Cypress tests', () => {
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg')
-      cy.get('#id_slug').type('Jukola-2019-1st-leg')
+      cy.get('#id_slug').clear().type('Jukola-2019-1st-leg')
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
 
@@ -41,7 +41,7 @@ context('Cypress tests', () => {
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg (2)')
-      cy.get('#id_slug').type('Jukola-2019-1st-leg-2')
+      cy.get('#id_slug').clear().type('Jukola-2019-1st-leg-2')
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_end_date').type('2019-06-16 00:00:00{enter}')
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
@@ -62,7 +62,7 @@ context('Cypress tests', () => {
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg (2)')
-      cy.get('#id_slug').type('Jukola-2019-1st-leg-2')
+      cy.get('#id_slug').clear().type('Jukola-2019-1st-leg-2')
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_end_date').type('2019-06-14 00:00:00{enter}')
       cy.get('#id_map_assignations-0-map').select('Jukola 2019 - 1st Leg (Halden SK)')
