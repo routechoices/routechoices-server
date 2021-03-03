@@ -377,7 +377,7 @@ class Notice(models.Model):
     text = models.CharField(
         max_length=280,
         blank=True,
-        help_text='This will be displayed on the event page.',
+        help_text='Optional text that will be displayed on the event page',
     )
 
     def __str__(self):
