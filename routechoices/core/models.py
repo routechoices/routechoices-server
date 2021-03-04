@@ -640,21 +640,19 @@ class Competitor(models.Model):
         return self.start_time > now()
 
     @cached_property
-    def next_device_competitor(self):
-        from_date = self.event.start_date
-        if self.start_time:
-            from_date = self.start_time
-        return self.device.competitor_set.filter(
-            start_time__gt=from_date
-        ).order_by('start_time').first(), from_date
-
-    @cached_property
     def locations(self):
         if self.device:
             qs = self.device.locations
         else:
             return []
-        next_competitor, from_date = self.next_device_competitor
+
+        from_date = self.event.start_date
+        if self.start_time:
+            from_date = self.start_time
+        next_competitor = self.device.competitor_set.filter(
+            start_time__gt=from_date
+        ).order_by('start_time').first()
+
         end_date = now()
         if next_competitor:
             end_date = min(
@@ -680,9 +678,10 @@ class Competitor(models.Model):
         ]
         return locs
 
-    def encode_data(self, locs):
+    @property
+    def encoded_data(self):
         data = []
-        for loc in locs:
+        for loc in self.locations:
             data.append(
                 GeoLocation(
                     loc['timestamp'],

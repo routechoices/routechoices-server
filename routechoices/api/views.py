@@ -199,7 +199,7 @@ def event_data(request, aid):
         nb_points += len(locations)
         results.append({
             'id': c.aid,
-            'encoded_data': c.encode_data(locations),
+            'encoded_data': c.encoded_data,
             'name': c.name,
             'short_name': c.short_name,
             'start_time': c.start_time,
