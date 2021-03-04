@@ -18,6 +18,7 @@ from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
@@ -638,19 +639,22 @@ class Competitor(models.Model):
     def started(self):
         return self.start_time > now()
 
-    @property
+    @cached_property
+    def next_device_competitor(self):
+        from_date = self.event.start_date
+        if self.start_time:
+            from_date = self.start_time
+        return self.device.competitor_set.filter(
+            start_time__gt=from_date
+        ).order_by('start_time').first(), from_date
+
+    @cached_property
     def locations(self):
         if self.device:
             qs = self.device.locations
         else:
             return []
-        from_date = self.event.start_date
-        if self.start_time:
-            from_date = self.start_time
-        next_competitor = self.device.competitor_set.filter(
-            start_time__gt=from_date
-        ).order_by('start_time').first()
-
+        next_competitor, from_date = self.next_device_competitor
         end_date = now()
         if next_competitor:
             end_date = min(
