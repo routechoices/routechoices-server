@@ -10,6 +10,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
@@ -17,12 +18,14 @@ from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
 from routechoices.core.models import (
-    Event,
-    Device,
+    Club,
     Competitor,
+    Device,
+    Event,
     ImeiDevice,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
+    PRIVACY_SECRET,
 )
 from routechoices.lib.helper import short_random_key
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
@@ -96,9 +99,32 @@ def api_root(request):
 
 @api_view(['GET'])
 def event_list(request):
-    events = Event.objects.filter(
-        privacy=PRIVACY_PUBLIC
-    ).select_related('club')
+    club_slug = request.GET.get('club')
+    event_slug = request.GET.get('event')
+    if event_slug and club_slug:
+        privacy_arg = {
+            'privacy__in': [PRIVACY_PUBLIC, PRIVACY_SECRET]
+        }
+    else:
+        privacy_arg = {
+            'privacy': PRIVACY_PUBLIC
+        }
+
+    if request.user.is_authenticated:
+        clubs = Club.objects.filter(admins=request.user)
+        events = Event.objects.filter(
+            Q(**privacy_arg) | Q(club__in=clubs)
+        ).select_related('club')
+    else:
+        events = Event.objects.filter(
+            **privacy_arg
+        ).select_related('club')
+
+    if club_slug:
+        events = events.filter(club__slug__iexact=club_slug)
+        if event_slug:
+            events = events.filter(slug__iexact=event_slug)
+
     output = []
     for event in events:
         output.append({
