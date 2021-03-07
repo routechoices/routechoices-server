@@ -310,21 +310,20 @@ def traccar_api_gw(request):
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
-
     try:
         lat = float(lat)
         lon = float(lon)
         tim = int(float(tim))
     except ValueError:
         logger.debug('Wrong data format')
-        return Response({
+        raise ValidationError({
             'status': 'error',
             'message': 'Invalid data format'
         })
 
     if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
         logger.debug('Too old position')
-        return ValidationError({
+        raise ValidationError({
             'status': 'error',
             'message': 'Position too old to add from API'
         })
@@ -338,7 +337,7 @@ def traccar_api_gw(request):
         logger.debug('No lon')
     if not tim:
         logger.debug('No timestamp')
-    return Response({
+    raise ValidationError({
         'status': 'error',
         'message': 'Missing lat, lon, or time'
     })
