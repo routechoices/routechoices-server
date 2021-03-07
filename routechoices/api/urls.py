@@ -1,9 +1,35 @@
 from django.conf.urls import url
 
+from rest_framework import permissions
+
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 from routechoices.api import views
 
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Routechoices.com API",
+      default_version='v1',
+      description="Routechoices.com API",
+      terms_of_service="https://www.routechoices.com/tos/",
+      contact=openapi.Contact(email="admin@routechoices.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+)
+
+
 urlpatterns = [
-    url(r'^$', views.api_root, name='api_root'),
+    url(r'^$',
+        schema_view.with_ui(
+            'redoc',
+            cache_timeout=0
+        ),
+        name='api_doc'
+    ),
     url(r'^device_id/?$', views.get_device_id, name='device_id_api'),
     url(r'^imei/?$', views.get_device_for_imei, name='device_imei_api'),
     url(
@@ -23,37 +49,37 @@ urlpatterns = [
         name='event_list'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/?$',
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$',
         views.event_detail,
         name='event_detail'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/map/?$',
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/?$',
         views.event_map_download,
         name='event_map_download'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/extra_map/(?P<index>\d+)?$',
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/extra_map/(?P<map_index>[1-9]\d*)?$',
         views.event_extra_map_download,
         name='event_extra_map_download'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/data/?$',
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/data/?$',
         views.event_data,
         name='event_data'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/map_details/?$',
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_details/?$',
         views.event_map_details,
         name='event_map_details'
     ),
     url(
-        r'^events/(?P<aid>[0-9a-zA-Z_-]+)/notice/?$',
-        views.event_notice,
-        name='event_notice'
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/announcement/?$',
+        views.event_announcement,
+        name='event_announcement'
     ),
     url(
-        r'^competitor/(?P<aid>[0-9a-zA-Z_-]+)/gpx$',
+        r'^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx$',
         views.competitor_gpx_download,
         name='competitor_gpx_download'
     ),

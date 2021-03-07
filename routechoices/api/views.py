@@ -17,6 +17,9 @@ from django.utils.timezone import now
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from routechoices.core.models import (
     Club,
     Competitor,
@@ -92,11 +95,25 @@ def serve_from_s3(bucket, request, path, filename='',
     return response
 
 
-@api_view(['GET'])
-def api_root(request):
-    return Response()
+club_param = openapi.Parameter(
+    'club',
+    openapi.IN_QUERY,
+    description="filter with this club slug",
+    type=openapi.TYPE_STRING
+)
+event_param = openapi.Parameter(
+    'event',
+    openapi.IN_QUERY,
+    description="filter with this event slug",
+    type=openapi.TYPE_STRING
+)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description='list events',
+    manual_parameters=[club_param, event_param]
+)
 @api_view(['GET'])
 def event_list(request):
     club_slug = request.GET.get('club')
@@ -122,8 +139,8 @@ def event_list(request):
 
     if club_slug:
         events = events.filter(club__slug__iexact=club_slug)
-        if event_slug:
-            events = events.filter(slug__iexact=event_slug)
+    if event_slug:
+        events = events.filter(slug__iexact=event_slug)
 
     output = []
     for event in events:
@@ -141,7 +158,7 @@ def event_list(request):
 
 
 @api_view(['GET'])
-def event_detail(request, aid):
+def event_detail(request, event_id):
     event = get_object_or_404(
         Event.objects.select_related(
             'club', 'notice'
@@ -150,7 +167,7 @@ def event_detail(request, aid):
             'extra_maps',
             'map_assignations'
         ),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
@@ -170,7 +187,7 @@ def event_detail(request, aid):
         },
         'competitors': [],
         'data': request.build_absolute_uri(
-            reverse('api:event_data', kwargs={'aid': event.aid})
+            reverse('api:event_data', kwargs={'event_id': event.aid})
         ),
         'announcement': event.notice.text,
         'extra_maps': [],
@@ -188,13 +205,13 @@ def event_detail(request, aid):
             'coordinates': m.map.bound,
             'url': request.build_absolute_uri(reverse(
                 'api:event_extra_map_download',
-                kwargs={'aid': event.aid, 'index': (i+1)}
+                kwargs={'event_id': event.aid, 'map_index': (i+1)}
             )),
         })
     output['map'] = {
         'coordinates': event.map.bound,
         'url': request.build_absolute_uri(
-            reverse('api:event_map_download', kwargs={'aid': event.aid})
+            reverse('api:event_map_download', kwargs={'event_id': event.aid})
         ),
         'title': event.map_title,
     } if event.map else None
@@ -204,11 +221,11 @@ def event_detail(request, aid):
 
 @cache_page(15)
 @api_view(['GET'])
-def event_data(request, aid):
+def event_data(request, event_id):
     t0 = time.time()
     event = get_object_or_404(
         Event.objects.select_related('club').prefetch_related('competitors'),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
@@ -238,11 +255,15 @@ def event_data(request, aid):
     })
 
 
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
 @api_view(['GET'])
-def event_map_details(request, aid):
+def event_map_details(request, event_id):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
@@ -264,10 +285,10 @@ def event_map_details(request, aid):
 
 
 @api_view(['GET'])
-def event_notice(request, aid):
+def event_announcement(request, event_id):
     event = get_object_or_404(
         Event.objects.all().select_related('notice'),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
     if event.has_notice:
@@ -278,7 +299,7 @@ def event_notice(request, aid):
     return Response({})
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
@@ -303,7 +324,7 @@ def traccar_api_gw(request):
 
     if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
         logger.debug('Too old position')
-        return Response({
+        return ValidationError({
             'status': 'error',
             'message': 'Position too old to add from API'
         })
@@ -396,6 +417,10 @@ class DataRenderer(renderers.BaseRenderer):
 GPS_SEURANTA_URL_RE = r'^https?://(gps|www)\.tulospalvelu\.fi/gps/(.*)$'
 
 
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
 @api_view(['GET'])
 @renderer_classes((DataRenderer, ))
 def gps_seuranta_proxy(request):
@@ -457,14 +482,16 @@ def device_search(request):
     if q and len(q) > 2:
         devices = Device.objects.filter(aid__startswith=q, is_gpx=False) \
             .values_list('id', 'aid')[:10]
-    return Response({'results': [{'id': d[0], 'aid': d[1]} for d in devices]})
+    return Response({
+        'results': [{'id': d[0], 'device_id': d[1]} for d in devices]
+    })
 
 
 @api_view(['GET'])
-def event_map_download(request, aid):
+def event_map_download(request, event_id):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
     if not event.map:
@@ -490,19 +517,19 @@ def event_map_download(request, aid):
 
 
 @api_view(['GET'])
-def event_extra_map_download(request, aid, index):
+def event_extra_map_download(request, event_id, map_index):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
-        aid=aid,
+        aid=event_id,
         start_date__lt=now()
     )
-    if event.extra_maps.all().count() < int(index) or int(index) == 0:
+    if event.extra_maps.all().count() < int(map_index) or int(map_index) == 0:
         raise NotFound()
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    raster_map = event.extra_maps.all()[int(index)-1]
+    raster_map = event.extra_maps.all()[int(map_index)-1]
     file_path = raster_map.path
     mime_type = raster_map.mime_type
     return serve_from_s3(
@@ -519,10 +546,10 @@ def event_extra_map_download(request, aid, index):
 
 
 @api_view(['GET'])
-def competitor_gpx_download(request, aid):
+def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
         Competitor.objects.all().select_related('event', 'event__club'),
-        aid=aid,
+        aid=competitor_id,
         start_time__lt=now()
     )
     event = competitor.event

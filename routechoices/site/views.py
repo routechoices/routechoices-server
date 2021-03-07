@@ -124,7 +124,7 @@ def event_map_view(request, club_slug, slug):
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect('api:event_map_download', aid=event.aid)
+    return redirect('api:event_map_download', event_id=event.aid)
 
 
 def event_extra_map_view(request, club_slug, slug, index):
@@ -133,7 +133,11 @@ def event_extra_map_view(request, club_slug, slug, index):
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect('api:event_extra_map_download', aid=event.aid, index=index)
+    return redirect(
+        'api:event_extra_map_download',
+        event_id=event.aid,
+        map_index=index
+    )
 
 
 def event_registration_view(request, club_slug, slug):

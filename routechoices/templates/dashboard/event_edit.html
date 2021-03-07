@@ -156,8 +156,8 @@ Selectize.define('preserve_on_blur', function(options) {
 function selectizeDeviceInput(){
     $("select[name$='device']").selectize({
         valueField: 'id',
-        labelField: 'aid',
-        searchField: 'aid',
+        labelField: 'device_id',
+        searchField: 'device_id',
         multiple: true,
         create: false,
         plugins: [ 'preserve_on_blur' ],

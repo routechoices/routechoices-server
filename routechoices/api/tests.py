@@ -22,10 +22,9 @@ class ApiTestCase(APITestCase):
         return res.data.get('device_id')
 
     def test_api_root(self):
-        url = self.reverse_and_check('api:api_root', '/api/')
+        url = self.reverse_and_check('api:api_doc', '/api/')
         res = self.client.get(url)
         self.assertEquals(res.status_code, status.HTTP_200_OK)
-        self.assertEquals(res.data, None)
 
     def test_get_time(self):
         url = self.reverse_and_check('api:time_api', '/api/time')

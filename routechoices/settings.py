@@ -59,8 +59,8 @@ INSTALLED_APPS = [
     'background_task',
     'bootstrap3',
     'admincommand',
-
     'rest_framework',
+    'drf_yasg',
 
     'django_s3_storage',
 
@@ -172,6 +172,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     )
 }
 

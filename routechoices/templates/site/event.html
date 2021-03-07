@@ -13,7 +13,7 @@
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}" />
 <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
 {% if event.started and event.map %}
-<meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% url 'api:event_map_download' aid=event.aid %}" />
+<meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% url 'api:event_map_download' event_id=event.aid %}" />
 {% else %}
 <meta property="og:image" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% endif %}
@@ -368,11 +368,11 @@ $(function() {
   }, 1e3);
   {% else %}
   isLiveEvent = {% if event.is_live %}true{% else %}false{% endif %};
-  liveUrl = '{% url 'api:event_data' aid=event.aid %}';
-  mapDetailsUrl = '{% url 'api:event_map_details' aid=event.aid %}';
+  liveUrl = '{% url 'api:event_data' event_id=event.aid %}';
+  mapDetailsUrl = '{% url 'api:event_map_details' event_id=event.aid %}';
   mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
-  mapUrl = '{% url 'api:event_map_download' aid=event.aid %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
-  noticeUrl = '{% url 'api:event_notice' aid=event.aid %}';
+  mapUrl = '{% url 'api:event_map_download' event_id=event.aid %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
+  noticeUrl = '{% url 'api:event_announcement' event_id=event.aid %}';
   {% if event.map %}
   var stemp = '{{ event.map.corners_coordinates }}'.split(',');
   addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);
@@ -383,7 +383,7 @@ $(function() {
       extraMaps.push({
         title:'{{e_map.title|escapejs}}',
         hash: '{{e_map.map.hash}}',
-        url: '{% url 'api:event_extra_map_download' aid=event.aid index=forloop.counter %}?map_hash={{e_map.map.hash}}',
+        url: '{% url 'api:event_extra_map_download' event_id=event.aid map_index=forloop.counter %}?map_hash={{e_map.map.hash}}',
         stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
       })
     {% endfor %}

@@ -713,6 +713,6 @@ class Competitor(models.Model):
         return reverse(
             'api:competitor_gpx_download',
             kwargs={
-                'aid': self.aid,
+                'competitor_id': self.aid,
             }
         )

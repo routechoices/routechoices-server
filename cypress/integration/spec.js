@@ -31,8 +31,12 @@ context('Cypress tests', () => {
 
       cy.get("input[value='Submit']").click()
       cy.url().should('match', /\/dashboard\/event$/)
-      cy.visit('/halden-sk/Jukola-2019-1st-leg')
 
+      cy.intercept('GET', /^\/api\/events\/[0-9a-zA-Z_-]+\/data/).as('eventData');
+      cy.visit('/halden-sk/Jukola-2019-1st-leg')
+      cy.wait('@eventData').then(({ request, response }) => {
+        expect(response.statusCode).to.eq(200);
+      });
       // Create Event with all fields info
       cy.visit('/dashboard/event')
       cy.url().should('match', /\/dashboard\/event$/)
