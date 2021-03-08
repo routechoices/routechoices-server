@@ -528,6 +528,11 @@ def event_create_view(request):
             notice = notice_form.save(commit=False)
             notice.event = event
             notice.save()
+            if request.POST.get('save_continue'):
+                return redirect(
+                    'dashboard:event_edit_view',
+                    id=event.aid
+                )
             return redirect('dashboard:event_list_view')
         else:
             devices = Device.objects.none()
@@ -615,6 +620,11 @@ def event_edit_view(request, id):
                     notice = event.notice
                 notice.text = notice_form.cleaned_data['text']
                 notice.save()
+            if request.POST.get('save_continue'):
+                return redirect(
+                    'dashboard:event_edit_view',
+                    id=event.aid
+                )
             return redirect('dashboard:event_list_view')
         else:
             dev_qs = Device.objects.filter(

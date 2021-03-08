@@ -29,7 +29,11 @@ from routechoices.lib.validators import (
      validate_corners_coordinates,
      validate_imei,
 )
-from routechoices.lib.helper import random_key, short_random_key, short_random_slug
+from routechoices.lib.helper import (
+    random_key,
+    short_random_key,
+    short_random_slug
+)
 from routechoices.lib.storages import OverwriteImageStorage
 import logging
 logger = logging.getLogger(__name__)
