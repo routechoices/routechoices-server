@@ -29,7 +29,7 @@ context('Cypress tests', () => {
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
 
-      cy.get("input[value='Submit']").click()
+      cy.get("input[value='Save']").click()
       cy.url().should('match', /\/dashboard\/event$/)
 
       cy.intercept('GET', /^\/api\/events\/[0-9a-zA-Z_-]+\/data/).as('eventData');
@@ -49,12 +49,17 @@ context('Cypress tests', () => {
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_end_date').type('2019-06-16 00:00:00{enter}')
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
-      cy.get('#id_competitors-0-device-selectized').type(devId).blur()
+      cy.get('#id_competitors-0-device-selectized').type(devId).wait(1000)
       cy.get('#id_competitors-0-name').type('Mats Haldin')
       cy.get('#id_competitors-0-short_name').type('Halden')
       cy.get('#id_competitors-0-start_time').type('2019-06-15 20:00:10{enter}')
-      
-      cy.get("input[value='Submit']").click()
+
+      cy.intercept('POST', '/dashboard/event/new').as('eventSubmit');
+      cy.get("input[value='Save']").click()
+      cy.wait('@eventSubmit').then(({ request, response }) => {
+        expect(response.statusCode).to.eq(302);
+        expect(request.body).to.contain('&competitors-0-device=1&');
+      });
       cy.url().should('match', /\/dashboard\/event$/)
       cy.visit('/halden-sk/Jukola-2019-1st-leg-2')
 
@@ -70,9 +75,9 @@ context('Cypress tests', () => {
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
       cy.get('#id_end_date').type('2019-06-14 00:00:00{enter}')
       cy.get('#id_map_assignations-0-map').select('Jukola 2019 - 1st Leg (Halden SK)')
-      cy.get('#id_competitors-0-device-selectized').type(devId).blur()
+      cy.get('#id_competitors-0-device-selectized').type(devId).wait(1000)
       cy.get('#id_competitors-0-start_time').type('2019-06-16 20:00:10{enter}')
-      cy.get("input[value='Submit']").click()
+      cy.get("input[value='Save']").click()
       cy.url().should('match', /\/dashboard\/event\/new$/)
       cy.contains('Start Date must be before End Date')
       cy.contains('Event with this Club and Slug already exists.')
