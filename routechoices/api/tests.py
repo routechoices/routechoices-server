@@ -85,7 +85,7 @@ class ApiTestCase(APITestCase):
         res = self.client.post(
             url,
             {
-                'id': dev_id,
+                'device_id': dev_id,
                 'raw_data': str(gps_encoded)
             }
         )

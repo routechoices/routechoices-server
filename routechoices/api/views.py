@@ -98,13 +98,13 @@ def serve_from_s3(bucket, request, path, filename='',
 club_param = openapi.Parameter(
     'club',
     openapi.IN_QUERY,
-    description="filter with this club slug",
+    description='filter with this club slug',
     type=openapi.TYPE_STRING
 )
 event_param = openapi.Parameter(
     'event',
     openapi.IN_QUERY,
-    description="filter with this event slug",
+    description='filter with this event slug',
     type=openapi.TYPE_STRING
 )
 
@@ -147,16 +147,16 @@ def event_list(request):
     output = []
     for event in events:
         output.append({
-            "id": event.aid,
-            "name": event.name,
-            "start_date": event.start_date,
-            "end_date": (event.end_date if event.end_date else None),
-            "slug": event.slug,
-            "club": event.club.name,
-            "club_slug": event.club.slug,
-            "open_registration": event.open_registration,
-            "open_route_upload": event.allow_route_upload,
-            "url": request.build_absolute_uri(event.get_absolute_url()),
+            'id': event.aid,
+            'name': event.name,
+            'start_date': event.start_date,
+            'end_date': (event.end_date if event.end_date else None),
+            'slug': event.slug,
+            'club': event.club.name,
+            'club_slug': event.club.slug,
+            'open_registration': event.open_registration,
+            'open_route_upload': event.allow_route_upload,
+            'url': request.build_absolute_uri(event.get_absolute_url()),
         })
     return Response(output)
 
@@ -186,16 +186,16 @@ def event_detail(request, event_id):
             raise PermissionDenied()
     output = {
         'event': {
-            "id": event.aid,
-            "name": event.name,
-            "start_date": event.start_date,
-            "end_date": (event.end_date if event.end_date else None),
-            "slug": event.slug,
-            "club": event.club.name,
-            "club_slug": event.club.slug,
-            "open_registration": event.open_registration,
-            "open_route_upload": event.allow_route_upload,
-            "url": request.build_absolute_uri(event.get_absolute_url()),
+            'id': event.aid,
+            'name': event.name,
+            'start_date': event.start_date,
+            'end_date': (event.end_date if event.end_date else None),
+            'slug': event.slug,
+            'club': event.club.name,
+            'club_slug': event.club.slug,
+            'open_registration': event.open_registration,
+            'open_route_upload': event.allow_route_upload,
+            'url': request.build_absolute_uri(event.get_absolute_url()),
         },
         'competitors': [],
         'data': request.build_absolute_uri(
@@ -236,16 +236,56 @@ def event_detail(request, event_id):
     operation_id='event_register',
     operation_description='register a competitor to a given event',
     tags=['events'],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'device_id': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='device id',
+            ),
+            'name': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='full name',
+            ),
+            'short_name': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='short version of the name displayed on the map',
+            ),
+            'start_time': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='start time, must be with the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)',
+            ),
+        },
+        required=['device_id', 'name'],
+    ),
+    responses={
+        '201': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'id': '<id>',
+                    'device_id': '<device_id>',
+                    'name': '<name>',
+                    'short_name': '<short_name>',
+                    'start_time': '<start_time>',
+                }
+            }
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def event_register(request, event_id):
     event = get_object_or_404(
         Event.objects.select_related(
-            'club', 'notice'
-        ).prefetch_related(
-            'competitors',
-            'extra_maps',
-            'map_assignations'
+            'club'
         ),
         aid=event_id
     )
@@ -297,7 +337,7 @@ def event_register(request, event_id):
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
-    })
+    }, status=status.HTTP_201_CREATED)
 
 
 @swagger_auto_schema(
@@ -392,53 +432,64 @@ def event_announcement(request, event_id):
     return Response({})
 
 
-device_id_traccar_param = openapi.Parameter(
-    'id',
-    openapi.IN_QUERY,
-    description="your device id",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-lat_traccar_param = openapi.Parameter(
-    'lat',
-    openapi.IN_QUERY,
-    description="a single location latitudes (in degrees)",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-lon_traccar_param = openapi.Parameter(
-    'lon',
-    openapi.IN_QUERY,
-    description="a single location longitude (in degrees)",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-ts_traccar_param = openapi.Parameter(
-    'timestamp',
-    openapi.IN_QUERY,
-    description="a single location timestamp (UNIX epoch in seconds)",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-
-
 @swagger_auto_schema(
     method='post',
     operation_id='traccar_gateway',
     operation_description='gateway for posting data from traccar application',
     tags=['post locations'],
     manual_parameters=[
-        device_id_traccar_param,
-        lat_traccar_param,
-        lon_traccar_param,
-        ts_traccar_param
-    ]
+        openapi.Parameter(
+            'id',
+            openapi.IN_QUERY,
+            description='your device id',
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'lat',
+            openapi.IN_QUERY,
+            description='a single location latitudes (in degrees)',
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'lon',
+            openapi.IN_QUERY,
+            description='a single location longitude (in degrees)',
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'timestamp',
+            openapi.IN_QUERY,
+            description='a single location timestamp (UNIX epoch in seconds)',
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'status': 'ok',
+                }
+            }
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
-        logger.debug('No traccar_id')
         raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
     devices = Device.objects.filter(aid=device_id)
@@ -461,10 +512,7 @@ def traccar_api_gw(request):
 
     if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
         logger.debug('Too old position')
-        raise ValidationError({
-            'status': 'error',
-            'message': 'Position too old to add from API'
-        })
+        raise ValidationError('Position too old to add from API')
 
     if lat and lon and tim:
         device.add_location(lat, lon, tim)
@@ -475,10 +523,7 @@ def traccar_api_gw(request):
         logger.debug('No lon')
     if not tim:
         logger.debug('No timestamp')
-    raise ValidationError({
-        'status': 'error',
-        'message': 'Missing lat, lon, or time'
-    })
+    raise ValidationError('Missing lat, lon, or time')
 
 
 @swagger_auto_schema(
@@ -491,7 +536,7 @@ def traccar_api_gw(request):
         properties={
             'device_id': openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="your device id",
+                description='your device id',
             ),
             'latitudes': openapi.Schema(
                 type=openapi.TYPE_STRING,
@@ -509,19 +554,20 @@ def traccar_api_gw(request):
         required=['device_id', 'latitudes', 'longitudes', 'timestamps'],
     ),
     responses={
-        "200": openapi.Response(
-            description="Success response",
+        '200': openapi.Response(
+            description='Success response',
             examples={
-                "application/json": {
-                    "status": "ok",
+                'application/json': {
+                    'status': 'ok',
+                    'n': '<number of locations posted>',
                 }
             }
         ),
-        "400": openapi.Response(
-            description="Validation Error",
+        '400': openapi.Response(
+            description='Validation Error',
             examples={
-                "application/json": [
-                    "<Error Message>"
+                'application/json': [
+                    '<error message>'
                 ]
             }
         ),
@@ -531,8 +577,7 @@ def traccar_api_gw(request):
 def garmin_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
-        logger.debug('No device_id')
-        raise ValidationError('Use Garmin App from Connect IQ store')
+        raise ValidationError('Missing device_id parameter')
     devices = Device.objects.filter(aid=device_id)
     if devices.count() == 0:
         raise ValidationError('No such device ID')
@@ -560,23 +605,7 @@ def garmin_api_gw(request):
             })
     if len(loc_array) > 0:
         device.add_locations(loc_array)
-    return Response({'status': 'ok'})
-
-
-device_id_pwa_param = openapi.Parameter(
-    'id',
-    openapi.IN_QUERY,
-    description="your device id",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-rawdata_pwa_param = openapi.Parameter(
-    'raw_data',
-    openapi.IN_QUERY,
-    description="a list of locations within last 10 minutes encoded according to our propriatery format",
-    type=openapi.TYPE_STRING,
-    required=True
-)
+    return Response({'status': 'ok', 'n': len(loc_array)})
 
 
 @swagger_auto_schema(
@@ -584,14 +613,46 @@ rawdata_pwa_param = openapi.Parameter(
     operation_id='pwa_gateway',
     operation_description='gateway for posting data from the pwa application',
     tags=['post locations'],
-    manual_parameters=[device_id_pwa_param, rawdata_pwa_param]
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'device_id': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='your device id',
+            ),
+            'raw_data': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations within last 10 minutes encoded according to our propriatery format',
+            ),
+        },
+        required=['device_id', 'raw_data'],
+    ),
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'status': 'ok',
+                    'n': '<number of locations posted>'
+                }
+            }
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def pwa_api_gw(request):
-    device_id = request.data.get('id')
+    device_id = request.data.get('device_id')
     if not device_id:
         raise ValidationError(
-            'Use the official Routechoices.com Tracker web app'
+            'Missing device_id parameter'
         )
     devices = Device.objects.filter(aid=device_id)
     if devices.count() == 0:
@@ -648,20 +709,22 @@ def gps_seuranta_proxy(request):
     operation_id='create_device_id',
     operation_description='create a device id',
     tags=['device'],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'status': 'ok',
+                    'device_id': '<device_id>',
+                }
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def get_device_id(request):
     device = Device.objects.create()
-    return Response({'device_id': device.aid})
-
-
-imei = openapi.Parameter(
-    'imei',
-    openapi.IN_QUERY,
-    description="your gps tracking device IMEI",
-    type=openapi.TYPE_STRING,
-    required=True
-)
+    return Response({'status': 'ok', 'device_id': device.aid})
 
 
 @swagger_auto_schema(
@@ -669,7 +732,36 @@ imei = openapi.Parameter(
     operation_id='create_imei_device_id',
     operation_description='create a device id for a specific imei',
     tags=['device'],
-    manual_parameters=[imei]
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'imei': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='your gps tracking device IMEI',
+            ),
+        },
+        required=['imei'],
+    ),
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'status': 'ok',
+                    'imei': '<IMEI>',
+                    'device_id': '<device_id>',
+                }
+            }
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def get_device_for_imei(request):
@@ -688,7 +780,11 @@ def get_device_for_imei(request):
         d.save()
         idevice = ImeiDevice(imei=imei, device=d)
         idevice.save()
-    return Response({'device_id': idevice.device.aid})
+    return Response({
+        'status': 'ok',
+        'device_id': d.aid,
+        'imei': imei
+    })
 
 
 @swagger_auto_schema(
@@ -705,7 +801,7 @@ def get_time(request):
 query_username_param = openapi.Parameter(
     'q',
     openapi.IN_QUERY,
-    description="a string containing the part of a username (min 3 characters)",
+    description='a string containing the part of a username (min 3 characters)',
     type=openapi.TYPE_STRING,
     required=True
 )
@@ -734,7 +830,7 @@ def user_search(request):
 query_device_id_param = openapi.Parameter(
     'q',
     openapi.IN_QUERY,
-    description="a string containing the begining of a device id (min 3 characters)",
+    description='a string containing the begining of a device id (min 3 characters)',
     type=openapi.TYPE_STRING,
     required=True
 )
