@@ -59,6 +59,11 @@ urlpatterns = [
         name='event_map_download'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/register/?$',
+        views.event_register,
+        name='event_register'
+    ),
+    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/extra_map/(?P<map_index>[1-9]\d*)?$',
         views.event_extra_map_download,
         name='event_extra_map_download'

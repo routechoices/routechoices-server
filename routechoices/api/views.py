@@ -30,7 +30,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
 )
-from routechoices.lib.helper import short_random_key
+from routechoices.lib.helper import short_random_key, initial_of_name
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
 from routechoices.lib.s3 import s3_object_url
@@ -232,6 +232,75 @@ def event_detail(request, event_id):
 
 
 @swagger_auto_schema(
+    method='post',
+    operation_id='event_register',
+    operation_description='register a competitor to a given event',
+    tags=['events'],
+)
+@api_view(['POST'])
+def event_register(request, event_id):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            'club', 'notice'
+        ).prefetch_related(
+            'competitors',
+            'extra_maps',
+            'map_assignations'
+        ),
+        aid=event_id
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    if not event.open_registration or event.end_date < now():
+        raise PermissionDenied()
+    device_id = request.data.get('device_id')
+    devices = Device.objects.filter(aid=device_id)
+    if devices.count() == 0:
+        raise ValidationError('No such device ID')
+    name = request.data.get('name')
+    if not name:
+        raise ValidationError('Property name is missing')
+    short_name = request.data.get('short_name')
+    if not short_name:
+        short_name = initial_of_name(name)
+    start_time = request.data.get('start_time')
+    if start_time:
+        try:
+            start_time = arrow.get(start_time).datetime
+        except Exception:
+            raise ValidationError('Property start_time could not be parsed')
+    elif event.start_date < now():
+        start_time = now()
+    else:
+        start_time = event.start_date
+    event_start = event.start_date
+    event_end = event.end_date
+    if start_time and (
+        (not event_end and event_start > start_time)
+            or (event_end and (event_start > start_time
+                               or start_time > event_end))):
+        raise ValidationError(
+            'Competitor start time should be during the event time'
+        )
+    comp = Competitor.objects.create(
+        name=name,
+        event=event,
+        short_name=short_name,
+        start_time=start_time,
+        device=devices.first(),
+    )
+    return Response({
+        'id': comp.aid,
+        'device_id': device_id,
+        'name': name,
+        'short_name': short_name,
+        'start_time': start_time,
+    })
+
+
+@swagger_auto_schema(
     method='get',
     operation_id='event_data',
     operation_description='read competitor data associated to an event',
@@ -372,7 +441,10 @@ def traccar_api_gw(request):
         logger.debug('No traccar_id')
         raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
-    device = get_object_or_404(Device, aid=device_id)
+    devices = Device.objects.filter(aid=device_id)
+    if devices.count() == 0:
+        raise ValidationError('No such device ID')
+    device = devices.first()
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
@@ -409,47 +481,51 @@ def traccar_api_gw(request):
     })
 
 
-device_id_garmin_param = openapi.Parameter(
-    'device_id',
-    openapi.IN_QUERY,
-    description="your device id",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-lat_garmin_param = openapi.Parameter(
-    'latitudes',
-    openapi.IN_QUERY,
-    description="a list of locations latitudes (in degrees) separated by commas",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-lon_garmin_param = openapi.Parameter(
-    'longitudes',
-    openapi.IN_QUERY,
-    description="a list of locations longitudes (in degrees) separated by commas",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-ts_garmin_param = openapi.Parameter(
-    'timestamps',
-    openapi.IN_QUERY,
-    description="a list of locations timestamps (UNIX epoch in seconds) separated by commas",
-    type=openapi.TYPE_STRING,
-    required=True
-)
-
-
 @swagger_auto_schema(
     method='post',
     operation_id='garmin_gateway',
     operation_description='gateway for posting data from garmin application, allows multiple locations at once',
     tags=['post locations'],
-    manual_parameters=[
-        device_id_garmin_param,
-        lat_garmin_param,
-        lon_garmin_param,
-        ts_garmin_param,
-    ]
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'device_id': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="your device id",
+            ),
+            'latitudes': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations latitudes (in degrees) separated by commas',
+            ),
+            'longitudes': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations longitudes (in degrees) separated by commas',
+            ),
+            'timestamps': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations timestamps (UNIX epoch in seconds) separated by commas',
+            ),
+        },
+        required=['device_id', 'latitudes', 'longitudes', 'timestamps'],
+    ),
+    responses={
+        "200": openapi.Response(
+            description="Success response",
+            examples={
+                "application/json": {
+                    "status": "ok",
+                }
+            }
+        ),
+        "400": openapi.Response(
+            description="Validation Error",
+            examples={
+                "application/json": [
+                    "<Error Message>"
+                ]
+            }
+        ),
+    }
 )
 @api_view(['POST'])
 def garmin_api_gw(request):
@@ -457,7 +533,10 @@ def garmin_api_gw(request):
     if not device_id:
         logger.debug('No device_id')
         raise ValidationError('Use Garmin App from Connect IQ store')
-    device = get_object_or_404(Device, aid=device_id)
+    devices = Device.objects.filter(aid=device_id)
+    if devices.count() == 0:
+        raise ValidationError('No such device ID')
+    device = devices.first()
     lats = request.data.get('latitudes', '').split(',')
     lons = request.data.get('longitudes', '').split(',')
     times = request.data.get('timestamps', '').split(',')
@@ -509,13 +588,16 @@ rawdata_pwa_param = openapi.Parameter(
 )
 @api_view(['POST'])
 def pwa_api_gw(request):
-    device_id = request.POST.get('id')
+    device_id = request.data.get('id')
     if not device_id:
         raise ValidationError(
             'Use the official Routechoices.com Tracker web app'
         )
-    device = get_object_or_404(Device, aid=device_id)
-    raw_data = request.POST.get('raw_data')
+    devices = Device.objects.filter(aid=device_id)
+    if devices.count() == 0:
+        raise ValidationError('No such device ID')
+    device = devices.first()
+    raw_data = request.data.get('raw_data')
     if not raw_data:
         raise ValidationError('Missing raw_data argument')
     locations = GeoLocationSeries(raw_data)
@@ -591,7 +673,7 @@ imei = openapi.Parameter(
 )
 @api_view(['POST'])
 def get_device_for_imei(request):
-    imei = request.POST.get('imei')
+    imei = request.data.get('imei')
     if not imei:
         raise ValidationError('No imei')
     try:
