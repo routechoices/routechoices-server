@@ -147,13 +147,15 @@ def event_list(request):
     output = []
     for event in events:
         output.append({
-            "name": event.name,
             "id": event.aid,
+            "name": event.name,
             "start_date": event.start_date,
             "end_date": (event.end_date if event.end_date else None),
             "slug": event.slug,
             "club": event.club.name,
             "club_slug": event.club.slug,
+            "open_registration": event.open_registration,
+            "open_route_upload": event.allow_route_upload,
             "url": request.build_absolute_uri(event.get_absolute_url()),
         })
     return Response(output)
@@ -184,13 +186,15 @@ def event_detail(request, event_id):
             raise PermissionDenied()
     output = {
         'event': {
-            "name": event.name,
             "id": event.aid,
+            "name": event.name,
             "start_date": event.start_date,
             "end_date": (event.end_date if event.end_date else None),
             "slug": event.slug,
             "club": event.club.name,
             "club_slug": event.club.slug,
+            "open_registration": event.open_registration,
+            "open_route_upload": event.allow_route_upload,
             "url": request.build_absolute_uri(event.get_absolute_url()),
         },
         'competitors': [],
