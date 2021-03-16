@@ -111,7 +111,9 @@ event_param = openapi.Parameter(
 
 @swagger_auto_schema(
     method='get',
+    operation_id='events_list',
     operation_description='list events',
+    tags=['events'],
     manual_parameters=[club_param, event_param]
 )
 @api_view(['GET'])
@@ -157,6 +159,12 @@ def event_list(request):
     return Response(output)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='event_detail',
+    operation_description='read an event detail',
+    tags=['events'],
+)
 @api_view(['GET'])
 def event_detail(request, event_id):
     event = get_object_or_404(
@@ -219,6 +227,12 @@ def event_detail(request, event_id):
     return Response(output)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='event_data',
+    operation_description='read competitor data associated to an event',
+    tags=['events'],
+)
 @cache_page(15)
 @api_view(['GET'])
 def event_data(request, event_id):
@@ -284,6 +298,12 @@ def event_map_details(request, event_id):
     })
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='event_announcement',
+    operation_description='read the announcement associated to an event',
+    tags=['events'],
+)
 @api_view(['GET'])
 def event_announcement(request, event_id):
     event = get_object_or_404(
@@ -299,6 +319,48 @@ def event_announcement(request, event_id):
     return Response({})
 
 
+device_id_traccar_param = openapi.Parameter(
+    'id',
+    openapi.IN_QUERY,
+    description="your device id",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+lat_traccar_param = openapi.Parameter(
+    'lat',
+    openapi.IN_QUERY,
+    description="a single location latitudes (in degrees)",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+lon_traccar_param = openapi.Parameter(
+    'lon',
+    openapi.IN_QUERY,
+    description="a single location longitude (in degrees)",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+ts_traccar_param = openapi.Parameter(
+    'timestamp',
+    openapi.IN_QUERY,
+    description="a single location timestamp (UNIX epoch in seconds)",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_id='traccar_gateway',
+    operation_description='gateway for posting data from traccar application',
+    tags=['post locations'],
+    manual_parameters=[
+        device_id_traccar_param,
+        lat_traccar_param,
+        lon_traccar_param,
+        ts_traccar_param
+    ]
+)
 @api_view(['POST'])
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
@@ -343,6 +405,48 @@ def traccar_api_gw(request):
     })
 
 
+device_id_garmin_param = openapi.Parameter(
+    'device_id',
+    openapi.IN_QUERY,
+    description="your device id",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+lat_garmin_param = openapi.Parameter(
+    'latitudes',
+    openapi.IN_QUERY,
+    description="a list of locations latitudes (in degrees) separated by commas",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+lon_garmin_param = openapi.Parameter(
+    'longitudes',
+    openapi.IN_QUERY,
+    description="a list of locations longitudes (in degrees) separated by commas",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+ts_garmin_param = openapi.Parameter(
+    'timestamps',
+    openapi.IN_QUERY,
+    description="a list of locations timestamps (UNIX epoch in seconds) separated by commas",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_id='garmin_gateway',
+    operation_description='gateway for posting data from garmin application, allows multiple locations at once',
+    tags=['post locations'],
+    manual_parameters=[
+        device_id_garmin_param,
+        lat_garmin_param,
+        lon_garmin_param,
+        ts_garmin_param,
+    ]
+)
 @api_view(['POST'])
 def garmin_api_gw(request):
     device_id = request.data.get('device_id')
@@ -376,6 +480,29 @@ def garmin_api_gw(request):
     return Response({'status': 'ok'})
 
 
+device_id_pwa_param = openapi.Parameter(
+    'id',
+    openapi.IN_QUERY,
+    description="your device id",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+rawdata_pwa_param = openapi.Parameter(
+    'raw_data',
+    openapi.IN_QUERY,
+    description="a list of locations within last 10 minutes encoded according to our propriatery format",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_id='pwa_gateway',
+    operation_description='gateway for posting data from the pwa application',
+    tags=['post locations'],
+    manual_parameters=[device_id_pwa_param, rawdata_pwa_param]
+)
 @api_view(['POST'])
 def pwa_api_gw(request):
     device_id = request.POST.get('id')
@@ -430,12 +557,34 @@ def gps_seuranta_proxy(request):
     return Response(response.content)
 
 
+@swagger_auto_schema(
+    method='post',
+    operation_id='create_device_id',
+    operation_description='create a device id',
+    tags=['device'],
+)
 @api_view(['POST'])
 def get_device_id(request):
     device = Device.objects.create()
     return Response({'device_id': device.aid})
 
 
+imei = openapi.Parameter(
+    'imei',
+    openapi.IN_QUERY,
+    description="your gps tracking device IMEI",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_id='create_imei_device_id',
+    operation_description='create a device id for a specific imei',
+    tags=['device'],
+    manual_parameters=[imei]
+)
 @api_view(['POST'])
 def get_device_for_imei(request):
     imei = request.POST.get('imei')
@@ -456,11 +605,33 @@ def get_device_for_imei(request):
     return Response({'device_id': idevice.device.aid})
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='server_time',
+    operation_description='read the server time',
+    tags=[],
+)
 @api_view(['GET'])
 def get_time(request):
     return Response({'time': time.time()})
 
 
+query_username_param = openapi.Parameter(
+    'q',
+    openapi.IN_QUERY,
+    description="a string containing the part of a username (min 3 characters)",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_id='user_search',
+    operation_description='search user by username',
+    tags=[],
+    manual_parameters=[query_username_param]
+)
 @api_view(['GET'])
 @login_required
 def user_search(request):
@@ -474,6 +645,22 @@ def user_search(request):
     })
 
 
+query_device_id_param = openapi.Parameter(
+    'q',
+    openapi.IN_QUERY,
+    description="a string containing the begining of a device id (min 3 characters)",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_id='device_search',
+    operation_description='search device by id',
+    tags=['device'],
+    manual_parameters=[query_device_id_param]
+)
 @api_view(['GET'])
 def device_search(request):
     devices = []
@@ -486,6 +673,12 @@ def device_search(request):
     })
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='event_map_download',
+    operation_description='download a map associated with an event',
+    tags=['events'],
+)
 @api_view(['GET'])
 def event_map_download(request, event_id):
     event = get_object_or_404(
@@ -515,6 +708,12 @@ def event_map_download(request, event_id):
     )
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='event_extra_map_download',
+    operation_description='download one of the extra maps associated with an event',
+    tags=['events'],
+)
 @api_view(['GET'])
 def event_extra_map_download(request, event_id, map_index):
     event = get_object_or_404(
@@ -544,6 +743,12 @@ def event_extra_map_download(request, event_id, map_index):
     )
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_id='competitor_gpx_download',
+    operation_description='download the gpx route of a competitor',
+    tags=[],
+)
 @api_view(['GET'])
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
