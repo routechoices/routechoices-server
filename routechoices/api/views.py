@@ -114,7 +114,41 @@ event_param = openapi.Parameter(
     operation_id='events_list',
     operation_description='list events',
     tags=['events'],
-    manual_parameters=[club_param, event_param]
+    manual_parameters=[club_param, event_param],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': [
+                    {
+                        "id": "PlCG3xFS-f4",
+                        "name": "Jukola 2019 - 1st Leg",
+                        "start_date": "2019-06-15T20:00:00Z",
+                        "end_date": None,
+                        "slug": "Jukola-2019-1st-leg",
+                        "club": "Kangasala SK",
+                        "club_slug": "ksk",
+                        "open_registration": False,
+                        "open_route_upload": False,
+                        "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg"
+                    },
+                    {
+                        "id": "ohFYzJep1hI",
+                        "name": "Jukola 2019 - 2nd Leg",
+                        "start_date": "2019-06-15T21:00:00Z",
+                        "end_date": "2019-06-16T00:00:00Z",
+                        "slug": "Jukola-2019-2nd-leg",
+                        "club": "Kangasala SK",
+                        "club_slug": "ksk",
+                        "open_registration": False,
+                        "open_route_upload": False,
+                        "url": "http://www.routechoices.com/ksk/Jukola-2019-2nd-leg"
+                    },
+                    '...'
+                ]
+            }
+        ),
+    }
 )
 @api_view(['GET'])
 def event_list(request):
@@ -166,6 +200,61 @@ def event_list(request):
     operation_id='event_detail',
     operation_description='read an event detail',
     tags=['events'],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    "event": {
+                        "id": "PlCG3xFS-f4",
+                        "name": "Jukola 2019 - 1st Leg",
+                        "start_date": "2019-06-15T20:00:00Z",
+                        "end_date": None,
+                        "slug": "Jukola-2019-1st-leg",
+                        "club": "Kangasala SK",
+                        "club_slug": "ksk",
+                        "open_registration": False,
+                        "open_route_upload": False,
+                        "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg"
+                    },
+                    "competitors": [
+                        {
+                            "id": "pwaCro4TErI",
+                            "name": "Olav Lundanes (Halden SK)",
+                            "short_name": "Halden SK",
+                            "start_time": "2019-06-15T20:00:00Z"
+                        },
+                        '...'
+                    ],
+                    "data": "http://www.routechoices.com/api/events/PlCG3xFS-f4/data",
+                    "announcement": "",
+                    "extra_maps": [],
+                    "map": {
+                        "coordinates": {
+                            "topLeft": {
+                                "lat": "61.45075",
+                                "lon": "24.18994"
+                            },
+                            "topRight": {
+                                "lat": "61.44656",
+                                "lon": "24.24721"
+                            },
+                            "bottomRight": {
+                                "lat": "61.42094",
+                                "lon": "24.23851"
+                            },
+                            "botttomLeft": {
+                                "lat": "61.42533",
+                                "lon": "24.18156"
+                            }
+                        },
+                        "url": "http://www.routechoices.com/api/events/PlCG3xFS-f4/map",
+                        "title": ""
+                    }
+                }
+            }
+        ),
+    }
 )
 @api_view(['GET'])
 def event_detail(request, event_id):
@@ -345,6 +434,27 @@ def event_register(request, event_id):
     operation_id='event_data',
     operation_description='read competitor data associated to an event',
     tags=['events'],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    "competitors": [
+                        {
+                            "id": "pwaCro4TErI",
+                            "encoded_data": "<encoded data>",
+                            "name": "Olav Lundanes (Halden SK)",
+                            "short_name": "Halden SK",
+                            "start_time": "2019-06-15T20:00:00Z"
+                        }
+                    ],
+                    "nb_points": 0,
+                    "duration": 0.009621381759643555,
+                    "timestamp": 1615986763.638066
+                }
+            }
+        ),
+    }
 )
 @cache_page(15)
 @api_view(['GET'])
@@ -416,6 +526,17 @@ def event_map_details(request, event_id):
     operation_id='event_announcement',
     operation_description='read the announcement associated to an event',
     tags=['events'],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    "updated": "2021-03-08T08:10:08.795905Z",
+                    "text": "Mass start at 9pm"
+                }
+            }
+        ),
+    }
 )
 @api_view(['GET'])
 def event_announcement(request, event_id):
@@ -792,27 +913,25 @@ def get_device_for_imei(request):
     operation_id='server_time',
     operation_description='read the server time',
     tags=[],
+    responses={
+        '200': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    "time": 1615987017.7934635
+                }
+            }
+        ),
+    }
 )
 @api_view(['GET'])
 def get_time(request):
     return Response({'time': time.time()})
 
 
-query_username_param = openapi.Parameter(
-    'q',
-    openapi.IN_QUERY,
-    description='a string containing the part of a username (min 3 characters)',
-    type=openapi.TYPE_STRING,
-    required=True
-)
-
-
 @swagger_auto_schema(
     method='get',
-    operation_id='user_search',
-    operation_description='search user by username',
-    tags=[],
-    manual_parameters=[query_username_param]
+    auto_schema=None,
 )
 @api_view(['GET'])
 @login_required
@@ -827,21 +946,9 @@ def user_search(request):
     })
 
 
-query_device_id_param = openapi.Parameter(
-    'q',
-    openapi.IN_QUERY,
-    description='a string containing the begining of a device id (min 3 characters)',
-    type=openapi.TYPE_STRING,
-    required=True
-)
-
-
 @swagger_auto_schema(
     method='get',
-    operation_id='device_search',
-    operation_description='search device by id',
-    tags=['device'],
-    manual_parameters=[query_device_id_param]
+    auto_schema=None,
 )
 @api_view(['GET'])
 def device_search(request):
@@ -857,9 +964,7 @@ def device_search(request):
 
 @swagger_auto_schema(
     method='get',
-    operation_id='event_map_download',
-    operation_description='download a map associated with an event',
-    tags=['events'],
+    auto_schema=None,
 )
 @api_view(['GET'])
 def event_map_download(request, event_id):
@@ -892,9 +997,7 @@ def event_map_download(request, event_id):
 
 @swagger_auto_schema(
     method='get',
-    operation_id='event_extra_map_download',
-    operation_description='download one of the extra maps associated with an event',
-    tags=['events'],
+    auto_schema=None,
 )
 @api_view(['GET'])
 def event_extra_map_download(request, event_id, map_index):
@@ -927,9 +1030,7 @@ def event_extra_map_download(request, event_id, map_index):
 
 @swagger_auto_schema(
     method='get',
-    operation_id='competitor_gpx_download',
-    operation_description='download the gpx route of a competitor',
-    tags=[],
+    auto_schema=None,
 )
 @api_view(['GET'])
 def competitor_gpx_download(request, competitor_id):
