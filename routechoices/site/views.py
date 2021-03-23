@@ -20,6 +20,7 @@ from routechoices.core.models import (
     PRIVACY_PRIVATE,
 )
 from routechoices.lib.helper import initial_of_name
+from routechoices.lib.pseudo_base64 import PseudoInt
 from routechoices.site.forms import CompetitorForm, ContactForm, UploadGPXForm
 
 
@@ -30,6 +31,16 @@ def home_view(request):
         request,
         'site/home.html',
     )
+
+
+def event_shortcut(request, pseudo_id):
+    p = PseudoInt('-')
+    try:
+        ev_id = p.decode(pseudo_id)
+    except Exception:
+        raise Http404()
+    event = get_object_or_404(Event, pk=int(ev_id))
+    return redirect(event.get_absolute_url())
 
 
 def tracker_view(request):

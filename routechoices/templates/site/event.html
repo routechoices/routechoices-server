@@ -253,6 +253,21 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/event-2021020600.js' %}"></script>
 <script>
+
+L.Control.Watermark = L.Control.extend({
+  onAdd: function(map) {
+    var img = L.DomUtil.create('img');
+    img.src = 'https://chart.googleapis.com/chart?cht=qr&chs=100x100&chl=https://routechoic.es/{{ event.shortcut }}';
+    img.style.width = '100px';
+    return img;
+  },
+  onRemove: function(map) {
+  }
+});
+L.control.watermark = function(opts) {
+  return new L.Control.Watermark(opts);
+}
+
 $(function() {
   $('.page-alerts').hide();
 
@@ -367,6 +382,7 @@ $(function() {
     }
   }, 1e3);
   {% else %}
+  L.control.watermark({ position: 'bottomleft' }).addTo(map);
   isLiveEvent = {% if event.is_live %}true{% else %}false{% endif %};
   liveUrl = '{% url 'api:event_data' event_id=event.aid %}';
   mapDetailsUrl = '{% url 'api:event_map_details' event_id=event.aid %}';
