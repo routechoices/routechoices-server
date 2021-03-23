@@ -1,6 +1,7 @@
 import gpxpy
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -30,6 +31,12 @@ def home_view(request):
         request,
         'site/home.html',
     )
+
+
+def event_shortcut(request, event_id):
+    event = get_object_or_404(Event, aid=event_id)
+    site = Site.objects.get(id=settings.SITE_ID)
+    return redirect('http' + ('s' if request.is_secure() else '') + '://' + site.domain + event.get_absolute_url())
 
 
 def tracker_view(request):

@@ -34,6 +34,7 @@ from routechoices.lib.helper import (
     short_random_key,
     short_random_slug
 )
+from routechoices.lib.pseudo_base64 import PseudoInt
 from routechoices.lib.storages import OverwriteImageStorage
 import logging
 logger = logging.getLogger(__name__)
@@ -334,6 +335,11 @@ class Event(models.Model):
                 'slug': self.slug
             }
         )
+
+    @property
+    def shortcut(self):
+        p = PseudoInt('-')
+        return p.encode(self.id)
 
     @property
     def hidden(self):

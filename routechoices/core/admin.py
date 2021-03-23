@@ -113,6 +113,7 @@ class EventAdmin(admin.ModelAdmin):
         'privacy',
         'club',
         'start_date',
+        'shortcut',
     )
     list_filter = ('club', 'privacy')
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]

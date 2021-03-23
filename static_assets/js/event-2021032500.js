@@ -79,6 +79,7 @@ var noticeUrl = null;
 var prevNotice = new Date(0);
 var resetMassStartContextMenuItem = null;
 var setMassStartContextMenuItem = null;
+var qrUrl = null
 
 var onStart = function(){
   if(isLiveEvent){
@@ -368,6 +369,8 @@ var displayOptions = function() {
         '<div class="form-group">' +
         '<label for="tailLengthInput">Length in seconds</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
+        '<h4>QR Link</h4>' +
+        '<img src="' + qrUrl + '" alt="qr">' +
         '</div>'
       )
     );
