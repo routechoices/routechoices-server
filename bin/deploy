@@ -5,7 +5,8 @@ BASEDIR=$(dirname $DIR)
 PID_FILE=${BASEDIR}/var/tasks.pid
 
 cd $BASEDIR
-git pull
+git fetch
+git reset origin/master --hard
 source $BASEDIR/env/bin/activate
 pip install -U -r requirements.txt
 ./manage.py collectstatic --noinput
