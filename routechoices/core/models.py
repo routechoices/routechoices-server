@@ -12,6 +12,8 @@ import gpxpy
 import gpxpy.gpx
 import pytz
 from PIL import Image
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
@@ -338,8 +340,9 @@ class Event(models.Model):
 
     @property
     def shortcut(self):
-        p = PseudoInt('-')
-        return p.encode(self.id)
+        if hasattr(settings, 'SHORTCUT_BASE_URL'):
+            return settings.SHORTCUT_BASE_URL + self.aid
+        return None
 
     @property
     def hidden(self):
