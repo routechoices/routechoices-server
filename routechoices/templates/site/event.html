@@ -215,6 +215,10 @@ and (max-device-width : 500px) {
           <a href="#" role="button" class="btn btn-sm btn-default" id="play_pause_button"><i class="fa fa-play"></i></a>
           <a href="#" role="button" class="btn btn-sm btn-default" id="next_button"><i class="fa fa-forward"></i></a>
         </div>
+
+        <div class="btn-group pull-right" id="share_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-default" id="share_button"><i class="fa fa-share-alt"></i></a>
+        </div>
         
       </div>
       <div style="padding-top:5px;">
@@ -253,6 +257,24 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/event-2021032500.js' %}"></script>
 <script>
+if (!navigator.canShare) {
+  console.log('d')
+  $('#share_button').hide();
+}
+
+function shareUrl (e) {
+  e.preventDefault();
+  const shareData = {
+    title: '{{ event.name|escapejs }}',
+    text: 'Live GPS Tracking of {{ event.name|escapejs }} by {{ event.club.name|escapejs }} on {{ site.name|escapejs }}',
+    url: {% if event.shortcut %}'{{ event.shortcut }}'{% else %}window.location{% endif %}
+  }
+  try {
+    navigator.share(shareData).then(function () {});
+  } catch(err) {
+  }
+};
+
 $(function() {
   $('.page-alerts').hide();
 
@@ -336,6 +358,8 @@ $(function() {
   map.on('dblclick', onPressCustomMassStart)
 
   $('#full_progress_bar').on('click', pressProgressBar)
+
+  $('#share_button').on('click', shareUrl)
 
   var thumb = document.querySelector('#full_progress_bar');
   thumb.onmousedown = function(event) {
