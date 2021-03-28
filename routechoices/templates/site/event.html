@@ -152,6 +152,10 @@ and (max-device-width : 500px) {
     border-radius: 0;
     margin-bottom: 0;
 }
+
+#share_button {
+  margin-left: 5px;
+}
 </style>
 {% endblock %}
 
@@ -258,8 +262,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/event-2021032600.js' %}"></script>
 <script>
 if (!navigator.canShare) {
-  console.log('d')
-  $('#share_button').hide();
+  $('#share_buttons').hide();
 }
 
 function shareUrl (e) {
