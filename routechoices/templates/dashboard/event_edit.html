@@ -251,6 +251,7 @@ $(function(){
         Papa.parse($('#csv_input')[0].files[0], {complete: onCsvParsed});
     })
     $('.datetimepicker').each(function(idx, el){
+        $(el).attr("autocomplete", "off");
         showLocalTime(el);
         $(el).on('dp.change', function(e) {
             showLocalTime(e.target);
