@@ -273,7 +273,7 @@ function shareUrl (e) {
     url: {% if event.shortcut %}'{{ event.shortcut }}'{% else %}window.location{% endif %}
   }
   try {
-    navigator.share(shareData).then(function () {});
+    navigator.share(shareData).then(function () {}).catch(function () {});
   } catch(err) {
   }
 };
