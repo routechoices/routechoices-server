@@ -29,7 +29,7 @@ jobs:
           nvm install v10 && nvm use v10 && nvm alias default v10
           node -v
           curl -o- -L https://yarnpkg.com/install.sh | bash
-          ~/.yarn/bin/yarn add cypress
+          ~/.yarn/bin/yarn add cypress@6
           ~/.yarn/bin/yarn add cypress-file-upload
           ~/.yarn/bin/yarn cypress install
           ~/.yarn/bin/yarn cypress run
