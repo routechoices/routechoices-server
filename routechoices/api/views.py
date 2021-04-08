@@ -20,6 +20,8 @@ from django.views.decorators.cache import cache_page
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from ratelimit.decorators import ratelimit
+
 from routechoices.core.models import (
     Club,
     Competitor,
@@ -553,6 +555,10 @@ def event_announcement(request, event_id):
     return Response({})
 
 
+def traccar_ratelimit_key(group, request):
+    return request.META['REMOTE_ADDR'] + request.query_params.get('id', '')
+
+
 @swagger_auto_schema(
     method='post',
     operation_id='traccar_gateway',
@@ -608,6 +614,7 @@ def event_announcement(request, event_id):
     }
 )
 @api_view(['POST'])
+@ratelimit(key=traccar_ratelimit_key, rate='70/m')
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
@@ -645,6 +652,10 @@ def traccar_api_gw(request):
     if not tim:
         logger.debug('No timestamp')
     raise ValidationError('Missing lat, lon, or time')
+
+
+def garmin_ratelimit_key(group, request):
+    return request.META['REMOTE_ADDR'] + request.data.get('device_id', '')
 
 
 @swagger_auto_schema(
@@ -695,6 +706,7 @@ def traccar_api_gw(request):
     }
 )
 @api_view(['POST'])
+@ratelimit(key=garmin_ratelimit_key, rate='70/m')
 def garmin_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
@@ -769,6 +781,7 @@ def garmin_api_gw(request):
     }
 )
 @api_view(['POST'])
+@ratelimit(key=garmin_ratelimit_key, rate='70/m')
 def pwa_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
@@ -843,6 +856,7 @@ def gps_seuranta_proxy(request):
     }
 )
 @api_view(['POST'])
+@ratelimit(key='ip', rate='10/m')
 def get_device_id(request):
     device = Device.objects.create()
     return Response({'status': 'ok', 'device_id': device.aid})
@@ -885,6 +899,7 @@ def get_device_id(request):
     }
 )
 @api_view(['POST'])
+@ratelimit(key='ip', rate='60/m')
 def get_device_for_imei(request):
     imei = request.data.get('imei')
     if not imei:
