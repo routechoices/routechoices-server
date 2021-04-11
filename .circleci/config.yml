@@ -21,15 +21,15 @@ jobs:
     - run: ./dc restart web
     - run: sudo apt install libgbm-dev-lts-utopic
     - run:
-        name: Install Node.js 10 and run cypress
+        name: Install Node.js 12 and run cypress
         # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
         command: |
           export NVM_DIR="/opt/circleci/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          nvm install v10 && nvm use v10 && nvm alias default v10
+          nvm install v12 && nvm use v12 && nvm alias default v12
           node -v
           curl -o- -L https://yarnpkg.com/install.sh | bash
-          ~/.yarn/bin/yarn add cypress@6
+          ~/.yarn/bin/yarn add cypress
           ~/.yarn/bin/yarn add cypress-file-upload
           ~/.yarn/bin/yarn cypress install
           ~/.yarn/bin/yarn cypress run
