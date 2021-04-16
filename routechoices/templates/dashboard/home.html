@@ -82,7 +82,10 @@
     $('.datetimepicker').map(function(i, el) {
       var options = {
           useCurrent: false,
-          format: 'YYYY-MM-DD HH:mm:ss'
+          format: 'YYYY-MM-DD HH:mm:ss',
+          locale:  moment.locale('en', {
+            week: { dow: 1 }
+          }),
       }
       $el = $(el);
       if($el.val()) {

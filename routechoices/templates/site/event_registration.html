@@ -35,7 +35,10 @@
     $('.datetimepicker').map(function(i, el) {
       var options = {
           useCurrent: false,
-          format: 'YYYY-MM-DDTHH:mm:00Z'
+          format: 'YYYY-MM-DDTHH:mm:00Z',
+          locale:  moment.locale('en', {
+            week: { dow: 1 }
+          }),
       }
       $el = $(el);
       if($el.val()) {
