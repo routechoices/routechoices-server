@@ -267,7 +267,7 @@ if (!navigator.canShare) {
 
 function shareUrl (e) {
   e.preventDefault();
-  const shareData = {
+  var shareData = {
     title: '{{ event.name|escapejs }}',
     text: 'Live GPS Tracking of {{ event.name|escapejs }} by {{ event.club.name|escapejs }} on {{ site.name|escapejs }}',
     url: {% if event.shortcut %}'{{ event.shortcut }}'{% else %}window.location{% endif %}
