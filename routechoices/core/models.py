@@ -196,6 +196,35 @@ class Map(models.Model):
         else:
             raise ValueError('Not a base 64 encoded data URI of an image')
 
+    @property
+    def thumbnail(self):
+        orig = self.image.open('rb').read()
+        img = Image.open(BytesIO(orig))
+        if img.mode != 'RGBA':
+            img = img.convert('RGB')
+        img = img.transform(
+            (1200, 630),
+            Image.QUAD,
+            (
+                int(self.width) / 2 - 300,
+                int(self.height) / 2 - 158,
+                int(self.width) / 2 - 300,
+                int(self.height) / 2 + 157,
+                int(self.width) / 2 + 300,
+                int(self.height) / 2 + 157,
+                int(self.width) / 2 + 300,
+                int(self.height) / 2 - 158
+            )
+        )
+        img_out = Image.new(
+            'RGB',
+            img.size,
+            (255, 255, 255, 0)
+        )
+        img_out.paste(img, (0, 0))
+        img.close()
+        return img_out
+
     def strip_exif(self):
         if self.image.closed:
             self.image.open()

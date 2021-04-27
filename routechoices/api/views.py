@@ -3,7 +3,6 @@ import os.path
 import re
 import time
 import urllib.parse
-
 import arrow
 import requests
 
@@ -1008,6 +1007,25 @@ def event_map_download(request, event_id):
         ),
         mime=mime_type
     )
+
+
+@api_view(['GET'])
+def event_map_thumb_download(request, event_id):
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=event_id,
+        start_date__lt=now()
+    )
+    if not event.map:
+        raise NotFound()
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    raster_map = event.map
+    response = HttpResponse(content_type='image/jpeg')
+    raster_map.thumbnail.save(response, 'JPEG', quality=80)
+    return response
 
 
 @swagger_auto_schema(
