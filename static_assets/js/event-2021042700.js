@@ -1,5 +1,3 @@
-
-  
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
     if (this === null) {
       throw new TypeError('Array.prototype.findIndex called on null or undefined');
@@ -561,17 +559,36 @@ var drawCompetitors = function(){
         } else {
           competitor.mapMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
         }
+        var pointX = map.latLngToContainerPoint([loc.coords.latitude, loc.coords.longitude]).x;
+        var mapMiddleX = map.getSize().x / 2;
+        if (pointX > mapMiddleX && !competitor.isNameOnRight && competitor.nameMarker) {
+          map.removeLayer(competitor.nameMarker);
+          competitor.nameMarker = null;
+        } else if (pointX <= mapMiddleX && competitor.isNameOnRight && competitor.nameMarker) {
+          map.removeLayer(competitor.nameMarker);
+          competitor.nameMarker = null;
+        };
         if(competitor.nameMarker == undefined){
+          var iconHtml = '<span style="color: '+competitor.color+';">'+competitor.short_name+'</span>';
+          var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color);
+          var nameTagEl = document.createElement('div');
+          nameTagEl.className = iconClass;
+          nameTagEl.innerHTML = iconHtml;
+          document.body.appendChild(nameTagEl);
+          var nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
+          document.body.removeChild(nameTagEl);
+          competitor.isNameOnRight = pointX > mapMiddleX;
           var runnerIcon = L.divIcon({
-            className: 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color),
-            html: '<span style="color: '+competitor.color+';">'+competitor.short_name+'</span>'
+            className: iconClass,
+            html: iconHtml,
+            iconAnchor: [competitor.isNameOnRight ? nameTagWidth - 5 : 0, 0]
           });
           competitor.nameMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             {icon: runnerIcon}
           );
           competitor.nameMarker.addTo(map);
-        }else{
+        } else {
           competitor.nameMarker.setLatLng([loc.coords.latitude, loc.coords.longitude]);
         }
       }

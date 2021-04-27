@@ -259,7 +259,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021032600.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021042700.js' %}"></script>
 <script>
 if (!navigator.canShare) {
   $('#share_buttons').hide();
@@ -359,7 +359,7 @@ $(function() {
   map.doubleClickZoom.disable(); 
 
   map.on('dblclick', onPressCustomMassStart)
-
+  map.on('move', function () { drawCompetitors() })
   $('#full_progress_bar').on('click', pressProgressBar)
 
   $('#share_button').on('click', shareUrl)
