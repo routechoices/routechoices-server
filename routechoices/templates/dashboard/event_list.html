@@ -27,9 +27,9 @@
                 <td>{{ event.is_live }}</a></td>
                 <td>{{ event.club }}</td>
                 <td>
-                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary">Open</a>
-                    {% if not event.ended and event.open_registration %} <a href="{% url 'site:event_registration_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default">Registration Page</a>{% endif %}
-                    {% if event.started and event.allow_route_upload %} <a href="{% url 'site:event_route_upload_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default">Route Upload Page</a>{% endif %}
+                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary" style="margin-bottom: 2px">Open</a>
+                    {% if not event.ended and event.open_registration %} <a href="{% url 'site:event_registration_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default" style="margin-bottom: 2px">Registration Page</a>{% endif %}
+                    {% if event.started and event.allow_route_upload %} <a href="{% url 'site:event_route_upload_view' slug=event.slug club_slug=event.club.slug %}" class="btn btn-default" style="margin-bottom: 2px">Route Upload Page</a>{% endif %}
                 </td>
             </tr>
             {% endfor %}
