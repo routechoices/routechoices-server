@@ -12,6 +12,7 @@
 <meta property="og:site_name" content="{{ site.name }}" />
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}" />
 <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
+<meta name="twitter:card" content="summary_large_image">
 {% if event.started and event.map %}
 <meta property="og:image" content="http://{{site.domain}}{% url 'api:event_map_thumb_download' event_id=event.aid %}" />
 <meta property="og:image:width" content="1200" />
@@ -23,6 +24,7 @@
 <meta property="og:image:width" content="512" />
 <meta property="og:image:height" content="512" />
 {% endif %}
+<link rel="canonical" href="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}">
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>

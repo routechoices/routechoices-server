@@ -1,8 +1,14 @@
+from datetime import timedelta
+
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from django.db.models import Count
 from django.db.models.functions import Length
+from django.utils.timezone import now
 
+from allauth.account.models import EmailAddress
 from routechoices.core.models import (
     Club,
     Competitor,
@@ -196,3 +202,27 @@ admin.site.register(Device, DeviceAdmin)
 admin.site.register(ImeiDevice, ImeiDeviceAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Map, MapAdmin)
+
+
+class MyUserAdmin(UserAdmin):
+    list_display = UserAdmin.list_display + ('has_verified_email', )
+    actions = ['clean_fake_users', ]
+
+    def has_verified_email(self, obj):
+        return EmailAddress.objects.filter(user=obj, verified=True).exists()
+
+    def clean_fake_users(self, request, queryset):
+        two_weeks_ago = now() - timedelta(days=14)
+        users = queryset.filter(date_joined__lt=two_weeks_ago)
+        for obj in users:
+            has_verified_email = EmailAddress.objects.filter(
+                user=obj,
+                verified=True
+            ).exists()
+            if not has_verified_email:
+                obj.delete()
+
+
+UserModel = get_user_model()
+admin.site.unregister(UserModel)
+admin.site.register(UserModel, MyUserAdmin)
