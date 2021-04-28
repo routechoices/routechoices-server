@@ -1,0 +1,78 @@
+{% load static %}{% load bootstrap3 %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF to JPEG</title>
+{% bootstrap_css %}
+</head>
+<body>
+<div class="container">
+<h1>Convert PDF to JPEG</h1>
+<form method="POST" action="" enctype="multipart/form-data">
+<div id="step2">
+ <div class="row">
+  <div class="col-md-12">
+    <div class="form-group">
+        <label for="exampleInputFile">PDF file</label>
+        <input type="file" id="pdfInputFile" accept=".pdf">
+        <p class="help-block">Only first page is converted to JPEG.</p>
+    </div>
+  </div>
+ </div>
+</div>
+</form>
+</div>
+ <footer class="page-footer font-small blue pt-4">
+     <!-- Copyright -->
+     <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
+         <a href="{% url 'site:home_view' %}"> {{  site.name }}</a>
+     </div>
+     <!-- Copyright -->
+ </footer>
+{% bootstrap_javascript jquery=1 %}
+<script src="{% static '/vendor/pdfjs-2.7.570/pdf.min.js' %}"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = '{% static '/vendor/pdfjs-2.7.570/pdf.worker.min.js' %}';
+
+var onPDF = function(ev, filename) {
+    console.log(ev.target.result)
+    var loadingTask = pdfjsLib.getDocument({data: new Uint8Array(ev.target.result)});
+    loadingTask.promise.then(function(pdf) {
+        pdf.getPage(1).then(function(page) {
+            var scale = 2;
+            var viewport = page.getViewport({scale: scale});
+            // Prepare canvas using PDF page dimensions
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            // Render PDF page into canvas context
+            var renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            var renderTask = page.render(renderContext);
+            renderTask.promise.then(function () {
+                console.log('Page rendered');
+                var link = document.createElement('a');
+                var ext = filename.split('.').pop();
+                filename = filename.slice(0, filename.length - ext.length) + 'jpg';
+                link.download = filename;
+                link.href = canvas.toDataURL('image/jpeg', 0.8);
+                link.click();
+            });
+        });
+    });
+}
+$(function(){
+    $('#pdfInputFile').on('change', function(ev) {
+        var file = ev.target.files[0];
+        var fr = new FileReader();
+        fr.onload = function(ev) {onPDF(ev, file.name)};
+        fr.readAsArrayBuffer(file);
+    });
+})
+</script>
+</body>
+</html>

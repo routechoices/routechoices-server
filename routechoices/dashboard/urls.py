@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', views.home_view, name='home_view'),
     url(r'^account/?$', views.account_edit_view, name='account_edit_view'),
     url(r'^calibrate_map/?$', views.calibration_view, name='calibration_view'),
+    url(r'^pdf_to_jpg/?$', views.pdf_to_jpg, name='pdf_to_jpg'),
     url(
         r'^check_calibration/?$',
         views.check_calibration_view,
