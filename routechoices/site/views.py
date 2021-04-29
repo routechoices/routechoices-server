@@ -152,12 +152,17 @@ def event_registration_view(request, club_slug, slug):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
         open_registration=True,
-    ).exclude(
-        end_date__isnull=False,
-        end_date__lt=now()
     ).first()
     if not event:
         raise Http404()
+    if event.end_date and event.end_date < now():
+        return render(
+            request,
+            'site/event_registration_closed.html',
+            {
+                'event': event,
+            }
+        )
     if request.method == 'POST':
         form = CompetitorForm(request.POST)
         # check whether it's valid:
