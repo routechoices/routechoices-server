@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+./bin/reload
+./bin/restart_tornado
+./bin/restart_task_queue
