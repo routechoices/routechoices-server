@@ -147,6 +147,28 @@ def event_extra_map_view(request, club_slug, slug, index):
     )
 
 
+def event_kmz_view(request, club_slug, slug):
+    event = get_object_or_404(
+        Event,
+        club__slug__iexact=club_slug,
+        slug__iexact=slug
+    )
+    return redirect('api:event_kmz_download', event_id=event.aid)
+
+
+def event_extra_kmz_view(request, club_slug, slug, index):
+    event = get_object_or_404(
+        Event,
+        club__slug__iexact=club_slug,
+        slug__iexact=slug
+    )
+    return redirect(
+        'api:event_extra_kmz_download',
+        event_id=event.aid,
+        map_index=index
+    )
+
+
 def event_registration_view(request, club_slug, slug):
     event = Event.objects.all().filter(
         club__slug__iexact=club_slug,

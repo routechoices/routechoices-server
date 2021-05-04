@@ -7,6 +7,7 @@ import re
 import time
 from io import BytesIO
 from decimal import Decimal
+from zipfile import ZipFile
 
 import gpxpy
 import gpxpy.gpx
@@ -164,6 +165,48 @@ class Map(models.Model):
         return data
 
     @property
+    def kmz(self):
+        doc_kml = '''<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+     xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <Folder>
+      <name>{}</name>
+      <GroundOverlay>
+        <drawOrder>50</drawOrder>
+        <Icon>
+          <href>files/doc.jpg</href>
+        </Icon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <gx:LatLonQuad>
+          <coordinates>
+            {},{} {},{} {},{} {},{}
+          </coordinates>
+        </gx:LatLonQuad>
+      </GroundOverlay>
+    </Folder>
+  </Document>
+</kml>'''.format(
+            self.name,
+            self.bound['bottomLeft']['lon'],
+            self.bound['bottomLeft']['lat'],
+            self.bound['bottomRight']['lon'],
+            self.bound['bottomRight']['lat'],
+            self.bound['topRight']['lon'],
+            self.bound['topRight']['lat'],
+            self.bound['topLeft']['lon'],
+            self.bound['topLeft']['lat'],
+        )
+        doc_jpg = self.data
+        kmz = BytesIO()
+        with ZipFile(kmz, 'w') as fp:
+            with fp.open('doc.kml', 'w') as file1:
+                file1.write(doc_kml.encode('utf-8'))
+            with fp.open('files/doc.jpg', 'w') as file2:
+                file2.write(doc_jpg)
+        return kmz.getbuffer()
+
+    @property
     def mime_type(self):
         return 'image/jpeg'
 
@@ -262,7 +305,7 @@ class Map(models.Model):
             'topLeft': {'lat': coords[0], 'lon': coords[1]},
             'topRight': {'lat': coords[2], 'lon': coords[3]},
             'bottomRight': {'lat': coords[4], 'lon': coords[5]},
-            'botttomLeft': {'lat': coords[6], 'lon': coords[7]},
+            'bottomLeft': {'lat': coords[6], 'lon': coords[7]},
         }
 
 

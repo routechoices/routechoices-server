@@ -23,7 +23,8 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    url(r'^$',
+    url(
+        r'^$',
         schema_view.with_ui(
             'redoc',
             cache_timeout=0
@@ -59,6 +60,11 @@ urlpatterns = [
         name='event_map_download'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/?$',
+        views.event_kmz_download,
+        name='event_kmz_download'
+    ),
+    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_thumb/?$',
         views.event_map_thumb_download,
         name='event_map_thumb_download'
@@ -71,6 +77,11 @@ urlpatterns = [
     url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/extra_map/(?P<map_index>[1-9]\d*)?$',
         views.event_extra_map_download,
+        name='event_extra_kmz_download'
+    ),
+    url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/extra_kmz/(?P<map_index>[1-9]\d*)?$',
+        views.event_extra_kmz_download,
         name='event_extra_map_download'
     ),
     url(
@@ -87,6 +98,12 @@ urlpatterns = [
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/announcement/?$',
         views.event_announcement,
         name='event_announcement'
+    ),
+    url(
+        r'^/maps/'
+        r'(?P<map_id>[-0-9a-zA-Z_]{11})/kmz/?$',
+        views.map_kmz_download,
+        name='map_kmz_download',
     ),
     url(
         r'^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx$',

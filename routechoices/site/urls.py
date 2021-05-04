@@ -61,6 +61,16 @@ urlpatterns = [
         name='event_extra_map_view'
     ),
     url(
+        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/kmz/?$',
+        views.event_kmz_view,
+        name='event_kmz_view'
+    ),
+    url(
+        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/extra_kmz/(?P<index>\d+)?$',
+        views.event_extra_kmz_view,
+        name='event_extra_kmz_view'
+    ),
+    url(
         r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/register/?$',
         views.event_registration_view,
         name='event_registration_view'

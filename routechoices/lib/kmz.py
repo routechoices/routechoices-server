@@ -42,8 +42,10 @@ def extract_ground_overlay_info(kml):
         try:
             name = doc.cssselect('name')[0].text_content()
             href = go.cssselect('Icon href')[0].text_content()
-            latlon_box = go.cssselect('LatLonBox')[0]
-            if len(latlon_box) > 0:
+            latlon_box_nodes = go.cssselect('LatLonBox')
+            latlon_quad_nodes = go.cssselect('LatLonQuad')
+            if len(latlon_box_nodes) > 0:
+                latlon_box = latlon_box_nodes[0]
                 north = float(latlon_box.cssselect('north')[0].text_content())
                 east = float(latlon_box.cssselect('east')[0].text_content())
                 south = float(latlon_box.cssselect('south')[0].text_content())
@@ -62,8 +64,8 @@ def extract_ground_overlay_info(kml):
                     '{},{}'.format(*se),
                     '{},{}'.format(*sw),
                 ))
-            else:
-                latlon_quad = go.cssselect('LatLonQuad')[0]
+            elif len(latlon_quad_nodes) > 0:
+                latlon_quad = latlon_quad_nodes[0]
                 sw, se, ne, nw = latlon_quad.cssselect('coordinates')[0] \
                     .text_content().strip().split(' ')
                 nw = nw.split(',')[::-1]
@@ -76,7 +78,8 @@ def extract_ground_overlay_info(kml):
                     '{},{}'.format(*se),
                     '{},{}'.format(*sw),
                 ))
+            else:
+                raise Exception()
         except Exception:
             raise BadKMLException('Could not find proper GroundOverlay')
-
         return name, href, corners_coords

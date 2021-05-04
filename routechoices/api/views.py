@@ -27,6 +27,7 @@ from routechoices.core.models import (
     Device,
     Event,
     ImeiDevice,
+    Map,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
@@ -244,7 +245,7 @@ def event_list(request):
                                 "lat": "61.42094",
                                 "lon": "24.23851"
                             },
-                            "botttomLeft": {
+                            "bottomLeft": {
                                 "lat": "61.42533",
                                 "lon": "24.18156"
                             }
@@ -1009,6 +1010,10 @@ def event_map_download(request, event_id):
     )
 
 
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
 @api_view(['GET'])
 def event_map_thumb_download(request, event_id):
     event = get_object_or_404(
@@ -1033,13 +1038,42 @@ def event_map_thumb_download(request, event_id):
     auto_schema=None,
 )
 @api_view(['GET'])
+def event_kmz_download(request, event_id):
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=event_id,
+        start_date__lt=now()
+    )
+    if not event.map:
+        raise NotFound()
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    raster_map = event.map
+    kmz_data = raster_map.kmz
+    response = HttpResponse(
+        kmz_data,
+        content_type='application/vnd.google-earth.kmz'
+    )
+    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
+        raster_map.name.replace('\\', '_').replace('"', '\\"')
+    )
+    return response
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
 def event_extra_map_download(request, event_id, map_index):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
         aid=event_id,
         start_date__lt=now()
     )
-    if event.extra_maps.all().count() < int(map_index) or int(map_index) == 0:
+    if event.extra_maps.all().count() < int(map_index):
         raise NotFound()
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
@@ -1066,6 +1100,65 @@ def event_extra_map_download(request, event_id, map_index):
     auto_schema=None,
 )
 @api_view(['GET'])
+def event_extra_kmz_download(request, event_id, map_index):
+    event = get_object_or_404(
+        Event.objects.all().select_related('club', 'map'),
+        aid=event_id,
+        start_date__lt=now()
+    )
+    if event.extra_maps.all().count() < int(map_index):
+        raise NotFound()
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    raster_map = event.extra_maps.all()[int(map_index)-1]
+    kmz_data = raster_map.kmz
+    response = HttpResponse(
+        kmz_data,
+        content_type='application/vnd.google-earth.kmz'
+    )
+    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
+        raster_map.name.replace('\\', '_').replace('"', '\\"')
+    )
+    return response
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@login_required
+@api_view(['GET'])
+def map_kmz_download(request, map_id, *args, **kwargs):
+    if request.user.is_superuser:
+        raster_map = get_object_or_404(
+            Map,
+            aid=map_id,
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        raster_map = get_object_or_404(
+            Map,
+            aid=id,
+            club__in=club_list
+        )
+    kmz_data = raster_map.kmz
+    response = HttpResponse(
+        kmz_data,
+        content_type='application/vnd.google-earth.kmz'
+    )
+    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
+        raster_map.name.replace('\\', '_').replace('"', '\\"')
+    )
+    return response
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
         Competitor.objects.all().select_related('event', 'event__club'),
@@ -1084,6 +1177,6 @@ def competitor_gpx_download(request, competitor_id):
     )
     response['Content-Disposition'] = 'attachment; filename="{}.gpx"'.format(
         competitor.event.name.replace('\\', '_').replace('"', '\\"') + ' - ' +
-        competitor.name
+        competitor.name.replace('\\', '_').replace('"', '\\"')
     )
     return response
