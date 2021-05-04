@@ -173,6 +173,7 @@ class Map(models.Model):
     <Folder>
       <name>{}</name>
       <GroundOverlay>
+        <name>{}</name>
         <drawOrder>50</drawOrder>
         <Icon>
           <href>files/doc.jpg</href>
@@ -187,6 +188,7 @@ class Map(models.Model):
     </Folder>
   </Document>
 </kml>'''.format(
+            self.name,
             self.name,
             self.bound['bottomLeft']['lon'],
             self.bound['bottomLeft']['lat'],
