@@ -7,6 +7,34 @@
       <h1>Export <a href="{{ event.get_absolute_url }}">{{ event.name }}</a></h1>
   </div>
 
+  {% if event.map %}
+  <div>
+    <table class="table table-striped">
+      <tr><th>Map</th><th>Export</th></tr>
+      <tr>
+        <td>{% if event.map_title %}{{ event.map_title }}{% else %}Main map{% endif %}</a></td>
+        <td>
+          {% if event.started %}
+          <a href="{% url 'site:event_map_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{% url 'site:event_kmz_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% for map in event.map_assignations.all %}
+      <tr>
+        <td>{{ map.title }}</a></td>
+        <td>
+          {% if event.started %}
+          <a href="{% url 'site:event_extra_map_view' club_slug=event.club.slug slug=event.slug index=forloop.counter %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{% url 'site:event_extra_kmz_view' club_slug=event.club.slug slug=event.slug index=forloop.counter %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
   <div>
     <table class="table table-striped">
       <tr><th>Competitor</th><th>Start time</th><th>Export</th></tr>
@@ -14,7 +42,7 @@
       <tr>
         <td>{{ competitor.name }}</a></td>
         <td>{{ competitor.start_time|date:'Y-m-d H:i:s \U\T\C' }}</td>
-        <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-xs btn-primary"><i class="fa fa-save"></i> GPX</a>{% endif %}</td>
+        <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> GPX</a>{% endif %}</td>
       </tr>
       {% endfor %}
     </table>
