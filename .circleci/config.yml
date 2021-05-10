@@ -20,7 +20,8 @@ jobs:
     - run: ./da test
     - run: ./da reset_db_for_tests
     - run: ./dc restart web
-    - run: sudo apt install libgbm-dev-lts-utopic
+    - run: sudo apt update
+    - run: sudo apt install -y libgbm-dev
     - run:
         name: Install Node.js 12 and run cypress
         # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
