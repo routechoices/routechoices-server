@@ -51,7 +51,7 @@
 
             <h3>Competitors {% if event.started %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
             {% bootstrap_formset_errors formset %}
-            <table class="table">
+            <table class="table competitor_table">
             {{ formset.management_form }}
             {% for form in formset %}
                {% bootstrap_form_errors form type='non_fields' %}
@@ -248,6 +248,13 @@ function showLocalTime(el) {
 }
 
 $(function(){
+    var originalEventStart = $('#id_start_date').val();
+    var competitorsWithSameStartAsEvents = $('.competitor_table .datetimepicker').filter(function(idx, el){
+        return originalEventStart !== '' && $(el).val() == originalEventStart;
+    }).map(function(idx, el){
+        return $(el).attr('id');
+    }).toArray();
+
     $('#csv_input').change(function(){
         Papa.parse($('#csv_input')[0].files[0], {complete: onCsvParsed});
     })
@@ -255,8 +262,22 @@ $(function(){
         $(el).attr("autocomplete", "off");
         showLocalTime(el);
         $(el).on('dp.change', function(e) {
+            var elId = $(e.target).attr('id');
+            if (competitorsWithSameStartAsEvents.includes(elId)) {
+                const index = competitorsWithSameStartAsEvents.indexOf(elId);
+                if (index > -1) {
+                    competitorsWithSameStartAsEvents.splice(index, 1);
+                }
+            }
             showLocalTime(e.target);
         });
+    });
+
+    $('#id_start_date').on('dp.change', function(e) {
+        var newValue = $(e.target).val();
+        $(competitorsWithSameStartAsEvents).each(function(idx, id){
+            $('#'+id).val(newValue);
+        })
     });
 })
 </script>
