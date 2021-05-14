@@ -141,22 +141,21 @@ $(function(){
 
     function display_preview_map(){
         map = L.map('preview_map');
-
+        var baseLayers = {};
         L.TileLayer.Common = L.TileLayer.extend({initialize: function(options){L.TileLayer.prototype.initialize.call(this, this.url, options);}});
         L.TileLayer['osm'] = L.TileLayer.Common.extend({url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', options:{attribution: '\u0026copy\u003B \u003Ca href\u003D\u0022http://openstreetmap.org\u0022\u003EOpenStreetMap\u003C/a\u003E contributors, \u003Ca href\u003D\u0022http://creativecommons.org/licenses/by\u002Dsa/2.0/\u0022\u003ECC\u002DBY\u002DSA\u003C/a\u003E'}});
         L.TileLayer['gmap-street'] = L.TileLayer.Common.extend({url: 'https://mt0.google.com/vt/x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', options:{attribution: '\u0026copy\u003B Google'}});
         L.TileLayer['gmap-hybrid'] = L.TileLayer.Common.extend({url: 'https://mt0.google.com/vt/lyrs\u003Dy\u0026hl\u003Den\u0026x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', options:{attribution: '\u0026copy\u003B Google'}});
-        L.TileLayer['finland-topo'] = L.TileLayer.Common.extend({url: 'http://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', options:{attribution: '\u0026copy\u003B National Land Survey of Finland'}});
-        L.TileLayer['mapant'] = L.TileLayer.Common.extend({url: 'https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', options:{attribution: 'MapAnt and National Land Survey of Finland'}});
-
-        var baseLayers = {};
+        L.TileLayer['finland-topo'] = L.TileLayer.Common.extend({url: 'https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', options:{attribution: '\u0026copy\u003B National Land Survey of Finland'}});
+        L.TileLayer['mapant-fi'] = L.TileLayer.Common.extend({url: 'https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', options:{attribution: 'MapAnt and National Land Survey of Finland'}});
+        L.TileLayer['norway-topo'] = L.TileLayer.Common.extend({url: 'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers\u003Dtopo4\u0026zoom\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', options:{attribution: ''}});
         var defaultLayer = new L.TileLayer['osm'];
-
         baseLayers["Open Street Map"] = defaultLayer;
         baseLayers["Google Map Street"] = new L.TileLayer['gmap-street'];
         baseLayers["Google Map Satellite"] = new L.TileLayer['gmap-hybrid'];
         baseLayers["Finland Topo"] = new L.TileLayer['finland-topo'];
-        baseLayers["MapAnt FI"] = new L.TileLayer['mapant'];
+        baseLayers["Mapant Finland"] = new L.TileLayer['mapant-fi'];
+        baseLayers["Norway Topo"] = new L.TileLayer['norway-topo'];
 
         map.addLayer(defaultLayer);
         map.addControl(new L.Control.Layers(baseLayers))
