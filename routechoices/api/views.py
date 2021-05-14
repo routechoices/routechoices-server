@@ -3,14 +3,18 @@ import os.path
 import re
 import time
 import urllib.parse
+import orjson as json
+
 import arrow
 import requests
 
+from django.contrib.sites.models import Site
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.urls import reverse
@@ -1180,3 +1184,114 @@ def competitor_gpx_download(request, competitor_id):
         competitor.name.replace('\\', '_').replace('"', '\\"')
     )
     return response
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
+def two_d_rerun_race_status(request):
+    '''
+/**/jQuery17036881551647526467_1620995291937(
+    {
+        "status":"OK",
+        "racename":"RELAY Leg 1 WOMEN",
+        "racestarttime":"2021-05-13T14:40:00.000Z",
+        "raceendtime":"2021-05-13T15:10:00.000Z",
+        "mapurl":"https://live.tractrac.com/events/event_20210430_EGKEuropea1/maps/c0c1bcb0-952d-0139-f8bb-10bf48d758ce/original_gabelungen-sprintrelay-neuchatel-women-with-forking-names.jpg",
+        "caltype":"3point",
+        "mapw":3526,
+        "maph":2506,
+        "calibration":[
+            [6.937006566873767,46.99098930845227,1316,1762],
+            [6.94023934338905,46.99479213285202,2054,518],
+            [6.943056285345106,46.99316207691443,2682,1055]
+        ],
+        "competitors":[
+            ["5bc546e0-960e-0139-fc65-10bf48d758ce","01 SUI Aebersold",null],
+            ["5bc7dde0-960e-0139-fc66-10bf48d758ce","02 SWE Strand",null],
+            ["5bca9e30-960e-0139-fc67-10bf48d758ce","03 NOR Haestad Bjornstad",null],
+            ["5bcbc240-960e-0139-fc68-10bf48d758ce","04 CZE Knapova",null],
+            ["5bccf5c0-960e-0139-fc69-10bf48d758ce","05 AUT Nilsson Simkovics",null],
+            ["5bcdd230-960e-0139-fc6a-10bf48d758ce","07 DEN Lind",null],
+            ["5bce9aa0-960e-0139-fc6b-10bf48d758ce","08 RUS Ryabkina",null],
+            ["5bcf6450-960e-0139-fc6c-10bf48d758ce","09 FIN Klemettinen",null],
+            ["5bd04a50-960e-0139-fc6d-10bf48d758ce","10 ITA Dallera",null],
+            ["5bd15890-960e-0139-fc6e-10bf48d758ce","11 LAT Grosberga",null],
+            ["5bd244b0-960e-0139-fc6f-10bf48d758ce","12 EST Kaasiku",null],
+            ["5bd31de0-960e-0139-fc70-10bf48d758ce","13 FRA Basset",null],
+            ["5bd3e5a0-960e-0139-fc71-10bf48d758ce","14 UKR Babych",null],
+            ["5bd4b6d0-960e-0139-fc72-10bf48d758ce","15 LTU Gvildyte",null],
+            ["5bd58cf0-960e-0139-fc73-10bf48d758ce","16 GER Winkler",null],
+            ["5bd662f0-960e-0139-fc74-10bf48d758ce","17 BUL Gotseva",null],
+            ["5bd73b60-960e-0139-fc75-10bf48d758ce","18 POR Rodrigues",null],
+            ["5bd81980-960e-0139-fc76-10bf48d758ce","19 BEL de Smul",null],
+            ["5bda1a60-960e-0139-fc77-10bf48d758ce","20 ESP Garcia Castro",null],
+            ["5bdb05e0-960e-0139-fc78-10bf48d758ce","21 HUN Weiler",null],
+            ["5bdc1870-960e-0139-fc79-10bf48d758ce","22 POL Wisniewska",null],
+            ["5bdcfd50-960e-0139-fc7a-10bf48d758ce","23 TUR Bozkurt",null]
+        ],
+        "controls":[]
+    }
+);
+'''
+
+    event_id = request.GET.get('eventid')
+    if not event_id:
+        raise Http404()
+    event = get_object_or_404(
+        Event.objects.all()
+        .select_related('club', 'map')
+        .prefetch_related(
+            'competitors',
+        ),
+        aid=event_id,
+        start_date__lt=now()
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    site = Site.objects.get(id=settings.SITE_ID)
+    response_json = {
+        'status': 'OK',
+        'racename': event.name,
+        'racestarttime': event.start_date,
+        'raceendtime': event.end_date,
+        'mapurl': f'https://{site.domain}{event.get_absolute_map_url()}?.jpg',
+        'caltype': '3point',
+        'mapw': event.map.width,
+        'maph': event.map.height,
+        'calibration': [
+            [
+                event.map.bound['topLeft']['lon'],
+                event.map.bound['topLeft']['lat'],
+                0,
+                0
+            ],
+            [
+                event.map.bound['topRight']['lon'],
+                event.map.bound['topRight']['lat'],
+                event.map.width,
+                0
+            ],
+            [
+                event.map.bound['bottomLeft']['lon'],
+                event.map.bound['bottomLeft']['lat'],
+                0, 
+                event.map.height
+            ]
+        ],
+        'competitors': []
+    }
+    for c in event.competitors.all():
+        response_json['competitors'].append(
+            [c.aid, c.name, c.start_time]
+        )
+
+    response_raw = str(json.dumps(response_json), 'utf-8')
+    callback = request.GET.get('callback')
+    if callback:
+        response_raw = f'/**/{callback}({response_raw});'
+    return HttpResponse(response_raw)    

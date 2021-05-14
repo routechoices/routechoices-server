@@ -401,7 +401,13 @@ class Event(models.Model):
         )
 
     def get_absolute_map_url(self):
-        return
+        return reverse(
+            'site:event_map_view',
+            kwargs={
+                'club_slug': self.club.slug,
+                'slug': self.slug
+            }
+        )
 
     def get_absolute_export_url(self):
         return reverse(

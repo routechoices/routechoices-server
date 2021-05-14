@@ -110,4 +110,9 @@ urlpatterns = [
         views.competitor_gpx_download,
         name='competitor_gpx_download'
     ),
+    url(
+        r'^woo/race_status/get_info.json',
+        views.two_d_rerun_race_status,
+        name='2d_rerun_race_status'
+    )
 ]
