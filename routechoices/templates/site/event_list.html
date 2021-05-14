@@ -21,6 +21,7 @@
         <td>{% if event.is_live %}<span class="label label-default">LIVE</span>{% else %}<span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>{% endif %}</td>
         <td>
           {% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
+          {% if event.ended and event.map %}&nbsp;<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-xs btn-primary" style="margin-bottom: 3px">2DRerun</a>{% endif %}
           {% if not event.ended and event.open_registration %}&nbsp;<a href="{% url 'site:event_registration_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
           {% if event.started and event.allow_route_upload %}&nbsp;<a href="{% url 'site:event_route_upload_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
         </td>

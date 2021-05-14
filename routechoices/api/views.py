@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404
@@ -1193,6 +1194,9 @@ def competitor_gpx_download(request, competitor_id):
 @api_view(['GET'])
 def two_d_rerun_race_status(request):
     '''
+
+http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={event.aid}&liveid=1
+
 /**/jQuery17036881551647526467_1620995291937(
     {
         "status":"OK",
@@ -1291,7 +1295,67 @@ def two_d_rerun_race_status(request):
         )
 
     response_raw = str(json.dumps(response_json), 'utf-8')
+    content_type = 'application/json'
     callback = request.GET.get('callback')
     if callback:
         response_raw = f'/**/{callback}({response_raw});'
-    return HttpResponse(response_raw)    
+        content_type = 'text/javascript; charset=utf-8'
+    return HttpResponse(response_raw, content_type=content_type)
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
+def two_d_rerun_race_data(request):
+    event_id = request.GET.get('eventid')
+    if not event_id:
+        raise Http404()
+    event = get_object_or_404(
+        Event.objects.all()
+        .prefetch_related(
+            'competitors',
+        ),
+        aid=event_id,
+        start_date__lt=now()
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    cached_result = cache.get(f'woo:{event.aid}:data')
+    if not cached_result:
+        competitors = event.competitors.select_related('device')\
+            .all().order_by('start_time', 'name')
+        nb_points = 0
+        results = []
+        for c in competitors:
+            locations = c.locations
+            nb_points += len(locations)
+            results += [[
+                c.aid,
+                ll['latitude'],
+                ll['longitude'],
+                0,
+                arrow.get(ll['timestamp']).datetime
+            ] for ll in c.locations]
+        response_json = {
+            'containslastpos': 1,
+            'lastpos': nb_points,
+            'status': 'OK',
+            'data': results,
+        }
+        cache.set(f'woo:{event.aid}:data', response_json, 15)
+    else:
+        response_json = cached_result
+    response_raw = str(json.dumps(response_json), 'utf-8')
+    content_type = 'application/json'
+    callback = request.GET.get('callback')
+    if callback:
+        response_raw = f'/**/{callback}({response_raw});'
+        content_type = 'text/javascript; charset=utf-8'
+    return HttpResponse(
+        response_raw,
+        content_type=content_type,
+    )
