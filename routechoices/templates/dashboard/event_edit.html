@@ -10,6 +10,9 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
+        {% if event %}<h1>{{event.name}}</h1>
+        <p><img src='https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ event.shortcut }}' alt=qr_link /><br><small><a href="{{ event.shortcut }}">{{ event.shortcut }}</a></small></p>
+        {% endif%}
         <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
         <form action="" method="post">
             {% csrf_token %}
