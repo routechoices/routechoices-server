@@ -76,7 +76,7 @@ def club_view(request, slug):
     events = paginator.get_page(page)
     return render(
         request,
-        'site/event_list_for_club.html',
+        'site/event_list.html',
         {
             'club': club,
             'events': events

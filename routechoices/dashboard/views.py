@@ -184,8 +184,9 @@ def club_create_view(request):
     form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
     return render(
         request,
-        'dashboard/club_create.html',
+        'dashboard/club_edit.html',
         {
+            'context': 'create',
             'form': form,
         }
     )
@@ -221,6 +222,7 @@ def club_edit_view(request, id):
         request,
         'dashboard/club_edit.html',
         {
+            'context': 'edit',
             'club': club,
             'form': form,
         }
@@ -298,8 +300,9 @@ def map_create_view(request):
         form.fields['club'].queryset = club_list
     return render(
         request,
-        'dashboard/map_create.html',
+        'dashboard/map_edit.html',
         {
+            'context': 'create',
             'form': form,
         }
     )
@@ -452,6 +455,7 @@ def map_edit_view(request, id):
         request,
         'dashboard/map_edit.html',
         {
+            'context': 'edit',
             'map': rmap,
             'form': form,
         }
@@ -564,8 +568,9 @@ def event_create_view(request):
             cform.fields['device'].queryset = devices
     return render(
         request,
-        'dashboard/event_create.html',
+        'dashboard/event_edit.html',
         {
+            'context': 'create',
             'form': form,
             'formset': formset,
             'extra_map_formset': extra_map_formset,
@@ -661,6 +666,7 @@ def event_edit_view(request, id):
         request,
         'dashboard/event_edit.html',
         {
+            'context': 'edit',
             'event': event,
             'form': form,
             'formset': formset,

@@ -10,12 +10,12 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
-        <h1>Edit Club</h1>
+        <h1>{% if context == 'edit' %}Edit Club{% else %}New CLub{% endif %}</h1>
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
             <input type="submit" value="Submit" class="btn btn-primary">
-            <a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>
+            {% if context == 'edit' %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>
 </div>

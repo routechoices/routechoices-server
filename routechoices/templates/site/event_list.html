@@ -3,38 +3,28 @@
 {% load bootstrap3 %}
 
 {% block extra_head %}
-<link rel="alternate" type="application/rss+xml" title="Event Feed" href="{% url 'site:events_feed' %}" />
+<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{% url 'site:club_feed' club.slug %}{% else %}{% url 'site:events_feed' %}{% endif%}" />
 {% endblock %}
 
 {% block content %}
-
-<!--
-<div class="row">
-<div class="alert alert-warning">
-  <p><i class="fa fa-warning"></i> Routechoices.com is a open source project, available to all for free, and hosted by vonlunteer.</p>
-  <p>You can help contribute to the payment of the cost of hosting this solution through monthly donations.</p>
-  <p>Follow this link if you want to contribute <a href="https://github.com/sponsors/rphlo"><i class="fa fa-heart"></i> Github Sponsor</a></p>
-</div>
-</div>
--->
 <div class="row">
   <div>
-      <h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>
+    {% if club %}<h1>Events by {{ club.name }} <a href="{% url 'site:club_feed' club.slug %}"><i class="fa fa-rss"></i></a></h1>{% else %}<h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>{% endif%}
   </div>
 
   <div>
     <table class="table table-striped">
-      <tr><th>Event</th><th>Date</th><th>Actions</th><th>Club</th></tr>
+      <tr><th>Event</th><th>Date</th><th>Actions</th>{% if not club %}<th>Club</th>{% endif%}</tr>
       {% for event in events %}
       <tr>
         <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
         <td>{% if event.is_live %}<span class="label label-default">LIVE</span>{% else %}<span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>{% endif %}</td>
         <td>
-            {% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
-            {% if not event.ended and event.open_registration %}&nbsp;<a href="{% url 'site:event_registration_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
-            {% if event.started and event.allow_route_upload %}&nbsp;<a href="{% url 'site:event_route_upload_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
+          {% if not event.hidden %}<a href="{{ event.get_absolute_export_url }}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
+          {% if not event.ended and event.open_registration %}&nbsp;<a href="{% url 'site:event_registration_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
+          {% if event.started and event.allow_route_upload %}&nbsp;<a href="{% url 'site:event_route_upload_view' club_slug=event.club.slug slug=event.slug %}" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
         </td>
-        <td><a href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>
+        {% if not club %}<td><a href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>{% endif%}
       </tr>
       {% endfor %}
     </table>

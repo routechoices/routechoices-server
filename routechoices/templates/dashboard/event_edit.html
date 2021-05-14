@@ -10,7 +10,7 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-xs-12">
-        <h1>Edit Event <small><span class="utc-offset"></span></small></h1>
+        <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
@@ -49,7 +49,7 @@
             <h3>Announcement</h3>
             {% bootstrap_form notice_form %}
 
-            <h3>Competitors {% if event.started %}<a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
+            <h3>Competitors{% if event.started %} <a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
             {% bootstrap_formset_errors formset %}
             <table class="table competitor_table">
             {{ formset.management_form }}
@@ -91,9 +91,9 @@
             </div>
             <hr/>
 
-            <input type="submit" value="Save" class="btn btn-primary">
+            <input type="submit" value="Save" class="btn btn-primary" id="submit-btn">
             <button type="submit" name="save_continue" value="True" class="btn btn-secondary">Save and Continue Editing</button>
-            <a href="{% url 'dashboard:event_delete_view' id=event.aid %}" class="btn btn-danger">Delete</a>
+            {% if context == 'edit' %}<a href="{% url 'dashboard:event_delete_view' id=event.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>
 </div>
