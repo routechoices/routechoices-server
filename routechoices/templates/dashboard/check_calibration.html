@@ -163,13 +163,13 @@ $(function(){
         baseLayers["Mapant Spain"] = L.TileLayer['mapant-es'];
 
         map.addLayer(defaultLayer);
-        map.addControl(new L.Control.Layers(baseLayers))
         var bounds = corners_latlng;
 
         var transformedImage = L.imageTransform(raster_map_image.src, bounds , {opacity: 0.7});
         transformedImage.addTo(map);
 
-        map.fitBounds(bounds)
+        map.addControl(new L.Control.Layers(baseLayers, {'Map': transformedImage}));
+        map.fitBounds(bounds);
     }
 
     $('#back_button').on('click', function(e){
