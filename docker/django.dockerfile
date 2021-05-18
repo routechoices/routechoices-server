@@ -12,6 +12,10 @@ RUN set -ex \
     && /venv/bin/pip install -U pip \
     && /venv/bin/pip install -r /requirements.txt
 
+# Install GDAL dependencies
+RUN apt update && apt install -y libgdal-dev g++ --no-install-recommends && \
+    apt clean -y
+
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /app/
 WORKDIR /app/

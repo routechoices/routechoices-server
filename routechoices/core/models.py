@@ -16,6 +16,7 @@ from PIL import Image
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Polygon, LinearRing
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
@@ -348,31 +349,61 @@ class Map(models.Model):
 
     def create_tile(self, output_width, output_height,
                     min_lon, max_lon, max_lat, min_lat):
-        orig = self.image.open('rb').read()
-        self.image.close()
-        img = Image.open(BytesIO(orig))
-        if img.mode != "RGBA":
-            img = img.convert("RGBA")
-        nw = self.spherical_mercator_to_map_xy(max_lat, min_lon)
-        ne = self.spherical_mercator_to_map_xy(max_lat, max_lon)
-        se = self.spherical_mercator_to_map_xy(min_lat, max_lon)
-        sw = self.spherical_mercator_to_map_xy(min_lat, min_lon)
-        tile_img = img.transform(
-            (output_width, output_height),
-            Image.QUAD,
-            (
-                ne[0], ne[1],
-                nw[0], nw[1],
-                sw[0], sw[1],
-                se[0], se[1],
+        tile_img = None
+        if self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
+            orig = self.image.open('rb').read()
+            self.image.close()
+            img = Image.open(BytesIO(orig))
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            nw = self.spherical_mercator_to_map_xy(max_lat, min_lon)
+            ne = self.spherical_mercator_to_map_xy(max_lat, max_lon)
+            se = self.spherical_mercator_to_map_xy(min_lat, max_lon)
+            sw = self.spherical_mercator_to_map_xy(min_lat, min_lon)
+            tile_img = img.transform(
+                (output_width, output_height),
+                Image.QUAD,
+                (
+                    ne[0], ne[1],
+                    nw[0], nw[1],
+                    sw[0], sw[1],
+                    se[0], se[1],
+                )
+            )
+        img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
+        if tile_img:
+            img_out.paste(tile_img, (0, 0), tile_img)
+        # output = BytesIO()
+        # img_out.save(output, format='png')
+        # data_out = output.getvalue()
+        # return data_out
+        return img_out
+
+    def intersects_with_tile(self, min_lon, max_lon, max_lat, min_lat):
+        tile_bounds_polygon = Polygon(
+            LinearRing(
+                (min_lat, min_lon),
+                (max_lat, min_lon),
+                (max_lat, max_lon),
+                (min_lat, max_lon),
+                (min_lat, min_lon),
             )
         )
-        img_out = Image.new('RGBA', tile_img.size, (255, 255, 255, 0))
-        img_out.paste(tile_img, (0, 0), tile_img)
-        output = BytesIO()
-        img_out.save(output, format='png')
-        data_out = output.getvalue()
-        return data_out
+        map_bounds_polygon = Polygon(
+            LinearRing(
+                self.map_xy_to_spherical_mercator(0, 0),
+                self.map_xy_to_spherical_mercator(0, self.height),
+                self.map_xy_to_spherical_mercator(self.width,
+                                                  self.height),
+                self.map_xy_to_spherical_mercator(self.width, 0),
+                self.map_xy_to_spherical_mercator(0, 0),
+            )
+        )
+        tile_bounds_polygon_prep = tile_bounds_polygon.prepared
+
+        if not tile_bounds_polygon_prep.intersects(map_bounds_polygon):
+            return False
+        return True
 
     def strip_exif(self):
         if self.image.closed:

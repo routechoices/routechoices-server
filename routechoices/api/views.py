@@ -1365,6 +1365,7 @@ def two_d_rerun_race_data(request):
     )
 
 
+@cache_page(3600)
 def wms_service(request):
     if 'WMS' not in [request.GET.get('service'), request.GET.get('SERVICE')]:
         return HttpResponseBadRequest('Service must be WMS')
@@ -1397,15 +1398,16 @@ def wms_service(request):
         out_image = Image.new('RGBA', (out_w, out_h), (255, 255, 255, 0))
         for layer in layers:
             try:
-                layer_raster = Image.open(BytesIO(layer.create_tile(
+                layer_raster = layer.create_tile(
                     out_w, out_h, min_lon, max_lon, min_lat, max_lat
-                )))
+                )
                 out_image.paste(
                     layer_raster,
                     (0, 0),
                     layer_raster
                 )
-            except Exception:
+            except Exception as e:
+                raise e
                 continue
         output = BytesIO()
         out_image.save(output, format='png')
