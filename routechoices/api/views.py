@@ -4,6 +4,8 @@ import re
 import time
 import urllib.parse
 import orjson as json
+from io import BytesIO
+from PIL import Image
 
 import arrow
 import requests
@@ -15,7 +17,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.urls import reverse
@@ -1239,7 +1241,7 @@ http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={ev
         "controls":[]
     }
 );
-'''
+    '''
 
     event_id = request.GET.get('eventid')
     if not event_id:
@@ -1359,3 +1361,96 @@ def two_d_rerun_race_data(request):
         response_raw,
         content_type=content_type,
     )
+
+
+def wms_service(request):
+    if 'WMS' not in [request.GET.get('service'), request.GET.get('SERVICE')]:
+        return HttpResponseBadRequest('Service must be WMS')
+    if 'GetMap' in [request.GET.get('request'),
+                    request.GET.get('REQUEST')]:
+        layers_raw = request.GET.get('layers', request.GET.get('LAYERS'))
+        bbox_raw = request.GET.get('bbox', request.GET.get('BBOX'))
+        width_raw = request.GET.get('width', request.GET.get('WIDTH'))
+        heigth_raw = request.GET.get('height', request.GET.get('HEIGHT'))
+        if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
+            return HttpResponseBadRequest('missing mandatory parameters')
+        layers_id = layers_raw.split(',')
+        try:
+            min_lat, min_lon, max_lat, max_lon = (float(x) for x in bbox_raw.split(','))
+            out_w, out_h = int(width_raw), int(heigth_raw)
+        except Exception:
+            return HttpResponseBadRequest('invalid parameters')
+        layers = Map.objects.filter(aid__in=layers_id)
+        out_image = Image.new('RGBA', (out_w, out_h), (255,255, 255, 0))
+        for layer in layers:
+            layer_raster = Image.open(BytesIO(layer.create_tile(
+                out_w, out_h, min_lon, max_lon, min_lat, max_lat
+            )))
+            out_image.paste(
+                layer_raster,
+                (0, 0),
+                layer_raster
+            )
+        output = BytesIO()
+        out_image.save(output, format='png')
+        data_out = output.getvalue()
+        return HttpResponse(
+            data_out,
+            content_type='image/png'
+        )
+    elif 'GetCapabilities' in [request.GET.get('request'),
+                               request.GET.get('REQUEST')]:
+        layers = Map.objects.all().select_related('club')
+        layers_xml = ''
+        for layer in layers:
+            layers_xml += f'''
+  <Layer>
+    <Name>{layer.aid}</Name>
+    <Title>{layer.name} by {layer.club}</Title>
+    <CRS>EPSG:3857</CRS>
+  </Layer>
+            '''
+        return HttpResponse(
+            f'''
+            <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+<WMS_Capabilities version="1.3.0" xmlns="http://www.opengis.net/wms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ms="http://mapserver.gis.umn.edu/mapserver" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd  http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/sld_capabilities.xsd  http://mapserver.gis.umn.edu/mapserver">
+<Service>
+  <Name>WMS</Name>
+  <Title>Routechoices</Title>
+  <Abstract>Routechoices server</Abstract>
+  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms"/>
+  <ContactInformation>
+  </ContactInformation>
+  <MaxWidth>10000</MaxWidth>
+  <MaxHeight>10000</MaxHeight>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <Format>text/xml</Format>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms"/></Get>
+          <Post><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms"/></Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <GetMap>
+      <Format>image/png</Format>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms"/></Get>
+          <Post><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms"/></Post>
+        </HTTP>
+      </DCPType>
+    </GetMap>
+  </Request>
+  <Exception>
+    <Format>XML</Format>
+    <Format>INIMAGE</Format>
+    <Format>BLANK</Format>
+  </Exception>{layers_xml}
+</Capability>
+</WMS_Capabilities>
+            '''
+        )

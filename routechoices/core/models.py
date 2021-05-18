@@ -35,12 +35,35 @@ from routechoices.lib.validators import (
 from routechoices.lib.helper import (
     random_key,
     short_random_key,
-    short_random_slug
+    short_random_slug,
+    general_2d_projection,
+    adjugate_matrix, project
 )
 from routechoices.lib.pseudo_base64 import PseudoInt
 from routechoices.lib.storages import OverwriteImageStorage
+from routechoices.lib.globalmaptiles import GlobalMercator
+
 import logging
+
 logger = logging.getLogger(__name__)
+
+GLOBAL_MERCATOR = GlobalMercator()
+
+
+class Point(object):
+    def __init__(self, x, y=None):
+        if isinstance(x, tuple):
+            self.x = x[0]
+            self.y = x[1]
+        elif isinstance(x, dict):
+            self.x = x.get('x')
+            self.y = x.get('y')
+        else:
+            self.x = x
+            self.y = y
+
+    def __repr__(self):
+        return f'x: {self.x}, y:{self.y}'
 
 
 class Club(models.Model):
@@ -270,6 +293,87 @@ class Map(models.Model):
         img.close()
         return img_out
 
+    @property
+    def size(self):
+        return {'width': self.width, 'height': self.height}
+
+    @property
+    def alignment_points(self):
+        r1_a = Point(0, 0)
+        r1_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['topLeft']))
+        r2_a = Point(0, self.height)
+        r2_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['bottomLeft']))
+        r3_a = Point(self.width, 0)
+        r3_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['topRight']))
+        r4_a = Point(self.width, self.height)
+        r4_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['bottomRight']))
+        return r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b
+
+    @property
+    def matrix_3d(self):
+        r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b = self.alignment_points
+        m = general_2d_projection(
+            r1_a.x, r1_a.y, r1_b.x, r1_b.y,
+            r2_a.x, r2_a.y, r2_b.x, r2_b.y,
+            r3_a.x, r3_a.y, r3_b.x, r3_b.y,
+            r4_a.x, r4_a.y, r4_b.x, r4_b.y
+        )
+        if not m[8]:
+            return
+        for i in range(9):
+            m[i] = m[i] / m[8]
+        return m
+
+    @property
+    def matrix_3d_inverse(self):
+        return adjugate_matrix(self.matrix_3d)
+
+    @property
+    def map_xy_to_spherical_mercator(self):
+        if not self.matrix_3d:
+            return lambda x, y: (0, 0)
+        return lambda x, y: project(self.matrix_3d, x, y)
+
+    @property
+    def spherical_mercator_to_map_xy(self):
+        return lambda x, y: project(self.matrix_3d_inverse, x, y)
+
+    def wsg84_to_map_xy(self, lat, lon):
+        xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': lat, 'lon': lon})
+        return self.spherical_mercator_to_map_xy(xy['x'], xy['y'])
+
+    def map_xy_to_wsg84(self, x, y):
+        mx, my = self.map_xy_to_spherical_mercator(x, y)
+        return GLOBAL_MERCATOR.meters_to_latlon({'x': mx, 'y': my})
+
+    def create_tile(self, output_width, output_height,
+                    min_lon, max_lon, max_lat, min_lat):
+        orig = self.image.open('rb').read()
+        self.image.close()
+        img = Image.open(BytesIO(orig))
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+        nw = self.spherical_mercator_to_map_xy(max_lat, min_lon)
+        ne = self.spherical_mercator_to_map_xy(max_lat, max_lon)
+        se = self.spherical_mercator_to_map_xy(min_lat, max_lon)
+        sw = self.spherical_mercator_to_map_xy(min_lat, min_lon)
+        tile_img = img.transform(
+            (output_width, output_height),
+            Image.QUAD,
+            (
+                ne[0], ne[1],
+                nw[0], nw[1],
+                sw[0], sw[1],
+                se[0], se[1],
+            )
+        )
+        img_out = Image.new('RGBA', tile_img.size, (255, 255, 255, 0))
+        img_out.paste(tile_img, (0, 0), tile_img)
+        output = BytesIO()
+        img_out.save(output, format='png')
+        data_out = output.getvalue()
+        return data_out
+
     def strip_exif(self):
         if self.image.closed:
             self.image.open()
@@ -302,7 +406,7 @@ class Map(models.Model):
 
     @property
     def bound(self):
-        coords = self.corners_coordinates.split(',')
+        coords = [float(x) for x in self.corners_coordinates.split(',')]
         return {
             'topLeft': {'lat': coords[0], 'lon': coords[1]},
             'topRight': {'lat': coords[2], 'lon': coords[3]},

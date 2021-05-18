@@ -90,15 +90,15 @@ def three_point_calibration_to_corners(calibration_string, width, height):
     cal_pts_raw = calibration_string.split('|')
     cal_pts = [
      {
-         'lng': float(cal_pts_raw[0]), 'lat': float(cal_pts_raw[1]),
+         'lon': float(cal_pts_raw[0]), 'lat': float(cal_pts_raw[1]),
          'x': float(cal_pts_raw[2]), 'y': float(cal_pts_raw[3])
      },
      {
-         'lng': float(cal_pts_raw[4]), 'lat': float(cal_pts_raw[5]),
+         'lon': float(cal_pts_raw[4]), 'lat': float(cal_pts_raw[5]),
          'x': float(cal_pts_raw[6]), 'y': float(cal_pts_raw[7])
      },
      {
-         'lng': float(cal_pts_raw[8]), 'lat': float(cal_pts_raw[9]),
+         'lon': float(cal_pts_raw[8]), 'lat': float(cal_pts_raw[9]),
          'x': float(cal_pts_raw[10]), 'y': float(cal_pts_raw[11])
      }
     ]
@@ -124,10 +124,10 @@ def three_point_calibration_to_corners(calibration_string, width, height):
       map_xy_to_latlon({'x': 0, 'y': height}),
     ]
     return [
-        round(corners[0]['lat'], 5), round(corners[0]['lng'], 5),
-        round(corners[1]['lat'], 5), round(corners[1]['lng'], 5),
-        round(corners[2]['lat'], 5), round(corners[2]['lng'], 5),
-        round(corners[3]['lat'], 5), round(corners[3]['lng'], 5),
+        round(corners[0]['lat'], 5), round(corners[0]['lon'], 5),
+        round(corners[1]['lat'], 5), round(corners[1]['lon'], 5),
+        round(corners[2]['lat'], 5), round(corners[2]['lon'], 5),
+        round(corners[3]['lat'], 5), round(corners[3]['lon'], 5),
     ]
 
 

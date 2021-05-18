@@ -111,13 +111,18 @@ urlpatterns = [
         name='competitor_gpx_download'
     ),
     url(
-        r'^woo/race_status/get_info.json',
+        r'^woo/race_status/get_info.json$',
         views.two_d_rerun_race_status,
         name='2d_rerun_race_status'
     ),
     url(
-        r'^woo/race_status/get_data.json',
+        r'^woo/race_status/get_data.json$',
         views.two_d_rerun_race_data,
         name='2d_rerun_race_data'
     ),
+    # url(
+    #    r'^wms/?$',
+    #    views.wms_service,
+    #    name='wms_service'
+    # ),
 ]

@@ -11,7 +11,7 @@ class GlobalMercator(object):
         Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator
         EPSG:900913
         """
-        lon = latlon['lng']
+        lon = latlon['lon']
         lat = latlon['lat']
         mx = lon * self.originShift / 180.0
         my = math.log(math.tan((90 + lat) * math.pi / 360.0)) / (
@@ -34,4 +34,4 @@ class GlobalMercator(object):
 
         lat = 180 / math.pi * (2 * math.atan(
             math.exp(lat * math.pi / 180.0)) - math.pi / 2.0)
-        return {'lat': lat, 'lng': lon}
+        return {'lat': lat, 'lon': lon}

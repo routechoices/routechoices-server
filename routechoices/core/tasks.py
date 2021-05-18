@@ -113,20 +113,20 @@ def decode_track_line(device, data, min_date=None, max_date=None):
             if pt[2] == '*':
                 pt[2] = 0
             dt = int(pt[0])
-            dlng = int(pt[1])
+            dlon = int(pt[1])
             dlat = int(pt[2])
         else:
             chars = \
                 '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' + \
                 'abcdefghijklmnopqrstuvwxyz'
             dt = chars.index(p[0]) - 31
-            dlng = chars.index(p[1]) - 31
+            dlon = chars.index(p[1]) - 31
             dlat = chars.index(p[2]) - 31
         t = arrow.get(prev_loc['datetime'].timestamp() + dt).datetime
 
         prev_loc = {
             'lat': ((prev_loc['lat'] * 100000) + dlat) / 100000,
-            'lon': ((prev_loc['lon'] * 50000) + dlng) / 50000,
+            'lon': ((prev_loc['lon'] * 50000) + dlon) / 50000,
             'datetime': t,
         }
         loc_array.append({
@@ -261,13 +261,13 @@ def import_map_from_loggator(club, map_data, name):
     map_file = ContentFile(r.content)
     coordinates = ','.join([
         str(map_data['coordinates']['topLeft']['lat']),
-        str(map_data['coordinates']['topLeft']['lng']),
+        str(map_data['coordinates']['topLeft']['lon']),
         str(map_data['coordinates']['topRight']['lat']),
-        str(map_data['coordinates']['topRight']['lng']),
+        str(map_data['coordinates']['topRight']['lon']),
         str(map_data['coordinates']['bottomRight']['lat']),
-        str(map_data['coordinates']['bottomRight']['lng']),
+        str(map_data['coordinates']['bottomRight']['lon']),
         str(map_data['coordinates']['bottomLeft']['lat']),
-        str(map_data['coordinates']['bottomLeft']['lng'])
+        str(map_data['coordinates']['bottomLeft']['lon'])
     ])
     map_model.image.save('imported_image', map_file, save=False)
     map_model.corners_coordinates = coordinates
