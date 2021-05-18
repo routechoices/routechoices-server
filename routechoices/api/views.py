@@ -40,6 +40,7 @@ from routechoices.core.models import (
     PRIVACY_SECRET,
 )
 from routechoices.lib.helper import short_random_key, initial_of_name
+from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
 from routechoices.lib.s3 import s3_object_url
@@ -56,6 +57,7 @@ from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
+GLOBAL_MERCATOR = GlobalMercator()
 
 
 def x_accel_redirect(request, path, filename='',
@@ -1377,20 +1379,34 @@ def wms_service(request):
         layers_id = layers_raw.split(',')
         try:
             min_lat, min_lon, max_lat, max_lon = (float(x) for x in bbox_raw.split(','))
+            if request.GET.get('SRS', request.GET.get('crs')) == 'CRS:84':
+                min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(','))
+                min_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': min_lon})
+                max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
+                min_lon = min_xy['y']
+                min_lat = min_xy['x']
+                max_lon = max_xy['y']
+                max_lat = max_xy['x']
             out_w, out_h = int(width_raw), int(heigth_raw)
         except Exception:
             return HttpResponseBadRequest('invalid parameters')
-        layers = Map.objects.filter(aid__in=layers_id)
-        out_image = Image.new('RGBA', (out_w, out_h), (255,255, 255, 0))
+        if 'all' in layers_id:
+            layers = Map.objects.all()
+        else:
+            layers = Map.objects.filter(aid__in=layers_id)
+        out_image = Image.new('RGBA', (out_w, out_h), (255, 255, 255, 0))
         for layer in layers:
-            layer_raster = Image.open(BytesIO(layer.create_tile(
-                out_w, out_h, min_lon, max_lon, min_lat, max_lat
-            )))
-            out_image.paste(
-                layer_raster,
-                (0, 0),
-                layer_raster
-            )
+            try:
+                layer_raster = Image.open(BytesIO(layer.create_tile(
+                    out_w, out_h, min_lon, max_lon, min_lat, max_lat
+                )))
+                out_image.paste(
+                    layer_raster,
+                    (0, 0),
+                    layer_raster
+                )
+            except Exception:
+                continue
         output = BytesIO()
         out_image.save(output, format='png')
         data_out = output.getvalue()
@@ -1400,20 +1416,63 @@ def wms_service(request):
         )
     elif 'GetCapabilities' in [request.GET.get('request'),
                                request.GET.get('REQUEST')]:
+        max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': 89.9, 'lon': 180})
+        min_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': -89.9, 'lon': -180})
+
         layers = Map.objects.all().select_related('club')
         layers_xml = ''
         for layer in layers:
+            min_lon = min(
+                layer.bound['topLeft']['lon'],
+                layer.bound['bottomLeft']['lon'],
+                layer.bound['bottomRight']['lon'],
+                layer.bound['topRight']['lon'],
+            )
+            max_lon = max(
+                layer.bound['topLeft']['lon'],
+                layer.bound['bottomLeft']['lon'],
+                layer.bound['bottomRight']['lon'],
+                layer.bound['topRight']['lon'],
+            )
+            min_lat = min(
+                layer.bound['topLeft']['lat'],
+                layer.bound['bottomLeft']['lat'],
+                layer.bound['bottomRight']['lat'],
+                layer.bound['topRight']['lat'],
+            )
+            max_lat = max(
+                layer.bound['topLeft']['lat'],
+                layer.bound['bottomLeft']['lat'],
+                layer.bound['bottomRight']['lat'],
+                layer.bound['topRight']['lat'],
+            )
+
+            l_max_xy = GLOBAL_MERCATOR.latlon_to_meters(
+                {'lat': max_lat, 'lon': max_lon}
+            )
+            l_min_xy = GLOBAL_MERCATOR.latlon_to_meters(
+                {'lat': min_lat, 'lon': min_lon}
+            )
+
             layers_xml += f'''
-  <Layer>
-    <Name>{layer.aid}</Name>
-    <Title>{layer.name} by {layer.club}</Title>
-    <CRS>EPSG:3857</CRS>
-  </Layer>
+    <Layer queryable="0" opaque="0" cascaded="0">
+      <Name>{layer.aid}</Name>
+      <Title>{layer.name} by {layer.club}</Title>
+      <CRS>EPSG:3857</CRS>
+      <CRS>CRS:84</CRS>
+      <EX_GeographicBoundingBox>
+        <westBoundLongitude>{min_lon}</westBoundLongitude>
+        <eastBoundLongitude>{max_lon}</eastBoundLongitude>
+        <southBoundLatitude>{min_lon}</southBoundLatitude>
+        <northBoundLatitude>{max_lat}</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      <BoundingBox CRS="EPSG:3857" minx="{l_min_xy['x']}" miny="{l_min_xy['y']}" maxx="{l_max_xy['x']}" maxy="{l_max_xy['y']}"/>
+      <BoundingBox CRS="EPSG:3857" minx="{min_lon}" miny="{min_lat}" maxx="{max_lon}" maxy="{max_lat}"/>
+    </Layer>
             '''
         return HttpResponse(
-            f'''
-            <?xml version='1.0' encoding="UTF-8" standalone="no" ?>
-<WMS_Capabilities version="1.3.0" xmlns="http://www.opengis.net/wms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ms="http://mapserver.gis.umn.edu/mapserver" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd  http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/sld_capabilities.xsd  http://mapserver.gis.umn.edu/mapserver">
+            f'''<?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+<WMS_Capabilities version="1.3.0" xmlns="http://www.opengis.net/wms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ms="http://mapserver.gis.umn.edu/mapserver" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd">
 <Service>
   <Name>WMS</Name>
   <Title>Routechoices</Title>
@@ -1449,7 +1508,22 @@ def wms_service(request):
     <Format>XML</Format>
     <Format>INIMAGE</Format>
     <Format>BLANK</Format>
-  </Exception>{layers_xml}
+  </Exception>
+  <Layer>
+    <Name>all</Name>
+    <Title>Routechoices Maps</Title>
+    <CRS>EPSG:3857</CRS>
+    <CRS>CRS:84</CRS>
+    <EX_GeographicBoundingBox>
+      <westBoundLongitude>-180</westBoundLongitude>
+      <eastBoundLongitude>180</eastBoundLongitude>
+      <southBoundLatitude>-90</southBoundLatitude>
+      <northBoundLatitude>90</northBoundLatitude>
+    </EX_GeographicBoundingBox>
+    <BoundingBox CRS="EPSG:3857" minx="{min_xy['x']}" miny="{min_xy['y']}" maxx="{max_xy['x']}" maxy="{max_xy['y']}"/>
+    <BoundingBox CRS="CRS:84" minx="-180" miny="-90" maxx="180" maxy="90"/>
+    {layers_xml}
+  </Layer>
 </Capability>
 </WMS_Capabilities>
             ''',
