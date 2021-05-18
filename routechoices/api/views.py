@@ -1452,5 +1452,6 @@ def wms_service(request):
   </Exception>{layers_xml}
 </Capability>
 </WMS_Capabilities>
-            '''
+            ''',
+            content_type='text/xml'
         )
