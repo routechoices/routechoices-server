@@ -15,7 +15,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import Q, Case, When
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
@@ -1394,7 +1394,10 @@ def wms_service(request):
         if 'all' in layers_id:
             layers = Map.objects.all()
         else:
-            layers = Map.objects.filter(aid__in=layers_id)
+            order = Case(
+                *[When(aid=aid, then=pos) for pos, aid in enumerate(layers_id)]
+            )
+            layers = Map.objects.filter(aid__in=layers_id).order_by(order)
         out_image = Image.new('RGBA', (out_w, out_h), (255, 255, 255, 0))
         for layer in layers:
             try:
