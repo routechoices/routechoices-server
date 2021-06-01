@@ -10,15 +10,18 @@
 <div class="container">
 <h1>Convert PDF to JPEG</h1>
 <form method="POST" action="" enctype="multipart/form-data">
-<div id="step2">
+<div>
  <div class="row">
-  <div class="col-md-12">
-    <div class="form-group">
-        <label for="exampleInputFile">PDF file</label>
-        <input type="file" id="pdfInputFile" accept=".pdf">
-        <p class="help-block">Only first page is converted to JPEG.</p>
+    <div class="col-md-12" id="step1">
+      <div class="form-group">
+          <label for="exampleInputFile">PDF file</label>
+          <input type="file" id="pdfInputFile" accept=".pdf">
+          <p class="help-block">Only first page is converted to JPEG.</p>
+      </div>
     </div>
-  </div>
+    <div class="col-md-12" id="step2">
+      <h1>Done</h1>
+    </div>
  </div>
 </div>
 </form>
@@ -32,6 +35,7 @@
  </footer>
 {% bootstrap_javascript jquery=1 %}
 <script src="{% static '/vendor/pdfjs-2.7.570/pdf.min.js' %}"></script>
+<script src="{% static '/vendor/filesaver-2.0.5/filesaver.min.js' %}"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = '{% static '/vendor/pdfjs-2.7.570/pdf.worker.min.js' %}';
 
@@ -60,18 +64,15 @@ var onPDF = function(ev, filename) {
             };
             var renderTask = page.render(renderContext);
             renderTask.promise.then(function () {
-                console.log('Page rendered');
-                var link = document.createElement('a');
                 var ext = filename.split('.').pop();
                 filename = filename.slice(0, filename.length - ext.length) + 'jpg';
-                link.download = filename;
-                link.href = canvas.toDataURL('image/jpeg', 0.8);
-                link.click();
+                canvas.toBlob(function(blob){saveAs(blob, filename);$('#step1').hide();$('#step2').show();}, 'image/jpeg', 0.8);
             });
         });
     });
 }
 $(function(){
+    $('#step2').hide()
     $('#pdfInputFile').on('change', function(ev) {
         var file = ev.target.files[0];
         var fr = new FileReader();
