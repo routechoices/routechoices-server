@@ -353,7 +353,7 @@ def event_detail(request, event_id):
             ),
             'start_time': openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description='start time, must be with the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)',
+                description='start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)',
             ),
         },
         required=['device_id', 'name'],

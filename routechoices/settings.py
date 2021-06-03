@@ -244,7 +244,7 @@ SLUG_BLACKLIST = [
     'signin', 'signup', 'site', 'sitemap', 'sites', 'smtp', 'sort', 'source',
     'sql', 'ssh', 'ssh-rsa', 'ssl', 'ssladmin', 'ssladministrator',
     'sslwebmaster', 'stage', 'staging', 'stat', 'static', 'statistics',
-    'stats', 'status', 'store', 'style', 'styles', 'stylesheet', 'stylesheets',
+    'stats', 'status', 'store', 'stripe', 'style', 'styles', 'stylesheet', 'stylesheets',
     'subdomain', 'subscribe', 'sudo', 'super', 'superuser', 'support', 'survey',
     'sync', 'sysadmin', 'system', 'tablet', 'tag', 'tags', 'team', 'telnet',
     'terms', 'terms-of-use', 'test', 'testimonials', 'theme', 'themes', 'today',
