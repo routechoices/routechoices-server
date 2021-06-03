@@ -5,7 +5,6 @@ from decimal import Decimal
 from io import BytesIO
 import logging
 import hashlib
-import orjson as json
 import re
 import time
 from zipfile import ZipFile
@@ -24,15 +23,13 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 
 from django_hosts.resolvers import reverse
-
 import gpxpy
 import gpxpy.gpx
-
+import orjson as json
 import polyline_encoding
-
-import pytz
-
 from PIL import Image
+import pytz
+import stripe
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
@@ -59,6 +56,7 @@ logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
 
+stripe.api_key = settings.STRIPE_API_KEY
 
 class Point(object):
     def __init__(self, x, y=None):
@@ -100,6 +98,11 @@ class Club(models.Model):
         help_text='This is used in the urls of your events'
     )
     admins = models.ManyToManyField(User)
+    stripe_customer_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ['name']
@@ -123,6 +126,32 @@ class Club(models.Model):
             qs = qs.exclude(id=self.id)
         if qs.exists():
             raise ValidationError('Club with this slug already exists.')
+
+    def get_or_create_stripe_customer_id(self):
+        if self.stripe_customer_id:
+            return self.stripe_customer_id, False
+        customer = stripe.Customer.create(
+            name=self.name,
+            description=f'Club "{self.name}" ({self.aid})',
+        )
+        self.stripe_customer_id = customer.id
+        self.save()
+        return self.stripe_customer_id, True
+
+    def get_active_subscription(self):
+        customer_id, created = self.get_or_create_stripe_customer_id()
+        if created:
+            return False
+        customer = stripe.Customer.retrieve(
+            customer_id,
+            expand=['subscriptions']
+        )
+        if len(customer.subscriptions.data) > 0:
+            for sub in customer.subscriptions.data:
+                if sub.status in ['active', 'trialing']:
+                    return sub.id
+        else:
+            return False
 
 
 def map_upload_path(instance=None, file_name=None):

@@ -96,6 +96,11 @@ class EventForm(ModelForm):
             raise ValidationError('Map must be from the organizing club')
         return rmap
 
+    def clean_club(self):
+        club = self.cleaned_data.get('club')
+        if not club.has_valid_subscription:
+            raise ValidationError('Club does not have a valid subscription')
+        return club
 
 class NoticeForm(ModelForm):
     class Meta:

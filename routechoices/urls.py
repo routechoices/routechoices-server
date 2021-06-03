@@ -51,6 +51,13 @@ urlpatterns = [
         )
     ),
     url(
+        r'^stripe/',
+        include(
+            ('routechoices.stripe.urls', 'stripe'),
+            namespace='stripe'
+        )
+    ),
+    url(
         r'^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
         r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',
         dashboard_map_download,

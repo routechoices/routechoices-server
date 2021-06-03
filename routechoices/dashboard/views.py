@@ -6,7 +6,9 @@ import zipfile
 import requests
 
 import gpxpy
+import stripe
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -39,6 +41,7 @@ from routechoices.lib.kmz import extract_ground_overlay_info
 
 DEFAULT_PAGE_SIZE = 25
 
+stripe.api_key = settings.STRIPE_API_KEY
 
 @login_required
 def home_view(request):
@@ -182,7 +185,7 @@ def club_create_view(request):
             club.creator = request.user
             club.save()
             form.save_m2m()
-            return redirect('dashboard:club_list_view')
+            return redirect('dashboard:club_edit_view', club.aid)
     else:
         form = ClubForm()
     form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
@@ -229,6 +232,9 @@ def club_edit_view(request, id):
             'context': 'edit',
             'club': club,
             'form': form,
+            'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+            'monthly_plan_id': settings.STRIPE_MONTHLY_PLAN_ID,
+            'yearly_plan_id': settings.STRIPE_YEARLY_PLAN_ID,
         }
     )
 
