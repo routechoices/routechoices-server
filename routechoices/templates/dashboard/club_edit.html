@@ -15,28 +15,44 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <input type="submit" value="Submit" class="btn btn-primary">
-            {% if context == 'edit' %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
+            {% if context == 'edit' and not club.active_subscription_id %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>
     {% if context == 'edit' %}
     <div class="col-xs-12">
-        {% if not club.get_active_subscription %}
-        <h1>Buy a Plan</h1>
+        {% if not club.active_subscription_id %}
+        <h2>Buy a plan for this club</h2>
+        <p>Each plan comes with a 15 days trial period.</p>
+        <p>You can cancel your plan any time.</p>
+        <p>A plan allows you to create and edit as many events as you desire.</p>
+        <div style="margin-bottom: 15px">
         <form id="payment-form">
-            <h4>Card details</h4>
             <div style="margin-bottom: 15px">
+            <h4>Card details</h4>
             <div id="card-element">
               <!-- Elements will create input elements here -->
             </div>
-        
+            <h4>Email address for billing</h4>
+            <input class="form-control" type="email" required id="id_billing_email"/>
             <!-- We'll put the error messages in this element -->
-            <div id="card-element-errors" role="alert"></div>
             </div>
+            <div id="card-element-errors" role="alert" class="hidden alert alert-danger"></div>
             <button class="btn btn-primary" type="submit" value="{{monthly_plan_id}}">Buy monthly plan (20€/month)</button>&nbsp;
             <button class="btn btn-success" type="submit" value="{{yearly_plan_id}}">Buy annual plan (200€/year)</button>
           </form>
+          </div>
+          <div id="messages" class="hidden alert alert-info"></div>
+          <div id="errors" class="hidden alert alert-danger"></div>
         {% else %}
         <h2>You have an active plan</h2>
+        <div style="margin-bottom: 15px;">
+          <button id="cancel-btn" class="btn btn-danger">Cancel plan</button>
+        </div>
+        <div id="messages" class="hidden alert alert-info"></div>
+        <div id="errors" class="hidden alert alert-danger"></div>
+        <p>If you cancel your plan, you will not be able to create or edit any events for this club anymore.</p>
+        <p>Events previously created will remain as they were and will not be deleted.</p>
+        
         {% endif %}
     </div>
     {% endif %}
@@ -71,21 +87,16 @@ $('#id_admins').selectize({
 </script>
 {% if context == 'edit' %}
 <script>
-  var stripe = Stripe('{{ stripe_publishable_key }}');
+var stripe = Stripe('{{ stripe_publishable_key }}');
+document.addEventListener('DOMContentLoaded', () => {
+  {% if not club.active_subscription_id %}
+  
   var elements = stripe.elements();
   var card = elements.create('card', {hidePostalCode: true, style: {base: {maxWidth: '500px'}}});
   card.mount('#card-element');
   card.on('change', function (event) {
     displayError(event);
   });
-  function displayError(event) {
-    var displayError = document.getElementById('card-element-errors');
-    if (event.error) {
-        displayError.textContent = event.error.message;
-    } else {
-        displayError.textContent = '';
-    }
-  }
   var form = document.getElementById('payment-form');
 
   form.addEventListener('submit', function (ev) {
@@ -93,6 +104,67 @@ $('#id_admins').selectize({
     console.log(ev);
     createPaymentMethod({card, priceId: ev.submitter.value})
   });
+  {% else %}
+  var cancelBtn = document.querySelector('#cancel-btn');
+  cancelBtn.addEventListener('click', onCancelSubscription)
+  {% endif %}
+})
+
+function setMessage(message){
+    var messagesDiv = document.querySelector('#messages');
+    messagesDiv.innerHTML = message;
+    if (message === '') {
+        $('#messages').addClass('hidden')
+    } else {
+        $('#messages').removeClass('hidden')
+    }
+}
+
+function setError(message){
+    setMessage('')
+    var messagesDiv = document.querySelector('#errors');
+    messagesDiv.innerHTML = message;
+    if (message === '') {
+        $('#errors').addClass('hidden')
+    } else {
+        $('#errors').removeClass('hidden')
+    }
+}
+
+function displayError(event) {
+    setMessage('')
+    var displayError = document.getElementById('card-element-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+        $('#card-element-errors').removeClass('hidden')
+    } else {
+        $('#card-element-errors').addClass('hidden')
+        displayError.textContent = '';
+    }
+  }
+
+function onCancelSubscription(ev) {
+  ev.preventDefault()
+  setMessage("Cancelling subscription...");
+  displayError('')
+  setError('')
+  fetch('/stripe/cancel_subscription/', {
+    method: 'POST',
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      subscriptionId: '{{club.active_subscription_id}}'
+    }),
+  })
+  .then((response) => response.json()).then(() => {
+      window.location.reload()
+  }).catch(function(e) {
+    setError('Something went wrong...')
+  })
+
+}
 
 function createPaymentMethod({ card, priceId }) {
   var customerId = '{{ club.get_or_create_stripe_customer_id.0 }}';
@@ -115,6 +187,9 @@ function createPaymentMethod({ card, priceId }) {
 }
 
 function createSubscription({ customerId, paymentMethodId, priceId }) {
+  setMessage('Creating subscription...')
+  displayError('')
+  setError('')
   return (
     fetch('/stripe/create_subscription/', {
       method: 'POST',
@@ -126,6 +201,7 @@ function createSubscription({ customerId, paymentMethodId, priceId }) {
         customerId: customerId,
         paymentMethodId: paymentMethodId,
         priceId: priceId,
+        billingEmail: $('#id_billing_email').val(),
       }),
     })
       .then((response) => {
@@ -161,19 +237,14 @@ function createSubscription({ customerId, paymentMethodId, priceId }) {
       .catch((error) => {
         // An error has happened. Display the failure to the user here.
         // We utilize the HTML element we created.
-        showCardError(error);
+        displayError(error);
       })
   );
 }
 
 function onSubscriptionComplete(result) {
   // Payment was successful.
-  if (result.subscription.status === 'active') {
-    // Change your UI to show a success message to your customer.
-    // Call your backend to grant access to your service based on
-    // `result.subscription.items.data[0].price.product` the customer subscribed to.
-    window.location.reload();
-  }
+  window.location.reload();
 }
 
 function handlePaymentThatRequiresCustomerAction({
@@ -219,7 +290,7 @@ function handlePaymentThatRequiresCustomerAction({
         }
       })
       .catch((error) => {
-        displayError(error);
+        throw error;
       });
   } else {
     // No customer action needed.

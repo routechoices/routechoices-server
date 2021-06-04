@@ -15,7 +15,14 @@ from django.forms import (
 )
 
 from routechoices.core.models import (
-    Club, Map, Event, Competitor, Device, Notice, MapAssignation
+    Club,
+    Map,
+    Event,
+    Competitor,
+    Device,
+    Notice,
+    MapAssignation,
+    PRIVACY_PUBLIC
 )
 from routechoices.lib.helper import get_aware_datetime
 
@@ -98,9 +105,27 @@ class EventForm(ModelForm):
 
     def clean_club(self):
         club = self.cleaned_data.get('club')
-        if not club.has_valid_subscription:
-            raise ValidationError('Club does not have a valid subscription')
+        if club.active_subscription_id:
+            return club
+        if self.instance.id and self.instance.aid not in club.free_event_ids:
+            raise ValidationError(
+                'Club does not have an active plan and this event was created outside the free plan '
+            )
+        if not self.instance.id and not club.can_create_free_event:
+            raise ValidationError(
+                'Club does not have an active plan and has exceeded its free plan'
+            )
         return club
+
+    def clean_privacy(self):
+        privacy = self.cleaned_data.get('privacy')
+        club = Club.objects.get(id=self.data.get('club'))
+        if club and not club.active_subscription_id and privacy != PRIVACY_PUBLIC:
+            raise ValidationError(
+                'Only public event can be created under the free plan'
+            )
+        return privacy
+
 
 class NoticeForm(ModelForm):
     class Meta:
@@ -115,13 +140,13 @@ class ExtraMapForm(ModelForm):
 
     def clean_map(self):
         rmap = self.cleaned_data.get('map')
-        club = self.data.get('club')
-        if club and int(club) != rmap.club_id:
-            raise ValidationError('Map must be from the organizing club')
         if not self.data.get('map'):
             raise ValidationError(
                 'Extra maps can be set only if the main map field is set first'
             )
+        club = self.data.get('club')
+        if club and int(club) != rmap.club_id:
+            raise ValidationError('Map must be from the organizing club')
         return rmap
 
     def clean_title(self):

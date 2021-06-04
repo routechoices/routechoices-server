@@ -2,6 +2,7 @@ import os
 
 import tempfile
 import zipfile
+from django.core.exceptions import ValidationError
 
 import requests
 
@@ -550,6 +551,10 @@ def event_create_view(request):
             notice = notice_form.save(commit=False)
             notice.event = event
             notice.save()
+            
+            if not event.club.active_subscription_id:
+                event.club.add_free_event(event)
+            
             if request.POST.get('save_continue'):
                 return redirect(
                     'dashboard:event_edit_view',

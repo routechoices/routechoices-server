@@ -4,6 +4,9 @@ from django.conf import settings
 
 
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import (
+    PermissionDenied
+)
 from rest_framework.response import Response
 
 stripe.api_key = settings.STRIPE_API_KEY
@@ -72,6 +75,7 @@ def create_subscription_view(request):
             invoice_settings={
                 'default_payment_method': data['paymentMethodId'],
             },
+            email=data['billingEmail'],
         )
         # Create the subscription
         subscription = stripe.Subscription.create(
@@ -86,3 +90,16 @@ def create_subscription_view(request):
         return Response(subscription)
     except Exception as e:
         return Response({'error': {'message': str(e)}})
+
+
+@api_view(['POST'])
+def cancel_subscription_view(request):
+    data = request.data
+    try:
+        #  Cancel the subscription by deleting it
+        deletedSubscription = stripe.Subscription.delete(
+            data['subscriptionId']
+        )
+        return Response(deletedSubscription)
+    except Exception as e:
+        raise PermissionDenied({'error': str(e)})

@@ -28,6 +28,11 @@ urlpatterns = [
         r'^privacy-policy/?$',
         TemplateView.as_view(template_name='site/privacy_policy.html'),
         name='privacy_policy_view'
+    ),   
+    url(
+        r'^pricing/?$',
+        TemplateView.as_view(template_name='site/pricing.html'),
+        name='pricing_view'
     ),
     url(
         r'^tos/?$',

@@ -8,6 +8,7 @@ import hashlib
 import re
 import time
 from zipfile import ZipFile
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -58,6 +59,7 @@ GLOBAL_MERCATOR = GlobalMercator()
 
 stripe.api_key = settings.STRIPE_API_KEY
 
+
 class Point(object):
     def __init__(self, x, y=None):
         if isinstance(x, tuple):
@@ -101,8 +103,9 @@ class Club(models.Model):
     stripe_customer_id = models.CharField(
         max_length=255,
         blank=True,
-        null=True
+        default='',
     )
+    free_plan_events_raw = models.TextField(blank=True, default='')
 
     class Meta:
         ordering = ['name']
@@ -138,7 +141,8 @@ class Club(models.Model):
         self.save()
         return self.stripe_customer_id, True
 
-    def get_active_subscription(self):
+    @cached_property
+    def active_subscription_id(self):
         customer_id, created = self.get_or_create_stripe_customer_id()
         if created:
             return False
@@ -152,6 +156,45 @@ class Club(models.Model):
                     return sub.id
         else:
             return False
+
+    @property
+    def free_plan_events(self):
+        if not self.free_plan_events_raw:
+            return []
+        return json.loads(self.free_plan_events_raw)
+
+    @property
+    def free_event_ids(self):
+        data = self.free_plan_events
+        return (e['id'] for e in data)
+
+    @property
+    def last_free_event_created_at(self):
+        data = self.free_plan_events
+        if len(data) == 0:
+            return None
+        return arrow.get(
+            max(e['created_at'] for e in data)
+        ).datetime
+
+    def add_free_event(self, event):
+        data = self.free_plan_events
+        data.append(
+            {
+                'id': event.aid,
+                'created_at': event.creation_date.timestamp()
+            }
+        )
+        self.free_plan_events_raw = str(json.dumps(data), 'utf-8')
+        self.save()
+
+    @property
+    def can_create_free_event(self):
+        last_created_at = self.last_free_event_created_at
+        if not last_created_at or \
+           (now() - last_created_at) > timedelta(days=30):
+            return True
+        return False
 
 
 def map_upload_path(instance=None, file_name=None):
@@ -666,7 +709,7 @@ class Event(models.Model):
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Event.objects.filter(
-            club__slug__iexact=self.club.slug,
+            club_id=self.club_id,
             slug__iexact=self.slug
         )
         if self.id:

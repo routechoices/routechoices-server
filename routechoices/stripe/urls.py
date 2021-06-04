@@ -13,4 +13,9 @@ urlpatterns = [
         views.create_subscription_view,
         name='create_subscription_view'
     ),
+    url(
+        r'^cancel_subscription/?$',
+        views.cancel_subscription_view,
+        name='cancel_subscription_view'
+    ),
 ]

@@ -31,17 +31,17 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get('#id_password').type(password + '{enter}')
  })
 
- Cypress.Commands.add("createClub", () => {
+ Cypress.Commands.add("createClub", (name) => {
   cy.visit('/dashboard/')
   cy.get('a').contains('Clubs').click()
   cy.url().should('match', /\/dashboard\/club$/)
   cy.get('a').contains('Create new club').click()
   cy.url().should('match', /\/dashboard\/club\/new$/)
-  cy.get('#id_name').type('Halden SK')
-  cy.get('#id_slug').type('halden-sk')
+  cy.get('#id_name').type(name)
+  cy.get('#id_slug').type(name.toLowerCase())
   cy.get('#id_admins').next('').type('admin{enter}')
   cy.get("input[value='Submit']").click()
-  cy.url().should('match', /\/dashboard\/club$/)
+  cy.url().should('match', /\/dashboard\/club\/[a-zA-Z0-9-_]{11}$/)
  })
 
  Cypress.Commands.add("getDeviceId", () => {
@@ -58,14 +58,14 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   })
  })
 
- Cypress.Commands.add("createMap", () => {
+ Cypress.Commands.add("createMap", (club) => {
   cy.visit('/dashboard/')
   cy.get('a').contains('Maps').click()
   cy.url().should('match', /\/dashboard\/map$/)
   cy.get('a').contains('Create new map').click()
   cy.url().should('match', /\/dashboard\/map\/new$/)
   
-  cy.get('#id_club').select('Halden SK')
+  cy.get('#id_club').select(club)
   cy.get('#id_name').type('Jukola 2019 - 1st Leg')
   const mapFileName = 'Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg'
   cy.get('#id_image').attachFile(mapFileName)

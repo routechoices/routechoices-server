@@ -12,7 +12,6 @@
         #generic_price_table .generic_content .generic_head_price{
 	        background-color: #efefef;
         }
-        
         #generic_price_table .generic_content .generic_head_price .generic_head_content .head_bg{
             border-color: #e4e4e4 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #e4e4e4;
         }
@@ -412,7 +411,7 @@
 <div id="generic_price_table">   
 <!--BLOCK ROW START-->
 <div class="row">
-    <div class="col-md-4"></div>
+    <div class="col-md-2"></div>
     <div class="col-md-4">
     
         <!--PRICE CONTENT START-->
@@ -430,7 +429,6 @@
                         <span>Free</span>
                     </div>
                     <!--//HEAD END-->
-                    <span>Routechoices.com is a free for all project</span>
                 </div>
                 <!--//HEAD CONTENT END-->
                 
@@ -450,10 +448,74 @@
             <!--FEATURE LIST START-->
             <div class="generic_feature_list">
                 <ul>
+                    <li><span>1 Event every 30 days</span></li>
+                    <li><span>Public Events Only</span></li>
+                    <li><span>Email Support</span></li>
+                </ul>
+            </div>
+            <!--//FEATURE LIST END-->
+            
+            <!--BUTTON START-->
+            <div class="generic_price_btn clearfix">
+                <a class="" href="{% url 'account_signup'%}">Sign up</a>
+            </div>
+            <!--//BUTTON END-->
+            
+        </div>
+        <!--//PRICE CONTENT END-->
+            
+    </div>
+    <div class="col-md-4">
+    
+        <!--PRICE CONTENT START-->
+        <div class="generic_content clearfix">
+            
+            <!--HEAD PRICE DETAIL START-->
+            <div class="generic_head_price clearfix">
+            
+                <!--HEAD CONTENT START-->
+                <div class="generic_head_content clearfix">
+                
+                    <!--HEAD START-->
+                    <div class="head_bg"></div>
+                    <div class="head">
+                        <span>Unlimited</span>
+                    </div>
+                    <!--//HEAD END-->
+                    
+                </div>
+                <!--//HEAD CONTENT END-->
+                
+                <!--PRICE START-->
+                <div class="generic_price_tag clearfix">	
+                    <span class="price">
+                        <span class="currency">20</span>
+                        <span class="cent">.00</span>
+                        <span class="sign">€</span>
+                        <span class="month">/MONTH/CLUB</span>
+                    </span>
+                    <span class="price">
+                        OR
+                    </span>
+                    <span class="price">
+                        <span class="currency">200</span>
+                        <span class="cent">.00</span>
+                        <span class="sign">€</span>
+                        <span class="month">/YEAR/CLUB</span>
+                    </span>
+                </div>
+                <!--//PRICE END-->
+                
+            </div>                            
+            <!--//HEAD PRICE DETAIL END-->
+            
+            <!--FEATURE LIST START-->
+            <div class="generic_feature_list">
+                <ul>
                     <li><span>Unlimited Events</span></li>
-                    <li><span>Public, Secret and Private Events</span></li>
-                    <li><span>Custom URL for your club pages</span></li>
-                    <li><span>Up to 10 club administors</span></li>
+                    <li><span>Secret and Private Events</span></li>
+                    <li><span>15 Days Trial</span></li>
+                    <li><span>Email Support</span></li>
                 </ul>
             </div>
             <!--//FEATURE LIST END-->
@@ -469,20 +531,5 @@
             
     </div>
 </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <!--PRICE HEADING START-->
-        <div class="price-heading clearfix">
-            <h1>Donations</h1>
-            <p>Routechoices.com is a free to use platform.</p>
-            <p>Consider supporting us so that we can keep improving the platform in the future and maintain the free experience:<br/><br/>
-                <a href="https://www.patreon.com/routechoices"><b>Become a backer or sponsor on Patreon</b></a><br/>
-                <a href="https://www.paypal.me/routechoices"><b>One time donation via PayPal</b></a>
-            </p>
-            <a href="{% url 'site:backers_view' %}">List of our backer</a>
-        </div>
-        <!--//PRICE HEADING END-->
-    </div>
 </div>
 {% endblock %}
