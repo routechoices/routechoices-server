@@ -34,7 +34,8 @@
           <p>Select below your desired option:</p>
           <p style="margin-top:2em">
             <a role="button" class="btn btn-info" id="android-btn" data-toggle="modal" data-target="#android-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with an Android smartphone</a>
-            <a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a IPhone</a>
+            <a role="button" class="btn btn-primary" id="ios-btn" data-toggle="modal" data-target="#ios-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a iPhone</a>
+            <!--<a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a IPhone</a> -->
             <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
             <a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>
           </p>
@@ -121,6 +122,39 @@
         </div>
       </div>
 
+      <div class="modal fade" id="ios-modal" tabindex="-1" role="dialog" aria-labelledby="traccar-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="ios-modal-label">iOS Tracking App</h4>
+            </div>
+            <div class="modal-body">
+              <p>
+                Download the Routechoices Tracker for iOS device.
+              </p>
+              <p>
+                 <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60px" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
+              </p>
+              <p>
+                When you'll open the app, it will display your device ID.
+               </p>
+               <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
+               <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone.</p>
+             <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
+              <ul>
+                <li>
+                  Make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
+                </li>
+              </ul>
+            </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="modal fade" id="android-modal" tabindex="-1" role="dialog" aria-labelledby="android-modal-label" aria-hidden="true">
         <div class="modal-dialog">
