@@ -26,9 +26,10 @@ class ClubForm(ModelForm):
 
     def clean_admins(self):
         admins = self.cleaned_data['admins']
-        if admins.count() > 5:
-            raise ValidationError('Clubs can only have a maximum of 5 admins')
+        if admins.count() > 10:
+            raise ValidationError('Clubs can only have a maximum of 10 admins')
         return admins
+
 
 class DeviceForm(Form):
     device = ModelChoiceField(
