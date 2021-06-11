@@ -30,6 +30,11 @@ urlpatterns = [
         name='tos_view'
     ),
     url(
+        r'^pricing/?$',
+        TemplateView.as_view(template_name='site/pricing.html'),
+        name='pricing_view'
+    ),
+    url(
         r'^r/(?P<event_id>[0-9a-zA-Z_-]+)/?$',
         views.event_shortcut,
         name='event_shortcut'
