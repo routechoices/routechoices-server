@@ -356,6 +356,10 @@ var displayOptions = function() {
         })
       )
     );
+    var qr = qrcode(0, 'L');
+    qr.addData(qrUrl)
+    qr.make()
+    var qrDataUrl = qr.createDataURL(4);
     mainDiv.append(
       $('<div"/>').html(
         '<h4>Competitors</h4>' +
@@ -367,7 +371,7 @@ var displayOptions = function() {
         '<div class="form-group">' +
         '<label for="tailLengthInput">Length in seconds</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
-        (qrUrl ? ('<h4>QR Link</h4><img src="' + qrUrl + '" alt="qr">') : '') +
+        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a  href="'+ qrUrl +'">'+qrUrl+'</a></p>') : '') +
         '</div>'
       )
     );

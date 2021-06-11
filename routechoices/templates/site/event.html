@@ -245,6 +245,7 @@ and (max-device-width : 500px) {
 
 {% endblock %}
 {% block extra_body %}
+<script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/moment-2.24.0/moment.js' %}"></script>
 <script src="{% static '/vendor/leaflet-smoothwheelzoom-2020.07.03/SmoothWheelZoom.js' %}"></script>
@@ -253,7 +254,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021042700.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021061100.js' %}"></script>
 <script>
 if (!navigator.canShare) {
   $('#share_buttons').hide();
@@ -390,7 +391,7 @@ $(function() {
   {% else %}
   isLiveEvent = {% if event.is_live %}true{% else %}false{% endif %};
   {% if event.shortcut %}
-  qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl={{ event.shortcut }}';
+  qrUrl = '{{ event.shortcut }}';
   {% endif %}
   liveUrl = '{% url 'api:event_data' event_id=event.aid %}';
   mapDetailsUrl = '{% url 'api:event_map_details' event_id=event.aid %}';
