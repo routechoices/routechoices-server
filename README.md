@@ -1,9 +1,9 @@
 [![rphlo](https://circleci.com/gh/rphlo/routechoices-server.svg?style=shield)](https://circleci.com/gh/rphlo/routechoices-server)
 
-Routechoices.com
+routechoices-server
 ==================
 
-Live GPS Tracking Solution for orienteering events.
+Server for live GPS tracking in orienteering events context.
 
 Run in docker for local development
 -----------------------------------
