@@ -1,4 +1,4 @@
-[![rphlo](https://circleci.com/gh/rphlo/routechoices-server.svg?style=shield)](https://circleci.com/gh/rphlo/routechoices-server)
+[![rphlo](https://circleci.com/gh/rphlo/routechoices-server.svg?style=shield&1)](https://circleci.com/gh/rphlo/routechoices-server)
 
 routechoices-server
 ==================
