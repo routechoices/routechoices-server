@@ -17,7 +17,7 @@ from routechoices.core.models import Device
 def _get_device(imei):
     try:
         return Device.objects.get(physical_device__imei=imei)
-    except Device.DoesNotExist:
+    except Exception:
         return None
 
 
@@ -98,7 +98,7 @@ class TMT250Connection():
             imei = data[2:].decode('ascii')
         except Exception:
             pass
-        if imei_len != len(imei):
+        if imei_len != len(imei) or imei_len != 15:
             print('invalid identification %s, %s, %d' % (
                 self.address,
                 imei,
