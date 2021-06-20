@@ -15,8 +15,8 @@ def validate_imei(number):
     matched = re.match(r'^\d{15}$', number)
     if not matched:
         raise ValidationError(_('Invalid IMEI (must be 15 characters)'))
-    if not luhn.validate(number):
-        raise ValidationError(_('Invalid IMEI (check digit does not match)'))
+    #if not luhn.validate(number):
+    #    raise ValidationError(_('Invalid IMEI (check digit does not match)'))
 
 
 def validate_latitude(value):
