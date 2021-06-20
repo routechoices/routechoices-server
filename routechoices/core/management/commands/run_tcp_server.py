@@ -4,6 +4,7 @@ import arrow
 from struct import unpack, pack
 from asgiref.sync import sync_to_async
 
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -12,7 +13,9 @@ from tornado.iostream import StreamClosedError
 from tornado.ioloop import IOLoop
 
 from routechoices.core.models import Device
-
+from routechoices.lib.validators import (
+     validate_imei,
+)
 
 def _get_device(imei):
     try:
@@ -98,7 +101,12 @@ class TMT250Connection():
             imei = data[2:].decode('ascii')
         except Exception:
             pass
-        if imei_len != len(imei) or imei_len != 15:
+        is_valid_imei = True
+        try:
+            validate_imei(imei)
+        except ValidationError:
+            is_valid_imei = False
+        if imei_len != len(imei) or not is_valid_imei:
             print('invalid identification %s, %s, %d' % (
                 self.address,
                 imei,
@@ -208,8 +216,17 @@ class GL200Connection():
             print(e)
             self.stream.close()
             return
+        is_valid_imei = True
+        try:
+            validate_imei(imei)
+        except ValidationError:
+            is_valid_imei = False
         if not imei:
             print('no imei')
+            self.stream.close()
+            return
+        elif not is_valid_imei:
+            print('invalid imei')
             self.stream.close()
             return
         self.db_device = await sync_to_async(

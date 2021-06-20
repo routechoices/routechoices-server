@@ -19,3 +19,4 @@ django-s3-storage
 orjson
 drf-yasg
 django-ratelimit
+fast-luhn

@@ -5,15 +5,18 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+import fast_luhn as luhn
 
 FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
 
 
 def validate_imei(number):
-    """Check if the number provided is a valid IMEI (or IMEISV) number."""
-    matched = re.match(r'^\d{14,16}$', number)
+    """Check if the number provided is a valid IMEI number."""
+    matched = re.match(r'^\d{15}$', number)
     if not matched:
-        raise ValidationError(_('Invalid IMEI'))
+        raise ValidationError(_('Invalid IMEI (must be 15 characters)'))
+    if not luhn.validate(number):
+        raise ValidationError(_('Invalid IMEI (check digit does not match)'))
 
 
 def validate_latitude(value):
@@ -23,9 +26,8 @@ def validate_latitude(value):
         value = Decimal(value)
     except Exception:
         raise ValidationError(_('not a number'))
-    else:
-        if value < -90 or value > 90:
-            raise ValidationError(_('latitude out of range -90.0 90.0'))
+    if value < -90 or value > 90:
+        raise ValidationError(_('latitude out of range -90.0 90.0'))
 
 
 def validate_longitude(value):
@@ -35,9 +37,8 @@ def validate_longitude(value):
         value = Decimal(value)
     except Exception:
         raise ValidationError(_('not a number'))
-    else:
-        if value < -180 or value > 180:
-            raise ValidationError(_('longitude out of range -180.0 180.0'))
+    if value < -180 or value > 180:
+        raise ValidationError(_('longitude out of range -180.0 180.0'))
 
 
 def validate_nice_slug(slug):
