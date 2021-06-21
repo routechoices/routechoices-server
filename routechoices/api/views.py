@@ -920,14 +920,15 @@ def get_device_for_imei(request):
     idevice = None
     try:
         idevice = ImeiDevice.objects.get(imei=imei)
+        device = idevice.device
     except ImeiDevice.DoesNotExist:
-        d = Device(aid=short_random_key()+'_i')
-        d.save()
-        idevice = ImeiDevice(imei=imei, device=d)
+        device = Device(aid=short_random_key()+'_i')
+        device.save()
+        idevice = ImeiDevice(imei=imei, device=device)
         idevice.save()
     return Response({
         'status': 'ok',
-        'device_id': d.aid,
+        'device_id': device.aid,
         'imei': imei
     })
 
