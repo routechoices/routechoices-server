@@ -915,8 +915,8 @@ def get_device_for_imei(request):
         raise ValidationError('No imei')
     try:
         validate_imei(imei)
-    except Exception:
-        raise ValidationError('Invalid imei')
+    except Exception as e:
+        raise ValidationError('Invalid imei '+str(e))
     idevice = None
     try:
         idevice = ImeiDevice.objects.get(imei=imei)

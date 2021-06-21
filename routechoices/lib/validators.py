@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-#import fast_luhn as luhn
+import fast_luhn as luhn
 
 FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
 
@@ -15,8 +15,8 @@ def validate_imei(number):
     matched = re.match(r'^\d{15}$', number)
     if not matched:
         raise ValidationError(_('Invalid IMEI (must be 15 characters)'))
-    #if not luhn.validate(number):
-    #    raise ValidationError(_('Invalid IMEI (check digit does not match)'))
+    if not luhn.validate(number):
+        raise ValidationError(_('Invalid IMEI (check digit does not match)'))
 
 
 def validate_latitude(value):
