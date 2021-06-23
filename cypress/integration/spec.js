@@ -33,7 +33,7 @@ context('Cypress tests', () => {
       cy.url().should('match', /\/dashboard\/event$/)
 
       cy.intercept('GET', /^\/api\/events\/[0-9a-zA-Z_-]+\/data/).as('eventData');
-      cy.visit('http://halden-sk.localhost:8080/Jukola-2019-1st-leg')
+      cy.forceVisit('/halden-sk/Jukola-2019-1st-leg')
       cy.wait('@eventData').then(({ request, response }) => {
         expect(response.statusCode).to.eq(200);
       });
@@ -61,7 +61,7 @@ context('Cypress tests', () => {
         expect(request.body).to.contain('&competitors-0-device=1&');
       });
       cy.url().should('match', /\/dashboard\/event$/)
-      cy.visit('http://halden-sk.localhost:8080/Jukola-2019-1st-leg-2')
+      cy.forceVisit('/halden-sk/Jukola-2019-1st-leg-2')
 
       // trigger as many errors has possible
       cy.visit('/dashboard/event')

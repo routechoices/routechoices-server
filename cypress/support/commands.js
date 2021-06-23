@@ -72,3 +72,9 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get("input[value='Submit']").click()
   cy.url().should('match', /\/dashboard\/map$/)
  })
+ 
+ Cypress.Commands.add('forceVisit', url => {
+  cy.window().then(win => {
+    return win.open(url, '_self');
+  });
+});
