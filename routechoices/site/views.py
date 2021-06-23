@@ -63,18 +63,19 @@ def events_view(request):
 
 def club_view(request, **kwargs):
     if kwargs.get('club_slug'):
+        club_slug = kwargs.get('club_slug')
+        if club_slug in ('api', 'admin', 'dashboard',):
+            return redirect('/{}/'.format(club_slug))
         return redirect(
             reverse(
                 'club_view',
                 host='clubs',
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
+                    'club_slug': club_slug
                 }
             )
         )
     club_slug = request.club_slug
-    if club_slug in ('api', 'admin', 'dashboard',):
-        return redirect('/{}/'.format(club_slug))
     club = get_object_or_404(
         Club,
         slug__iexact=club_slug
