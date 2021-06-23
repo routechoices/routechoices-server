@@ -22,12 +22,12 @@ class ApiTestCase(APITestCase):
         return res.data.get('device_id')
 
     def test_api_root(self):
-        url = self.reverse_and_check('api:api_doc', '/api/')
+        url = self.reverse_and_check('api:api_doc', '//www.localhost:8080/api/')
         res = self.client.get(url)
         self.assertEquals(res.status_code, status.HTTP_200_OK)
 
     def test_get_time(self):
-        url = self.reverse_and_check('api:time_api', '/api/time')
+        url = self.reverse_and_check('api:time_api', '//www.localhost:8080/api/time')
         t1 = time.time()
         res = self.client.get(url)
         t2 = time.time()
@@ -35,14 +35,14 @@ class ApiTestCase(APITestCase):
         self.assertTrue(t1 < res.data.get('time') < t2)
 
     def test_get_device_id(self):
-        url = self.reverse_and_check('api:device_id_api', '/api/device_id')
+        url = self.reverse_and_check('api:device_id_api', '//www.localhost:8080/api/device_id')
         res = self.client.post(url)
         self.assertEquals(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data.get('device_id')) == 6)
         self.assertTrue(res.data.get('device_id') != self.get_device_id())
 
     def test_traccar_api_gw(self):
-        url = self.reverse_and_check('api:traccar_api_gw', '/api/traccar')
+        url = self.reverse_and_check('api:traccar_api_gw', '//www.localhost:8080/api/traccar')
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
@@ -58,7 +58,7 @@ class ApiTestCase(APITestCase):
         self.assertEquals(nb_points, 1)
 
     def test_garmin_api_gw(self):
-        url = self.reverse_and_check('api:garmin_api_gw', '/api/garmin')
+        url = self.reverse_and_check('api:garmin_api_gw', '//www.localhost:8080/api/garmin')
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
@@ -75,7 +75,7 @@ class ApiTestCase(APITestCase):
         self.assertEquals(nb_points, 2)
 
     def test_pwa_api_gw(self):
-        url = self.reverse_and_check('api:pwa_api_gw', '/api/pwa')
+        url = self.reverse_and_check('api:pwa_api_gw', '//www.localhost:8080/api/pwa')
         dev_id = self.get_device_id()
         t = time.time()
         gps_encoded = GeoLocationSeries([])
