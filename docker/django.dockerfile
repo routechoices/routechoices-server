@@ -34,7 +34,7 @@ ENV DJANGO_SETTINGS_MODULE=routechoices.settings
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 RUN DATABASE_URL=none /venv/bin/python manage.py collectstatic --noinput
-
+RUN echo 127.0.0.1 www.localhost halden-sk.localhost | tee -a /etc/hosts
 # ENTRYPOINT ["/app/docker-entrypoint.sh"]
 # Start uWSGI
 # CMD ["/venv/bin/uwsgi", "--http-auto-chunked", "--http-keepalive"]
