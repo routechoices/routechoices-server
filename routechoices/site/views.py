@@ -37,7 +37,7 @@ def home_view(request):
 def event_shortcut(request, event_id):
     event = get_object_or_404(Event, aid=event_id)
     site = Site.objects.get(id=settings.SITE_ID)
-    return redirect('http' + ('s' if request.is_secure() else '') + '://' + event.get_absolute_url())
+    return redirect('http' + ('s' if request.is_secure() else '') + ':' + event.get_absolute_url())
 
 
 def tracker_view(request):
