@@ -1263,13 +1263,12 @@ http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={ev
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    site = Site.objects.get(id=settings.SITE_ID)
     response_json = {
         'status': 'OK',
         'racename': event.name,
         'racestarttime': event.start_date,
         'raceendtime': event.end_date,
-        'mapurl': f'https://{site.domain}{event.get_absolute_map_url()}?.jpg',
+        'mapurl': f'https:{event.get_absolute_map_url()}?.jpg',
         'caltype': '3point',
         'mapw': event.map.width,
         'maph': event.map.height,
