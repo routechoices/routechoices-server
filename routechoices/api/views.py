@@ -1150,7 +1150,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
         club_list = Club.objects.filter(admins=request.user)
         raster_map = get_object_or_404(
             Map,
-            aid=id,
+            aid=map_id,
             club__in=club_list
         )
     kmz_data = raster_map.kmz
