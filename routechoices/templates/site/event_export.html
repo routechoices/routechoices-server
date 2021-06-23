@@ -26,8 +26,8 @@
         <td>{{ map.title }}</a></td>
         <td>
           {% if event.started %}
-          <a href="{% url 'event_extra_map_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
-          <a href="{% url 'event_extra_kmz_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{% host_url 'event_extra_map_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{% host_url 'event_extra_kmz_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>
