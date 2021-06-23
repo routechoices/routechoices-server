@@ -10,6 +10,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
+from django_hosts.resolvers import reverse
 from allauth.account.models import EmailAddress
 
 from routechoices.core.models import (
@@ -36,7 +37,7 @@ def home_view(request):
 def event_shortcut(request, event_id):
     event = get_object_or_404(Event, aid=event_id)
     site = Site.objects.get(id=settings.SITE_ID)
-    return redirect('http' + ('s' if request.is_secure() else '') + '://' + site.domain + event.get_absolute_url())
+    return redirect('http' + ('s' if request.is_secure() else '') + '://' + event.get_absolute_url())
 
 
 def tracker_view(request):
@@ -60,12 +61,23 @@ def events_view(request):
     )
 
 
-def club_view(request, slug):
-    if slug in ('api', 'admin', 'dashboard',):
-        return redirect('/{}/'.format(slug))
+def club_view(request, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'club_view',
+                host='clubs',
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
+    if club_slug in ('api', 'admin', 'dashboard',):
+        return redirect('/{}/'.format(club_slug))
     club = get_object_or_404(
         Club,
-        slug__iexact=slug
+        slug__iexact=club_slug
     )
     event_list = Event.objects.filter(
         club=club,
@@ -84,7 +96,21 @@ def club_view(request, slug):
     )
 
 
-def event_view(request, club_slug, slug):
+def event_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
+    if not club_slug:
+        club_slug = request.club_slug
     event = get_object_or_404(
         Event.objects.all().prefetch_related('competitors'),
         club__slug__iexact=club_slug,
@@ -104,7 +130,19 @@ def event_view(request, club_slug, slug):
     )
 
 
-def event_export_view(request, club_slug, slug):
+def event_export_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_export_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = get_object_or_404(
         Event.objects.all().prefetch_related('competitors'),
         club__slug__iexact=club_slug,
@@ -125,16 +163,40 @@ def event_export_view(request, club_slug, slug):
     )
 
 
-def event_map_view(request, club_slug, slug):
+def event_map_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_map_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = get_object_or_404(
         Event,
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect('api:event_map_download', event_id=event.aid)
+    return redirect(reverse('api:event_map_download', kwargs={'event_id':event.aid}))
 
 
-def event_extra_map_view(request, club_slug, slug, index):
+def event_extra_map_view(request, slug, index, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_extra_map_view',
+                host='clubs',
+                kwargs={'slug': slug, 'index': index},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = get_object_or_404(
         Event,
         club__slug__iexact=club_slug,
@@ -147,16 +209,40 @@ def event_extra_map_view(request, club_slug, slug, index):
     )
 
 
-def event_kmz_view(request, club_slug, slug):
+def event_kmz_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_kmz_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = get_object_or_404(
         Event,
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect('api:event_kmz_download', event_id=event.aid)
+    return redirect(reverse('api:event_kmz_download', kwargs={'event_id': event.aid}))
 
 
-def event_extra_kmz_view(request, club_slug, slug, index):
+def event_extra_kmz_view(request, slug, index, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_extra_kmz_view',
+                host='clubs',
+                kwargs={'slug': slug, 'index': index},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = get_object_or_404(
         Event,
         club__slug__iexact=club_slug,
@@ -169,7 +255,19 @@ def event_extra_kmz_view(request, club_slug, slug, index):
     )
 
 
-def event_registration_view(request, club_slug, slug):
+def event_registration_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_registration_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = Event.objects.all().filter(
         club__slug__iexact=club_slug,
         slug__iexact=slug,
@@ -197,11 +295,12 @@ def event_registration_view(request, club_slug, slug):
                 'Successfully registered for this event.'
             )
             return redirect(
-                'site:event_registration_view',
-                **{
-                    'club_slug': event.club.slug,
-                    'slug': event.slug,
-                }
+                reverse(
+                    'event_registration_view',
+                    host='clubs',
+                    kwargs={'slug': event.slug},
+                    host_kwargs={'club_slug': event.club.slug}
+                )
             )
         else:
             devices = Device.objects.none()
@@ -225,7 +324,19 @@ def event_registration_view(request, club_slug, slug):
     )
 
 
-def event_route_upload_view(request, club_slug, slug):
+def event_route_upload_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_route_upload_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
     event = Event.objects.all().filter(
         club__slug__iexact=club_slug,
         slug__iexact=slug,

@@ -20,3 +20,4 @@ orjson
 drf-yasg
 django-ratelimit
 fast-luhn
+django-hosts

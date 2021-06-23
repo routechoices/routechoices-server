@@ -1,5 +1,5 @@
 import time
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
@@ -17,7 +17,7 @@ class ApiTestCase(APITestCase):
         return url
 
     def get_device_id(self):
-        url = reverse('api:device_id_api')
+        url = reverse('api:device_id_api', host='www')
         res = self.client.post(url)
         return res.data.get('device_id')
 

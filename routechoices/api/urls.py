@@ -100,8 +100,7 @@ urlpatterns = [
         name='event_announcement'
     ),
     url(
-        r'^maps/'
-        r'(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$',
+        r'^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$',
         views.map_kmz_download,
         name='map_kmz_download',
     ),

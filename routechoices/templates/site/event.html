@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load bootstrap3 %}
+{% load hosts %}
 
 {% block head_title %}{{ site.name }} | {{ event.name }}{% endblock %}
 
@@ -14,10 +15,10 @@
 <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{site.domain}}{{ event.get_absolute_url }}" />
 <meta name="twitter:card" content="summary_large_image">
 {% if event.started and event.map %}
-<meta property="og:image" content="http://{{site.domain}}{% url 'api:event_map_thumb_download' event_id=event.aid %}" />
+<meta property="og:image" content="http://{{site.domain}}{% host_url 'api:event_map_thumb_download' event_id=event.aid host 'www' %}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-{% if request.is_secure %}<meta property="og:image:secure_url" content="https://{{site.domain}}{% url 'api:event_map_thumb_download' event_id=event.aid %}" />{% endif %}
+{% if request.is_secure %}<meta property="og:image:secure_url" content="https://{{site.domain}}{% host_url 'api:event_map_thumb_download' event_id=event.aid host 'www' %}" />{% endif %}
 {% else %}
 <meta property="og:image" content="http://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />
 {% if request.is_secure %}<meta property="og:image:secure_url" content="https://{{site.domain}}{% static 'android-chrome-512x512.png' %}" />{% endif %}
@@ -254,8 +255,10 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021061100.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021062300.js' %}"></script>
 <script>
+var clock = ServerClock({url: '{% host_url 'api:time_api' host 'www' %}'});
+
 if (!navigator.canShare) {
   $('#share_buttons').hide();
 }
@@ -393,11 +396,11 @@ $(function() {
   {% if event.shortcut %}
   qrUrl = '{{ event.shortcut }}';
   {% endif %}
-  liveUrl = '{% url 'api:event_data' event_id=event.aid %}';
-  mapDetailsUrl = '{% url 'api:event_map_details' event_id=event.aid %}';
+  liveUrl = '{% host_url 'api:event_data' event_id=event.aid host 'www' %}';
+  mapDetailsUrl = '{% host_url 'api:event_map_details' event_id=event.aid host 'www' %}';
   mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
-  mapUrl = '{% url 'api:event_map_download' event_id=event.aid %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
-  noticeUrl = '{% url 'api:event_announcement' event_id=event.aid %}';
+  mapUrl = '{% host_url 'api:event_map_download' event_id=event.aid host 'www' %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
+  noticeUrl = '{% host_url 'api:event_announcement' event_id=event.aid host 'www' %}';
   {% if event.map %}
   var stemp = '{{ event.map.corners_coordinates }}'.split(',');
   addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);
@@ -408,7 +411,7 @@ $(function() {
       extraMaps.push({
         title:'{{e_map.title|escapejs}}',
         hash: '{{e_map.map.hash}}',
-        url: '{% url 'api:event_extra_map_download' event_id=event.aid map_index=forloop.counter %}?map_hash={{e_map.map.hash}}',
+        url: '{% host_url 'api:event_extra_map_download' event_id=event.aid map_index=forloop.counter host 'www' %}?map_hash={{e_map.map.hash}}',
         stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
       })
     {% endfor %}

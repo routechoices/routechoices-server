@@ -1,5 +1,5 @@
 from django.contrib.sitemaps import Sitemap
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.utils.timezone import now
 from routechoices.core.models import Event, Club, PRIVACY_PUBLIC
 

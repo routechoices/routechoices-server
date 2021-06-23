@@ -1,4 +1,4 @@
-{% load static %}{% load bootstrap3 %}{% load raven %}<!DOCTYPE html>
+{% load static %}{% load bootstrap3 %}{% load raven %}{% load hosts %}<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -53,20 +53,20 @@
                 <div class="col-sm-3">
                     <h5>Get started</h5>
                     <ul>
-                        <li><a href="{% url 'site:home_view'%}">Home</a></li>
-                        <li><a href="{% url 'site:events_view'%}">Events</a></li>
-                        <li><a href="{% url 'site:tracker_view'%}">Trackers</a></li>
-                        <li><a href="{% url 'account_login'%}">Login</a></li>
-                        <li><a href="{% url 'account_signup'%}">Sign up</a></li>
+                        <li><a href="{% host_url 'site:home_view' host 'www'%}">Home</a></li>
+                        <li><a href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
+                        <li><a href="{% host_url 'site:tracker_view' host 'www'%}">Trackers</a></li>
+                        <li><a href="{% host_url 'account_login' host 'www'%}">Login</a></li>
+                        <li><a href="{% host_url 'account_signup' host 'www'%}">Sign up</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-3">
                     <h5>About us</h5>
                     <ul>
-                        <li><a href="{% url 'site:contact_view'%}">Contact us</a></li>
-                        <li><a href="{% url 'site:pricing_view'%}">Pricing</a></li>
-                        <li><a href="{% url 'site:tos_view'%}">Term of service</a></li>
-                        <li><a href="{% url 'site:privacy_policy_view'%}">Privacy policy</a></li>
+                        <li><a href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
+                        <li><a href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
+                        <li><a href="{% host_url 'site:tos_view' host 'www'%}">Term of service</a></li>
+                        <li><a href="{% host_url 'site:privacy_policy_view' host 'www'%}">Privacy policy</a></li>
                     </ul>
                 </div>
                 <div class="col-sm-3">
@@ -85,7 +85,7 @@
         </div>
         <div class="second-bar">
            <div class="container">
-                <h2 class="logo site-name"><a href="{% url 'site:home_view'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35px"> {{site.name}}</a></h2>
+                <h2 class="logo site-name"><a href="{% host_url 'site:home_view' host 'www'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35px"> {{site.name}}</a></h2>
                 <!--<div class="social-icons">
                     <a href="#" class="twitter"><i class="fa fa-twitter"></i></a>
                     <a href="#" class="facebook"><i class="fa fa-facebook"></i></a>

@@ -20,7 +20,7 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.views.decorators.cache import cache_page
 
 from drf_yasg.utils import swagger_auto_schema
@@ -299,7 +299,7 @@ def event_detail(request, event_id):
         },
         'competitors': [],
         'data': request.build_absolute_uri(
-            reverse('api:event_data', kwargs={'event_id': event.aid})
+            reverse('api:event_data', host='www', kwargs={'event_id': event.aid})
         ),
         'announcement': event.notice.text,
         'extra_maps': [],
@@ -317,13 +317,14 @@ def event_detail(request, event_id):
             'coordinates': m.map.bound,
             'url': request.build_absolute_uri(reverse(
                 'api:event_extra_map_download',
+                host='www',
                 kwargs={'event_id': event.aid, 'map_index': (i+1)}
             )),
         })
     output['map'] = {
         'coordinates': event.map.bound,
         'url': request.build_absolute_uri(
-            reverse('api:event_map_download', kwargs={'event_id': event.aid})
+            reverse('api:event_map_download', host='www', kwargs={'event_id': event.aid})
         ),
         'title': event.map_title,
     } if event.map else None

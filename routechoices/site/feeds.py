@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 
 from routechoices.core.models import Event, PRIVACY_PUBLIC, Club
 
@@ -34,8 +34,8 @@ class LiveEventsFeed(Feed):
 
 
 class ClubLiveEventsFeed(Feed):
-    def get_object(self, request, slug):
-        return Club.objects.get(slug=slug)
+    def get_object(self, request, **kwargs):
+        return Club.objects.get(slug=request.club_slug)
 
     def title(self, obj):
         site = Site.objects.get(id=settings.SITE_ID)
@@ -46,7 +46,11 @@ class ClubLiveEventsFeed(Feed):
         return "Events by {} on {}".format(obj, site.name)
 
     def link(self, obj):
-        return reverse('site:club_view', kwargs={'slug': obj.slug})
+        return reverse(
+            'club_view',
+            host='clubs',
+            host_kwargs={'club_slug': obj.slug}
+        )
 
     def items(self, obj):
         return Event.objects.select_related('club').filter(

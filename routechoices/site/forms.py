@@ -12,7 +12,7 @@ from django.forms import (
     Textarea,
     BooleanField
 )
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.utils.timezone import now
 
 from routechoices.core.models import Competitor, Event, Device

@@ -21,7 +21,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
-from django.urls import reverse
+from django_hosts.resolvers import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
@@ -102,10 +102,9 @@ class Club(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'site:club_view',
-            kwargs={
-                'slug': self.slug
-            }
+            'club_view',
+            host='clubs',
+            host_kwargs={'club_slug': self.slug}
         )
 
     def validate_unique(self, exclude=None):
@@ -528,11 +527,10 @@ class Event(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'site:event_view',
-            kwargs={
-                'club_slug': self.club.slug,
-                'slug': self.slug
-            }
+            'event_view',
+            host='clubs',
+            kwargs={'slug': self.slug},
+            host_kwargs={'club_slug': self.club.slug}
         )
 
     def get_absolute_map_url(self):
@@ -546,11 +544,10 @@ class Event(models.Model):
 
     def get_absolute_export_url(self):
         return reverse(
-            'site:event_export_view',
-            kwargs={
-                'club_slug': self.club.slug,
-                'slug': self.slug
-            }
+            'event_export_view',
+            host='clubs',
+            kwargs={'slug': self.slug},
+            host_kwargs={'club_slug': self.club.slug}
         )
 
     @property
@@ -940,6 +937,7 @@ class Competitor(models.Model):
     def get_absolute_gpx_url(self):
         return reverse(
             'api:competitor_gpx_download',
+            host='www',
             kwargs={
                 'competitor_id': self.aid,
             }
