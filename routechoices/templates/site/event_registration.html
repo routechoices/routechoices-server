@@ -61,7 +61,7 @@ function selectizeDeviceInput(){
         load: function(query, callback) {
             if (!query.length || query.length < 2) return callback();
             $.ajax({
-                url: '{% host_url 'api:device_search_api' host 'www' %}?q=' + encodeURIComponent(query),
+                url: '{% host_url 'device_search_api' host 'api' %}?q=' + encodeURIComponent(query),
                 type: 'GET',
                 error: function() {
                     callback();

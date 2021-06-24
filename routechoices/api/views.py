@@ -299,7 +299,7 @@ def event_detail(request, event_id):
         },
         'competitors': [],
         'data': request.build_absolute_uri(
-            reverse('api:event_data', host='www', kwargs={'event_id': event.aid})
+            reverse('event_data', host='api', kwargs={'event_id': event.aid})
         ),
         'announcement': event.notice.text,
         'extra_maps': [],
@@ -316,15 +316,19 @@ def event_detail(request, event_id):
             'title': m.title,
             'coordinates': m.map.bound,
             'url': request.build_absolute_uri(reverse(
-                'api:event_extra_map_download',
-                host='www',
+                'event_extra_map_download',
+                host='api',
                 kwargs={'event_id': event.aid, 'map_index': (i+1)}
             )),
         })
     output['map'] = {
         'coordinates': event.map.bound,
         'url': request.build_absolute_uri(
-            reverse('api:event_map_download', host='www', kwargs={'event_id': event.aid})
+            reverse(
+                'event_map_download',
+                host='api', 
+                kwargs={'event_id': event.aid}
+            )
         ),
         'title': event.map_title,
     } if event.map else None
@@ -670,8 +674,8 @@ def garmin_ratelimit_key(group, request):
 
 @swagger_auto_schema(
     method='post',
-    operation_id='garmin_gateway',
-    operation_description='gateway for posting data from garmin application, allows multiple locations at once',
+    operation_id='locations_gateway',
+    operation_description='gateway for posting locations data, allows multiple locations at once',
     tags=['post locations'],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -717,7 +721,7 @@ def garmin_ratelimit_key(group, request):
 )
 @api_view(['POST'])
 @ratelimit(key=garmin_ratelimit_key, rate='70/m')
-def garmin_api_gw(request):
+def locations_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
         raise ValidationError('Missing device_id parameter')
@@ -751,6 +755,10 @@ def garmin_api_gw(request):
     return Response({'status': 'ok', 'n': len(loc_array)})
 
 
+def garmin_api_gw(request):
+    return locations_api_gw(request)
+
+
 @swagger_auto_schema(
     method='post',
     operation_id='pwa_gateway',
@@ -765,7 +773,7 @@ def garmin_api_gw(request):
             ),
             'raw_data': openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description='a list of locations within last 10 minutes encoded according to our propriatery format',
+                description='a list of locations within last 10 minutes encoded according to our proprietary format',
             ),
         },
         required=['device_id', 'raw_data'],

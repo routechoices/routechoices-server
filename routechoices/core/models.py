@@ -937,8 +937,8 @@ class Competitor(models.Model):
 
     def get_absolute_gpx_url(self):
         return reverse(
-            'api:competitor_gpx_download',
-            host='www',
+            'competitor_gpx_download',
+            host='api',
             kwargs={
                 'competitor_id': self.aid,
             }

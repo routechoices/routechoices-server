@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^device/search/?$', views.device_search, name='device_search_api'),
     url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
     url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
+    url(r'^locations/?$', views.locations_api_gw, name='locations_api_gw'),
     url(
         r'^events/?$',
         views.event_list,

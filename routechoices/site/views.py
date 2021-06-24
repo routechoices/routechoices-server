@@ -182,7 +182,13 @@ def event_map_view(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect(reverse('api:event_map_download', kwargs={'event_id':event.aid}))
+    return redirect(
+        reverse(
+            'event_map_download',
+            host='api',
+            kwargs={'event_id': event.aid}
+        )
+    )
 
 
 def event_extra_map_view(request, slug, index, **kwargs):
@@ -204,9 +210,14 @@ def event_extra_map_view(request, slug, index, **kwargs):
         slug__iexact=slug
     )
     return redirect(
-        'api:event_extra_map_download',
-        event_id=event.aid,
-        map_index=index
+        reverse(
+            'event_extra_map_download',
+            host= 'api',
+            kwargs={
+                'event_id': event.aid,
+                'map_index': index
+            }
+        )
     )
 
 
@@ -228,7 +239,13 @@ def event_kmz_view(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
-    return redirect(reverse('api:event_kmz_download', kwargs={'event_id': event.aid}))
+    return redirect(
+        reverse(
+            'event_kmz_download',
+            host='api',
+            kwargs={'event_id': event.aid}
+        )
+    )
 
 
 def event_extra_kmz_view(request, slug, index, **kwargs):
@@ -250,9 +267,14 @@ def event_extra_kmz_view(request, slug, index, **kwargs):
         slug__iexact=slug
     )
     return redirect(
-        'api:event_extra_kmz_download',
-        event_id=event.aid,
-        map_index=index
+        reverse(
+            'event_extra_kmz_download',
+            host='api',
+            kwargs={
+                'event_id': event.aid,
+                'map_index': index
+            }
+        )
     )
 
 

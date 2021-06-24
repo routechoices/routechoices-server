@@ -1,7 +1,7 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
 {% load bootstrap3 %}
-
+{% load hosts %}
 {%  block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap3.css' %}" />
@@ -34,7 +34,7 @@ $('#id_admins').selectize({
     load: function(query, callback) {
         if (!query.length || query.length < 2) return callback();
         $.ajax({
-            url: '/api/user/search/?q=' + encodeURIComponent(query),
+            url: '{% host_url 'user_search_api' host 'api' %}?q=' + encodeURIComponent(query),
             type: 'GET',
             error: function() {
                 callback();
