@@ -7,7 +7,7 @@ host_patterns = patterns(
     host(r'api', 'routechoices.api.urls', name='api'),
     host(
         r'(?P<club_slug>[a-zA-Z0-9_-]{2,})', 
-        'routechoices.site.clubs_urls', 
-        callback='routechoices.site.clubs_urls.set_club',
+        'routechoices.club.urls', 
+        callback='routechoices.club.urls.set_club',
         name='clubs'),
 )

@@ -15,9 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url
-from django.urls import include, path
+from django.urls import include
 from django.contrib.sitemaps.views import sitemap
-from django.conf import settings
 from routechoices.dashboard.views import dashboard_map_download
 from routechoices.site.sitemaps import (
     EventsSitemap,

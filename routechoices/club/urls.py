@@ -1,7 +1,6 @@
 from django.conf.urls import url
-from django.views.generic import TemplateView
 
-from routechoices.site import views, feeds
+from routechoices.club import views, feeds
 
 
 def set_club(request, club_slug):

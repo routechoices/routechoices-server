@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from routechoices.site import views, feeds
@@ -39,51 +39,11 @@ urlpatterns = [
         views.event_shortcut,
         name='event_shortcut'
     ),
-    url(r'^(?P<club_slug>[0-9a-zA-Z_-]+)/?$', views.club_view, name='old_club_view'),
     url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/feed/?$',
-        feeds.club_live_event_feed,
-        name='old_club_feed'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/?$',
-        views.event_view,
-        name='old_event_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/export/?$',
-        views.event_export_view,
-        name='old_event_export_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/map/?$',
-        views.event_map_view,
-        name='old_event_map_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/extra_map/(?P<index>\d+)?$',
-        views.event_extra_map_view,
-        name='old_event_extra_map_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/kmz/?$',
-        views.event_kmz_view,
-        name='old_event_kmz_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/extra_kmz/(?P<index>\d+)?$',
-        views.event_extra_kmz_view,
-        name='old_event_extra_kmz_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/(?P<slug>[0-9a-zA-Z_-]+)/register/?$',
-        views.event_registration_view,
-        name='old_event_registration_view'
-    ),
-    url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/' +
-        r'(?P<slug>[0-9a-zA-Z_-]+)/upload_route/?$',
-        views.event_route_upload_view,
-        name='old_event_route_upload_view'
+        r'^(?P<club_slug>[0-9a-zA-Z_-]+)/',
+        include(
+            ('routechoices.club.urls', 'club'),
+            namespace='club'
+        )
     ),
 ]
