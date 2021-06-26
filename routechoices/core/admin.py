@@ -3,7 +3,6 @@ from datetime import timedelta
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.utils.safestring import mark_safe
 from django.db.models import Count
 from django.db.models.functions import Length
 from django.utils.timezone import now
@@ -138,9 +137,7 @@ class DeviceCompetitorInline(admin.TabularInline):
     ordering = ('-start_time', )
 
     def link(self, obj):
-        return mark_safe(
-            f'<a href="{obj.event.get_absolute_url()}">View on Site</a>'
-        )
+        return f'<a href="{obj.event.get_absolute_url()}">View on Site</a>'
 
 
 class DeviceAdmin(admin.ModelAdmin):

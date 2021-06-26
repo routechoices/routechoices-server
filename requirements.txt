@@ -10,7 +10,7 @@ psycopg2-binary
 django-allauth
 django-bootstrap3
 raven
-lxml
+defusedxml
 cssselect
 tornado
 django-background-tasks

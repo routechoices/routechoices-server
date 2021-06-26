@@ -40,7 +40,6 @@ from routechoices.lib.helper import (
     general_2d_projection,
     adjugate_matrix, project
 )
-from routechoices.lib.pseudo_base64 import PseudoInt
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
 

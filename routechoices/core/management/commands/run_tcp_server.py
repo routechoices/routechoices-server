@@ -34,10 +34,12 @@ class TMT250Decoder():
 
     def decode_alv(self, data):
         self.packet['zeroes'] = unpack('>i', data[:4])[0]
-        assert(self.packet['zeroes'] == 0)
+        if self.packet['zeroes'] != 0:
+            raise Exception('zeroes should be 0')
         self.packet['length'] = unpack('>i', data[4:8])[0]
         self.packet['codec'] = data[8]
-        assert(self.packet['codec'] == 8)
+        if self.packet['codec'] != 8:
+            raise Exception('codec should be 8')
         self.packet['num_data'] = data[9]
         self.extract_records(data)
         return self.packet
@@ -97,14 +99,11 @@ class TMT250Connection():
             return
         imei_len = (data[0] << 8) + data[1]
         imei = ''
-        try:
-            imei = data[2:].decode('ascii')
-        except Exception:
-            pass
         is_valid_imei = True
         try:
+            imei = data[2:].decode('ascii')
             validate_imei(imei)
-        except ValidationError:
+        except Exception:
             is_valid_imei = False
         if imei_len != len(imei) or not is_valid_imei:
             print('invalid identification %s, %s, %d' % (
@@ -133,10 +132,8 @@ class TMT250Connection():
 
     async def _on_read_line(self, data):
         zeroes = unpack('>i', data[:4])[0]
-        try:
-            assert(zeroes == 0)
-        except AssertionError:
-            return
+        if zeroes != 0:
+            raise Exception('zeroes should be 0')
         self.packet_length = unpack('>i', data[4:8])[0] + 4
         self.buffer = bytes(data)
         await self._on_full_data(self.buffer)
