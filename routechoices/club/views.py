@@ -403,7 +403,7 @@ def event_route_upload_view(request, slug, **kwargs):
         form = UploadGPXForm()
     return render(
         request,
-        'site/event_route_upload.html',
+        'club/event_route_upload.html',
         {
             'event': event,
             'form': form,
@@ -411,28 +411,4 @@ def event_route_upload_view(request, slug, **kwargs):
     )
 
 
-def contact(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            subject = (
-                'Routechoices.com contact form - '
-                + form.cleaned_data['subject']
-            )
-            from_email = form.cleaned_data['from_email']
-            message = form.cleaned_data['message']
-            send_mail(
-                subject,
-                message,
-                from_email,
-                [settings.DEFAULT_FROM_EMAIL]
-            )
-            return redirect('site:contact_email_sent_view')
-    else:
-        form = ContactForm()
-    if request.user.is_authenticated:
-        form.fields['from_email'].initial = EmailAddress.objects.get_primary(
-            request.user
-        ).email
-        form.fields['from_email'].widget = HiddenInput()
-    return render(request, "site/contact.html", {'form': form})
+
