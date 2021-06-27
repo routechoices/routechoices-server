@@ -1,4 +1,5 @@
 from datetime import timedelta
+import arrow
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
@@ -6,6 +7,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 from django.db.models.functions import Length
 from django.utils.timezone import now
+from django.db.models.expressions import RawSQL
 
 from allauth.account.models import EmailAddress
 from routechoices.core.models import (
@@ -144,7 +146,7 @@ class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
         'creation_date',
-        'last_date_viewed',
+        'last_position_at',
         'last_position',
         'location_count',
         'competitor_count',
@@ -159,6 +161,11 @@ class DeviceAdmin(admin.ModelAdmin):
                 locations_raw_length=Length('locations_raw')
             ).annotate(
                 competitor_count=Count('competitor_set')
+            ).annotate(
+                last_position_at=RawSQL(
+                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp.+,(\d+)]'))[1]", 
+                    ()
+                )
             )
 
     def location_count(self, obj):
@@ -167,8 +174,14 @@ class DeviceAdmin(admin.ModelAdmin):
     def competitor_count(self, obj):
         return obj.competitor_count
 
+    def last_position_at(self, obj):
+        if not obj.last_position_at:
+            return None
+        return arrow.get(int(obj.last_position_at)).datetime
+
     location_count.admin_order_field = 'locations_raw_length'
     competitor_count.admin_order_field = 'competitor_count'
+    last_position_at.admin_order_field = 'last_position_at'
 
     def clean_positions(self, request, queryset):
         for obj in queryset:
