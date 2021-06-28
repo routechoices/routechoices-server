@@ -8,6 +8,7 @@ import time
 from io import BytesIO
 from decimal import Decimal
 from zipfile import ZipFile
+from decimal import Decimal
 
 import gpxpy
 import gpxpy.gpx
@@ -185,6 +186,13 @@ class Map(models.Model):
         with self.image.open('rb') as fp:
             data = fp.read()
         return data
+
+    @property
+    def corners_coordinates_short(self):
+        coords = ','.join(
+            [str(round(Decimal(x), 5)) for x in self.corners_coordinates.split(',')]
+        )
+        return coords
 
     @property
     def kmz(self):

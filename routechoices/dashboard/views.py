@@ -725,7 +725,7 @@ def dashboard_map_download(request, id, *args, **kwargs):
         '/internal/' + file_path,
         filename='{}_{}_.{}'.format(
             raster_map.name,
-            raster_map.corners_coordinates.replace(',', '_'),
+            raster_map.corners_coordinates_short.replace(',', '_'),
             mime_type[6:]
         ),
         mime=mime_type

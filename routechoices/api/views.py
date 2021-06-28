@@ -1022,7 +1022,7 @@ def event_map_download(request, event_id):
         '/internal/' + file_path,
         filename='{}_{}_.{}'.format(
             raster_map.name,
-            raster_map.corners_coordinates.replace(',', '_'),
+            raster_map.corners_coordinates_short.replace(',', '_'),
             mime_type[6:]
         ),
         mime=mime_type
@@ -1107,7 +1107,7 @@ def event_extra_map_download(request, event_id, map_index):
         '/internal/' + file_path,
         filename='{}_{}_.{}'.format(
             raster_map.name,
-            raster_map.corners_coordinates.replace(',', '_'),
+            raster_map.corners_coordinates_short.replace(',', '_'),
             mime_type[6:]
         ),
         mime=mime_type
