@@ -8,6 +8,7 @@ from django.db.models import Count
 from django.db.models.functions import Length
 from django.utils.timezone import now
 from django.db.models.expressions import RawSQL
+from django.utils.safestring import mark_safe
 
 from allauth.account.models import EmailAddress
 from routechoices.core.models import (
@@ -139,7 +140,7 @@ class DeviceCompetitorInline(admin.TabularInline):
     ordering = ('-start_time', )
 
     def link(self, obj):
-        return f'<a href="{obj.event.get_absolute_url()}">View on Site</a>'
+        return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
 
 
 class DeviceAdmin(admin.ModelAdmin):
