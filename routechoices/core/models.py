@@ -692,8 +692,8 @@ class Device(models.Model):
         all_ts = set(locs['timestamps'])
         if ts not in all_ts:
             locs['timestamps'].append(ts)
-            locs['latitudes'].append(lat)
-            locs['longitudes'].append(lon)
+            locs['latitudes'].append(round(lat, 5))
+            locs['longitudes'].append(round(lon, 5))
             self.locations = locs
             if save:
                 self.save()
@@ -720,8 +720,8 @@ class Device(models.Model):
             if isinstance(lon, Decimal):
                 lon = float(lon)
             new_ts.append(ts)
-            new_lat.append(lat)
-            new_lon.append(lon)
+            new_lat.append(round(lat, 5))
+            new_lon.append(round(lon, 5))
         locs['timestamps'] += new_ts
         locs['latitudes'] += new_lat
         locs['longitudes'] += new_lon
@@ -748,8 +748,8 @@ class Device(models.Model):
             if timestamp_int not in timestamps:
                 timestamps.add(timestamp_int)
                 locs['timestamps'].append(timestamp_int)
-                locs['latitudes'].append(locations['latitudes'][idx])
-                locs['longitudes'].append(locations['longitudes'][idx])
+                locs['latitudes'].append(round(locations['latitudes'][idx], 5))
+                locs['longitudes'].append(round(locations['longitudes'][idx], 5))
         self.locations = locs
         if save:
             self.save()

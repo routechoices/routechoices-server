@@ -779,8 +779,12 @@ def event_route_upload_view(request, id):
                                 points['timestamps'].append(
                                     point.time.timestamp()
                                 )
-                                points['latitudes'].append(point.latitude)
-                                points['longitudes'].append(point.longitude)
+                                points['latitudes'].append(
+                                    round(point.latitude, 5)
+                                )
+                                points['longitudes'].append(
+                                    round(point.longitude, 5)
+                                )
                                 if not start_time:
                                     start_time = point.time
                 device.locations = points

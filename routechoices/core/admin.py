@@ -164,7 +164,12 @@ class DeviceAdmin(admin.ModelAdmin):
                 competitor_count=Count('competitor_set')
             ).annotate(
                 last_position_at=RawSQL(
-                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp.+,(\d+)]'))[1]", 
+                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp:[,\[](\d+)]'))[1]", 
+                    ()
+                )
+            ).annotate(
+                location_count_sql=RawSQL(
+                    "SELECT COUNT(1) FROM REGEXP_MATCHES(locations_raw, ',', 'g')", 
                     ()
                 )
             )
@@ -180,7 +185,7 @@ class DeviceAdmin(admin.ModelAdmin):
             return None
         return arrow.get(int(obj.last_position_at)).datetime
 
-    location_count.admin_order_field = 'locations_raw_length'
+    location_count.admin_order_field = 'location_count_sql'
     competitor_count.admin_order_field = 'competitor_count'
     last_position_at.admin_order_field = 'last_position_at'
 
