@@ -169,7 +169,7 @@ class DeviceAdmin(admin.ModelAdmin):
                 )
             ).annotate(
                 location_count_sql=RawSQL(
-                    "SELECT COUNT(1) FROM REGEXP_MATCHES(locations_raw, ',', 'g')", 
+                    "CHAR_LENGTH(locations_raw) - CHAR_LENGTH(REPLACE(locations_raw, ',', ''))", 
                     ()
                 )
             )
