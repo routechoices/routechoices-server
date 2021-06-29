@@ -22,10 +22,6 @@ from routechoices.core.models import (
     MapAssignation,
 )
 
-NO_LOCATIONS_LENGTH = len(
-    '{"timestamps": [], "latitudes": [], "longitudes": []}'
-)
-
 
 class HasLocationFilter(admin.SimpleListFilter):
     title = 'Wether It Has Locations'
@@ -40,11 +36,11 @@ class HasLocationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'has_no_locations':
             return queryset.filter(
-                locations_raw_length__lte=NO_LOCATIONS_LENGTH
+                location_count_sql=0
             )
         elif self.value():
             return queryset.filter(
-                locations_raw_length__gt=NO_LOCATIONS_LENGTH
+                location_count_sql__gt=0
             )
 
 
@@ -159,8 +155,6 @@ class DeviceAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
-                locations_raw_length=Length('locations_raw')
-            ).annotate(
                 competitor_count=Count('competitor_set')
             ).annotate(
                 last_position_at=RawSQL(
@@ -169,13 +163,13 @@ class DeviceAdmin(admin.ModelAdmin):
                 )
             ).annotate(
                 location_count_sql=RawSQL(
-                    "CHAR_LENGTH(locations_raw) - CHAR_LENGTH(REPLACE(locations_raw, ',', ''))", 
+                    "json_array_length(locations_raw::json->'timestamps')", 
                     ()
                 )
             )
 
     def location_count(self, obj):
-        return obj.location_count
+        return obj.location_count_sql
 
     def competitor_count(self, obj):
         return obj.competitor_count
