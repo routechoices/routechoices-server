@@ -398,7 +398,7 @@ def event_register(request, event_id):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    if not event.open_registration or event.end_date < now():
+    if not event.open_registration or (event.end_date and event.end_date < now()):
         raise PermissionDenied()
     device_id = request.data.get('device_id')
     devices = Device.objects.filter(aid=device_id)
