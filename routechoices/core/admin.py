@@ -4,8 +4,7 @@ import arrow
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
-from django.db.models.functions import Length
+from django.db.models import Count, Case, Value, When
 from django.utils.timezone import now
 from django.db.models.expressions import RawSQL
 from django.utils.safestring import mark_safe
@@ -162,9 +161,9 @@ class DeviceAdmin(admin.ModelAdmin):
                     ()
                 )
             ).annotate(
-                location_count_sql=RawSQL(
-                    "json_array_length(locations_raw::json->'timestamps')", 
-                    ()
+                location_count_sql=Case(
+                    When(locations_raw='', then=Value(0)),
+                    default=RawSQL("json_array_length(locations_raw::json->'timestamps')", ())
                 )
             )
 
