@@ -56,7 +56,7 @@ from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
-API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
+# API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
 GLOBAL_MERCATOR = GlobalMercator()
 
 
@@ -652,9 +652,9 @@ def traccar_api_gw(request):
             'message': 'Invalid data format'
         })
 
-    if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
-        logger.debug('Too old position')
-        raise ValidationError('Position too old to add from API')
+    # if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
+    #    logger.debug('Too old position')
+    #    raise ValidationError('Position too old to add from API')
 
     if lat and lon and tim:
         device.add_location(lat, lon, tim)
@@ -743,8 +743,8 @@ def locations_api_gw(request):
                 tim = int(float(times[i]))
             except ValueError:
                 continue
-            if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
-                continue
+            # if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
+            #     continue
             loc_array.append({
                 'timestamp': tim,
                 'latitude': lat,
@@ -816,9 +816,9 @@ def pwa_api_gw(request):
     locations = GeoLocationSeries(raw_data)
     loc_array = []
     for location in locations:
-        dtime = abs(time.time() - int(location.timestamp))
-        if dtime > API_LOCATION_TIMESTAMP_MAX_AGE:
-            continue
+        # dtime = abs(time.time() - int(location.timestamp))
+        # if dtime > API_LOCATION_TIMESTAMP_MAX_AGE:
+        #     continue
         loc_array.append({
             'timestamp': int(location.timestamp),
             'latitude': location.coordinates.latitude,
