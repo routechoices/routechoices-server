@@ -17,6 +17,7 @@ from routechoices.lib.validators import (
      validate_imei,
 )
 
+
 def _get_device(imei):
     try:
         return Device.objects.get(physical_device__imei=imei)
