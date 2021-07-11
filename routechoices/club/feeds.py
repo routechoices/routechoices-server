@@ -9,11 +9,7 @@ from routechoices.core.models import Event, PRIVACY_PUBLIC, Club
 
 class ClubLiveEventsFeed(Feed):
     def get_object(self, request, **kwargs):
-        if kwargs.get('club_slug'):
-            club_slug = kwargs.get('club_slug')
-        else:
-            club_slug = request.club_slug
-        return Club.objects.get(slug__iexact=club_slug)
+        return Club.objects.get(slug__iexact=request.club_slug)
 
     def title(self, obj):
         site = Site.objects.get(id=settings.SITE_ID)

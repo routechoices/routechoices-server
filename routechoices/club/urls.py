@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from routechoices.club import views, feeds
+from routechoices.club import views
 
 
 def set_club(request, club_slug):
@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^$', views.club_view, name='club_view'),
     url(
         r'^feed/?$',
-        feeds.club_live_event_feed,
+        views.club_live_event_feed,
         name='club_feed'
     ),
     url(

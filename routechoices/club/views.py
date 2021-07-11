@@ -1,17 +1,12 @@
 import gpxpy
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.sites.models import Site
-from django.core.mail import send_mail
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.forms import HiddenInput
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
 from django_hosts.resolvers import reverse
-from allauth.account.models import EmailAddress
 
 from routechoices.core.models import (
     Club,
@@ -22,7 +17,8 @@ from routechoices.core.models import (
     PRIVACY_PRIVATE,
 )
 from routechoices.lib.helper import initial_of_name
-from routechoices.site.forms import CompetitorForm, ContactForm, UploadGPXForm
+from routechoices.site.forms import CompetitorForm, UploadGPXForm
+from routechoices.club import feeds
 
 
 def club_view(request, **kwargs):
@@ -59,6 +55,21 @@ def club_view(request, **kwargs):
             'events': events
         }
     )
+
+
+def club_live_event_feed(request, **kwargs):
+    if kwargs.get('club_slug'):
+        club_slug = kwargs.get('club_slug')
+        return redirect(
+            reverse(
+                'club_feed',
+                host='clubs',
+                host_kwargs={
+                    'club_slug': club_slug
+                }
+            )
+        )
+    return feeds.club_live_event_feed(request, **kwargs)
 
 
 def event_view(request, slug, **kwargs):
