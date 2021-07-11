@@ -2,13 +2,18 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django_hosts.resolvers import reverse
+from django.shortcuts import redirect
 
 from routechoices.core.models import Event, PRIVACY_PUBLIC, Club
 
 
 class ClubLiveEventsFeed(Feed):
     def get_object(self, request, **kwargs):
-        return Club.objects.get(slug=request.club_slug)
+        if kwargs.get('club_slug'):
+            club_slug = kwargs.get('club_slug')
+        else:
+            club_slug = request.club_slug
+        return Club.objects.get(slug__iexact=club_slug)
 
     def title(self, obj):
         site = Site.objects.get(id=settings.SITE_ID)
