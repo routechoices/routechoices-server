@@ -1,3 +1,31 @@
+L.Control.Ranking = L.Control.extend({
+  
+  onAdd: function(map) {
+      var back = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-ranking');
+      back.style.width = '200px';
+      back.style.background = 'white'
+      return back;
+  },
+
+  setValues(ranking) {
+    var el = $('.leaflet-control-ranking')
+    var out = ''
+    ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
+    ranking.forEach(function (c, i) {
+      out += '<div>' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + ' <span style="float:right">' + getProgressBarText(c.time) + '</span></div>'
+    })
+    el.html(out)
+  },
+
+  onRemove: function(map) {
+    $('.leaflet-control-ranking').remove()
+  }
+});
+
+L.control.ranking = function(opts) {
+  return new L.Control.Ranking(opts);
+}
+
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
     if (this === null) {
       throw new TypeError('Array.prototype.findIndex called on null or undefined');
@@ -76,7 +104,54 @@ var noticeUrl = null;
 var prevNotice = new Date(0);
 var resetMassStartContextMenuItem = null;
 var setMassStartContextMenuItem = null;
+var setFinishLineContextMenuItem = null;
+var removeFinishLineContextMenuItem = null;
+
 var qrUrl = null
+var finishLineCrosses = [];
+var finishLinePoints = [];
+var finishLinePoly = null;
+var rankControl = null;
+
+function drawFinishLine (e) {
+  finishLinePoints = [];
+  if(finishLinePoly){
+    map.removeLayer(finishLinePoly);
+    map.removeControl(rankControl);
+    finishLinePoly = null;
+  };
+	finishLinePoints.push(e.latlng);
+  map.on('click', drawFinishLineEnd);
+}
+
+function removeFinishLine() {
+  if(finishLinePoly){
+    map.removeLayer(finishLinePoly);
+    map.removeControl(rankControl);
+    finishLinePoly = null;
+    map.contextmenu.removeItem(removeFinishLineContextMenuItem);
+    removeFinishLineContextMenuItem = null;
+    setFinishLineContextMenuItem = map.contextmenu.insertItem({
+      text: 'Draw finish line',
+      callback: drawFinishLine
+    }, 1);
+  };
+}
+
+function drawFinishLineEnd(e) {
+  finishLinePoints.push(e.latlng);
+  finishLinePoly = L.polyline(finishLinePoints, {color: 'purple'});
+  map.off('click', drawFinishLineEnd);
+  rankControl = L.control.ranking({ position: 'topright' })
+  map.addControl(rankControl);
+  map.addLayer(finishLinePoly);
+  map.contextmenu.removeItem(setFinishLineContextMenuItem);
+  setFinishLineContextMenuItem = null;
+  removeFinishLineContextMenuItem = map.contextmenu.insertItem({
+      text: 'Remove finish line',
+      callback: removeFinishLine
+  }, 1);
+}
 
 var onStart = function(){
   if(isLiveEvent){
@@ -141,7 +216,7 @@ var selectReplayMode = function(e){
     setMassStartContextMenuItem = map.contextmenu.insertItem({
       text: 'Mass Start from here',
       callback: onPressCustomMassStart
-    }, 1);
+    }, 2);
   }
   isLiveMode = false;
   prevShownTime = getCompetitionStartDate();
@@ -272,7 +347,7 @@ var displayCompetitorList = function(){
       var div = $('<li/>');
       div.addClass('media').html('\
         <div class="media-left"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
-        <div class="media-body"><b>'+competitor.name+'</b><br/>\
+        <div class="media-body"><b>'+ $('<span/>').text(competitor.name).html() +'</b><br/>\
           <div class="btn-group btn-group-xs" role="group">\
             <button type="button" class="toggle_competitor_btn btn btn-default"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
             <button type="button" class="center_competitor_btn btn btn-default"><i class="fa fa-map-marker"></i></button>\
@@ -473,7 +548,18 @@ var zoomOnCompetitor = function(compr){
   var loc = route.getByTime(timeT);
   map.setView([loc.coords.latitude, loc.coords.longitude]);
 }
-var getProgressBarText = function(){
+var getRelativeTime = function(currentTime) {
+  var viewedTime = currentTime;
+  if (!isRealTime) {
+      if (isCustomStart) {
+        viewedTime -= getCompetitorsMinCustomOffset() + getCompetitionStartDate();
+      } else {
+        viewedTime -= getCompetitionStartDate();
+      }
+  }
+  return viewedTime;
+}
+var getProgressBarText = function(currentTime){
     var result = '';
     var viewedTime = currentTime;
     if (!isRealTime) {
@@ -516,9 +602,9 @@ var drawCompetitors = function(){
     }
   }
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
-  $('#progress_bar_text').html(getProgressBarText());
+  $('#progress_bar_text').html(getProgressBarText(currentTime));
+  finishLineCrosses = [];
   competitorList.forEach(function(competitor){
-
     if(!competitor.isShown){
       return;
     }
@@ -530,6 +616,35 @@ var drawCompetitors = function(){
       }
       if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
         viewedTime += Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
+      }
+      if(finishLinePoly) {
+        var allPoints = route.getArray();
+        for (var i=1; i < allPoints.length; i++) {
+          var tPoint = allPoints[i];
+          if (viewedTime < tPoint.timestamp) {
+            break
+          }
+          if (L.LineUtil.segmentsIntersect(
+              map.project(finishLinePoints[0], 16),
+              map.project(finishLinePoints[1], 16),
+              map.project(L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]), 16),
+              map.project(L.latLng([allPoints[i-1].coords.latitude, allPoints[i-1].coords.longitude]), 16)
+            )
+          ) {
+            var competitorTime = tPoint.timestamp;
+            if(!isLiveMode && !isRealTime && !isCustomStart && competitor.start_time){
+              competitorTime -= Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
+            }
+            if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
+              competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
+            }
+            finishLineCrosses.push({
+              competitor, 
+              time: competitorTime
+            });
+            break;
+          }
+        }
       }
       var hasPointLast30sec = route.hasPointInInterval(viewedTime - 30 * 1e3, viewedTime);
       if(!hasPointLast30sec){
@@ -572,7 +687,7 @@ var drawCompetitors = function(){
           competitor.nameMarker = null;
         };
         if(competitor.nameMarker == undefined){
-          var iconHtml = '<span style="color: '+competitor.color+';">'+competitor.short_name+'</span>';
+          var iconHtml = '<span style="color: '+competitor.color+';">' + $('<span/>').text(competitor.short_name).html() + '</span>';
           var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color);
           var nameTagEl = document.createElement('div');
           nameTagEl.className = iconClass;
@@ -638,6 +753,14 @@ var drawCompetitors = function(){
       }
     }
   })
+
+  if(finishLinePoly) { 
+    rankControl.setValues(finishLineCrosses);
+  }
+}
+
+function drawFinishLineRanking () {
+  
 }
 
 function formatSpeed(s){
@@ -692,7 +815,7 @@ function onPressCustomMassStart (e) {
       resetMassStartContextMenuItem = map.contextmenu.insertItem({
           text: 'Reset Mass Start',
           callback: onPressResetMassStart
-      }, 1);
+      }, 2);
     }
   }
 }
