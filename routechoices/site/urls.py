@@ -30,6 +30,11 @@ urlpatterns = [
         name='tos_view'
     ),
     url(
+        r'^features/?$',
+        TemplateView.as_view(template_name='site/features.html'),
+        name='features_view'
+    ),
+    url(
         r'^pricing/?$',
         TemplateView.as_view(template_name='site/pricing.html'),
         name='pricing_view'
