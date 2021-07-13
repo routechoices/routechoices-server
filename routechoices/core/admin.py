@@ -214,7 +214,7 @@ admin.site.register(Map, MapAdmin)
 
 
 class MyUserAdmin(UserAdmin):
-    list_display = UserAdmin.list_display + ('has_verified_email', )
+    list_display = UserAdmin.list_display + ('date_joined', 'has_verified_email', )
     actions = ['clean_fake_users', ]
 
     def has_verified_email(self, obj):
