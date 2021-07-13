@@ -475,6 +475,26 @@ PRIVACY_CHOICES = (
     (PRIVACY_PRIVATE, 'Private'),
 )
 
+MAP_OSM = 'osm'
+MAP_GOOGLE_STREET = 'gmap-street'
+MAP_GOOGLE_SAT = 'gmap-hybrid'
+MAP_MAPANT_FI = 'mapant-fi'
+MAP_MAPANT_NO = 'mapant-no'
+MAP_MAPANT_ES = 'mapant-es'
+MAP_TOPO_FI = 'topo-fi'
+MAP_TOPO_NO = 'topo-no'
+
+MAP_CHOICES = (
+    (MAP_OSM, 'Open Street Map'),
+    (MAP_GOOGLE_STREET, 'Google Map Street'),
+    (MAP_GOOGLE_SAT, 'Google Map Satellite'),
+    (MAP_MAPANT_FI, 'Mapant Finland'),
+    (MAP_MAPANT_NO, 'Mapant Norway'),
+    (MAP_MAPANT_ES, 'Mapant Spain'),
+    (MAP_TOPO_FI, 'Topo Finland'),
+    (MAP_TOPO_NO, 'Topo Norway'),
+)
+
 
 class Event(models.Model):
     aid = models.CharField(
@@ -511,6 +531,11 @@ class Event(models.Model):
         max_length=8,
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
+    )
+    backdrop_map = models.CharField(
+        max_length=16,
+        choices=MAP_CHOICES,
+        default=MAP_OSM,
     )
     map = models.ForeignKey(
         Map,
