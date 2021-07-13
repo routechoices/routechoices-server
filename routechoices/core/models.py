@@ -8,7 +8,6 @@ import time
 from io import BytesIO
 from decimal import Decimal
 from zipfile import ZipFile
-from decimal import Decimal
 
 import gpxpy
 import gpxpy.gpx
@@ -28,6 +27,7 @@ from django.utils.timezone import now
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
+     validate_gpx,
      validate_nice_slug,
      validate_latitude,
      validate_longitude,
@@ -124,6 +124,20 @@ def map_upload_path(instance=None, file_name=None):
     if file_name:
         pass
     basename = instance.aid + '_' + str(int(time.time()))
+    tmp_path.append(basename[0])
+    tmp_path.append(basename[1])
+    tmp_path.append(basename)
+    return os.path.join(*tmp_path)
+
+
+def route_upload_path(instance=None, file_name=None):
+    import os.path
+    tmp_path = [
+        'routes'
+    ]
+    if file_name:
+        pass
+    basename = instance.aid + '_' + str(int(time.time())) + '.gpx'
     tmp_path.append(basename[0])
     tmp_path.append(basename[1])
     tmp_path.append(basename)
@@ -473,22 +487,25 @@ class Event(models.Model):
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
          Club,
+         verbose_name='Club*',
          related_name='events',
          on_delete=models.CASCADE
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        verbose_name='Name*',
+        max_length=255
+    )
     slug = models.CharField(
+        verbose_name='Slug*',
         max_length=50,
         validators=[validate_nice_slug, ],
         db_index=True,
         help_text='This is used to build the url of this event',
         default=short_random_slug,
     )
-    start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
+    start_date = models.DateTimeField(verbose_name='Start Date (UTC)*')
     end_date = models.DateTimeField(
-        verbose_name='End Date (UTC)',
-        null=True,
-        blank=True,
+        verbose_name='End Date (UTC)*',
     )
     privacy = models.CharField(
         max_length=8,

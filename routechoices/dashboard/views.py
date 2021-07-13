@@ -521,7 +521,7 @@ def event_create_view(request):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = EventForm(request.POST)
+        form = EventForm(request.POST, request.FILES)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         formset = CompetitorFormSet(request.POST)
@@ -599,7 +599,7 @@ def event_edit_view(request, id):
     all_devices = list(comp_devices_id) + list(own_devices_id)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = EventForm(request.POST, instance=event)
+        form = EventForm(request.POST, request.FILES, instance=event)
         form.fields['club'].queryset = club_list
         form.fields['map'].queryset = map_list
         extra_map_formset = ExtraMapFormSet(request.POST, instance=event)

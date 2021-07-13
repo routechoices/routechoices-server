@@ -11,6 +11,7 @@ from django.forms import (
     inlineformset_factory,
     ModelChoiceField,
     FileField,
+    FileInput,
 )
 
 from routechoices.core.models import (
@@ -78,7 +79,7 @@ class EventForm(ModelForm):
                   'map_title']
         widgets = {
             'start_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
-            'end_date': DateTimeInput(attrs={'class': 'datetimepicker'})
+            'end_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
         }
 
     def clean(self):

@@ -20,8 +20,8 @@
           <li><a href="{% host_url 'site:tracker_view' host 'www'%}">Trackers</a></li>
           <li><a href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
           <li><a href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
-          <li>{% if user.is_authenticated %}<a href="{% host_url 'account_logout' host 'www'%}" style="margin-left: 12px;padding: 8px 0 0 0;"><button type="button" class="btn btn-danger navbar-btn" style="margin-top: 0">Logout</button></a>{% else %}<a href="{% host_url 'account_login' host 'www' %}" style="margin-left: 12px;padding: 8px 0 0 0;"><button type="button" class="btn btn-primary navbar-btn" style="margin-top: 0;margin-right:5px">Login</button></a>{% endif %}</li>
-          {% if not user.is_authenticated %}<li><a href="{% host_url 'account_signup' host 'www'%}" style="margin-left: 12px;padding: 8px 0 0 0;"><button type="button" class="btn btn-success navbar-btn" style="margin-top: 0">Sign up for free</button></a></li>{% endif %}
+          <li>{% if user.is_authenticated %}<a href="{% host_url 'account_logout' host 'www'%}" style="margin-left: 0px;padding: 8px 0 0 0;"><button type="button" class="btn btn-danger navbar-btn" style="margin-top: 0">Logout</button></a>{% else %}<a href="{% host_url 'account_login' host 'www' %}" style="margin-left: 0px;padding: 8px 0 0 0;"><button type="button" class="btn btn-primary navbar-btn" style="margin-top: 0;margin-right:5px">Login</button></a>{% endif %}</li>
+          {% if not user.is_authenticated %}<li><a href="{% host_url 'account_signup' host 'www'%}" style="margin-left: 0px;padding: 8px 0 0 0;"><button type="button" class="btn btn-success navbar-btn" style="margin-top: 0">Sign up for free</button></a></li>{% endif %}
         </ul>
       </div>
     </div>

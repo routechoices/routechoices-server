@@ -27,6 +27,7 @@ context('Cypress tests', () => {
       cy.get('#id_name').type('Jukola 2019 - 1st Leg')
       cy.get('#id_slug').clear().type('Jukola-2019-1st-leg')
       cy.get('#id_start_date').type('2019-06-15 20:00:00{enter}')
+      cy.get('#id_end_date').type('2019-06-16 10:00:00{enter}')
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
 
       cy.get("input[value='Save']").click()
