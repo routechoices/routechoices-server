@@ -59,5 +59,6 @@ urlpatterns = [
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     url('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,
         {'sitemaps': sitemaps}, name='sitemap'),
+    url(r'', include('user_sessions.urls', 'user_sessions')),
     url(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
 ]

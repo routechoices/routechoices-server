@@ -1,7 +1,7 @@
 version: '2'  
 services:
   db:
-    container_name: pz01
+    container_name: rc_postgres
     image: postgres:latest
     environment:
       POSTGRES_DB: app_db
@@ -11,7 +11,7 @@ services:
     expose:
       - "5432"
   minio:
-    container_name: mz01
+    container_name: rc_minio
     image: minio/minio:latest
     volumes:
       - ../media:/data
@@ -22,13 +22,14 @@ services:
       MINIO_SECRET_KEY: minio123
     command: server /data
   smtp:
-    container_name: sz01
+    container_name: rc_mailhog
     image: mailhog/mailhog:latest
     ports:
       - "8025:8025"
     expose:
       - "1025"
   nginx:
+    container_name: rc_nginx
     image: nginx:latest
     ports:
       - "8080:8080"
@@ -37,9 +38,9 @@ services:
       - ../nginx:/etc/nginx/conf.d
     links:
       - minio
-      - web
-  web:
-    container_name: dz01
+      - django
+  django:
+    container_name: rc_django
     stop_signal: SIGINT
     build:
       context: ..

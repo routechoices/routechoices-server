@@ -16,11 +16,11 @@ jobs:
     - run: ./da migrate
     - run: ./da collectstatic
     - run: ./da createcachetable
-    - run: ./dc restart web 
+    - run: ./dc restart django 
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' www.localhost:8080)" != "200" ]]; do sleep 5; done' || false
     - run: ./da test
     - run: ./da reset_db_for_tests
-    - run: ./dc restart web
+    - run: ./dc restart django
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev
     - run:

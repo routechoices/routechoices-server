@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
@@ -57,6 +56,8 @@ INSTALLED_APPS = [
     'routechoices',
     'routechoices.core',
     'routechoices.site',
+    'routechoices.lib',
+    'user_sessions',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -74,7 +75,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'routechoices.core.middleware.XForwardedForMiddleware',
+    'user_sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -83,6 +85,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
 ]
+
+SESSION_ENGINE = 'user_sessions.backends.db'
 
 ROOT_URLCONF = 'routechoices.urls'
 ROOT_HOSTCONF = 'routechoices.hosts'
@@ -169,6 +173,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -300,6 +305,10 @@ AWS_SECRET_ACCESS_KEY = "minio123"
 # The optional AWS session token to use.
 AWS_SESSION_TOKEN = ""
 AWS_S3_ENDPOINT_URL = "http://minio:9000"
+
+GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
+
+SILENCED_SYSTEM_CHECKS = ['admin.E410']
 
 try:
     from .local_settings import *

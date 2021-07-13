@@ -21,3 +21,5 @@ drf-yasg
 django-ratelimit
 fast-luhn
 django-hosts
+django-user-sessions
+geoip2

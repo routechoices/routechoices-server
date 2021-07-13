@@ -9,6 +9,8 @@
         <a href="{% url 'account_email' %}">Edit email addresses</a><br/>
         <h4>Password</h4>
         <a href="{% url 'account_set_password' %}">Change password</a><br/>
+        <h4>Sessions</h4>
+        <a href="{% url 'user_sessions:session_list' %}">Review active sessions</a><br/>
     </div>
 </div>
 {% endblock %}
