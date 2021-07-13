@@ -507,25 +507,25 @@ class Event(models.Model):
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
          Club,
-         verbose_name='Club*',
+         verbose_name='Club',
          related_name='events',
          on_delete=models.CASCADE
     )
     name = models.CharField(
-        verbose_name='Name*',
+        verbose_name='Name',
         max_length=255
     )
     slug = models.CharField(
-        verbose_name='Slug*',
+        verbose_name='Slug',
         max_length=50,
         validators=[validate_nice_slug, ],
         db_index=True,
         help_text='This is used to build the url of this event',
         default=short_random_slug,
     )
-    start_date = models.DateTimeField(verbose_name='Start Date (UTC)*')
+    start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
     end_date = models.DateTimeField(
-        verbose_name='End Date (UTC)*',
+        verbose_name='End Date (UTC)',
     )
     privacy = models.CharField(
         max_length=8,
