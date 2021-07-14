@@ -261,6 +261,7 @@ var fetchCompetitorRoutes = function(url){
     routesLastFetched = +clock.now();
     lastDataTs = response.timestamp;
     isCurrentlyFetchingRoutes = false;
+    $('#eventLoadingModal').remove()
   }).fail(function(){
     isCurrentlyFetchingRoutes = false;
   });
