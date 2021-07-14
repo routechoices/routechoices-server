@@ -14,6 +14,10 @@ from django.core.files import File
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.dispatch import receiver
+
+from allauth.account.signals import password_reset, password_changed
+
 
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
@@ -818,3 +822,11 @@ def event_route_upload_view(request, id):
             'form': form,
         }
     )
+
+
+@receiver(password_reset)
+@receiver(password_changed)
+def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
+    user.session_set.exclude(
+        session_key=request.session.session_key
+    ).delete()
