@@ -604,6 +604,7 @@ var drawCompetitors = function(){
   }
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
   $('#progress_bar_text').html(getProgressBarText(currentTime));
+  var oldFinishCrosses = finishLineCrosses.slice();
   finishLineCrosses = [];
   competitorList.forEach(function(competitor){
     if(!competitor.isShown){
@@ -620,30 +621,61 @@ var drawCompetitors = function(){
       }
       if(finishLinePoly) {
         var allPoints = route.getArray();
-        for (var i=1; i < allPoints.length; i++) {
-          var tPoint = allPoints[i];
-          if (viewedTime < tPoint.timestamp) {
-            break
-          }
-          if (L.LineUtil.segmentsIntersect(
+        var oldCrossing = oldFinishCrosses.find(function(el){return el.competitor.id === competitor.id});
+        var useOldCrossing = false
+        if (oldCrossing) {
+          var oldTs = allPoints[oldCrossing.idx].timestamp;
+          if (viewedTime >= oldTs) {
+            if (L.LineUtil.segmentsIntersect(
               map.project(finishLinePoints[0], 16),
               map.project(finishLinePoints[1], 16),
-              map.project(L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]), 16),
-              map.project(L.latLng([allPoints[i-1].coords.latitude, allPoints[i-1].coords.longitude]), 16)
+              map.project(L.latLng([allPoints[oldCrossing.idx].coords.latitude, allPoints[oldCrossing.idx].coords.longitude]), 16),
+              map.project(L.latLng([allPoints[oldCrossing.idx-1].coords.latitude, allPoints[oldCrossing.idx-1].coords.longitude]), 16)
             )
-          ) {
-            var competitorTime = tPoint.timestamp;
-            if(!isLiveMode && !isRealTime && !isCustomStart && competitor.start_time){
-              competitorTime -= Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
+            ) {
+              var competitorTime = allPoints[oldCrossing.idx].timestamp;
+              if(!isLiveMode && !isRealTime && !isCustomStart && competitor.start_time){
+                competitorTime -= Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
+              }
+              if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
+                competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
+              }
+              finishLineCrosses.push({
+                competitor, 
+                time: competitorTime,
+                idx: oldCrossing.idx
+              });
+              useOldCrossing = true;
             }
-            if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
-              competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
+          }
+        }
+        if(!useOldCrossing) {
+          for (var i=1; i < allPoints.length; i++) {
+            var tPoint = allPoints[i];
+            if (viewedTime < tPoint.timestamp) {
+              break
             }
-            finishLineCrosses.push({
-              competitor, 
-              time: competitorTime
-            });
-            break;
+            if (L.LineUtil.segmentsIntersect(
+                map.project(finishLinePoints[0], 16),
+                map.project(finishLinePoints[1], 16),
+                map.project(L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]), 16),
+                map.project(L.latLng([allPoints[i-1].coords.latitude, allPoints[i-1].coords.longitude]), 16)
+              )
+            ) {
+              var competitorTime = tPoint.timestamp;
+              if(!isLiveMode && !isRealTime && !isCustomStart && competitor.start_time){
+                competitorTime -= Math.max(0, new Date(competitor.start_time) - getCompetitionStartDate());
+              }
+              if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
+                competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
+              }
+              finishLineCrosses.push({
+                competitor, 
+                time: competitorTime,
+                idx: i
+              });
+              break;
+            }
           }
         }
       }
