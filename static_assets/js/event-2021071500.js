@@ -4,6 +4,8 @@ L.Control.Ranking = L.Control.extend({
       var back = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-ranking');
       back.style.width = '200px';
       back.style.background = 'white'
+      back.style['max-height'] = '195px'
+      back.style['overflow-y'] = 'auto'
       return back;
   },
 
@@ -12,7 +14,7 @@ L.Control.Ranking = L.Control.extend({
     var out = ''
     ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
     ranking.forEach(function (c, i) {
-      out += '<div>' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + ' <span style="float:right">' + getProgressBarText(c.time) + '</span></div>'
+      out += '<div style="clear:both;margin-bottom:-5px"><span style="display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:2px;width:148px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;width:47px;">' + getProgressBarText(c.time) + '</span></div>'
     })
     el.html(out)
   },
@@ -640,12 +642,14 @@ var drawCompetitors = function(){
               if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
                 competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
               }
-              finishLineCrosses.push({
-                competitor, 
-                time: competitorTime,
-                idx: oldCrossing.idx
-              });
-              useOldCrossing = true;
+              if (getRelativeTime(competitorTime) > 0) {
+                finishLineCrosses.push({
+                  competitor, 
+                  time: competitorTime,
+                  idx: oldCrossing.idx
+                });
+                useOldCrossing = true;
+              }
             }
           }
         }
@@ -669,12 +673,14 @@ var drawCompetitors = function(){
               if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
                 competitorTime -= Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate());
               }
-              finishLineCrosses.push({
-                competitor, 
-                time: competitorTime,
-                idx: i
-              });
-              break;
+              if (getRelativeTime(competitorTime) > 0) {
+                finishLineCrosses.push({
+                  competitor, 
+                  time: competitorTime,
+                  idx: i
+                });
+                break;
+              }
             }
           }
         }
