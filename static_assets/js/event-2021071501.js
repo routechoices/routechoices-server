@@ -2,10 +2,11 @@ L.Control.Ranking = L.Control.extend({
   
   onAdd: function(map) {
       var back = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-ranking');
-      back.style.width = '200px';
+      back.style.width = '205px';
       back.style.background = 'white'
       back.style['max-height'] = '195px'
-      back.style['overflow-y'] = 'auto'
+      back.style['overflow-y'] = 'scroll'
+      back.style['overflow-x'] = 'hidden'
       return back;
   },
 
@@ -14,9 +15,11 @@ L.Control.Ranking = L.Control.extend({
     var out = ''
     ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
     ranking.forEach(function (c, i) {
-      out += '<div style="clear:both;margin-bottom:-5px"><span style="display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:2px;width:148px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;width:47px;">' + getProgressBarText(c.time) + '</span></div>'
+      out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
     })
-    el.html(out)
+    if (el.html() !== out){
+      el.html(out)
+    }
   },
 
   onRemove: function(map) {
