@@ -23,3 +23,4 @@ fast-luhn
 django-hosts
 django-user-sessions
 geoip2
+polyline-encoding-rust @ git+https://github.com/rphlo/polyline_encoding.git

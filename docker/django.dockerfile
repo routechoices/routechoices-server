@@ -3,18 +3,19 @@ FROM python:3-buster
 # Copy in your requirements file
 ADD requirements.txt /requirements.txt
 
+# Install GDAL dependencies
+RUN apt update && apt install -y libgdal-dev g++ --no-install-recommends && \
+    apt clean -y
 # OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
 # ADD requirements /requirements
+RUN apt-get install cargo -y
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
 RUN set -ex \
     && python -m venv /venv \
-    && /venv/bin/pip install -U pip \
+    && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install -r /requirements.txt
 
-# Install GDAL dependencies
-RUN apt update && apt install -y libgdal-dev g++ --no-install-recommends && \
-    apt clean -y
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /app/

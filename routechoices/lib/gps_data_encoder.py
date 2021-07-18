@@ -6,6 +6,8 @@ import calendar
 from decimal import Decimal
 from datetime import datetime
 
+import polyline_encoding
+
 from django.utils.timezone import utc
 
 
@@ -339,9 +341,9 @@ class GeoLocationSeries(object):
             tim_d = int(round(float(pt.timestamp) - prev_tim))
             lat_d = int(round(1e5*(float(coord.latitude) - prev_lat)))
             lon_d = int(round(1e5*(float(coord.longitude) - prev_lon)))
-            result += (encode_unsigned_number(tim_d) +
-                       encode_signed_number(lat_d) +
-                       encode_signed_number(lon_d))
+            result += (polyline_encoding.encode_unsigned_number(tim_d) +
+                       polyline_encoding.encode_signed_number(lat_d) +
+                       polyline_encoding.encode_signed_number(lon_d))
             prev_tim += tim_d
             prev_lat += lat_d/1e5
             prev_lon += lon_d/1e5
