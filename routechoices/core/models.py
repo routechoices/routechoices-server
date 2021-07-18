@@ -924,14 +924,14 @@ class Competitor(models.Model):
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
-        next_competitor = self.device.competitor_set.filter(
+        next_competitor_start_time = self.device.competitor_set.filter(
             start_time__gt=from_date
-        ).order_by('start_time').first()
+        ).order_by('start_time').values_list('start_time', flat=True).first()
 
         end_date = now()
-        if next_competitor:
+        if next_competitor_start_time:
             end_date = min(
-                next_competitor.start_time,
+                next_competitor_start_time,
                 end_date
             )
         if self.event.end_date:
