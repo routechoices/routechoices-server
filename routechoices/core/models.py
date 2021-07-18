@@ -43,7 +43,7 @@ from routechoices.lib.helper import (
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
-
+import polyline_encoding
 import logging
 
 logger = logging.getLogger(__name__)
@@ -955,15 +955,22 @@ class Competitor(models.Model):
 
     @property
     def encoded_data(self):
-        data = []
-        for loc in self.locations:
-            data.append(
-                GeoLocation(
-                    loc['timestamp'],
-                    (loc['latitude'], loc['longitude'])
-                )
-            )
-        return str(GeoLocationSeries(data))
+        result = ""
+        YEAR2010 = 1262304000
+        prev_tim = YEAR2010
+        prev_lat = 0
+        prev_lon = 0
+        for pt in self.locations:
+            tim_d = int(round(float(pt['timestamp']) - prev_tim))
+            lat_d = int(round(1e5*(float(pt['latitude']) - prev_lat)))
+            lon_d = int(round(1e5*(float(pt['longitude']) - prev_lon)))
+            result += (polyline_encoding.encode_unsigned_number(tim_d) +
+                       polyline_encoding.encode_signed_number(lat_d) +
+                       polyline_encoding.encode_signed_number(lon_d))
+            prev_tim += tim_d
+            prev_lat += lat_d/1e5
+            prev_lon += lon_d/1e5
+        return result
 
     @property
     def gpx(self):
