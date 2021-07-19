@@ -10,6 +10,12 @@ services:
     restart: always
     expose:
       - "5432"
+  memcached:
+    container_name: rc_memcached
+    image: memcached:latest
+    restart: always
+    expose:
+      - "11211"
   minio:
     container_name: rc_minio
     image: minio/minio:latest
@@ -61,4 +67,5 @@ services:
       - db
       - minio
       - smtp
+      - memcached
     user: ${USERID}:${GROUPID}
