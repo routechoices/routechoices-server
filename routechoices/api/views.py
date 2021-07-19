@@ -520,7 +520,7 @@ def event_data(request, event_id):
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
     }
-    cache.set(cache_key, res, 7.5)
+    cache.set(cache_key, res, 15)
     return Response(res)
 
 
