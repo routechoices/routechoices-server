@@ -6,7 +6,7 @@ import urllib.parse
 import orjson as json
 from io import BytesIO
 from PIL import Image
-
+import random
 import arrow
 import requests
 
@@ -472,14 +472,13 @@ def event_register(request, event_id):
         ),
     }
 )
-
 @api_view(['GET'])
 def event_data(request, event_id):
     t0 = time.time()
 
     cache_ts = t0 // 5
-    cache_key = f'event_data:{event_id}:{request.GET.get("t", 0)}:{cache_ts}'
-    prev_cache_key = f'event_data:{event_id}:{request.GET.get("t", 0)}:{cache_ts - 1}'
+    cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts}'
+    prev_cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts - 1}'
 
     cached_res = cache.get(cache_key)
     if cached_res:
@@ -488,7 +487,7 @@ def event_data(request, event_id):
         cached_res = cache.get(prev_cache_key)
         if cached_res:
             return Response(cached_res)
-    cache.set(f'{cache_key}:processing', 1, 7.5)
+    cache.set(f'{cache_key}:processing', 1, 15)
 
     event = get_object_or_404(
         Event.objects.select_related('club').prefetch_related('competitors'),
@@ -515,6 +514,8 @@ def event_data(request, event_id):
             'start_time': c.start_time,
         })
     res = {
+        'cache_key': cache_ts,
+        'rand': random.random(),
         'competitors': results,
         'nb_points': nb_points,
         'duration': (time.time()-t0),
