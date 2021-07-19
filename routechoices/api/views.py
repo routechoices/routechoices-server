@@ -6,7 +6,6 @@ import urllib.parse
 import orjson as json
 from io import BytesIO
 from PIL import Image
-import random
 import arrow
 import requests
 
@@ -514,14 +513,12 @@ def event_data(request, event_id):
             'start_time': c.start_time,
         })
     res = {
-        'cache_key': cache_ts,
-        'rand': random.random(),
         'competitors': results,
         'nb_points': nb_points,
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
     }
-    cache.set(cache_key, res, 15)
+    cache.set(cache_key, res, 20)
     return Response(res)
 
 
