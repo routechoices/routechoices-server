@@ -476,7 +476,7 @@ def event_register(request, event_id):
 def event_data(request, event_id):
     t0 = time.time()
 
-    cache_ts = t0 // 5
+    cache_ts = t0 // 7.5
     cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts}'
     prev_cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts - 1}'
 
