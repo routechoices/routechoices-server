@@ -472,10 +472,24 @@ def event_register(request, event_id):
         ),
     }
 )
-@cache_page(15)
+
 @api_view(['GET'])
 def event_data(request, event_id):
     t0 = time.time()
+
+    cache_ts = t0 // 5
+    cache_key = f'event_data:{event_id}:{request.GET.get("t", 0)}:{cache_ts}'
+    prev_cache_key = f'event_data:{event_id}:{request.GET.get("t", 0)}:{cache_ts - 1}'
+
+    cached_res = cache.get(cache_key)
+    if cached_res:
+        return Response(cached_res)
+    elif cache.get(f'{cache_key}:processing'):
+        cached_res = cache.get(prev_cache_key)
+        if cached_res:
+            return Response(cached_res)
+    cache.set(f'{cache_key}:processing', 1, 7.5)
+
     event = get_object_or_404(
         Event.objects.select_related('club').prefetch_related('competitors'),
         aid=event_id,
@@ -500,12 +514,14 @@ def event_data(request, event_id):
             'short_name': c.short_name,
             'start_time': c.start_time,
         })
-    return Response({
+    res = {
         'competitors': results,
         'nb_points': nb_points,
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
-    })
+    }
+    cache.set(cache_key, res, 7.5)
+    return Response(res)
 
 
 @swagger_auto_schema(
