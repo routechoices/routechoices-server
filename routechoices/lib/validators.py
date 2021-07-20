@@ -14,7 +14,10 @@ FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
 
 def validate_imei(number):
     """Check if the number provided is a valid IMEI number."""
-    matched = re.match(r'^\d{15}$', number)
+    try:
+        matched = re.match(r'^\d{15}$', number)
+    except Exception:
+        raise ValidationError('Invalid IMEI')
     if not matched:
         raise ValidationError(_('Invalid IMEI (must be 15 characters)'))
     if not luhn.validate(number):
