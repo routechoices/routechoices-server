@@ -36,12 +36,12 @@
 {% endblock %}
 
 {% block extra_body %}
-<script src="{% static '/vendor/luxon-2.0.1/luxon.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script>
 $(function(){
     $('.date-utc').each(function(i, el){
         $el = $(el);
-        $el.text(luxon.DateTime.fromISO($el.data('date')).setZone('system').toFormat('yyyy-MM-dd HH:mm'));
+        $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm'));
     });
 })
 </script>

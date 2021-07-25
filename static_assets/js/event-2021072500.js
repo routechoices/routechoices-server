@@ -579,7 +579,7 @@ var getProgressBarText = function(currentTime){
         result += t > 3600 ? Math.floor(t/3600) + ':': '';
         result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60);
     } else {
-        result = luxon.DateTime.fromMillis(viewedTime).toFormat('TT');
+        result = dayjs(viewedTime).format('HH:mm:ss');
     }
     return result;
 }

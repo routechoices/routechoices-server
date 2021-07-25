@@ -267,7 +267,7 @@ and (max-device-width : 500px) {
 {% block extra_body %}
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
-<script src="{% static '/vendor/luxon-2.0.1/luxon.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-smoothwheelzoom-2020.07.03/SmoothWheelZoom.js' %}"></script>
 <script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
@@ -275,7 +275,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2019052200.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021071900.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021072500.js' %}"></script>
 <script>
 var clock = ServerClock({url: '{% host_url 'time_api' host 'api' %}'});
 
@@ -431,7 +431,7 @@ $(function() {
   var startDate = new Date('{{event.start_date|date:'c'}}');
   $('.date-utc').each(function(i, el){
     $el = $(el);
-    $el.text(luxon.DateTime.fromISO($el.data('date')).setZone('system', { keepLocalTime: true }).setLocale('en').toFormat('DDD, TT'));
+    $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'));
   });
   window.setInterval(function(){
     if(new Date() > startDate) {
