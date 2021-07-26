@@ -526,7 +526,9 @@ def event_data(request, event_id):
                 event.end_date,
                 end_date
             )
-        nb, encoded_data = c.device.get_locations_between_dates(from_date, to_date, encoded=True)
+        nb, encoded_data = (0, "")
+        if c.device_id:
+            nb, encoded_data = c.device.get_locations_between_dates(from_date, to_date, encoded=True)
         nb_points += nb
         results.append({
             'id': c.aid,
