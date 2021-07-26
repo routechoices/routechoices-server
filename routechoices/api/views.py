@@ -501,7 +501,7 @@ def event_data(request, event_id):
         .all().order_by('start_time', 'name')
     devices = (c.device_id for c in competitors)
     all_devices_competitors = Competitor.objects.filter(start_time__gte=event.start_date, device_id__in=devices)
-    competitors_by_device = {}
+    start_times_by_device = {}
     for c in all_devices_competitors:
         start_times_by_device.setdefault(c.device_id, [])
         start_times_by_device[c.device_id].append(c.start_time)
