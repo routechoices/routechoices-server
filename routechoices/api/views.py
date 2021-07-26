@@ -505,16 +505,17 @@ def event_data(request, event_id):
     for c in all_devices_competitors:
         start_times_by_device.setdefault(c.device_id, [])
         start_times_by_device[c.device_id].append(c.start_time)
-        start_times_by_device[c.device_id] = sorted(competitors_by_device[c.device_id])
+        start_times_by_device[c.device_id] = sorted(start_times_by_device[c.device_id])
     nb_points = 0
     results = []
     for c in competitors:
         from_date = c.start_time
         next_competitor_start_time = None
-        for nxt in start_times_by_device.get(c.device_id, []):
-            if nxt > c.start_time:
-                next_competitor_start_time = nxt
-                break
+        if c.device_id:
+            for nxt in start_times_by_device.get(c.device_id, []):
+                if nxt > c.start_time:
+                    next_competitor_start_time = nxt
+                    break
         end_date = now()
         if next_competitor_start_time:
             end_date = min(
