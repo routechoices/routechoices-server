@@ -712,6 +712,37 @@ class Device(models.Model):
     @locations.setter
     def locations(self, locs):
         self.locations_raw = str(json.dumps(locs), 'utf-8')
+    
+    def get_locations_between_dates(self, from_date, end_date, encoded=False):
+        qs = self.locations
+        locs = [
+            {
+                'timestamp': i[1],
+                'latitude': qs['latitudes'][i[0]],
+                'longitude': qs['longitudes'][i[0]],
+            } for i in sorted(
+                enumerate(qs['timestamps']),
+                key=lambda x:x[1]
+            ) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
+        ]
+        if not encoded:
+            return len(locs), locs
+        result = ""
+        YEAR2010 = 1262304000
+        prev_tim = YEAR2010
+        prev_lat = 0
+        prev_lon = 0
+        for pt in locs:
+            tim_d = int(round(float(pt['timestamp']) - prev_tim))
+            lat_d = int(round(1e5*(float(pt['latitude']) - prev_lat)))
+            lon_d = int(round(1e5*(float(pt['longitude']) - prev_lon)))
+            result += (polyline_encoding.encode_unsigned_number(tim_d) +
+                       polyline_encoding.encode_signed_number(lat_d) +
+                       polyline_encoding.encode_signed_number(lon_d))
+            prev_tim += tim_d
+            prev_lat += lat_d/1e5
+            prev_lon += lon_d/1e5
+        return len(locs), result
 
     def add_location(self, lat, lon, timestamp=None, save=True):
         try:
