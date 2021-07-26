@@ -499,15 +499,38 @@ def event_data(request, event_id):
             raise PermissionDenied()
     competitors = event.competitors.select_related('device')\
         .all().order_by('start_time', 'name')
-
+    devices = (c.device_id for c in competitors)
+    all_devices_competitors = Competitor.objects.filter(start_time_gte=event.start_date, device_id__in=devices)
+    competitors_by_device = {}
+    for c in all_devices_competitors:
+        start_times_by_device.setdefault(c.device_id, [])
+        start_times_by_device[c.device_id].append(c.start_time)
+        start_times_by_device[c.device_id] = sorted(competitors_by_device[c.device_id])
     nb_points = 0
     results = []
     for c in competitors:
-        locations = c.locations
-        nb_points += len(locations)
+        from_date = c.start_time
+        next_competitor_start_time = None
+        for nxt in start_times_by_device.get(c.device_id, []):
+            if nxt > c.start_time:
+                next_competitor_start_time = nxt
+                break
+        end_date = now()
+        if next_competitor_start_time:
+            end_date = min(
+                next_competitor_start_time,
+                end_date
+            )
+        if event.end_date:
+            end_date = min(
+                event.end_date,
+                end_date
+            )
+        nb, encoded_data = c.device.get_locations_between_dates(from_date, to_date, encoded=True)
+        nb_points += nb
         results.append({
             'id': c.aid,
-            'encoded_data': c.encoded_data,
+            'encoded_data': encoded_data,
             'name': c.name,
             'short_name': c.short_name,
             'start_time': c.start_time,
