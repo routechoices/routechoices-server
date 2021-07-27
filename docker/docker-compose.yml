@@ -16,6 +16,9 @@ services:
     restart: always
     expose:
       - "11211"
+    entrypoint:
+      - memcached
+      - -I 10m
   minio:
     container_name: rc_minio
     image: minio/minio:latest
