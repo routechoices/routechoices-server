@@ -489,7 +489,7 @@ def event_data(request, event_id):
     cache.set(f'{cache_key}:processing', 1, 15)
 
     event = get_object_or_404(
-        Event.objects.select_related('club').prefetch_related('competitors'),
+        Event.objects.select_related('club'),
         aid=event_id,
         start_date__lt=now()
     )
@@ -500,12 +500,14 @@ def event_data(request, event_id):
     competitors = event.competitors.select_related('device')\
         .all().order_by('start_time', 'name')
     devices = (c.device_id for c in competitors)
-    all_devices_competitors = Competitor.objects.filter(start_time__gte=event.start_date, device_id__in=devices)
+    all_devices_competitors = Competitor.objects.filter(
+        start_time__gte=event.start_date,
+        device_id__in=devices
+    ).order_by('start_time')
     start_times_by_device = {}
     for c in all_devices_competitors:
         start_times_by_device.setdefault(c.device_id, [])
         start_times_by_device[c.device_id].append(c.start_time)
-        start_times_by_device[c.device_id] = sorted(start_times_by_device[c.device_id])
     nb_points = 0
     results = []
     for c in competitors:
