@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load bootstrap3 %}
+
+{% block content %}
+<center><h1>Thanks for their support</h1>
+<hr/>
+<p>{% for n in backers %}{% if forloop.counter0 %}, {% endif %}{{n|escape|title}}{% empty %} - {% endfor %}</p></center>
+{% endblock %}

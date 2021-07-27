@@ -201,7 +201,7 @@ SLUG_BLACKLIST = [
     'aes256-gcm', 'affiliate', 'affiliates', 'ajax', 'alert', 'alerts',
     'alpha', 'amp', 'analytics', 'api', 'app', 'apps', 'asc', 'assets', 'atom',
     'auth', 'authentication', 'authorize', 'autoconfig', 'autodiscover',
-    'avatar', 'backup', 'banner', 'banners', 'beta', 'billing', 'billings',
+    'avatar', 'backers', 'backup', 'banner', 'banners', 'beta', 'billing', 'billings',
     'blog', 'blogs', 'board', 'bookmark', 'bookmarks', 'broadcasthost',
     'business', 'buy', 'cache', 'calendar', 'campaign', 'captcha', 'careers',
     'cart', 'cas', 'categories', 'category', 'cdn', 'cgi', 'cgi-bin',
@@ -309,6 +309,8 @@ AWS_S3_ENDPOINT_URL = "http://minio:9000"
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
 SILENCED_SYSTEM_CHECKS = ['admin.E410']
+
+PATREON_CREATOR_ID = "xRJAgEV1zma3MfnaVGg9SRTYet-EUTKqn4O2Llz6_lk"
 
 try:
     from .local_settings import *

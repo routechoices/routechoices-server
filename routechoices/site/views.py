@@ -23,7 +23,7 @@ from routechoices.core.models import (
 )
 from routechoices.lib.helper import initial_of_name
 from routechoices.site.forms import CompetitorForm, ContactForm, UploadGPXForm
-
+from routechoices.lib.patreon_api import PatreonAPI
 
 def home_view(request):
     if request.user.is_authenticated:
@@ -444,6 +444,38 @@ def event_route_upload_view(request, slug, **kwargs):
             'form': form,
         }
     )
+
+
+def backers(request):
+    access_token = settings.PATREON_CREATOR_ID
+    api_client = PatreonAPI(access_token)
+
+    # Get the campaign ID
+    response = api_client.fetch_campaign_and_patrons()
+    main_campaign = response['data'][0]
+    creator_id = main_campaign['relationships']['creator']['data']['id']
+    included = response.get('included')
+    pledges = [obj for obj in included
+               if obj['type'] == 'pledge' and obj['relationships']['creator']['data']['id'] == creator_id]
+    patron_ids = [pledge['relationships']['patron']['data']['id'] for pledge in pledges]
+    patrons = [obj for obj in included
+               if obj['type'] == 'user' and obj['id'] in patron_ids]
+    patron_attributes_map = {patron['id']: patron['attributes']
+                             for patron in patrons
+                             if 'email' in patron['attributes']}
+    patronage_map = {}
+    for pledge in pledges:
+        if pledge['relationships']['patron']['data']['id'] in patron_attributes_map:
+            patron_attributes = patron_attributes_map[pledge['relationships']['patron']['data']['id']]
+            if 'email' in patron_attributes and 'amount_cents' in pledge['attributes']:
+                relevant_info = {
+                    'amount_cents': pledge['attributes']['amount_cents']
+                }
+                if 'full_name' in patron_attributes:
+                    relevant_info['full_name'] = patron_attributes['full_name']
+                patronage_map[patron_attributes['email']] = relevant_info
+    return render(request, "site/backers.html", {'backers': [b.get('full_name') for b in patronage_map.values() if b.get('full_name')]})
+
 
 
 def contact(request):

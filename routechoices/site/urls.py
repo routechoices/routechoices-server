@@ -12,6 +12,11 @@ urlpatterns = [
         name='contact_view'
     ),
     url(
+        r'^backers/?$',
+        views.backers,
+        name='backers_view'
+    ),
+    url(
         r'^contact/success/?$',
         TemplateView.as_view(template_name='site/contact_email_sent.html'),
         name='contact_email_sent_view'
