@@ -462,18 +462,17 @@ def backers(request):
                if obj['type'] == 'user' and obj['id'] in patron_ids]
     patron_attributes_map = {patron['id']: patron['attributes']
                              for patron in patrons
-                             if 'email' in patron['attributes']}
+                             if 'full_name' in patron['attributes']}
     patronage_map = {}
     for pledge in pledges:
         if pledge['relationships']['patron']['data']['id'] in patron_attributes_map:
             patron_attributes = patron_attributes_map[pledge['relationships']['patron']['data']['id']]
-            if 'email' in patron_attributes and 'amount_cents' in pledge['attributes']:
+            if 'full_name' in patron_attributes and 'amount_cents' in pledge['attributes']:
                 relevant_info = {
                     'amount_cents': pledge['attributes']['amount_cents']
                 }
-                if 'full_name' in patron_attributes:
-                    relevant_info['full_name'] = patron_attributes['full_name']
-                patronage_map[patron_attributes['email']] = relevant_info
+                relevant_info['full_name'] = patron_attributes['full_name']
+                patronage_map[patron_attributes['full_name']] = relevant_info
     return render(request, "site/backers.html", {'backers': [b.get('full_name') for b in patronage_map.values() if b.get('full_name')]})
 
 
