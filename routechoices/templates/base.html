@@ -96,18 +96,19 @@
     {% endblock %}
     {% endblock %}
     <script
-      src="https://browser.sentry-cdn.com/5.27.4/bundle.min.js"
-      integrity="sha384-yUnxX3o5D7+yEEIKDXlpygg+0Q2LdyklXwZVWUjc6fohGisYvhpyQbRvNYaDGtvU"
-      crossorigin="anonymous"
-    ></script>
+      src="https://browser.sentry-cdn.com/6.10.0/bundle.min.js"
+      integrity="sha384-nsIkfmMh0uiqg+AwegHcT1SMiPNWnhZmjFDwTshLTxur6ZPNaGT8vwT+vHwI5Jag"
+      crossorigin="anonymous">
+    </script>
     <script
-      src="https://browser.sentry-cdn.com/5.27.4/bundle.tracing.min.js"
-      integrity="sha384-C4FnDB434rh858hdUT1O7fV7zJMZAUKKtHMBPeJjZZrlnf0lmZkWDMV+rAHEq+6b"
-      crossorigin="anonymous"
-    ></script>
+      src="https://browser.sentry-cdn.com/6.10.0/bundle.tracing.min.js"
+      integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
+      crossorigin="anonymous">
+    </script>
     <script>
     Sentry.init({
       dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
+      release: "master@{{version}}",
       integrations: [new Sentry.Integrations.BrowserTracing()],
       tracesSampleRate: 0.05,
     });
