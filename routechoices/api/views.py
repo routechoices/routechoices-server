@@ -300,7 +300,7 @@ def event_detail(request, event_id):
         'data': request.build_absolute_uri(
             reverse('event_data', host='api', kwargs={'event_id': event.aid})
         ),
-        'announcement': event.notice.text,
+        'announcement': event.notice.text if event.has_notice else '',
         'extra_maps': [],
     }
     for c in event.competitors.all():
