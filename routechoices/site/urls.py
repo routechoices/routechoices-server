@@ -50,7 +50,7 @@ urlpatterns = [
         name='event_shortcut'
     ),
     url(
-        r'^(?P<club_slug>[0-9a-zA-Z_-]{2,})/',
+        r'^(?P<club_slug>[0-9a-zA-Z][0-9a-zA-Z_-]+)/',
         include(
             ('routechoices.club.urls', 'club'),
             namespace='club'
