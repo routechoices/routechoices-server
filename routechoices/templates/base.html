@@ -143,12 +143,14 @@
             }
         });
     </script>
+    {% if panelbear_id %}
     <!-- Panelbear Analytics - We respect your privacy -->
-    <script async src="https://cdn.panelbear.com/analytics.js?site=JsBR7lF0TQD"></script>
+    <script async src="https://cdn.panelbear.com/analytics.js?site={{panelbear_id}}"></script>
     <script>
         window.panelbear = window.panelbear || function() { (window.panelbear.q = window.panelbear.q || []).push(arguments); };
-        panelbear('config', { site: 'JsBR7lF0TQD' });
+        panelbear('config', { site: '{{panelbear_id}}' });
     </script>
+    {% endif %}
     {% block extra_body %}
     {% endblock %}
   </body>
