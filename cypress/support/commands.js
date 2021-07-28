@@ -54,7 +54,7 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
       cookie: ''
     },
   }).then(response => {
-    return cy.wrap(response.body.device_id)
+    cy.wrap(response.body.device_id).as('devId')
   })
  })
 
