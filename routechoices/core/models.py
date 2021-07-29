@@ -1,29 +1,38 @@
 import arrow
 import base64
 import datetime
-import orjson as json
+from decimal import Decimal
+from io import BytesIO
+import logging
 import hashlib
+import orjson as json
 import re
 import time
-from io import BytesIO
-from decimal import Decimal
 from zipfile import ZipFile
-
-import gpxpy
-import gpxpy.gpx
-import pytz
-from PIL import Image
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Polygon, LinearRing
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
-from django_hosts.resolvers import reverse
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
+
+from django_hosts.resolvers import reverse
+
+import gpxpy
+import gpxpy.gpx
+
+import polyline_encoding
+
+import pytz
+
+from PIL import Image
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
@@ -43,8 +52,7 @@ from routechoices.lib.helper import (
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
-import polyline_encoding
-import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -638,6 +646,13 @@ class Event(models.Model):
                 'Event with this Club and Slug already exists.'
             )
 
+    def invalidate_cache(self):
+        t0 = time.time()
+        cache_ts = int(t0 // (10 if self.is_live else 7*24*3600))
+        cache_prefix = 'live' if self.is_live else 'archived'
+        cache_key = f'{cache_prefix}_event_data:{self.aid}:{cache_ts}'
+        cache.delete(cache_key)
+
     @property
     def has_notice(self):
         return hasattr(self, 'notice')
@@ -1030,3 +1045,8 @@ class Competitor(models.Model):
                 'competitor_id': self.aid,
             }
         )
+
+
+@receiver([post_save, post_delete], sender=Competitor)
+def save_profile(sender, instance, **kwargs):
+    instance.event.invalidate_cache()

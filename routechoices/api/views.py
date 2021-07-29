@@ -474,25 +474,41 @@ def event_register(request, event_id):
 @api_view(['GET'])
 def event_data(request, event_id):
     t0 = time.time()
-
-    cache_ts = t0 // 7.5
-    cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts}'
-    prev_cache_key = f'event_data:{event_id}:{request.GET.get("t", -1)}:{cache_ts - 1}'
-
-    cached_res = cache.get(cache_key)
-    if cached_res:
-        return Response(cached_res)
-    elif cache.get(f'{cache_key}:processing'):
-        cached_res = cache.get(prev_cache_key)
-        if cached_res:
-            return Response(cached_res)
-    cache.set(f'{cache_key}:processing', 1, 15)
+    
+    # First check if we have a live event cache
+    # if we do return cache
+    live_cache_ts = int(t0 // 10)
+    live_cache_key = f'live_event_data:{event_id}:{live_cache_ts}'
+    live_cached_res = cache.get(live_cache_key)
+    if live_cached_res:
+        return Response(live_cached_res)
 
     event = get_object_or_404(
         Event.objects.select_related('club'),
         aid=event_id,
         start_date__lt=now()
     )
+
+    cache_ts = int(t0 // (10 if event.is_live else 7*24*3600))
+    cache_prefix = 'live' if event.is_live else 'archived'
+    cache_key = f'{cache_prefix}_event_data:{event_id}:{cache_ts}'
+    prev_cache_key = f'{cache_prefix}_event_data:{event_id}:{cache_ts - 1}'
+    # then if event is archived check if we have a cache for that
+    # return it if we do
+    cached_res = None
+    if event.ended:
+        cached_res = cache.get(cache_key)
+    if cached_res:
+        return Response(cached_res)
+    # If we dont have cache check if we are currently generating cache
+    # if so return previous cache data if available
+    elif cache.get(f'{cache_key}:processing'):
+        cached_res = cache.get(prev_cache_key)
+        if cached_res:
+            return Response(cached_res)
+    # else generate data and set that we are generating cache
+    cache.set(f'{cache_key}:processing', 1, 15)
+
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -546,7 +562,7 @@ def event_data(request, event_id):
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
     }
-    cache.set(cache_key, res, 20)
+    cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
     return Response(res)
 
 
