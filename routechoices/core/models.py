@@ -37,6 +37,7 @@ from PIL import Image
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
      validate_gpx,
+     validate_domain_slug,
      validate_nice_slug,
      validate_latitude,
      validate_longitude,
@@ -94,7 +95,7 @@ class Club(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.CharField(
         max_length=50,
-        validators=[validate_nice_slug, ],
+        validators=[validate_domain_slug, ],
         unique=True,
         help_text='This is used in the urls of your events'
     )

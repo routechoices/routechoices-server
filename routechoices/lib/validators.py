@@ -65,6 +65,25 @@ def validate_nice_slug(slug):
         raise ValidationError(_('Forbidden word.'))
 
 
+def validate_domain_slug(slug):
+    if re.search(r'[^-a-zA-Z0-9]', slug):
+        raise ValidationError(_('Only alphanumeric characters '
+                                'and hyphens are allowed.'))
+    if len(slug) < 2:
+        raise ValidationError(_('Too short. (min. 2 characters)'))
+    elif len(slug) > 32:
+        raise ValidationError(_('Too long. (max. 32 characters)'))
+    if slug[0] in "-":
+        raise ValidationError(_('Must start with an alphanumeric character.'))
+    if slug[-1] in "-":
+        raise ValidationError(_('Must end with an alphanumeric character.'))
+    if '--' in slug:
+        raise ValidationError(_('Cannot include 2 non alphanumeric '
+                                'character in a row.'))
+    if slug.lower() in settings.SLUG_BLACKLIST:
+        raise ValidationError(_('Forbidden word.'))
+
+
 def validate_image_data_uri(value):
     if not value:
         raise ValidationError(_('Data URI Can not be null'))
