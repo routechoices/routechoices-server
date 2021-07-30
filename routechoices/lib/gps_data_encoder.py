@@ -332,21 +332,13 @@ class GeoLocationSeries(object):
         }
 
     def __str__(self):
-        result = ""
-        prev_tim = YEAR2010
-        prev_lat = 0
-        prev_lon = 0
-        for pt in self:
-            coord = pt.coordinates
-            tim_d = int(round(float(pt.timestamp) - prev_tim))
-            lat_d = int(round(1e5*(float(coord.latitude) - prev_lat)))
-            lon_d = int(round(1e5*(float(coord.longitude) - prev_lon)))
-            result += (polyline_encoding.encode_unsigned_number(tim_d) +
-                       polyline_encoding.encode_signed_number(lat_d) +
-                       polyline_encoding.encode_signed_number(lon_d))
-            prev_tim += tim_d
-            prev_lat += lat_d/1e5
-            prev_lon += lon_d/1e5
+        result = polyline_encoding.encode_data(
+            [{
+                "timestamp": pt.timestamp,
+                "latitude": float(pt.coordinates.latitude),
+                "longitude": float(pt.coordinates.longitude),
+            } for pt in self]
+        )
         return result
 
     @staticmethod

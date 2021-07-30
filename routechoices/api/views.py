@@ -480,7 +480,7 @@ def event_data(request, event_id):
     live_cache_ts = int(t0 // 10)
     live_cache_key = f'live_event_data:{event_id}:{live_cache_ts}'
     live_cached_res = cache.get(live_cache_key)
-    if live_cached_res:
+    if live_cached_res and not settings.DEBUG:
         return Response(live_cached_res)
 
     event = get_object_or_404(
@@ -498,13 +498,13 @@ def event_data(request, event_id):
     cached_res = None
     if event.ended:
         cached_res = cache.get(cache_key)
-    if cached_res:
+    if cached_res and not settings.DEBUG:
         return Response(cached_res)
     # If we dont have cache check if we are currently generating cache
     # if so return previous cache data if available
     elif cache.get(f'{cache_key}:processing'):
         cached_res = cache.get(prev_cache_key)
-        if cached_res:
+        if cached_res and not settings.DEBUG:
             return Response(cached_res)
     # else generate data and set that we are generating cache
     cache.set(f'{cache_key}:processing', 1, 15)

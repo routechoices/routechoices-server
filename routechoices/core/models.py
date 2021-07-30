@@ -743,21 +743,7 @@ class Device(models.Model):
         ]
         if not encoded:
             return len(locs), locs
-        result = ""
-        YEAR2010 = 1262304000
-        prev_tim = YEAR2010
-        prev_lat = 0
-        prev_lon = 0
-        for pt in locs:
-            tim_d = int(round(float(pt['timestamp']) - prev_tim))
-            lat_d = int(round(1e5*(float(pt['latitude']) - prev_lat)))
-            lon_d = int(round(1e5*(float(pt['longitude']) - prev_lon)))
-            result += (polyline_encoding.encode_unsigned_number(tim_d) +
-                       polyline_encoding.encode_signed_number(lat_d) +
-                       polyline_encoding.encode_signed_number(lon_d))
-            prev_tim += tim_d
-            prev_lat += lat_d/1e5
-            prev_lon += lon_d/1e5
+        result = polyline_encoding.encode_data(locs)
         return len(locs), result
 
     def add_location(self, lat, lon, timestamp=None, save=True):
@@ -1002,21 +988,7 @@ class Competitor(models.Model):
 
     @property
     def encoded_data(self):
-        result = ""
-        YEAR2010 = 1262304000
-        prev_tim = YEAR2010
-        prev_lat = 0
-        prev_lon = 0
-        for pt in self.locations:
-            tim_d = int(round(float(pt['timestamp']) - prev_tim))
-            lat_d = int(round(1e5*(float(pt['latitude']) - prev_lat)))
-            lon_d = int(round(1e5*(float(pt['longitude']) - prev_lon)))
-            result += (polyline_encoding.encode_unsigned_number(tim_d) +
-                       polyline_encoding.encode_signed_number(lat_d) +
-                       polyline_encoding.encode_signed_number(lon_d))
-            prev_tim += tim_d
-            prev_lat += lat_d/1e5
-            prev_lon += lon_d/1e5
+        result = polyline_encoding.encode_data(self.locations)
         return result
 
     @property
