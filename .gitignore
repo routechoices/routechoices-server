@@ -14,6 +14,7 @@ MANIFEST
 *.vscode
 *.bak
 *.mmdb
+*.json.gz
 media/*
 static/*
 htmlcov/*
