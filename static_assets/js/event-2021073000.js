@@ -236,8 +236,16 @@ var selectReplayMode = function(e){
       fetchNotice(); 
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
+    
     currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate);
-    currentTime = Math.min(+clock.now(), currentTime, getCompetitionEndDate());
+    var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
+    if (isCustomStart) {
+      maxCTime = getCompetitionStartDate() + getCompetitorsMinCustomOffset() + getCompetitorsMaxDuration(true)
+    }
+    if (isRealTime) {
+      maxCTime = getCompetitionStartDate() + (Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate())
+    }
+    currentTime = Math.min(+clock.now(), currentTime, maxCTime);
     drawCompetitors();
     prevShownTime = currentTime;
     prevDisplayRefresh = +clock.now();
@@ -602,9 +610,9 @@ var drawCompetitors = function(){
     perc = isLiveMode ? 100 : (currentTime-getCompetitionStartDate())/(Math.min(+clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * 100
   } else {
     if (isCustomStart) {
-      perc = (currentTime-(getCompetitionStartDate()+getCompetitorsMinCustomOffset())) / getCompetitorsMaxDuration(true) * 100;
+      perc = (currentTime - (getCompetitionStartDate()+getCompetitorsMinCustomOffset())) / getCompetitorsMaxDuration(true) * 100;
     } else {
-      perc = (currentTime-getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100;
+      perc = (currentTime - getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100;
     }
   }
   $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc);
@@ -799,10 +807,6 @@ var drawCompetitors = function(){
   if(finishLinePoly) { 
     rankControl.setValues(finishLineCrosses);
   }
-}
-
-function drawFinishLineRanking () {
-  
 }
 
 function formatSpeed(s){
