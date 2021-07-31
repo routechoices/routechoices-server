@@ -551,11 +551,13 @@ def event_create_view(request):
                 )
             return redirect('dashboard:event_list_view')
         else:
-            devices = Device.objects.none()
+            dev_qs = Device.objects.none()
             if request.user.is_authenticated:
-                devices = request.user.devices.all()
+                dev_qs = request.user.devices.all()
+            c = [['', '---------'],] + [[d.id, d.aid] for d in dev_qs]
             for cform in formset.forms:
-                cform.fields['device'].queryset = devices
+                cform.fields['device'].queryset = dev_qs
+                cform.fields['device'].choices = c
     else:
         form = EventForm()
         form.fields['club'].queryset = club_list
@@ -565,11 +567,13 @@ def event_create_view(request):
         for mform in extra_map_formset.forms:
             mform.fields['map'].queryset = map_list
         notice_form = NoticeForm()
-        devices = Device.objects.none()
+        dev_qs = Device.objects.none()
         if request.user.is_authenticated:
-            devices = request.user.devices.all()
+            dev_qs = request.user.devices.all()
+        c = [['', '---------'],] + [[d.id, d.aid] for d in dev_qs]
         for cform in formset.forms:
-            cform.fields['device'].queryset = devices
+            cform.fields['device'].queryset = dev_qs
+            cform.fields['device'].choices = c
     return render(
         request,
         'dashboard/event_edit.html',
@@ -647,8 +651,10 @@ def event_edit_view(request, id):
             dev_qs = Device.objects.filter(
                 id__in=all_devices
             )
+            c = [['', '---------'],] + [[d.id, d.aid] for d in dev_qs]
             for cform in formset.forms:
                 cform.fields['device'].queryset = dev_qs
+                cform.fields['device'].choices = c
     else:
         form = EventForm(instance=event)
         form.fields['club'].queryset = club_list
@@ -664,8 +670,12 @@ def event_edit_view(request, id):
         dev_qs = Device.objects.filter(
             id__in=all_devices
         )
+        c = [['', '---------'],] + [[d.id, d.aid] for d in dev_qs]
         for cform in formset.forms:
             cform.fields['device'].queryset = dev_qs
+            cform.fields['device'].choices = c
+
+
     return render(
         request,
         'dashboard/event_edit.html',
