@@ -10,6 +10,14 @@ from django.utils.timezone import is_aware, make_aware
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
 
+from user_sessions.templatetags.user_sessions import device as device_name
+
+
+def get_device_name(ua):
+    if ua.startswith('Routechoices-ios-tracker'):
+        return 'iOS'
+    return device_name(ua)
+
 
 def get_aware_datetime(date_str):
     ret = parse_datetime(date_str)

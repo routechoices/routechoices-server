@@ -696,12 +696,14 @@ class MapAssignation(models.Model):
 
 class Device(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
     aid = models.CharField(
         default=short_random_key,
         max_length=12,
         unique=True,
         validators=[validate_slug, ]
     )
+    user_agent = models.CharField(max_length=200, blank=True)
     is_gpx = models.BooleanField(default=False)
     owners = models.ManyToManyField(
         User,

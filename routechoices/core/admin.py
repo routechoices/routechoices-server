@@ -10,6 +10,9 @@ from django.db.models.expressions import RawSQL
 from django.utils.safestring import mark_safe
 
 from allauth.account.models import EmailAddress
+
+from routechoices.lib.helper import get_device_name
+
 from routechoices.core.models import (
     Club,
     Competitor,
@@ -20,6 +23,42 @@ from routechoices.core.models import (
     Notice,
     MapAssignation,
 )
+
+
+
+class ModifiedDateFilter(admin.SimpleListFilter):
+    title = 'When was it modified'
+    parameter_name = 'modified'
+
+    def lookups(self, request, model_admin):
+        return [
+            (None, 'Today'),
+            ('week', 'This Week'),
+            ('all', 'All'),
+        ]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        from_date = arrow.utcnow().shift(days=-1).datetime
+        if self.value() == 'week':
+            from_date = arrow.utcnow().shift(weeks=-1).datetime
+            return queryset.filter(
+                modification_date__gte=from_date
+            )
+        elif self.value():
+            return queryset.all()
+        return queryset.filter(
+            modification_date__gte=from_date
+        )
 
 
 class HasLocationFilter(admin.SimpleListFilter):
@@ -141,7 +180,9 @@ class DeviceCompetitorInline(admin.TabularInline):
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
+        'device_name',
         'creation_date',
+        'modification_date',
         'last_position_at',
         'last_position',
         'location_count',
@@ -150,7 +191,10 @@ class DeviceAdmin(admin.ModelAdmin):
     actions = ['clean_positions']
     search_fields = ('aid', )
     inlines = [DeviceCompetitorInline, ]
-    list_filter = (HasCompetitorFilter, HasLocationFilter, )
+    list_filter = (ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
+
+    def get_ordering(self, request):
+        return ['-modification_date', 'aid']
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
@@ -189,6 +233,8 @@ class DeviceAdmin(admin.ModelAdmin):
     clean_positions.short_description = \
         "Remove duplicate positions from storage"
 
+    def device_name(self, obj):
+        return get_device_name(obj.user_agent) or obj.user_agent
 
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (

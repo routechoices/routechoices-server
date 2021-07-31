@@ -696,6 +696,8 @@ def traccar_api_gw(request):
     if devices.count() == 0:
         raise ValidationError('No such device ID')
     device = devices.first()
+    if not device.user_agent:
+        device.user_agent = 'Traccar'
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
@@ -787,6 +789,8 @@ def locations_api_gw(request):
     if devices.count() == 0:
         raise ValidationError('No such device ID')
     device = devices.first()
+    if not device.user_agent:
+        device.user_agent = request.session.user_agent[:200]
     lats = request.data.get('latitudes', '').split(',')
     lons = request.data.get('longitudes', '').split(',')
     times = request.data.get('timestamps', '').split(',')
@@ -934,7 +938,7 @@ def gps_seuranta_proxy(request):
 @api_view(['POST'])
 @ratelimit(key='ip', rate='10/m')
 def get_device_id(request):
-    device = Device.objects.create()
+    device = Device.objects.create(user_agent=request.session.user_agent[:200])
     return Response({'status': 'ok', 'device_id': device.aid})
 
 
