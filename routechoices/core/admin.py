@@ -27,7 +27,7 @@ from routechoices.core.models import (
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
-    title = 'When was it modified'
+    title = 'When Was It Modified'
     parameter_name = 'modified'
 
     def lookups(self, request, model_admin):
