@@ -26,6 +26,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from ratelimit.decorators import ratelimit
+from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.core.models import (
     Club,
@@ -698,6 +699,9 @@ def traccar_api_gw(request):
     device = devices.first()
     if not device.user_agent:
         device.user_agent = 'Traccar'
+        dev_name = device_name(request.session.user_agent[:200])
+        if dev_name:
+            device.user_agent += f' {dev_name}'
     lat = request.query_params.get('lat')
     lon = request.query_params.get('lon')
     tim = request.query_params.get('timestamp')
