@@ -14,7 +14,7 @@ from user_sessions.templatetags.user_sessions import device as device_name
 
 
 def get_device_name(ua):
-    if ua in ('Teltonika', 'Queclink'):
+    if ua in ('Traccar', 'Teltonika', 'Queclink'):
         return ua
     if ua.startswith('Routechoices-ios-tracker'):
         return 'iOS'
