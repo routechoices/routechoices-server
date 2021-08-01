@@ -168,6 +168,8 @@ class TMT250Connection():
                     'latitude': r['latlon'][0],
                     'longitude': r['latlon'][1],
                 })
+            if not self.db_device.user_agent:
+                self.db_device.user_agent = 'Teltonika'
             self.db_device.add_locations(loc_array, save=False)
             await sync_to_async(self.db_device.save, thread_sensitive=True)()
             self.waiting_for_content = True
@@ -286,6 +288,8 @@ class GL200Connection():
             timestamp,
             save=False
         )
+        if not self.db_device.user_agent:
+                self.db_device.user_agent = 'Queclink'
         await sync_to_async(self.db_device.save, thread_sensitive=True)()
         print('data wrote to db')
 
