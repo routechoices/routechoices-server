@@ -846,7 +846,9 @@ class Device(models.Model):
                 key=lambda x:x[1]
             )
         ]
-        return locs[-1]
+        pos = locs[-1]
+        pos['datetime'] = arrow.get(pos['timestamp']).datetime
+        return pos
 
     @property
     def last_date_viewed(self):
