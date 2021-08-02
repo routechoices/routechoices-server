@@ -733,6 +733,8 @@ class Device(models.Model):
     
     def get_locations_between_dates(self, from_date, end_date, encoded=False):
         qs = self.locations
+        from_ts = from_date.timestamp()
+        end_ts = end_date.timestamp()
         locs = [
             {
                 'timestamp': i[1],
@@ -741,7 +743,7 @@ class Device(models.Model):
             } for i in sorted(
                 enumerate(qs['timestamps']),
                 key=lambda x:x[1]
-            ) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
+            ) if from_ts < i[1] < end_ts
         ]
         if not encoded:
             return len(locs), locs
