@@ -759,7 +759,7 @@ class Device(models.Model):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
-        d = zip(*qs['timestamp'], *qs['latitude'], *qs['longitude'])
+        d = zip(*qs['timestamps'], *qs['latitudes'], *qs['longitudes'])
         
         locs = [
             {
