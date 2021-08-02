@@ -759,15 +759,17 @@ class Device(models.Model):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
+        d = zip(*qs['timestamp'], *qs['latitude'], *qs['longitude'])
+        
         locs = [
             {
-                'timestamp': i[1],
-                'latitude': qs['latitudes'][i[0]],
-                'longitude': qs['longitudes'][i[0]],
+                'timestamp': i[0],
+                'latitude': i[1],
+                'longitude': i[2],
             } for i in sorted(
-                enumerate(qs['timestamps']),
-                key=itemgetter(1)
-            ) if from_ts < i[1] < end_ts
+                d,
+                key=itemgetter(0)
+            ) if from_ts < i[0] < end_ts
         ]
         if not encoded:
             return len(locs), locs
