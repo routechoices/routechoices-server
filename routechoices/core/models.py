@@ -1,10 +1,12 @@
 import arrow
 import base64
+import bisect
 import datetime
 from decimal import Decimal
 from io import BytesIO
 import logging
 import hashlib
+from operator import itemgetter
 import orjson as json
 import re
 import time
@@ -730,7 +732,29 @@ class Device(models.Model):
     @locations.setter
     def locations(self, locs):
         self.locations_raw = str(json.dumps(locs), 'utf-8')
-    
+
+    def get_locations_between_dates_alt(self, from_date, end_date, encoded=False):
+        qs = self.locations
+        from_ts = from_date.timestamp()
+        end_ts = end_date.timestamp()
+        timestamps_w_order = sorted(
+            enumerate(qs['timestamps']),
+            key=itemgetter(1)
+        )
+        timestamps = list(zip(*timestamps_w_order))[1]
+        ts_from_index = bisect.bisect_right(timestamps, from_ts)
+        ts_end_index = bisect.bisect_left(timestamps, end_ts)
+        locs = [
+            {
+                'timestamp': timestamps_w_order[i][1],
+                'latitude': qs['latitudes'][timestamps_w_order[i][0]],
+                'longitude': qs['longitudes'][timestamps_w_order[i][0]],
+            } for i in range(ts_from_index, ts_end_index)]
+        if not encoded:
+            return len(locs), locs
+        result = polyline_encoding.encode_data(locs)
+        return len(locs), result
+
     def get_locations_between_dates(self, from_date, end_date, encoded=False):
         qs = self.locations
         from_ts = from_date.timestamp()
@@ -742,7 +766,7 @@ class Device(models.Model):
                 'longitude': qs['longitudes'][i[0]],
             } for i in sorted(
                 enumerate(qs['timestamps']),
-                key=lambda x:x[1]
+                key=itemgetter(1)
             ) if from_ts < i[1] < end_ts
         ]
         if not encoded:
