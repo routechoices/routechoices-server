@@ -866,17 +866,15 @@ class Device(models.Model):
         locations = self.locations
         locs = [
             {
-                'timestamp': timestamp,
-                'latitude': locations['latitudes'][idx],
-                'longitude': locations['longitudes'][idx],
-            } for idx, timestamp in sorted(
-                enumerate(locations['timestamps']),
-                key=lambda x:x[1]
+                'timestamp': i[0],
+                'latitude': i[1],
+                'longitude': i[2],
+            } for i in sorted(
+                d,
+                key=itemgetter(0)
             )
         ]
-        pos = locs[-1]
-        pos['datetime'] = arrow.get(pos['timestamp']).datetime
-        return pos
+        return locs[-1]
 
     @property
     def last_date_viewed(self):
