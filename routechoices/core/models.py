@@ -842,6 +842,8 @@ class Device(models.Model):
             return 0
 
     def remove_duplicates(self, save=True):
+        if self.location_count == 0:
+            return
         qs = self.locations
         d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
         sorted_locs = sorted(
@@ -855,9 +857,13 @@ class Device(models.Model):
             if t != prev_t:
                 prev_t = t
                 loc_list.append([t, round(loc[1], 5), round(loc[2], 5)])
-        tims, lats, lons = zip(*locs)
+        if len(loc_list) == 0:
+            tims, lats, lons = [], [], []
+        else:
+            tims, lats, lons = zip(*loc_list)
         new_locs = {'timestamps': tims, 'latitudes': lats, 'longitudes': lons}
-        if save and qs != new_locs:
+        new_raw = str(json.dumps(new_locs), 'utf-8')
+        if save and self.locations_raw != new_raw:
             self.save()
 
     @cached_property
