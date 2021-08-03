@@ -14,7 +14,7 @@
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
-                <th>Start Date (UTC)</th>
+                <th>Start Date</th>
                 <th>Privacy</th>
                 <th>Is Live</th>
                 <th>Club</th>
@@ -23,7 +23,7 @@
             {% for event in events %}
             <tr>
                 <td><a href="{% url 'dashboard:event_edit_view' id=event.aid %}">{{ event.name }}</a></td>
-                <td>{{ event.start_date|date:'Y-m-d H:i:s' }}</a></td>
+                <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i:s' }}</span></td>
                 <td>{{ event.get_privacy_display }}</a></td>
                 <td>{% if event.is_live %}<i style="color:green" class="fa fa-check-circle"></i>{% else %}<i style="color:red" class="fa fa-times-circle"></i>{% endif %}</a></td>
                 <td>{{ event.club }}</td>
@@ -39,4 +39,16 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_body %}
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script>
+$(function(){
+    $('.date-utc').each(function(i, el){
+        $el = $(el);
+        $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm:ss'));
+    });
+})
+</script>
 {% endblock %}
