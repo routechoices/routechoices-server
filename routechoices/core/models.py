@@ -859,7 +859,7 @@ class Device(models.Model):
         if save:
             self.save()
 
-    @property
+    @cached_property
     def last_location(self):
         if self.location_count == 0:
             return None
@@ -886,7 +886,7 @@ class Device(models.Model):
             .utcfromtimestamp(t) \
             .replace(tzinfo=pytz.utc)
 
-    @property
+    @cached_property
     def last_position(self):
         ll = self.last_location
         if not ll:
