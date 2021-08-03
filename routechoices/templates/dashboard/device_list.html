@@ -15,8 +15,8 @@
             {% for device in devices %}
             <tr>
                 <td><span class="label label-default" style="font-size: 1.5em">{{ device.aid }}</span></td>
-                <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_location.datetime|date:"c"}}">{{device.last_location.datetime|date:'Y-m-d H:i:s'}}</span>{% else %}-{% endif %}</td>
-                <td>{% if device.last_location %}{{device.last_location.latitude}}, {{device.last_location.longitude}}{% else %}-{% endif %}</td>
+                <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_date_viewed|date:"c"}}">{{device.last_date_viewed|date:'Y-m-d H:i:s'}} UTC</span>{% else %}-{% endif %}</td>
+                <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }}{% else %}-{% endif %}</td>
                 <td><a class="btn btn-danger" href="{% url 'dashboard:device_remove_view' id=device.aid %}">Remove</a></td>
             </tr>
             {% endfor %}
