@@ -863,7 +863,8 @@ class Device(models.Model):
     def last_location(self):
         if self.location_count == 0:
             return None
-        locations = self.locations
+        qs = self.locations
+        d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
         locs = [
             {
                 'timestamp': i[0],
