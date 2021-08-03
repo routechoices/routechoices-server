@@ -842,21 +842,22 @@ class Device(models.Model):
             return 0
 
     def remove_duplicates(self, save=True):
-        locations = self.locations
-        timestamps = set()
-        locs = {'timestamps': [], 'latitudes': [], 'longitudes': []}
-        for idx, timestamp in sorted(
-                    enumerate(locations['timestamps']),
-                    key=lambda x: x[1]
-                ):
-            timestamp_int = int(timestamp)
-            if timestamp_int not in timestamps:
-                timestamps.add(timestamp_int)
-                locs['timestamps'].append(timestamp_int)
-                locs['latitudes'].append(round(locations['latitudes'][idx], 5))
-                locs['longitudes'].append(round(locations['longitudes'][idx], 5))
-        self.locations = locs
-        if save:
+        qs = self.locations
+        d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
+        sorted_locs = sorted(
+            d,
+            key=itemgetter(0)
+        )
+        loc_list = []
+        prev_t = None
+        for loc in sorted_locs:
+            t = int(loc[0])
+            if t != prev_t:
+                prev_t = t
+                loc_list.append([t, round(loc[1], 5), round(loc[2], 5)])
+        tims, lats, lons = zip(*locs)
+        new_locs = {'timestamps': tims, 'latitudes': lats, 'longitudes': lons}
+        if save and qs != new_locs:
             self.save()
 
     @cached_property
