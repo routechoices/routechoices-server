@@ -327,8 +327,10 @@ def event_registration_view(request, slug, **kwargs):
             )
         else:
             devices = Device.objects.none()
+            if form.data['device']:
+                devices |= Device.object.filter(id=form.data['device'].id)
             if request.user.is_authenticated:
-                devices = request.user.devices.all()
+                devices |= request.user.devices.all()
             form.fields['device'].queryset = devices
     else:
         form = CompetitorForm(initial={'event': event})

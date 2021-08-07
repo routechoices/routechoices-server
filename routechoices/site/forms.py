@@ -47,12 +47,27 @@ class CompetitorForm(ModelForm):
         }
 
     def clean(self):
+        super().clean()
         event = Event.objects.get(id=self.data.get('event'))
         event_end = event.end_date
         if event_end and now() > event_end:
             raise ValidationError(
-                'Competition ended, registration is not posible anymore'
+                'Competition ended, registration is not possible anymore'
             )
+        name = self.cleaned_data.get('name')
+        device = self.cleaned_data.get('device')
+        start_time = self.cleaned_data.get('start_time')
+        event_start = event.start_date
+        if not start_time and event_start < now():
+            start_time = now()
+        elif not start_time and event_start > now():
+            start_time = event_start
+        prev_dev_comp = Competitor.objects.filter(
+            device_id=device.id,
+            start_time__lte=start_time
+        ).order_by('-start_time').first()
+        if prev_dev_comp.name == name and prev_dev_comp.event == event:
+            raise ValidationError('Competitor already registered')
 
     def clean_start_time(self):
         start = self.cleaned_data.get('start_time')

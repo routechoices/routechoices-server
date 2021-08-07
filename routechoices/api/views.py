@@ -404,6 +404,7 @@ def event_register(request, event_id):
     devices = Device.objects.filter(aid=device_id)
     if devices.count() == 0:
         raise ValidationError('No such device ID')
+    device = devices.first()
     name = request.data.get('name')
     if not name:
         raise ValidationError('Property name is missing')
@@ -429,12 +430,20 @@ def event_register(request, event_id):
         raise ValidationError(
             'Competitor start time should be during the event time'
         )
+    
+    prev_dev_comp = Competitor.objects.filter(
+        device_id=device.id,
+        start_time__lte=start_time
+    ).order_by('-start_time').first()
+    if prev_dev_comp.name == name and prev_dev_comp.short_name == short_name and prev_dev_comp.event == event:
+        raise ValidationError('Competitor already registered')
+
     comp = Competitor.objects.create(
         name=name,
         event=event,
         short_name=short_name,
         start_time=start_time,
-        device=devices.first(),
+        device=device,
     )
     return Response({
         'id': comp.aid,
