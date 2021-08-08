@@ -435,7 +435,7 @@ def event_register(request, event_id):
         device_id=device.id,
         start_time__lte=start_time
     ).order_by('-start_time').first()
-    if prev_dev_comp.name == name and prev_dev_comp.short_name == short_name and prev_dev_comp.event == event:
+    if prev_dev_comp and prev_dev_comp.name == name and prev_dev_comp.short_name == short_name and prev_dev_comp.event == event:
         raise ValidationError('Competitor already registered')
 
     comp = Competitor.objects.create(
