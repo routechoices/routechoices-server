@@ -1,4 +1,4 @@
-/* Positioning.js 2018-03-21 */
+/* Positioning.js 2021-08-11 */
 var intValCodec = (function() {
     var decodeUnsignedValueFromString = function (encoded) {
             var enc_len = encoded.length,
@@ -136,6 +136,11 @@ var PositionArchive = function(){
         }
         return this;
     };
+
+    this.push = function(pos) {
+        positions.push(pos);
+    }
+    
     this.eraseInterval = function(start, end){
         var index_s=_locationOf({timestamp: start}),
             index_e=_locationOf({timestamp: end});
@@ -200,6 +205,11 @@ var PositionArchive = function(){
             result.add(positions[i]);
         }
         return result;
+    };
+    this.hasPointInInterval = function(t1, t2) {
+        var i1 = _locationOf({timestamp:t1}),
+            i2 = _locationOf({timestamp:t2});
+        return i1 !== i2;
     };
     this.getDuration = function() {
         if(positions.length <= 1) {
@@ -281,9 +291,9 @@ var PositionArchive = function(){
 };
 
 PositionArchive.fromTks = function(encoded) {
-    var YEAR2010=1262304000000, // = Date.parse("2010-01-01T00:00:00Z"),
+    var YEAR2010 = 1262304000, // = Date.parse("2010-01-01T00:00:00Z")/1e3,
         vals = [],
-        prev_vals = [YEAR2010/1e3, 0, 0],
+        prev_vals = [YEAR2010, 0, 0],
         enc_len = encoded.length,
         pts = new PositionArchive(),
         r;
@@ -295,13 +305,14 @@ PositionArchive.fromTks = function(encoded) {
             } else {
                 r = intValCodec.decodeSignedValueFromString(encoded);
             }
-            vals[i] = prev_vals[i] + r[0];
             encoded = r[1];
-            prev_vals[i] = prev_vals[i] + r[0];
+            var new_val = prev_vals[i] + r[0]
+            vals[i] = new_val;
+            prev_vals[i] = new_val;
         }
-        pts.add(new Position({
-            'timestamp': vals[0]*1e3,
-            'coords': {'latitude':vals[1]/1e5, 'longitude': vals[2]/1e5, 'accuracy': 0}
+        pts.push(new Position({
+            timestamp: vals[0] * 1e3,
+            coords: {latitude: vals[1] / 1e5, longitude: vals[2] / 1e5, accuracy: 0}
         }));
         enc_len = encoded.length;
     }

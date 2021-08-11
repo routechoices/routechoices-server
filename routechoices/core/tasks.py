@@ -258,20 +258,24 @@ def import_map_from_loggator(club, map_data, name):
         return map_model
     if r.status_code != 200:
         raise MapImportError('API returned error code')
-    map_file = ContentFile(r.content)
-    coordinates = ','.join([
-        str(map_data['coordinates']['topLeft']['lat']),
-        str(map_data['coordinates']['topLeft']['lon']),
-        str(map_data['coordinates']['topRight']['lat']),
-        str(map_data['coordinates']['topRight']['lon']),
-        str(map_data['coordinates']['bottomRight']['lat']),
-        str(map_data['coordinates']['bottomRight']['lon']),
-        str(map_data['coordinates']['bottomLeft']['lat']),
-        str(map_data['coordinates']['bottomLeft']['lon'])
-    ])
-    map_model.image.save('imported_image', map_file, save=False)
-    map_model.corners_coordinates = coordinates
-    map_model.save()
+    try:
+        map_file = ContentFile(r.content)
+        coordinates = ','.join([
+            str(map_data['coordinates']['topLeft']['lat']),
+            str(map_data['coordinates']['topLeft']['lng']),
+            str(map_data['coordinates']['topRight']['lat']),
+            str(map_data['coordinates']['topRight']['lng']),
+            str(map_data['coordinates']['bottomRight']['lat']),
+            str(map_data['coordinates']['bottomRight']['lng']),
+            str(map_data['coordinates']['bottomLeft']['lat']),
+            str(map_data['coordinates']['bottomLeft']['lng'])
+        ])
+        map_model.image.save('imported_image', map_file, save=False)
+        map_model.corners_coordinates = coordinates
+        map_model.save()
+    except Exception:
+        map_model.delete()
+        raise MapImportError('Could not import map')
     return map_model
 
 

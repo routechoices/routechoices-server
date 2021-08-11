@@ -191,11 +191,11 @@ var selectLiveMode = function(e){
   isLiveMode=true;
 
   (function whileLive(){
-    if (+clock.now()-routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes) {
+    if (((performance.now()-routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes();
       fetchMapDetails();
     }
-    if(((+clock.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
+    if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice(); 
     }
     currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3;
@@ -227,17 +227,17 @@ var selectReplayMode = function(e){
   prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
   playbackRate = 1;
-  prevDisplayRefresh = +clock.now();
+  prevDisplayRefresh = performance.now();
   (function whileReplay(){
-    if(isLiveEvent && + clock.now() - routesLastFetched > -timeOffsetSec * 1e3 && !isCurrentlyFetchingRoutes){
+    if(isLiveEvent && ((performance.now() - routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes){
       fetchCompetitorRoutes(); 
     }
-    if(((+clock.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
+    if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice(); 
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
     
-    currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (+clock.now() - prevDisplayRefresh) * actualPlaybackRate);
+    currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (performance.now() - prevDisplayRefresh) * actualPlaybackRate);
     var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
     if (isCustomStart) {
       maxCTime = getCompetitionStartDate() + getCompetitorsMinCustomOffset() + getCompetitorsMaxDuration(true)
@@ -248,7 +248,7 @@ var selectReplayMode = function(e){
     currentTime = Math.min(+clock.now(), currentTime, maxCTime);
     drawCompetitors();
     prevShownTime = currentTime;
-    prevDisplayRefresh = +clock.now();
+    prevDisplayRefresh = performance.now();
     if(!isLiveMode){
       setTimeout(whileReplay, 101);
     }
@@ -271,7 +271,7 @@ var fetchCompetitorRoutes = function(url){
     });
     updateCompetitorList(response.competitors);
     displayCompetitorList();
-    routesLastFetched = +clock.now();
+    routesLastFetched = performance.now();
     lastDataTs = response.timestamp;
     isCurrentlyFetchingRoutes = false;
     $('#eventLoadingModal').remove()
@@ -301,7 +301,7 @@ var fetchNotice = function() {
   $.ajax({
     url: noticeUrl
   }).done(function(response){
-    noticeLastFetched = +clock.now();
+    noticeLastFetched = performance.now();
     isCurrentlyFetchingNotice = false;
     if (response.updated && response.text && new Date(response.updated) > prevNotice) {
       prevNotice = new Date(response.updated);
@@ -444,10 +444,13 @@ var displayOptions = function() {
         })
       )
     );
-    var qr = qrcode(0, 'L');
-    qr.addData(qrUrl)
-    qr.make()
-    var qrDataUrl = qr.createDataURL(4);
+    var qrDataUrl = null
+    if (qrUrl) {
+      var qr = qrcode(0, 'L');
+      qr.addData(qrUrl)
+      qr.make()
+      qrDataUrl = qr.createDataURL(4);
+    }
     mainDiv.append(
       $('<div"/>').html(
         '<h4>Competitors</h4>' +
@@ -504,7 +507,7 @@ var getCompetitionStartDate = function() {
     competitorList.forEach(function(c){
         var route = competitorRoutes[c.id];
         if(route) {
-            res = res>route.getByIndex(0).timestamp?route.getByIndex(0).timestamp: res;
+            res = res > route.getByIndex(0).timestamp ? route.getByIndex(0).timestamp : res;
         }
     })
     return res
