@@ -264,7 +264,8 @@ var fetchCompetitorRoutes = function(url){
     data: data,
     xhrFields: {
       withCredentials: true
-   }
+   },
+   crossDomain: true,
   }).done(function(response){
     response.competitors.forEach(function(competitor){
       if(competitor.encoded_data) {
@@ -287,7 +288,8 @@ var fetchMapDetails = function() {
     url: mapDetailsUrl,
     xhrFields: {
       withCredentials: true
-   }
+   },
+   crossDomain: true,
   }).done(function(response){
     if (mapHash != response.hash) {
       mapHash = response.hash;
@@ -308,7 +310,8 @@ var fetchNotice = function() {
     url: noticeUrl,
     xhrFields: {
       withCredentials: true
-   }
+   },
+   crossDomain: true,
   }).done(function(response){
     noticeLastFetched = performance.now();
     isCurrentlyFetchingNotice = false;
