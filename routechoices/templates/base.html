@@ -16,6 +16,7 @@
     <meta name="theme-color" content="#ffffff">
     <title>{% block head_title %}{{site.name}}{% endblock %}</title>
     <link rel="stylesheet" href="{% static '/vendor/bootstrap-3.4.1/css/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
     <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'css/site.css' %}" />
     {% block extra_head %}
@@ -115,6 +116,7 @@
     </script>
     <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
     <script>
         function getCookie(name) {
             var cookieValue = null;

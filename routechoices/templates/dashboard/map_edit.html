@@ -39,7 +39,12 @@
     $(function(){
         $('#id_image').on('change', function(){
             if(this.files[0].size > 1e7){
-                alert("File is too big!");
+                swal({
+                    title: 'Error!',
+                    text: 'File is too big!',
+                    type: 'error',
+                    confirmButtonText: 'OK'
+                });
                 this.value = "";
             }
             if(this.value) {

@@ -189,7 +189,12 @@ function onCsvParsed(result){
         })
     }
     if(errors){
-        alert('Could not parse this file');
+        swal({
+            title: 'Error!',
+            text: 'Could not parse this file',
+            type: 'error',
+            confirmButtonText: 'OK'
+        });
         return
     }
     // clear empty lines
