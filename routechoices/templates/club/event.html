@@ -278,12 +278,11 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/event-2021081200.js' %}"></script>
 <script>
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}"
-var clock = ServerClock({url: '{% host_url 'time_api' host 'api' %}'});
+var clock = ServerClock({url: "{% host_url 'time_api' host 'api' %}"});
 
 if (!navigator.canShare) {
   $('#share_buttons').hide();
 }
-console.log($('meta[property="og:description"]').attr('content'), String(window.location))
 
 function shareUrl (e) {
   e.preventDefault();
