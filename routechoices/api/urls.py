@@ -61,14 +61,14 @@ urlpatterns = [
         name='event_map_download'
     ),
     url(
-        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/?$',
-        views.event_kmz_download,
-        name='event_kmz_download'
-    ),
-    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_thumb/?$',
         views.event_map_thumb_download,
         name='event_map_thumb_download'
+    ),
+    url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/?$',
+        views.event_kmz_download,
+        name='event_kmz_download'
     ),
     url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/register/?$',
@@ -89,16 +89,6 @@ urlpatterns = [
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/data/?$',
         views.event_data,
         name='event_data'
-    ),
-    url(
-        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_details/?$',
-        views.event_map_details,
-        name='event_map_details'
-    ),
-    url(
-        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/announcement/?$',
-        views.event_announcement,
-        name='event_announcement'
     ),
     url(
         r'^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$',

@@ -198,7 +198,7 @@ def event_list(request):
             'end_date': (event.end_date if event.end_date else None),
             'slug': event.slug,
             'club': event.club.name,
-            'club_slug': event.club.slug,
+            'club_slug': event.club.slug.lower(),
             'open_registration': event.open_registration,
             'open_route_upload': event.allow_route_upload,
             'url': request.build_absolute_uri(event.get_absolute_url()),
@@ -226,7 +226,9 @@ def event_list(request):
                         "club_slug": "ksk",
                         "open_registration": False,
                         "open_route_upload": False,
-                        "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg"
+                        "url": "https://www.routechoices.com/ksk/Jukola-2019-1st-leg",
+                        "shortcut": "https://routechoic.es/PlCG3xFS-f4",
+                        "backdrop": "osm"
                     },
                     "competitors": [
                         {
@@ -237,7 +239,7 @@ def event_list(request):
                         },
                         '...'
                     ],
-                    "data": "http://www.routechoices.com/api/events/PlCG3xFS-f4/data",
+                    "data": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
                     "announcement": "",
                     "extra_maps": [],
                     "map": {
@@ -259,8 +261,10 @@ def event_list(request):
                                 "lon": "24.18156"
                             }
                         },
-                        "url": "http://www.routechoices.com/api/events/PlCG3xFS-f4/map",
-                        "title": ""
+                        "url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
+                        "title": "",
+                        "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
+                        "last_mod": "2019-06-10T17:21:52.417000Z"
                     }
                 }
             }
@@ -289,13 +293,15 @@ def event_detail(request, event_id):
             'id': event.aid,
             'name': event.name,
             'start_date': event.start_date,
-            'end_date': (event.end_date if event.end_date else None),
+            'end_date': event.end_date,
             'slug': event.slug,
             'club': event.club.name,
-            'club_slug': event.club.slug,
+            'club_slug': event.club.slug.lower(),
             'open_registration': event.open_registration,
             'open_route_upload': event.allow_route_upload,
             'url': request.build_absolute_uri(event.get_absolute_url()),
+            'shortcut': event.shortcut,
+            'backdrop': event.backdrop_map,
         },
         'competitors': [],
         'data': request.build_absolute_uri(
@@ -320,8 +326,11 @@ def event_detail(request, event_id):
                 host='api',
                 kwargs={'event_id': event.aid, 'map_index': (i+1)}
             )),
+            'hash': m.map.hash,
+            'last_mod': m.map.modification_date,
         })
     output['map'] = {
+        'title': event.map_title,
         'coordinates': event.map.bound,
         'url': request.build_absolute_uri(
             reverse(
@@ -330,7 +339,8 @@ def event_detail(request, event_id):
                 kwargs={'event_id': event.aid}
             )
         ),
-        'title': event.map_title,
+        'hash': event.map.hash,
+        'last_mod': event.map.modification_date,
     } if event.map else None
 
     return Response(output)
@@ -574,67 +584,6 @@ def event_data(request, event_id):
     }
     cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
     return Response(res)
-
-
-@swagger_auto_schema(
-    method='get',
-    auto_schema=None,
-)
-@api_view(['GET'])
-def event_map_details(request, event_id):
-    event = get_object_or_404(
-        Event.objects.all().select_related('club', 'map'),
-        aid=event_id,
-        start_date__lt=now()
-    )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied()
-    if not event.map:
-        return Response({
-            'hash': '',
-            'last_mod': '',
-            'corners_coordinates': '',
-        })
-    rmap = event.map
-    return Response({
-        'hash': rmap.hash,
-        'last_mod': rmap.modification_date,
-        'corners_coordinates': rmap.corners_coordinates,
-    })
-
-
-@swagger_auto_schema(
-    method='get',
-    operation_id='event_announcement',
-    operation_description='read the announcement associated to an event',
-    tags=['events'],
-    responses={
-        '200': openapi.Response(
-            description='Success response',
-            examples={
-                'application/json': {
-                    "updated": "2021-03-08T08:10:08.795905Z",
-                    "text": "Mass start at 9pm"
-                }
-            }
-        ),
-    }
-)
-@api_view(['GET'])
-def event_announcement(request, event_id):
-    event = get_object_or_404(
-        Event.objects.all().select_related('notice'),
-        aid=event_id,
-        start_date__lt=now()
-    )
-    if event.has_notice:
-        return Response({
-            'updated': event.notice.modification_date,
-            'text': event.notice.text,
-        })
-    return Response({})
 
 
 def traccar_ratelimit_key(group, request):

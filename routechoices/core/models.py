@@ -115,7 +115,7 @@ class Club(models.Model):
         return reverse(
             'club_view',
             host='clubs',
-            host_kwargs={'club_slug': self.slug}
+            host_kwargs={'club_slug': self.slug.lower()}
         )
 
     def validate_unique(self, exclude=None):
@@ -590,7 +590,7 @@ class Event(models.Model):
             'event_view',
             host='clubs',
             kwargs={'slug': self.slug},
-            host_kwargs={'club_slug': self.club.slug}
+            host_kwargs={'club_slug': self.club.slug.lower()}
         )
 
     def get_absolute_map_url(self):

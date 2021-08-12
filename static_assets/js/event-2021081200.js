@@ -100,7 +100,6 @@ var currentTime = 0;
 var lastDataTs = 0;
 var lastNbPoints = 0;
 var optionDisplayed = false;
-var mapDetailsUrl = null;
 var mapHash = '';
 var mapUrl = null;
 var rasterMap = null;
@@ -117,6 +116,35 @@ var finishLineCrosses = [];
 var finishLinePoints = [];
 var finishLinePoly = null;
 var rankControl = null;
+
+var backdropMaps = {}
+backdropMaps['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+  maxZoom: 18
+});
+backdropMaps['gmap-street'] = L.tileLayer('https://mt0.google.com/vt/x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
+  attribution: '\u0026copy\u003B Google'
+});
+backdropMaps['gmap-hybrid'] = L.tileLayer('https://mt0.google.com/vt/lyrs\u003Dy\u0026hl\u003Den\u0026x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
+  attribution: '\u0026copy\u003B Google'
+});
+backdropMaps['topo-fi'] = L.tileLayer('https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', {
+  attribution: '\u0026copy\u003B National Land Survey of Finland'
+});
+backdropMaps['mapant-fi'] = L.tileLayer('https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
+  attribution: 'MapAnt.fi and National Land Survey of Finland'
+});
+backdropMaps['topo-no'] = L.tileLayer(
+  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers\u003Dtopo4\u0026zoom\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
+    attribution: ''
+});
+backdropMaps['mapant-no'] = L.tileLayer('https://mapant.no/osm-tiles/{z}/{x}/{y}.png', {
+  attribution: 'MapAnt.no'
+});
+backdropMaps['mapant-es'] = L.tileLayer.wms(
+    'https://mapant.es/mapserv?map=/mapas/geotiff.map',
+    {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true, attribution: 'MapAnt.es'}
+);
 
 function drawFinishLine (e) {
   finishLinePoints = [];
@@ -193,7 +221,6 @@ var selectLiveMode = function(e){
   (function whileLive(){
     if (((performance.now()-routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes();
-      fetchMapDetails();
     }
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice(); 
@@ -283,31 +310,11 @@ var fetchCompetitorRoutes = function(url){
     isCurrentlyFetchingRoutes = false;
   });
 };
-var fetchMapDetails = function() {
-  $.ajax({
-    url: mapDetailsUrl,
-    xhrFields: {
-      withCredentials: true
-   },
-   crossDomain: true,
-  }).done(function(response){
-    if (mapHash != response.hash) {
-      mapHash = response.hash;
-      if (mapHash != '') {
-        var lastMod = + new Date(response.last_mod);
-        var stemp = response.corners_coordinates.split(',');
-        removeRasterMap();
-        addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl + '?t=' + lastMod);
-      } else {
-        removeRasterMap();
-      }
-    }
-  })
-};
+
 var fetchNotice = function() {
   isCurrentlyFetchingNotice = true;
   $.ajax({
-    url: noticeUrl,
+    url: eventUrl,
     xhrFields: {
       withCredentials: true
    },
@@ -315,16 +322,16 @@ var fetchNotice = function() {
   }).done(function(response){
     noticeLastFetched = performance.now();
     isCurrentlyFetchingNotice = false;
-    if (response.updated && response.text && new Date(response.updated) > prevNotice) {
-      prevNotice = new Date(response.updated);
-      $('#alert-text').text(response.text);
-      $('.page-alerts').show();
+    if (response.announcement && response.announcement != prevNotice) {
+      prevNotice = response.announcement;
+      $('#alert-text').text(prevNotice);
       $('.page-alert').slideDown();
     } else {
       isCurrentlyFetchingNotice = false;
     }
   })
 }
+
 var updateCompetitorList = function(newList) {
     newList.forEach(updateCompetitor)
 }

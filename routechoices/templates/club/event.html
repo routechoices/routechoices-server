@@ -275,20 +275,22 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021081100.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021081102.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021081200.js' %}"></script>
 <script>
+var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}"
 var clock = ServerClock({url: '{% host_url 'time_api' host 'api' %}'});
 
 if (!navigator.canShare) {
   $('#share_buttons').hide();
 }
+console.log($('meta[property="og:description"]').attr('content'), String(window.location))
 
 function shareUrl (e) {
   e.preventDefault();
   var shareData = {
-    title: '{{ event.name|escapejs }}',
-    text: 'Live GPS Tracking of {{ event.name|escapejs }} by {{ event.club.name|escapejs }} on {{ site.name|escapejs }}',
-    url: {% if event.shortcut %}'{{ event.shortcut }}'{% else %}window.location{% endif %}
+    title: $('meta[property="og:title"]').attr('content'),
+    text: $('meta[property="og:description"]').attr('content'),
+    url: window.location
   }
   try {
     navigator.share(shareData).then(function () {}).catch(function () {});
@@ -298,7 +300,6 @@ function shareUrl (e) {
 
 $(function() {
   $('.page-alerts').hide();
-
   $('.page-alert .close').click(function(e) {
     e.preventDefault();
     $(this).closest('.page-alert').slideUp();
@@ -307,61 +308,6 @@ $(function() {
   $("#before_race_modal").modal('show').on('hide.bs.modal', function(e){
       e.preventDefault();
   });
-  map = L.map('map', {
-    center: [15, 0],
-    zoom: 3,
-    zoomControl: false,
-    scrollWheelZoom: false, // disable original zoom function
-    smoothWheelZoom: true,  // enable smooth zoom
-    zoomSnap: 0,
-   	contextmenu: true,
-    contextmenuWidth: 140,
-	  contextmenuItems: [
-    {
-        text: 'Center map here',
-        callback: centerMap
-      }, '-', {
-        text: 'Zoom in',
-        callback: zoomIn
-      }, {
-        text: 'Zoom out',
-        callback: zoomOut
-      }
-    ]
-  });
-  L.control.pan().addTo(map);
-  L.control.zoom().addTo(map);
-
-  var backdropMaps = {}
-  backdropMaps['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    maxZoom: 18
-  });
-  backdropMaps['gmap-street'] = L.tileLayer('https://mt0.google.com/vt/x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
-    attribution: '\u0026copy\u003B Google'
-  });
-  backdropMaps['gmap-hybrid'] = L.tileLayer('https://mt0.google.com/vt/lyrs\u003Dy\u0026hl\u003Den\u0026x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
-    attribution: '\u0026copy\u003B Google'
-  });
-  backdropMaps['topo-fi'] = L.tileLayer('https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', {
-    attribution: '\u0026copy\u003B National Land Survey of Finland'
-  });
-  backdropMaps['mapant-fi'] = L.tileLayer('https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
-    attribution: 'MapAnt.fi and National Land Survey of Finland'
-  });
-  backdropMaps['topo-no'] = L.tileLayer(
-    'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers\u003Dtopo4\u0026zoom\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
-      attribution: ''
-  });
-  backdropMaps['mapant-no'] = L.tileLayer('https://mapant.no/osm-tiles/{z}/{x}/{y}.png', {
-    attribution: 'MapAnt.no'
-  });
-  backdropMaps['mapant-es'] = L.tileLayer.wms(
-        'https://mapant.es/mapserv?map=/mapas/geotiff.map',
-        {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true, attribution: 'MapAnt.es'}
-    );
-
-  backdropMaps['{{event.backdrop_map}}'].addTo(map);
 
   $('#runners_show_button').on('click', function(e){
     e.preventDefault();
@@ -400,12 +346,8 @@ $(function() {
     e.preventDefault();
     onPressResetMassStart()
   });
-  map.doubleClickZoom.disable(); 
 
-  map.on('dblclick', onPressCustomMassStart)
-  map.on('move', function () { drawCompetitors() })
   $('#full_progress_bar').on('click', pressProgressBar)
-
   $('#share_button').on('click', shareUrl)
 
   var thumb = document.querySelector('#full_progress_bar');
@@ -425,64 +367,113 @@ $(function() {
       return false;
   };
 
-  {% if event.hidden %}
-  $('#eventLoadingModal').remove()
-  $('#eventNotStartedModal').modal({backdrop:'static', keyboard: false, });
-  var startDate = new Date('{{event.start_date|date:'c'}}');
   $('.date-utc').each(function(i, el){
     $el = $(el);
     $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'));
   });
-  window.setInterval(function(){
-    if(new Date() > startDate) {
-      location.reload();
-    }
-  }, 1e3);
-  {% else %}
-  isLiveEvent = {% if event.is_live %}true{% else %}false{% endif %};
-  {% if event.shortcut %}
-  qrUrl = '{{ event.shortcut }}';
-  {% endif %}
-  liveUrl = '{% host_url 'event_data' event_id=event.aid host 'api' %}';
-  mapDetailsUrl = '{% host_url 'event_map_details' event_id=event.aid host 'api' %}';
-  mapHash = '{% if event.map %}{{ event.map.hash }}{% endif %}';
-  mapUrl = '{% host_url 'event_map_download' event_id=event.aid host 'api' %}{% if event.map %}?map_hash={{ event.map.hash }}{% endif %}';
-  noticeUrl = '{% host_url 'event_announcement' event_id=event.aid host 'api' %}';
-  {% if event.map %}
-  var stemp = '{{ event.map.corners_coordinates }}'.split(',');
-  addRasterMap([1*stemp[0],1*stemp[1]],[1*stemp[2],1*stemp[3]],[1*stemp[4],1*stemp[5]],[1*stemp[6],1*stemp[7]], mapUrl, true);
-  {% endif %}
-  var extraMaps = [];
-  {% if event.map_assignations.count %}
-    {% for e_map in event.map_assignations.all %}
-      extraMaps.push({
-        title: $('<span/>').text('{{e_map.title|escapejs}}').html(),
-        hash: '{{e_map.map.hash}}',
-        url: '{% host_url 'event_extra_map_download' event_id=event.aid map_index=forloop.counter host 'api' %}?map_hash={{e_map.map.hash}}',
-        stemp: '{{ e_map.map.corners_coordinates }}'.split(','),
-      })
-    {% endfor %}
-    var extraMapLayer = {[{% if event.map_title %}$('<span/>').text('{{ event.map_title|escapejs }}').html(){% else %}'<i class="fa fa-star"></i> Main Map'{% endif %}]: rasterMap};
-    for (var i=0; i < extraMaps.length; i++) {
-      var m = extraMaps[i];
-      extraMapLayer[m.title] = new L.ImageTransform(
-        m.url, 
-        [[1*m.stemp[0],1*m.stemp[1]],[1*m.stemp[2],1*m.stemp[3]],[1*m.stemp[4],1*m.stemp[5]],[1*m.stemp[6],1*m.stemp[7]]]
-      );
-    }
-    L.control.layers(extraMapLayer, null, {collapsed: false}).addTo(map);
-  {% endif %}
 
-  if (!setFinishLineContextMenuItem) {
-    setFinishLineContextMenuItem = map.contextmenu.insertItem({
-      text: 'Draw finish line',
-      callback: drawFinishLine
-    }, 1);
-  }
-  onStart();
-  {% endif %}
+  map = L.map('map', {
+    center: [15, 0],
+    zoom: 3,
+    zoomControl: false,
+    scrollWheelZoom: false, // disable original zoom function
+    smoothWheelZoom: true,  // enable smooth zoom
+    zoomSnap: 0,
+   	contextmenu: true,
+    contextmenuWidth: 140,
+	  contextmenuItems: [
+    {
+        text: 'Center map here',
+        callback: centerMap
+      }, '-', {
+        text: 'Zoom in',
+        callback: zoomIn
+      }, {
+        text: 'Zoom out',
+        callback: zoomOut
+      }
+    ]
+  });
+  L.control.pan().addTo(map);
+  L.control.zoom().addTo(map);
+  map.doubleClickZoom.disable(); 
+  map.on('dblclick', onPressCustomMassStart)
+  map.on('move', function () { drawCompetitors() })
+
+  $.ajax({
+    url: eventUrl,
+    xhrFields: {
+      withCredentials: true
+   },
+   crossDomain: true,
+  }).done(function(response){
+    backdropMaps[response.event.backdrop].addTo(map);
+    var now = new Date()
+    var startEvent = new Date(response.event.start_date)
+    var endEvent = new Date(response.event.end_date)
+    if (startEvent > now) {
+      $('#eventLoadingModal').remove()
+      $('#eventNotStartedModal').modal({backdrop:'static', keyboard: false, });
+      window.setInterval(function(){
+        if(new Date() > startEvent) {
+          location.reload();
+        }
+      }, 1e3);
+    } else {
+      if (endEvent > now) {
+        isLiveEvent = true
+      }
+      qrUrl = response.event.shortcut;
+      liveUrl = response.data
+      if (response.map) {
+        mapHash = response.map.hash
+        mapUrl = response.map.url + '?map_hash=' + mapHash
+        addRasterMap(
+          [response.map.coordinates.topLeft.lat, response.map.coordinates.topLeft.lon],
+          [response.map.coordinates.topRight.lat, response.map.coordinates.topRight.lon],
+          [response.map.coordinates.bottomRight.lat, response.map.coordinates.bottomRight.lon],
+          [response.map.coordinates.bottomLeft.lat, response.map.coordinates.bottomLeft.lon],
+          mapUrl,
+          true
+        )
+      }
+      var extraMaps = response.extra_maps;
+      if(extraMaps.length) {
+        var extraMapLayer = {[response.map.title ? $('<span/>').text(response.map.title).html() : '<i class="fa fa-star"></i> Main Map'] : rasterMap}
+        for (var i=0; i < extraMaps.length; i++) {
+          var m = extraMaps[i];
+          extraMapLayer[m.title] = new L.ImageTransform(
+            m.url + '?map_hash=' + m.hash, 
+            [
+              [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
+              [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
+              [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
+              [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
+            ]
+          );
+        }
+        L.control.layers(extraMapLayer, null, {collapsed: false}).addTo(map);
+      }
+      if (response.announcement) {
+        prevNotice = response.announcement;
+        $('#alert-text').text(prevNotice);
+        $('.page-alert').slideUp(0);
+        $('.page-alerts').show();
+        $('.page-alert').slideDown();
+      }
+      if (!setFinishLineContextMenuItem) {
+        setFinishLineContextMenuItem = map.contextmenu.insertItem({
+          text: 'Draw finish line',
+          callback: drawFinishLine
+        }, 1);
+      }
+      onStart();
+    }
+  }).fail(function(){
+    $('#eventLoadingModal').remove()
+    swal({text: 'Something went wrong', title: 'error', type: 'error'})
+  });
 })
-
 </script>
 {% endblock %}
 
