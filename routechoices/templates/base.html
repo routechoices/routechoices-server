@@ -42,7 +42,9 @@
     {% block body %}
     <div class='notifications top-right'></div>
     <!-- Fixed navbar -->
+    {% block navbar %}
     {% include "navbar.html" %}
+    {% endblock %}
     <div class="container content">
     {% block content %}
     {% endblock %}

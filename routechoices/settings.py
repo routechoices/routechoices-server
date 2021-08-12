@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'admincommand',
     'rest_framework',
     'drf_yasg',
+    'markdownify.apps.MarkdownifyConfig',
 
     'django_s3_storage',
 
@@ -312,6 +313,42 @@ GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 SILENCED_SYSTEM_CHECKS = ['admin.E410']
 
 PATREON_CREATOR_ID = "xRJAgEV1zma3MfnaVGg9SRTYet-EUTKqn4O2Llz6_lk"
+
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'img',
+            'a',
+            'abbr',
+            'acronym',
+            'b',
+            'blockquote',
+            'em',
+            'i',
+            'li',
+            'ol',
+            'p',
+            'strong',
+            'ul'
+        ],
+        "WHITELIST_ATTRS": [
+            'href',
+            'src',
+            'alt',
+            'style',
+        ],
+        "WHITELIST_STYLES": [
+            'color',
+            'width',
+            'height'
+            'font-weight',
+        ]
+    }
+}
 
 try:
     from .local_settings import *

@@ -23,7 +23,7 @@ from routechoices.lib.helper import get_aware_datetime
 class ClubForm(ModelForm):
     class Meta:
         model = Club
-        fields = ['name', 'slug', 'admins']
+        fields = ['name', 'slug', 'admins', 'description']
 
     def clean_admins(self):
         admins = self.cleaned_data['admins']

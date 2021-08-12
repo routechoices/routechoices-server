@@ -2,12 +2,18 @@
 {% load static %}
 {% load bootstrap3 %}
 {% load hosts %}
+{% load markdownify %}
 
 {% block extra_head %}
 <link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{% host_url 'club_feed' host 'clubs' club_slug=club.slug %}{% else %}{% url 'site:events_feed' %}{% endif%}" />
 {% endblock %}
 
 {% block content %}
+{% if club %}
+<div class="row">
+  {{club.description|markdownify }}  
+</div>
+{% endif %}
 <div class="row">
   <div>
     {% if club %}<h1>Events by {{ club.name }} <a href="{% host_url 'club_feed' host 'clubs' club_slug=club.slug %}"><i class="fa fa-rss"></i></a></h1>{% else %}<h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>{% endif%}

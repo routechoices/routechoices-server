@@ -102,7 +102,14 @@ class Club(models.Model):
         help_text='This is used in the urls of your events'
     )
     admins = models.ManyToManyField(User)
-
+    description = models.TextField(
+        blank=True,
+        default='''# GPS tracking powered by routechoices.com
+        
+Browse our events here.
+        ''',
+        help_text='This text will be displayed on your site frontpage, use markdown formatting'
+    )
     class Meta:
         ordering = ['name']
         verbose_name = 'club'
