@@ -4,6 +4,8 @@
 {% load hosts %}
 {% load markdownify %}
 
+{% block head_title %}Events on {{site.name}}{% endblock %}
+
 {% block extra_head %}
 <link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{{event.club.nice_url}}/feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
 {% endblock %}
