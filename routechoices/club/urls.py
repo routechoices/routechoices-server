@@ -55,7 +55,7 @@ urlpatterns = [
         name='event_view'
     ),
     url(
-        r'.well-known/acme-challenge/(?P<challenge>.+$',
+        r'\.well-known/acme-challenge/(?P<challenge>.+)$',
         views.acme_challenge,
         name='acme_challenge'
     ),
