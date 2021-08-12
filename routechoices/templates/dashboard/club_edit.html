@@ -31,11 +31,16 @@ $('#id_admins').selectize({
     searchField: 'username',
     multiple: true,
     create: false,
+    plugins: [ 'preserve_on_blur' ],
     load: function(query, callback) {
         if (!query.length || query.length < 2) return callback();
         $.ajax({
-            url: '{% host_url 'user_search_api' host 'api' %}?q=' + encodeURIComponent(query),
+            url: '{% host_url "user_search_api" host "api" %}?q=' + encodeURIComponent(query),
             type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
             error: function() {
                 callback();
             },
