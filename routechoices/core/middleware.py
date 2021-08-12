@@ -129,8 +129,10 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if ':' in settings.PARENT_HOST:
             default_domain = settings.PARENT_HOST[:settings.PARENT_HOST.rfind(':')]
         raw_host = request.get_host()
+        if ':' in raw_host:
+            raw_host = raw_host[:raw_host.rfind(':')]
         request.use_cname = False
-        if not raw_host.endswith(default_domain):
+        if not raw_host.endswith(default_domain) and not raw_host in ('localhost', '127.0.0.1'):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
                 return HttpResponse(status=204)
@@ -164,7 +166,9 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
         if ':' in settings.PARENT_HOST:
             default_domain = settings.PARENT_HOST[:settings.PARENT_HOST.rfind(':')]
         raw_host = request.get_host()
-        if not raw_host.endswith(default_domain):
+        if ':' in raw_host:
+            raw_host = raw_host[:raw_host.rfind(':')]
+        if not raw_host.endswith(default_domain) and not raw_host in ('localhost', '127.0.0.1'):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
                 return HttpResponse(status=204)
