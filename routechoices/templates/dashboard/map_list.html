@@ -19,8 +19,8 @@
                 <td><a href="{% url 'dashboard:map_edit_view' id=map.aid %}">{{ map.name }}</a></td>
                 <td>{{ map.club }}</td>
                 <td>
-                    <!--<a class="btn btn-sm btn-primary" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa fa-download"></i> KMZ</a>
-                    <a class="btn btn-sm btn-primary" href="{{map.image.url}}"><i class="fa fa-download"></i> JPEG</a>-->
+                    <a class="btn btn-sm btn-primary" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa fa-download"></i> KMZ</a>
+                    <a class="btn btn-sm btn-primary" href="{{map.image.url}}"><i class="fa fa-download"></i> JPEG</a>
                 </td>
             </tr>
             {% endfor %}

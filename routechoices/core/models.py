@@ -45,6 +45,7 @@ from routechoices.lib.validators import (
      validate_longitude,
      validate_corners_coordinates,
      validate_imei,
+     domain_validator,
 )
 from routechoices.lib.helper import (
     random_key,
@@ -110,6 +111,14 @@ Browse our events here.
         ''',
         help_text='This text will be displayed on your site frontpage, use markdown formatting'
     )
+    domain = models.CharField(
+        max_length=128,
+        blank=True,
+        default='',
+        validators=[domain_validator, ]
+    )
+    acme_challenge = models.CharField(max_length=128, blank=True)
+
     class Meta:
         ordering = ['name']
         verbose_name = 'club'
@@ -119,6 +128,12 @@ Browse our events here.
         return self.name
 
     def get_absolute_url(self):
+        return self.nice_url
+
+    @property
+    def nice_url(self):
+        if self.domain:
+            return f'http://{self.domain}'
         return reverse(
             'club_view',
             host='clubs',
@@ -593,30 +608,13 @@ class Event(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse(
-            'event_view',
-            host='clubs',
-            kwargs={'slug': self.slug},
-            host_kwargs={'club_slug': self.club.slug.lower()}
-        )
+        return f'{self.club.nice_url}/{self.slug}'
 
     def get_absolute_map_url(self):
-        return reverse(
-            'event_map_view',
-            host='clubs',
-            kwargs={
-                'slug': self.slug
-            },
-            host_kwargs={'club_slug': self.club.slug}
-        )
+        return f'{self.club.nice_url}/{self.slug}/map'
 
     def get_absolute_export_url(self):
-        return reverse(
-            'event_export_view',
-            host='clubs',
-            kwargs={'slug': self.slug},
-            host_kwargs={'club_slug': self.club.slug}
-        )
+        return f'{self.club.nice_url}/{self.slug}/export'
 
     @property
     def shortcut(self):

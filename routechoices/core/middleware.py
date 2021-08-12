@@ -3,7 +3,12 @@ import logging
 from re import compile
 
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
+from django.urls import NoReverseMatch, set_urlconf, get_urlconf
+
+from django_hosts.middleware import HostsBaseMiddleware
+
+from routechoices.core.models import Club
 
 
 XFF_EXEMPT_URLS = []
@@ -114,3 +119,61 @@ class XForwardedForMiddleware:
             return HttpResponseBadRequest()
 
         return None
+
+
+
+class HostsRequestMiddleware(HostsBaseMiddleware):
+    def process_request(self, request):
+        # Find best match, falling back to settings.DEFAULT_HOST
+        default_domain = settings.PARENT_HOST
+        if ':' in settings.PARENT_HOST:
+            default_domain = settings.PARENT_HOST[:settings.PARENT_HOST.rfind(':')]
+        raw_host = request.get_host()
+        request.use_cname = False
+        if not raw_host.endswith(default_domain):
+            club = Club.objects.filter(domain=raw_host).first()
+            if not club:
+                return HttpResponse(status=204)
+            raw_host = f'{club.slug.lower()}.{default_domain}'
+            request.use_cname = True
+        host, kwargs = self.get_host(raw_host)
+        # This is the main part of this middleware
+        request.urlconf = host.urlconf
+        request.host = host
+        # But we have to temporarily override the URLconf
+        # already to allow correctly reversing host URLs in
+        # the host callback, if needed.
+        current_urlconf = get_urlconf()
+        try:
+            set_urlconf(host.urlconf)
+            return host.callback(request, **kwargs)
+        finally:
+            # Reset URLconf for this thread on the way out for complete
+            # isolation of request.urlconf
+            set_urlconf(current_urlconf)
+
+
+class HostsResponseMiddleware(HostsBaseMiddleware):
+    def process_response(self, request, response):
+        # Django resets the base urlconf when it starts to process
+        # the response, so we need to set this again, in case
+        # any of our middleware makes use of host, etc URLs.
+
+        # Find best match, falling back to settings.DEFAULT_HOST
+        default_domain = settings.PARENT_HOST
+        if ':' in settings.PARENT_HOST:
+            default_domain = settings.PARENT_HOST[:settings.PARENT_HOST.rfind(':')]
+        raw_host = request.get_host()
+        if not raw_host.endswith(default_domain):
+            club = Club.objects.filter(domain=raw_host).first()
+            if not club:
+                return HttpResponse(status=204)
+            raw_host = f'{club.slug.lower()}.{default_domain}'
+            request.use_cname = True
+        host, kwargs = self.get_host(raw_host)
+        # This is the main part of this middleware
+        request.urlconf = host.urlconf
+        request.host = host
+
+        set_urlconf(host.urlconf)
+        return response

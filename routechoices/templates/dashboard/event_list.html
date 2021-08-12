@@ -29,8 +29,8 @@
                 <td>{{ event.club }}</td>
                 <td>
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> Open</a>
-                    {% if not event.ended and event.open_registration %} <a href="{% host_url 'event_registration_view' slug=event.slug host 'clubs' club_slug=event.club.slug %}" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
-                    {% if event.started and event.allow_route_upload %} <a href="{% host_url 'event_route_upload_view' slug=event.slug host 'clubs' club_slug=event.club.slug %}" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
+                    {% if not event.ended and event.open_registration %} <a href="{{event.club.nice_url}}/{{event.slug}}/register" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
+                    {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}/{{event.slug}}/upload_route" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
                 </td>
             </tr>
             {% endfor %}

@@ -74,7 +74,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django_hosts.middleware.HostsRequestMiddleware',
+    'routechoices.core.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'routechoices.core.middleware.XForwardedForMiddleware',
     'user_sessions.middleware.SessionMiddleware',
@@ -84,7 +84,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware',
+    'routechoices.core.middleware.HostsResponseMiddleware',
 ]
 
 SESSION_ENGINE = 'user_sessions.backends.db'

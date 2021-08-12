@@ -16,8 +16,8 @@
         <td>{% if event.map_title %}{{ event.map_title }}{% else %}Main map{% endif %}</a></td>
         <td>
           {% if event.started %}
-          <a href="{% host_url 'event_map_view' slug=event.slug host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
-          <a href="{% host_url 'event_kmz_view' slug=event.slug host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/map" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/kmz" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>
@@ -26,8 +26,8 @@
         <td>{{ map.title }}</a></td>
         <td>
           {% if event.started %}
-          <a href="{% host_url 'event_extra_map_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
-          <a href="{% host_url 'event_extra_kmz_view' slug=event.slug index=forloop.counter host 'clubs' club_slug=event.club.slug %}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/extra_map/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/extra_kmz/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>

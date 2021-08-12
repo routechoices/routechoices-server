@@ -3,13 +3,19 @@ import os
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator, ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 import gpxpy
 import fast_luhn as luhn
 
 FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
+
+
+domain_validator = RegexValidator(
+    r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$",
+    "Please enter a valid domain"
+)
 
 
 def validate_imei(number):

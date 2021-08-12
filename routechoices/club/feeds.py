@@ -20,11 +20,7 @@ class ClubLiveEventsFeed(Feed):
         return "Events by {} on {}".format(obj, site.name)
 
     def link(self, obj):
-        return reverse(
-            'club_view',
-            host='clubs',
-            host_kwargs={'club_slug': obj.slug}
-        )
+        return f'{obj.nice_url}'
 
     def items(self, obj):
         return Event.objects.select_related('club').filter(
