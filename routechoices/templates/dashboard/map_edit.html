@@ -14,7 +14,7 @@
                 To check calibration <a target="_blank" rel="opener" href="{% url 'dashboard:check_calibration_view' %}">Click Here</a>
             </p>
             <p>To convert a PDF map in a image file <a target="_blank" rel="opener" href="{% url 'dashboard:pdf_to_jpg' %}">Click here</a></p>
-            <input type="submit" value="Submit" class="btn btn-primary">
+            <input type="submit" value="Save" class="btn btn-primary">
             {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' id=map.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>

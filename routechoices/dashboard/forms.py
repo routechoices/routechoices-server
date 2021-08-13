@@ -12,13 +12,14 @@ from django.forms import (
     ModelChoiceField,
     FileField,
     FileInput,
+    CharField
 )
 
 from routechoices.core.models import (
     Club, Map, Event, Competitor, Device, Notice, MapAssignation
 )
-from routechoices.lib.helper import get_aware_datetime
-
+from routechoices.lib.helper import get_aware_datetime, check_records
+from routechoices.lib.validators import domain_validator
 
 class ClubForm(ModelForm):
     class Meta:
@@ -30,6 +31,32 @@ class ClubForm(ModelForm):
         if admins.count() > 10:
             raise ValidationError('Clubs can only have a maximum of 10 admins')
         return admins
+
+class ClubDomainForm(ModelForm):
+    domain = CharField(
+        max_length=128,
+        label="Custom domain",
+        help_text="eg: 'example.com'",
+        validators=[domain_validator],
+        required=False
+    )
+    class Meta:
+        model = Club
+        fields = ('domain', )
+
+    def clean_domain(self):
+        domain = self.cleaned_data['domain']
+        if domain == '':
+            return domain
+        if not check_records(domain):
+            raise ValidationError(f"TXT record for '{domain}' has not been set.")
+        matching_blogs = Club.objects.filter(domain__iexact=domain)
+        if self.instance:
+            matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
+        if matching_blogs.exists():
+            raise ValidationError(f"Domain '{domain}'  already exists.")
+        else:
+            return domain.lower()
 
 
 class DeviceForm(Form):

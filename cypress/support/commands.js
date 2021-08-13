@@ -40,8 +40,8 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get('#id_name').type('Halden SK')
   cy.get('#id_slug').type('halden-sk')
   cy.get('#id_admins').next('').type('admin{enter}')
-  cy.get("input[value='Submit']").click()
-  cy.url().should('match', /\/dashboard\/club$/)
+  cy.get("input[value='Save']").click()
+  cy.get('a').contains('successfully').click()
  })
 
  Cypress.Commands.add("getDeviceId", () => {
@@ -69,7 +69,7 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get('#id_name').type('Jukola 2019 - 1st Leg')
   const mapFileName = 'Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg'
   cy.get('#id_image').attachFile(mapFileName)
-  cy.get("input[value='Submit']").click()
+  cy.get("input[value='Save']").click()
   cy.url().should('match', /\/dashboard\/map$/)
  })
  

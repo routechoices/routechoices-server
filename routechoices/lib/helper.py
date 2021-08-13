@@ -1,7 +1,7 @@
 import base64
 import secrets
 import struct
-
+import subprocess
 import requests
 
 from django.utils.dateparse import parse_datetime
@@ -213,3 +213,10 @@ def initial_of_name(name):
     parts = name.split()
     initials = [part[0].upper() for part in parts[:-1]]
     return '.'.join(initials + [parts[-1]])
+
+
+def check_records(domain):
+    if not domain:
+        return
+    verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
+    return ('full-speed-no-mistakes' in str(verification_string))

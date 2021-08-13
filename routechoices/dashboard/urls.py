@@ -24,9 +24,14 @@ urlpatterns = [
     url(r'^club/?$', views.club_list_view, name='club_list_view'),
     url(r'^club/new/?$', views.club_create_view, name='club_create_view'),
     url(
-        r'^club/(?P<id>[A-Za-z0-9_-]+)/?$',
+        r'^club/(?P<id>[A-Za-z0-9_-]+)/$',
         views.club_edit_view,
         name='club_edit_view'
+    ),
+    url(
+        r'^club/(?P<id>[A-Za-z0-9_-]+)/custom_domain/?$',
+        views.club_custom_domain_view,
+        name='club_custom_domain_view'
     ),
     url(
         r'^club/(?P<id>[A-Za-z0-9_-]+)/delete/?$',

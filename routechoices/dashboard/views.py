@@ -32,7 +32,7 @@ from routechoices.dashboard.forms import (
     ClubForm, MapForm, EventForm,
     CompetitorFormSet, UploadGPXForm,
     UploadKmzForm, DeviceForm, NoticeForm,
-    ExtraMapFormSet,
+    ExtraMapFormSet, ClubDomainForm
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
 
@@ -112,6 +112,7 @@ def device_add_view(request):
             ownership.user = request.user
             ownership.device = device
             ownership.save()
+            messages.success(request, 'Device added successfully')
             return redirect('dashboard:device_list_view')
     else:
         form = DeviceForm()
@@ -141,6 +142,7 @@ def device_remove_view(request, id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         ownership.delete()
+        messages.success(request, 'Device removed')
         return redirect('dashboard:device_list_view')
     return render(
         request,
@@ -182,7 +184,8 @@ def club_create_view(request):
             club.creator = request.user
             club.save()
             form.save_m2m()
-            return redirect('dashboard:club_list_view')
+            messages.success(request, 'Club created successfully')
+            return redirect('dashboard:club_edit_view', id=club.aid)
     else:
         form = ClubForm()
     form.fields['admins'].queryset = User.objects.filter(id=request.user.id)
@@ -216,17 +219,52 @@ def club_edit_view(request, id):
         # check whether it's valid:
         if form.is_valid():
             club = form.save()
-            return redirect('dashboard:club_list_view')
+            messages.success(request, 'Changes saved successfully')
+            return redirect('dashboard:club_edit_view', id=club.aid)
     else:
         form = ClubForm(instance=club)
     form.fields['admins'].queryset = User.objects.filter(
-            id__in=club.admins.all()
-        )
+        id__in=club.admins.all()
+    )
     return render(
         request,
         'dashboard/club_edit.html',
         {
             'context': 'edit',
+            'club': club,
+            'form': form,
+        }
+    )
+
+
+@login_required
+def club_custom_domain_view(request, id):
+    if request.user.is_superuser:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+        )
+    else:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+            admins=request.user
+        )
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ClubDomainForm(request.POST, instance=club)
+        # check whether it's valid:
+        if form.is_valid():
+            club = form.save()
+            messages.success(request, 'Changes saved successfully')
+            return redirect('dashboard:club_custom_domain_view', id=club.aid)
+    else:
+        form = ClubDomainForm(instance=club)
+    return render(
+        request,
+        'dashboard/custom_domain.html',
+        {
             'club': club,
             'form': form,
         }
@@ -250,6 +288,7 @@ def club_delete_view(request, id):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         club.delete()
+        messages.success(request, 'Club deleted')
         return redirect('dashboard:club_list_view')
     return render(
         request,
@@ -298,6 +337,7 @@ def map_create_view(request):
         # check whether it's valid:
         if form.is_valid():
             form.save()
+            messages.success(request, 'Map created successfully')
             return redirect('dashboard:map_list_view')
     else:
         form = MapForm()
@@ -451,6 +491,7 @@ def map_edit_view(request, id):
         # check whether it's valid:
         if form.is_valid():
             form.save()
+            messages.success(request, 'Changes saved successfully')
             return redirect('dashboard:map_list_view')
     else:
         form = MapForm(instance=rmap)
@@ -482,6 +523,7 @@ def map_delete_view(request, id):
         )
     if request.method == 'POST':
         rmap.delete()
+        messages.success(request, 'Map deleted')
         return redirect('dashboard:map_list_view')
     return render(
         request,
@@ -544,6 +586,7 @@ def event_create_view(request):
             notice = notice_form.save(commit=False)
             notice.event = event
             notice.save()
+            messages.success(request, 'Event created successfully')
             if request.POST.get('save_continue'):
                 return redirect(
                     'dashboard:event_edit_view',
@@ -641,6 +684,7 @@ def event_edit_view(request, id):
                     notice = event.notice
                 notice.text = notice_form.cleaned_data['text']
                 notice.save()
+            messages.success(request, 'Changes saved successfully')
             if request.POST.get('save_continue'):
                 return redirect(
                     'dashboard:event_edit_view',
@@ -707,6 +751,7 @@ def event_delete_view(request, id):
 
     if request.method == 'POST':
         event.delete()
+        messages.success(request, 'Event deleted')
         return redirect('dashboard:event_list_view')
     return render(
         request,

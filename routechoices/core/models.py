@@ -100,7 +100,7 @@ class Club(models.Model):
         max_length=50,
         validators=[validate_domain_slug, ],
         unique=True,
-        help_text='This is used in the urls of your events'
+        help_text='.routechoices.com | <a href="custom_domain/">Add a custom domain</a>'
     )
     admins = models.ManyToManyField(User)
     description = models.TextField(

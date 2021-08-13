@@ -8,7 +8,7 @@ RUN apt update && apt install -y libgdal-dev g++ --no-install-recommends && \
     apt clean -y
 # OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
 # ADD requirements /requirements
-RUN apt-get install cargo -y
+RUN apt-get install cargo dnsutils -y
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
 RUN set -ex \

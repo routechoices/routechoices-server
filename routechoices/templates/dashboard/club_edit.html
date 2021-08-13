@@ -14,7 +14,7 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <input type="submit" value="Submit" class="btn btn-primary">
+            <input type="submit" value="Save" class="btn btn-primary">
             {% if context == 'edit' %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>
