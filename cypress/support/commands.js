@@ -41,7 +41,7 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get('#id_slug').type('halden-sk')
   cy.get('#id_admins').next('').type('admin{enter}')
   cy.get("input[value='Save']").click()
-  cy.get('a').contains('successfully').click()
+  cy.contains('successfully')
  })
 
  Cypress.Commands.add("getDeviceId", () => {
