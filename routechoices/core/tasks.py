@@ -404,12 +404,13 @@ def import_single_event_from_tractrac(event_id):
     if r.status_code != 200:
         raise EventImportError('API returned error code')
     event_data = r.json()
+    event_name = event_data['eventName'] + ' - ' + event_data['raceName']
     slug = base64.urlsafe_b64encode(UUID(hex=event_data['raceId']).bytes).rstrip(b'=').decode('ascii')
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,
         defaults={
-            'name': event_data['eventName'] + ' - ' + event_data['raceName'],
+            'name': event_name,
             'start_date':
                 arrow.get(event_data['raceTrackingStartTime']).datetime,
             'end_date':
@@ -422,7 +423,7 @@ def import_single_event_from_tractrac(event_id):
     map_model = None
     if maps:  
         map_info = maps[0]
-        map_model = import_map_from_tractrac(club, map_info, event_data['eventName'])
+        map_model = import_map_from_tractrac(club, map_info, event_name)
     if map_model:
         event.map = map_model
         event.save()
