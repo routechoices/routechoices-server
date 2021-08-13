@@ -1,0 +1,10 @@
+{% load static %}
+{% load hosts %}
+
+<footer id="myFooter">
+    <div class="second-bar">
+        <div class="container">
+            <h2 class="logosmall site-name"><a href="{% host_url 'site:home_view' host 'www'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35px"> Powered by {{site.name}}</a></h2>
+        </div>
+    </div>
+</footer>

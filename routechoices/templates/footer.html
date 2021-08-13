@@ -1,0 +1,43 @@
+{% load static %}
+{% load hosts %}
+
+<footer id="myFooter">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <h5>Get started</h5>
+                <ul>
+                    <li><a href="{% host_url 'site:home_view' host 'www'%}">Home</a></li>
+                    <li><a href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
+                    <li><a href="{% host_url 'site:tracker_view' host 'www'%}">Trackers</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-3">
+                <h5>About us</h5>
+                <ul>
+                    <li><a href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
+                    <li><a href="{% host_url 'site:tos_view' host 'www'%}">Term of service</a></li>
+                    <li><a href="{% host_url 'site:privacy_policy_view' host 'www'%}">Privacy policy</a></li>
+                    <li><a href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-3">
+            </div>
+            <div class="col-sm-3 info">
+                <h5>Information</h5>
+                <p>{{site.name}} is a free and open source live GPS tracking solution for orienteering events.</p>
+            </div>
+        </div>
+    </div>
+    <div class="second-bar">
+       <div class="container">
+            <h2 class="logo site-name"><a href="{% host_url 'site:home_view' host 'www'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35px"> {{site.name}}</a></h2>
+            <!--<div class="social-icons">
+                <a href="#" class="twitter"><i class="fa fa-twitter"></i></a>
+                <a href="#" class="facebook"><i class="fa fa-facebook"></i></a>
+                <a href="#" class="google"><i class="fa fa-google-plus"></i></a>
+            </div>-->
+        </div>
+    </div>
+</footer>
+<!-- Footer -->
