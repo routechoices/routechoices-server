@@ -1,5 +1,6 @@
 import requests
 import arrow
+import base64
 import tempfile
 from PIL import Image
 from django.core.files.base import ContentFile
@@ -402,11 +403,12 @@ def import_single_event_from_tractrac(event_id):
     if r.status_code != 200:
         raise EventImportError('API returned error code')
     event_data = r.json()
+    slug = base64.urlsafe_b64encode(event_data['raceId'].encode('ascii')).rstrip(b'=').decode('ascii')
     event, created = Event.objects.get_or_create(
         club=club,
-        slug=event_data['webId'],
+        slug=slug,
         defaults={
-            'name': event_data['eventName'],
+            'name': event_data['eventName'] + ' - ' + event_data['raceName'],
             'start_date':
                 arrow.get(event_data['raceTrackingStartTime']).datetime,
             'end_date':
@@ -427,6 +429,7 @@ def import_single_event_from_tractrac(event_id):
     print(data_url)
     response = requests.get(data_url, stream=True)
     if response.status_code != 200:
+        event.delete()
         raise EventImportError('API returned error code')
     lf = tempfile.NamedTemporaryFile()
     for block in response.iter_content(1024 * 8):
