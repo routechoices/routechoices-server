@@ -1,5 +1,6 @@
 import requests
 import arrow
+import tempfile
 from PIL import Image
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
@@ -9,6 +10,8 @@ from background_task import background
 from routechoices.core.models import Map, Event, Device, Competitor, Club
 from routechoices.lib.helper import short_random_key, \
     three_point_calibration_to_corners
+from routechoices.lib.mtb_decoder import MtbDecoder
+
 
 GPSSEURANTA_EVENT_URL = 'http://www.tulospalvelu.fi/gps/'
 LOGGATOR_EVENT_URL = 'https://loggator.com/api/events/'
@@ -50,6 +53,20 @@ def get_loggator_club():
     return club
 
 
+def get_tractrac_club():
+    admins = User.objects.filter(is_superuser=True)
+    club, created = Club.objects.get_or_create(
+        slug='tractrac',
+        defaults={
+            'name': 'TracTrac'
+        }
+    )
+    if created:
+        club.admins.set(admins)
+        club.save()
+    return club
+
+
 def import_map_from_gps_seuranta(club, map_data, name, event_id):
     map_url = GPSSEURANTA_EVENT_URL + event_id + '/map'
     r = requests.get(map_url)
@@ -72,6 +89,35 @@ def import_map_from_gps_seuranta(club, map_data, name, event_id):
     coordinates = ','.join([
         str(x) for x in corners
     ])
+    map_model.image.save('imported_image', map_file, save=False)
+    map_model.corners_coordinates = coordinates
+    map_model.save()
+    return map_model
+
+
+def import_map_from_tractrac(club, map_info, name):
+    map_url = map_info.get('location')
+    r = requests.get(map_url)
+    
+    if r.status_code != 200:
+        raise MapImportError('API returned error code')
+    map_file = ContentFile(r.content)
+    with Image.open(map_file) as img:
+        width, height = img.size
+    corners = three_point_calibration_to_corners(
+        f"{map_info['long1']}|{map_info['lat1']}|{map_info['x1']}|{map_info['y1']}|{map_info['long2']}|{map_info['lat2']}|{map_info['x2']}|{map_info['y2']}|{map_info['long3']}|{map_info['lat3']}|{map_info['x3']}|{map_info['y3']}",
+        width,
+        height
+    )
+    coordinates = ','.join([
+        str(x) for x in corners
+    ])
+    map_model, created = Map.objects.get_or_create(
+        name=name,
+        club=club,
+    )
+    if not created:
+        return map_model
     map_model.image.save('imported_image', map_file, save=False)
     map_model.corners_coordinates = coordinates
     map_model.save()
@@ -347,3 +393,63 @@ def import_single_event_from_loggator(event_id):
         if dev:
             dev.add_locations(loc_array_map.get(c_data['device_id']))
     return event
+
+
+@background(schedule=0)
+def import_single_event_from_tractrac(event_id):
+    club = get_tractrac_club()
+    r = requests.get(event_id)
+    if r.status_code != 200:
+        raise EventImportError('API returned error code')
+    event_data = r.json()
+    event, created = Event.objects.get_or_create(
+        club=club,
+        slug=event_data['webId'],
+        defaults={
+            'name': event_data['eventName'],
+            'start_date':
+                arrow.get(event_data['raceTrackingStartTime']).datetime,
+            'end_date':
+                arrow.get(event_data['raceTrackingEndTime']).datetime,
+        }
+    )
+    if not created:
+        return
+    maps = [m for m in event_data['maps'] if m.get('is_default_loaded')]
+    map_model = None
+    if maps:  
+        map_info = maps[0]
+        map_model = import_map_from_tractrac(club, map_info, event_data['eventName'])
+    if map_model:
+        event.map = map_model
+        event.save()
+    data_url = event_id[:event_id.rfind('/')] + '/datafiles' + event_id[event_id.rfind('/'):-4] + 'mtb'
+    print(data_url)
+    response = requests.get(data_url, stream=True)
+    if response.status_code != 200:
+        raise EventImportError('API returned error code')
+    lf = tempfile.NamedTemporaryFile()
+    for block in response.iter_content(1024 * 8):
+        if not block:
+            break
+        lf.write(block)
+    device_map = MtbDecoder(lf.name).decode()
+    for c_data in event_data['competitors'].values():
+        st = c_data.get('startTime')
+        if not st:
+            st = event_data['raceTrackingStartTime']
+        dev = device_map.get(c_data['uuid'])
+        dev_model = None
+        if dev:
+            dev_model = Device.objects.create(
+                aid=short_random_key() + '_TRC',
+                is_gpx=True,
+            )
+            dev_model.add_locations(dev)
+        Competitor.objects.create(
+            name=c_data['name'],
+            short_name=c_data['nameShort'],
+            start_time=arrow.get(st).datetime,
+            device=dev_model,
+            event=event,
+        )

@@ -1,0 +1,275 @@
+import struct
+from uuid import UUID
+
+class MtbDecoder():
+    def __init__(self, filename):
+        self.device_map = {}
+        self.filename = filename
+
+    def get_float(self):
+        d = self.fp.read(4)
+        if not d:
+            return None
+        return struct.unpack('>f', d)[0]
+
+    def get_double(self):
+        d = self.fp.read(8)
+        if not d:
+            return None
+        return struct.unpack('>d', d)[0]
+
+    def get_int16(self):
+        d = self.fp.read(2)
+        if not d:
+            return None
+        return struct.unpack('>h', d)[0]
+
+    def get_int32(self):
+        d = self.fp.read(4)
+        if not d:
+            return None
+        return struct.unpack('>i', d)[0]
+
+    def get_int64(self):
+        d = self.fp.read(8)
+        if not d:
+            return None
+        return struct.unpack('>q', d)[0]
+
+    def get_uuid(self):
+        d = self.fp.read(16)
+        return str(UUID(bytes=d))
+
+    def get_string_nn(self):
+        l = self.get_int32()
+        return self.fp.read(l)
+
+    def skip_uuid(self):
+        self.fp.read(16)
+
+    def skip_int32(self):
+        self.fp.read(4)
+
+    def skip_int64(self):
+        self.fp.read(8)
+
+    def decode(self):
+        with open(self.filename, 'rb') as fp:
+            self.fp = fp
+            while True:
+                self.current_size = self.get_int32()
+                t = self.get_int32()
+                if t == 1:
+                    self.read_event_latest_type()
+                elif t == 2:
+                    self.read_event_sequence_type()
+                elif t == 5:
+                    self.read_race_latest_type()
+                elif t == 6:
+                    self.read_race_sequence_type()
+                elif not t:
+                    print('done')
+                    break
+                else:
+                    raise Exception('Bad Format')
+        return self.device_map     
+
+    def read_event_latest_type(self):
+        self.skip_uuid()
+        t = self.get_int32()
+        if t == 36:
+            self.fp.read(44)
+        elif t == 37:
+            self.fp.read(self.current_size - 20)
+        else:
+            raise Exception('Bad format')
+        
+    def read_event_sequence_type(self):
+        self.skip_uuid()
+        t = self.get_int32()
+        if t == 20:
+            a = self.current_size - 36
+            while a > 0:
+                self.skip_int32()
+                a -= 4
+                e = self.fp.read(1)
+                a -= 1,
+                if b'\x01' == e or b'\x03' == e:
+                    self.get_int32()
+                    a -= 4
+                else:
+                    self.get_int64()
+                    a -= 8
+                if b'\x02' == e or b'\x03' == e:
+                    self.get_int32()
+                    a -= 4
+                else:
+                    self.get_int64()
+                    a -= 8
+                self.skip_uuid()
+                a -= 16
+                self.get_int32()
+                a -= 4
+                self.fp.read(16)
+                a -= 16
+        else:
+            raise Exception('Bad Format')
+
+    def read_race_latest_type(self):
+        self.skip_uuid()
+        self.skip_uuid()
+        t = self.get_int32()
+        if t == 34:
+            c = self.current_size - 36
+            while c > 0:
+                t = self.get_int32()
+                c -= 4
+                self.skip_uuid()
+                c -= 16
+                self.get_int64()
+                c -= 8
+                r = (t - 16 - 8) / 24
+                a = 1
+                while a <= r:
+                    a += 1
+                    self.skip_uuid()
+                    c -= 16
+                    self.get_int64()
+                    c -= 8
+        elif t == 35:
+            e = self.current_size - 36
+            while e > 0:
+                e -= self.read_route()
+        elif t == 36:
+            self.fp.read(44)
+        elif t == 37:
+            self.fp.read(self.current_size-36)
+        elif t == 39:
+            c = self.current_size - 36
+            while c > 0:
+                t = self.get_int32()
+                c -= 4
+                self.skip_uuid()
+                c -= 16
+                self.get_int64()
+                c -= 8
+                i = (t - 16 - 8) / 16
+                h = 1
+                while h <= i:
+                    h += 1
+                    self.get_int64()
+                    c -= 8
+                    self.get_int32()
+                    c -= 4
+                    self.get_int32()
+                    c -= 4
+        else:
+            raise Exception('Bad Format')
+
+    def read_route(self):
+        c = 0
+        s = (self.get_int32() - 24) / 16
+        c += 4
+        self.skip_uuid()
+        c += 16
+        self.skip_int64()
+        c += 8
+        t = 0
+        while t < s:
+            t += 1
+            self.skip_uuid()
+            c += 16
+        return c
+
+    def read_race_sequence_type(self):
+        self.skip_uuid()
+        self.skip_uuid()
+        t = self.get_int32()
+        if t == 18:
+            self.read_competitor_data(False)
+        elif t == 19:
+            self.read_competitor_data(True)
+        elif t == 23:
+            # sensor data aka Trash
+            n = self.current_size - 36
+            self.fp.read(32)
+            n -= 32
+            while n > 0:
+                i = self.get_int32()
+                n -= 4
+                r = n
+                t = self.fp.read(1)
+                n -= 1
+                if b'\x03' == t or b'\x01' == t:
+                    e = self.get_int32() + 2147483648
+                    n -= 4
+                else: 
+                    e = self.get_int64()
+                    n -= 8
+                if b'\x02' == t or b'\x03' == t:
+                    s = 1e3 * (self.get_int32() + 2147483648)
+                    n -= 4
+                else:
+                    s = self.get_int64()
+                    n -= 8
+                self.get_int32()
+                n -= 4
+                a = self.fp.read(16)
+                n -= 16
+                o = self.get_int64()
+                n -= 8
+                h = self.get_string_nn()
+                n -= h.length + 4
+                c = self.get_int16()
+                n -= 2,
+                self.fp.read(i - (r - n))
+                n -= i - (r - n)
+        else:
+            raise Exception('Bad Format')
+
+    def read_competitor_data(self, t):
+        h = self.current_size - 36
+        self.fp.read(32)
+        h -= 32
+        while h > 0:
+            o = self.get_int32()
+            h -= 4
+            s = self.fp.read(1)
+            h -= 1
+            if b'\x03' == s or b'\x01' == s:
+                r = self.get_int32() + 2147483648
+                h -= 4
+            else:
+                r = self.get_int64()
+                h -= 8
+            if b'\x02' == s or b'\x03' == s:
+                a = 1e3 * (self.get_int32() + 2147483648)
+                h -= 4
+            else:
+                a = self.get_int64()
+                h -= 8
+            i = self.get_uuid()
+            h -= 16
+            e = self.read_position(a, t)
+            h -= 16
+            if t:
+                h -= 8
+            self.add_position(i, r, e)
+
+    def read_position(self, t, e):
+        s = {
+            'longitude': self.get_int32() / 1e7,
+            'latitude': self.get_int32() / 1e7,
+            'height': self.get_float(),
+            'speed': self.get_int16() / 10,
+            'direction': self.get_int16() / 10,
+            'm': None,
+            'timestamp': int(t/1e3)
+        }
+        s['m'] = self.get_double() if e else None
+        return s
+
+    def add_position(self, id, t, p):
+        if not self.device_map.get(id):
+            self.device_map[id] = []
+        self.device_map[id].append(p)

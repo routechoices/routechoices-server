@@ -133,7 +133,7 @@ Browse our events here.
     @property
     def nice_url(self):
         if self.domain:
-            return f'http://{self.domain}'
+            return f'http://{self.domain}/'
         return reverse(
             'club_view',
             host='clubs',
@@ -608,13 +608,13 @@ class Event(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return f'{self.club.nice_url}/{self.slug}'
+        return f'{self.club.nice_url}{self.slug}'
 
     def get_absolute_map_url(self):
-        return f'{self.club.nice_url}/{self.slug}/map'
+        return f'{self.club.nice_url}{self.slug}/map'
 
     def get_absolute_export_url(self):
-        return f'{self.club.nice_url}/{self.slug}/export'
+        return f'{self.club.nice_url}{self.slug}/export'
 
     @property
     def shortcut(self):
