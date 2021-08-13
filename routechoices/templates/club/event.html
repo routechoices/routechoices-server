@@ -6,12 +6,12 @@
 {% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
 
 {% block extra_head %}
-<meta name="description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}"/>
+<meta name="description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }}"/>
 <meta property="og:title" content="{{ event.name }}" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="{{ site.name }}" />
-<meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }} on {{ site.name }}" />
+<meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }}" />
 <meta property="og:url" content="{{ event.get_absolute_url }}" />
 <meta name="twitter:card" content="summary_large_image">
 {% if event.started and event.map %}
