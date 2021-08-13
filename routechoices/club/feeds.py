@@ -13,11 +13,11 @@ class ClubLiveEventsFeed(Feed):
 
     def title(self, obj):
         site = Site.objects.get(id=settings.SITE_ID)
-        return "Live GPS Events by {} on {}".format(obj.name, site.name)
+        return f"Live GPS Events by {obj.name}"
 
     def description(self, obj):
         site = Site.objects.get(id=settings.SITE_ID)
-        return "Events by {} on {}".format(obj, site.name)
+        return f"Events by {obj.name}"
 
     def link(self, obj):
         return f'{obj.nice_url}'
