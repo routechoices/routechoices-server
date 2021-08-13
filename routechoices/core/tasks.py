@@ -436,7 +436,13 @@ def import_single_event_from_tractrac(event_id):
         if not block:
             break
         lf.write(block)
-    device_map = MtbDecoder(lf.name).decode()
+    lf.flush()
+    try:
+        device_map = MtbDecoder(lf.name).decode()
+    except:
+        event.delete()
+        raise EventImportError('Could not decode mtb')
+    lf.close()
     for c_data in event_data['competitors'].values():
         st = c_data.get('startTime')
         if not st:
