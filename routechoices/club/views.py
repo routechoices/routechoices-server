@@ -51,7 +51,7 @@ def club_view(request, **kwargs):
     events = paginator.get_page(page)
     return render(
         request,
-        'club/event_list.html',
+        'site/event_list.html',
         {
             'club': club,
             'events': events

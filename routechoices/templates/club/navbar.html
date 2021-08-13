@@ -12,10 +12,12 @@
         </button>
         <a class="navbar-brand site-name" href="{% host_url 'site:events_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25px"></span></a>
       </div>
+      {% if club or event.club %}
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="{% if club %}{{ club.get_absolute_url }}{% else %}{{ event.club.get_absolute_url }}{% endif %}">Events by {% if club %}{{ club.name }}{% else %}{{ event.club.name }}{% endif %}</a></li>
           </ul>
       </div>
+      {% endif %}
     </div>
   </nav>

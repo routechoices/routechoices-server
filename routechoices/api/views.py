@@ -1361,31 +1361,26 @@ def two_d_rerun_race_data(request):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    cached_result = cache.get(f'woo:{event.aid}:data')
-    if not cached_result:
-        competitors = event.competitors.select_related('device')\
-            .all().order_by('start_time', 'name')
-        nb_points = 0
-        results = []
-        for c in competitors:
-            locations = c.locations
-            nb_points += len(locations)
-            results += [[
-                c.aid,
-                ll['latitude'],
-                ll['longitude'],
-                0,
-                arrow.get(ll['timestamp']).datetime
-            ] for ll in c.locations]
-        response_json = {
-            'containslastpos': 1,
-            'lastpos': nb_points,
-            'status': 'OK',
-            'data': results,
-        }
-        cache.set(f'woo:{event.aid}:data', response_json, 15)
-    else:
-        response_json = cached_result
+    competitors = event.competitors.select_related('device')\
+        .all().order_by('start_time', 'name')
+    nb_points = 0
+    results = []
+    for c in competitors:
+        locations = c.locations
+        nb_points += len(locations)
+        results += [[
+            c.aid,
+            ll['latitude'],
+            ll['longitude'],
+            0,
+            arrow.get(ll['timestamp']).datetime
+        ] for ll in c.locations]
+    response_json = {
+        'containslastpos': 1,
+        'lastpos': nb_points,
+        'status': 'OK',
+        'data': results,
+    }
     response_raw = str(json.dumps(response_json), 'utf-8')
     content_type = 'application/json'
     callback = request.GET.get('callback')
