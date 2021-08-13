@@ -508,6 +508,7 @@ PRIVACY_CHOICES = (
     (PRIVACY_PRIVATE, 'Private'),
 )
 
+MAP_BLANK = 'blank'
 MAP_OSM = 'osm'
 MAP_GOOGLE_STREET = 'gmap-street'
 MAP_GOOGLE_SAT = 'gmap-hybrid'
@@ -518,6 +519,7 @@ MAP_TOPO_FI = 'topo-fi'
 MAP_TOPO_NO = 'topo-no'
 
 MAP_CHOICES = (
+    (MAP_BLANK, 'Blank'),
     (MAP_OSM, 'Open Street Map'),
     (MAP_GOOGLE_STREET, 'Google Map Street'),
     (MAP_GOOGLE_SAT, 'Google Map Satellite'),
@@ -568,7 +570,7 @@ class Event(models.Model):
     backdrop_map = models.CharField(
         max_length=16,
         choices=MAP_CHOICES,
-        default=MAP_OSM,
+        default=MAP_BLANK,
     )
     map = models.ForeignKey(
         Map,
