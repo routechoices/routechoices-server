@@ -101,7 +101,19 @@ def event_view(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
-    if event.club.domain and not request.use_cname:
+    if event.privacy == PRIVACY_PRIVATE:
+        if request.use_cname:
+            return redirect(
+                reverse(
+                    'event_view',
+                    host='clubs',
+                    kwargs={'slug': slug},
+                    host_kwargs={
+                        'club_slug': club_slug
+                    }
+                )
+            )
+    elif event.club.domain and not request.use_cname:
         return redirect(f'{event.club.nice_url}/{event.slug}')
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
