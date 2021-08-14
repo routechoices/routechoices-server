@@ -275,7 +275,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021081100.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021081403.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021081404.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -375,6 +375,7 @@ $(function() {
 
   map = L.map('map', {
     center: [15, 0],
+    maxZoom: 16,
     zoom: 3,
     zoomControl: false,
     scrollWheelZoom: false, // disable original zoom function
@@ -451,10 +452,11 @@ $(function() {
               [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
               [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
             ]
-            MapLayers[m.title] = new L.ImageTransform(
-              m.url + '?map_hash=' + m.hash,
-              bounds
-            )
+            MapLayers[m.title] = L.tileLayer.wms(wmsService+'?', {
+                layers: eventId + '/' + i,
+                bounds: bounds,
+                tileSize: 512,
+            })
           }
           
         }

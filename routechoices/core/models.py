@@ -52,7 +52,7 @@ from routechoices.lib.helper import (
     short_random_key,
     short_random_slug,
     general_2d_projection,
-    adjugate_matrix, project
+    adjugate_matrix, project, find_coeffs
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -401,33 +401,46 @@ class Map(models.Model):
         return GLOBAL_MERCATOR.meters_to_latlon({'x': mx, 'y': my})
 
     def create_tile(self, output_width, output_height,
-                    min_lon, max_lon, max_lat, min_lat):
-        
-        cache_key = f'tile_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
+                    min_lat, max_lat, min_lon, max_lon):
+        cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
         cached = cache.get(cache_key)
         if cached and not settings.DEBUG:
             return cached
 
         tile_img = None
         if self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
+            r_w = (max_lon - min_lon)/output_width
+            r_h = (max_lat - min_lat)/output_height
+
+            tl = self.map_xy_to_spherical_mercator(0, 0)
+            tr = self.map_xy_to_spherical_mercator(self.width, 0)
+            br = self.map_xy_to_spherical_mercator(self.width, self.height)
+            bl = self.map_xy_to_spherical_mercator(0, self.height)
+
+            p1 = [
+                (0, 0),
+                (self.width, 0),
+                (self.width, self.height),
+                (0, self.height),
+            ]
+            p2 = [
+                ((tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h),
+                ((tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h),
+                ((br[0] - min_lon)/r_w, (max_lat - br[1])/r_h),
+                ((bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h),
+            ]
+            coeffs = find_coeffs(p2, p1)
+
             orig = self.image.open('rb').read()
             self.image.close()
             img = Image.open(BytesIO(orig))
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
-            nw = self.spherical_mercator_to_map_xy(max_lat, min_lon)
-            ne = self.spherical_mercator_to_map_xy(max_lat, max_lon)
-            se = self.spherical_mercator_to_map_xy(min_lat, max_lon)
-            sw = self.spherical_mercator_to_map_xy(min_lat, min_lon)
             tile_img = img.transform(
                 (output_width, output_height),
-                Image.QUAD,
-                (
-                    ne[0], ne[1],
-                    nw[0], nw[1],
-                    sw[0], sw[1],
-                    se[0], se[1],
-                )
+                Image.PERSPECTIVE,
+                coeffs,
+                Image.BICUBIC
             )
         img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
         if tile_img:
@@ -436,14 +449,14 @@ class Map(models.Model):
                 cache.set(cache_key, img_out, 3600*24*30)
         return img_out
 
-    def intersects_with_tile(self, min_lon, max_lon, max_lat, min_lat):
+    def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
         tile_bounds_polygon = Polygon(
             LinearRing(
-                (min_lat, min_lon),
-                (max_lat, min_lon),
-                (max_lat, max_lon),
-                (min_lat, max_lon),
-                (min_lat, min_lon),
+                (min_lon, min_lat),
+                (min_lon, max_lat),
+                (max_lon, max_lat),
+                (max_lon, min_lat ),
+                (min_lon, min_lat),
             )
         )
         map_bounds_polygon = Polygon(

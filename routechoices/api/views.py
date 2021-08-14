@@ -1357,15 +1357,15 @@ def wms_service(request):
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
             return HttpResponseBadRequest('missing mandatory parameters')
         try:
-            min_lat, min_lon, max_lat, max_lon = (float(x) for x in bbox_raw.split(','))
+            min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(','))
             if request.GET.get('SRS', request.GET.get('crs')) == 'CRS:84':
                 min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(','))
                 min_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': min_lon})
                 max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
-                min_lon = min_xy['y']
-                min_lat = min_xy['x']
-                max_lon = max_xy['y']
-                max_lat = max_xy['x']
+                min_lat = min_xy['y']
+                min_lon = min_xy['x']
+                max_lat = max_xy['y']
+                max_lon = max_xy['x']
             out_w, out_h = int(width_raw), int(heigth_raw)
             if '/' in layers_raw:
                 layer_id, map_index = layers_raw.split('/')
@@ -1393,7 +1393,7 @@ def wms_service(request):
 
         try:
             out_image = raster_map.create_tile(
-                out_w, out_h, min_lon, max_lon, min_lat, max_lat
+                out_w, out_h, min_lat, max_lat, min_lon, max_lon
             )
         except Exception as e:
             raise e

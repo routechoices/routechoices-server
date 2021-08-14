@@ -3,6 +3,7 @@ import secrets
 import struct
 import subprocess
 import requests
+import numpy
 
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
@@ -220,3 +221,15 @@ def check_records(domain):
         return
     verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
     return ('full-speed-no-mistakes' in str(verification_string))
+
+
+def find_coeffs(pa, pb):
+    '''Find coefficients for perspective transformation. From http://stackoverflow.com/a/14178717/4414003.'''
+    matrix = []
+    for p1, p2 in zip(pa, pb):
+        matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0]*p1[0], -p2[0]*p1[1]])
+        matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1]*p1[0], -p2[1]*p1[1]])
+    A = numpy.matrix(matrix, dtype=numpy.float)
+    B = numpy.array(pb).reshape(8)
+    res = numpy.dot(numpy.linalg.inv(A.T * A) * A.T, B)
+    return numpy.array(res).reshape(8)
