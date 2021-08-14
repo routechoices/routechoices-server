@@ -17,7 +17,7 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <p><i class="fa fa-warning"></i> You can stream to only one event at a time. If you register now, your active session will end  {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+            <p><i class="fa fa-warning"></i> You can stream your GPS data to only one event at a time. If you register now, your active session will end {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
             <input type="submit" value="Register" class="btn btn-primary">
         </form>
     </div>
