@@ -287,7 +287,7 @@ def event_registration_view(request, slug, **kwargs):
         if request.user.is_authenticated:
             devices = request.user.devices.all()
         form.fields['device'].queryset = devices
-    form.fields['device'].label = "Live Streaming Device ID"
+    form.fields['device'].label = "Device ID"
     return render(
         request,
         'club/event_registration.html',

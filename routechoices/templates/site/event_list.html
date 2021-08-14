@@ -7,7 +7,7 @@
 {% block head_title %}{% if club %}Events by {{club.name}} | Powered by {{site.name}}{% else %}Events on {{site.name}}{% endif %}{% endblock %}
 
 {% block extra_head %}
-<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{{event.club.nice_url}}/feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
+<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
 {% endblock %}
 
 {% block content %}
@@ -18,7 +18,7 @@
 {% endif %}
 <div class="row">
   <div>
-    {% if club %}<h1>Events by {{ club.name }} <a href="{{event.club.nice_url}}/feed"><i class="fa fa-rss"></i></a></h1>{% else %}<h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>{% endif%}
+    {% if club %}<h1>Events by {{ club.name }} <a href="{{event.club.nice_url}}feed"><i class="fa fa-rss"></i></a></h1>{% else %}<h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>{% endif%}
   </div>
 
   <div>
@@ -29,10 +29,10 @@
         <td><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></td>
         <td>{% if event.is_live %}<span class="label label-danger">LIVE</span>{% else %}<span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>{% endif %}</td>
         <td>
-          {% if not event.hidden %}<a href="{{event.club.nice_url}}/{{event.slug}}/export" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
+          {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
           {% if event.ended and event.map %}&nbsp;<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-xs btn-primary" style="margin-bottom: 3px">2DRerun</a>{% endif %}
-          {% if not event.ended and event.open_registration %}&nbsp;<a href="{{event.club.nice_url}}/{{event.slug}}/register" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
-          {% if event.started and event.allow_route_upload %}&nbsp;<a href="{{event.club.nice_url}}/{{event.slug}}/upload_route" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
+          {% if not event.ended and event.open_registration %}&nbsp;<a href="{{event.club.nice_url}}{{event.slug}}/register" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
+          {% if event.started and event.allow_route_upload %}&nbsp;<a href="{{event.club.nice_url}}{{event.slug}}/upload_route" class="btn btn-xs btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
         </td>
         {% if not club %}<td><a href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>{% endif%}
       </tr>

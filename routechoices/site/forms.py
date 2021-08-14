@@ -30,20 +30,14 @@ class CompetitorForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_time'].label = "Start time (Optional)"
         self.fields['device'].help_text = 'Get a device ID from the <a href= \
             "%s">trackers page</a>' % reverse('site:tracker_view')
 
     class Meta:
         model = Competitor
-        fields = ('event', 'device', 'name', 'start_time')
+        fields = ('event', 'device', 'name')
         widgets = {
             'event': HiddenInput(),
-            'start_time': DateTimeInput(attrs={
-                'title': 'Start time',
-                'placeholder': 'Start time',
-                'class': 'datetimepicker'
-            }),
         }
 
     def clean(self):
@@ -68,22 +62,6 @@ class CompetitorForm(ModelForm):
         ).order_by('-start_time').first()
         if prev_dev_comp and prev_dev_comp.name == name and prev_dev_comp.event == event:
             raise ValidationError('Competitor already registered')
-
-    def clean_start_time(self):
-        start = self.cleaned_data.get('start_time')
-        event = Event.objects.get(id=self.data.get('event'))
-        event_start = event.start_date
-        event_end = event.end_date
-        if start and ((not event_end and event_start > start)
-                      or (event_end
-                          and (event_start > start
-                               or start > event_end))):
-            raise ValidationError(
-                'Competitor start time should be during the event time'
-            )
-        elif not start and event_start < now():
-            start = now()
-        return start
 
 
 class ContactForm(Form):

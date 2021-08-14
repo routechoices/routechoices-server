@@ -13,9 +13,11 @@
 <div class="row">
     <div class="col-xs-12">
         <h1>Register for event {{ event.name }} by {{ event.club.name }}</h1>
+        <p>Event {% if not event.hidden %}started {{event.start_date|timesince}} ago{% else %}starts on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
+            <p><i class="fa fa-warning"></i> You can stream to only one event at a time. If you register now, your active session will end  {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
             <input type="submit" value="Register" class="btn btn-primary">
         </form>
     </div>
@@ -26,28 +28,14 @@
 <script src="{% static '/vendor/moment-2.24.0/moment-with-locales.js' %}"></script>
 <script src="{% static '/vendor/bootstrap-datetime-picker-4.17.47/bootstrap-datetimepicker.min.js' %}"></script>
 <script src="{% static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script>
-  $(function () {
-    var offset = moment().utcOffset();
-    var offsetText = (offset > 0 ? '+' : '-') +
-        ('0' + Math.floor(Math.abs(offset / 60))).slice(-2) + ':' +
-        ('0' + Math.round(offset % 60)).slice(-2);
-    $('.utc-offset').text('(UTC Offset ' + offsetText + ')');
-    $('.datetimepicker').map(function(i, el) {
-      var options = {
-          useCurrent: false,
-          format: 'YYYY-MM-DDTHH:mm:00Z',
-          locale:  moment.locale('en', {
-            week: { dow: 1 }
-          }),
-      }
-      $el = $(el);
-      if($el.val()) {
-        options.date = moment($el.val());
-      }
-      $el.datetimepicker(options);
-    })
-  });
+$(function(){
+    $('.date-utc').each(function(i, el){
+        $el = $(el);
+        $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'));
+    });
+})
 </script>
 <script>
 function selectizeDeviceInput(){
