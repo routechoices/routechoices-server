@@ -241,8 +241,7 @@ def event_list(request):
                     ],
                     "data": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
                     "announcement": "",
-                    "extra_maps": [],
-                    "map": {
+                    "maps": [{
                         "coordinates": {
                             "topLeft": {
                                 "lat": "61.45075",
@@ -264,8 +263,9 @@ def event_list(request):
                         "url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
                         "title": "",
                         "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
-                        "last_mod": "2019-06-10T17:21:52.417000Z"
-                    }
+                        "last_mod": "2019-06-10T17:21:52.417000Z",
+                        "default": True,
+                    }]
                 }
             }
         ),
@@ -308,7 +308,7 @@ def event_detail(request, event_id):
             reverse('event_data', host='api', kwargs={'event_id': event.aid})
         ),
         'announcement': event.notice.text if event.has_notice else '',
-        'extra_maps': [],
+        'maps': [],
     }
     for c in event.competitors.all():
         output['competitors'].append({
@@ -317,32 +317,34 @@ def event_detail(request, event_id):
             'short_name': c.short_name,
             'start_time': c.start_time,
         })
+    if event.map:
+        output['maps'].append({
+            'title': event.map_title,
+            'coordinates': event.map.bound,
+            'url': request.build_absolute_uri(
+                reverse(
+                    'event_map_download',
+                    host='api',
+                    kwargs={'event_id': event.aid}
+                )
+            ),
+            'hash': event.map.hash,
+            'last_mod': event.map.modification_date,
+            'default': True
+        })
     for i, m in enumerate(event.map_assignations.all()):
-        output['extra_maps'].append({
+        output['maps'].append({
             'title': m.title,
             'coordinates': m.map.bound,
             'url': request.build_absolute_uri(reverse(
-                'event_extra_map_download',
+                'event_map_download',
                 host='api',
                 kwargs={'event_id': event.aid, 'map_index': (i+1)}
             )),
             'hash': m.map.hash,
             'last_mod': m.map.modification_date,
+            'default': False
         })
-    output['map'] = {
-        'title': event.map_title,
-        'coordinates': event.map.bound,
-        'url': request.build_absolute_uri(
-            reverse(
-                'event_map_download',
-                host='api', 
-                kwargs={'event_id': event.aid}
-            )
-        ),
-        'hash': event.map.hash,
-        'last_mod': event.map.modification_date,
-    } if event.map else None
-
     return Response(output)
 
 
@@ -1025,19 +1027,25 @@ def device_search(request):
     auto_schema=None,
 )
 @api_view(['GET'])
-def event_map_download(request, event_id):
+def event_map_download(request, event_id, map_index=0):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
         aid=event_id,
         start_date__lt=now()
     )
-    if not event.map:
+    if map_index == 0 and not event.map:
         raise NotFound()
+    elif event.extra_maps.all().count() < int(map_index):
+        raise NotFound()
+
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    raster_map = event.map
+    if map_index == 0:
+         raster_map = event.map
+    else:
+        raster_map = event.extra_maps.all()[int(map_index)-1]
     file_path = raster_map.path
     mime_type = raster_map.mime_type
     return serve_from_s3(
@@ -1081,19 +1089,25 @@ def event_map_thumb_download(request, event_id):
     auto_schema=None,
 )
 @api_view(['GET'])
-def event_kmz_download(request, event_id):
+def event_kmz_download(request, event_id, map_index=0):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
         aid=event_id,
         start_date__lt=now()
     )
-    if not event.map:
+    if map_index == 0 and not event.map:
         raise NotFound()
+    elif event.extra_maps.all().count() < int(map_index):
+        raise NotFound()
+
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    raster_map = event.map
+    if map_index == 0:
+         raster_map = event.map
+    else:
+        raster_map = event.extra_maps.all()[int(map_index)-1]
     kmz_data = raster_map.kmz
     response = HttpResponse(
         kmz_data,

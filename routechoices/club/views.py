@@ -164,13 +164,13 @@ def event_export_view(request, slug, **kwargs):
     )
 
 
-def event_map_view(request, slug, **kwargs):
+def event_map_view(request, slug, index=0, **kwargs):
     if kwargs.get('club_slug'):
         return redirect(
             reverse(
                 'event_map_view',
                 host='clubs',
-                kwargs={'slug': slug},
+                kwargs={'slug': slug, 'index': index},
                 host_kwargs={
                     'club_slug': kwargs.get('club_slug')
                 }
@@ -188,33 +188,6 @@ def event_map_view(request, slug, **kwargs):
         reverse(
             'event_map_download',
             host='api',
-            kwargs={'event_id': event.aid}
-        )
-    )
-
-
-def event_extra_map_view(request, slug, index, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_extra_map_view',
-                host='clubs',
-                kwargs={'slug': slug, 'index': index},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
-    club_slug = request.club_slug
-    event = get_object_or_404(
-        Event,
-        club__slug__iexact=club_slug,
-        slug__iexact=slug
-    )
-    return redirect(
-        reverse(
-            'event_extra_map_download',
-            host='api',
             kwargs={
                 'event_id': event.aid,
                 'map_index': index
@@ -223,13 +196,13 @@ def event_extra_map_view(request, slug, index, **kwargs):
     )
 
 
-def event_kmz_view(request, slug, **kwargs):
+def event_kmz_view(request, slug, index=0, **kwargs):
     if kwargs.get('club_slug'):
         return redirect(
             reverse(
                 'event_kmz_view',
                 host='clubs',
-                kwargs={'slug': slug},
+                kwargs={'slug': slug, 'index': index},
                 host_kwargs={
                     'club_slug': kwargs.get('club_slug')
                 }
@@ -244,33 +217,6 @@ def event_kmz_view(request, slug, **kwargs):
     return redirect(
         reverse(
             'event_kmz_download',
-            host='api',
-            kwargs={'event_id': event.aid}
-        )
-    )
-
-
-def event_extra_kmz_view(request, slug, index, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_extra_kmz_view',
-                host='clubs',
-                kwargs={'slug': slug, 'index': index},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
-    club_slug = request.club_slug
-    event = get_object_or_404(
-        Event,
-        club__slug__iexact=club_slug,
-        slug__iexact=slug
-    )
-    return redirect(
-        reverse(
-            'event_extra_kmz_download',
             host='api',
             kwargs={
                 'event_id': event.aid,

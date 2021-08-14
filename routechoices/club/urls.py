@@ -20,24 +20,14 @@ urlpatterns = [
         name='event_export_view'
     ),
     url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/map/?$',
+        r'(?P<slug>[0-9a-zA-Z_-]+)/map/(?P<index>\d+)?$',
         views.event_map_view,
         name='event_map_view'
     ),
     url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/extra_map/(?P<index>\d+)?$',
-        views.event_extra_map_view,
-        name='event_extra_map_view'
-    ),
-    url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/kmz/?$',
+        r'(?P<slug>[0-9a-zA-Z_-]+)/kmz/(?P<index>\d+)?$',
         views.event_kmz_view,
         name='event_kmz_view'
-    ),
-    url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/extra_kmz/(?P<index>\d+)?$',
-        views.event_extra_kmz_view,
-        name='event_extra_kmz_view'
     ),
     url(
         r'(?P<slug>[0-9a-zA-Z_-]+)/register/?$',

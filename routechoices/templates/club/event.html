@@ -424,34 +424,37 @@ $(function() {
       }
       qrUrl = response.event.shortcut;
       liveUrl = response.data
-      if (response.map) {
-        mapHash = response.map.hash
-        mapUrl = response.map.url + '?map_hash=' + mapHash
-        addRasterMap(
-          [response.map.coordinates.topLeft.lat, response.map.coordinates.topLeft.lon],
-          [response.map.coordinates.topRight.lat, response.map.coordinates.topRight.lon],
-          [response.map.coordinates.bottomRight.lat, response.map.coordinates.bottomRight.lon],
-          [response.map.coordinates.bottomLeft.lat, response.map.coordinates.bottomLeft.lon],
-          mapUrl,
-          true
-        )
-      }
-      var extraMaps = response.extra_maps;
-      if(extraMaps.length) {
-        var extraMapLayer = {[response.map.title ? $('<span/>').text(response.map.title).html() : '<i class="fa fa-star"></i> Main Map'] : rasterMap}
-        for (var i=0; i < extraMaps.length; i++) {
-          var m = extraMaps[i];
-          extraMapLayer[m.title] = new L.ImageTransform(
-            m.url + '?map_hash=' + m.hash, 
-            [
+
+      if(response.maps.length) {
+        var MapLayers = {};
+        for (var i=0; i < response.maps.length; i++) {
+          var m = response.maps[i];
+          if (i == 0) {
+            m.title = m.title ? $('<span/>').text(m.title).html() : '<i class="fa fa-star"></i> Main Map';
+            mapHash = m.hash
+            mapUrl = m.url + '?map_hash=' + mapHash
+            addRasterMap(
               [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
               [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
               [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
               [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-            ]
-          );
+              mapUrl,
+              true
+            )
+            MapLayers[m.title] = rasterMap
+          } else {
+            MapLayers[m.title] = new L.ImageTransform(
+              m.url + '?map_hash=' + m.hash,
+              [
+                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
+                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
+                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
+                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
+              ]
+            );
+          }
         }
-        L.control.layers(extraMapLayer, null, {collapsed: false}).addTo(map);
+        L.control.layers(MapLayers, null, {collapsed: false}).addTo(map);
       }
       if (response.announcement) {
         prevNotice = response.announcement;

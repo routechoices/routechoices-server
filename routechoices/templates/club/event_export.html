@@ -26,8 +26,8 @@
         <td>{{ map.title }}</a></td>
         <td>
           {% if event.started %}
-          <a href="{{event.club.nice_url}}/{{event.slug}}/extra_map/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
-          <a href="{{event.club.nice_url}}/{{event.slug}}/extra_kmz/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/map/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> JPEG</a>
+          <a href="{{event.club.nice_url}}/{{event.slug}}/kmz/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>
