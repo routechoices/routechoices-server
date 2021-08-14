@@ -164,7 +164,7 @@ def event_export_view(request, slug, **kwargs):
     )
 
 
-def event_map_view(request, slug, index=0, **kwargs):
+def event_map_view(request, slug, index='0', **kwargs):
     if kwargs.get('club_slug'):
         return redirect(
             reverse(
@@ -196,7 +196,7 @@ def event_map_view(request, slug, index=0, **kwargs):
     )
 
 
-def event_kmz_view(request, slug, index=0, **kwargs):
+def event_kmz_view(request, slug, index='0', **kwargs):
     if kwargs.get('club_slug'):
         return redirect(
             reverse(

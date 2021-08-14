@@ -1027,13 +1027,13 @@ def device_search(request):
     auto_schema=None,
 )
 @api_view(['GET'])
-def event_map_download(request, event_id, map_index=0):
+def event_map_download(request, event_id, map_index='0'):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
         aid=event_id,
         start_date__lt=now()
     )
-    if map_index == 0 and not event.map:
+    if map_index == '0' and not event.map:
         raise NotFound()
     elif event.extra_maps.all().count() < int(map_index):
         raise NotFound()
@@ -1042,7 +1042,7 @@ def event_map_download(request, event_id, map_index=0):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    if map_index == 0:
+    if map_index == '0':
          raster_map = event.map
     else:
         raster_map = event.extra_maps.all()[int(map_index)-1]
@@ -1089,13 +1089,13 @@ def event_map_thumb_download(request, event_id):
     auto_schema=None,
 )
 @api_view(['GET'])
-def event_kmz_download(request, event_id, map_index=0):
+def event_kmz_download(request, event_id, map_index='0'):
     event = get_object_or_404(
         Event.objects.all().select_related('club', 'map'),
         aid=event_id,
         start_date__lt=now()
     )
-    if map_index == 0 and not event.map:
+    if map_index == '0' and not event.map:
         raise NotFound()
     elif event.extra_maps.all().count() < int(map_index):
         raise NotFound()
@@ -1104,7 +1104,7 @@ def event_kmz_download(request, event_id, map_index=0):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    if map_index == 0:
+    if map_index == '0':
          raster_map = event.map
     else:
         raster_map = event.extra_maps.all()[int(map_index)-1]
