@@ -860,7 +860,7 @@ function addRasterMap(a, b, c, d, src, fit) {
     fit = false;
   }
   var bounds = [a, b, c, d];
-  new L.ImageTransform(
+  rasterMap = new L.ImageTransform(
     src,
     bounds
   ).addTo(map);
