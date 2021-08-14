@@ -275,7 +275,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021081100.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021081401.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021081402.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -445,17 +445,21 @@ $(function() {
             )
             MapLayers[m.title] = rasterMap
           } else {
-            var bounds = L.latLngBounds([
+            var bounds = [
               [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
               [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
               [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
               [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-            ])
-            MapLayers[m.title] = L.tileLayer.wms(wmsService+'?', {
-                layers: eventId + '/' + i,
-                bounds: bounds,
-                tileSize: 512,
-            })
+            ]
+            MapLayers[m.title] = new L.ImageTransform(
+              m.url + '?map_hash=' + m.hash,
+              [
+                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
+                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
+                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
+                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
+              ]
+            );
           }
           
         }

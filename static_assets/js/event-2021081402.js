@@ -860,11 +860,10 @@ function addRasterMap(a, b, c, d, src, fit) {
     fit = false;
   }
   var bounds = [a, b, c, d];
-  rasterMap = L.tileLayer.wms(wmsService+'?', {
-      layers: eventId,
-      bounds: bounds,
-      tileSize: 512,
-  }).addTo(map);
+  new L.ImageTransform(
+    src,
+    bounds
+  ).addTo(map);
   if(fit) {
     var z = map.fitBounds(bounds);
   }
