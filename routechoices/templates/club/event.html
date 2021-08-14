@@ -459,7 +459,9 @@ $(function() {
           }
           
         }
-        L.control.layers(MapLayers, null, {collapsed: false}).addTo(map);
+        if (response.maps.length > 1) {
+            L.control.layers(MapLayers, null, {collapsed: false}).addTo(map);
+        }
       }
       if (response.announcement) {
         prevNotice = response.announcement;
