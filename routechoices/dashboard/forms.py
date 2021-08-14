@@ -89,7 +89,6 @@ class MapForm(ModelForm):
             rgb_img.save(out_buffer, 'JPEG', quality=60)
             f_new = File(out_buffer, name=fn)
             return f_new
-        return None
 
 
 class EventForm(ModelForm):

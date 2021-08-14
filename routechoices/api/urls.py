@@ -100,9 +100,9 @@ urlpatterns = [
         views.two_d_rerun_race_data,
         name='2d_rerun_race_data'
     ),
-    # url(
-    #     r'^wms/?$',
-    #     views.wms_service,
-    #     name='wms_service'
-    # ),
+    url(
+        r'^wms/?$',
+        views.wms_service,
+        name='wms_service'
+    ),
 ]

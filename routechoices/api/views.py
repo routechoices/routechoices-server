@@ -1123,68 +1123,6 @@ def event_kmz_download(request, event_id, map_index=0):
     method='get',
     auto_schema=None,
 )
-@api_view(['GET'])
-def event_extra_map_download(request, event_id, map_index):
-    event = get_object_or_404(
-        Event.objects.all().select_related('club', 'map'),
-        aid=event_id,
-        start_date__lt=now()
-    )
-    if event.extra_maps.all().count() < int(map_index):
-        raise NotFound()
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied()
-    raster_map = event.extra_maps.all()[int(map_index)-1]
-    file_path = raster_map.path
-    mime_type = raster_map.mime_type
-    return serve_from_s3(
-        'routechoices-maps',
-        request,
-        '/internal/' + file_path,
-        filename='{}_{}_.{}'.format(
-            raster_map.name,
-            raster_map.corners_coordinates_short.replace(',', '_'),
-            mime_type[6:]
-        ),
-        mime=mime_type
-    )
-
-
-@swagger_auto_schema(
-    method='get',
-    auto_schema=None,
-)
-@api_view(['GET'])
-def event_extra_kmz_download(request, event_id, map_index):
-    event = get_object_or_404(
-        Event.objects.all().select_related('club', 'map'),
-        aid=event_id,
-        start_date__lt=now()
-    )
-    if event.extra_maps.all().count() < int(map_index):
-        raise NotFound()
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied()
-    raster_map = event.extra_maps.all()[int(map_index)-1]
-    kmz_data = raster_map.kmz
-    response = HttpResponse(
-        kmz_data,
-        content_type='application/vnd.google-earth.kmz'
-    )
-    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
-        raster_map.name.replace('\\', '_').replace('"', '\\"')
-    )
-    return response
-
-
-@swagger_auto_schema(
-    method='get',
-    auto_schema=None,
-)
 @login_required
 @api_view(['GET'])
 def map_kmz_download(request, map_id, *args, **kwargs):
@@ -1407,7 +1345,6 @@ def two_d_rerun_race_data(request):
     )
 
 
-@cache_page(3600)
 def wms_service(request):
     if 'WMS' not in [request.GET.get('service'), request.GET.get('SERVICE')]:
         return HttpResponseBadRequest('Service must be WMS')
@@ -1419,7 +1356,6 @@ def wms_service(request):
         heigth_raw = request.GET.get('height', request.GET.get('HEIGHT'))
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
             return HttpResponseBadRequest('missing mandatory parameters')
-        layers_id = layers_raw.split(',')
         try:
             min_lat, min_lon, max_lat, max_lon = (float(x) for x in bbox_raw.split(','))
             if request.GET.get('SRS', request.GET.get('crs')) == 'CRS:84':
@@ -1431,29 +1367,36 @@ def wms_service(request):
                 max_lon = max_xy['y']
                 max_lat = max_xy['x']
             out_w, out_h = int(width_raw), int(heigth_raw)
+            if '/' in layers_raw:
+                layer_id, map_index = layers_raw.split('/')
+                map_index = int(map_index)
+            else:
+                layer_id = layers_raw
+                map_index = 0
         except Exception:
             return HttpResponseBadRequest('invalid parameters')
-        if 'all' in layers_id:
-            layers = Map.objects.all()
+        
+        event = get_object_or_404(Event.objects.select_related('club'), aid=layer_id)
+        if map_index == 0 and not event.map:
+            raise NotFound()
+        elif event.extra_maps.all().count() < int(map_index):
+            raise NotFound()
+
+        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+            if not request.user.is_authenticated or \
+                    not event.club.admins.filter(id=request.user.id).exists():
+                raise PermissionDenied()
+        if map_index == 0:
+            raster_map = event.map
         else:
-            order = Case(
-                *[When(aid=aid, then=pos) for pos, aid in enumerate(layers_id)]
+            raster_map = event.extra_maps.all()[int(map_index)-1]
+
+        try:
+            out_image = raster_map.create_tile(
+                out_w, out_h, min_lon, max_lon, min_lat, max_lat
             )
-            layers = Map.objects.filter(aid__in=layers_id).order_by(order)
-        out_image = Image.new('RGBA', (out_w, out_h), (255, 255, 255, 0))
-        for layer in layers:
-            try:
-                layer_raster = layer.create_tile(
-                    out_w, out_h, min_lon, max_lon, min_lat, max_lat
-                )
-                out_image.paste(
-                    layer_raster,
-                    (0, 0),
-                    layer_raster
-                )
-            except Exception as e:
-                raise e
-                continue
+        except Exception as e:
+            raise e
         output = BytesIO()
         out_image.save(output, format='png')
         data_out = output.getvalue()
@@ -1463,7 +1406,7 @@ def wms_service(request):
         )
     elif 'GetCapabilities' in [request.GET.get('request'),
                                request.GET.get('REQUEST')]:
-        max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': 89.9, 'lon': 180})
+        """ max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': 89.9, 'lon': 180})
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': -89.9, 'lon': -180})
 
         layers = Map.objects.all().select_related('club')
@@ -1575,4 +1518,5 @@ def wms_service(request):
 </WMS_Capabilities>
             ''',
             content_type='text/xml'
-        )
+        ) """
+        return HttpResponse(status_code=501)

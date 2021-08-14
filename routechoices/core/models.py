@@ -402,6 +402,12 @@ class Map(models.Model):
 
     def create_tile(self, output_width, output_height,
                     min_lon, max_lon, max_lat, min_lat):
+        
+        cache_key = f'tile_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
+        cached = cache.get(cache_key)
+        if cached and not settings.DEBUG:
+            return cached
+
         tile_img = None
         if self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
             orig = self.image.open('rb').read()
@@ -426,10 +432,8 @@ class Map(models.Model):
         img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
         if tile_img:
             img_out.paste(tile_img, (0, 0), tile_img)
-        # output = BytesIO()
-        # img_out.save(output, format='png')
-        # data_out = output.getvalue()
-        # return data_out
+            if not settings.DEBUG:
+                cache.set(cache_key, img_out, 3600*24*30)
         return img_out
 
     def intersects_with_tile(self, min_lon, max_lon, max_lat, min_lat):

@@ -859,13 +859,14 @@ function addRasterMap(a, b, c, d, src, fit) {
   if (fit === undefined) {
     fit = false;
   }
-  var anchors = [a, b, c, d];
-  rasterMap = new L.ImageTransform(
-    src,
-    anchors
-  ).addTo(map);
+  var bounds = [a, b, c, d];
+  rasterMap = L.tileLayer.wms(wmsService+'?', {
+      layers: eventId,
+      bounds: bounds,
+      tileSize: 512,
+  }).addTo(map);
   if(fit) {
-    var z = map.fitBounds(anchors);
+    var z = map.fitBounds(bounds);
   }
 }
 
