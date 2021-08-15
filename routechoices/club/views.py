@@ -227,14 +227,14 @@ def event_kmz_view(request, slug, index='0', **kwargs):
 
 
 def event_registration_view(request, slug, **kwargs):
-    if kwargs.get('club_slug') or request.use_name:
+    if kwargs.get('club_slug') or request.use_cname:
         return redirect(
             reverse(
                 'event_registration_view',
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
+                    'club_slug': kwargs.get('club_slug', request.club_slug)
                 }
             )
         )
@@ -304,7 +304,7 @@ def event_route_upload_view(request, slug, **kwargs):
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
+                    'club_slug': kwargs.get('club_slug', request.club_slug)
                 }
             )
         )
