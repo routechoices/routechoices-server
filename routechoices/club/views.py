@@ -270,7 +270,7 @@ def event_registration_view(request, slug, **kwargs):
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
+                    'club_slug': club_slug
                 }
             )
             return redirect(target_url)
@@ -378,7 +378,7 @@ def event_route_upload_view(request, slug, **kwargs):
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
+                    'club_slug': club_slug
                 }
             )
             messages.success(
