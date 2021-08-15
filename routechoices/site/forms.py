@@ -24,6 +24,19 @@ class UploadGPXForm(Form):
         validators=[FileExtensionValidator(allowed_extensions=['gpx'])]
     )
 
+    def __init__(self, *args, **kwargs):
+        self.event = None
+        if 'event' in kwargs:
+            self.event = kwargs.pop('event')
+        super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if self.event:
+            if self.event.competitors.filter(name=name).exists():
+                raise ValidationError('Name already taken')
+        return name
+        
 
 class CompetitorForm(ModelForm):
     device = ModelChoiceField(required=True, queryset=Device.objects.all())

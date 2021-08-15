@@ -323,7 +323,7 @@ def event_route_upload_view(request, slug, **kwargs):
     if not event:
         raise Http404()
     if request.method == 'POST':
-        form = UploadGPXForm(request.POST, request.FILES)
+        form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:
         if form.is_valid():
             error = None
