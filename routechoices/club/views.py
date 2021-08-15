@@ -227,7 +227,7 @@ def event_kmz_view(request, slug, index='0', **kwargs):
 
 
 def event_registration_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
+    if kwargs.get('club_slug') or request.use_name:
         return redirect(
             reverse(
                 'event_registration_view',
@@ -246,8 +246,6 @@ def event_registration_view(request, slug, **kwargs):
     ).first()
     if not event:
         raise Http404()
-    if event.club.domain and not request.use_cname:
-        return redirect(f'{event.club.nice_url}{event.slug}/register')
     if event.end_date and event.end_date < now():
         return render(
             request,
@@ -270,11 +268,11 @@ def event_registration_view(request, slug, **kwargs):
             target_url = reverse(
                 'event_registration_view',
                 host='clubs',
-                kwargs={'slug': event.slug},
-                host_kwargs={'club_slug': event.club.slug}
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
             )
-            if event.club.domain:
-                target_url = f'{event.club.nice_url}{event.slug}/register'
             return redirect(target_url)
         else:
             devices = Device.objects.none()
@@ -299,7 +297,7 @@ def event_registration_view(request, slug, **kwargs):
 
 
 def event_route_upload_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
+    if kwargs.get('club_slug') or request.use_cname:
         return redirect(
             reverse(
                 'event_route_upload_view',
@@ -318,8 +316,6 @@ def event_route_upload_view(request, slug, **kwargs):
     ).filter(
         start_date__lte=now()
     ).first()
-    if event.club.domain and not request.use_cname:
-        return redirect(f'{event.club.nice_url}{event.slug}/register')
     if not event:
         raise Http404()
     if request.method == 'POST':
@@ -377,7 +373,14 @@ def event_route_upload_view(request, slug, **kwargs):
                     competitor.start_time = start_time
                 competitor.save()
             
-            target_url = f'{event.club.nice_url}{event.slug}/upload_route'
+            target_url = reverse(
+                'event_route_upload_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
             messages.success(
                 request,
                 'Successfully uploaded route for this event.'
