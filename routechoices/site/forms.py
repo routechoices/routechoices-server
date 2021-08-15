@@ -50,9 +50,16 @@ class CompetitorForm(ModelForm):
             'event': HiddenInput(),
         }
 
+    def clean_name(self):
+        event = self.cleaned_data.get('event')
+        name = self.cleaned_data['name']
+        if event and event.competitors.filter(name=name).exists():
+            raise ValidationError('Name already taken')
+        return name
+
     def clean(self):
         super().clean()
-        event = Event.objects.get(id=self.data.get('event'))
+        event = self.cleaned_data.get('event')
         event_end = event.end_date
         if event_end and now() > event_end:
             raise ValidationError(
