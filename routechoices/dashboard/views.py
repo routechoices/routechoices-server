@@ -647,7 +647,7 @@ def event_edit_view(request, id):
     if request.user.is_authenticated:
         own_devices = request.user.devices.all()
     own_devices_id = own_devices.values_list('id', flat=True)
-    all_devices = list(comp_devices_id) + list(own_devices_id)
+    all_devices = set(list(comp_devices_id) + list(own_devices_id))
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, instance=event)

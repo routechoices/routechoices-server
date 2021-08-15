@@ -413,13 +413,13 @@ def event_register(request, event_id):
     if not event.open_registration or (event.end_date and event.end_date < now()):
         raise PermissionDenied()
     device_id = request.data.get('device_id')
-    devices = Device.objects.filter(aid=device_id)
+    device = Device.objects.filter(aid=device_id).first()
     
     errs = []
 
-    if devices.count() == 0:
+    if not device:
         errs.append('No such device ID')
-    device = devices.first()
+    
     name = request.data.get('name')
 
     if not name:
@@ -462,11 +462,12 @@ def event_register(request, event_id):
         event=event,
         short_name=short_name,
         start_time=start_time,
-        device=device,
+        device_id=device.pk,
     )
+    comp.save()
     return Response({
         'id': comp.aid,
-        'device_id': device_id,
+        'device_id': device.aid,
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
