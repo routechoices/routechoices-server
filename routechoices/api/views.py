@@ -418,8 +418,11 @@ def event_register(request, event_id):
         raise ValidationError('No such device ID')
     device = devices.first()
     name = request.data.get('name')
+
+    errs = []
+
     if not name:
-        raise ValidationError('Property name is missing')
+        errs.append(ValidationError('Property name is missing'))
     short_name = request.data.get('short_name')
     if not short_name:
         short_name = initial_of_name(name)
@@ -428,26 +431,30 @@ def event_register(request, event_id):
         try:
             start_time = arrow.get(start_time).datetime
         except Exception:
-            raise ValidationError('Property start_time could not be parsed')
+            errs.append(ValidationError('Start time could not be parsed'))
     elif event.start_date < now():
         start_time = now()
     else:
         start_time = event.start_date
     event_start = event.start_date
     event_end = event.end_date
+    
     if start_time and (
         (not event_end and event_start > start_time)
             or (event_end and (event_start > start_time
                                or start_time > event_end))):
-        raise ValidationError(
+        errs.append(ValidationError(
             'Competitor start time should be during the event time'
-        )
+        ))
     
     if event.competitors.filter(name=name).exists():
-        raise ValidationError('Competitor with same name already registered')
+        errs.append(ValidationError('Competitor with same name already registered'))
      
     if event.competitors.filter(short_name=short_name).exists():
-        raise ValidationError('Competitor with same short name already registered')
+        errs.append(ValidationError('Competitor with same short name already registered'))
+    
+    if errs:
+        raise ValidationError(errs)
 
     comp = Competitor.objects.create(
         name=name,
