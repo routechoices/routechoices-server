@@ -25,16 +25,13 @@ class UploadGPXForm(Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.event = None
-        if 'event' in kwargs:
-            self.event = kwargs.pop('event')
+        self.event = kwargs.pop('event', None)
         super().__init__(*args, **kwargs)
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if self.event:
-            if self.event.competitors.filter(name=name).exists():
-                raise ValidationError('Name already taken')
+        if self.event and self.event.competitors.filter(name=name).exists():
+            raise ValidationError('Name already taken')
         return name
         
 
