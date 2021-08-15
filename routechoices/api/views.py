@@ -414,15 +414,16 @@ def event_register(request, event_id):
         raise PermissionDenied()
     device_id = request.data.get('device_id')
     devices = Device.objects.filter(aid=device_id)
+    
+    errs = []
+
     if devices.count() == 0:
-        raise ValidationError('No such device ID')
+        errs.append('No such device ID')
     device = devices.first()
     name = request.data.get('name')
 
-    errs = []
-
     if not name:
-        errs.append(ValidationError('Property name is missing'))
+        errs.append('Property name is missing')
     short_name = request.data.get('short_name')
     if not short_name:
         short_name = initial_of_name(name)
@@ -431,7 +432,7 @@ def event_register(request, event_id):
         try:
             start_time = arrow.get(start_time).datetime
         except Exception:
-            errs.append(ValidationError('Start time could not be parsed'))
+            errs.append('Start time could not be parsed')
     elif event.start_date < now():
         start_time = now()
     else:
@@ -443,18 +444,18 @@ def event_register(request, event_id):
         (not event_end and event_start > start_time)
             or (event_end and (event_start > start_time
                                or start_time > event_end))):
-        errs.append(ValidationError(
+        errs.append(
             'Competitor start time should be during the event time'
-        ))
+        )
     
     if event.competitors.filter(name=name).exists():
-        errs.append(ValidationError('Competitor with same name already registered'))
+        errs.append('Competitor with same name already registered')
      
     if event.competitors.filter(short_name=short_name).exists():
-        errs.append(ValidationError('Competitor with same short name already registered'))
+        errs.append('Competitor with same short name already registered')
     
     if errs:
-        raise ValidationError(errs)
+        raise ValidationError('\r\n'.join(errs))
 
     comp = Competitor.objects.create(
         name=name,
