@@ -630,7 +630,7 @@ class Event(models.Model):
         return f'{self.club.nice_url}{self.slug}'
 
     def get_absolute_map_url(self):
-        return f'{self.club.nice_url}{self.slug}/map'
+        return f'{self.club.nice_url}{self.slug}/map/'
 
     def get_absolute_export_url(self):
         return f'{self.club.nice_url}{self.slug}/export'
