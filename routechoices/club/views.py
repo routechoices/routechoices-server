@@ -376,22 +376,12 @@ def event_route_upload_view(request, slug, **kwargs):
                         ):
                     competitor.start_time = start_time
                 competitor.save()
+            
+            target_url = f'{event.club.nice_url}{event.slug}/upload_route'
             messages.success(
                 request,
                 'Successfully uploaded route for this event.'
             )
-            target_url = reverse(
-                'event_route_upload_view',
-                host='clubs',
-                kwargs={
-                    'slug': event.slug,
-                },
-                host_kwargs={
-                    'club_slug': event.club.slug,
-                }
-            )
-            if event.club.domain:
-                target_url = f'{event.club.nice_url}{event.slug}/upload_route'
             return redirect(target_url)
     else:
         form = UploadGPXForm()
