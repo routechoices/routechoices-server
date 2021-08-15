@@ -462,12 +462,11 @@ def event_register(request, event_id):
         event=event,
         short_name=short_name,
         start_time=start_time,
-        device_id=device.pk,
+        device=device,
     )
-    comp.save()
     return Response({
         'id': comp.aid,
-        'device_id': comp.device.aid,
+        'device_id': device.aid,
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
