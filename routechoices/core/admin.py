@@ -140,6 +140,7 @@ class CompetitorInline(admin.TabularInline):
         'short_name',
         'start_time',
     )
+    autocomplete_fields = ('device', )
 
 
 class NoticeInline(admin.TabularInline):
