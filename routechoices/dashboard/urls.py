@@ -70,7 +70,7 @@ urlpatterns = [
         name='event_delete_view'
     ),
     url(
-        r'^event/(?P<id>[A-Za-z0-9_-]+)/upload_route/?$',
+        r'^event/(?P<id>[A-Za-z0-9_-]+)/route_upload/?$',
         views.event_route_upload_view,
         name='event_gpx_upload_view'
     ),

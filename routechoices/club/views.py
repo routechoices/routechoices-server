@@ -8,6 +8,7 @@ from django.utils.timezone import now
 
 from django_hosts.resolvers import reverse
 
+
 from routechoices.core.models import (
     Club,
     Competitor,
@@ -227,14 +228,14 @@ def event_kmz_view(request, slug, index='0', **kwargs):
 
 
 def event_registration_view(request, slug, **kwargs):
-    if kwargs.get('club_slug') or request.use_cname:
+    if kwargs.get('club_slug'):
         return redirect(
             reverse(
                 'event_registration_view',
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug', request.club_slug)
+                    'club_slug': kwargs.get('club_slug')
                 }
             )
         )
@@ -246,6 +247,9 @@ def event_registration_view(request, slug, **kwargs):
     ).first()
     if not event:
         raise Http404()
+    club = event.club
+    if club.domain and not request.use_cname:
+        return redirect(f'{club.nice_url}{event.slug}/registration')
     if event.end_date and event.end_date < now():
         return render(
             request,
@@ -265,14 +269,7 @@ def event_registration_view(request, slug, **kwargs):
                 request,
                 'Successfully registered for this event.'
             )
-            target_url = reverse(
-                'event_registration_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': club_slug
-                }
-            )
+            target_url = f'{club.nice_url}{event.slug}/registration_complete'
             return redirect(target_url)
         else:
             devices = Device.objects.none()
@@ -296,15 +293,47 @@ def event_registration_view(request, slug, **kwargs):
     )
 
 
+def event_registration_done_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_registration_done_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
+    event = Event.objects.all().select_related('club').filter(
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+        open_registration=True,
+    ).first()
+    if not event:
+        raise Http404()
+    club = event.club
+    if club.domain and not request.use_cname:
+        return redirect(f'{club.nice_url}{event.slug}/registration_complete')
+    return render(
+        request,
+        'club/event_registration_done.html',
+        {
+            'event': event,
+        }
+    )
+
+
 def event_route_upload_view(request, slug, **kwargs):
-    if kwargs.get('club_slug') or request.use_cname:
+    if kwargs.get('club_slug'):
         return redirect(
             reverse(
                 'event_route_upload_view',
                 host='clubs',
                 kwargs={'slug': slug},
                 host_kwargs={
-                    'club_slug': kwargs.get('club_slug', request.club_slug)
+                    'club_slug': kwargs.get('club_slug')
                 }
             )
         )
@@ -318,6 +347,9 @@ def event_route_upload_view(request, slug, **kwargs):
     ).first()
     if not event:
         raise Http404()
+    club = event.club
+    if club.domain and not request.use_cname:
+        return redirect(f'{club.nice_url}{event.slug}/route_upload')
     if request.method == 'POST':
         form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:
@@ -373,18 +405,7 @@ def event_route_upload_view(request, slug, **kwargs):
                     competitor.start_time = start_time
                 competitor.save()
             
-            target_url = reverse(
-                'event_route_upload_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': club_slug
-                }
-            )
-            messages.success(
-                request,
-                'Successfully uploaded route for this event.'
-            )
+            target_url = f'{club.nice_url}{event.slug}/route_upload_complete'
             return redirect(target_url)
     else:
         form = UploadGPXForm()
@@ -394,6 +415,40 @@ def event_route_upload_view(request, slug, **kwargs):
         {
             'event': event,
             'form': form,
+        }
+    )
+
+
+def event_route_upload_done_view(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_route_upload_done_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
+    event = Event.objects.all().select_related('club').filter(
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+        allow_route_upload=True,
+    ).filter(
+        start_date__lte=now()
+    ).first()
+    if not event:
+        raise Http404()
+    club = event.club
+    if club.domain and not request.use_cname:
+        return redirect(f'{club.nice_url}{event.slug}/route_upload_complete')
+    return render(
+        request,
+        'club/event_route_upload_done.html',
+        {
+            'event': event,
         }
     )
 

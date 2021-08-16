@@ -30,14 +30,24 @@ urlpatterns = [
         name='event_kmz_view'
     ),
     url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/register/?$',
+        r'(?P<slug>[0-9a-zA-Z_-]+)/registration/?$',
         views.event_registration_view,
         name='event_registration_view'
     ),
     url(
-        r'(?P<slug>[0-9a-zA-Z_-]+)/upload_route/?$',
+        r'(?P<slug>[0-9a-zA-Z_-]+)/registration_complete/?$',
+        views.event_registration_done_view,
+        name='event_registration_done_view'
+    ),
+    url(
+        r'(?P<slug>[0-9a-zA-Z_-]+)/route_upload/?$',
         views.event_route_upload_view,
         name='event_route_upload_view'
+    ),
+    url(
+        r'(?P<slug>[0-9a-zA-Z_-]+)/route_upload_complete/?$',
+        views.event_route_upload_done_view,
+        name='event_route_upload_done_view'
     ),
     url(
         r'(?P<slug>[0-9a-zA-Z_-]+)/?$',
