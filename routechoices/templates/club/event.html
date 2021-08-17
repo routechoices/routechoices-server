@@ -173,6 +173,11 @@ and (max-device-width : 500px) {
 .navbar {
   z-index: 1000000;
 }
+
+.leaflet-left.has-leaflet-pan-control .leaflet-control-rotate {
+    position: relative;
+    left: 24px;
+}
 </style>
 {% endblock %}
 
@@ -273,6 +278,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/leaflet.lineUtils.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
+<script type="text/javascript" src="{% static '/vendor/leaflet-rotate-0.1.2/leaflet-rotate.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021081100.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/event-2021081404.js' %}"></script>
@@ -381,6 +387,8 @@ $(function() {
     scrollWheelZoom: false, // disable original zoom function
     smoothWheelZoom: true,  // enable smooth zoom
     zoomSnap: 0,
+    rotate: false,
+    touchRotate: false,
    	contextmenu: true,
     contextmenuWidth: 140,
 	  contextmenuItems: [
@@ -398,6 +406,7 @@ $(function() {
   });
   L.control.pan().addTo(map);
   L.control.zoom().addTo(map);
+  //L.control.rotate({closeOnZeroBearing: false}).addTo(map)
   map.doubleClickZoom.disable(); 
   map.on('dblclick', onPressCustomMassStart)
   map.on('move', function () { drawCompetitors() })
