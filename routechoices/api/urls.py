@@ -81,6 +81,11 @@ urlpatterns = [
         name='event_data'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/data_load_test/?$',
+        views.event_data_load_test,
+        name='event_data_load_test'
+    ),
+    url(
         r'^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$',
         views.map_kmz_download,
         name='map_kmz_download',

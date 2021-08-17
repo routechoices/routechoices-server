@@ -612,6 +612,11 @@ def event_data(request, event_id):
     return Response(res, headers=headers)
 
 
+def event_data_load_test(request, event_id):
+    event_data(request, event_id)
+    return HttpResponse('ok')
+
+
 def traccar_ratelimit_key(group, request):
     return request.META['REMOTE_ADDR'] + request.query_params.get('id', '')
 
