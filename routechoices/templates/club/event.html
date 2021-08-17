@@ -388,7 +388,7 @@ $(function() {
     smoothWheelZoom: true,  // enable smooth zoom
     zoomSnap: 0,
     rotate: false,
-    touchRotate: false,
+    touchRotate: true,
    	contextmenu: true,
     contextmenuWidth: 140,
 	  contextmenuItems: [
@@ -406,7 +406,7 @@ $(function() {
   });
   L.control.pan().addTo(map);
   L.control.zoom().addTo(map);
-  //L.control.rotate({closeOnZeroBearing: false}).addTo(map)
+  L.control.rotate({closeOnZeroBearing: true}).addTo(map)
   map.doubleClickZoom.disable(); 
   map.on('dblclick', onPressCustomMassStart)
   map.on('move', function () { drawCompetitors() })
