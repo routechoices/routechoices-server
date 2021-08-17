@@ -609,10 +609,14 @@ var getProgressBarText = function(currentTime){
           viewedTime -= getCompetitionStartDate();
         }
         var t = viewedTime / 1e3;
+        
         to2digits = function(x){return ('0'+Math.floor(x)).slice(-2);},
         result += t > 3600 ? Math.floor(t/3600) + ':': '';
         result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60);
     } else {
+        if(viewedTime === 0) {
+          return '00:00:00'
+        }
         result = dayjs(viewedTime).format('HH:mm:ss');
     }
     return result;
