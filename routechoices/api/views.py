@@ -84,7 +84,7 @@ def x_accel_redirect(request, path, filename='',
 
 
 def serve_from_s3(bucket, request, path, filename='',
-                  mime='application/force-download'):
+                  mime='application/force-download', headers=None):
     path = re.sub(r'^/internal/', '', path)
     url = s3_object_url(path, bucket)
     url = '/s3{}'.format(url[len(settings.AWS_S3_ENDPOINT_URL):])
@@ -93,7 +93,7 @@ def serve_from_s3(bucket, request, path, filename='',
     if request.method == 'GET':
         response_status = status.HTTP_206_PARTIAL_CONTENT
 
-    response = HttpResponse('', status=response_status)
+    response = HttpResponse('', status=response_status, headers=headers)
 
     if request.method == 'GET':
         response['X-Accel-Redirect'] = urllib.parse.quote(url.encode('utf-8'))
@@ -345,7 +345,12 @@ def event_detail(request, event_id):
             'last_mod': m.map.modification_date,
             'default': False
         })
-    return Response(output)
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
+    return Response(output, headers=headers)
 
 
 @swagger_auto_schema(
@@ -464,13 +469,19 @@ def event_register(request, event_id):
         start_time=start_time,
         device=device,
     )
+
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
     return Response({
         'id': comp.aid,
         'device_id': device.aid,
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
-    }, status=status.HTTP_201_CREATED)
+    }, status=status.HTTP_201_CREATED, headers=headers)
 
 
 @swagger_auto_schema(
@@ -592,7 +603,13 @@ def event_data(request, event_id):
         'timestamp': arrow.utcnow().timestamp(),
     }
     cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
-    return Response(res)
+
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
+    return Response(res, headers=headers)
 
 
 def traccar_ratelimit_key(group, request):
@@ -1055,6 +1072,12 @@ def event_map_download(request, event_id, map_index='0'):
         raster_map = event.extra_maps.all()[int(map_index)-1]
     file_path = raster_map.path
     mime_type = raster_map.mime_type
+
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
     return serve_from_s3(
         'routechoices-maps',
         request,
@@ -1064,7 +1087,8 @@ def event_map_download(request, event_id, map_index='0'):
             raster_map.corners_coordinates_short.replace(',', '_'),
             mime_type[6:]
         ),
-        mime=mime_type
+        mime=mime_type,
+        headers=headers
     )
 
 
@@ -1086,7 +1110,13 @@ def event_map_thumb_download(request, event_id):
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
     raster_map = event.map
-    response = HttpResponse(content_type='image/jpeg')
+
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
+    response = HttpResponse(content_type='image/jpeg', headers=headers)
     raster_map.thumbnail.save(response, 'JPEG', quality=80)
     return response
 
@@ -1116,9 +1146,16 @@ def event_kmz_download(request, event_id, map_index='0'):
     else:
         raster_map = event.extra_maps.all()[int(map_index)-1]
     kmz_data = raster_map.kmz
+    
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
     response = HttpResponse(
         kmz_data,
-        content_type='application/vnd.google-earth.kmz'
+        content_type='application/vnd.google-earth.kmz',
+        headers=headers
     )
     response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
         raster_map.name.replace('\\', '_').replace('"', '\\"')
@@ -1173,10 +1210,17 @@ def competitor_gpx_download(request, competitor_id):
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
     gpx_data = competitor.gpx
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
     response = HttpResponse(
         gpx_data,
-        content_type='application/gpx+xml'
+        content_type='application/gpx+xml',
+        headers=headers,
     )
+
     response['Content-Disposition'] = 'attachment; filename="{}.gpx"'.format(
         competitor.event.name.replace('\\', '_').replace('"', '\\"') + ' - ' +
         competitor.name.replace('\\', '_').replace('"', '\\"')
@@ -1296,7 +1340,13 @@ http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={ev
     if callback:
         response_raw = f'/**/{callback}({response_raw});'
         content_type = 'text/javascript; charset=utf-8'
-    return HttpResponse(response_raw, content_type=content_type)
+    
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
+    return HttpResponse(response_raw, content_type=content_type, headers=headers)
 
 
 @swagger_auto_schema(
@@ -1346,9 +1396,16 @@ def two_d_rerun_race_data(request):
     if callback:
         response_raw = f'/**/{callback}({response_raw});'
         content_type = 'text/javascript; charset=utf-8'
+    
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
     return HttpResponse(
         response_raw,
         content_type=content_type,
+        headers=headers,
     )
 
 
@@ -1407,9 +1464,16 @@ def wms_service(request):
         output = BytesIO()
         out_image.save(output, format='png')
         data_out = output.getvalue()
+
+        headers = None
+        if event.privacy == PRIVACY_PRIVATE:
+            headers = {
+                'Cache-Control': 'Private'
+            }
         return HttpResponse(
             data_out,
-            content_type='image/png'
+            content_type='image/png',
+            headers=headers
         )
     elif 'GetCapabilities' in [request.GET.get('request'),
                                request.GET.get('REQUEST')]:

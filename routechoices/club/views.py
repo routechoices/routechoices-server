@@ -102,6 +102,7 @@ def event_view(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
+    # Page needs not send ajax with cookies to prove identity, cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
             return redirect(
@@ -121,13 +122,17 @@ def event_view(request, slug, **kwargs):
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
 
-    return render(
+    response = render(
         request,
         'club/event.html',
         {
             'event': event,
         }
     )
+    if event.privacy == PRIVACY_PRIVATE:
+        response['Cache-Control'] = 'private'
+    return response
+
 
 
 def event_export_view(request, slug, **kwargs):
@@ -156,13 +161,16 @@ def event_export_view(request, slug, **kwargs):
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
 
-    return render(
+    response = render(
         request,
         'club/event_export.html',
         {
             'event': event,
         }
     )
+    if event.privacy == PRIVACY_PRIVATE:
+        response['Cache-Control'] = 'private'
+    return response
 
 
 def event_map_view(request, slug, index='0', **kwargs):
