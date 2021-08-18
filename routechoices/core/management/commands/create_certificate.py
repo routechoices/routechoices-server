@@ -104,7 +104,11 @@ class Command(BaseCommand):
                 is_new_acct=True,
                 contact_email='raphael@routechoices.com'
             )
-            certificate = client.get_certificate()
+            try:
+                certificate = client.get_certificate()
+            except Exception:
+                self.stderr.write('Failed to create certificate...')
+                continue
             cert_key = client.cert_key
             acct_key = client.account
 
