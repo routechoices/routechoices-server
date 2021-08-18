@@ -27,3 +27,4 @@ polyline-encoding-rust @ git+https://github.com/rphlo/polyline_encoding.git
 pymemcache
 django-markdownify
 numpy
+sewer==0.8.4
