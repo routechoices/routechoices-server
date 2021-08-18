@@ -15,6 +15,11 @@ urlpatterns = [
         name='club_feed'
     ),
     url(
+        r'\.well-known/acme-challenge/(?P<challenge>.+)$',
+        views.acme_challenge,
+        name='acme_challenge'
+    ),
+    url(
         r'(?P<slug>[0-9a-zA-Z_-]+)/export/?$',
         views.event_export_view,
         name='event_export_view'
@@ -53,10 +58,5 @@ urlpatterns = [
         r'(?P<slug>[0-9a-zA-Z_-]+)/?$',
         views.event_view,
         name='event_view'
-    ),
-    url(
-        r'\.well-known/acme-challenge/(?P<challenge>.+)$',
-        views.acme_challenge,
-        name='acme_challenge'
     ),
 ]

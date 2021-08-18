@@ -461,7 +461,7 @@ def event_route_upload_done_view(request, slug, **kwargs):
     )
 
 
-def acme_challenge(request, acme_challenge):
+def acme_challenge(request, challenge):
     club_slug = request.club_slug
     club = get_object_or_404(
         Club,
@@ -469,7 +469,7 @@ def acme_challenge(request, acme_challenge):
     )
     if not club.domain or not request.use_cname:
         return Http404()
-    if acme_challenge == club.acme_challenge.split('.')[0]:
+    if challenge == club.acme_challenge.split('.')[0]:
         return HttpResponse(club.acme_challenge)
     else:
         raise Http404()
