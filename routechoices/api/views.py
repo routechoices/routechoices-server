@@ -282,7 +282,6 @@ def event_detail(request, event_id):
             'map_assignations'
         ),
         aid=event_id,
-        start_date__lt=now()
     )
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
@@ -307,44 +306,46 @@ def event_detail(request, event_id):
         'data': request.build_absolute_uri(
             reverse('event_data', host='api', kwargs={'event_id': event.aid})
         ),
-        'announcement': event.notice.text if event.has_notice else '',
+        'announcement': '',
         'maps': [],
     }
-    for c in event.competitors.all():
-        output['competitors'].append({
-            'id': c.aid,
-            'name': c.name,
-            'short_name': c.short_name,
-            'start_time': c.start_time,
-        })
-    if event.map:
-        output['maps'].append({
-            'title': event.map_title,
-            'coordinates': event.map.bound,
-            'url': request.build_absolute_uri(
-                reverse(
+    if event.start_date < now():
+        output['announcement'] = event.notice.text if event.has_notice else ''
+        for c in event.competitors.all():
+            output['competitors'].append({
+                'id': c.aid,
+                'name': c.name,
+                'short_name': c.short_name,
+                'start_time': c.start_time,
+            })
+        if event.map:
+            output['maps'].append({
+                'title': event.map_title,
+                'coordinates': event.map.bound,
+                'url': request.build_absolute_uri(
+                    reverse(
+                        'event_map_download',
+                        host='api',
+                        kwargs={'event_id': event.aid}
+                    )
+                ),
+                'hash': event.map.hash,
+                'last_mod': event.map.modification_date,
+                'default': True
+            })
+        for i, m in enumerate(event.map_assignations.all()):
+            output['maps'].append({
+                'title': m.title,
+                'coordinates': m.map.bound,
+                'url': request.build_absolute_uri(reverse(
                     'event_map_download',
                     host='api',
-                    kwargs={'event_id': event.aid}
-                )
-            ),
-            'hash': event.map.hash,
-            'last_mod': event.map.modification_date,
-            'default': True
-        })
-    for i, m in enumerate(event.map_assignations.all()):
-        output['maps'].append({
-            'title': m.title,
-            'coordinates': m.map.bound,
-            'url': request.build_absolute_uri(reverse(
-                'event_map_download',
-                host='api',
-                kwargs={'event_id': event.aid, 'map_index': (i+1)}
-            )),
-            'hash': m.map.hash,
-            'last_mod': m.map.modification_date,
-            'default': False
-        })
+                    kwargs={'event_id': event.aid, 'map_index': (i+1)}
+                )),
+                'hash': m.map.hash,
+                'last_mod': m.map.modification_date,
+                'default': False
+            })
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {
