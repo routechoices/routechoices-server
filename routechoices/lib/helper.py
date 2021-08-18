@@ -1,7 +1,7 @@
 import base64
 import secrets
 import struct
-import subprocess
+import requests
 import requests
 import numpy
 
@@ -219,8 +219,13 @@ def initial_of_name(name):
 def check_records(domain):
     if not domain:
         return
-    verification_string = subprocess.Popen(["dig", "-t", "txt", domain, '+short'], stdout=subprocess.PIPE).communicate()[0]
-    return ('full-speed-no-mistakes' in str(verification_string))
+    resp = requests.get(f'https://cloudflare-dns.com/dns-query?ct=application/dns-json&type=TXT&name={domain}')
+    data = resp.json()
+    answer = data.get('Answer', [])
+    for ans in answer:
+        if ans.get('data') == '"full-speed-no-mistakes"':
+            return True
+    return False
 
 
 def find_coeffs(pa, pb):
