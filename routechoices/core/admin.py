@@ -105,7 +105,7 @@ class HasCompetitorFilter(admin.SimpleListFilter):
 
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'creation_date', 'event_count',
+        'name', 'domain', 'creation_date', 'event_count',
     )
 
     def get_queryset(self, request):
