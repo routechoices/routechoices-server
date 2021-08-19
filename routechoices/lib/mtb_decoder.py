@@ -53,6 +53,9 @@ class MtbDecoder():
     def skip_int64(self):
         self.fp.read(8)
 
+    def skip_bytes(self, n):
+        self.fp.read(n)
+
     def decode(self):
         with open(self.filename, 'rb') as fp:
             self.fp = fp
@@ -93,7 +96,7 @@ class MtbDecoder():
                 self.skip_int32()
                 a -= 4
                 e = self.fp.read(1)
-                a -= 1,
+                a -= 1
                 if b'\x01' == e or b'\x03' == e:
                     self.get_int32()
                     a -= 4
@@ -106,74 +109,53 @@ class MtbDecoder():
                 else:
                     self.get_int64()
                     a -= 8
-                self.skip_uuid()
-                a -= 16
-                self.get_int32()
-                a -= 4
-                self.fp.read(16)
-                a -= 16
+                self.skip_bytes(36)
         else:
             raise Exception('Bad Format')
 
     def read_race_latest_type(self):
-        self.skip_uuid()
-        self.skip_uuid()
+        self.skip_bytes(32)
         t = self.get_int32()
         if t == 34:
             c = self.current_size - 36
             while c > 0:
                 t = self.get_int32()
-                c -= 4
-                self.skip_uuid()
-                c -= 16
-                self.get_int64()
-                c -= 8
-                r = (t - 16 - 8) / 24
-                a = 1
-                while a <= r:
+                c -= 28
+                self.skip_bytes(24)
+                r = (t - 24) / 24
+                a = 0
+                while a < r:
                     a += 1
-                    self.skip_uuid()
-                    c -= 16
-                    self.get_int64()
-                    c -= 8
+                    self.skip_bytes(24)
+                    c -= 24
         elif t == 35:
             e = self.current_size - 36
             while e > 0:
                 e -= self.read_route()
         elif t == 36:
-            self.fp.read(44)
+            self.skip_bytes(44)
         elif t == 37:
-            self.fp.read(self.current_size-36)
+            self.skip_bytes(self.current_size-36)
         elif t == 39:
             c = self.current_size - 36
             while c > 0:
                 t = self.get_int32()
-                c -= 4
-                self.skip_uuid()
-                c -= 16
-                self.get_int64()
-                c -= 8
-                i = (t - 16 - 8) / 16
-                h = 1
-                while h <= i:
+                c -= 28
+                self.skip_bytes(24)
+                i = (t - 24) / 16
+                h = 0
+                while h < i:
                     h += 1
-                    self.get_int64()
-                    c -= 8
-                    self.get_int32()
-                    c -= 4
-                    self.get_int32()
-                    c -= 4
+                    self.skip_bytes(16)
+                    c -= 16
         else:
             raise Exception('Bad Format')
 
     def read_route(self):
         c = 0
         s = (self.get_int32() - 24) / 16
-        c += 4
-        self.skip_uuid()
-        c += 16
-        self.skip_int64()
-        c += 8
+        c += 28
+        self.skip_bytes(24)
         t = 0
         while t < s:
             t += 1
@@ -182,8 +164,7 @@ class MtbDecoder():
         return c
 
     def read_race_sequence_type(self):
-        self.skip_uuid()
-        self.skip_uuid()
+        self.skip_bytes(32)
         t = self.get_int32()
         if t == 18:
             self.read_competitor_data(False)
@@ -192,7 +173,7 @@ class MtbDecoder():
         elif t == 23:
             # sensor data aka Trash
             n = self.current_size - 36
-            self.fp.read(32)
+            self.skip_bytes(32)
             n -= 32
             while n > 0:
                 i = self.get_int32()
@@ -212,17 +193,13 @@ class MtbDecoder():
                 else:
                     s = self.get_int64()
                     n -= 8
-                self.get_int32()
-                n -= 4
-                a = self.fp.read(16)
-                n -= 16
-                o = self.get_int64()
-                n -= 8
+                self.skip_bytes(28)
+                n -= 28
                 h = self.get_string_nn()
-                n -= h.length + 4
-                c = self.get_int16()
+                n -= len(h) + 4
+                self.get_int16()
                 n -= 2,
-                self.fp.read(i - (r - n))
+                self.skip_bytes(i - (r - n))
                 n -= i - (r - n)
         else:
             raise Exception('Bad Format')
@@ -232,7 +209,7 @@ class MtbDecoder():
         self.fp.read(32)
         h -= 32
         while h > 0:
-            o = self.get_int32()
+            self.get_int32()
             h -= 4
             s = self.fp.read(1)
             h -= 1
