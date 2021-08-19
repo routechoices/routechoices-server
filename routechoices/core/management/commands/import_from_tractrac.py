@@ -16,6 +16,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for event_id in options['event_ids']:
             try:
+                prefix = 'https://live.tractrac.com/viewer/index.html?target='
+                if event_id.startswith(prefix):
+                    event_id = event_id[len(prefix):]
                 self.stdout.write('Importing event %s' % event_id)
                 if options['task']:
                     import_single_event_from_tractrac(event_id)
