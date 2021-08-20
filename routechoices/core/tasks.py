@@ -628,7 +628,7 @@ def import_single_event_from_otracker(event_id):
         raise EventImportError('API returned error code')
     event_data = r.json()
     ft = event_data['event']['replay_time']['from_ts']
-    slug = event_id
+    slug = base64.urlsafe_b64encode(UUID(hex=event_id).bytes).rstrip(b'=').decode('ascii')
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,
