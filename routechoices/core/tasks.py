@@ -644,13 +644,11 @@ def import_single_event_from_otracker(event_id):
         return
     map_model = None
     map_model = import_map_from_otracker(club, event_data['event']['map_image'], event_name)
-    if not map_model:
-        event.delete()
-        raise EventImportError('Need a map')
-    event.map = map_model
-    event.save()
+    if map_model:
+        event.map = map_model
+        event.save()
 
-    data_url = f'https://otracker.lt/data/locations/history/{event_id}'
+    data_url = f'https://otracker.lt/data/locations/history/{event_id}?map_type=tileimage'
     response = requests.get(data_url, stream=True)
     if response.status_code != 200:
         event.delete()
@@ -666,10 +664,7 @@ def import_single_event_from_otracker(event_id):
             orig_device_map = json.load(f)
             device_map = {}
             for d in orig_device_map.keys():
-                device_map[d] = []
-                for x in orig_device_map[d]:
-                    latlon = map_model.map_xy_to_wsg84(x['lon'], event_data['event']['map_image']['height'] - x['lat'])
-                    device_map[d].append({'timestamp': x['fix_time']+ft, 'latitude': latlon['lat'], 'longitude': latlon['lon']})
+                device_map[d] = [{'timestamp': x['fix_time']+ft, 'latitude': x['lat'], 'longitude': x['lon']} for x in orig_device_map[d]]
     except Exception:
         event.delete()
         raise EventImportError('Could not decode data')
