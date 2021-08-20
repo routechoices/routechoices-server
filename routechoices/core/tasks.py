@@ -4,6 +4,8 @@ import arrow
 import base64
 import tempfile
 import json
+from bs4 import BeautifulSoup
+
 from uuid import UUID
 from PIL import Image
 from django.core.files.base import ContentFile
@@ -49,6 +51,19 @@ def get_sportrec_club():
         slug='sportrec',
         defaults={
             'name': 'SportRec'
+        }
+    )
+    if created:
+        club.admins.set(admins)
+        club.save()
+    return club
+
+def get_otracker_club():
+    admins = User.objects.filter(is_superuser=True)
+    club, created = Club.objects.get_or_create(
+        slug='otracker',
+        defaults={
+            'name': 'OTracker'
         }
     )
     if created:
@@ -158,6 +173,25 @@ def import_map_from_tractrac(club, map_info, name):
     coordinates = ','.join([
         str(x) for x in corners
     ])
+    map_model, created = Map.objects.get_or_create(
+        name=name,
+        club=club,
+    )
+    if not created:
+        return map_model
+    map_model.image.save('imported_image', map_file, save=False)
+    map_model.corners_coordinates = coordinates
+    map_model.save()
+    return map_model
+
+
+def import_map_from_otracker(club, map_data, name):
+    map_url = map_data['url']
+    r = requests.get(map_url)
+    if r.status_code != 200:
+        raise MapImportError('API returned error code')
+    map_file = ContentFile(r.content)
+    coordinates = f"{map_data['options']['tl']['lat']},{map_data['options']['tl']['lon']},{map_data['options']['tr']['lat']},{map_data['options']['tr']['lon']},{map_data['options']['br']['lat']},{map_data['options']['br']['lon']},{map_data['options']['bl']['lat']},{map_data['options']['bl']['lon']}"
     map_model, created = Map.objects.get_or_create(
         name=name,
         club=club,
@@ -575,6 +609,85 @@ def import_single_event_from_sportrec(event_id):
         Competitor.objects.create(
             name=c_data['fullname'],
             short_name=c_data['shortname'],
+            start_time=arrow.get(st).datetime,
+            device=dev_model,
+            event=event,
+        )
+
+
+@background(schedule=0)
+def import_single_event_from_otracker(event_id):
+    club = get_otracker_club()
+    rp = requests.get(f'https://otracker.lt/events/{event_id}')
+    if rp.status_code != 200:
+        raise EventImportError('API returned error code')
+    soup = BeautifulSoup(rp.text, 'html.parser')
+    event_name = soup.find('title').string
+    r = requests.get(f'https://otracker.lt/data/events/{event_id}')
+    if r.status_code != 200:
+        raise EventImportError('API returned error code')
+    event_data = r.json()
+    ft = event_data['event']['replay_time']['from_ts']
+    slug = event_id
+    event, created = Event.objects.get_or_create(
+        club=club,
+        slug=slug,
+        defaults={
+            'name': event_name,
+            'start_date':
+                arrow.get(event_data['event']['replay_time']['from_ts']).datetime,
+            'end_date':
+                arrow.get(event_data['event']['replay_time']['to_ts']).datetime,
+        }
+    )
+    if not created:
+        return
+    map_model = None
+    map_model = import_map_from_otracker(club, event_data['event']['map_image'], event_name)
+    if not map_model:
+        event.delete()
+        raise EventImportError('Need a map')
+    event.map = map_model
+    event.save()
+
+    data_url = f'https://otracker.lt/data/locations/history/{event_id}'
+    response = requests.get(data_url, stream=True)
+    if response.status_code != 200:
+        event.delete()
+        raise EventImportError('API returned error code')
+    lf = tempfile.NamedTemporaryFile()
+    for block in response.iter_content(1024 * 8):
+        if not block:
+            break
+        lf.write(block)
+    lf.flush()
+    try:
+        with open(lf.name, 'r') as f:
+            orig_device_map = json.load(f)
+            device_map = {}
+            for d in orig_device_map.keys():
+                device_map[d] = []
+                for x in orig_device_map[d]:
+                    latlon = map_model.map_xy_to_wsg84(x['lon'], event_data['event']['map_image']['height'] - x['lat'])
+                    device_map[d].append({'timestamp': x['fix_time']+ft, 'latitude': latlon['lat'], 'longitude': latlon['lon']})
+    except Exception:
+        event.delete()
+        raise EventImportError('Could not decode data')
+    lf.close()
+
+    for c_data in event_data['competitors'].values():
+        st = c_data.get('sync_offset') + ft
+        dev = device_map.get(str(c_data['id']))
+        dev_model = None
+        if dev:
+            dev_model = Device.objects.create(
+                aid=short_random_key() + '_OTR',
+                is_gpx=True,
+            )
+            dev_model.add_locations(dev)
+        Competitor.objects.create(
+            name=c_data['name'],
+            short_name=c_data['short_name'],
             start_time=arrow.get(st).datetime,
             device=dev_model,
             event=event,

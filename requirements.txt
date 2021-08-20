@@ -28,3 +28,4 @@ pymemcache
 django-markdownify
 numpy
 sewer==0.8.4
+bs4
