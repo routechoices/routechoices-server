@@ -622,7 +622,7 @@ def import_single_event_from_otracker(event_id):
     if rp.status_code != 200:
         raise EventImportError('API returned error code')
     soup = BeautifulSoup(rp.text, 'html.parser')
-    event_name = soup.find('title').string
+    event_name = soup.find('title').string[:-13]
     r = requests.get(f'https://otracker.lt/data/events/{event_id}')
     if r.status_code != 200:
         raise EventImportError('API returned error code')
