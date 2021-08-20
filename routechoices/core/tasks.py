@@ -1,7 +1,9 @@
+from os import EX_CANTCREAT
 import requests
 import arrow
 import base64
 import tempfile
+import json
 from uuid import UUID
 from PIL import Image
 from django.core.files.base import ContentFile
@@ -11,7 +13,7 @@ from background_task import background
 
 from routechoices.core.models import Map, Event, Device, Competitor, Club
 from routechoices.lib.helper import short_random_key, \
-    three_point_calibration_to_corners
+    three_point_calibration_to_corners, compute_corners_from_kml_latlonbox
 from routechoices.lib.mtb_decoder import MtbDecoder
 
 
@@ -33,6 +35,20 @@ def get_gpsseuranta_club():
         slug='gpsseuranta',
         defaults={
             'name': 'GPS Seuranta'
+        }
+    )
+    if created:
+        club.admins.set(admins)
+        club.save()
+    return club
+
+
+def get_sportrec_club():
+    admins = User.objects.filter(is_superuser=True)
+    club, created = Club.objects.get_or_create(
+        slug='sportrec',
+        defaults={
+            'name': 'SportRec'
         }
     )
     if created:
@@ -93,6 +109,34 @@ def import_map_from_gps_seuranta(club, map_data, name, event_id):
     ])
     map_model.image.save('imported_image', map_file, save=False)
     map_model.corners_coordinates = coordinates
+    map_model.save()
+    return map_model
+
+
+def import_map_from_sportrec(club, event_id, map_data, name):
+    map_url = f'https://sportrec.eu/ui/nsport_admin/index.php?r=api/map&id={event_id}'
+    r = requests.get(map_url)
+    map_file = ContentFile(r.content)
+    if r.status_code != 200:
+        raise MapImportError('API returned error code')
+    map_model, created = Map.objects.get_or_create(
+        name=name,
+        club=club,
+    )
+    if not created:
+        return map_model
+    coords = map_data['map_box']
+    n, e, s, w = [float(x) for x in coords.replace('(', '').replace(')', '').split(',')]
+
+    nw, ne, se, sw = compute_corners_from_kml_latlonbox(n, e, s, w, -float(map_data['map_angle']))
+    corners_coords = ','.join((
+        '{},{}'.format(*nw),
+        '{},{}'.format(*ne),
+        '{},{}'.format(*se),
+        '{},{}'.format(*sw),
+    ))
+    map_model.image.save('imported_image', map_file, save=False)
+    map_model.corners_coordinates = corners_coords
     map_model.save()
     return map_model
 
@@ -460,6 +504,77 @@ def import_single_event_from_tractrac(event_id):
         Competitor.objects.create(
             name=c_data['name'],
             short_name=c_data['nameShort'],
+            start_time=arrow.get(st).datetime,
+            device=dev_model,
+            event=event,
+        )
+
+
+@background(schedule=0)
+def import_single_event_from_sportrec(event_id):
+    club = get_sportrec_club()
+    r = requests.get(f'https://sportrec.eu/ui/nsport_admin/index.php?r=api/competition&id={event_id}')
+    if r.status_code != 200:
+        raise EventImportError('API returned error code')
+    event_data = r.json()
+    event_name = event_data['competition']['title']
+    slug = event_id
+    event, created = Event.objects.get_or_create(
+        club=club,
+        slug=slug,
+        defaults={
+            'name': event_name,
+            'start_date':
+                arrow.get(event_data['competition']['time_start']).datetime,
+            'end_date':
+                arrow.get(event_data['competition']['time_finish']).datetime,
+        }
+    )
+    if not created:
+        return
+    map_model = None
+    if event_data['hasMap']:
+        map_model = import_map_from_sportrec(club, event_id, event_data['track'], event_name)
+    if map_model:
+        event.map = map_model
+        event.save()
+    data_url = f'https://sportrec.eu/ui/nsport_admin/index.php?r=api/history&id={event_id}'
+    response = requests.get(data_url, stream=True)
+    if response.status_code != 200:
+        event.delete()
+        raise EventImportError('API returned error code')
+    lf = tempfile.NamedTemporaryFile()
+    for block in response.iter_content(1024 * 8):
+        if not block:
+            break
+        lf.write(block)
+    lf.flush()
+    try:
+        with open(lf.name, 'r') as f:
+            device_map = {}
+            device_data = json.load(f)
+            for d in device_data['locations']:
+                device_map[d['device_id']] = [{'timestamp': float(x['aq'])/1e3, 'latitude': float(x['lat']), 'longitude': float(x['lon'])} for x in d['locations']]
+    except Exception:
+        event.delete()
+        raise EventImportError('Could not decode data')
+    lf.close()
+
+    for c_data in event_data['participants']:
+        st = c_data.get('time_start')
+        if not st:
+            st = event_data['competition']['time_start']
+        dev = device_map.get(c_data['device_id'])
+        dev_model = None
+        if dev:
+            dev_model = Device.objects.create(
+                aid=short_random_key() + '_SPR',
+                is_gpx=True,
+            )
+            dev_model.add_locations(dev)
+        Competitor.objects.create(
+            name=c_data['fullname'],
+            short_name=c_data['shortname'],
             start_time=arrow.get(st).datetime,
             device=dev_model,
             event=event,

@@ -1,39 +1,9 @@
 from defusedxml import minidom
-from math import pi, cos, sin
 
+from routechoices.lib.helper import compute_corners_from_kml_latlonbox
 
 class BadKMLException(Exception):
     pass
-
-
-def deg2rad(deg):
-    return deg * pi / 180
-
-
-def compute_corners_from_kml_latlonbox(n, e, s, w, rot):
-    a = (e + w) / 2
-    b = (n + s) / 2
-    squish = cos(deg2rad(b))
-    x = squish * (e - w) / 2
-    y = (n - s) / 2
-
-    ne = (
-        b + x * sin(deg2rad(rot)) + y * cos(deg2rad(rot)),
-        a + (x * cos(deg2rad(rot)) - y * sin(deg2rad(rot))) / squish,
-    )
-    nw = (
-        b - x * sin(deg2rad(rot)) + y * cos(deg2rad(rot)),
-        a - (x * cos(deg2rad(rot)) + y * sin(deg2rad(rot))) / squish,
-    )
-    sw = (
-        b - x * sin(deg2rad(rot)) - y * cos(deg2rad(rot)),
-        a - (x * cos(deg2rad(rot)) - y * sin(deg2rad(rot))) / squish,
-    )
-    se = (
-        b + x * sin(deg2rad(rot)) - y * cos(deg2rad(rot)),
-        a + (x * cos(deg2rad(rot)) + y * sin(deg2rad(rot))) / squish,
-    )
-    return nw, ne, se, sw
 
 
 def extract_ground_overlay_info(kml):

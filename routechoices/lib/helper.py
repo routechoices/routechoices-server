@@ -12,6 +12,12 @@ from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
 
 from user_sessions.templatetags.user_sessions import device as device_name
+from math import pi, cos, sin
+
+
+
+def deg2rad(deg):
+    return deg * pi / 180
 
 
 def get_device_name(ua):
@@ -196,6 +202,31 @@ def project(m, x, y):
     v = multiply_matrix_vector(m, [x, y, 1])
     return v[0] / v[2], v[1] / v[2]
 
+
+def compute_corners_from_kml_latlonbox(n, e, s, w, rot):
+    a = (e + w) / 2
+    b = (n + s) / 2
+    squish = cos(deg2rad(b))
+    x = squish * (e - w) / 2
+    y = (n - s) / 2
+
+    ne = (
+        b + x * sin(deg2rad(rot)) + y * cos(deg2rad(rot)),
+        a + (x * cos(deg2rad(rot)) - y * sin(deg2rad(rot))) / squish,
+    )
+    nw = (
+        b - x * sin(deg2rad(rot)) + y * cos(deg2rad(rot)),
+        a - (x * cos(deg2rad(rot)) + y * sin(deg2rad(rot))) / squish,
+    )
+    sw = (
+        b - x * sin(deg2rad(rot)) - y * cos(deg2rad(rot)),
+        a - (x * cos(deg2rad(rot)) - y * sin(deg2rad(rot))) / squish,
+    )
+    se = (
+        b + x * sin(deg2rad(rot)) - y * cos(deg2rad(rot)),
+        a + (x * cos(deg2rad(rot)) + y * sin(deg2rad(rot))) / squish,
+    )
+    return nw, ne, se, sw
 
 def initial_of_name(name):
     """Converts a name to initials and surname.
