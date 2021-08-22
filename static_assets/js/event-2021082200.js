@@ -221,6 +221,7 @@ var selectLiveMode = function(e){
   $("#replay_control_buttons").hide();
   timeOffsetSec = -30;
   isLiveMode=true;
+  isRealTime=true;
 
   (function whileLive(){
     if (((performance.now()-routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes) {
