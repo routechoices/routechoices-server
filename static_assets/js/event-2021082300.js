@@ -5,9 +5,16 @@ L.Control.Ranking = L.Control.extend({
       back.style.width = '205px';
       back.style.background = 'white'
       back.style['max-height'] = '195px'
-      back.style['overflow-y'] = 'scroll'
+      back.style['overflow-y'] = 'auto'
       back.style['overflow-x'] = 'hidden'
-      return back;
+      back.style['z-index'] = 1e9
+      back.style['padding'] = '5px';
+      back.style['top'] = '60px';
+      back.style['right'] = '10px';
+      back.style['position'] = 'absolute';
+      back.style['font-size'] = '12px';
+      document.body.appendChild(back)
+      return  L.DomUtil.create('div', 'tmp');
   },
 
   setValues(ranking) {
@@ -24,6 +31,7 @@ L.Control.Ranking = L.Control.extend({
 
   onRemove: function(map) {
     $('.leaflet-control-ranking').remove()
+    $('.tmp').remove()
   }
 });
 
