@@ -118,6 +118,7 @@ class Command(BaseCommand):
             cert_key.write_pem(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key'))
             write_account_key(acct_key, os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key'))
             write_nginf_conf(domain)
+            nginx_need_restart = True
         if nginx_need_restart:
             print('Reload nginx for changes to take effect...')
         
