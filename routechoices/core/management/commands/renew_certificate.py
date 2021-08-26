@@ -127,7 +127,6 @@ class Command(BaseCommand):
                 self.stderr.write('Failed to create certificate...')
                 continue
             cert_key = client.cert_key
-            acct_key = client.account
 
             with open(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt'), 'w') as f:
                 f.write(certificate)
