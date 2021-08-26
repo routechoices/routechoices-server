@@ -95,11 +95,13 @@ class Command(BaseCommand):
             if os.path.exists(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')):
                 self.stderr.write('Certificates for this domain already exists')
                 continue
-        
+            
+            acct_key = AcmeAccount.create("secp256r1")
+
             client = sewer.client.Client(
                 domain_name=domain,
                 provider=ClubProvider(club),
-                account= AcmeAccount.create("secp256r1"),
+                account=acct_key,
                 cert_key=AcmeKey.create("secp256r1"),
                 is_new_acct=True,
                 contact_email='raphael@routechoices.com'
@@ -110,7 +112,6 @@ class Command(BaseCommand):
                 self.stderr.write('Failed to create certificate...')
                 continue
             cert_key = client.cert_key
-            acct_key = client.account
 
             with open(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt'), 'w') as f:
                 f.write(certificate)
