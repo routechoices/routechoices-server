@@ -19,9 +19,6 @@ from django.urls import include
 from django.contrib.sitemaps.views import sitemap
 from routechoices.dashboard.views import dashboard_map_download
 from routechoices.site.sitemaps import (
-    EventsSitemap,
-    ClubsSitemap,
-    EventsExportSitemap,
     StaticViewSitemap,
     DynamicViewSitemap,
 )
@@ -32,9 +29,6 @@ admin.site.site_title = "Routechoices.com Admin Site"
 admin.site.index_title = "Welcome to Routechoices.com Administration Site"
 
 sitemaps = {
-    'events': EventsSitemap,
-    'events_export': EventsExportSitemap,
-    'clubs': ClubsSitemap,
     'static': StaticViewSitemap,
     'dynamic': DynamicViewSitemap,
 }
