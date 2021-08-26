@@ -48,7 +48,7 @@ server {{
 
 def write_account_key(self, filename):
     with open(filename, "wb") as f:
-        if self.__kid:
+        if hasattr(self, '__kid') and self.__kid:
             f.write(("KID: %s\n" % self.__kid).encode())
             if self._timestamp:
                 f.write(("Timestamp: %s\n" % self._timestamp).encode())
