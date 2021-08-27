@@ -278,8 +278,6 @@ def event_detail(request, event_id):
             'club', 'notice'
         ).prefetch_related(
             'competitors',
-            'extra_maps',
-            'map_assignations'
         ),
         aid=event_id,
     )
@@ -333,17 +331,17 @@ def event_detail(request, event_id):
                 'last_mod': event.map.modification_date,
                 'default': True
             })
-        for i, m in enumerate(event.extra_maps.all().order_by('pk')):
+        for i, m in enumerate(event.map_assignations.all().select_related('map')):
             output['maps'].append({
-                'title': event.map_assignations.get(map=m).title,
-                'coordinates': m.bound,
+                'title': m.title,
+                'coordinates': m.map.bound,
                 'url': request.build_absolute_uri(reverse(
                     'event_map_download',
                     host='api',
                     kwargs={'event_id': event.aid, 'map_index': (i+1)}
                 )),
-                'hash': m.hash,
-                'last_mod': m.modification_date,
+                'hash': m.map.hash,
+                'last_mod': m.map.modification_date,
                 'default': False
             })
     headers = None
