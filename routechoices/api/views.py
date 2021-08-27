@@ -333,17 +333,17 @@ def event_detail(request, event_id):
                 'last_mod': event.map.modification_date,
                 'default': True
             })
-        for i, m in enumerate(event.map_assignations.all()):
+        for i, m in enumerate(event.extra_maps.all().order_by('pk')):
             output['maps'].append({
-                'title': m.title,
-                'coordinates': m.map.bound,
+                'title': event.map_assignations.get(map=m).title,
+                'coordinates': m.bound,
                 'url': request.build_absolute_uri(reverse(
                     'event_map_download',
                     host='api',
                     kwargs={'event_id': event.aid, 'map_index': (i+1)}
                 )),
-                'hash': m.map.hash,
-                'last_mod': m.map.modification_date,
+                'hash': m.hash,
+                'last_mod': m.modification_date,
                 'default': False
             })
     headers = None
@@ -1075,7 +1075,7 @@ def event_map_download(request, event_id, map_index='0'):
     if map_index == '0':
          raster_map = event.map
     else:
-        raster_map = event.extra_maps.all()[int(map_index)-1]
+        raster_map = event.extra_maps.order_by('pk').all()[int(map_index)-1]
     file_path = raster_map.path
     mime_type = raster_map.mime_type
 
@@ -1150,7 +1150,7 @@ def event_kmz_download(request, event_id, map_index='0'):
     if map_index == '0':
          raster_map = event.map
     else:
-        raster_map = event.extra_maps.all()[int(map_index)-1]
+        raster_map = event.extra_maps.all().order_by('pk')[int(map_index)-1]
     kmz_data = raster_map.kmz
     
     headers = None
@@ -1459,7 +1459,7 @@ def wms_service(request):
         if map_index == 0:
             raster_map = event.map
         else:
-            raster_map = event.extra_maps.all()[int(map_index)-1]
+            raster_map = event.extra_maps.all().order_by('pk')[int(map_index)-1]
 
         try:
             out_image = raster_map.create_tile(
