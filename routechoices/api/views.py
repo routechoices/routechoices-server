@@ -1073,7 +1073,7 @@ def event_map_download(request, event_id, map_index='0'):
     if map_index == '0':
          raster_map = event.map
     else:
-        raster_map = event.extra_maps.order_by('pk').all()[int(map_index)-1]
+        raster_map = event.map_assignations.select_related('map').all()[int(map_index)-1].map
     file_path = raster_map.path
     mime_type = raster_map.mime_type
 
@@ -1148,7 +1148,7 @@ def event_kmz_download(request, event_id, map_index='0'):
     if map_index == '0':
          raster_map = event.map
     else:
-        raster_map = event.extra_maps.all().order_by('pk')[int(map_index)-1]
+        raster_map = event.map_assignations.select_related('map').all()[int(map_index)-1].map
     kmz_data = raster_map.kmz
     
     headers = None
@@ -1457,7 +1457,7 @@ def wms_service(request):
         if map_index == 0:
             raster_map = event.map
         else:
-            raster_map = event.extra_maps.all().order_by('pk')[int(map_index)-1]
+            raster_map = event.map_assignations.select_related('map').all()[int(map_index)-1].map
 
         try:
             out_image = raster_map.create_tile(

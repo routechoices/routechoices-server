@@ -102,7 +102,7 @@ def event_view(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
-    # Page needs not send ajax with cookies to prove identity, cannot be done from custom domain
+    # If event is private, page needs to send ajax with cookies to prove identity, cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
             return redirect(
@@ -155,7 +155,7 @@ def event_export_view(request, slug, **kwargs):
         start_date__lt=now()
     )
     if event.club.domain and not request.use_cname:
-        return redirect(f'{event.club.nice_url}{event.slug}')
+        return redirect(f'{event.club.nice_url}{event.slug}/export')
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -187,12 +187,12 @@ def event_map_view(request, slug, index='0', **kwargs):
         )
     club_slug = request.club_slug
     event = get_object_or_404(
-        Event.objects.all().select_related('club').prefetch_related('competitors'),
+        Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
     if event.club.domain and not request.use_cname:
-        return redirect(f'{event.club.nice_url}{event.slug}')
+        return redirect(f'{event.club.nice_url}{event.slug}/map/{index}')
     return redirect(
         reverse(
             'event_map_download',
@@ -219,10 +219,12 @@ def event_kmz_view(request, slug, index='0', **kwargs):
         )
     club_slug = request.club_slug
     event = get_object_or_404(
-        Event,
+        Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug
     )
+    if event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}/kmz/{index}')
     return redirect(
         reverse(
             'event_kmz_download',

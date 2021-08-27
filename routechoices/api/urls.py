@@ -91,7 +91,7 @@ urlpatterns = [
         name='map_kmz_download',
     ),
     url(
-        r'^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx$',
+        r'^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx/?$',
         views.competitor_gpx_download,
         name='competitor_gpx_download'
     ),
