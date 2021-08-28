@@ -1,48 +1,37 @@
 /* Positioning.js 2021-08-28 */
+// Depends on BN.js, https://github.com/indutny/bn.js
 var intValCodec = (function() {
     var decodeUnsignedValueFromString = function (encoded) {
             var enc_len = encoded.length,
                 i=0,
-                shift = 0,
-                result = 0,
+                s = 0,
+                // result = 0
+                result = new BN(0, 10),
                 b = 0x20;
             while(b >= 0x20 && i<enc_len){
                   b = encoded.charCodeAt(i) - 63;
                   i += 1;
-                  result |= (b & 0x1f) << shift;
-                  shift += 5;
+                  // result |=  (b & 0x1f) << s
+                  result = result.or(new BN(b & 0x1f, 10).shln(s));
+                  s += 5;
             }
-            return [result, encoded.slice(i)];
+            return [parseInt(result.toString(), 10), encoded.slice(i)];
         },
         decodeSignedValueFromString = function (encoded) {
             var r = decodeUnsignedValueFromString(encoded),
-                result = r[0],
+                // result = r[0]
+                result = new BN(r[0], 10),
                 left_encoded = r[1];
-            if (result & 1) {
-                return [~(result>>>1), left_encoded];
+            // if (result & 1) {
+            if (result.and(new BN(1, 10)).toString() === "1") {
+                // return [~(result >>> 1), left_encoded]
+                return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), left_encoded];
             } else {
-                return [result>>>1, left_encoded];
+                // return [result >>> 1, left_encoded]
+                return [parseInt(result.shrn(1).toString(), 10), left_encoded];
             }
-        },
-        encodeUnsignedNumber = function (num) {
-            var encoded = '';
-            while (num >= 0x20) {
-                encoded += String.fromCharCode((0x20 | (num & 0x1f)) + 63);
-                num = num >>> 5;
-            }
-            encoded += String.fromCharCode((num + 63));
-            return encoded;
-        },
-        encodeSignedNumber = function(num) {
-            var sgn_num = num << 1;
-            if(num < 0){
-                sgn_num = ~(sgn_num);
-            }
-            return encodeUnsignedNumber(sgn_num);
-        };
+        }
     return {
-        encodeUnsignedNumber: encodeUnsignedNumber,
-        encodeSignedNumber: encodeSignedNumber,
         decodeUnsignedValueFromString: decodeUnsignedValueFromString,
         decodeSignedValueFromString: decodeSignedValueFromString
     };
