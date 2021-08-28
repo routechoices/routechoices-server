@@ -30,7 +30,7 @@ from django_hosts.resolvers import reverse
 import gpxpy
 import gpxpy.gpx
 
-import polyline_encoding
+import gps_encoding
 
 import pytz
 
@@ -757,28 +757,6 @@ class Device(models.Model):
     def locations(self, locs):
         self.locations_raw = str(json.dumps(locs), 'utf-8')
 
-    def get_locations_between_dates_alt(self, from_date, end_date, encoded=False):
-        qs = self.locations
-        from_ts = from_date.timestamp()
-        end_ts = end_date.timestamp()
-        timestamps_w_order = sorted(
-            enumerate(qs['timestamps']),
-            key=itemgetter(1)
-        )
-        timestamps = list(zip(*timestamps_w_order))[1]
-        ts_from_index = bisect.bisect_right(timestamps, from_ts)
-        ts_end_index = bisect.bisect_left(timestamps, end_ts)
-        locs = [
-            {
-                'timestamp': timestamps_w_order[i][1],
-                'latitude': qs['latitudes'][timestamps_w_order[i][0]],
-                'longitude': qs['longitudes'][timestamps_w_order[i][0]],
-            } for i in range(ts_from_index, ts_end_index)]
-        if not encoded:
-            return len(locs), locs
-        result = polyline_encoding.encode_data(locs)
-        return len(locs), result
-
     def get_locations_between_dates(self, from_date, end_date, encoded=False):
         qs = self.locations
         from_ts = from_date.timestamp()
@@ -797,7 +775,7 @@ class Device(models.Model):
         ]
         if not encoded:
             return len(locs), locs
-        result = polyline_encoding.encode_data(locs)
+        result = gps_encoding.encode_data(locs)
         return len(locs), result
 
     def add_location(self, lat, lon, timestamp=None, save=True):
@@ -1011,9 +989,7 @@ class Competitor(models.Model):
 
     @cached_property
     def locations(self):
-        if self.device:
-            qs = self.device.locations
-        else:
+        if not self.device:
             return []
 
         from_date = self.event.start_date
@@ -1023,34 +999,24 @@ class Competitor(models.Model):
             start_time__gt=from_date
         ).order_by('start_time').values_list('start_time', flat=True).first()
 
-        end_date = now()
+        to_date = now()
         if next_competitor_start_time:
-            end_date = min(
+            to_date = min(
                 next_competitor_start_time,
-                end_date
+                to_date
             )
         if self.event.end_date:
-            end_date = min(
+            to_date = min(
                 self.event.end_date,
-                end_date
+                to_date
             )
 
-        locs = [
-            {
-                'timestamp': i[1],
-                'latitude': qs['latitudes'][i[0]],
-                'longitude': qs['longitudes'][i[0]],
-                'competitor': self.id,
-            } for i in sorted(
-                enumerate(qs['timestamps']),
-                key=lambda x:x[1]
-            ) if i[1] > from_date.timestamp() and i[1] < end_date.timestamp()
-        ]
+        _, locs = self.device.get_locations_between_dates(from_date, to_date)
         return locs
 
     @property
     def encoded_data(self):
-        result = polyline_encoding.encode_data(self.locations)
+        result = gps_encoding.encode_data(self.locations)
         return result
 
     @property

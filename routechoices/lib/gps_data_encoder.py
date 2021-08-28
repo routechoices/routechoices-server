@@ -6,7 +6,7 @@ import calendar
 from decimal import Decimal
 from datetime import datetime
 
-import polyline_encoding
+import gps_encoding
 
 from django.utils.timezone import utc
 
@@ -330,7 +330,7 @@ class GeoLocationSeries(object):
         }
 
     def __str__(self):
-        result = polyline_encoding.encode_data(
+        result = gps_encoding.encode_data(
             [{
                 "timestamp": pt.timestamp,
                 "latitude": float(pt.coordinates.latitude),
