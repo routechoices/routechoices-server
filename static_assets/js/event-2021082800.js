@@ -309,7 +309,7 @@ var fetchCompetitorRoutes = function(url){
   }).done(function(response){
     response.competitors.forEach(function(competitor){
       if(competitor.encoded_data) {
-        var route = PositionArchive.fromTks(competitor.encoded_data);
+        var route = PositionArchive.fromEncoded(competitor.encoded_data);
         competitorRoutes[competitor.id] = route;
       }
     });

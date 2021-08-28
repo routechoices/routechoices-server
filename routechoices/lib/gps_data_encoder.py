@@ -189,8 +189,6 @@ class GeoLocationSeries(object):
         decorated = sorted(lst)
         self._keys = [item.timestamp for item in decorated]
         self._items = [item for item in decorated]
-        if isinstance(lst, str):
-            lst = self.decode_str(lst)
         for item in lst:
             self.check_instance(item)
 
@@ -347,8 +345,13 @@ class GeoLocationSeries(object):
         tim = YEAR2010
         lat = 0
         lon = 0
+        is_first = True
         while len(encoded) > 0:
-            tim_d, encoded = decode_unsigned_number(encoded)
+            if is_first:
+                is_first = False
+                tim_d, encoded = decode_signed_number(encoded)
+            else:
+                tim_d, encoded = decode_unsigned_number(encoded)
             lat_d, encoded = decode_signed_number(encoded)
             lon_d, encoded = decode_signed_number(encoded)
             tim += tim_d

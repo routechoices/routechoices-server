@@ -1,4 +1,4 @@
-/* Positioning.js 2021-08-11 */
+/* Positioning.js 2021-08-28 */
 var intValCodec = (function() {
     var decodeUnsignedValueFromString = function (encoded) {
             var enc_len = encoded.length,
@@ -226,82 +226,26 @@ var PositionArchive = function(){
             return now-positions[0].timestamp;
         }
     };
-    this.exportCSV = function() {
-        var raw_csv = 'timestamp, latitude, longitude, accuracy\n',
-            l, lc, i;
-        for (i=0;i<positions.length;i++) {
-            l = positions[i];
-            lc = l.coords;
-            raw_csv += [l.timestamp, lc.latitude, lc.longitude, lc.accuracy].join(', ');
-            raw_csv += '\n';
-        }
-        return raw_csv;
-    };
-    this.exportTks = function() {
-        if (positions.length===0) {
-            return '';
-        }
-        var YEAR2010=1262304000000, // = Date.parse("2010-01-01T00:00:00Z"),
-            prev_pos = new Position({
-                timestamp:YEAR2010,
-                coords:{latitude:0, longitude:0, accuracy:0}
-            }),
-            raw="",
-            mround = Math.round,
-            _1e5=1e5,
-            _1e3=1e3,
-            k, kc, pc,
-            dt, dlat, dlon,
-            last_skipped_t=null, p_len = positions.length;
-        for (var i = 0; i < p_len; i++) {
-            k = positions[i];
-            kc = k.coords;
-            pc = prev_pos.coords;
-            dt = k.timestamp-prev_pos.timestamp;
-            dlat = kc.latitude-pc.latitude;
-            dlon = kc.longitude-pc.longitude;
-            if ( mround(dlat*_1e5)===0 && mround(dlon*_1e5)===0 && i!=p_len-1) {
-                last_skipped_t = k.timestamp;
-            } else {
-                if(last_skipped_t!==null && i!=p_len-1){
-                    dt = last_skipped_t-prev_pos.timestamp;
-                    raw += intValCodec.encodeUnsignedNumber(mround(dt/_1e3)) +
-                        intValCodec.encodeSignedNumber(0) +
-                        intValCodec.encodeSignedNumber(0);
-                    prev_pos.timestamp=prev_pos.timestamp+mround(dt/_1e3)*_1e3;
-                    dt = k.timestamp-prev_pos.timestamp;
-                    last_skipped_t=null;
-                }
-                raw += intValCodec.encodeUnsignedNumber(mround(dt/_1e3)) +
-                    intValCodec.encodeSignedNumber(mround(dlat*_1e5)) +
-                    intValCodec.encodeSignedNumber(mround(dlon*_1e5));
-                prev_pos = new Position(
-                {
-                    timestamp: prev_pos.timestamp+mround(dt/_1e3)*_1e3,
-                    coords: {
-                        latitude: pc.latitude+mround(dlat*_1e5)/_1e5,
-                        longitude: pc.longitude+mround(dlon*_1e5)/_1e5,
-                        accuracy: 0
-                    }
-                });
-            }
-        }
-        return raw;
-    };
 };
 
-PositionArchive.fromTks = function(encoded) {
+PositionArchive.fromEncoded = function(encoded) {
     var YEAR2010 = 1262304000, // = Date.parse("2010-01-01T00:00:00Z")/1e3,
         vals = [],
         prev_vals = [YEAR2010, 0, 0],
         enc_len = encoded.length,
         pts = new PositionArchive(),
-        r;
-
+        r,
+        is_first = true;
+   
     while (enc_len > 0) {
         for(var i = 0; i < 3; i++) {
             if(i === 0) {
-                r = intValCodec.decodeUnsignedValueFromString(encoded);
+                if(is_first){
+                    is_first = false;
+                    r = intValCodec.decodeSignedValueFromString(encoded);
+                } else {
+                    r = intValCodec.decodeUnsignedValueFromString(encoded);
+                }
             } else {
                 r = intValCodec.decodeSignedValueFromString(encoded);
             }
