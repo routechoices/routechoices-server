@@ -11,7 +11,6 @@ var intValCodec = (function() {
             b = encoded.charCodeAt(i + offset) - 63;
             i += 1;
             if (s === 30) {
-                console.log('large');
                 return decodeLargeUnsignedValueFromString(encoded, offset);
             }
             result |= (b & 0x1f) << s;
@@ -22,9 +21,9 @@ var intValCodec = (function() {
     decodeSignedValueFromString = function (encoded, offset) {
         var r = decodeUnsignedValueFromString(encoded, offset),
             result = r[0];
-            if(r[3]) {
-                return decodeLargeSignedValueFromString(encoded, offset)
-            }
+        if(r[2]) {
+            return decodeLargeSignedValueFromString(encoded, offset)
+        }
         if (result & 1) {
             return [~(result>>>1), r[1]];
         } else {
