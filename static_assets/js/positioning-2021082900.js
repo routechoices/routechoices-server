@@ -10,6 +10,10 @@ var intValCodec = (function() {
         while(b >= 0x20 && i + offset < enc_len){
             b = encoded.charCodeAt(i + offset) - 63;
             i += 1;
+            if (s === 30) {
+                console.log('large');
+                return decodeLargeUnsignedValueFromString(encoded, offset);
+            }
             result |= (b & 0x1f) << s;
             s += 5;
         }
@@ -18,6 +22,9 @@ var intValCodec = (function() {
     decodeSignedValueFromString = function (encoded, offset) {
         var r = decodeUnsignedValueFromString(encoded, offset),
             result = r[0];
+            if(r[3]) {
+                return decodeLargeSignedValueFromString(encoded, offset)
+            }
         if (result & 1) {
             return [~(result>>>1), r[1]];
         } else {
@@ -36,15 +43,15 @@ var intValCodec = (function() {
                 result = result.or(new BN(b & 0x1f, 10).shln(s));
                 s += 5;
         }
-        return [parseInt(result.toString(), 10), i];
+        return [parseInt(result.toString(), 10), i, true];
     },
     decodeLargeSignedValueFromString = function (encoded, offset) {
-        var r = decodeUnsignedValueFromString(encoded, offset),
+        var r = decodeLargeUnsignedValueFromString(encoded, offset),
             result = new BN(r[0], 10);
         if (result.and(new BN(1, 10)).toString() === "1") {
             return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), r[1]];
         } else {
-            return [parseInt(result.shrn(1).toString(), 10), r[1]];
+            return [parseInt(result.shrn(1).toString(), 10), r[1], true];
         }
     }
     return {
