@@ -19,11 +19,16 @@ var intValCodec = (function() {
         return [result, i];
     },
     decodeSignedValueFromString = function (encoded, offset) {
-        var r = decodeUnsignedValueFromString(encoded, offset),
-            result = r[0];
+        var r = decodeUnsignedValueFromString(encoded, offset);
         if(r[2]) {
-            return decodeLargeSignedValueFromString(encoded, offset)
+            var result = new BN(r[0], 10);
+            if (result.and(new BN(1, 10)).toString() === "1") {
+                return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), r[1]];
+            } else {
+                return [parseInt(result.shrn(1).toString(), 10), r[1], true];
+            }
         }
+        var result = r[0];
         if (result & 1) {
             return [~(result>>>1), r[1]];
         } else {
@@ -43,21 +48,10 @@ var intValCodec = (function() {
                 s += 5;
         }
         return [parseInt(result.toString(), 10), i, true];
-    },
-    decodeLargeSignedValueFromString = function (encoded, offset) {
-        var r = decodeLargeUnsignedValueFromString(encoded, offset),
-            result = new BN(r[0], 10);
-        if (result.and(new BN(1, 10)).toString() === "1") {
-            return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), r[1]];
-        } else {
-            return [parseInt(result.shrn(1).toString(), 10), r[1], true];
-        }
     }
     return {
         decodeUnsignedValueFromString: decodeUnsignedValueFromString,
         decodeSignedValueFromString: decodeSignedValueFromString,
-        decodeLargeUnsignedValueFromString: decodeLargeUnsignedValueFromString,
-        decodeLargeSignedValueFromString: decodeLargeSignedValueFromString
     };
 })();
 
