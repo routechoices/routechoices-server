@@ -1,39 +1,57 @@
 /* Positioning.js 2021-08-28 */
 // Depends on BN.js, https://github.com/indutny/bn.js
 var intValCodec = (function() {
-    var decodeUnsignedValueFromString = function (encoded) {
-            var enc_len = encoded.length,
-                i=0,
-                s = 0,
-                // result = 0
-                result = new BN(0, 10),
-                b = 0x20;
-            while(b >= 0x20 && i<enc_len){
-                  b = encoded.charCodeAt(i) - 63;
-                  i += 1;
-                  // result |=  (b & 0x1f) << s
-                  result = result.or(new BN(b & 0x1f, 10).shln(s));
-                  s += 5;
-            }
-            return [parseInt(result.toString(), 10), encoded.slice(i)];
-        },
-        decodeSignedValueFromString = function (encoded) {
-            var r = decodeUnsignedValueFromString(encoded),
-                // result = r[0]
-                result = new BN(r[0], 10),
-                left_encoded = r[1];
-            // if (result & 1) {
-            if (result.and(new BN(1, 10)).toString() === "1") {
-                // return [~(result >>> 1), left_encoded]
-                return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), left_encoded];
-            } else {
-                // return [result >>> 1, left_encoded]
-                return [parseInt(result.shrn(1).toString(), 10), left_encoded];
-            }
+    var decodeUnsignedValueFromString = function (encoded, offset) {
+        var enc_len = encoded.length,
+            i=0,
+            s = 0,
+            result = 0,
+            b = 0x20;
+        while(b >= 0x20 && i + offset < enc_len){
+            b = encoded.charCodeAt(i + offset) - 63;
+            i += 1;
+            result |= (b & 0x1f) << s;
+            s += 5;
         }
+        return [result, i];
+    },
+    decodeSignedValueFromString = function (encoded, offset) {
+        var r = decodeUnsignedValueFromString(encoded, offset),
+            result = r[0];
+        if (result & 1) {
+            return [~(result>>>1), r[1]];
+        } else {
+            return [result>>>1, r[1]];
+        }
+    },
+    decodeLargeUnsignedValueFromString = function (encoded, offset) {
+        var enc_len = encoded.length,
+            i=0,
+            s = 0,
+            result = new BN(0, 10),
+            b = 0x20;
+        while(b >= 0x20 && i + offset < enc_len){
+                b = encoded.charCodeAt(i + offset) - 63;
+                i += 1;
+                result = result.or(new BN(b & 0x1f, 10).shln(s));
+                s += 5;
+        }
+        return [parseInt(result.toString(), 10), i];
+    },
+    decodeLargeSignedValueFromString = function (encoded, offset) {
+        var r = decodeUnsignedValueFromString(encoded, offset),
+            result = new BN(r[0], 10);
+        if (result.and(new BN(1, 10)).toString() === "1") {
+            return [parseInt(result.shrn(1).add(new BN(1)).neg().toString(), 10), r[1]];
+        } else {
+            return [parseInt(result.shrn(1).toString(), 10), r[1]];
+        }
+    }
     return {
         decodeUnsignedValueFromString: decodeUnsignedValueFromString,
-        decodeSignedValueFromString: decodeSignedValueFromString
+        decodeSignedValueFromString: decodeSignedValueFromString,
+        decodeLargeUnsignedValueFromString: decodeLargeUnsignedValueFromString,
+        decodeLargeSignedValueFromString: decodeLargeSignedValueFromString
     };
 })();
 
@@ -224,21 +242,22 @@ PositionArchive.fromEncoded = function(encoded) {
         enc_len = encoded.length,
         pts = new PositionArchive(),
         r,
-        is_first = true;
+        is_first = true,
+        offset = 0;
    
-    while (enc_len > 0) {
+    while (offset < enc_len) {
         for(var i = 0; i < 3; i++) {
             if(i === 0) {
                 if(is_first){
                     is_first = false;
-                    r = intValCodec.decodeSignedValueFromString(encoded);
+                    r = intValCodec.decodeSignedValueFromString(encoded, offset);
                 } else {
-                    r = intValCodec.decodeUnsignedValueFromString(encoded);
+                    r = intValCodec.decodeUnsignedValueFromString(encoded, offset);
                 }
             } else {
-                r = intValCodec.decodeSignedValueFromString(encoded);
+                r = intValCodec.decodeSignedValueFromString(encoded, offset);
             }
-            encoded = r[1];
+            offset += r[1];
             var new_val = prev_vals[i] + r[0]
             vals[i] = new_val;
             prev_vals[i] = new_val;
