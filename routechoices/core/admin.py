@@ -8,6 +8,8 @@ from django.db.models import Count, Case, Value, When
 from django.utils.timezone import now
 from django.db.models.expressions import RawSQL
 from django.utils.safestring import mark_safe
+from django.utils.functional import cached_property
+from django.core.paginator import Paginator
 
 from allauth.account.models import EmailAddress
 
@@ -178,6 +180,14 @@ class DeviceCompetitorInline(admin.TabularInline):
         return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
 
 
+class MyPaginator(Paginator):
+    @cached_property
+    def count(self):
+        qs = self.object_list.all()
+        qs.query.annotations.clear()
+        return qs.count()
+
+
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'aid',
@@ -193,12 +203,13 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ('aid', )
     inlines = [DeviceCompetitorInline, ]
     list_filter = (ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
+    show_full_result_count = False
 
     def get_ordering(self, request):
         return ['-modification_date', 'aid']
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(
+        qs = super().get_queryset(request).annotate(
                 competitor_count=Count('competitor_set')
             ).annotate(
                 last_position_at=RawSQL(
@@ -211,6 +222,10 @@ class DeviceAdmin(admin.ModelAdmin):
                     default=RawSQL("json_array_length(locations_raw::json->'timestamps')", ())
                 )
             )
+        return qs
+
+    def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
+        return MyPaginator(queryset, per_page, orphans, allow_empty_first_page)
 
     def location_count(self, obj):
         return obj.location_count_sql
