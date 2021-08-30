@@ -836,7 +836,7 @@ def event_route_upload_view(request, id):
                                     and point.latitude \
                                     and point.longitude:
                                 points['timestamps'].append(
-                                    point.time.timestamp()
+                                    int(point.time.timestamp())
                                 )
                                 points['latitudes'].append(
                                     round(point.latitude, 5)
