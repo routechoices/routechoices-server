@@ -207,11 +207,19 @@ class DeviceCompetitorInline(admin.TabularInline):
         return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
 
 
-class MyPaginator(Paginator):
+class DevicePaginator(Paginator):
     @cached_property
     def count(self):
         qs = self.object_list.all()
         qs.query.annotations.clear()
+        qs = qs.annotate(
+            competitor_count=Count('competitor_set')
+        ).annotate(
+            location_count_sql=Case(
+                When(locations_raw='', then=Value(0)),
+                default=RawSQL("json_array_length(locations_raw::json->'timestamps')", ())
+            )
+        )
         return qs.count()
 
 
@@ -229,7 +237,7 @@ class DeviceAdmin(admin.ModelAdmin):
     actions = ['clean_positions']
     search_fields = ('aid', )
     inlines = [DeviceCompetitorInline, ]
-    list_filter = (IsGPXFilter, ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
+    list_filter = (IsGPXFilter,ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
     show_full_result_count = False
 
     def get_ordering(self, request):
@@ -252,7 +260,7 @@ class DeviceAdmin(admin.ModelAdmin):
         return qs
 
     def get_paginator(self, request, queryset, per_page, orphans=0, allow_empty_first_page=True):
-        return MyPaginator(queryset, per_page, orphans, allow_empty_first_page)
+        return DevicePaginator(queryset, per_page, orphans, allow_empty_first_page)
 
     def location_count(self, obj):
         return obj.location_count_sql
