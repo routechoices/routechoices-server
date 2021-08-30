@@ -104,6 +104,33 @@ class HasCompetitorFilter(admin.SimpleListFilter):
                 competitor_count__gt=0
             )
 
+class IsGPXFilter(admin.SimpleListFilter):
+    title = 'Wether It Is From An External System'
+    parameter_name = 'is_live'
+    def lookups(self, request, model_admin):
+        return [
+            (None, 'Supported Device'),
+            ('gpx', 'External Device'),
+            ('all', 'All'),
+        ]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value() == 'gpx':
+            return queryset.filter(is_gpx=True)
+        elif self.value():
+            return queryset.all()
+        return queryset.filter(is_gpx=False)
+
 
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
@@ -202,7 +229,7 @@ class DeviceAdmin(admin.ModelAdmin):
     actions = ['clean_positions']
     search_fields = ('aid', )
     inlines = [DeviceCompetitorInline, ]
-    list_filter = (ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
+    list_filter = (IsGPXFilter, ModifiedDateFilter, HasCompetitorFilter, HasLocationFilter, )
     show_full_result_count = False
 
     def get_ordering(self, request):
