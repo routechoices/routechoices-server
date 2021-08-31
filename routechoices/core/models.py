@@ -10,6 +10,7 @@ import orjson as json
 import re
 import time
 from zipfile import ZipFile
+import magic
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -161,7 +162,7 @@ Browse our events here.
 
 
 @receiver(pre_delete, sender=Club, dispatch_uid='club_delete_signal')
-def delete_blog_receiver(sender, instance, using, **kwargs):
+def delete_club_receiver(sender, instance, using, **kwargs):
     if instance.domain:
         delete_domain(instance.domain)
 
@@ -260,6 +261,9 @@ class Map(models.Model):
 
     @property
     def kmz(self):
+        doc_img = self.data
+        mime_type = magic.from_buffer(doc_img, mime=True)
+        ext = mime_type[6:]
         doc_kml = '''<?xml version="1.0" encoding="utf-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"
      xmlns:gx="http://www.google.com/kml/ext/2.2">
@@ -270,7 +274,7 @@ class Map(models.Model):
         <name>{}</name>
         <drawOrder>50</drawOrder>
         <Icon>
-          <href>files/doc.jpg</href>
+          <href>files/doc.{}</href>
         </Icon>
         <altitudeMode>clampToGround</altitudeMode>
         <gx:LatLonQuad>
@@ -284,6 +288,7 @@ class Map(models.Model):
 </kml>'''.format(
             self.name,
             self.name,
+            ext,
             self.bound['bottomLeft']['lon'],
             self.bound['bottomLeft']['lat'],
             self.bound['bottomRight']['lon'],
@@ -293,24 +298,27 @@ class Map(models.Model):
             self.bound['topLeft']['lon'],
             self.bound['topLeft']['lat'],
         )
-        doc_jpg = self.data
         kmz = BytesIO()
         with ZipFile(kmz, 'w') as fp:
             with fp.open('doc.kml', 'w') as file1:
                 file1.write(doc_kml.encode('utf-8'))
-            with fp.open('files/doc.jpg', 'w') as file2:
-                file2.write(doc_jpg)
+            with fp.open(f'files/doc.{ext}', 'w') as file2:
+                file2.write(doc_img)
         return kmz.getbuffer()
 
     @property
     def mime_type(self):
-        return 'image/jpeg'
+        with self.image.storage.open(self.image.name, mode='rb', nbytes=2048) as fp:
+            data = fp.read()
+            return magic.from_buffer(data, mime=True)
 
     @property
     def data_uri(self):
+        data = self.data
+        mime_type = magic.from_buffer(data, mime=True)
         return 'data:{};base64,{}'.format(
-            self.mime_type,
-            base64.b64encode(self.data).decode('utf-8')
+            mime_type,
+            base64.b64encode(data).decode('utf-8')
         )
 
     @data_uri.setter
