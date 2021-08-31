@@ -191,6 +191,13 @@ class UploadGPXForm(Form):
     )
 
 
+class UploadMapGPXForm(Form):
+    club = ModelChoiceField(queryset=Club.objects.all())
+    gpx_file = FileField(
+        validators=[FileExtensionValidator(allowed_extensions=['gpx'])]
+    )
+
+
 class UploadKmzForm(Form):
     club = ModelChoiceField(queryset=Club.objects.all())
     file = FileField(

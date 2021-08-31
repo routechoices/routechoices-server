@@ -32,7 +32,8 @@ from routechoices.dashboard.forms import (
     ClubForm, MapForm, EventForm,
     CompetitorFormSet, UploadGPXForm,
     UploadKmzForm, DeviceForm, NoticeForm,
-    ExtraMapFormSet, ClubDomainForm
+    ExtraMapFormSet, ClubDomainForm,
+    UploadMapGPXForm,
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
 
@@ -347,6 +348,71 @@ def map_create_view(request):
         'dashboard/map_edit.html',
         {
             'context': 'create',
+            'form': form,
+        }
+    )
+
+
+@login_required
+def map_gpx_upload_view(request):
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = UploadMapGPXForm(request.POST, request.FILES)
+        form.fields['club'].queryset = club_list
+        # check whether it's valid:
+        if form.is_valid():
+            error = None
+            try:
+                gpx_file = form.cleaned_data['gpx_file'].read().decode('utf8')
+            except UnicodeDecodeError:
+                error = "Couldn't decode file"
+            if not error:
+                try:
+                    gpx = gpxpy.parse(gpx_file)
+                except Exception:
+                    error = "Couldn't parse file"
+            if not error:
+                has_points = False
+                segments = []
+                for route in gpx.routes:
+                    points = []
+                    for point, _ in route.walk():
+                        has_points = True
+                        points.append([round(point.latitude, 5), round(point.longitude, 5)])
+                    segments.append(points)
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        points = []
+                        for point in segment.points:
+                            if point.latitude and point.longitude:
+                                has_points = True
+                                points.append([round(point.latitude, 5), round(point.longitude, 5)])
+                        segments.append(points)
+                if not has_points:
+                    error = "Could not find points in this file"
+                else:
+                    new_map = Map.from_points(segments)
+                    new_map.name = form.cleaned_data['gpx_file'].name[:-4]
+                    new_map.club = form.cleaned_data['club']
+                    new_map.save()
+            if error:
+                messages.error(request, error)
+            else:
+                messages.success(
+                    request,
+                    'The import of the map was successful'
+                )
+                return redirect('dashboard:map_list_view')
+    else:
+        form = UploadMapGPXForm()
+    return render(
+        request,
+        'dashboard/map_gpx_upload.html',
+        {
             'form': form,
         }
     )

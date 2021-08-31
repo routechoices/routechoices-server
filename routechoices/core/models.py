@@ -1,6 +1,5 @@
 import arrow
 import base64
-import bisect
 import datetime
 from decimal import Decimal
 from io import BytesIO
@@ -30,11 +29,12 @@ from django_hosts.resolvers import reverse
 import gpxpy
 import gpxpy.gpx
 
+
 import gps_encoding
 
 import pytz
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
@@ -61,6 +61,40 @@ from routechoices.lib.globalmaptiles import GlobalMercator
 logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
+
+
+def _lon_to_x(lon, zoom):
+    """
+    transform longitude to tile number
+    :type lon: float
+    :type zoom: int
+    :rtype: float
+    """
+    if not (-180 <= lon <= 180):
+        lon = (lon + 180) % 360 - 180
+
+    return ((lon + 180.) / 360) * pow(2, zoom)
+
+
+def _lat_to_y(lat, zoom):
+    """
+    transform latitude to tile number
+    :type lat: float
+    :type zoom: int
+    :rtype: float
+    """
+    if not (-90 <= lat <= 90):
+        lat = (lat + 90) % 180 - 90
+
+    return (1 - log(tan(lat * pi / 180) + 1 / cos(lat * pi / 180)) / pi) / 2 * pow(2, zoom)
+
+
+def _y_to_lat(y, zoom):
+    return atan(sinh(pi * (1 - 2 * y / pow(2, zoom)))) / pi * 180
+
+
+def _x_to_lon(x, zoom):
+    return x / pow(2, zoom) * 360.0 - 180.0
 
 
 class Point(object):
@@ -515,6 +549,58 @@ class Map(models.Model):
             'bottomLeft': {'lat': coords[6], 'lon': coords[7]},
         }
 
+    @classmethod
+    def from_points(cls, seg):
+        new_map = cls()
+
+        min_lat = 90
+        max_lat = -90
+        min_lon = 180
+        max_lon = -180
+        for pts in seg:
+            min_lat = min(min_lat, min((pt[0] for pt in pts)))
+            max_lat = max(max_lat, max((pt[0] for pt in pts)))
+            min_lon = min(min_lon, min((pt[1] for pt in pts)))
+            max_lon = max(max_lon, max((pt[1] for pt in pts)))
+        
+        tl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': min_lon})
+        tr_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
+        br_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': max_lon})
+        bl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': min_lon})
+
+        MAX = 2000
+        offset = 30
+        width = tr_xy['x'] - tl_xy['x'] + offset * 2
+        height = tr_xy['y'] - br_xy['y'] + offset * 2
+
+        scale = 1
+        if width > MAX or height > MAX:
+            scale = max(width, height) / MAX
+        
+        tl_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tl_xy['x'] - offset*scale, 'y': tl_xy['y'] + offset*scale})
+        tr_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tr_xy['x'] + offset*scale, 'y': tr_xy['y'] + offset*scale})
+        br_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': br_xy['x'] + offset*scale, 'y': br_xy['y'] - offset*scale})
+        bl_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': bl_xy['x'] - offset*scale, 'y': bl_xy['y'] - offset*scale})
+
+        new_map.corners_coordinates = f"{tl_latlon['lat']},{tl_latlon['lon']},{tr_latlon['lat']},{tr_latlon['lon']},{br_latlon['lat']},{br_latlon['lon']},{bl_latlon['lat']},{bl_latlon['lon']}"
+        im = Image.new('RGBA', (int(width / scale), int(height / scale)), (255, 255, 255, 0))
+        new_map.width = int(width / scale)
+        new_map.height = int(height / scale)
+        draw = ImageDraw.Draw(im)
+        for pts in seg:
+            map_pts = [new_map.wsg84_to_map_xy(pt[0], pt[1]) for pt in pts]
+            draw.line(map_pts, 'white', 15, joint='curve')
+            draw.line(map_pts, '#D2322D', 12, joint='curve')
+
+        out_buffer = BytesIO()
+        im.save(out_buffer, 'PNG', dpi=(300, 300))
+        f_new = File(out_buffer)
+        new_map.image.save(
+            'filename',
+            f_new,
+            save=False,
+        )
+        return new_map
 
 PRIVACY_PUBLIC = 'public'
 PRIVACY_SECRET = 'secret'

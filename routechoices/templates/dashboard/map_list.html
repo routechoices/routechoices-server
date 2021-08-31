@@ -8,6 +8,7 @@
     <div class="col-xs-12">
         <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
         <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-default">Import from KMZ/KML</a>
+        <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-default">Import from GPX</a>
         <h1>Your Clubs Maps</h1>
         {% if not maps %}
             <p>You haven't created any map yet.</p>

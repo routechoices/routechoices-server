@@ -47,6 +47,11 @@ urlpatterns = [
         name='map_upload_kmz_view'
     ),
     url(
+        r'^map/upload_gpx/?$',
+        views.map_gpx_upload_view,
+        name='map_upload_gpx_view'
+    ),
+    url(
         r'^map/(?P<id>[A-Za-z0-9_-]+)/?$',
         views.map_edit_view,
         name='map_edit_view'
