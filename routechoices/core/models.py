@@ -590,7 +590,7 @@ class Map(models.Model):
         for pts in seg:
             map_pts = [new_map.wsg84_to_map_xy(pt[0], pt[1]) for pt in pts]
             draw.line(map_pts, 'white', 15, joint='curve')
-            draw.line(map_pts, '#D2322D', 12, joint='curve')
+            draw.line(map_pts, 'purple', 12, joint='curve')
 
         out_buffer = BytesIO()
         im.save(out_buffer, 'PNG', dpi=(300, 300))
