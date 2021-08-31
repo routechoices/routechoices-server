@@ -19,7 +19,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -52,7 +52,8 @@ from routechoices.lib.helper import (
     short_random_key,
     short_random_slug,
     general_2d_projection,
-    adjugate_matrix, project, find_coeffs
+    adjugate_matrix, project, find_coeffs,
+    delete_domain
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -61,40 +62,6 @@ from routechoices.lib.globalmaptiles import GlobalMercator
 logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
-
-
-def _lon_to_x(lon, zoom):
-    """
-    transform longitude to tile number
-    :type lon: float
-    :type zoom: int
-    :rtype: float
-    """
-    if not (-180 <= lon <= 180):
-        lon = (lon + 180) % 360 - 180
-
-    return ((lon + 180.) / 360) * pow(2, zoom)
-
-
-def _lat_to_y(lat, zoom):
-    """
-    transform latitude to tile number
-    :type lat: float
-    :type zoom: int
-    :rtype: float
-    """
-    if not (-90 <= lat <= 90):
-        lat = (lat + 90) % 180 - 90
-
-    return (1 - log(tan(lat * pi / 180) + 1 / cos(lat * pi / 180)) / pi) / 2 * pow(2, zoom)
-
-
-def _y_to_lat(y, zoom):
-    return atan(sinh(pi * (1 - 2 * y / pow(2, zoom)))) / pi * 180
-
-
-def _x_to_lon(x, zoom):
-    return x / pow(2, zoom) * 360.0 - 180.0
 
 
 class Point(object):
@@ -181,6 +148,22 @@ Browse our events here.
             qs = qs.exclude(id=self.id)
         if qs.exists():
             raise ValidationError('Club with this slug already exists.')
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            if self.domain:
+                self.domain = self.domain.lower()
+            old_domain = Club.objects.get(pk=self.pk).domain
+            if old_domain and old_domain != self.domain:
+                delete_domain(old_domain)
+        self.slug = self.slug.lower()
+        return super().save(*args, **kwargs)
+
+
+@receiver(pre_delete, sender=Club, dispatch_uid='club_delete_signal')
+def delete_blog_receiver(sender, instance, using, **kwargs):
+    if instance.domain:
+        delete_domain(instance.domain)
 
 
 def map_upload_path(instance=None, file_name=None):

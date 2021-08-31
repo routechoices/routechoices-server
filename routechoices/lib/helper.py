@@ -4,7 +4,10 @@ import struct
 import requests
 import requests
 import numpy
+import os
+import os.path
 
+from django.conf import settings
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
 
@@ -269,3 +272,13 @@ def find_coeffs(pa, pb):
     B = numpy.array(pb).reshape(8)
     res = numpy.dot(numpy.linalg.inv(A.T * A) * A.T, B)
     return numpy.array(res).reshape(8)
+
+
+def delete_domain(domain):
+    ngx_conf = os.path.join(settings.BASE_DIR, 'nginx', 'custom_domains', f'{domain}')
+    crt_file = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')
+    key_file = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')
+    act_file = os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key')
+    for file in (ngx_conf, crt_file, key_file, act_file):
+        if os.path.exists(file):
+            os.remove(file)
