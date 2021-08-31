@@ -381,17 +381,19 @@ def map_gpx_upload_view(request):
                 for route in gpx.routes:
                     points = []
                     for point, _ in route.walk():
-                        has_points = True
                         points.append([round(point.latitude, 5), round(point.longitude, 5)])
-                    segments.append(points)
+                    if len(points) > 1:
+                        has_points = True
+                        segments.append(points)
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = []
                         for point in segment.points:
                             if point.latitude and point.longitude:
-                                has_points = True
                                 points.append([round(point.latitude, 5), round(point.longitude, 5)])
-                        segments.append(points)
+                        if len(points) > 1:
+                            has_points = True
+                            segments.append(points)
                 if not has_points:
                     error = "Could not find points in this file"
                 else:
