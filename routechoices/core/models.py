@@ -48,7 +48,7 @@ from routechoices.lib.validators import (
      validate_imei,
      domain_validator,
 )
-from routechoices.lib.helper import (
+from routechoices.lib.helpers import (
     random_key,
     short_random_key,
     short_random_slug,

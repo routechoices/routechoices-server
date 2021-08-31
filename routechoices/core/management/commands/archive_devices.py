@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 
 from routechoices.core.models import Device
-from routechoices.lib.helper import short_random_key
+from routechoices.lib.helpers import short_random_key
 
 
 class Command(BaseCommand):

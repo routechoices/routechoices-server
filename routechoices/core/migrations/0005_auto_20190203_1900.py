@@ -4,7 +4,7 @@ import django.core.validators
 from django.db import migrations, models
 import django.utils.timezone
 import re
-import routechoices.lib.helper
+import routechoices.lib.helpers
 import routechoices.lib.validators
 
 
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='device',
             name='aid',
-            field=models.CharField(default=routechoices.lib.helper.short_random_key, max_length=12, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')]),
+            field=models.CharField(default=routechoices.lib.helpers.short_random_key, max_length=12, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')]),
         ),
         migrations.AlterField(
             model_name='event',

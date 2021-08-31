@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 
 from allauth.account.models import EmailAddress
 
-from routechoices.lib.helper import get_device_name
+from routechoices.lib.helpers import get_device_name
 
 from routechoices.core.models import (
     Club,

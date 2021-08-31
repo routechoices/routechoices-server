@@ -7,7 +7,7 @@ import django.db.models.deletion
 import django.utils.timezone
 import routechoices.core.models
 import routechoices.lib
-import routechoices.lib.helper
+import routechoices.lib.helpers
 import routechoices.lib.storages
 
 
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             name='Club',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('aid', models.CharField(default=routechoices.lib.helper.random_key, editable=False, max_length=12, unique=True)),
+                ('aid', models.CharField(default=routechoices.lib.helpers.random_key, editable=False, max_length=12, unique=True)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('modification_date', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=255)),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             name='Competitor',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('aid', models.CharField(default=routechoices.lib.helper.random_key, editable=False, max_length=12, unique=True)),
+                ('aid', models.CharField(default=routechoices.lib.helpers.random_key, editable=False, max_length=12, unique=True)),
                 ('name', models.CharField(max_length=64)),
                 ('short_name', models.CharField(blank=True, max_length=32, null=True)),
                 ('start_time', models.DateTimeField()),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
             name='Device',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('aid', models.CharField(default=routechoices.lib.helper.short_random_key, max_length=12, unique=True)),
+                ('aid', models.CharField(default=routechoices.lib.helpers.short_random_key, max_length=12, unique=True)),
             ],
             options={
                 'verbose_name_plural': 'devices',
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
             name='Event',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('aid', models.CharField(default=routechoices.lib.helper.random_key, editable=False, max_length=12, unique=True)),
+                ('aid', models.CharField(default=routechoices.lib.helpers.random_key, editable=False, max_length=12, unique=True)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('modification_date', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=255)),

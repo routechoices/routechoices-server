@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from background_task import background
 
 from routechoices.core.models import Map, Event, Device, Competitor, Club
-from routechoices.lib.helper import short_random_key, \
+from routechoices.lib.helpers import short_random_key, \
     three_point_calibration_to_corners, compute_corners_from_kml_latlonbox
 from routechoices.lib.mtb_decoder import MtbDecoder
 

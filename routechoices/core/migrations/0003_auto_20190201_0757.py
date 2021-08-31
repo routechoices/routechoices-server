@@ -4,7 +4,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import routechoices.core.models
 import routechoices.lib
-import routechoices.lib.helper
+import routechoices.lib.helpers
 import routechoices.lib.storages
 
 
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Map',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('aid', models.CharField(default=routechoices.lib.helper.random_key, editable=False, max_length=12, unique=True)),
+                ('aid', models.CharField(default=routechoices.lib.helpers.random_key, editable=False, max_length=12, unique=True)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('modification_date', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=255)),

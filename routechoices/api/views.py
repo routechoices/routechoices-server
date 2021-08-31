@@ -39,7 +39,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
 )
-from routechoices.lib.helper import short_random_key, initial_of_name
+from routechoices.lib.helpers import short_random_key, initial_of_name
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei

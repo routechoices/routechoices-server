@@ -172,7 +172,8 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
+LOGIN_URL = '//www.localhost:8080/accounts/login/'
+REDIRECT_ALLOWED_DOMAINS = ['api.localhost', 'www.localhost']
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -274,7 +275,7 @@ SLUG_BLACKLIST = [
     'widgets', 'wiki', 'wpad', 'write', 'www', 'www-data', 'www1', 'www2',
     'www3', 'www4', 'you', 'yourname', 'yourusername', 'zlib', 'traccar',
 ]
-
+ACCOUNT_ADAPTER = 'routechoices.lib.account_adapters.SiteAccountAdapter'
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"

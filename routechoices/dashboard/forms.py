@@ -18,7 +18,7 @@ from django.forms import (
 from routechoices.core.models import (
     Club, Map, Event, Competitor, Device, Notice, MapAssignation
 )
-from routechoices.lib.helper import get_aware_datetime, check_records
+from routechoices.lib.helpers import get_aware_datetime, check_records
 from routechoices.lib.validators import domain_validator
 
 class ClubForm(ModelForm):

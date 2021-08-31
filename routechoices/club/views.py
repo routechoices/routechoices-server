@@ -17,7 +17,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_PRIVATE,
 )
-from routechoices.lib.helper import initial_of_name
+from routechoices.lib.helpers import initial_of_name
 from routechoices.site.forms import CompetitorForm, UploadGPXForm
 from routechoices.club import feeds
 

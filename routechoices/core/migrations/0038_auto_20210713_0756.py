@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import routechoices.lib.helper
+import routechoices.lib.helpers
 import routechoices.lib.validators
 
 
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='slug',
-            field=models.CharField(db_index=True, default=routechoices.lib.helper.short_random_slug, help_text='This is used to build the url of this event', max_length=50, validators=[routechoices.lib.validators.validate_nice_slug], verbose_name='Slug'),
+            field=models.CharField(db_index=True, default=routechoices.lib.helpers.short_random_slug, help_text='This is used to build the url of this event', max_length=50, validators=[routechoices.lib.validators.validate_nice_slug], verbose_name='Slug'),
         ),
         migrations.AlterField(
             model_name='event',

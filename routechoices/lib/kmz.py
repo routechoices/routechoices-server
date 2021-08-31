@@ -1,6 +1,6 @@
 from defusedxml import minidom
 
-from routechoices.lib.helper import compute_corners_from_kml_latlonbox
+from routechoices.lib.helpers import compute_corners_from_kml_latlonbox
 
 class BadKMLException(Exception):
     pass
