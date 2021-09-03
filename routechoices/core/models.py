@@ -549,10 +549,13 @@ class Map(models.Model):
         min_lon = 180
         max_lon = -180
         for pts in seg:
-            min_lat = min(min_lat, min((pt[0] for pt in pts)))
-            max_lat = max(max_lat, max((pt[0] for pt in pts)))
-            min_lon = min(min_lon, min((pt[1] for pt in pts)))
-            max_lon = max(max_lon, max((pt[1] for pt in pts)))
+            lats_lons = list(zip(*pts))
+            lats = lats_lons[0]
+            lons = lats_lons[1]
+            min_lat = min(min_lat, min(lats))
+            max_lat = max(max_lat, max(lats))
+            min_lon = min(min_lon, min(lons))
+            max_lon = max(max_lon, max(lons))
         
         tl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': min_lon})
         tr_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
