@@ -694,7 +694,7 @@ var drawCompetitors = function(){
               }
               if (getRelativeTime(competitorTime) > 0) {
                 finishLineCrosses.push({
-                  competitor, 
+                  competitor: competitor, 
                   time: competitorTime,
                   idx: oldCrossing.idx
                 });
