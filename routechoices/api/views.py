@@ -53,6 +53,7 @@ from rest_framework.exceptions import (
     PermissionDenied
 )
 from rest_framework.response import Response
+import warnings
 
 
 logger = logging.getLogger(__name__)
@@ -810,6 +811,7 @@ def locations_api_gw(request):
 
 
 def garmin_api_gw(request):
+    warnings.warn(Warning('garmin'))
     return locations_api_gw(request)
 
 
