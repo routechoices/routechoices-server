@@ -471,6 +471,9 @@ $(function() {
         }
         if (response.maps.length > 1) {
             L.control.layers(MapLayers, null, {collapsed: false}).addTo(map);
+            map.on('baselayerchange', function(e) {
+                map.fitBounds(e.layer.options.bounds)
+            })
         }
       }
       if (response.announcement) {
