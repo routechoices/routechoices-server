@@ -1,5 +1,5 @@
 arrow
-django
+django==3.2.6
 pillow
 django-cors-headers
 requests
