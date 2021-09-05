@@ -428,7 +428,13 @@ class Map(models.Model):
     def create_tile(self, output_width, output_height,
                     min_lat, max_lat, min_lon, max_lon):
         cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
-        cached = cache.get(cache_key)
+
+        cached = None
+        if not settings.DEBUG:
+            try:
+                cached = cache.get(cache_key)
+            except Exception:
+                pass
         if cached and not settings.DEBUG:
             return cached
 
@@ -471,7 +477,10 @@ class Map(models.Model):
         if tile_img:
             img_out.paste(tile_img, (0, 0), tile_img)
             if not settings.DEBUG:
-                cache.set(cache_key, img_out, 3600*24*30)
+                try:
+                    cache.set(cache_key, img_out, 3600*24*30)
+                except Exception:
+                    pass
         return img_out
 
     def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):

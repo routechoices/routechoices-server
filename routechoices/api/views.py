@@ -533,22 +533,31 @@ def event_data(request, event_id):
     cache_prefix = 'live' if event.is_live else 'archived'
     cache_key = f'{cache_prefix}_event_data:{event_id}:{cache_ts}'
     prev_cache_key = f'{cache_prefix}_event_data:{event_id}:{cache_ts - 1}'
-    # then if event is archived check if we have a cache for that
+    # then if we have a cache for that
     # return it if we do
     cached_res = None
-    if event.ended:
-        cached_res = cache.get(cache_key)
-    if cached_res and not settings.DEBUG:
+    if not settings.DEBUG and not event.is_live:
+        try:
+            cached_res = cache.get(cache_key)
+        except Exception:
+            pass
+    if cached_res:
         return Response(cached_res)
     # If we dont have cache check if we are currently generating cache
     # if so return previous cache data if available
-    elif cache.get(f'{cache_key}:processing'):
-        cached_res = cache.get(prev_cache_key)
-        if cached_res and not settings.DEBUG:
+    elif cache.get(f'{cache_key}:processing') and not settings.DEBUG:
+        try:
+            cached_res = cache.get(prev_cache_key)
+        except Exception:
+            pass
+        if cached_res:
             return Response(cached_res)
     # else generate data and set that we are generating cache
-    cache.set(f'{cache_key}:processing', 1, 15)
-
+    if not settings.DEBUG:
+        try:
+            cache.set(f'{cache_key}:processing', 1, 15)
+        except Exception:
+            pass
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
@@ -602,8 +611,11 @@ def event_data(request, event_id):
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
     }
-    cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
-
+    if not settings.DEBUG:
+        try:
+            cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
+        except Exception:
+            pass
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {
