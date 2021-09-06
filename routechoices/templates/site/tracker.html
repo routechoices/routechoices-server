@@ -24,19 +24,19 @@
         <div class="row">
           <h1>GPS Trackers</h1>
           <div class="row" style="margin-bottom: 15px">
-            <div class="col col-md-4 col-xs-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/iphone_tracker.png' %}"/></div>
-            <div class="col col-md-4 col-xs-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/TMT250.png' %}"/></div>
-            <div class="col col-md-4 col-xs-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/gl300.png' %}"/></div>
-            <!--<div class="col col-md-3 col-xs-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
+            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/iphone_tracker.png' %}"/></div>
+            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/TMT250.png' %}"/></div>
+            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/gl300.png' %}"/></div>
+            <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
           <p>You can upload your location to provide live GPS tracking in two different way. Using a smartphone or using a dedicated GPS tracker.</p>
           <p>For each method we need to generate for the device a unique device ID that can be trasmitted to the organizer.</p>
           <p>Select below your desired option for more detail instructions:</p>
           <p style="margin-top:2em; text-align:center">
-            <a role="button" class="btn btn-info" id="android-btn" data-toggle="modal" data-target="#android-modal" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
-            <a role="button" class="btn btn-primary" id="ios-btn" data-toggle="modal" data-target="#ios-modal" style="margin-bottom: 5px"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
+            <a role="button" class="btn btn-info" id="android-btn" data-bs-toggle="modal" data-bs-target="#android-modal" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
+            <a role="button" class="btn btn-primary" id="ios-btn" data-bs-toggle="modal" data-bs-target="#ios-modal" style="margin-bottom: 5px"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
             <!--<a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a IPhone</a> -->
-            <a role="button" class="btn btn-danger" id="tmt250-btn" data-toggle="modal" data-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
+            <a role="button" class="btn btn-danger" id="tmt250-btn" data-bs-toggle="modal" data-bs-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
             <!--<a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>-->
           </p>
         </div>
@@ -45,8 +45,8 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
               <h4 class="modal-title" id="garmin-modal-label">Garmin Tracking App</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p>
@@ -63,7 +63,7 @@
              </p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -72,8 +72,8 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
               <h4 class="modal-title" id="traccar-modal-label">Traccar Tracking App</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p>
@@ -116,7 +116,7 @@
              <p>For more troubleshooting see <a href="https://www.traccar.org/client-troubleshooting/">Traccar troubleshooting page</a></p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -126,8 +126,8 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
               <h4 class="modal-title" id="ios-modal-label">iOS Tracking App</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p>
@@ -140,7 +140,8 @@
                 When you'll open the app, it will display your device ID.
                </p>
                <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
-               <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone.</p>
+               <p>Once you have good GPS signal the Device ID should turn green and the app will start streaming your position.</p>
+               <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone and that GPS access is allowed all the time.</p>
              <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
                 <li>
@@ -153,7 +154,7 @@
             </p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -163,8 +164,8 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
               <h4 class="modal-title" id="android-modal-label">Android Tracking App</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
              <p>
@@ -177,7 +178,8 @@
               When you'll open the app, it will display your device ID.
              </p>
              <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
-             <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone.</p>
+             <p>Once you have good GPS signal the Device ID should turn green and the app will start streaming your position.</p>
+             <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone and that GPS access is allowed all the time.</p>
              <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
                 <li>
@@ -190,7 +192,7 @@
              </p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -201,8 +203,8 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
               <h4 class="modal-title" id="tmt250-modal-label">GPS Trackers</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <p>
@@ -231,20 +233,20 @@
                   <label for="IMEI">IMEI</label>
                   <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
                   <small id="IMEIHelp" class="form-text text-muted">This is used to link your physical device with our system.</small>
-                  <div id="imeiErrorMsg" class="invalid-feedback hidden">
+                  <div id="imeiErrorMsg" class="invalid-feedback d-none">
                     <i class="fa fa-warning"></i> Invalid IMEI
                   </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Generate</button>
               </form>
               <br/>
-              <ul id="imeiDevId" class="well hidden" >
+              <ul id="imeiDevId" class="well d-none" >
                 <li>IMEI <code id="imeiRes"></code></li>
                 <li>Device ID: <code class="imeiDevId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
               </ul>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -254,8 +256,8 @@
           <div class="modal-dialog">
               <div class="modal-content">
                    <div class="modal-header">
-                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                       <h4 class="modal-title" id="error-modal-label">Error</h4>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                       <div id="error-modal-msg"></div>
@@ -306,7 +308,9 @@ $(function() {
         setDeviceId(response.device_id)
       }).fail(function() {
         $('#error-modal-msg').text("Couldn't connect to API server");
-        $('#error-modal').modal('show');
+        var errorModal = new bootstrap.Modal(document.getElementById('error-modal'))
+        errorModal.show()
+
       })
     } else {
       $(".devId").text(devId);
@@ -321,14 +325,14 @@ $(function() {
       dataType: 'json',
       data: {imei: $('#IMEI').val()}
     }).done(function(response) {
-      $('#IMEIDiv').removeClass('has-error')
-      $('#imeiDevId').removeClass('hidden')
+      $('#IMEIDiv').removeClass('is-invalid')
+      $('#imeiDevId').removeClass('d-none')
       $('.imeiDevId').text(response.device_id);
-      $('#imeiErrorMsg').addClass('hidden');
+      $('#imeiErrorMsg').addClass('d-none');
     }).fail(function() {
-      $('#imeiErrorMsg').removeClass('hidden');
-      $('#IMEIDiv').addClass('has-error')
-      $('#imeiDevId').addClass('hidden')
+      $('#imeiErrorMsg').removeClass('d-none');
+      $('#IMEI').addClass('is-invalid')
+      $('#imeiDevId').addClass('d-none')
     })
   })
 });

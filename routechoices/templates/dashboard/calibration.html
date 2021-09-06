@@ -1,10 +1,10 @@
-{% load static %}{% load bootstrap3 %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calibrate Map</title>
-{% bootstrap_css %}
+<link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.0/bootstrap.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <style>
 .leaflet_map {
@@ -76,7 +76,7 @@
 </div>
 </div>
 </div>
-<div id="step3" class="hidden">
+<div id="step3" class="d-none">
 <div class="row">
 <div class="col-md-12">
 <div id="preview_map" class="leaflet_map"></div>
@@ -98,7 +98,7 @@
      </div>
      <!-- Copyright -->
  </footer>
-{% bootstrap_javascript jquery=1 %}
+<script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
 <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
@@ -252,7 +252,7 @@ $(function(){
 
     function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
-        var imageURL = $(imageInput).parent().children('a').attr('href');
+        var imageURL = $(imageInput).parent().find('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {
@@ -420,8 +420,8 @@ $(function(){
     $('#to_step3_button').on('click', function(e){
         e.preventDefault();
         compute_calib_string();
-        $('#step2').addClass('hidden');
-        $('#step3').removeClass('hidden');
+        $('#step2').addClass('d-none');
+        $('#step3').removeClass('d-none');
         $('#help_text').text(help_texts[1]);
         display_preview_map();
     });
@@ -429,8 +429,8 @@ $(function(){
         e.preventDefault();
         map_c.remove();
         $('#help_text').text(help_texts[0]);
-        $('#step3').addClass('hidden');
-        $('#step2').removeClass('hidden');
+        $('#step3').addClass('d-none');
+        $('#step2').removeClass('d-none');
     });
 
     $('#to_step4_button').on('click', function(e){

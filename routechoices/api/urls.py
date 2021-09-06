@@ -14,7 +14,7 @@ schema_view = get_schema_view(
       default_version='v1',
       description="Routechoices.com API",
       terms_of_service="https://www.routechoices.com/tos/",
-      contact=openapi.Contact(email="admin@routechoices.com"),
+      contact=openapi.Contact(email="info@routechoices.com"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,

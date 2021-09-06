@@ -1,10 +1,10 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         <h1>Upload GPX</h1>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}

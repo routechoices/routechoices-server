@@ -16,8 +16,8 @@
         <td>{% if event.map_title %}{{ event.map_title }}{% else %}Main map{% endif %}</a></td>
         <td>
           {% if event.started %}
-          <a href="{{event.club.nice_url}}{{event.slug}}/map/" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> Image</a>
-          <a href="{{event.club.nice_url}}{{event.slug}}/kmz/" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{{event.club.nice_url}}{{event.slug}}/map/" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> Image</a>
+          <a href="{{event.club.nice_url}}{{event.slug}}/kmz/" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>
@@ -26,8 +26,8 @@
         <td>{{ map.title }}</a></td>
         <td>
           {% if event.started %}
-          <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> Image</a>
-          <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter}}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> KMZ</a>
+          <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter}}" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> Image</a>
+          <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter}}" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> KMZ</a>
           {% endif %}
         </td>
       </tr>
@@ -43,7 +43,7 @@
       <tr>
         <td>{{ competitor.name }}</a></td>
         <td>{{ competitor.start_time|date:'Y-m-d H:i:s \U\T\C' }}</td>
-        <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-xs btn-primary"><i class="fa fa-download"></i> GPX</a>{% if event.map %} <a href="https://karttamuovi.com/new#title={{ event.name|urlencode }}%20-%20{{competitor.name|urlencode}}&kmz=https:{% host_url 'event_kmz_download' event_id=event.aid host 'api' %}&gpx=https:{% host_url 'competitor_gpx_download' competitor_id=competitor.aid host 'api' %}" class="btn btn-xs btn-primary" target="_blank" rel="noreferrer"><i class="fa fa-external-link"></i> Karttamuovi</a>{% endif %}{% endif %}</td>
+        <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> GPX</a>{% if event.map %} <a href="https://karttamuovi.com/new#title={{ event.name|urlencode }}%20-%20{{competitor.name|urlencode}}&kmz=https:{% host_url 'event_kmz_download' event_id=event.aid host 'api' %}&gpx=https:{% host_url 'competitor_gpx_download' competitor_id=competitor.aid host 'api' %}" class="btn btn-sm btn-primary" target="_blank" rel="noreferrer"><i class="fa fa-external-link"></i> Karttamuovi</a>{% endif %}{% endif %}</td>
       </tr>
       {% endfor %}
     </table>

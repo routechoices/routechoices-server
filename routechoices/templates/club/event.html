@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load hosts %}
 
 {% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
@@ -52,7 +52,7 @@
 
 .sidebar {
     position: fixed;
-    top: 51px;
+    top: 56px;
     bottom: 90px;
     left: 0;
     z-index: 1000;
@@ -104,14 +104,14 @@ and (max-device-width : 500px) {
 
  .main {
     position: fixed;
-    top: 51px;
+    top: 56px;
     bottom: 90px;
     right: 0px;
     left: 0px;
 }
 .main-alerts {
     position: fixed;
-    top: 51px;
+    top: 56px;
     right: 0px;
     left: 0px;
 }
@@ -167,7 +167,7 @@ and (max-device-width : 500px) {
 }
 
 .modal-backdrop, #eventNotStartedModal, #eventLoadingModal {
-  top: 50px;
+  top: 56px;
 }
 
 .navbar {
@@ -177,6 +177,10 @@ and (max-device-width : 500px) {
 .leaflet-left.has-leaflet-pan-control .leaflet-control-rotate {
     position: relative;
     left: 24px;
+}
+
+.time_bar .btn-secondary:focus {
+  box-shadow: none
 }
 </style>
 {% endblock %}
@@ -188,47 +192,47 @@ and (max-device-width : 500px) {
 
 <div class="container-fluid">
   <div class="row">
-    <div id="sidebar" class="hidden-xs col-sm-3 col-lg-2 sidebar"></div>
-    <div id="map" class="col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main"></div>
-    <div class="page-alerts col-xs-12 col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main-alerts">
-      <div class="alert alert-info page-alert" id="alert-2">
-          <button type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+    <div id="sidebar" class="d-none d-sm-block col-sm-3 col-lg-2 sidebar"></div>
+    <div id="map" class="d-sm-block col-12 col-sm-9 offset-sm-3 col-lg-10 offset-lg-2 main"></div>
+    <div class="page-alerts col-12 col-sm-9 offset-sm-3 col-lg-10 offset-lg-2 main-alerts">
+      <div class="alert alert-info page-alert alert-dismissible" id="alert-2">
           <strong>Heads up!</strong> <span id="alert-text"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     </div>
   </div>
   <div class="row">  
-    <div class="col-xs-12 time_bar">
+    <div class="col-12 time_bar">
       <div>
-        <div class="btn-group hidden-sm hidden-md hidden-lg">
-          <a href="#" role="button" class="btn btn-sm btn-default" id="runners_show_button"><i class="fa fa-users"></i></a>
+        <div class="d-sm-none btn-group">
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="runners_show_button"><i class="fa fa-users"></i></a>
         </div>
         
-        <div class="btn-group" id="view_mods_buttons">
-          <a href="#" role="button" class="btn btn-sm btn-default" id="live_button">Live</a>
-          <a href="#" role="button" class="btn btn-sm btn-default" id="replay_button">Replay</a>
+        <div class="btn-group me-2" role="group" id="view_mods_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="live_button">Live</a>
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="replay_button">Replay</a>
         </div>
         
-        <div class="btn-group" id="replay_mode_buttons">
-          <a href="#" role="button" class="btn btn-sm btn-default active" id="real_time_button">Real Time</a>
-          <a href="#" role="button" class="btn btn-sm btn-default" id="mass_start_button">Mass start</a>
+        <div class="btn-group me-2" role="group" id="replay_mode_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-secondary active" id="real_time_button">Real Time</a>
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="mass_start_button">Mass start</a>
         </div>
         
-        <div class="btn-group" id="replay_control_buttons">
-          <a href="#" role="button" class="btn btn-sm btn-default" id="prev_button"><i class="fa fa-backward"></i></a>
-          <a href="#" role="button" class="btn btn-sm btn-default" id="play_pause_button"><i class="fa fa-play"></i></a>
-          <a href="#" role="button" class="btn btn-sm btn-default" id="next_button"><i class="fa fa-forward"></i></a>
+        <div class="btn-group me-2" role="group" id="replay_control_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="prev_button"><i class="fa fa-backward"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="play_pause_button"><i class="fa fa-play"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="next_button"><i class="fa fa-forward"></i></a>
         </div>
 
-        <div class="btn-group pull-right" id="share_buttons">
-          <a href="#" role="button" class="btn btn-sm btn-default" id="share_button"><i class="fa fa-share-alt"></i></a>
+        <div class="btn-group pull-right me-2" role="group" id="share_buttons">
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="share_button"><i class="fa fa-share-alt"></i></a>
         </div>
         
       </div>
       <div style="padding-top:5px;">
         <div id="full_progress_bar" class="progress" style="cursor: pointer">
           <div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            <span id="progress_bar_text" style="color:#666;padding:5px"></span>
+            <span id="progress_bar_text" style="padding:5px"></span>
           </div>
         </div>
       </div>
@@ -281,7 +285,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021090603.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021090800.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -312,19 +316,17 @@ $(function() {
     $(this).closest('.page-alert').slideUp();
   });
 
-  $("#before_race_modal").modal('show').on('hide.bs.modal', function(e){
-      e.preventDefault();
-  });
-
   $('#runners_show_button').on('click', function(e){
     e.preventDefault();
-    if($('#sidebar').hasClass('hidden-xs')){
-      $('#sidebar').removeClass('hidden-xs').addClass('col-xs-12');
-      $('#map').addClass('hidden-xs').removeClass('col-xs-12');
+    if($('#sidebar').hasClass('d-none')){
+      $('#sidebar').removeClass('d-none').addClass('col-12');
+      $('#map').addClass('d-none').removeClass('col-12');
+      console.log('A')
     }else{
-      $('#sidebar').addClass('hidden-xs').removeClass('col-xs-12');
-      $('#map').removeClass('hidden-xs').addClass('col-xs-12');
+      $('#sidebar').addClass('d-none').removeClass('col-12');
+      $('#map').removeClass('d-none').addClass('col-12');
       map.invalidateSize()
+      console.log('B')
     }
   })
 
@@ -425,7 +427,12 @@ $(function() {
     var endEvent = new Date(response.event.end_date)
     if (startEvent > now) {
       $('#eventLoadingModal').remove()
-      $('#eventNotStartedModal').modal({backdrop:'static', keyboard: false, });
+
+      var preRaceModal = new bootstrap.Modal(document.getElementById("eventNotStartedModal"), {backdrop:'static', keyboard: false, })
+      document.getElementById("eventNotStartedModal").addEventListener('hide.bs.modal', function(e){
+          e.preventDefault();
+      })
+      preRaceModal.show();
       window.setInterval(function(){
         if(new Date() > startEvent) {
           location.reload();

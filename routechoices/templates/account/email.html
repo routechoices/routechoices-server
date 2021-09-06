@@ -1,7 +1,7 @@
 {% extends "dashboard/home.html" %}
 
 {% load i18n %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block head_title %}{% trans "Account" %}{% endblock %}
 
@@ -22,18 +22,18 @@
 
 {{ emailaddress.email }}
     {% if emailaddress.verified %}
-    <span class="verified label label-success">{% trans "Verified" %}</span>
+    <span class="verified badge bg-success">{% trans "Verified" %}</span>
     {% else %}
-    <span class="unverified label label-danger">{% trans "Unverified" %}</span>
+    <span class="unverified badge bg-danger">{% trans "Unverified" %}</span>
     {% endif %}
-      {% if emailaddress.primary %}<span class="primary label label-primary">{% trans "Primary" %}</span>{% endif %}
+      {% if emailaddress.primary %}<span class="primary badge bg-primary">{% trans "Primary" %}</span>{% endif %}
 </label>
 </div>
   {% endfor %}
 
 <div class="buttonHolder">
       <button class="secondaryAction btn btn-primary" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
-      <button class="secondaryAction btn btn-default" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
+      <button class="secondaryAction btn btn-secondary" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
       <button class="primaryAction btn btn-danger" type="submit" name="action_remove" ><i class="fa fa-trash"></i> {% trans 'Remove' %}</button>
 </div>
 
@@ -45,8 +45,8 @@
 
 {% endif %}
 
-
-    <h2>{% trans "Add E-mail Address" %}</h2>
+<br/>
+    <h3>{% trans "Add E-mail Address" %}</h3>
 
     <form method="post" action="{% url 'account_email' %}" class="add_email">
         {% csrf_token %}

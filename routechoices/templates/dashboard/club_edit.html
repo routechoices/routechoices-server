@@ -1,15 +1,15 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load hosts %}
 {%  block extra_head %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap3.css' %}" />
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap5.css' %}" />
 {%  endblock %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         <h1>{% if context == 'edit' %}Edit Club{% else %}New CLub{% endif %}</h1>
         <form action="" method="post">
             {% csrf_token %}
@@ -25,6 +25,9 @@
 {{ block.super }}
 <script src="{% static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
 <script>
+{% if context != 'edit' %}
+$('#id_slug').parent().find('.form-text').text('.routechoices.com')
+{% endif %}
 $('#id_admins').selectize({
     valueField: 'id',
     labelField: 'username',
