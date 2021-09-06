@@ -876,7 +876,7 @@ function addRasterMap(bounds, src, fit) {
     layers: eventId,
     bounds: bounds,
     tileSize: 512,
-    noWrap: 'false',
+    noWrap: true,
   }).addTo(map);
   if(fit) {
     map.fitBounds(bounds);
