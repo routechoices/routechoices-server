@@ -35,7 +35,7 @@
       {% csrf_token %}
       <p>{% blocktrans %}You can also end all other sessions but the current.
         This will log you out on all other devices.{% endblocktrans %}</p>
-      <button type="submit" class="btn btn-default btn-warning">{% trans "End All Other Sessions" %}</button>
+      <button type="submit" class="btn btn-secondary btn-warning">{% trans "End All Other Sessions" %}</button>
     </form>
   {% endif %}
 {% endblock %}

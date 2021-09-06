@@ -1,15 +1,16 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load hosts %}
 {%  block extra_head %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap3.css' %}" />
+<link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static '/vendor/tempus-dominus-6alpha1/css/tempus-dominus.css' %}"/>
 {%  endblock %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         {% if event %}<h1>{{event.name}}</h1>
         {% if event.shortcut %}
         <p><img id='qr_img' src='' alt="qr_link" /><br><small><a href="{{ event.shortcut }}">{{ event.shortcut }}</a></small></p>
@@ -20,7 +21,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <h4>Extra Maps</h4>
-            <div class="help-block">Extra maps can be used for example if the route is split in multiple parts</div>
+            <div class="form-text">Extra maps can be used for example if the route is split in multiple parts</div>
             {% bootstrap_formset_errors extra_map_formset %}
             <table class="table">
             {{ extra_map_formset.management_form }}
@@ -85,9 +86,9 @@
             {% endfor %}
             </table>
 
-            <label for="csv_input">Import competitors from CSV</label>
-            <input type="file" name="csv_input" id="csv_input" accept="text/csv"/>
-            <div class="help-block">
+            <label for="csv_input" class="form-label">Import competitors from CSV</label>
+            <input type="file" name="csv_input" id="csv_input" class="form-control"accept="text/csv"/>
+            <div class="form-text">
                 Follow the following format for the CSV:<br/>
                 Column A - Full name / displayed in the menu on the left during the event /<br/>
                 Column B - Shortname / displayed next to the marker on the live event /<br/>
@@ -107,7 +108,29 @@
 {%  block extra_body %}
 {{ block.super }}
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
-<script src="{% static '/vendor/jquery-formset-1.3/jquery.formset.js' %}"></script>
+<script src="{% static '/vendor/jquery-formset-1.3.1/jquery.formset.js' %}"></script>
+<script src="{% static '/vendor/popper-2.9.3/popper.min.js' %}"></script>
+<script src="{% static '/vendor/tempus-dominus-6alpha1/js/tempus-dominus.js' %}"></script>
+<script type="text/javascript">
+  $(function () {
+    $('.datetimepicker').map(function(i, el) {
+      var options = {
+          useCurrent: false,
+          display: {
+            components: {
+              useTwentyfourHour: true,
+              seconds: true,
+            }
+          }
+      }
+      $el = $(el);
+      if($el.val()) {
+        options.defaultDate = new Date($el.val());
+      }
+      new tempusDominus.TempusDominus(el, options);
+    })
+  });
+</script>
 <script>
     $("label[for$='DELETE']").parents('.form-group').hide()
     $('.formset_row').formset({
@@ -246,7 +269,7 @@ $(function(){
     $('.datetimepicker').each(function(idx, el){
         $(el).attr("autocomplete", "off");
         showLocalTime(el);
-        $(el).on('dp.change', function(e) {
+        el.addEventListener(tempusDominus.Namespace.events.change, function(e) {
             var elId = $(e.target).attr('id');
             if (competitorsWithSameStartAsEvents.includes(elId)) {
                 const index = competitorsWithSameStartAsEvents.indexOf(elId);
@@ -258,7 +281,7 @@ $(function(){
         });
     });
 
-    $('#id_start_date').on('dp.change', function(e) {
+    document.getElementById('id_start_date').addEventListener(tempusDominus.Namespace.events.change, function(e) {
         var newValue = $(e.target).val();
         $(competitorsWithSameStartAsEvents).each(function(idx, id){
             $('#'+id).val(newValue);

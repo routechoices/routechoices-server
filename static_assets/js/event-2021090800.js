@@ -202,7 +202,7 @@ var onStart = function(){
   if(isLiveEvent){
     selectLiveMode();
   } else {
-    $("#live_button").hide();
+    $("#live_button").remove();
     selectReplayMode();
   }
   fetchCompetitorRoutes();
@@ -385,20 +385,21 @@ var displayCompetitorList = function(){
     if (optionDisplayed){
       return;
     }
-    var listDiv = $('<ul id="listCompetitor"/>');
-    listDiv.addClass('media-list');
+    var listDiv = $('<div id="listCompetitor"/>');
+    listDiv;
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || getColor(ii);
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown;
-      var div = $('<li/>');
-      div.addClass('media').html('\
-        <div class="media-left"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
-        <div class="media-body"><b>'+ $('<span/>').text(competitor.name).html() +'</b><br/>\
-          <div class="btn-group btn-group-xs" role="group">\
-            <button type="button" class="toggle_competitor_btn btn btn-default"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
-            <button type="button" class="center_competitor_btn btn btn-default"><i class="fa fa-map-marker"></i></button>\
+      var div = $('<div/>');
+      div.html('<hr style="margin: 0 0 3px 0"/>\
+        <div class="float-start" style="margin-right: 5px"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
+        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
+        <div><div class="btn-group btn-group-sm" role="group">\
+            <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
+            <button type="button" class="center_competitor_btn btn btn-default btn-sm"><i class="fa fa-map-marker"></i></button>\
           </div>\
           <span><small class="speedometer"></small></span>\
+        </div>\
         </div>')
       $(div).find('.toggle_competitor_btn').on('click', function(e){
         e.preventDefault();
@@ -438,7 +439,7 @@ var displayCompetitorList = function(){
       var mainDiv = $('<div id="competitorSidebar"/>');
       mainDiv.append(
         $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
-          $('<button class="btn btn-default btn-xs"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
+          $('<button class="btn btn-default btn-sm"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
         )
       );
       if(competitorList.length > 10) {
@@ -468,7 +469,7 @@ var displayOptions = function() {
     var mainDiv = $('<div/>');
     mainDiv.append(
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
-        $('<button class="btn btn-default btn-xs"/>')
+        $('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
         .on('click', function(){
           optionDisplayed = false;

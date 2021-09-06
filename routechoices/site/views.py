@@ -104,8 +104,8 @@ def contact(request):
     else:
         form = ContactForm()
     if request.user.is_authenticated:
-        form.fields['from_email'].initial = EmailAddress.objects.get_primary(
-            request.user
-        ).email
-        form.fields['from_email'].widget = HiddenInput()
+        primary_email = EmailAddress.objects.get_primary(request.user)
+        if primary_email:
+            form.fields['from_email'].initial = primary_email.email
+            form.fields['from_email'].widget = HiddenInput()
     return render(request, "site/contact.html", {'form': form})

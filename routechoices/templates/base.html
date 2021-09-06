@@ -1,4 +1,4 @@
-{% load static %}{% load bootstrap3 %}{% load raven %}{% load hosts %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}{% load raven %}{% load hosts %}<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -15,10 +15,10 @@
     <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
     <meta name="theme-color" content="#ffffff">
     <title>{% block head_title %}{{site.name}}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static '/vendor/bootstrap-3.4.1/css/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.0/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
     <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
-    <link rel="stylesheet" href="{% static 'css/site-2021081300.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/site-2021090800.css' %}" />
     {% block extra_head %}
     {% endblock %}
     <style>
@@ -38,9 +38,7 @@
     </style>
   </head>
   <body>
-    {% bootstrap_messages %}
     {% block body %}
-    <div class='notifications top-right'></div>
     <!-- Fixed navbar -->
     {% block navbar %}
     {% if request.club_slug %}
@@ -49,6 +47,8 @@
     {% include "navbar.html" %}
     {% endif %}
     {% endblock %}
+    {% bootstrap_messages %}
+    <div class='notifications top-right'></div>
     <div class="container content">
     {% block content %}
     {% endblock %}
@@ -80,7 +80,7 @@
     });
     </script>
     <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
-    <script src="{% static '/vendor/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap-5.1.0/bootstrap.bundle.min.js' %}"/></script>
     <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
     <script>
         function getCookie(name) {

@@ -1,13 +1,13 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
 {% load hosts %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary">Create new event</a>
-        <h1>Your Clubs Events <small><span class="utc-offset"></span></small></h1>
+        <h1>Your Clubs Events</h1>
         {% if not events %}
             <p>You haven't created any event yet.</p>
         {% else %}
@@ -29,8 +29,8 @@
                 <td>{{ event.club }}</td>
                 <td>
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> Open</a>
-                    {% if not event.ended and event.open_registration %} <a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
-                    {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-default" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
+                    {% if not event.ended and event.open_registration %} <a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-secondary" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
+                    {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-secondary" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -42,6 +42,7 @@
 {% endblock %}
 
 {% block extra_body %}
+{{ block.super }}
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script>
 $(function(){

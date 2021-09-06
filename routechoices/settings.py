@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'background_task',
-    'bootstrap3',
+    'django_bootstrap5',
     'admincommand',
     'rest_framework',
     'drf_yasg',

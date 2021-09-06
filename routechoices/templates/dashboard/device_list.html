@@ -1,10 +1,10 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col">
         <a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary">Add new device</a>
         <h1>Your Devices</h1>
         {% if not devices %}
@@ -14,7 +14,7 @@
             <tr><th>Device ID</th><th>Last Date Seen</th><th>Last Position Coordinates</th><th>Action</th></tr>
             {% for device in devices %}
             <tr>
-                <td><span class="label label-default" style="font-size: 1.5em">{{ device.aid }}</span></td>
+                <td><span class="badge bg-secondary" style="font-size: 1.5em">{{ device.aid }}</span></td>
                 <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_date_viewed|date:"c"}}">{{device.last_date_viewed|date:'Y-m-d H:i:s'}} UTC</span>{% else %}-{% endif %}</td>
                 <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }}{% else %}-{% endif %}</td>
                 <td><a class="btn btn-danger" href="{% url 'dashboard:device_remove_view' id=device.aid %}">Remove</a></td>

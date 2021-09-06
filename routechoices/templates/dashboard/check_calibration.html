@@ -1,10 +1,10 @@
-{% load static %}{% load bootstrap3 %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Check Map Calibration</title>
-{% bootstrap_css %}
+<link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.0/bootstrap.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <style>
 .leaflet_map {
@@ -72,8 +72,8 @@
      </div>
      <!-- Copyright -->
  </footer>
-{% bootstrap_javascript jquery=1 %}
-<script src="{%  static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
+<script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
+<script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
 <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script>
@@ -89,7 +89,7 @@ $(function(){
 
     function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
-        var imageURL = $(imageInput).parent().children('a').attr('href');
+        var imageURL = $(imageInput).parent().find('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {

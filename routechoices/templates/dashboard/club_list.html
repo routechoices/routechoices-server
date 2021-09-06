@@ -1,10 +1,10 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary">Create new club</a>
         <h1>Your Clubs</h1>
         {% if not clubs %}

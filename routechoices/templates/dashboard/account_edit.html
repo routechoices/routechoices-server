@@ -1,16 +1,16 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12">
         <h4>Email Addresses</h4>
-        <a href="{% url 'account_email' %}">Edit email addresses</a><br/>
+        <p><a href="{% url 'account_email' %}" class="btn btn-primary">Edit email addresses</a></p>
         <h4>Password</h4>
-        <a href="{% url 'account_set_password' %}">Change password</a><br/>
+        <p><a href="{% url 'account_set_password' %}" class="btn btn-primary">Change password</a></p>
         <h4>Sessions</h4>
-        <a href="{% url 'user_sessions:session_list' %}">Review active sessions</a><br/>
+        <p><a href="{% url 'user_sessions:session_list' %}" class="btn btn-primary">Review active sessions</a></p>
     </div>
 </div>
 {% endblock %}
