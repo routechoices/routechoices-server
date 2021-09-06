@@ -868,17 +868,18 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(bounds, origBounds, src, fit) {
+function addRasterMap(bounds, src, fit) {
   if (fit === undefined) {
     fit = false;
   }
-  rasterMap = new L.ImageTransform(
-    src,
-    bounds,
-    {origBounds: bounds}
-  ).addTo(map);
+  rasterMap = L.tileLayer.wms(wmsService+'?', {
+    layers: eventId,
+    bounds: bounds,
+    tileSize: 512,
+    noWrap: 'false',
+  }).addTo(map);
   if(fit) {
-    map.fitBounds(origBounds);
+    map.fitBounds(bounds);
   }
 }
 

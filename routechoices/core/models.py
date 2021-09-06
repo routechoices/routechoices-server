@@ -346,7 +346,7 @@ class Map(models.Model):
     def thumbnail(self):
         orig = self.image.open('rb').read()
         img = Image.open(BytesIO(orig))
-        if img.mode != 'RGBA':
+        if img.mode != 'RGB':
             img = img.convert('RGB')
         img = img.transform(
             (1200, 630),
@@ -362,14 +362,7 @@ class Map(models.Model):
                 int(self.height) / 2 - 158
             )
         )
-        img_out = Image.new(
-            'RGB',
-            img.size,
-            (255, 255, 255, 0)
-        )
-        img_out.paste(img, (0, 0))
-        img.close()
-        return img_out
+        return img
 
     @property
     def size(self):
@@ -437,54 +430,54 @@ class Map(models.Model):
         if cached and not settings.DEBUG:
             return cached
 
-        tile_img = None
-
-        if self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
-            r_w = (max_lon - min_lon)/output_width
-            r_h = (max_lat - min_lat)/output_height
-
-            tl = self.map_xy_to_spherical_mercator(0, 0)
-            tr = self.map_xy_to_spherical_mercator(self.width, 0)
-            br = self.map_xy_to_spherical_mercator(self.width, self.height)
-            bl = self.map_xy_to_spherical_mercator(0, self.height)
-
-            p1 = [
-                (0, 0),
-                (self.width, 0),
-                (self.width, self.height),
-                (0, self.height),
-            ]
-            p2 = [
-                ((tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h),
-                ((tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h),
-                ((br[0] - min_lon)/r_w, (max_lat - br[1])/r_h),
-                ((bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h),
-            ]
-
-            coeffs = find_coeffs(p2, p1)
-            orig = self.image.open('rb').read()
-            self.image.close()
-            img = Image.open(BytesIO(orig))
-            if img.mode != "RGBA":
-                img = img.convert("RGBA")
-            tile_img = img.transform(
-                (output_width, output_height),
-                Image.PERSPECTIVE,
-                coeffs,
-                Image.BICUBIC
-            )
         img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
-        if tile_img:
-            img_out.paste(tile_img, (0, 0), tile_img)
-            if not settings.DEBUG:
-                try:
-                    cache.set(cache_key, img_out, 3600*24*30)
-                except Exception:
-                    pass
+
+        if not self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
+            return img_out
+
+        r_w = (max_lon - min_lon)/output_width
+        r_h = (max_lat - min_lat)/output_height
+
+        tl = self.map_xy_to_spherical_mercator(0, 0)
+        tr = self.map_xy_to_spherical_mercator(self.width, 0)
+        br = self.map_xy_to_spherical_mercator(self.width, self.height)
+        bl = self.map_xy_to_spherical_mercator(0, self.height)
+
+        p1 = [
+            (0, 0),
+            (self.width, 0),
+            (self.width, self.height),
+            (0, self.height),
+        ]
+        p2 = [
+            ((tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h),
+            ((tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h),
+            ((br[0] - min_lon)/r_w, (max_lat - br[1])/r_h),
+            ((bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h),
+        ]
+
+        coeffs = find_coeffs(p2, p1)
+        orig = self.image.open('rb').read()
+        self.image.close()
+        img = Image.open(BytesIO(orig))
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+        tile_img = img.transform(
+            (output_width, output_height),
+            Image.PERSPECTIVE,
+            coeffs,
+            Image.BICUBIC
+        )
+        img_out.paste(tile_img, (0, 0), tile_img)
+        if not settings.DEBUG:
+            try:
+                cache.set(cache_key, img_out, 3600*24*30)
+            except Exception:
+                pass
         return img_out
 
     def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
-        tile_bounds_polygon = Polygon(
+        tile_bounds_poly = Polygon(
             LinearRing(
                 (min_lon, min_lat),
                 (min_lon, max_lat),
@@ -493,8 +486,7 @@ class Map(models.Model):
                 (min_lon, min_lat),
             )
         )
-
-        map_bounds_polygon = Polygon(
+        map_bounds_poly = Polygon(
             LinearRing(
                 self.map_xy_to_spherical_mercator(0, 0),
                 self.map_xy_to_spherical_mercator(0, self.height),
@@ -503,24 +495,28 @@ class Map(models.Model):
                 self.map_xy_to_spherical_mercator(0, 0),
             )
         )
-        tile_bounds_polygon_prep = tile_bounds_polygon.prepared
-        return tile_bounds_polygon_prep.intersects(map_bounds_polygon)
+        tile_bounds_poly_prep = tile_bounds_poly.prepared
+        return tile_bounds_poly_prep.intersects(map_bounds_poly)
 
     def strip_exif(self):
         if self.image.closed:
             self.image.open()
         with Image.open(self.image.file) as image:
-            rgb_img = image.convert('RGB')
-            if image.size[0] > 3000 and image.size[1] > 3000:
-                if image.size[0] >= image.size[1]:
-                    new_h = 3000
-                    new_w = new_h / image.size[1] * image.size[0]
-                else:
-                    new_w = 3000
-                    new_h = new_w / image.size[0] * image.size[1]
-                rgb_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
+            rgba_img = image.convert('RGBA')
+            MAX = 3000
+            if image.size[0] > MAX and image.size[1] > MAX:
+                scale = MAX / min(image.size[0], image.size[1])
+                new_w = image.size[0] * scale
+                new_h = image.size[1] * scale
+                rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
             out_buffer = BytesIO()
-            rgb_img.save(out_buffer, 'JPEG', quality=60, dpi=(300, 300))
+            rgb_img = Image.new("RGB", rgba_img.size, (255, 255, 255))
+            rgb_img.paste(rgba_img, mask=rgba_img.split()[3])
+            params = {
+                'dpi': (72, 72),
+                'quality': 60,
+            }
+            rgb_img.save(out_buffer, 'JPEG', **params)
             f_new = File(out_buffer, name=self.image.name)
             self.image.save(
                 'filename',

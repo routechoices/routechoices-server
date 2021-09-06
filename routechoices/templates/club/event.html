@@ -281,7 +281,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021090601.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021090602.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -451,19 +451,7 @@ $(function() {
               [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
               [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
             ]
-            /*
-            var origBounds = bounds;
-            if (m.coordinates.topLeft.lon < 180 || m.coordinates.bottomLeft.lon < 180 || m.coordinates.topRight.lon > 180 || m.coordinates.bottomRight.lon > 180) {
-              bounds = [
-                [m.coordinates.topLeft.lat, -180],
-                [m.coordinates.topRight.lat, 180],
-                [m.coordinates.bottomRight.lat, -180],
-                [m.coordinates.bottomLeft.lat, 180],
-              ]
-            }
-            */
             addRasterMap(
-              bounds,
               bounds,
               mapUrl,
               true
@@ -476,35 +464,19 @@ $(function() {
               [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
               [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
             ]
-            /*
-            var origBounds = bounds;
-            if (m.coordinates.topLeft.lon < 180 || m.coordinates.bottomLeft.lon < 180 || m.coordinates.topRight.lon > 180 || m.coordinates.bottomRight.lon > 180) {
-              bounds = [
-                [m.coordinates.topLeft.lat, -180],
-                [m.coordinates.topRight.lat, 180],
-                [m.coordinates.bottomRight.lat, -180],
-                [m.coordinates.bottomLeft.lat, 180],
-              ]
-            }
             MapLayers[m.title] = L.tileLayer.wms(wmsService+'?', {
                 layers: eventId + '/' + i,
                 bounds: bounds,
-                origBounds: origBounds,
                 tileSize: 512,
+                noWrap: 'false',
             })
-            */
-            MapLayers[m.title] = new L.ImageTransform(
-              m.url + '?map_hash=' + m.hash,
-              bounds,
-              {origBounds: bounds}
-            );
           }
         }
         if (response.maps.length > 1) {
             L.control.layers(MapLayers, null, {collapsed: false}).addTo(map);
             map.on('baselayerchange', function(e) {
                 console.log(e)
-                map.fitBounds(e.layer.options.origBounds)
+                map.fitBounds(e.layer.options.bounds)
             })
         }
       }
