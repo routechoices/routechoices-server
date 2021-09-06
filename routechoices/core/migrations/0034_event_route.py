@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='route',
-            field=models.FileField(help_text='Optional GPX file to be overlayed on the map', null=True, upload_to=routechoices.core.models.route_upload_path, validators=[routechoices.lib.validators.validate_gpx]),
+            field=models.FileField(help_text='Optional GPX file to be overlayed on the map', null=True, upload_to=routechoices.core.models.route_upload_path),
         ),
     ]

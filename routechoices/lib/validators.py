@@ -6,10 +6,9 @@ from django.conf import settings
 from django.core.validators import RegexValidator, ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-import gpxpy
 import fast_luhn as luhn
 
-FLOAT_RE = re.compile(r'^(\-?[0-9]{1,3}(\.[0-9]+)?)$')
+FLOAT_RE = re.compile(r'^(\-?[0-9]+(\.[0-9]+)?)$')
 
 
 domain_validator = RegexValidator(
@@ -108,29 +107,14 @@ def validate_corners_coordinates(val):
     if len(cal_values) != 8:
         raise ValidationError(_('Corners coordinates must have 8 float values '
                                 'separated by commas.'))
-    for val in cal_values:
+    for i, val in enumerate(cal_values):
         if not FLOAT_RE.match(val):
             raise ValidationError(
                 _('Corners coordinates must only contain float values.')
             )
-
-
-def validate_gpx(value):
-    ext = os.path.splitext(value.name)[1]
-    valid_extensions = ['.gpx']
-    if ext.lower() not in valid_extensions:
-        pass
-        # raise ValidationError('Unsupported file extension.')
-    try:
-        pass
-        # gpx_file = value.read().decode('utf8')
-    except UnicodeDecodeError:
-        raise ValidationError('Could not decode file')
-    try:
-        pass
-        # gpxpy.parse(gpx_file)
-    except Exception:
-        raise ValidationError('Could not parse file')
+        if i % 2 == 0:
+            validate_latitude(val)
+       
 
 
 custom_username_validators = [validate_nice_slug, ]

@@ -39,7 +39,6 @@ from PIL import Image, ImageDraw
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
-     validate_gpx,
      validate_domain_slug,
      validate_nice_slug,
      validate_latitude,
