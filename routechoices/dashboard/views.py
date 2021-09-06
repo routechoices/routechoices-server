@@ -1,5 +1,5 @@
 import os
-
+import math
 import tempfile
 import zipfile
 
@@ -378,19 +378,47 @@ def map_gpx_upload_view(request):
             if not error:
                 has_points = False
                 segments = []
+
+                points = []
+                prev_lon = None
+                offset_lon = 0
+                for point in gpx.waypoints:
+                    lon = point.longitude + offset_lon
+                    if prev_lon and abs(prev_lon-lon) > 180:
+                        offset_lon += math.copysign(360, (prev_lon + 180) % 360 - (lon + 180) % 360)
+                        lon = point.longitude + offset_lon
+                    prev_lon = lon
+                    points.append([round(point.latitude, 5), round(lon, 5)])
+                if len(points) > 1:
+                    has_points = True
+                    segments.append(points)
+
                 for route in gpx.routes:
                     points = []
+                    prev_lon = None
+                    offset_lon = 0
                     for point, _ in route.walk():
-                        points.append([round(point.latitude, 5), round(point.longitude, 5)])
+                        lon = point.longitude + offset_lon
+                        if prev_lon and abs(prev_lon-lon) > 180:
+                            offset_lon += math.copysign(360, (prev_lon + 180) % 360 - (lon + 180) % 360)
+                            lon = point.longitude + offset_lon
+                        prev_lon = lon
+                        points.append([round(point.latitude, 5), round(lon, 5)])
                     if len(points) > 1:
                         has_points = True
                         segments.append(points)
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = []
+                        prev_lon = None
+                        offset_lon = 0
                         for point in segment.points:
-                            if point.latitude and point.longitude:
-                                points.append([round(point.latitude, 5), round(point.longitude, 5)])
+                            lon = point.longitude + offset_lon
+                            if prev_lon and abs(prev_lon-lon) > 180:
+                                offset_lon += math.copysign(360, (prev_lon + 180) % 360 - (lon + 180) % 360)
+                                lon = point.longitude + offset_lon
+                            prev_lon = lon
+                            points.append([round(point.latitude, 5), round(lon, 5)])
                         if len(points) > 1:
                             has_points = True
                             segments.append(points)

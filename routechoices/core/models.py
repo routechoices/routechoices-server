@@ -439,6 +439,7 @@ class Map(models.Model):
             return cached
 
         tile_img = None
+
         if self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
             r_w = (max_lon - min_lon)/output_width
             r_h = (max_lat - min_lat)/output_height
@@ -460,8 +461,8 @@ class Map(models.Model):
                 ((br[0] - min_lon)/r_w, (max_lat - br[1])/r_h),
                 ((bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h),
             ]
-            coeffs = find_coeffs(p2, p1)
 
+            coeffs = find_coeffs(p2, p1)
             orig = self.image.open('rb').read()
             self.image.close()
             img = Image.open(BytesIO(orig))
@@ -493,21 +494,18 @@ class Map(models.Model):
                 (min_lon, min_lat),
             )
         )
+
         map_bounds_polygon = Polygon(
             LinearRing(
                 self.map_xy_to_spherical_mercator(0, 0),
                 self.map_xy_to_spherical_mercator(0, self.height),
-                self.map_xy_to_spherical_mercator(self.width,
-                                                  self.height),
+                self.map_xy_to_spherical_mercator(self.width, self.height),
                 self.map_xy_to_spherical_mercator(self.width, 0),
                 self.map_xy_to_spherical_mercator(0, 0),
             )
         )
         tile_bounds_polygon_prep = tile_bounds_polygon.prepared
-
-        if not tile_bounds_polygon_prep.intersects(map_bounds_polygon):
-            return False
-        return True
+        return tile_bounds_polygon_prep.intersects(map_bounds_polygon)
 
     def strip_exif(self):
         if self.image.closed:
@@ -565,7 +563,7 @@ class Map(models.Model):
             max_lat = max(max_lat, max(lats))
             min_lon = min(min_lon, min(lons))
             max_lon = max(max_lon, max(lons))
-        
+
         tl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': min_lon})
         tr_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
         br_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': max_lon})
