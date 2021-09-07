@@ -2867,14 +2867,15 @@
                 return DateTime.convert(d);
             }
             if (typeof d === typeof '') {
-                const dateTime = new DateTime(d);
+                const _d = d.substring(0,10)+'T'+d.substring(11)+'Z';
+                const dateTime = new DateTime(_d);
                 if (JSON.stringify(dateTime) === 'null') {
                     return null;
                 }
                 return dateTime;
             }
             return null;
-        }
+        }5
         /**
          * Type checks that `value` is an array of Date or DateTime
          * @param optionName Provides text to error messages e.g. disabledDates
@@ -3329,4 +3330,4 @@
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=tempus-dominus.js.map
+
