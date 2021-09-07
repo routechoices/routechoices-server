@@ -244,15 +244,7 @@ and (max-device-width : 500px) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body" style="text-align: center">
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; display: block;" width="174px" height="174px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-          <circle cx="50" cy="50" r="0" fill="none" stroke="#000000" stroke-width="10">
-            <animate attributeName="r" repeatCount="indefinite" dur="0.9900990099009901s" values="0;40" keyTimes="0;1" keySplines="0 0.2 0.8 1" calcMode="spline" begin="0s"></animate>
-            <animate attributeName="opacity" repeatCount="indefinite" dur="0.9900990099009901s" values="1;0" keyTimes="0;1" keySplines="0.2 0 0.8 1" calcMode="spline" begin="0s"></animate>
-          </circle><circle cx="50" cy="50" r="0" fill="none" stroke="#000000" stroke-width="10">
-            <animate attributeName="r" repeatCount="indefinite" dur="0.9900990099009901s" values="0;40" keyTimes="0;1" keySplines="0 0.2 0.8 1" calcMode="spline" begin="-0.49504950495049505s"></animate>
-            <animate attributeName="opacity" repeatCount="indefinite" dur="0.9900990099009901s" values="1;0" keyTimes="0;1" keySplines="0.2 0 0.8 1" calcMode="spline" begin="-0.49504950495049505s"></animate>
-          </circle>
-          </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100px"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
         <h1>Loading...</h1>
       </div>
     </div><!-- /.modal-content -->
@@ -261,11 +253,11 @@ and (max-device-width : 500px) {
 
 <div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal">
   <div class="modal-dialog" role="document">
-    <div class="modal-content" style="text-align: center">
-      <div class="modal-header">
-         <h2 class="modal-title">Event not yet started</h2>
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-center">
+         <h2 class="modal-title" >Event not yet started</h2>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="text-align: center">
         <h4>Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
     </div><!-- /.modal-content -->
@@ -427,7 +419,6 @@ $(function() {
     var endEvent = new Date(response.event.end_date)
     if (startEvent > now) {
       $('#eventLoadingModal').remove()
-
       var preRaceModal = new bootstrap.Modal(document.getElementById("eventNotStartedModal"), {backdrop:'static', keyboard: false, })
       document.getElementById("eventNotStartedModal").addEventListener('hide.bs.modal', function(e){
           e.preventDefault();
