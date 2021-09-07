@@ -1,24 +1,24 @@
-version: 2
+version: 2.1
 jobs:
   build-and-test:
     # to speed up Dockers builds turn on layer caching
     # which is a paid CircleCI feature
     # https://circleci.com/docs/2.0/docker-layer-caching/
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202107-02
       docker_layer_caching: false
     steps:
     - checkout
     - run: echo 127.0.0.1 www.localhost halden-sk.localhost | sudo tee -a /etc/hosts
     - run: mkdir -p media/routechoices-maps/maps/
     - run: ./dc up -d
+    - run: ./dc pipinstall
     - run: ./da migrate
     - run: ./da collectstatic
     - run: ./da createcachetable
     - run: ./dc restart django 
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' www.localhost:8080)" != "200" ]]; do sleep 5; done' || false
     - run: ./da test
-    - run: ./da reset_db_for_tests
     - run: ./dc restart django
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev
@@ -41,7 +41,7 @@ jobs:
 
   deploy:
     machine:
-        image: ubuntu-2004:202104-01
+        image: ubuntu-2004:202107-02
         docker_layer_caching: false
     steps:
     - run:
@@ -50,7 +50,6 @@ jobs:
           ssh root@routechoices.com 'sudo -u apps /apps/routechoices.com/bin/deploy'
 
 workflows:
-  version: 2
   build_test_and_deploy:
     jobs:
       - build-and-test

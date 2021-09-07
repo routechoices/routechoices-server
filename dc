@@ -15,16 +15,10 @@ if [ "$1" = 'rebuild' ]; then
 elif [ "$1" = 'exec' -a $# -eq 2 ]; then
     extra_args="$* /bin/bash"
     shift 2
-elif [ "$1" = 'restoredb' ]; then
-    if [ $# -eq 2 ]; then
-        dumpfile=$2
-    else
-        dumpfile=postgres.bak
-    fi
-    echo "Restoring database from $dumpfile..."
-    docker exec -i rc_postgres \
-        pg_restore -U app_user -d app_db \
-            --clean --if-exists --no-owner < "$dumpfile"
+elif [ "$1" = 'pipinstall' ]; then
+    echo "Updating pip env..."
+    docker exec -i rc_django \
+        /venv/bin/pip install -r requirements.txt
     exit 0
 elif [ "$1" = 'test' ]; then
     shift

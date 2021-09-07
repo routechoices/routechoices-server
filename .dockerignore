@@ -1,0 +1,16 @@
+media/*
+node_modules/*
+static/*
+.circleci/*
+.github/*
+cypress/*
+log/*
+.gitignore
+cypress.json
+da
+dc
+LICENSE
+Makefile
+package.json
+README.md
+yarn.lock

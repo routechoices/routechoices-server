@@ -9,22 +9,23 @@ RUN apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev --no-ins
 # OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
 # ADD requirements /requirements
 
-# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
-RUN set -ex \
-    && python -m venv /venv \
-    && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /requirements.txt
-
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /app/
 WORKDIR /app/
 ADD . /app/
 
+# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
+RUN set -ex \
+    && python -m venv /venv \
+    && /venv/bin/pip install --upgrade pip \
+    && /venv/bin/pip install -r /requirements.txt
+
 # uWSGI will listen on this port
 EXPOSE 8000
 # 
 EXPOSE 2000
+EXPOSE 2002
 
 # Add any custom, static environment variables needed by Django or your settings file here:
 ENV DJANGO_SETTINGS_MODULE=routechoices.settings
