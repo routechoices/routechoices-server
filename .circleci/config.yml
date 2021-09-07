@@ -11,7 +11,6 @@ jobs:
     - checkout
     - run: echo 127.0.0.1 www.localhost halden-sk.localhost | sudo tee -a /etc/hosts
     - run: mkdir -p media/routechoices-maps/maps/
-    - run: ./dc build
     - run: ./dc up -d
     - run: ./da migrate
     - run: ./da collectstatic

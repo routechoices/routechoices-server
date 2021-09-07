@@ -50,6 +50,7 @@ services:
       - django
   django:
     container_name: rc_django
+    image: rphl/routechoices-dev-server
     stop_signal: SIGINT
     build:
       context: ..

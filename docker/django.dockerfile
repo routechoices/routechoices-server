@@ -1,14 +1,13 @@
-FROM python:3-bullseye
+FROM python:3-slim
 
 # Copy in your requirements file
 ADD requirements.txt /requirements.txt
 
 # Install GDAL dependencies
-RUN apt update && apt install -y libgdal-dev g++ --no-install-recommends && \
+RUN apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev --no-install-recommends && \
     apt clean -y
 # OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
 # ADD requirements /requirements
-RUN apt-get install cargo dnsutils -y
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
 RUN set -ex \
