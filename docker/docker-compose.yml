@@ -52,9 +52,6 @@ services:
     container_name: rc_django
     image: rphl/routechoices-dev-server
     stop_signal: SIGINT
-    build:
-      context: ..
-      dockerfile: docker/django.dockerfile
     volumes:
       - ../:/app/:rw
     environment:
