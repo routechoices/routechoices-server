@@ -46,7 +46,8 @@ def club_view(request, **kwargs):
     event_list = Event.objects.filter(
         club=club,
         privacy=PRIVACY_PUBLIC
-    ).select_related('map', 'club')
+    ).select_related('club')
+    live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -55,7 +56,8 @@ def club_view(request, **kwargs):
         'site/event_list.html',
         {
             'club': club,
-            'events': events
+            'events': events,
+            'live_events': live_events,
         }
     )
 

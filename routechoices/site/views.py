@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 
 from django.core.paginator import Paginator
 from django.forms import HiddenInput
-
+from django.utils.timezone import now
 from django.shortcuts import get_object_or_404, redirect, render
 
 from allauth.account.models import EmailAddress
@@ -42,14 +42,18 @@ def tracker_view(request):
 def events_view(request):
     event_list = Event.objects.filter(
         privacy=PRIVACY_PUBLIC
-    ).select_related('map', 'club').prefetch_related('map_assignations')
+    ).select_related('club').prefetch_related('map_assignations')
+    live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
     return render(
         request,
         'site/event_list.html',
-        {'events': events}
+        {
+            'events': events,
+            'live_events': live_events
+        }
     )
 
 

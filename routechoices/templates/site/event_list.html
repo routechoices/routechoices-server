@@ -15,10 +15,35 @@
 <div class="row">
   {{club.description|markdownify }}  
 </div>
+<hr/>
 {% endif %}
 <div class="row">
+  {% if live_events %}
+  <div><h2>Live</h2></div>
   <div>
-    {% if club %}<h1>Events by {{ club.name }} <a href="{{event.club.nice_url}}feed"><i class="fa fa-rss"></i></a></h1>{% else %}<h1>Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h1>{% endif%}
+    <table class="table table-striped">
+      <tr><th>Event</th><th>Date</th><th>Actions</th>{% if not club %}<th>Organizer</th>{% endif%}</tr>
+      {% for event in live_events %}
+      <tr>
+        <td><a class="link-primary" href="{{ event.get_absolute_url }}">{{ event.name }}</a>{% if event.is_live %}<span class="badge bg-danger pull-right">LIVE</span>{% endif %}</td>
+        <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span></td>
+        <td>
+          {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
+          {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
+          {% if not event.ended and event.open_registration %}<a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
+          {% if event.started and event.allow_route_upload %}<a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
+        </td>
+        {% if not club %}<td><a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>{% endif%}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif%}
+  <div>
+    {% if club %}
+    <h2>All Events by {{ club.name }} <a href="{{event.club.nice_url}}feed"><i class="fa fa-rss"></i></a></h2>
+    {% else %}<h2>All Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h2>
+    {% endif%}
   </div>
 
   <div>
@@ -30,7 +55,7 @@
         <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span></td>
         <td>
           {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
-          {% if event.ended and event.map %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
+          {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
           {% if not event.ended and event.open_registration %}<a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
           {% if event.started and event.allow_route_upload %}<a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-sm btn-primary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
         </td>
