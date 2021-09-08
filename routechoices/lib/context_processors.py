@@ -12,6 +12,6 @@ def get_git_revision_short_hash():
 def site(request):
     return {
         'site': Site.objects.get_current(),
-        'panelbear_id': getattr(settings, 'PANELBEAR_ID', None),
+        'enable_analytics': getattr(settings, 'ENABLE_ANALYTICS', None),
         'version': get_git_revision_hash(),
     }

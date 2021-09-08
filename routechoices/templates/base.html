@@ -111,13 +111,24 @@
             }
         });
     </script>
-    {% if panelbear_id %}
-    <!-- Panelbear Analytics - We respect your privacy -->
-    <script async src="https://cdn.panelbear.com/analytics.js?site={{panelbear_id}}"></script>
+    {% if enable_analytics %}
+    <!-- Matomo -->
     <script>
-        window.panelbear = window.panelbear || function() { (window.panelbear.q = window.panelbear.q || []).push(arguments); };
-        panelbear('config', { site: '{{panelbear_id}}' });
+      var _paq = window._paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="https://stats.io.rphlo.com/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '2']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
     </script>
+    <noscript><p><img src="https://stats.io.rphlo.com/matomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Matomo Code -->
     {% endif %}
     {% block extra_body %}
     {% endblock %}
