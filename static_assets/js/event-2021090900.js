@@ -495,7 +495,7 @@ var displayOptions = function() {
         '<div class="form-group">' +
         '<label for="tailLengthInput">Length in seconds</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
-        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a  href="'+ qrUrl +'">'+qrUrl+'</a></p>') : '') +
+        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '') +
         '</div>'
       )
     );

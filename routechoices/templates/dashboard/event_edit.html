@@ -13,7 +13,9 @@
     <div class="col-12">
         {% if event %}<h1>{{event.name}}</h1>
         {% if event.shortcut %}
-        <p><img id='qr_img' src='' alt="qr_link" /><br><small><a href="{{ event.shortcut }}">{{ event.shortcut }}</a></small></p>
+        <div>
+        <p><img id='qr_img' src='' alt="qr_link" /><br><small><a class="small qrUrlText" href="{{ event.shortcut }}">{{ event.shortcut }}</a></small></p>
+        </div>
         {% endif%}
         {% endif%}
         <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
@@ -182,6 +184,7 @@ $(function(){
     })
     {% if event.shortcut %}
     var qrUrl = '{{ event.shortcut }}';
+    $('.qrUrlText').text(qrUrl.replace(/^https?:\/\//, '')); 
     var qr = qrcode(0, 'L');
     qr.addData(qrUrl)
     qr.make()
