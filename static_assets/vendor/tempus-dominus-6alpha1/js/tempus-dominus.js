@@ -2867,8 +2867,8 @@
                 return DateTime.convert(d);
             }
             if (typeof d === typeof '') {
-                const _d = d.substring(0,10)+'T'+d.substring(11)+'Z';
-                const dateTime = new DateTime(_d);
+                const _d = d.substring(0,10) + 'T' + d.substring(11, 19) + 'Z';
+                const dateTime = new DateTime(new Date(_d).toLocaleString('en-US', { timeZone: "UTC" }));
                 if (JSON.stringify(dateTime) === 'null') {
                     return null;
                 }
