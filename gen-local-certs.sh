@@ -3,7 +3,7 @@ set -e
 NAME=routechoices
 DOMAIN=routechoices.dev # Use your own domain name
 
-mkdir -p environments/local/certs
+mkdir -p nginx/certs
 cd nginx/certs
 
 ######################
