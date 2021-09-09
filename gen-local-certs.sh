@@ -51,6 +51,6 @@ esac
 if [ "$(uname)" == "Mac" ]; then
     sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${NAME}CA.pem
 elif [ "$(uname)" == "Linux" ]; then
-    sudo cp ${NAME}.crt /usr/local/share/ca-certificates/${NAME}.crt
+    sudo cp ${NAME}CA.pem /usr/local/share/ca-certificates/${NAME}CA.crt
     sudo update-ca-certificates
 fi
