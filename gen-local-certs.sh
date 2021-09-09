@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 NAME=routechoices
 DOMAIN=routechoices.dev # Use your own domain name
 
