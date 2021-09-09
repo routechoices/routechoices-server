@@ -9,7 +9,7 @@ jobs:
       docker_layer_caching: false
     steps:
     - checkout
-    - run: echo 127.0.0.1 www.localhost halden-sk.localhost | sudo tee -a /etc/hosts
+    - run: ./gen-local-certs.sh
     - run: mkdir -p media/routechoices-maps/maps/
     - run: ./dc up -d
     - run: ./dc pipinstall
@@ -17,7 +17,7 @@ jobs:
     - run: ./da collectstatic
     - run: ./da createcachetable
     - run: ./dc restart django 
-    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' www.localhost:8080)" != "200" ]]; do sleep 5; done' || false
+    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
     - run: ./da test
     - run: ./dc restart django
     - run: sudo apt update

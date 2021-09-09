@@ -11,7 +11,7 @@ class Command(BaseCommand):
         call_command('flush', '--noinput')
         call_command('migrate', '--noinput')
         s = Site.objects.all().first()
-        s.domain = "localhost:8080"
+        s.domain = "routechoices.dev"
         s.name = "Routechoices.com"
         s.save()
         User.objects.create_user(

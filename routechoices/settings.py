@@ -92,7 +92,7 @@ SESSION_ENGINE = 'user_sessions.backends.db'
 ROOT_URLCONF = 'routechoices.urls'
 ROOT_HOSTCONF = 'routechoices.hosts'
 DEFAULT_HOST = 'www'
-PARENT_HOST = 'localhost:8080'
+PARENT_HOST = 'routechoices.dev'
 
 TEMPLATES = [
     {
@@ -172,8 +172,8 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_URL = '//www.localhost:8080/accounts/login/'
-REDIRECT_ALLOWED_DOMAINS = ['api.localhost', 'www.localhost']
+LOGIN_URL = '//www.routechoices.dev/accounts/login/'
+REDIRECT_ALLOWED_DOMAINS = ['api.routechoices.dev', 'www.routechoices.dev']
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -350,6 +350,9 @@ MARKDOWNIFY = {
         ]
     }
 }
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 try:
     from .local_settings import *

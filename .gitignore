@@ -28,3 +28,4 @@ cypress/videos/*
 node_modules/*
 yarn.lock
 package.json
+nginx/certs/*
