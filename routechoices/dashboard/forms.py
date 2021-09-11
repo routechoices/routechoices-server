@@ -108,8 +108,8 @@ class EventForm(ModelForm):
                   'allow_route_upload', 'start_date', 'end_date',
                   'backdrop_map', 'map', 'map_title']
         widgets = {
-            'start_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
-            'end_date': DateTimeInput(attrs={'class': 'datetimepicker'}),
+            'start_date': DateTimeInput(attrs={'class': 'datetimepicker', 'autocomplete': 'off'}),
+            'end_date': DateTimeInput(attrs={'class': 'datetimepicker', 'autocomplete': 'off'}),
         }
 
     def clean(self):
@@ -169,7 +169,7 @@ class CompetitorForm(ModelForm):
         model = Competitor
         fields = ('event', 'device', 'name', 'short_name', 'start_time')
         widgets = {
-            'start_time': DateTimeInput(attrs={'class': 'datetimepicker'}),
+            'start_time': DateTimeInput(attrs={'class': 'datetimepicker', 'autocomplete': 'off'}),
         }
 
     def clean_start_time(self):

@@ -129,11 +129,24 @@
       var val = $el.val()
       if(val) {
         val = val.substring(0,10) + 'T' + val.substring(11, 19) + 'Z'
-        options.defaultDate = new Date(new Date(val).toLocaleString('en-US', { timeZone: "UTC" }));
+        options.defaultDate = new Date(new Date(val).toLocaleString('en-US', { timeZone: "UTC" }))
       }
-      new tempusDominus.TempusDominus(el, options);
-    })
+      new tempusDominus.TempusDominus(el, options)
+    });
   });
+  const onAddedCompetitorRow = function(row) {
+    var options = {
+        useCurrent: false,
+        display: {
+        components: {
+            useTwentyfourHour: true,
+            seconds: true,
+        }
+        }
+    }
+    var el = $(row).find('.datetimepicker')[0]
+    new tempusDominus.TempusDominus(el, options)
+  }
 </script>
 <script>
     $("label[for$='DELETE']").parents('.form-group').hide()
@@ -141,7 +154,8 @@
         addText: '<i class="fa fa-plus-circle"></i> Add Competitor',
         addCssClass: 'btn btn-primary add-competitor-btn',
         deleteText: '<i class="fa fa-trash fa-2x"></i>',
-        prefix: 'competitors'
+        prefix: 'competitors',
+        added: onAddedCompetitorRow
     });
     $('.extra_map_formset_row').formset({
         addText: '<i class="fa fa-plus-circle"></i> Add Map',
@@ -165,7 +179,7 @@ function selectizeDeviceInput(){
             console.log(query)
             if (!query.length || query.length < 2) return callback();
             $.ajax({
-                url: '{% host_url 'device_search_api' host 'api' %}?q=' + encodeURIComponent(query),
+                url: "{% host_url 'device_search_api' host 'api' %}?q=" + encodeURIComponent(query),
                 type: 'GET',
                 error: function() {
                     callback();
