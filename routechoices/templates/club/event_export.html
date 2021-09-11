@@ -42,11 +42,24 @@
       {% for competitor in event.competitors.all %}
       <tr>
         <td>{{ competitor.name }}</a></td>
-        <td>{{ competitor.start_time|date:'Y-m-d H:i:s \U\T\C' }}</td>
+        <td><span class="date-utc" data-date="{{ competitor.start_time|date:'c' }}">{{ competitor.start_time|date:'Y-m-d H:i:s \U\T\C' }}</span></td>
         <td>{% if event.started %}<a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> GPX</a>{% if event.map %} <a href="https://karttamuovi.com/new#title={{ event.name|urlencode }}%20-%20{{competitor.name|urlencode}}&kmz=https:{% host_url 'event_kmz_download' event_id=event.aid host 'api' %}&gpx=https:{% host_url 'competitor_gpx_download' competitor_id=competitor.aid host 'api' %}" class="btn btn-sm btn-primary" target="_blank" rel="noreferrer"><i class="fa fa-external-link"></i> Karttamuovi</a>{% endif %}{% endif %}</td>
       </tr>
       {% endfor %}
     </table>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script>
+$(function(){
+    $('.date-utc').each(function(i, el){
+        $el = $(el);
+        $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm:ss'));
+    });
+})
+</script>
 {% endblock %}
