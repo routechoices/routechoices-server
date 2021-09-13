@@ -192,7 +192,7 @@ and (max-device-width : 500px) {
 
 <div class="container-fluid">
   <div class="row">
-    <div id="sidebar" class="d-none d-sm-block col-sm-4 col-lg-3 col-xxl-2 sidebar"></div>
+    <div id="sidebar" class="d-none d-sm-block col-sm-4 col-lg-3 col-xxl-2 sidebar" style="z-index: 10001"></div>
     <div id="map" class="d-sm-block col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main"></div>
     <div class="page-alerts col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main-alerts">
       <div class="alert alert-info page-alert alert-dismissible" id="alert-2">
@@ -202,7 +202,7 @@ and (max-device-width : 500px) {
     </div>
   </div>
   <div class="row">  
-    <div class="col-12 time_bar">
+    <div class="col-12 time_bar" style="z-index: 110001">
       <div>
         <div class="d-sm-none me-2 btn-group" style="margin-bottom: 2px">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="runners_show_button"><i class="fa fa-users"></i></a>
@@ -240,7 +240,7 @@ and (max-device-width : 500px) {
   </div>
 </div>
 
-<div class="modal" tabindex="-1" role="dialog" id="eventLoadingModal" style="display: block;">
+<div class="modal" tabindex="-1" role="dialog" id="eventLoadingModal" style="display: block; z-index: 10002">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body" style="text-align: center">
@@ -251,7 +251,7 @@ and (max-device-width : 500px) {
   </div><!-- /.modal-dialog -->
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal">
+<div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal" style="z-index: 10002">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-center">
@@ -278,7 +278,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021091300.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021091303.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -314,12 +314,10 @@ $(function() {
     if($('#sidebar').hasClass('d-none')){
       $('#sidebar').removeClass('d-none').addClass('col-12');
       $('#map').addClass('d-none').removeClass('col-12');
-      console.log('A')
     }else{
       $('#sidebar').addClass('d-none').removeClass('col-12');
       $('#map').removeClass('d-none').addClass('col-12');
       map.invalidateSize()
-      console.log('B')
     }
   })
 

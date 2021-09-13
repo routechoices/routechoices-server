@@ -21,13 +21,13 @@ L.Control.Ranking = L.Control.extend({
       back.style['max-height'] = '195px'
       back.style['overflow-y'] = 'auto'
       back.style['overflow-x'] = 'hidden'
-      back.style['z-index'] = 1e9
+      back.style['z-index'] = 10000
       back.style['padding'] = '5px';
       back.style['top'] = ((showClusters ? 200 : 0) + 62) + 'px';
       back.style['right'] = '10px';
       back.style['position'] = 'absolute';
       back.style['font-size'] = '12px';
-      document.body.appendChild(back)
+      document.body.prepend(back)
       return  L.DomUtil.create('div', 'tmp');
   },
 
@@ -61,13 +61,13 @@ L.Control.Grouping = L.Control.extend({
       back.style['max-height'] = '195px'
       back.style['overflow-y'] = 'auto'
       back.style['overflow-x'] = 'hidden'
-      back.style['z-index'] = 1e9
+      back.style['z-index'] = 10000
       back.style['padding'] = '5px';
       back.style['top'] = '62px';
       back.style['right'] = '10px';
       back.style['position'] = 'absolute';
       back.style['font-size'] = '12px';
-      document.body.appendChild(back)
+      document.body.prepend(back)
       return  L.DomUtil.create('div', 'tmp2');
   },
 
@@ -75,13 +75,17 @@ L.Control.Grouping = L.Control.extend({
     var el = $('.leaflet-control-grouping')
     var out = ''
     cl.forEach(function(k, i) {
-      out += '<div style="margin-bottom:15px"><h6>Group '+ alphabetizeNumber(i) +'</h6>';
+      if (i!==0){
+        out+='<br/>'
+      }
+      out += '<h6>Group '+ alphabetizeNumber(i) +'</h6>';
       k.parts.forEach(function(ci) {
         out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + c[ci].name + '</span></div>'
       })
-      out += '</div>'
+      out += ''
     })
     if (el.html() !== out){
+      console.log(+new Date())
       el.html(out)
     }
   },

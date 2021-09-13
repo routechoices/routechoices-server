@@ -10,6 +10,7 @@ jobs:
     steps:
     - checkout
     - run: ./gen-local-certs.sh
+    - run: echo "127.0.0.1 routechoices.dev api.routechoices.dev www.routechoices.dev halden-sk.routechoices.dev" | sudo tee -a /etc/hosts
     - run: mkdir -p media/routechoices-maps/maps/
     - run: ./dc up -d
     - run: ./dc pipinstall
