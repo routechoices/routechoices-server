@@ -76,16 +76,14 @@ L.Control.Grouping = L.Control.extend({
     var out = ''
     cl.forEach(function(k, i) {
       if (i!==0){
-        out+='<br/>'
+        out+='<br>'
       }
       out += '<h6>Group '+ alphabetizeNumber(i) +'</h6>';
       k.parts.forEach(function(ci) {
-        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + c[ci].name + '</span></div>'
+        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + c[ci].name + '</span></div>'
       })
-      out += ''
     })
     if (el.html() !== out){
-      console.log(+new Date())
       el.html(out)
     }
   },
