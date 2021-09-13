@@ -38,6 +38,9 @@ L.Control.Ranking = L.Control.extend({
     ranking.forEach(function (c, i) {
       out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
     })
+    if(out === '<h6>Ranking</h6>' ) {
+      out += '<p>-</p>'
+    }
     if (el.html() !== out){
       el.html(out)
     }
@@ -80,9 +83,12 @@ L.Control.Grouping = L.Control.extend({
       }
       out += '<h6>Group '+ alphabetizeNumber(i) +'</h6>';
       k.parts.forEach(function(ci) {
-        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + c[ci].name + '</span></div>'
+        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + $('<span/>').text(c[ci].name).html() + '</span></div>'
       })
     })
+    if(out === '' ) {
+      out = '<h6>No Groups</h6>'
+    }
     if (el.html() !== out){
       el.html(out)
     }
