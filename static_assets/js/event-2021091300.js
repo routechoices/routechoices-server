@@ -1,5 +1,19 @@
+var alphabetizeNumber = function(integer) {
+  // toString takes radix as attribute, values from '0'...'p'. Char codes for '0'...'9' => 48...57 and 'a'...'p' => 97...112 so if > 96 then letter otherwise cast as int
+  return Number(integer)
+    .toString(26)
+    .split('')
+    .map((c) =>
+      (c.charCodeAt() > 96
+        ? String.fromCharCode(c.charCodeAt() + 10)
+        : String.fromCharCode(97 + parseInt(c))
+      ).toUpperCase()
+    )
+    .join('');
+}
+
+
 L.Control.Ranking = L.Control.extend({
-  
   onAdd: function(map) {
       var back = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-ranking');
       back.style.width = '205px';
@@ -9,7 +23,7 @@ L.Control.Ranking = L.Control.extend({
       back.style['overflow-x'] = 'hidden'
       back.style['z-index'] = 1e9
       back.style['padding'] = '5px';
-      back.style['top'] = '60px';
+      back.style['top'] = ((showClusters ? 200 : 0) + 62) + 'px';
       back.style['right'] = '10px';
       back.style['position'] = 'absolute';
       back.style['font-size'] = '12px';
@@ -19,7 +33,7 @@ L.Control.Ranking = L.Control.extend({
 
   setValues: function(ranking) {
     var el = $('.leaflet-control-ranking')
-    var out = ''
+    var out = '<h6>Ranking</h6>'
     ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
     ranking.forEach(function (c, i) {
       out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
@@ -37,6 +51,49 @@ L.Control.Ranking = L.Control.extend({
 
 L.control.ranking = function(opts) {
   return new L.Control.Ranking(opts);
+}
+
+L.Control.Grouping = L.Control.extend({
+  onAdd: function(map) {
+      var back = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-grouping');
+      back.style.width = '205px';
+      back.style.background = 'white'
+      back.style['max-height'] = '195px'
+      back.style['overflow-y'] = 'auto'
+      back.style['overflow-x'] = 'hidden'
+      back.style['z-index'] = 1e9
+      back.style['padding'] = '5px';
+      back.style['top'] = '62px';
+      back.style['right'] = '10px';
+      back.style['position'] = 'absolute';
+      back.style['font-size'] = '12px';
+      document.body.appendChild(back)
+      return  L.DomUtil.create('div', 'tmp2');
+  },
+
+  setValues: function(c, cl) {
+    var el = $('.leaflet-control-grouping')
+    var out = ''
+    cl.forEach(function(k, i) {
+      out += '<div style="margin-bottom:15px"><h6>Group '+ alphabetizeNumber(i) +'</h6>';
+      k.parts.forEach(function(ci) {
+        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + c[ci].name + '</span></div>'
+      })
+      out += '</div>'
+    })
+    if (el.html() !== out){
+      el.html(out)
+    }
+  },
+
+  onRemove: function(map) {
+    $('.leaflet-control-grouping').remove()
+    $('.tmp2').remove()
+  }
+});
+
+L.control.grouping = function(opts) {
+  return new L.Control.Grouping(opts);
 }
 
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
@@ -118,13 +175,14 @@ var resetMassStartContextMenuItem = null;
 var setMassStartContextMenuItem = null;
 var setFinishLineContextMenuItem = null;
 var removeFinishLineContextMenuItem = null;
-
+var clusters = {};
 var qrUrl = null
 var finishLineCrosses = [];
 var finishLinePoints = [];
 var finishLinePoly = null;
 var rankControl = null;
-
+var showClusters = false;
+var groupControl = null;
 var backdropMaps = {}
 backdropMaps['blank'] = L.tileLayer('https://www.routechoices.com/static/wood.jpg', {
   attribution: '',
@@ -496,7 +554,9 @@ var displayOptions = function() {
         '<label for="tailLengthInput">Length in seconds</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
         (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '') +
-        '</div>'
+        '</div>' +
+        '<h4>Grouping</h4>' +
+        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showClusters ? 'on' : 'off') + '"></i> Show Groups</button>'
       )
     );
     $(mainDiv).find('#tailLengthInput').on('input', function(e){
@@ -505,6 +565,27 @@ var displayOptions = function() {
         v = 0;
       }
       tailLength = Math.max(0, v);
+    });
+    $(mainDiv).find('.toggle_cluster_btn').on('click', function(e){
+      if (showClusters){
+        $('.toggle_cluster_btn')
+          .find('.fa-toggle-on')
+          .removeClass('fa-toggle-on')
+          .addClass('fa-toggle-off')
+        showClusters = false;
+        map.removeControl(groupControl)
+        $('.leaflet-control-ranking').css('top', '62px')
+      } else {
+        $('.toggle_cluster_btn')
+          .find('.fa-toggle-off')
+          .removeClass('fa-toggle-off')
+          .addClass('fa-toggle-on')
+        groupControl = L.control.grouping({ position: 'topright' })
+        map.addControl(groupControl);
+        showClusters = true
+        $('.leaflet-control-ranking').css('top', '262px')
+      };
+      
     });
     $(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
       competitorList.forEach(function(competitor){
@@ -843,7 +924,121 @@ var drawCompetitors = function(){
       }
     }
   })
+  
+  // Create cluster
+  if(showClusters) {
+    var listCompWithMarker = []
+    var gpsPointData = []
+    competitorList.forEach(function(competitor){
+      if (competitor.mapMarker){
+        listCompWithMarker.push(competitor)
+        var latLon = competitor.mapMarker.getLatLng()
+        gpsPointData.push({
+          location: {
+            accuracy: 0,
+            latitude: latLon.lat,
+            longitude: latLon.lng
+          }
+        })
+      }
+    })
+    var dbscanner = jDBSCAN()
+      .eps(0.015)
+      .minPts(1)
+      .distance('HAVERSINE')
+      .data(gpsPointData);
+    var gpsPointAssignmentResult = dbscanner();
+    var clusterCenters = dbscanner.getClusters();
+    
+    Object.keys(clusters).forEach(function(k) {
+      if (gpsPointAssignmentResult.indexOf(k) === -1) {
+        if (clusters[k].mapMarker) {
+          map.removeLayer(clusters[k].mapMarker);
+          clusters[k].mapMarker = null
+        }
+        if (clusters[k].nameMarker) {
+          map.removeLayer(clusters[k].nameMarker);
+          clusters[k].nameMarker = null
+        }
+      }
+    })
+    
+    gpsPointAssignmentResult.forEach(function(d, i) {
+      if (d != 0) {
+        var cluster = clusters[d] || {}
+        var clusterCenter = clusterCenters[d-1]
+        if (!cluster.color) {
+          cluster.color = getColor(i)
+        }
+        var c = listCompWithMarker[i];
+        if(c.mapMarker) {
+          map.removeLayer(c.mapMarker);
+          c.mapMarker = null
+        }
+        if(c.nameMarker) {
+          map.removeLayer(c.nameMarker);
+          c.nameMarker = null
+        }
+        if (cluster.mapMarker) {
+          cluster.mapMarker.setLatLng([clusterCenter.location.latitude, clusterCenter.location.longitude])
+        } else {
+          var svgRect = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="'+cluster.color+'"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>';
+          var pulseIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect).replace('#','%23'),
+            iconSize: [40, 40],
+            shadowSize: [40, 40],
+            iconAnchor: [20, 20],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0]
+          });
+          cluster.mapMarker = L.marker(
+            [clusterCenter.location.latitude, clusterCenter.location.longitude],
+            {icon: pulseIcon}
+          );
+          cluster.mapMarker.addTo(map);
+        }
 
+        var pointX = map.latLngToContainerPoint([clusterCenter.location.latitude, clusterCenter.location.longitude]).x;
+        var mapMiddleX = map.getSize().x / 2;
+        if (pointX > mapMiddleX && !cluster.isNameOnRight && cluster.nameMarker) {
+          map.removeLayer(cluster.nameMarker);
+          cluster.nameMarker = null;
+        } else if (pointX <= mapMiddleX && cluster.isNameOnRight && cluster.nameMarker) {
+          map.removeLayer(cluster.nameMarker);
+          cluster.nameMarker = null;
+        };
+
+        if (cluster.nameMarker) {
+          cluster.nameMarker.setLatLng([clusterCenter.location.latitude, clusterCenter.location.longitude])
+        } else {
+          var iconHtml = '<span style="color: '+cluster.color+';">Group ' + alphabetizeNumber(d - 1) +'</span>';
+          var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(cluster.color);
+          var nameTagEl = document.createElement('div');
+          nameTagEl.className = iconClass;
+          nameTagEl.innerHTML = iconHtml;
+          document.body.appendChild(nameTagEl);
+          var nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
+          document.body.removeChild(nameTagEl);
+          cluster.isNameOnRight = pointX > mapMiddleX;
+          var runnerIcon = L.divIcon({
+            className: iconClass,
+            html: iconHtml,
+            iconAnchor: [cluster.isNameOnRight ? nameTagWidth - 5 : 0, 0]
+          });
+          cluster.nameMarker = L.marker(
+            [clusterCenter.location.latitude, clusterCenter.location.longitude],
+            {icon: runnerIcon}
+          );
+          cluster.nameMarker.addTo(map);
+        }
+        clusters[d] = cluster
+      } else {
+
+      }
+    })
+
+    groupControl.setValues(listCompWithMarker, clusterCenters);
+  }
   if(finishLinePoly) { 
     rankControl.setValues(finishLineCrosses);
   }
