@@ -14,7 +14,7 @@
             <tr><th>Device ID</th><th>Last Date Seen</th><th>Last Position Coordinates</th><th>Action</th></tr>
             {% for device in devices %}
             <tr>
-                <td><span class="badge bg-secondary" style="font-size: 1.5em">{{ device.aid }}</span></td>
+                <td><span class="badge bg-dark" style="font-size: 1em">{{ device.aid }}</span> <button class="btn btn-sm copy-btn" title="copy" data-value="{{ device.aid }}"><i class="fa fa-copy"></i></button></td>
                 <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_date_viewed|date:"c"}}">{{device.last_date_viewed|date:'Y-m-d H:i:s'}} UTC</span>{% else %}-{% endif %}</td>
                 <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }}{% else %}-{% endif %}</td>
                 <td><a class="btn btn-danger" href="{% url 'dashboard:device_remove_view' id=device.aid %}"><i class="fa fa-times"></i> Remove</a></td>
@@ -32,9 +32,13 @@
 <script>
 $(function(){
     $('.date-utc').each(function(i, el){
-        $el = $(el);
+        var $el = $(el);
         $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm:ss'));
     });
+    $('.copy-btn').on('click', function(ev){
+        var $el = $(ev.currentTarget)
+        navigator.clipboard.writeText($el.data('value'))
+    })
 })
 </script>
 {% endblock %}
