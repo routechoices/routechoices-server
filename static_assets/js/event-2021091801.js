@@ -484,6 +484,20 @@ var displayCompetitorList = function(){
             competitor.color = color
             colorModal.hide()
             displayCompetitorList()
+            
+            if(competitor.mapMarker) {
+              map.removeLayer(competitor.mapMarker);
+            }
+            if(competitor.nameMarker) {
+              map.removeLayer(competitor.nameMarker);
+            }
+            if(competitor.tail) {
+              map.removeLayer(competitor.tail);
+            }
+            competitor.mapMarker = null;
+            competitor.nameMarker = null;
+            competitor.tail = null;
+
             $('#save-color').off('click')
           }
         })(competitor, color, colorModal))
