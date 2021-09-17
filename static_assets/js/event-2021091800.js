@@ -192,6 +192,7 @@ var rankControl = null;
 var showClusters = false;
 var groupControl = null;
 var backdropMaps = {}
+var colorModal = new bootstrap.Modal(document.getElementById("colorModal"))
 backdropMaps['blank'] = L.tileLayer('https://www.routechoices.com/static/wood.jpg', {
   attribution: '',
   maxZoom: 18
@@ -458,7 +459,7 @@ var displayCompetitorList = function(){
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown;
       var div = $('<div/>');
       div.html('<hr style="margin: 0 0 3px 0"/>\
-        <div class="float-start" style="margin-right: 5px"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
+        <div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
         <div><div class="btn-group btn-group-sm" role="group">\
             <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
@@ -467,6 +468,26 @@ var displayCompetitorList = function(){
           <span><small class="speedometer"></small></span>\
         </div>\
         </div>')
+
+      $(div).find('.color-tag').on('click', function() {
+        $('#color-name').text(competitor.name)
+        var color = competitor.color
+        var CP = $('<div/>')
+        CP.colorpicker({inline: true, color: color}).on('colorpickerChange', function(ev){
+          color = ev.color.toString()
+        });
+        $('#color-picker').text('')
+        $('#color-picker').append(CP)
+        colorModal.show()
+        $('#save-color').on('click', (function() {
+          return function(){
+            competitor.color = color
+            colorModal.hide()
+            displayCompetitorList()
+            $('#save-color').off('click')
+          }
+        })(competitor, color, colorModal))
+      })
       $(div).find('.toggle_competitor_btn').on('click', function(e){
         e.preventDefault();
         var icon = $(this).find('i');
@@ -521,6 +542,7 @@ var displayCompetitorList = function(){
       var mainDiv = $('#competitorSidebar');
       mainDiv.append(listDiv);
     }
+
 }
 
 var filterCompetitorList = function(e) {

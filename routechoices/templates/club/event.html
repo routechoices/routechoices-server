@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.css' %}"/>
 <style>
 /* oswald-regular - latin_latin-ext */
 @font-face {
@@ -166,7 +167,7 @@ and (max-device-width : 500px) {
   margin-left: 5px;
 }
 
-.modal-backdrop, #eventNotStartedModal, #eventLoadingModal {
+.modal-backdrop, #eventNotStartedModal, #eventLoadingModal, #colorModal{
   top: 56px;
 }
 
@@ -264,10 +265,29 @@ and (max-device-width : 500px) {
   </div><!-- /.modal-dialog -->
 </div>
 
+<div class="modal fade" id="colorModal" tabindex="-1" role="dialog"
+     aria-labelledby="colorModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="colorModalLabel">Select new color for <span id="color-name"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="color-picker"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-color">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block extra_body %}
 <script type="text/javascript" src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
+<script type="text/javascript" src="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
 <script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
@@ -278,7 +298,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021091305.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021091800.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
