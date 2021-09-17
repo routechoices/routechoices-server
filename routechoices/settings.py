@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'django_s3_storage',
 
     'raven.contrib.django.raven_compat',
+    'qr_code',
 ]
 
 MIDDLEWARE = [

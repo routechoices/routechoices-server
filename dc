@@ -17,7 +17,7 @@ elif [ "$1" = 'exec' -a $# -eq 2 ]; then
     shift 2
 elif [ "$1" = 'pipinstall' ]; then
     echo "Updating pip env..."
-    docker exec -i rc_django \
+    docker exec -u root -i rc_django \
         /venv/bin/pip install -r requirements.txt
     exit 0
 elif [ "$1" = 'test' ]; then
