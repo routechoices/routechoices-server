@@ -298,7 +298,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021091801.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021091802.js' %}"></script>
 <script>
 var eventId = '{{event.aid}}';
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}";
@@ -418,9 +418,14 @@ $(function() {
       }
     ]
   });
-  L.control.pan().addTo(map);
-  L.control.zoom().addTo(map);
-  L.control.rotate({closeOnZeroBearing: false}).addTo(map)
+  panControl = L.control.pan()
+  zoomControl = L.control.zoom()
+  rotateControl = L.control.rotate({closeOnZeroBearing: false})
+
+  panControl.addTo(map)
+  zoomControl.addTo(map)
+  rotateControl.addTo(map)
+
   map.doubleClickZoom.disable(); 
   map.on('dblclick', onPressCustomMassStart)
   map.on('move', function () { drawCompetitors() })
