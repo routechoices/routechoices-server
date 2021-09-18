@@ -72,6 +72,11 @@ urlpatterns = [
         name='event_upload_route'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$',
+        views.event_delete_competitor,
+        name='event_delete_competitor'
+    ),
+    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$',
         views.event_map_download,
         name='event_map_download'

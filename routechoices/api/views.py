@@ -6,22 +6,19 @@ import time
 import urllib.parse
 import orjson as json
 from io import BytesIO
-from PIL import Image
 import arrow
 import requests
 
-from django.contrib.sites.models import Site
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.db.models import Q, Case, When
+from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from django.views.decorators.cache import cache_page
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -482,6 +479,45 @@ def event_register(request, event_id):
         'short_name': short_name,
         'start_time': start_time,
     }, status=status.HTTP_201_CREATED, headers=headers)
+
+
+@swagger_auto_schema(
+    method='delete',
+    operation_id='event_delete_competitor',
+    operation_description='delete a competitor from a given event',
+    tags=['events'],
+    responses={
+        '204': openapi.Response(
+            description='Success response',
+            examples={'application/json':''}
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
+)
+@api_view(['DELETE'])
+@login_required
+def event_delete_competitor(request, event_id, competitor_id):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            'club'
+        ),
+        aid=event_id
+    )
+    is_user_event_admin = request.user.is_authenticated and event.club.admins.filter(id=request.user.id).exists()
+    if not is_user_event_admin:
+        raise PermissionDenied()
+    c = event.competitors.filter(aid=competitor_id).first()
+    if not c:
+        raise ValidationError('no such competitor in this event')
+    c.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
