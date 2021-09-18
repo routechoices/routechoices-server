@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from rest_framework import permissions
 
@@ -23,6 +23,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(
         r'^$',
         schema_view.with_ui(
@@ -64,6 +65,11 @@ urlpatterns = [
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/register/?$',
         views.event_register,
         name='event_register'
+    ),
+    url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/upload_route/?$',
+        views.event_upload_route,
+        name='event_upload_route'
     ),
     url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$',

@@ -1,0 +1,131 @@
+{% load static %}{% load django_bootstrap5 %}{% load raven %}{% load hosts %}<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}" color="#5bbad5">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <meta name="apple-mobile-web-app-title" content="Routechoices">
+    <meta name="application-name" content="Routechoices">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="{% static 'browserconfig.xml' %}">
+    <meta name="theme-color" content="#ffffff">
+    <title>{% block head_title %}{{site.name}}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.0/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
+    <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/site-2021090800.css' %}" />
+    {% block extra_head %}
+    {% endblock %}
+    <style>
+      /* oswald-regular - latin_latin-ext */
+      @font-face {
+        font-family: 'Atkinson-Hyperlegible-Bold-102';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Atkinson Hyperlegible Bold 102'), local('Atkinson-Hyperlegible-Bold-102'),
+             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+      }
+      .site-name{
+          font-family: 'Atkinson-Hyperlegible-Bold-102', sans-serif;
+          white-space: nowrap;
+      }
+        .block-center {
+            max-width: 500px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+        }
+        .block-center .block-center-heading {
+            margin-bottom: 10px;
+        }
+
+    </style>
+  </head>
+  <body>
+    {% block body %}
+    <!-- Fixed navbar -->
+    {% block navbar %}
+    {% include "oauth2_provider/navbar.html" %}
+    {% endblock %}
+    {% block content %}
+    {% endblock %}
+    {% endblock %}
+    </div>
+    <script
+      src="https://browser.sentry-cdn.com/6.10.0/bundle.min.js"
+      integrity="sha384-nsIkfmMh0uiqg+AwegHcT1SMiPNWnhZmjFDwTshLTxur6ZPNaGT8vwT+vHwI5Jag"
+      crossorigin="anonymous">
+    </script>
+    <script
+      src="https://browser.sentry-cdn.com/6.10.0/bundle.tracing.min.js"
+      integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
+      crossorigin="anonymous">
+    </script>
+    <script>
+    Sentry.init({
+      dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
+      release: "master@{{version}}",
+      integrations: [new Sentry.Integrations.BrowserTracing()],
+      tracesSampleRate: 0.05,
+    });
+    </script>
+    <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap-5.1.0/bootstrap.bundle.min.js' %}"/></script>
+    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    </script>
+    {% if enable_analytics %}
+    <!-- Matomo -->
+    <script>
+      var _paq = window._paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="https://stats.io.rphlo.com/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '2']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <noscript><p><img src="revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Matomo Code -->
+    {% endif %}
+    {% block extra_body %}
+    {% endblock %}
+  </body>
+</html>

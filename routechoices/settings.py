@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['*']
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-
     # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 )
@@ -64,6 +63,7 @@ INSTALLED_APPS = [
     'background_task',
     'django_bootstrap5',
     'admincommand',
+    'oauth2_provider',
     'rest_framework',
     'drf_yasg',
     'markdownify.apps.MarkdownifyConfig',
@@ -178,6 +178,9 @@ REDIRECT_ALLOWED_DOMAINS = ['api.routechoices.dev', 'www.routechoices.dev']
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+SESSION_COOKIE_DOMAIN = ".routechoices.dev"
+SESSION_COOKIE_SAMESITE = None
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
@@ -189,6 +192,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     )
@@ -354,6 +358,28 @@ MARKDOWNIFY = {
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'full': 'Read and Write data'}
+}
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'OAuth2': {
+         'type': 'oauth2',
+         'authorizationUrl': '/oauth2/authorize/',
+         'tokenUrl': '/oauth2/token/',
+         'flow': 'accessCode',
+         'scopes': {
+            'full': 'Read and Write data',
+         }
+      }
+   }
+}
 
 try:
     from .local_settings import *

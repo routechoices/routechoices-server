@@ -1,3 +1,4 @@
+from datetime import timedelta
 import logging
 import os.path
 import re
@@ -410,12 +411,12 @@ def event_register(request, event_id):
         ),
         aid=event_id
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
+    is_user_event_admin = request.user.is_authenticated and event.club.admins.filter(id=request.user.id).exists()
+    if not is_user_event_admin:
+        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
             raise PermissionDenied()
-    if not event.open_registration or (event.end_date and event.end_date < now()):
-        raise PermissionDenied()
+        if not event.open_registration or (event.end_date and event.end_date < now()):
+            raise PermissionDenied()
     device_id = request.data.get('device_id')
     device = Device.objects.filter(aid=device_id).first()
     
@@ -477,6 +478,169 @@ def event_register(request, event_id):
     return Response({
         'id': comp.aid,
         'device_id': device.aid,
+        'name': name,
+        'short_name': short_name,
+        'start_time': start_time,
+    }, status=status.HTTP_201_CREATED, headers=headers)
+
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_id='event_upload_route',
+    operation_description='register a competitor to a given event and upload its positions',
+    tags=['events'],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'name': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='full name',
+            ),
+            'short_name': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='short version of the name displayed on the map',
+            ),
+            'start_time': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)',
+            ),
+            'latitudes': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations latitudes (in degrees) separated by commas',
+            ),
+            'longitudes': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations longitudes (in degrees) separated by commas',
+            ),
+            'timestamps': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='a list of locations timestamps (UNIX epoch in seconds) separated by commas',
+            ),
+        },
+        required=['name'],
+    ),
+    responses={
+        '201': openapi.Response(
+            description='Success response',
+            examples={
+                'application/json': {
+                    'id': '<id>',
+                    'device_id': '<device_id>',
+                    'name': '<name>',
+                    'short_name': '<short_name>',
+                    'start_time': '<start_time>',
+                }
+            }
+        ),
+        '400': openapi.Response(
+            description='Validation Error',
+            examples={
+                'application/json': [
+                    '<error message>'
+                ]
+            }
+        ),
+    }
+)
+@api_view(['POST'])
+def event_upload_route(request, event_id):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            'club'
+        ),
+        aid=event_id
+    )
+    is_user_event_admin = request.user.is_authenticated and event.club.admins.filter(id=request.user.id).exists()
+    if not is_user_event_admin:
+        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+            raise PermissionDenied()
+        if not event.allow_route_upload or event.start_date > now():
+            raise PermissionDenied()
+    errs = []
+    
+    name = request.data.get('name')
+
+    if not name:
+        errs.append('Property name is missing')
+    short_name = request.data.get('short_name')
+    if not short_name:
+        short_name = initial_of_name(name)
+    
+    if event.competitors.filter(name=name).exists():
+        errs.append('Competitor with same name already registered')
+     
+    if event.competitors.filter(short_name=short_name).exists():
+        errs.append('Competitor with same short name already registered')
+
+    lats = request.data.get('latitudes', '').split(',')
+    lons = request.data.get('longitudes', '').split(',')
+    times = request.data.get('timestamps', '').split(',')
+    if len(lats) != len(lons) != len(times):
+        raise ValidationError('latitudes, longitudes, and timestamps, should have same ammount of points')
+    loc_array = []
+    start_pt_ts = (event.end_date + timedelta(seconds=1)).timestamp()
+    for i in range(len(times)):
+        if times[i] and lats[i] and lons[i]:
+            try:
+                lat = float(lats[i])
+                lon = float(lons[i])
+                tim = int(float(times[i]))
+                start_pt_ts = min(tim, start_pt_ts)
+            except ValueError:
+                continue
+
+            loc_array.append({
+                'timestamp': tim,
+                'latitude': lat,
+                'longitude': lon,
+            })
+    start_pt_dt = arrow.get(start_pt_ts).datetime
+    if start_pt_dt > event.end_date or event.start_date > start_pt_dt:
+        start_pt_dt = event.start_date
+    start_time = request.data.get('start_time')
+    if start_time:
+        try:
+            start_time = arrow.get(start_time).datetime
+        except Exception:
+            errs.append('Start time could not be parsed')
+    else:
+        start_time = start_pt_dt
+    event_start = event.start_date
+    event_end = event.end_date
+    
+    if start_time and (
+        (not event_end and event_start > start_time)
+            or (event_end and (event_start > start_time
+                               or start_time > event_end))):
+        errs.append(
+            'Competitor start time should be during the event time'
+        )
+    
+    if errs:
+        raise ValidationError('\r\n'.join(errs))
+
+    device = None
+    if len(loc_array) > 0:
+        device = Device.objects.create(user_agent=request.session.user_agent[:200], is_gpx=True)
+        device.add_locations(loc_array)
+
+    comp = Competitor.objects.create(
+        name=name,
+        event=event,
+        short_name=short_name,
+        start_time=start_time,
+        device=device,
+    )
+
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {
+            'Cache-Control': 'Private'
+        }
+    return Response({
+        'id': comp.aid,
+        'device_id': device.aid if device else '',
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
@@ -799,7 +963,7 @@ def locations_api_gw(request):
     lons = request.data.get('longitudes', '').split(',')
     times = request.data.get('timestamps', '').split(',')
     if len(lats) != len(lons) != len(times):
-        raise ValidationError('Data error')
+        raise ValidationError('latitudes, longitudes, and timestamps, should have same ammount of points')
     loc_array = []
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:

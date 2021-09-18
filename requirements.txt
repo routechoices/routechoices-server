@@ -31,3 +31,4 @@ sewer==0.8.4
 bs4
 python-magic
 django-qr-code
+django-oauth-toolkit
