@@ -61,6 +61,8 @@
         </td>
         {% if not club %}<td><a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></td>{% endif%}
       </tr>
+      {% empty %}
+      <tr><td colspan="3" style="text-align:center"><h2>No public events yet...</h2></td></tr>
       {% endfor %}
     </table>
   </div>
