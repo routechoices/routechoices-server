@@ -29,6 +29,14 @@ def validate_imei(number):
         raise ValidationError(_('Invalid IMEI (check digit does not match)'))
 
 
+def validate_esn(number):
+    """Check if the number provided is a valid IMEI number."""
+    try:
+        matched = re.match(r'^\d-\d{7}$', number)
+    except Exception:
+        raise ValidationError('Invalid ESN')
+
+
 def validate_latitude(value):
     if isinstance(value, (float, int)):
         value = str(value)

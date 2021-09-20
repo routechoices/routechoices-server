@@ -45,6 +45,7 @@ from routechoices.lib.validators import (
      validate_longitude,
      validate_corners_coordinates,
      validate_imei,
+     validate_esn,
      domain_validator,
 )
 from routechoices.lib.helpers import (
@@ -1133,3 +1134,32 @@ class Competitor(models.Model):
 @receiver([post_save, post_delete], sender=Competitor)
 def save_profile(sender, instance, **kwargs):
     instance.event.invalidate_cache()
+
+
+class SpotFeed(models.Model):
+    feed_id = models.CharField(
+        max_length=64,
+        unique=True,
+    )
+
+
+class SpotDevice(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
+    messenger_id = models.CharField(
+        max_length=32,
+        unique=True,
+        validators=[validate_esn, ]
+    )
+    device = models.OneToOneField(
+        Device,
+        related_name='spot_device',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ['messenger_id']
+        verbose_name = 'spot device'
+        verbose_name_plural = 'spot devices'
+
+    def __str__(self):
+        return self.messenger_id

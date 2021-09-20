@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASEDIR=$(dirname $DIR)
+PID_FILE=${BASEDIR}/var/spot.pid
+if [ -f $PID_FILE ];
+then
+ pid=`cat $PID_FILE`
+ echo "checks PID $pid"
+ if ps -p $pid > /dev/null 2>&1
+ then
+  echo "already running"
+ else
+  echo "starting"
+  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_spot_crawler > ${BASEDIR}/log/spot.log 2> ${BASEDIR}/log/spot.error.log &
+  echo $! > $PID_FILE
+ fi
+else
+ echo "starting"
+ nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_spot_crawler > ${BASEDIR}/log/spot.log 2> ${BASEDIR}/log/spot.error.log &
+ echo $! > $PID_FILE
+fi
