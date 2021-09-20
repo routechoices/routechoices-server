@@ -9,6 +9,7 @@ from django.urls import NoReverseMatch, set_urlconf, get_urlconf
 from django_hosts.middleware import HostsBaseMiddleware
 
 from routechoices.core.models import Club
+from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 
 
 XFF_EXEMPT_URLS = []
@@ -181,3 +182,8 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
 
         set_urlconf(host.urlconf)
         return response
+
+
+class CorsMiddleware(OrigCorsMiddleware):
+    def is_enabled(self, request):
+       return request.host.name == 'api' and super().is_enabled(request)

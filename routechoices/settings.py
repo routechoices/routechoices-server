@@ -79,7 +79,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'routechoices.core.middleware.XForwardedForMiddleware',
     'user_sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'routechoices.core.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
