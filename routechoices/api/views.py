@@ -834,57 +834,7 @@ def traccar_ratelimit_key(group, request):
 
 @swagger_auto_schema(
     method='post',
-    operation_id='traccar_gateway',
-    operation_description='gateway for posting data from traccar application',
-    tags=['post locations'],
-    manual_parameters=[
-        openapi.Parameter(
-            'id',
-            openapi.IN_QUERY,
-            description='your device id',
-            type=openapi.TYPE_STRING,
-            required=True
-        ),
-        openapi.Parameter(
-            'lat',
-            openapi.IN_QUERY,
-            description='a single location latitudes (in degrees)',
-            type=openapi.TYPE_STRING,
-            required=True
-        ),
-        openapi.Parameter(
-            'lon',
-            openapi.IN_QUERY,
-            description='a single location longitude (in degrees)',
-            type=openapi.TYPE_STRING,
-            required=True
-        ),
-        openapi.Parameter(
-            'timestamp',
-            openapi.IN_QUERY,
-            description='a single location timestamp (UNIX epoch in seconds)',
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ],
-    responses={
-        '200': openapi.Response(
-            description='Success response',
-            examples={
-                'application/json': {
-                    'status': 'ok',
-                }
-            }
-        ),
-        '400': openapi.Response(
-            description='Validation Error',
-            examples={
-                'application/json': [
-                    '<error message>'
-                ]
-            }
-        ),
-    }
+    auto_schema=None,
 )
 @api_view(['POST'])
 @ratelimit(key=traccar_ratelimit_key, rate='70/m')
@@ -938,54 +888,12 @@ def garmin_ratelimit_key(group, request):
 
 @swagger_auto_schema(
     method='post',
-    operation_id='locations_gateway',
-    operation_description='gateway for posting locations data, allows multiple locations at once',
-    tags=['post locations'],
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'device_id': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='your device id',
-            ),
-            'latitudes': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='a list of locations latitudes (in degrees) separated by commas',
-            ),
-            'longitudes': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='a list of locations longitudes (in degrees) separated by commas',
-            ),
-            'timestamps': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='a list of locations timestamps (UNIX epoch in seconds) separated by commas',
-            ),
-        },
-        required=['device_id', 'latitudes', 'longitudes', 'timestamps'],
-    ),
-    responses={
-        '200': openapi.Response(
-            description='Success response',
-            examples={
-                'application/json': {
-                    'status': 'ok',
-                    'n': '<number of locations posted>',
-                }
-            }
-        ),
-        '400': openapi.Response(
-            description='Validation Error',
-            examples={
-                'application/json': [
-                    '<error message>'
-                ]
-            }
-        ),
-    }
+    auto_schema=None,
 )
 @api_view(['POST'])
 @ratelimit(key=garmin_ratelimit_key, rate='70/m')
 def locations_api_gw(request):
+    _ = request.data.get('secret')
     device_id = request.data.get('device_id')
     if not device_id:
         raise ValidationError('Missing device_id parameter')

@@ -39,12 +39,12 @@ urlpatterns = [
         views.gps_seuranta_proxy,
         name='gps_seuranta_proxy'
     ),
-    url(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
     url(r'^time/?$', views.get_time, name='time_api'),
     url(r'^user/search/?$', views.user_search, name='user_search_api'),
     url(r'^device/search/?$', views.device_search, name='device_search_api'),
-    url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
-    url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
+    #url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
+    #url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
+    #url(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
     url(r'^locations/?$', views.locations_api_gw, name='locations_api_gw'),
     url(
         r'^events/?$',
