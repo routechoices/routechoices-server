@@ -1032,20 +1032,7 @@ def gps_seuranta_proxy(request):
 
 @swagger_auto_schema(
     method='post',
-    operation_id='create_device_id',
-    operation_description='create a device id',
-    tags=['device'],
-    responses={
-        '200': openapi.Response(
-            description='Success response',
-            examples={
-                'application/json': {
-                    'status': 'ok',
-                    'device_id': '<device_id>',
-                }
-            }
-        ),
-    }
+    auto_schema=None,
 )
 @api_view(['POST'])
 @ratelimit(key='ip', rate='10/m')
