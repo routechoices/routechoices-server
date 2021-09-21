@@ -1,5 +1,5 @@
 import json
-import urllib.request
+import requests
 
 
 class PatreonAPI(object):
@@ -14,8 +14,8 @@ class PatreonAPI(object):
         return self.__get_json('current_user/campaigns?include=rewards,creator,goals,pledges')
 
     def __get_json(self, suffix):
-        url = "https://api.patreon.com/oauth2/api/{}".format(suffix)
-        headers = {'Authorization': "Bearer {}".format(self.access_token)}
-        request = urllib.request.Request(url, headers=headers)
-        contents = urllib.request.urlopen(request).read()
-        return json.loads(contents)
+        request = requests.get(
+            f'https://api.patreon.com/oauth2/api/{suffix}',
+            headers={'Authorization': f'Bearer {self.access_token}'}
+        )
+        return request.json()
