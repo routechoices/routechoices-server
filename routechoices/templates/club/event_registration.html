@@ -45,7 +45,7 @@ function selectizeDeviceInput(){
         create: false,
         plugins: [ 'preserve_on_blur' ],
         load: function(query, callback) {
-            if (!query.length || query.length < 2) return callback();
+            if (!query.length || query.length < 4) return callback();
             $.ajax({
                 url: '{% host_url "device_search_api" host "api" %}?q=' + encodeURIComponent(query),
                 type: 'GET',

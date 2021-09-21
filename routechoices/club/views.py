@@ -17,7 +17,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_PRIVATE,
 )
-from routechoices.lib.helpers import initial_of_name
+from routechoices.lib.helpers import initial_of_name, short_random_key
 from routechoices.site.forms import CompetitorForm, UploadGPXForm
 from routechoices.club import feeds
 
@@ -377,10 +377,7 @@ def event_route_upload_view(request, slug, **kwargs):
                 except Exception:
                     error = "Couldn't parse file"
             if not error:
-                device = Device.objects.create()
-                device.aid += '_GPX'
-                device.is_gpx = True
-                device.save()
+                device = Device.objects.create(aid=f'{short_random_key()}_GPX', is_gpx=True)
                 points = {'timestamps': [], 'latitudes': [], 'longitudes': []}
                 start_time = None
                 for track in gpx.tracks:

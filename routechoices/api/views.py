@@ -1187,20 +1187,25 @@ def get_device_id(request):
 def get_device_for_imei(request):
     imei = request.data.get('imei')
     if not imei:
-        raise ValidationError('No imei')
+        raise ValidationError('No IMEI')
     try:
         validate_imei(imei)
     except Exception as e:
-        raise ValidationError('Invalid imei '+str(e))
+        raise ValidationError('Invalid IMEI: ' + str(e))
     idevice = None
     try:
-        idevice = ImeiDevice.objects.get(imei=imei)
+        idevice = ImeiDevice.objects.select_related('device').get(imei=imei)
         device = idevice.device
     except ImeiDevice.DoesNotExist:
-        device = Device(aid=short_random_key()+'_i')
-        device.save()
-        idevice = ImeiDevice(imei=imei, device=device)
-        idevice.save()
+        pass
+    if idevice:
+        if re.match(r'/[^0-9]/', device.aid):
+            device = Device.objects.create()
+            idevice.device = device
+            idevice.save()
+    else:
+        device = Device.objects.create()
+        idevice = ImeiDevice.objects.create(imei=imei, device=device)
     return Response({
         'status': 'ok',
         'device_id': device.aid,

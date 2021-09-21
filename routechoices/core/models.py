@@ -50,7 +50,7 @@ from routechoices.lib.validators import (
 )
 from routechoices.lib.helpers import (
     random_key,
-    short_random_key,
+    random_device_id,
     short_random_slug,
     general_2d_projection,
     adjugate_matrix, project, find_coeffs,
@@ -807,7 +807,7 @@ class Device(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     aid = models.CharField(
-        default=short_random_key,
+        default=random_device_id,
         max_length=12,
         unique=True,
         validators=[validate_slug, ]

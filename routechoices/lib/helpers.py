@@ -54,6 +54,11 @@ def short_random_key():
     return generate_random_string(alphabet, 6)
 
 
+def random_device_id():
+    alphabet = '0123456789'
+    return generate_random_string(alphabet, 8)
+
+
 def short_random_slug():
     alphabet = '23456789abcdefghijkmnopqrstuvwxyz'
     return generate_random_string(alphabet, 6)

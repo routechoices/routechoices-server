@@ -36,6 +36,7 @@ from routechoices.dashboard.forms import (
     UploadMapGPXForm,
 )
 from routechoices.lib.kmz import extract_ground_overlay_info
+from routechoices.lib.helpers import short_random_key
 
 
 DEFAULT_PAGE_SIZE = 25
@@ -919,10 +920,7 @@ def event_route_upload_view(request, id):
                 except Exception:
                     error = "Couldn't parse file"
             if not error:
-                device = Device.objects.create()
-                device.aid += '_GPX'
-                device.is_gpx = True
-                device.save()
+                device = Device.objects.create(aid=f'{short_random_key()}_GPX', is_gpx=True)
                 start_time = None
                 points = {'timestamps': [], 'latitudes': [], 'longitudes': []}
                 for track in gpx.tracks:

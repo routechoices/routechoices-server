@@ -2,11 +2,6 @@
 {% load static %}
 {% load django_bootstrap5 %}
 
-{%  block extra_head %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap5.css' %}" />
-{%  endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col-12">
