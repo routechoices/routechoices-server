@@ -39,7 +39,7 @@ class ApiTestCase(APITestCase):
         url = self.reverse_and_check('device_id_api', '/device_id')
         res = self.client.post(url, SERVER_NAME='api.localhost:8000')
         self.assertEquals(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data.get('device_id')) == 6)
+        self.assertTrue(len(res.data.get('device_id')) == 8)
         self.assertTrue(res.data.get('device_id') != self.get_device_id())
 
     def test_traccar_api_gw(self):
