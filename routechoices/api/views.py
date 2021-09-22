@@ -1095,9 +1095,10 @@ def get_device_for_imei(request):
         pass
     if idevice:
         if re.match(r'/[^0-9]/', device.aid):
-            device = Device.objects.create()
-            idevice.device = device
-            idevice.save()
+            if device.competitor_set.filter(start_time__gte=now()).count() == 0:
+                device = Device.objects.create()
+                idevice.device = device
+                idevice.save()
     else:
         device = Device.objects.create()
         idevice = ImeiDevice.objects.create(imei=imei, device=device)
