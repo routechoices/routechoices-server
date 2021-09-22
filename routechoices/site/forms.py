@@ -41,6 +41,8 @@ class ResetPasswordForm(OrigResetPasswordForm):
                 "account/email/password_reset_nomatch", email, context
             )
         return self.cleaned_data["email"]
+
+
 class UploadGPXForm(Form):
     name = CharField(max_length=64, required=True)
     gpx_file = FileField(
