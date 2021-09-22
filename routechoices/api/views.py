@@ -1154,11 +1154,24 @@ def user_search(request):
 def device_search(request):
     devices = []
     q = request.GET.get('q')
-    if q and len(q) > 2:
+    if q and len(q) > 4:
         devices = Device.objects.filter(aid__startswith=q, is_gpx=False) \
             .values_list('id', 'aid')[:10]
     return Response({
         'results': [{'id': d[0], 'device_id': d[1]} for d in devices]
+    })
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
+def device_registrations(request, device_id):
+    device = get_object_or_404(Device, aid=device_id, is_gpx=False)
+    competitors = device.competitor_set.filter(start_time__gte=now())
+    return Response({
+        'count': competitors.count()
     })
 
 
