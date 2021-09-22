@@ -1095,7 +1095,7 @@ def get_device_for_imei(request):
         pass
     if idevice:
         if re.match(r'/[^0-9]/', device.aid):
-            if device.competitor_set.filter(start_time__gte=now()).count() == 0:
+            if device.competitor_set.filter(event__end_date__gte=now()).count() == 0:
                 device = Device.objects.create()
                 idevice.device = device
                 idevice.save()
@@ -1170,7 +1170,7 @@ def device_search(request):
 @api_view(['GET'])
 def device_registrations(request, device_id):
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
-    competitors = device.competitor_set.filter(start_time__gte=now())
+    competitors = device.competitor_set.filter(event__end_date__gte=now())
     return Response({
         'count': competitors.count()
     })
