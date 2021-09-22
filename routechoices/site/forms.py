@@ -14,10 +14,33 @@ from django.forms import (
 )
 from django_hosts.resolvers import reverse
 from django.utils.timezone import now
+from django.contrib.sites.shortcuts import get_current_site
 
 from routechoices.core.models import Competitor, Event, Device
+from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import filter_users_by_email
 
 
+class ResetPasswordForm(OrigResetPasswordForm):
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        email = get_adapter().clean_email(email)
+        self.users = filter_users_by_email(email, is_active=True)
+        return self.cleaned_data["email"]
+
+    def save(self, request, **kwargs):
+        email = super().save(request, **kwargs)
+        if len(self.users) == 0:
+            current_site = get_current_site(request)
+            context ={
+                "current_site": current_site,
+                "request": request,
+            }
+            get_adapter(request).send_mail(
+                "account/email/password_reset_nomatch", email, context
+            )
+        return self.cleaned_data["email"]
 class UploadGPXForm(Form):
     name = CharField(max_length=64, required=True)
     gpx_file = FileField(
