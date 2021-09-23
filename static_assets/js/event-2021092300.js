@@ -537,6 +537,11 @@ var displayCompetitorList = function(){
       competitor.div = div
       competitor.speedometer = div.find('.speedometer')
     })
+    if (competitorList.length === 0) {
+      var div = $('<div/>')
+      div.html('<h3>No Competitors Yet...</h3>')
+      listDiv.append(div)
+    }
     if(searchText === null) {
       var mainDiv = $('<div id="competitorSidebar"/>')
       mainDiv.append(
