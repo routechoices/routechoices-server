@@ -92,13 +92,12 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            subject = (
-                'Routechoices.com contact form - '
-                + form.cleaned_data['subject']
-            )
             from_email = form.cleaned_data['from_email']
+            subject = (
+                f'Routechoices.com contact form - {form.cleaned_data["subject"]} [{from_email}]'
+            )
             message = form.cleaned_data['message']
-            msg = EmailMessage(subject, message, from_email, [settings.DEFAULT_FROM_EMAIL])
+            msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [settings.EMAIL_CUSTOMER_SERVICE])
             msg.content_subtype = "html"
             msg.send()
             return redirect('site:contact_email_sent_view')

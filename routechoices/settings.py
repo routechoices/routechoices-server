@@ -384,6 +384,8 @@ SWAGGER_SETTINGS = {
    }
 }
 
+EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
+
 POST_LOCATION_SECRETS = ["<replace-me>"]
 
 try:
