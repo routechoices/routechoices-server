@@ -893,10 +893,12 @@ def garmin_ratelimit_key(group, request):
 @api_view(['POST'])
 @ratelimit(key=garmin_ratelimit_key, rate='70/m')
 def locations_api_gw(request):
-    _ = request.data.get('secret')
+    secret_provided = request.data.get('secret')
     device_id = request.data.get('device_id')
     if not device_id:
         raise ValidationError('Missing device_id parameter')
+    if re.match(r'^[0-9]+$', device_id) and settings.POST_LOCATION_SECRET != secret_provided:
+        raise PermissionDenied('Invalid secret')
     devices = Device.objects.filter(aid=device_id)
     if devices.count() == 0:
         raise ValidationError('No such device ID')

@@ -1,4 +1,7 @@
 import time
+
+from django.conf import settings
+
 from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, override_settings
@@ -43,7 +46,7 @@ class ApiTestCase(APITestCase):
         self.assertTrue(res.data.get('device_id') != self.get_device_id())
 
 
-    def test_garmin_api_gw(self):
+    def test_locations_api_gw(self):
         url = self.reverse_and_check('locations_api_gw', '/locations')
         dev_id = self.get_device_id()
         t = time.time()
@@ -54,6 +57,7 @@ class ApiTestCase(APITestCase):
                 'latitudes': '1.1,1.2',
                 'longitudes': '3.1,3.2',
                 'timestamps': '{},{}'.format(t, t+1),
+                'secret': settings.POST_LOCATION_SECRET
             },
             SERVER_NAME='api.localhost:8000'
         )

@@ -384,6 +384,8 @@ SWAGGER_SETTINGS = {
    }
 }
 
+POST_LOCATION_SECRET = "<replace-me>"
+
 try:
     from .local_settings import *
 except ImportError:
