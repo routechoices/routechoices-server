@@ -384,7 +384,7 @@ SWAGGER_SETTINGS = {
    }
 }
 
-POST_LOCATION_SECRET = "<replace-me>"
+POST_LOCATION_SECRETS = ["<replace-me>"]
 
 try:
     from .local_settings import *

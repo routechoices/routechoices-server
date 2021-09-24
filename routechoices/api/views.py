@@ -897,7 +897,7 @@ def locations_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
         raise ValidationError('Missing device_id parameter')
-    if re.match(r'^[0-9]+$', device_id) and settings.POST_LOCATION_SECRET != secret_provided:
+    if re.match(r'^[0-9]+$', device_id) and secret_provided not in settings.POST_LOCATION_SECRETS:
         raise PermissionDenied('Invalid secret')
     devices = Device.objects.filter(aid=device_id)
     if devices.count() == 0:

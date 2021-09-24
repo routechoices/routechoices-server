@@ -57,7 +57,7 @@ class ApiTestCase(APITestCase):
                 'latitudes': '1.1,1.2',
                 'longitudes': '3.1,3.2',
                 'timestamps': '{},{}'.format(t, t+1),
-                'secret': settings.POST_LOCATION_SECRET
+                'secret': settings.POST_LOCATION_SECRETS[0]
             },
             SERVER_NAME='api.localhost:8000'
         )
