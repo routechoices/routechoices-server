@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.forms import (
     CharField,
-    DateTimeInput,
     FileField,
     Form,
     HiddenInput,
@@ -10,17 +9,18 @@ from django.forms import (
     ModelForm,
     EmailField,
     Textarea,
-    BooleanField
 )
 from django_hosts.resolvers import reverse
 from django.utils.timezone import now
 from django.contrib.sites.shortcuts import get_current_site
 
-from routechoices.core.models import Competitor, Event, Device
 from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import filter_users_by_email
 
+from captcha.fields import CaptchaField
+
+from routechoices.core.models import Competitor, Device
 
 class ResetPasswordForm(OrigResetPasswordForm):
     def clean_email(self):
@@ -96,12 +96,4 @@ class ContactForm(Form):
     from_email = EmailField(label='Your email address', required=True)
     subject = CharField(required=True, max_length=128)
     message = CharField(widget=Textarea, required=True)
-    spam_filter = BooleanField(
-        label='Leave this box unchecked to prove you are human',
-        required=False
-    )
-
-    def clean_spam_filter(self):
-        if self.cleaned_data['spam_filter']:
-            raise ValidationError('You must prove you are human')
-        return self.cleaned_data['spam_filter']
+    captcha = CaptchaField(help_text="To verify that you are not a robot, please enter the letters in the picture.")

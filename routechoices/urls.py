@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
+    url(r'^captcha/', include('captcha.urls')),
     url(
         r'^dashboard/',
         include(

@@ -72,6 +72,7 @@ INSTALLED_APPS = [
 
     'raven.contrib.django.raven_compat',
     'qr_code',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -387,6 +388,10 @@ SWAGGER_SETTINGS = {
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
 POST_LOCATION_SECRETS = ["<replace-me>"]
+
+CAPTCHA_NOISE_FUNCTIONS = (
+    'captcha.helpers.noise_dots',
+)
 
 try:
     from .local_settings import *
