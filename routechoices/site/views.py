@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 from django.core.paginator import Paginator
 from django.forms import HiddenInput
@@ -98,12 +98,9 @@ def contact(request):
             )
             from_email = form.cleaned_data['from_email']
             message = form.cleaned_data['message']
-            send_mail(
-                subject,
-                message,
-                from_email,
-                [settings.DEFAULT_FROM_EMAIL]
-            )
+            msg = EmailMessage(subject, message, from_email, [settings.DEFAULT_FROM_EMAIL])
+            msg.content_subtype = "html"
+            msg.send()
             return redirect('site:contact_email_sent_view')
     else:
         form = ContactForm()
