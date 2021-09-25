@@ -1,12 +1,16 @@
 from django.contrib.sites.models import Site
 from django.conf import settings
-import subprocess
+from git import Repo
+
 
 def get_git_revision_hash():
-    return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=settings.BASE_DIR).decode('utf8').strip()
+    repo = Repo(settings.BASE_DIR)
+    hc = repo.head.commit
+    return hc.hexsha
+
 
 def get_git_revision_short_hash():
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], cwd=settings.BASE_DIR).decode('utf8').strip()
+    return get_git_revision_hash()[:7]
 
 
 def site(request):

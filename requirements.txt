@@ -34,3 +34,4 @@ django-qr-code
 django-oauth-toolkit
 django-simple-captcha
 cryptography
+GitPython
