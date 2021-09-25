@@ -1,7 +1,8 @@
+import arrow
 import os
 import os.path
 import subprocess
-import sys
+from cryptography import x509
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -14,15 +15,13 @@ from typing import cast
 
 
 def is_expirying(domain):
-    r = subprocess.run(
-        ['openssl', 'x509', '-checkend', '450000', '-noout', '-in', f'{domain}.crt'],
-        cwd=os.path.join(settings.BASE_DIR, 'nginx', 'certs'),
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True
-    )
-    return r.stdout.startswith('Certificate will expire')
+    cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')
+    if not os.path.exists(cert_path):
+        return True
+    with open(cert_path, 'rb') as fp:
+        data = fp.read()
+    cert = x509.load_pem_x509_certificate(data)
+    return arrow.utcnow().shift(weeks=1) > arrow.get(cert.not_valid_after)
 
 
 def read_account_key(cls, filename: str):
