@@ -211,3 +211,5 @@ body{
     display: block;
     margin-bottom: 5px;
 }
+
+.navbar{padding-top:0.5rem;padding-bottom:0.5rem}
