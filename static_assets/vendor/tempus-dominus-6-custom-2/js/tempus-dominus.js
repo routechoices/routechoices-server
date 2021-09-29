@@ -2875,7 +2875,7 @@
                 return dateTime;
             }
             return null;
-        }5
+        }
         /**
          * Type checks that `value` is an array of Date or DateTime
          * @param optionName Provides text to error messages e.g. disabledDates
