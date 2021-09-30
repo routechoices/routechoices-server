@@ -212,6 +212,7 @@ class Map(models.Model):
     name = models.CharField(max_length=255)
     image = models.ImageField(
         upload_to=map_upload_path,
+        max_length=255,
         height_field='height',
         width_field='width',
         storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),

@@ -46,6 +46,7 @@ class ResetPasswordForm(OrigResetPasswordForm):
 class UploadGPXForm(Form):
     name = CharField(max_length=64, required=True)
     gpx_file = FileField(
+        max_length=255,
         validators=[FileExtensionValidator(allowed_extensions=['gpx'])]
     )
 
