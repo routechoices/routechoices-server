@@ -81,6 +81,7 @@ MIDDLEWARE = [
     'routechoices.core.middleware.XForwardedForMiddleware',
     'user_sessions.middleware.SessionMiddleware',
     'routechoices.core.middleware.CorsMiddleware',
+    'csp.middleware.CSPMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -388,6 +389,11 @@ SWAGGER_SETTINGS = {
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
 POST_LOCATION_SECRETS = ["<replace-me>"]
+
+XFF_TRUSTED_PROXY_DEPTH = 1
+
+CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'www.routechoices.dev', 'api.routechoices.dev')
+CSP_IMG_SRC = ("'self'", '*', 'data:')
 
 
 try:

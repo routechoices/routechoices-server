@@ -122,4 +122,9 @@ urlpatterns = [
         views.wms_service,
         name='wms_service'
     ),
+    url(
+        r'^check_latlon/?$',
+        views.ip_lat_lon,
+        name='ip_latlon'
+    ),
 ]

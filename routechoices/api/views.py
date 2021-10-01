@@ -12,6 +12,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse
@@ -880,6 +881,20 @@ def traccar_api_gw(request):
     if not tim:
         logger.debug('No timestamp')
     raise ValidationError('Missing lat, lon, or time')
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@api_view(['GET'])
+def ip_lat_lon(request):
+    g = GeoIP2()
+    try:
+        lat, lon = g.lat_lon(request.META['REMOTE_ADDR'])
+    except Exception:
+        return Response({'status': 'fail'})
+    return Response({'status': 'success', 'lat': lat, 'lon': lon})
 
 
 def garmin_ratelimit_key(group, request):

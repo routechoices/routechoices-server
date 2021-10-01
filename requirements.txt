@@ -1,5 +1,5 @@
+django>=3,<4.0
 arrow
-django
 pillow
 django-cors-headers
 requests
@@ -35,3 +35,4 @@ django-oauth-toolkit
 django-simple-captcha
 cryptography
 GitPython
+django-csp
