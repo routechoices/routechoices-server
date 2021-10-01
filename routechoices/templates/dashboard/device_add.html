@@ -23,30 +23,5 @@
 {% block extra_body %}
 {{ block.super }}
 <script src="{%  static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
-<script>
-
-</script>
-<script>
-$('#id_device').selectize({
-    valueField: 'id',
-    labelField: 'device_id',
-    searchField: 'device_id',
-    multiple: true,
-    create: false,
-    plugins: [ 'preserve_on_blur' ],
-    load: function(query, callback) {
-        if (!query.length || query.length < 4) return callback();
-        $.ajax({
-            url: '{% host_url "device_search_api" host "api" %}?q=' + encodeURIComponent(query),
-            type: 'GET',
-            error: function() {
-                callback();
-            },
-            success: function(res) {
-                callback(res.results);
-            }
-        });
-    }
-});
-</script>
+<script src="{% static '/scripts/dashboard/device_add.js' %}?_=2021100100"></script>
 {%  endblock %}

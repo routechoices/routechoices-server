@@ -46,12 +46,5 @@
 {% block extra_body %}
 {{ block.super }}
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
-<script>
-$(function(){
-    $('.date-utc').each(function(i, el){
-        $el = $(el);
-        $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm:ss'));
-    });
-})
-</script>
+<script src="{% static '/scripts/dashboard/event_list.js' %}?_=2021100100"></script>
 {% endblock %}

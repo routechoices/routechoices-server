@@ -71,63 +71,14 @@
       integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
       crossorigin="anonymous">
     </script>
-    <script>
-    Sentry.init({
-      dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
-      release: "master@{{version}}",
-      integrations: [new Sentry.Integrations.BrowserTracing()],
-      tracesSampleRate: 0.05,
-    });
-    </script>
     <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"/></script>
     <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
-    <script>
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        var csrftoken = getCookie('csrftoken');
-        function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-    </script>
+    <script src="{% static '/scripts/base.js' %}?_=2021100100"></script>
     {% if enable_analytics %}
     <!-- Matomo -->
-    <script>
-      var _paq = window._paq = window._paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://stats.io.rphlo.com/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '2']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
-    <noscript><p><img src="revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    <script src="{% static '/scripts/analytics.js' %}?_=2021100100"></script>
+    <noscript><p><img src="https://stats.io.rphlo.com/revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
     <!-- End Matomo Code -->
     {% endif %}
     {% block extra_body %}

@@ -27,40 +27,5 @@
 <script src="{% static '/vendor/moment-2.24.0/moment-with-locales.js' %}"></script>
 <script src="{% static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
-<script>
-$(function(){
-    $('.date-utc').each(function(i, el){
-        $el = $(el);
-        $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'));
-    });
-})
-</script>
-<script>
-function selectizeDeviceInput(){
-    $("select[name$='device']").selectize({
-        valueField: 'id',
-        labelField: 'device_id',
-        searchField: 'device_id',
-        multiple: true,
-        create: false,
-        plugins: [ 'preserve_on_blur' ],
-        load: function(query, callback) {
-            if (!query.length || query.length < 4) return callback();
-            $.ajax({
-                url: '{% host_url "device_search_api" host "api" %}?q=' + encodeURIComponent(query),
-                type: 'GET',
-                error: function() {
-                    callback();
-                },
-                success: function(res) {
-                    callback(res.results);
-                }
-            });
-        }
-    });
-}
-$(function(){
-    selectizeDeviceInput();
-})
-</script>
+<script src="{% static '/scripts/club/event_registration.js' %}?_=2021100100"></script>
 {% endblock %}

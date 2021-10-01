@@ -136,6 +136,59 @@ def event_view(request, slug, **kwargs):
     return response
 
 
+def event_js(request, slug, **kwargs):
+    if kwargs.get('club_slug'):
+        return redirect(
+            reverse(
+                'event_view',
+                host='clubs',
+                kwargs={'slug': slug},
+                host_kwargs={
+                    'club_slug': kwargs.get('club_slug')
+                }
+            )
+        )
+    club_slug = request.club_slug
+    if not club_slug:
+        club_slug = request.club_slug
+    event = get_object_or_404(
+        Event.objects.all().select_related('club').prefetch_related('competitors'),
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+    )
+    # If event is private, page needs to send ajax with cookies to prove identity, cannot be done from custom domain
+    if event.privacy == PRIVACY_PRIVATE:
+        if request.use_cname:
+            return redirect(
+                reverse(
+                    'event_view',
+                    host='clubs',
+                    kwargs={'slug': slug},
+                    host_kwargs={
+                        'club_slug': club_slug
+                    }
+                )
+            )
+    elif event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}')
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied
+
+    response = render(
+        request,
+        'club/event.js',
+        {
+            'event': event,
+        }
+    )
+    if event.privacy == PRIVACY_PRIVATE:
+        response['Cache-Control'] = 'private'
+    response['Content-Type'] = "application/javascript"
+    return response
+
+
 
 def event_export_view(request, slug, **kwargs):
     if kwargs.get('club_slug'):

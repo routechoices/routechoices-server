@@ -392,7 +392,8 @@ POST_LOCATION_SECRETS = ["<replace-me>"]
 
 XFF_TRUSTED_PROXY_DEPTH = 1
 
-CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'www.routechoices.dev', 'api.routechoices.dev')
+CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev', 'api.routechoices.dev', 'www.routechoices.com', 'api.routechoices.com')
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", '*', 'data:')
 
 

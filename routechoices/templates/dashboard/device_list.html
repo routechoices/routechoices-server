@@ -29,21 +29,5 @@
 
 {% block extra_body %}
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
-<script>
-$(function(){
-    $('.date-utc').each(function(i, el){
-        var $el = $(el);
-        $el.text(dayjs($el.data('date')).local().format('YYYY-MM-DD HH:mm:ss'));
-    });
-    $('.copy-btn').on('click', function(ev){
-        var $el = $(ev.currentTarget)
-        var tooltip = new bootstrap.Tooltip(ev.currentTarget, 
-            {'placement': 'right', 'title': 'copied'}
-        )
-        tooltip.show()
-        setTimeout(function(){tooltip.dispose()}, 500)
-        navigator.clipboard.writeText($el.data('value'))
-    })
-})
-</script>
+<script src="{% static '/scripts/dashboard/device_list.js' %}?_=2021100100"></script>
 {% endblock %}

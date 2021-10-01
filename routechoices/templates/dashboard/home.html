@@ -66,20 +66,5 @@
 
 {% block extra_body %}
 <script src="{% static '/vendor/moment-2.24.0/moment-with-locales.js' %}"></script>
-<script type="text/javascript">
-  $(function () {
-    var offset = moment().utcOffset();
-    var offsetText = (offset > 0 ? '+' : '-') +
-        ('0' + Math.floor(Math.abs(offset / 60))).slice(-2) + ':' +
-        ('0' + Math.round(offset % 60)).slice(-2);
-    $('.utc-offset').text('(UTC Offset ' + offsetText + ')');
-  })
-</script>
-<script>
-$(document).ready(function () {
-  $('[data-toggle="offcanvas"]').click(function () {
-    $('.row-offcanvas').toggleClass('active')
-  });
-});
-</script>
+<script src="{% static '/scripts/dashboard/home.js' %}?_=2021100100"></script>
 {% endblock %}

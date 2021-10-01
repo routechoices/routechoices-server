@@ -55,6 +55,11 @@ urlpatterns = [
         name='event_route_upload_done_view'
     ),
     url(
+        r'(?P<slug>[0-9a-zA-Z_-]+)\.js?$',
+        views.event_js,
+        name='event_js'
+    ),
+    url(
         r'(?P<slug>[0-9a-zA-Z_-]+)/?$',
         views.event_view,
         name='event_view'
