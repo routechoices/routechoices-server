@@ -888,13 +888,16 @@ def traccar_api_gw(request):
     auto_schema=None,
 )
 @api_view(['GET'])
-def ip_lat_lon(request):
+def ip_latlon(request):
     g = GeoIP2()
+    headers = {
+        'Cache-Control': 'Private'
+    }
     try:
         lat, lon = g.lat_lon(request.META['REMOTE_ADDR'])
     except Exception:
-        return Response({'status': 'fail'})
-    return Response({'status': 'success', 'lat': lat, 'lon': lon})
+        return Response({'status': 'fail'}, headers=headers)
+    return Response({'status': 'success', 'lat': lat, 'lon': lon}, headers=headers)
 
 
 def garmin_ratelimit_key(group, request):

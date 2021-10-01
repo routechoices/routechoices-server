@@ -124,7 +124,7 @@ urlpatterns = [
     ),
     url(
         r'^check_latlon/?$',
-        views.ip_lat_lon,
+        views.ip_latlon,
         name='ip_latlon'
     ),
 ]
