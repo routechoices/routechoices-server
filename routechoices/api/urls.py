@@ -53,6 +53,11 @@ urlpatterns = [
         name='event_list'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)\.js$',
+        views.event_js,
+        name='event_js'
+    ),
+    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$',
         views.event_detail,
         name='event_detail'

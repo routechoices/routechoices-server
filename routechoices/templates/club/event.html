@@ -299,7 +299,7 @@ and (max-device-width : 500px) {
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/event-2021092300.js' %}"></script>
-<script type="text/javascript" src="{{event.club.nice_url}}{{event.slug}}.js"></script>
+<script type="text/javascript" src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
 <script type="text/javascript" src="{% static '/scripts/club/event.js' %}?_=2021100100"></script>
 {% endblock %}
 

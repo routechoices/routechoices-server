@@ -17,7 +17,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
 
@@ -349,6 +349,32 @@ def event_detail(request, event_id):
             'Cache-Control': 'Private'
         }
     return Response(output, headers=headers)
+
+
+def event_js(request, event_id):
+    event = get_object_or_404(
+        Event.objects.select_related(
+            'club', 'notice'
+        ).prefetch_related(
+            'competitors',
+        ),
+        aid=event_id,
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
+    response = render(
+        request,
+        'club/event.js',
+        {
+            'event': event,
+        }
+    )
+    if event.privacy == PRIVACY_PRIVATE:
+        response['Cache-Control'] = 'private'
+    response['Content-Type'] = "application/javascript"
+    return response
 
 
 @swagger_auto_schema(
