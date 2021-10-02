@@ -468,7 +468,7 @@ class Map(models.Model):
             (output_width, output_height),
             Image.PERSPECTIVE,
             coeffs,
-            Image.BICUBIC
+            Image.BILINEAR
         )
         img_out.paste(tile_img, (0, 0), tile_img)
         if not settings.DEBUG:
