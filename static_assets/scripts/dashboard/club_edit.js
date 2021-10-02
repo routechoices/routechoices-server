@@ -8,7 +8,7 @@ $('#id_admins').selectize({
     load: function(query, callback) {
         if (!query.length || query.length < 2) return callback();
         $.ajax({
-            url: '//api.routechoices.com/user/search?q=' + encodeURIComponent(query),
+            url: apiBaseURL + 'user/search?q=' + encodeURIComponent(query),
             type: 'GET',
             xhrFields: {
                 withCredentials: true

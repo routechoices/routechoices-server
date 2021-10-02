@@ -23,5 +23,6 @@
 {% block extra_body %}
 {{ block.super }}
 <script src="{%  static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/device_add.js' %}?_=2021100100"></script>
+<script src="{% host_url 'site_specs_js' host 'api' %}"></script>
+<script src="{% static '/scripts/dashboard/device_add.js' %}?_=2021100200"></script>
 {%  endblock %}

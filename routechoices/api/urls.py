@@ -32,6 +32,7 @@ urlpatterns = [
         ),
         name='api_doc'
     ),
+    url(r'^site-specs\.js$', views.site_specs_js, name='site_specs_js'),
     url(r'^device_id/?$', views.get_device_id, name='device_id_api'),
     url(r'^imei/?$', views.get_device_for_imei, name='device_imei_api'),
     url(

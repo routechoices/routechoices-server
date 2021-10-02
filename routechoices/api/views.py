@@ -351,6 +351,15 @@ def event_detail(request, event_id):
     return Response(output, headers=headers)
 
 
+def site_specs_js(request):
+    response = render(
+        request,
+        'site_specs.js',
+    )
+    response['Content-Type'] = "application/javascript"
+    return response
+
+
 def event_js(request, event_id):
     event = get_object_or_404(
         Event.objects.select_related(

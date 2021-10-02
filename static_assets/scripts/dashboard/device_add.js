@@ -8,7 +8,7 @@ $('#id_device').selectize({
     load: function(query, callback) {
         if (!query.length || query.length < 4) return callback();
         $.ajax({
-            url: '//api.routechoices.com/device/search?q=' + encodeURIComponent(query),
+            url: apiBaseURL + 'device/search?q=' + encodeURIComponent(query),
             type: 'GET',
             error: function() {
                 callback();
