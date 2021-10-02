@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^events/?$', views.events_view, name='events_view'),
     url(r'^events/feed/?$', feeds.live_event_feed, name='events_feed'),
     url(r'^tracker/?$', views.tracker_view, name='tracker_view'),
+    url(r'^trackers/?$', views.tracker_view, name='trackers_view'),
     url(
         r'^privacy-policy/?$',
         TemplateView.as_view(template_name='site/privacy_policy.html'),

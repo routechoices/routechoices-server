@@ -2,21 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-    <style>
-    /* roboto-mono-regular - latin */
-    @font-face {
-      font-family: 'Roboto Mono';
-      font-style: normal;
-      font-weight: 400;
-      src: local('Roboto Mono'), local('RobotoMono-Regular'),
-           url("{% static '/fonts/roboto-mono-v5-latin-regular.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-           url("{% static '/fonts/roboto-mono-v5-latin-regular.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-    }
-
-    .roboto {
-        font-family: 'Roboto Mono', monospace;
-    }
-    </style>
+<link rel="stylesheet" href="{% static 'styles/site/tracker.css' %}?_=2021100200" />
 {% endblock %}
 
 {% block content %}

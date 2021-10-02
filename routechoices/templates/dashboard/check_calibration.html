@@ -6,47 +6,7 @@
 <title>Check Map Calibration</title>
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.1/bootstrap.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
-<style>
-.leaflet_map {
-    height: 600px;
-    background: #f5f5f5;
-    border: 1px solid #000;
-    margin-bottom: 5px;
-}
-.map_preview {
-   position: relative;
-   width: 100%;
-   padding: 15px 0;
-}
-.map_preview img {
-   border: 1px solid #000;
-   border-radius: 5px;
-   max-width: 100%;
-}
-.map_preview .location {
-    position: absolute;
-   top: 20px;
-   left: 5px;
-   width: 45px;
-   margin: 0;
-}
-.map_preview h2 {
-   position: absolute;
-   top: 60px;
-   left: 0px;
-   width: 100%;
-   margin: 0;
-}
-.map_preview h2 span {
-   color: white;
-   font: bold 15px/30px Helvetica, Sans-Serif;
-   letter-spacing: -1px;
-   background: rgb(0, 0, 0); /* fallback color */
-   background: rgba(0, 0, 0, 0.7);
-   padding: 0 10px 0 30px;
-   margin: 0;
-}
-</style>
+<link rel="stylesheet" href="{% static 'styles/dashboard/check_calibration.css' %}?_=2021100200" />
 </head>
 <body>
 <div class="container">

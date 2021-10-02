@@ -13,7 +13,7 @@
       <ul class="navbar-nav d-flex">
         {% if user.is_authenticated %}<li><a class="nav-link" href="{% host_url 'site:home_view'%}">Dashboard</a></li>{% endif %}
         <li class="nav-item"><a class="nav-link" class="nav-link" href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% host_url 'site:tracker_view' host 'www'%}">Trackers</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% host_url 'site:trackers_view' host 'www'%}">Trackers</a></li>
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
         <li class="nav-item"><a class="nav-link" style="white-space:nowrap" href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
         <li class="nav-item">{% if user.is_authenticated %}<a class="nav-link" href="{% host_url 'account_logout' host 'www'%}" style="margin-left: 0px;padding: 0px;"><button type="button" class="btn btn-danger navbar-btn" style="margin-top: 0">Logout</button></a>{% else %}<a class="nav-link" href="{% host_url 'account_login' host 'www' %}" style="margin-left: 0px;padding: 0px;"><button type="button" class="btn btn-primary navbar-btn" style="margin-top: 0;margin-right:5px">Login</button></a>{% endif %}</li>

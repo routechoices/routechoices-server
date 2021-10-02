@@ -21,30 +21,7 @@
     <link rel="stylesheet" href="{% static 'css/site-2021092500.css' %}" />
     {% block extra_head %}
     {% endblock %}
-    <style>
-      /* oswald-regular - latin_latin-ext */
-      @font-face {
-        font-family: 'Atkinson-Hyperlegible-Bold-102';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Atkinson Hyperlegible Bold 102'), local('Atkinson-Hyperlegible-Bold-102'),
-             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff2' %}") format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-             url("{% static '/fonts/Atkinson-Hyperlegible-Bold-102.woff' %}") format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-      }
-      .site-name{
-          font-family: 'Atkinson-Hyperlegible-Bold-102', sans-serif;
-          white-space: nowrap;
-      }
-        .block-center {
-            max-width: 500px;
-            padding: 19px 29px 29px;
-            margin: 0 auto 20px;
-        }
-        .block-center .block-center-heading {
-            margin-bottom: 10px;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}?_=2021100200" />
   </head>
   <body>
     {% block body %}
