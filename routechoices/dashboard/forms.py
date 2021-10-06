@@ -105,7 +105,7 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = ['club', 'name', 'slug', 'privacy', 'open_registration',
-                  'allow_route_upload', 'allow_live_chat', 'start_date', 'end_date',
+                  'allow_route_upload', 'start_date', 'end_date',
                   'backdrop_map', 'map', 'map_title']
         widgets = {
             'start_date': DateTimeInput(attrs={'class': 'datetimepicker', 'autocomplete': 'off'}),
