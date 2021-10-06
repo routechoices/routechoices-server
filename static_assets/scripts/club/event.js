@@ -60,6 +60,9 @@ $(function() {
     onPressResetMassStart()
   });
 
+
+  $('#chat_show_button').on('click', displayChat)
+
   $('#full_progress_bar').on('click', pressProgressBar)
   $('#share_button').on('click', shareUrl)
 
@@ -150,6 +153,21 @@ $(function() {
     } else {
       if (endEvent > now) {
         isLiveEvent = true
+        if (response.event.chat_enabled) {
+          $('#chat_button_group').removeClass('d-none');
+          $.ajax({
+            url: 'https://'+ chatServer + '/' + eventId,
+            dataType: 'JSON'
+          }).success(function(data){
+            chatMessages = data
+          })
+          chatSocket = new WebSocket('wss://'+chatServer+'/ws/'+eventId)
+          // Listen for messages
+          chatSocket.addEventListener('message', function (event) {
+              chatMessages.push(JSON.parse(event.data));
+              refreshMessageList()
+          })
+        }
       }
       qrUrl = response.event.shortcut;
       liveUrl = response.data

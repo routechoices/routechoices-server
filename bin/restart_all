@@ -9,3 +9,4 @@ cd $BASEDIR
 ./bin/restart_spot
 ./bin/restart_task_queue
 ./bin/restart_tornado
+./bin/restart_chat

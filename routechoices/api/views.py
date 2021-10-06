@@ -295,6 +295,7 @@ def event_detail(request, event_id):
             'club_slug': event.club.slug.lower(),
             'open_registration': event.open_registration,
             'open_route_upload': event.allow_route_upload,
+            'chat_enabled': event.allow_live_chat,
             'url': request.build_absolute_uri(event.get_absolute_url()),
             'shortcut': event.shortcut,
             'backdrop': event.backdrop_map,
@@ -378,7 +379,8 @@ def event_js(request, event_id):
         'club/event.js',
         {
             'event': event,
-        }
+            'chat_server': settings.CHAT_SERVER
+        },
     )
     if event.privacy == PRIVACY_PRIVATE:
         response['Cache-Control'] = 'private'

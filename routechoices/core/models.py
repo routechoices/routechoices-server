@@ -700,6 +700,10 @@ class Event(models.Model):
         default=False,
         help_text="Participants can upload their routes after the event.",
     )
+    allow_live_chat = models.BooleanField(
+        default=False,
+        help_text="Spectator will have a chat enabled during the live.",
+    )
 
     class Meta:
         ordering = ['-start_date', 'name']
@@ -1164,3 +1168,11 @@ class SpotDevice(models.Model):
 
     def __str__(self):
         return self.messenger_id
+
+
+class ChatMessage(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField()
+    event = models.ForeignKey(Event, related_name='chat_messages', on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=20)
+    message = models.CharField(max_length=100)

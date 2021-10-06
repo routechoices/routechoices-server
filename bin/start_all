@@ -9,3 +9,4 @@ cd $BASEDIR
 ./bin/start_spot
 ./bin/start_task_queue
 ./bin/start_tornado
+./bin/start_chat

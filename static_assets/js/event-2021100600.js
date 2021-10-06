@@ -197,6 +197,10 @@ var showClusters = false
 var showControls = true
 var backdropMaps = {}
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"))
+var chatDisplayed = false;
+var chatMessages = [];
+var chatSocket = null;
+
 backdropMaps['blank'] = L.tileLayer('https://www.routechoices.com/static/wood.jpg', {
   attribution: '',
   maxZoom: 18
@@ -453,7 +457,7 @@ var updateCompetitor = function(newData) {
 }
 
 var displayCompetitorList = function(){
-    if (optionDisplayed){
+    if (optionDisplayed || chatDisplayed){
       return;
     }
     var listDiv = $('<div id="listCompetitor"/>')
@@ -551,7 +555,7 @@ var displayCompetitorList = function(){
       )
       if(competitorList.length > 10) {
         mainDiv.append(
-          $('<input class="form-control" placeholder="Search Competitors" val="'+searchText+'"/>').on('keyup', filterCompetitorList)
+          $('<input class="form-control" placeholder="Search Competitors" val=""/>').on('keyup', filterCompetitorList)
         )
       }
       mainDiv.append(listDiv)
@@ -569,6 +573,66 @@ var filterCompetitorList = function(e) {
     var inputVal = $(e.target).val()
     searchText = inputVal.toLowerCase()
     displayCompetitorList()
+}
+
+var displayChat = function() {
+    chatDisplayed = true
+    optionDisplayed = false
+    var mainDiv = $('<div/>')
+    mainDiv.append(
+      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+        $('<button class="btn btn-default btn-sm"/>')
+        .html('<i class="fa fa-times"></i>')
+        .on('click', function(){
+          chatDisplayed = false
+          displayCompetitorList()
+        })
+      )
+    )
+    mainDiv.append(
+      $('<div/>').html(
+        '<h4>Chat</h4>'
+      )
+    )
+    mainDiv.append(
+      $('<form/>').html(
+        '<label class="form-label" for="nickname">Nickname</label>'+
+        '<input class="form-control" name="nickname" id="chatNick" placeholder="Nickname" maxlength="20" />'+
+        '<label class="form-label" for="message">Message</label>'+
+        '<input class="form-control" name="message" id="chatMessage" placeholder="Message" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
+        '<input class="btn btn-primary pull-right" type="submit" value="Send" />'
+      ).on('submit', function(ev) {
+        ev.preventDefault()
+        if($('#chatMessage').val() === '' || $('#chatNick').val() === ''){
+          return
+        }
+        $.ajax(
+          {
+            url: 'https://'+ chatServer + '/' + eventId,
+            data: JSON.stringify({
+              nickname: $('#chatNick').val(),
+              message: $('#chatMessage').val()
+            }),
+            method: 'POST',
+            dataType: 'JSON',
+            crossDomain: true
+          })
+        $('#chatMessage').val('')
+      })
+    )
+    mainDiv.append($('<div style="clear: both"/>').attr('id', 'messageList'))
+    $('#sidebar').html('')
+    $('#sidebar').append(mainDiv)
+    refreshMessageList()
+}
+
+var refreshMessageList = function() {
+  var out = ''
+  chatMessages.sort((a, b) => b.timestamp - a.timestamp)
+  chatMessages.forEach(function(msg){
+    out += '<div><span><b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>';
+  })
+  $('#messageList').html(out);
 }
 
 var displayOptions = function() {
@@ -593,7 +657,7 @@ var displayOptions = function() {
       qrDataUrl = qr.createDataURL(4)
     }
     mainDiv.append(
-      $('<div"/>').html(
+      $('<div/>').html(
         '<h4>Competitors</h4>' +
         '<div>' +
         '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> Hide All</button>' +
