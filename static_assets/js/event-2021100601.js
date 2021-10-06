@@ -200,7 +200,8 @@ var colorModal = new bootstrap.Modal(document.getElementById("colorModal"))
 var chatDisplayed = false;
 var chatMessages = [];
 var chatSocket = null;
-
+var chatNick = '';
+var isChatConnecting = false
 backdropMaps['blank'] = L.tileLayer('https://www.routechoices.com/static/wood.jpg', {
   attribution: '',
   maxZoom: 18
@@ -638,6 +639,10 @@ var displayChat = function(ev) {
     $('#sidebar').html('')
     $('#sidebar').append(mainDiv)
     refreshMessageList()
+    $('#chatNick').val(chatNick)
+    $('#chatNick').on('change', function(ev){
+      chatNick = ev.target.value
+    })
 }
 
 var refreshMessageList = function() {
@@ -1297,4 +1302,28 @@ function pressProgressBar(e){
     currentTime = getCompetitionStartDate() + getCompetitorsMaxDuration() * perc
   }
   prevShownTime = currentTime
+}
+
+function connectChat() {
+  if(isChatConnecting)return
+  isChatConnecting = true
+  try{
+    var chatSocket = new WebSocket('wss://'+chatServer+'/ws/'+eventId)
+    // Listen for messages
+    chatSocket.addEventListener('open', function (event) {
+      // TODO: keep status updated
+      isChatConnecting = false
+    })
+    chatSocket.addEventListener('message', function (event) {
+      chatMessages.push(JSON.parse(event.data));
+      refreshMessageList()
+    })
+    chatSocket.addEventListener('close', function(ev){
+      setTimeout(connectChat, 1e3)
+      chatSocket = null;
+      isChatConnecting = false
+    });
+  } catch(e) {
+    isChatConnecting = false
+  }
 }

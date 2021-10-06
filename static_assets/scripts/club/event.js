@@ -161,12 +161,7 @@ $(function() {
           }).success(function(data){
             chatMessages = data
           })
-          chatSocket = new WebSocket('wss://'+chatServer+'/ws/'+eventId)
-          // Listen for messages
-          chatSocket.addEventListener('message', function (event) {
-              chatMessages.push(JSON.parse(event.data));
-              refreshMessageList()
-          })
+          connectChat()
         }
       }
       qrUrl = response.event.shortcut;
