@@ -24,6 +24,8 @@ from routechoices.core.models import (
     Map,
     Notice,
     MapAssignation,
+    SpotDevice,
+    SpotFeed,
 )
 
 
@@ -287,10 +289,24 @@ class DeviceAdmin(admin.ModelAdmin):
     def device_name(self, obj):
         return get_device_name(obj.user_agent) or obj.user_agent
 
+
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
         'imei',
         'device'
+    )
+
+
+class SpotDeviceAdmin(admin.ModelAdmin):
+    list_display = (
+        'messenger_id',
+        'device'
+    )
+
+
+class SpotFeedAdmin(admin.ModelAdmin):
+    list_display = (
+        'feed_id',
     )
 
 
@@ -308,6 +324,8 @@ admin.site.register(Device, DeviceAdmin)
 admin.site.register(ImeiDevice, ImeiDeviceAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Map, MapAdmin)
+admin.site.register(SpotDevice, SpotDeviceAdmin)
+admin.site.register(SpotFeed, SpotFeedAdmin)
 
 
 class MyUserAdmin(UserAdmin):
