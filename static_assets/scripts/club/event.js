@@ -17,7 +17,7 @@ function shareUrl (e) {
 
 $(function() {
   $('.page-alerts').hide();
-  $('.page-alert .close').click(function(e) {
+  $('.page-alert .close').on('click', function(e) {
     e.preventDefault();
     $(this).closest('.page-alert').slideUp();
   });
@@ -27,11 +27,12 @@ $(function() {
     if($('#sidebar').hasClass('d-none')){
       $('#sidebar').removeClass('d-none').addClass('col-12');
       $('#map').addClass('d-none').removeClass('col-12');
-    }else{
+    }else if(!chatDisplayed){
       $('#sidebar').addClass('d-none').removeClass('col-12');
       $('#map').removeClass('d-none').addClass('col-12');
       map.invalidateSize()
     }
+    displayCompetitorList(true)
   })
 
   $('#live_button').on('click', selectLiveMode);
@@ -59,7 +60,6 @@ $(function() {
     e.preventDefault();
     onPressResetMassStart()
   });
-
 
   $('#chat_show_button').on('click', displayChat)
 

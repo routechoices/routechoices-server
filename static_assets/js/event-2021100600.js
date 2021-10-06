@@ -456,10 +456,12 @@ var updateCompetitor = function(newData) {
     }
 }
 
-var displayCompetitorList = function(){
-    if (optionDisplayed || chatDisplayed){
+var displayCompetitorList = function(force){
+    if (!force && (optionDisplayed || chatDisplayed)){
       return;
     }
+    optionDisplayed =false
+    chatDisplayed = false
     var listDiv = $('<div id="listCompetitor"/>')
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || getColor(ii)
@@ -575,9 +577,21 @@ var filterCompetitorList = function(e) {
     displayCompetitorList()
 }
 
-var displayChat = function() {
-    chatDisplayed = true
+var displayChat = function(ev) {
+    ev.preventDefault();
     optionDisplayed = false
+    if(chatDisplayed) {
+      chatDisplayed = false
+      $('#sidebar').addClass('d-none').removeClass('col-12');
+      $('#map').removeClass('d-none').addClass('col-12');
+      map.invalidateSize()
+      return
+    }
+    if($('#sidebar').hasClass('d-none')){
+      $('#sidebar').removeClass('d-none').addClass('col-12');
+      $('#map').addClass('d-none').removeClass('col-12');
+    }
+    chatDisplayed = true
     var mainDiv = $('<div/>')
     mainDiv.append(
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
