@@ -450,7 +450,7 @@ def event_chat(request, event_id):
     }
     try:
         r = requests.post(
-            f'https://{settings.CHAT_SERVER}/{event_id}' if not settings.DEBUG else f'http://127.0.0.1:8009/{event_id}',
+            f'http://127.0.0.1:8009/{event_id}', #f'https://{settings.CHAT_SERVER}/{event_id}' if not settings.DEBUG else f'http://127.0.0.1:8009/{event_id}',
             data=json.dumps(
                 doc
             ),

@@ -615,12 +615,13 @@ var displayChat = function(ev) {
         '<input class="form-control" name="nickname" id="chatNick" placeholder="Nickname" maxlength="20" />'+
         '<label class="form-label" for="message">Message</label>'+
         '<input class="form-control" name="message" id="chatMessage" placeholder="Message" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
-        '<input class="btn btn-primary pull-right" type="submit" value="Send" />'
+        '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
       ).on('submit', function(ev) {
         ev.preventDefault()
-        if($('#chatMessage').val() === '' || $('#chatNick').val() === ''){
+        if($('#chatMessage').val() === '' || $('#chatNick').val() === '' || $('chatSubmitBtn').val() === 'Sending...'){
           return
         }
+        $('#chatSubmitBtn').val('Sending...')
         $.ajax(
           {
             url: 'https:'+ chatMessagesEndpoint,
@@ -631,9 +632,12 @@ var displayChat = function(ev) {
             method: 'POST',
             dataType: 'JSON',
             crossDomain: true
+          }).success(function(){
+            $('#chatMessage').val('')
+            $('#chatMessage').focus()
+          }).always(function(){
+            $('#chatSubmitBtn').val('Send')
           })
-        $('#chatMessage').val('')
-        $('#chatMessage').focus()
       })
     )
     mainDiv.append($('<div style="clear: both"/>').attr('id', 'messageList'))
