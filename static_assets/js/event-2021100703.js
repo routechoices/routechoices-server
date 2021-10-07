@@ -558,7 +558,7 @@ var displayCompetitorList = function(force){
       )
       if(competitorList.length > 10) {
         mainDiv.append(
-          $('<input class="form-control" placeholder="Search Competitors" val=""/>').on('keyup', filterCompetitorList)
+          $('<input class="form-control" placeholder="Search Competitors" type="search" val=""/>').on('input', filterCompetitorList)
         )
       }
       mainDiv.append(listDiv)
