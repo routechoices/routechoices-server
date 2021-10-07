@@ -156,7 +156,7 @@ $(function() {
         if (response.event.chat_enabled) {
           $('#chat_button_group').removeClass('d-none');
           $.ajax({
-            url: 'https://'+ chatServer + '/' + eventId,
+            url: 'https:'+ chatMessagesEndpoint,
             dataType: 'JSON'
           }).success(function(data){
             chatMessages = data

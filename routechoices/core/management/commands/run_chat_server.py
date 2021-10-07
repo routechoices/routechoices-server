@@ -1,112 +1,29 @@
 import json
 import arrow
+from django.conf import settings
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 from django.utils.timezone import now
 from django.core.management.base import BaseCommand
-from routechoices.core.models import Event, ChatMessage
+from routechoices.core.models import Event
 from asgiref.sync import sync_to_async
-import hashlib
+
 
 EVENTS_CHATS = {}
 
 
-class LiveEventChatHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.set_header("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type") 
+class HealthCheckHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write(tornado.escape.json_encode({'status': 'ok'}))
 
-    
-    async def options(self, event_id):
-        event = await sync_to_async(
-            Event.objects.filter(
-                aid=event_id,
-                start_date__lte=now(),
-                end_date__gte=now(),
-                allow_live_chat=True,
-            ).first,
-            thread_sensitive=True
-        )()
-        if not event:
-            raise tornado.web.HTTPError(404)
-        self.set_status(204)
-        self.finish()
 
-    async def get(self, event_id):
-        event = await sync_to_async(
-            Event.objects.filter(
-                aid=event_id,
-                start_date__lte=now(),
-                end_date__gte=now(),
-                allow_live_chat=True,
-            ).first,
-            thread_sensitive=True
-        )()
-        if not event:
-            raise tornado.web.HTTPError(404)
-        msgs = await sync_to_async(
-            lambda x: list(ChatMessage.objects.filter(event=x))
-        )(event)
-        out = []
-        for msg in msgs:
-            remote_ip = msg.ip_address
-            hash_user = hashlib.sha256()
-            hash_user.update(msg.nickname.encode('utf-8'))
-            hash_user.update(remote_ip.encode('utf-8'))
-            out.append({
-                "nickname": msg.nickname,
-                "message": msg.message,
-                "timestamp": msg.creation_date.timestamp(),
-                "user_hash": hash_user.hexdigest(),
-            })
-        self.write(tornado.escape.json_encode(out))
-
-    async def post(self, event_id):
-        event = await sync_to_async(
-            Event.objects.filter(
-                aid=event_id,
-                start_date__lte=now(),
-                end_date__gte=now(),
-                allow_live_chat=True,
-            ).first,
-            thread_sensitive=True
-        )()
-        if not event:
-            raise tornado.web.HTTPError(404)
-        try:
-            data = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError:
-            raise tornado.web.HTTPError(400)
-        if not data.get('nickname') or not data.get('message'):
-            raise tornado.web.HTTPError(400)
-        remote_ip = self.request.headers.get("X-Real-IP") or \
-            self.request.headers.get("X-Forwarded-For") or \
-            self.request.remote_ip
-        
-        hash_user = hashlib.sha256()
-        hash_user.update(data['nickname'].encode('utf-8'))
-        hash_user.update(remote_ip.encode('utf-8'))
-        
-        doc = {
-            "nickname": data['nickname'],
-            "message": data['message'],
-            "timestamp": arrow.utcnow().timestamp(),
-            "user_hash": hash_user.hexdigest(),
-        }
-        
-        await sync_to_async(
-            ChatMessage.objects.create
-        )(
-            nickname=data['nickname'],
-            message=data['message'],
-            ip_address=remote_ip,
-            event=event
-        )
+class LiveEventChatHandler(tornado.web.RequestHandler):    
+    def post(self, event_id):
+        if self.request.headers.get("Authorization") != f'Bearer {settings.CHAT_INTERNAL_SECRET}':
+            raise tornado.web.HTTPError(403)
         for item in EVENTS_CHATS.get(event_id, []):
-            item.write_message(json.dumps(doc))
+            item.write_message(self.request.body)
 
 
 class LiveEventChatSocket(tornado.websocket.WebSocketHandler):
@@ -141,6 +58,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         tornado_app = tornado.web.Application([
+            (r'/heath', HealthCheckHandler),
             (r'/([a-zA-Z0-9_-]{11})', LiveEventChatHandler),
             (r'/ws/([a-zA-Z0-9_-]{11})', LiveEventChatSocket)
         ])

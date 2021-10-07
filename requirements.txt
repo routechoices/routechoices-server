@@ -18,7 +18,6 @@ django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-s3-storage
 orjson
 drf-yasg
-django-ratelimit
 fast-luhn
 django-hosts
 django-user-sessions

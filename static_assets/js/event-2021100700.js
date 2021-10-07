@@ -623,16 +623,17 @@ var displayChat = function(ev) {
         }
         $.ajax(
           {
-            url: 'https://'+ chatServer + '/' + eventId,
-            data: JSON.stringify({
+            url: 'https:'+ chatMessagesEndpoint,
+            data: {
               nickname: $('#chatNick').val(),
               message: $('#chatMessage').val()
-            }),
+            },
             method: 'POST',
             dataType: 'JSON',
             crossDomain: true
           })
         $('#chatMessage').val('')
+        $('#chatMessage').focus()
       })
     )
     mainDiv.append($('<div style="clear: both"/>').attr('id', 'messageList'))

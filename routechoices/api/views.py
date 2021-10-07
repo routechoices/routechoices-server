@@ -8,7 +8,8 @@ import orjson as json
 from io import BytesIO
 import arrow
 import requests
-
+import hashlib
+import base64
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -19,12 +20,12 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.utils.timezone import now
+
 from django_hosts.resolvers import reverse
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from ratelimit.decorators import ratelimit
 from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.core.models import (
@@ -34,6 +35,7 @@ from routechoices.core.models import (
     Event,
     ImeiDevice,
     Map,
+    ChatMessage,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
@@ -45,18 +47,27 @@ from routechoices.lib.validators import validate_imei
 from routechoices.lib.s3 import s3_object_url
 
 from rest_framework import renderers, status
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes, throttle_classes
 from rest_framework.exceptions import (
     ValidationError,
     NotFound,
     PermissionDenied
 )
 from rest_framework.response import Response
-
+from rest_framework.throttling import AnonRateThrottle
 
 logger = logging.getLogger(__name__)
 # API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
 GLOBAL_MERCATOR = GlobalMercator()
+
+
+class PostDataThrottle(AnonRateThrottle):
+    rate = '70/min'
+
+    def allow_request(self, request, view):
+        if request.method == 'GET':
+            return True
+        return super().allow_request(request, view)
 
 
 def x_accel_redirect(request, path, filename='',
@@ -386,6 +397,77 @@ def event_js(request, event_id):
         response['Cache-Control'] = 'private'
     response['Content-Type'] = "application/javascript"
     return response
+
+
+@swagger_auto_schema(
+    method='get',
+    auto_schema=None,
+)
+@swagger_auto_schema(
+    method='post',
+    auto_schema=None,
+)
+@api_view(['GET', 'POST'])
+@throttle_classes([PostDataThrottle, ])
+def event_chat(request, event_id):
+    event = get_object_or_404(
+        Event,
+        aid=event_id,
+        start_date__lte=now(),
+        end_date__gte=now(),
+        allow_live_chat=True,
+    )
+    if request.method == 'GET':
+        msgs = ChatMessage.objects.filter(event=event)
+        out = []
+        for msg in msgs:
+            remote_ip = msg.ip_address
+            hash_user = hashlib.sha256()
+            hash_user.update(msg.nickname.encode('utf-8'))
+            hash_user.update(remote_ip.encode('utf-8'))
+            out.append({
+                "nickname": msg.nickname,
+                "message": msg.message,
+                "timestamp": msg.creation_date.timestamp(),
+                "user_hash": base64.urlsafe_b64encode(hash_user.digest()).decode('ascii'),
+            })
+        return Response(out)
+
+    nickname = request.data.get('nickname')
+    message = request.data.get('message')
+    if not nickname or not message:
+        raise ValidationError('Missing parameter>' + nickname + '><' + message)
+    
+    remote_ip = request.META['REMOTE_ADDR']
+    hash_user = hashlib.sha256()
+    hash_user.update(nickname.encode('utf-8'))
+    hash_user.update(remote_ip.encode('utf-8'))
+    doc = {
+        "nickname": nickname,
+        "message": message,
+        "timestamp": arrow.utcnow().timestamp(),
+        "user_hash": base64.urlsafe_b64encode(hash_user.digest()).decode('ascii'),
+    }
+    try:
+        r = requests.post(
+            f'https://{settings.CHAT_SERVER}/{event_id}' if not settings.DEBUG else f'http://127.0.0.1:8009/{event_id}',
+            data=json.dumps(
+                doc
+            ),
+            headers={'Authorization': f'Bearer {settings.CHAT_INTERNAL_SECRET}'}
+        )
+    except Exception as e:
+        return Response({'status': 'failed', 'message': 'chat server offline'}, status=400)
+    if r.status_code != 200:
+        return Response({'status': 'failed', 'message': 'chat server bad response'}, status=400)
+    ChatMessage.objects.create(
+        nickname=nickname,
+        message=message,
+        ip_address=remote_ip,
+        event=event
+    )
+    return Response({'status': 'sent'}, status=201)
+
 
 
 @swagger_auto_schema(
@@ -866,16 +948,11 @@ def event_data_load_test(request, event_id):
     return HttpResponse('ok')
 
 
-def traccar_ratelimit_key(group, request):
-    return request.META['REMOTE_ADDR'] + request.query_params.get('id', '')
-
-
 @swagger_auto_schema(
     method='post',
     auto_schema=None,
 )
 @api_view(['POST'])
-@ratelimit(key=traccar_ratelimit_key, rate='70/m')
 def traccar_api_gw(request):
     traccar_id = request.query_params.get('id')
     if not traccar_id:
@@ -937,16 +1014,12 @@ def ip_latlon(request):
     return Response({'status': 'success', 'lat': lat, 'lon': lon}, headers=headers)
 
 
-def garmin_ratelimit_key(group, request):
-    return request.META['REMOTE_ADDR'] + request.data.get('device_id', '')
-
-
 @swagger_auto_schema(
     method='post',
     auto_schema=None,
 )
 @api_view(['POST'])
-@ratelimit(key=garmin_ratelimit_key, rate='70/m')
+@throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
     secret_provided = request.data.get('secret')
     device_id = request.data.get('device_id')
@@ -1030,7 +1103,6 @@ def garmin_api_gw(request):
     }
 )
 @api_view(['POST'])
-@ratelimit(key=garmin_ratelimit_key, rate='70/m')
 def pwa_api_gw(request):
     device_id = request.data.get('device_id')
     if not device_id:
@@ -1092,7 +1164,6 @@ def gps_seuranta_proxy(request):
     auto_schema=None,
 )
 @api_view(['POST'])
-@ratelimit(key='ip', rate='10/m')
 def get_device_id(request):
     device = Device.objects.create(user_agent=request.session.user_agent[:200])
     return Response({'status': 'ok', 'device_id': device.aid})
@@ -1135,7 +1206,6 @@ def get_device_id(request):
     }
 )
 @api_view(['POST'])
-@ratelimit(key='ip', rate='60/m')
 def get_device_for_imei(request):
     imei = request.data.get('imei')
     if not imei:

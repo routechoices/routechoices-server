@@ -389,6 +389,7 @@ SWAGGER_SETTINGS = {
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
 CHAT_SERVER = "chat.routechoices.dev"
+CHAT_INTERNAL_SECRET = '<change-me>'
 
 POST_LOCATION_SECRETS = ["<replace-me>"]
 

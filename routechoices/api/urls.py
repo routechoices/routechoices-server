@@ -64,6 +64,11 @@ urlpatterns = [
         name='event_detail'
     ),
     url(
+        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/chat/?$',
+        views.event_chat,
+        name='event_chat'
+    ),
+    url(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_thumb/?$',
         views.event_map_thumb_download,
         name='event_map_thumb_download'
