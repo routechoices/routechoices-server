@@ -654,7 +654,7 @@ var refreshMessageList = function() {
   var out = ''
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
   chatMessages.forEach(function(msg){
-    out += '<div><span><b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>';
+    out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>';
   })
   $('#messageList').html(out);
 }
