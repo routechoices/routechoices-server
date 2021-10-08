@@ -1,6 +1,6 @@
 
 function selectizeDeviceInput(){
-    $("select[name$='device']").selectize({
+    $("select[name='device']").selectize({
         valueField: 'id',
         labelField: 'device_id',
         searchField: 'device_id',

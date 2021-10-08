@@ -1,3 +1,25 @@
+
+var seletizeOptions = {
+    valueField: 'id',
+    labelField: 'device_id',
+    searchField: 'device_id',
+    create: false,
+    plugins: [ 'preserve_on_blur' ],
+    load: function(query, callback) {
+        if (!query.length || query.length < 4) return callback();
+        $.ajax({
+            url: apiBaseURL + 'device/search?q=' + encodeURIComponent(query),
+            type: 'GET',
+            error: function() {
+                callback();
+            },
+            success: function(res) {
+                callback(res.results);
+            }
+        });
+    }
+}
+
 function onAddedCompetitorRow(row) {
     var options = {
         useCurrent: false,
@@ -10,31 +32,7 @@ function onAddedCompetitorRow(row) {
     }
     var el = $(row).find('.datetimepicker')[0]
     new tempusDominus.TempusDominus(el, options)
-}
-
-function selectizeDeviceInput(){
-    $("select[name$='device']").selectize({
-        valueField: 'id',
-        labelField: 'device_id',
-        searchField: 'device_id',
-        multiple: true,
-        create: false,
-        plugins: [ 'preserve_on_blur' ],
-        load: function(query, callback) {
-            console.log(query)
-            if (!query.length || query.length < 4) return callback();
-            $.ajax({
-                url: apiBaseURL + 'device/search?q=' + encodeURIComponent(query),
-                type: 'GET',
-                error: function() {
-                    callback();
-                },
-                success: function(res) {
-                    callback(res.results);
-                }
-            });
-        }
-    });
+    $(row).find('select[name$="-device"]').selectize(seletizeOptions);
 }
 
 function onCsvParsed(result){
@@ -103,8 +101,6 @@ function showLocalTime(el) {
 }
 
 $(function(){
-    selectizeDeviceInput()
-
     $('.datetimepicker').map(function(i, el) {
         var options = {
             useCurrent: false,
@@ -123,7 +119,7 @@ $(function(){
         }
         new tempusDominus.TempusDominus(el, options)
     });
-    $("label[for$='DELETE']").parents('.form-group').hide()
+    $('label[for$="-DELETE"]').parents('.form-group').hide()
     $('.formset_row').formset({
         addText: '<i class="fa fa-plus-circle"></i> Add Competitor',
         addCssClass: 'btn btn-primary add-competitor-btn',
@@ -138,9 +134,9 @@ $(function(){
         prefix: 'map_assignations',
         formCssClass: 'extra_map_formset_row',
     });
-    $('.add-competitor-btn').on('click', function(){
-        selectizeDeviceInput()
-    });
+    // next line must come after formset initialization
+    $('select[name$="-device"]').selectize(seletizeOptions);
+
     var originalEventStart = $('#id_start_date').val();
     var competitorsWithSameStartAsEvents = $('.competitor_table .datetimepicker').filter(function(idx, el){
         return originalEventStart !== '' && $(el).val() == originalEventStart;
