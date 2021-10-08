@@ -258,12 +258,28 @@ def initial_of_name(name):
 def check_records(domain):
     if not domain:
         return
-    resp = requests.get(f'https://cloudflare-dns.com/dns-query?ct=application/dns-json&type=TXT&name={domain}')
-    data = resp.json()
+    
+    try:
+        resp = requests.get(f'https://cloudflare-dns.com/dns-query?ct=application/dns-json&type=TXT&name={requests.utils.quote(domain)}')
+    except Exception:
+        return False
+    
+    if resp.status_code != 200:
+        return False
+    
+    try:
+        data = resp.json()
+    except Exception:
+        return False
+    
+    if data.get('Status') != 0:
+        return False
+    
     answer = data.get('Answer', [])
     for ans in answer:
         if ans.get('data') == '"full-speed-no-mistakes"':
             return True
+    
     return False
 
 
