@@ -13,6 +13,7 @@ from django.utils.timezone import is_aware, make_aware
 
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
+from routechoices.lib.validators import validate_nice_slug
 
 from user_sessions.templatetags.user_sessions import device as device_name
 from math import pi, cos, sin
@@ -42,10 +43,14 @@ def get_aware_datetime(date_str):
 
 def random_key():
     rand_bytes = bytes(struct.pack('Q', secrets.randbits(64)))
-    b64 = base64.b64encode(rand_bytes).decode('utf-8')
+    b64 = base64.b64encode(rand_bytes).decode('ascii')
     b64 = b64[:11]
     b64 = b64.replace('+', '-')
     b64 = b64.replace('/', '_')
+    try:
+        validate_nice_slug(b64)
+    except Exception:
+        return random_key()
     return b64
 
 
