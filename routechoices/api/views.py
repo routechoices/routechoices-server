@@ -959,7 +959,7 @@ def traccar_api_gw(request):
         raise ValidationError('Use Traccar App on android or IPhone')
     device_id = traccar_id
     devices = Device.objects.filter(aid=device_id)
-    if devices.count() == 0:
+    if not devices.exists():
         raise ValidationError('No such device ID')
     device = devices.first()
     if not device.user_agent:
@@ -1028,7 +1028,7 @@ def locations_api_gw(request):
     if re.match(r'^[0-9]+$', device_id) and secret_provided not in settings.POST_LOCATION_SECRETS:
         raise PermissionDenied('Invalid secret')
     devices = Device.objects.filter(aid=device_id)
-    if devices.count() == 0:
+    if not devices.exists():
         raise ValidationError('No such device ID')
     device = devices.first()
     if not device.user_agent:
@@ -1110,7 +1110,7 @@ def pwa_api_gw(request):
             'Missing device_id parameter'
         )
     devices = Device.objects.filter(aid=device_id)
-    if devices.count() == 0:
+    if not devices.exists():
         raise ValidationError('No such device ID')
     device = devices.first()
     raw_data = request.data.get('raw_data')
@@ -1222,7 +1222,7 @@ def get_device_for_imei(request):
         pass
     if idevice:
         if re.match(r'/[^0-9]/', device.aid):
-            if device.competitor_set.filter(event__end_date__gte=now()).count() == 0:
+            if not device.competitor_set.filter(event__end_date__gte=now()).exists():
                 device = Device.objects.create()
                 idevice.device = device
                 idevice.save()
