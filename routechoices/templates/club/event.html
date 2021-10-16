@@ -71,11 +71,14 @@
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="next_button"><i class="fa fa-forward"></i></a>
         </div>
 
+        <div class="btn-group pull-right me-2" role="group" id="share_buttons" style="margin-bottom: 2px">
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="share_button"><i class="fa fa-share-alt"></i></a>
+        </div>
         <div class="btn-group pull-right me-2 d-none" style="margin-bottom: 2px" id="chat_button_group">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="chat_show_button"><i class="fa fa-commenting-o"></i></a>
         </div>
         <div class="btn-group pull-right me-2" role="group" id="share_buttons" style="margin-bottom: 2px">
-          <a href="#" role="button" class="btn btn-sm btn-secondary" id="share_button"><i class="fa fa-share-alt"></i></a>
+          <a href="#" role="button" class="btn btn-sm btn-secondary" id="options_show_button"><i class="fa fa-cog"></i></a>
         </div>
         
       </div>
@@ -148,8 +151,8 @@
 <script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script type="text/javascript" src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021100703.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/event-2021101600.js' %}"></script>
 <script type="text/javascript" src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
-<script type="text/javascript" src="{% static '/scripts/club/event.js' %}?_=2021100700"></script>
+<script type="text/javascript" src="{% static '/scripts/club/event.js' %}?_=2021101600"></script>
 {% endblock %}
 

@@ -468,8 +468,8 @@ var displayCompetitorList = function(force){
       competitor.color = competitor.color || getColor(ii)
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown
       var div = $('<div/>')
-      div.html('<hr style="margin: 0 0 3px 0"/>\
-        <div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
+      div.html((listDiv.html() !== '' ? '<hr style="margin: 0 0 3px 0"/>' : '') +
+        '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
         <div><div class="btn-group btn-group-sm" role="group">\
             <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
@@ -551,11 +551,40 @@ var displayCompetitorList = function(force){
     }
     if(searchText === null) {
       var mainDiv = $('<div id="competitorSidebar"/>')
-      mainDiv.append(
-        $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
-          $('<button class="btn btn-default btn-sm"/>').html('<i class="fa fa-cog"></i>').on('click', displayOptions)
+      if(competitorList.length){
+        mainDiv.append(
+          '<div>' +
+          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> Hide All</button>' +
+          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> Show All</button>' +
+          '</div>'
         )
-      )
+      }
+      $(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
+        competitorList.forEach(function(competitor){
+          competitor.isShown = false
+          if(competitor.mapMarker) {
+            map.removeLayer(competitor.mapMarker)
+          }
+          if(competitor.nameMarker) {
+            map.removeLayer(competitor.nameMarker)
+          }
+          if(competitor.tail) {
+            map.removeLayer(competitor.tail)
+          }
+          competitor.mapMarker = null
+          competitor.nameMarker = null
+          competitor.tail = null
+          updateCompetitor(competitor)
+        })
+        displayCompetitorList()
+      })
+      $(mainDiv).find('#showAllCompetitorBtn').on('click', function(){
+      competitorList.forEach(function(competitor){
+        competitor.isShown = true
+        updateCompetitor(competitor)
+        displayCompetitorList()
+      })
+    })
       if(competitorList.length > 10) {
         mainDiv.append(
           $('<input class="form-control" placeholder="Search Competitors" type="search" val=""/>').on('input', filterCompetitorList)
@@ -569,7 +598,6 @@ var displayCompetitorList = function(force){
       var mainDiv = $('#competitorSidebar')
       mainDiv.append(listDiv)
     }
-
 }
 
 var filterCompetitorList = function(e) {
@@ -659,7 +687,20 @@ var refreshMessageList = function() {
   $('#messageList').html(out);
 }
 
-var displayOptions = function() {
+var displayOptions = function(ev) {
+    ev.preventDefault();
+    chatDisplayed = false
+    if(optionDisplayed) {
+      optionDisplayed = false
+      $('#sidebar').addClass('d-none').removeClass('col-12');
+      $('#map').removeClass('d-none').addClass('col-12');
+      map.invalidateSize()
+      return
+    }
+    if($('#sidebar').hasClass('d-none')){
+      $('#sidebar').removeClass('d-none').addClass('col-12');
+      $('#map').addClass('d-none').removeClass('col-12');
+    }
     optionDisplayed = true
     searchText = null
     var mainDiv = $('<div/>')
@@ -682,21 +723,16 @@ var displayOptions = function() {
     }
     mainDiv.append(
       $('<div/>').html(
-        '<h4>Competitors</h4>' +
-        '<div>' +
-        '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> Hide All</button>' +
-        '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> Show All</button>' +
-        '</div>' +
         '<h4>Tails</h4>' +
         '<div class="form-group">' +
         '<label for="tailLengthInput">Length in seconds</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
-        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '') +
-        '</div>' +
+        '</div>' +      
         '<h4>Map Controls</h4>' +
         '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showControls ? 'on' : 'off') + '"></i> Show Map Controls</button>' +
         '<h4>Grouping</h4>' +
-        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showClusters ? 'on' : 'off') + '"></i> Show Groups</button>'
+        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showClusters ? 'on' : 'off') + '"></i> Show Groups</button>' +
+        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '')
       )
     )
     $(mainDiv).find('#tailLengthInput').on('input', function(e){
@@ -747,31 +783,6 @@ var displayOptions = function() {
         showControls = true
       }
     })
-    $(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
-      competitorList.forEach(function(competitor){
-        competitor.isShown = false
-        if(competitor.mapMarker) {
-          map.removeLayer(competitor.mapMarker)
-        }
-        if(competitor.nameMarker) {
-          map.removeLayer(competitor.nameMarker)
-        }
-        if(competitor.tail) {
-          map.removeLayer(competitor.tail)
-        }
-        competitor.mapMarker = null
-        competitor.nameMarker = null
-        competitor.tail = null
-        updateCompetitor(competitor)
-      })
-    })
-    $(mainDiv).find('#showAllCompetitorBtn').on('click', function(){
-      competitorList.forEach(function(competitor){
-        competitor.isShown = true
-        updateCompetitor(competitor)
-      })
-    })
-
     $('#sidebar').html('')
     $('#sidebar').append(mainDiv)
 }

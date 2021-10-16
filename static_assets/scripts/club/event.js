@@ -62,7 +62,7 @@ $(function() {
   });
 
   $('#chat_show_button').on('click', displayChat)
-
+  $('#options_show_button').on('click', displayOptions)
   $('#full_progress_bar').on('click', pressProgressBar)
   $('#share_button').on('click', shareUrl)
 
