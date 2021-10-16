@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0036_remove_event_route'),
+        ('core', '0033_auto_20210713_0535'),
     ]
 
     operations = [

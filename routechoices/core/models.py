@@ -54,7 +54,7 @@ from routechoices.lib.helpers import (
     short_random_slug,
     general_2d_projection,
     adjugate_matrix, project, find_coeffs,
-    delete_domain
+    delete_domain, time_base64
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -172,23 +172,8 @@ def map_upload_path(instance=None, file_name=None):
     tmp_path = [
         'maps'
     ]
-    if file_name:
-        pass
-    basename = instance.aid + '_' + str(int(time.time()))
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
-    tmp_path.append(basename)
-    return os.path.join(*tmp_path)
-
-
-def route_upload_path(instance=None, file_name=None):
-    import os.path
-    tmp_path = [
-        'routes'
-    ]
-    if file_name:
-        pass
-    basename = instance.aid + '_' + str(int(time.time())) + '.gpx'
+    time_hash = time_base64()
+    basename = instance.aid + '_' + time_hash
     tmp_path.append(basename[0])
     tmp_path.append(basename[1])
     tmp_path.append(basename)

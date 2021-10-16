@@ -6,6 +6,7 @@ import requests
 import numpy
 import os
 import os.path
+import time
 
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
@@ -18,6 +19,13 @@ from routechoices.lib.validators import validate_nice_slug
 from user_sessions.templatetags.user_sessions import device as device_name
 from math import pi, cos, sin
 
+
+def time_base64():
+    t = int(time.time())
+    b = struct.pack(">Q", t)
+    while b.startswith(b'\x00'):
+        b = b[1:]
+    return base64.urlsafe_b64encode(b).decode('utf-8').replace('=', '')
 
 
 def deg2rad(deg):
