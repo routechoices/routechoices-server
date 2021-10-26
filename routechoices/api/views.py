@@ -1675,6 +1675,11 @@ def wms_service(request):
         bbox_raw = request.GET.get('bbox', request.GET.get('BBOX'))
         width_raw = request.GET.get('width', request.GET.get('WIDTH'))
         heigth_raw = request.GET.get('height', request.GET.get('HEIGHT'))
+        format = request.GET.get('format', request.GET.get('FORMAT'))
+
+        if format not in ('image/png', 'image/webp'):
+            return HttpResponseBadRequest('invalid format')
+
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
             return HttpResponseBadRequest('missing mandatory parameters')
         try:
@@ -1719,7 +1724,10 @@ def wms_service(request):
         except Exception as e:
             raise e
         output = BytesIO()
-        out_image.save(output, format='png')
+        extra_args = {}
+        if format == 'image/webp':
+            extra_args = {'quality': 20}
+        out_image.save(output, format='png' if format == 'image/png' else 'webp', **extra_args)
         data_out = output.getvalue()
 
         headers = None
@@ -1729,7 +1737,7 @@ def wms_service(request):
             }
         return HttpResponse(
             data_out,
-            content_type='image/png',
+            content_type=format,
             headers=headers
         )
     elif 'GetCapabilities' in [request.GET.get('request'),

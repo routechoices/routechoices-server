@@ -2,6 +2,32 @@ if (!navigator.canShare) {
   $('#share_buttons').hide();
 }
 
+function checkWebpFeature(feature) {
+  return new Promise(function(res) {
+    var kTestImages = {
+        lossy: "UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA",
+        lossless: "UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==",
+        alpha: "UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==",
+        animation: "UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA"
+    };
+    var img = new Image();
+    img.onload = function () {
+        var result = (img.width > 0) && (img.height > 0);
+        res(result);
+    };
+    img.onerror = function () {
+        res(false);
+    };
+    img.src = "data:image/webp;base64," + kTestImages[feature];
+  });
+}
+
+var hasWebPAlpha = false;
+
+(function (){
+   checkWebpFeature('alpha').then(function(res){hasWebPAlpha=res})
+})()
+
 function shareUrl (e) {
   e.preventDefault();
   var shareData = {
@@ -199,6 +225,7 @@ $(function() {
                 bounds: bounds,
                 tileSize: 512,
                 noWrap: true,
+                format: hasWebPAlpha ? 'image/webp' : 'image/png'
             })
           }
         }
