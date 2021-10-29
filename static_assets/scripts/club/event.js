@@ -2,13 +2,11 @@ if (!navigator.canShare) {
   $('#share_buttons').hide();
 }
 
-function checkWebpFeature(feature) {
+function checkImageFormatCapability(format) {
   return new Promise(function(res) {
     var kTestImages = {
-        lossy: "UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA",
-        lossless: "UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==",
-        alpha: "UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==",
-        animation: "UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA"
+        webp: "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==",
+        avif: 'data:image/avif;base64,AAAAFGZ0eXBhdmlmAAAAAG1pZjEAAACgbWV0YQAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAC8AAAAGwAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAARWlwcnAAAAAoaXBjbwAAABRpc3BlAAAAAAAAAAQAAAAEAAAADGF2MUOBAAAAAAAAFWlwbWEAAAAAAAAAAQABAgECAAAAI21kYXQSAAoIP8R8hAQ0BUAyDWeeUy0JG+QAACANEkA='
     };
     var img = new Image();
     img.onload = function () {
@@ -18,14 +16,16 @@ function checkWebpFeature(feature) {
     img.onerror = function () {
         res(false);
     };
-    img.src = "data:image/webp;base64," + kTestImages[feature];
+    img.src = kTestImages[format];
   });
 }
 
-var hasWebPAlpha = false;
+var hasWebpSupport = false;
+var hasAvifSupport = false;
 
 (function (){
-   checkWebpFeature('alpha').then(function(res){hasWebPAlpha=res})
+  checkImageFormatCapability('webp').then(function(res){hasWebpSupport = res})
+  checkImageFormatCapability('avif').then(function(res){hasAvifSupport = res})
 })()
 
 function shareUrl (e) {
@@ -225,7 +225,7 @@ $(function() {
                 bounds: bounds,
                 tileSize: 512,
                 noWrap: true,
-                format: hasWebPAlpha ? 'image/webp' : 'image/png'
+                format: hasWebpSupport ? 'image/webp' : 'image/png'
             })
           }
         }
