@@ -69,9 +69,9 @@
                 </div>
                 <div class="p-2 bd-highlight" style="border-left: 1px solid rgba(0,0,0,.125); width:320px">
                   {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
-                  {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
                   {% if not event.ended and event.open_registration %}<a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-plus-circle"></i> Register</a>{% endif %}
                   {% if event.started and event.allow_route_upload %}<a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-upload"></i> Upload Route</a>{% endif %}
+                  {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
                 </div>
             </div>
         </div>
