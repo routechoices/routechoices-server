@@ -1,5 +1,4 @@
 var alphabetizeNumber = function(integer) {
-  // toString takes radix as attribute, values from '0'...'p'. Char codes for '0'...'9' => 48...57 and 'a'...'p' => 97...112 so if > 96 then letter otherwise cast as int
   return Number(integer)
     .toString(26)
     .split('')
@@ -11,7 +10,6 @@ var alphabetizeNumber = function(integer) {
     )
     .join('')
 }
-
 
 L.Control.Ranking = L.Control.extend({
   onAdd: function(map) {
@@ -105,52 +103,55 @@ L.control.grouping = function(opts) {
 }
 
 Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
-    if (this === null) {
-      throw new TypeError('Array.prototype.findIndex called on null or undefined')
-    } else if (typeof callback !== 'function') {
-      throw new TypeError('callback must be a function')
+  if (this === null) {
+    throw new TypeError('Array.prototype.findIndex called on null or undefined')
+  } else if (typeof callback !== 'function') {
+    throw new TypeError('callback must be a function')
+  }
+  var list = Object(this)
+  var length = list.length >>> 0
+  var thisArg = arguments[1]
+  for (var i = 0; i < length; i++) {
+    if ( callback.call(thisArg, list[i], i, list) ) {
+      return i
     }
-    var list = Object(this)
-    // Makes sures is always has an positive integer as length.
-    var length = list.length >>> 0
-    var thisArg = arguments[1]
-    for (var i = 0; i < length; i++) {
-      if ( callback.call(thisArg, list[i], i, list) ) {
-        return i
-      }
-    }
-    return -1
   }
-  var COLORS = [
-    '#e6194B',
-    '#3cb44b',
-    '#4363d8',
-    '#f58231',
-    '#911eb4',
-    '#42d4f4',
-    '#f032e6',
-    '#bfef45',
-    '#469990',
-    '#9A6324',
-    '#800000',
-    '#aaffc3',
-    '#808000',
-    '#000075',
-    '#ffe119',
-    '#a9a9a9',
-    '#000000'
-  ]
-  var getColor = function(i) {
-    return COLORS[i % COLORS.length]
-  }
-  function getContrastYIQ(hexcolor){
-    hexcolor = hexcolor.replace("#", "")
-    var r = parseInt(hexcolor.substr(0,2),16)
-    var g = parseInt(hexcolor.substr(2,2),16)
-    var b = parseInt(hexcolor.substr(4,2),16)
-    var yiq = ((r*299)+(g*587)+(b*114))/1000
-    return (yiq <= 168) ? 'dark' : 'light'
-  }
+  return -1
+}
+
+var COLORS = [
+  '#e6194B',
+  '#3cb44b',
+  '#4363d8',
+  '#f58231',
+  '#911eb4',
+  '#42d4f4',
+  '#f032e6',
+  '#bfef45',
+  '#469990',
+  '#9A6324',
+  '#800000',
+  '#aaffc3',
+  '#808000',
+  '#000075',
+  '#ffe119',
+  '#a9a9a9',
+  '#000000'
+]
+
+var getColor = function(i) {
+  return COLORS[i % COLORS.length]
+}
+
+function getContrastYIQ(hexcolor){
+  hexcolor = hexcolor.replace("#", "")
+  var r = parseInt(hexcolor.substr(0,2),16)
+  var g = parseInt(hexcolor.substr(2,2),16)
+  var b = parseInt(hexcolor.substr(4,2),16)
+  var yiq = ((r*299)+(g*587)+(b*114))/1000
+  return (yiq <= 168) ? 'dark' : 'light'
+}
+
 var map = null
 var isLiveMode = false
 var liveUrl = null

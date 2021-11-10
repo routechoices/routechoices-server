@@ -1,5 +1,4 @@
-{% load hosts %}
-var eventId = '{{event.aid}}'
+{% load hosts %}var eventId = '{{event.aid}}'
 var eventUrl = "{% host_url 'event_detail' event_id=event.aid host 'api' %}"
 var wmsService = "{% host_url 'wms_service' host 'api' %}"
 var chatServer = '{{ chat_server }}'
