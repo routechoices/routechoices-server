@@ -197,7 +197,7 @@ $(function() {
         var MapLayers = {};
         for (var i=0; i < response.maps.length; i++) {
           var m = response.maps[i];
-          if (i == 0) {
+          if (m.default) {
             m.title = m.title ? $('<span/>').text(m.title).html() : '<i class="fa fa-star"></i> Main Map';
             mapHash = m.hash
             mapUrl = m.url + '?map_hash=' + mapHash
@@ -236,6 +236,8 @@ $(function() {
                 map.fitBounds(e.layer.options.bounds)
             })
         }
+      } else {
+        zoomOnRunners = true
       }
       if (response.announcement) {
         prevNotice = response.announcement;
