@@ -405,7 +405,7 @@ var fetchCompetitorRoutes = function(url){
     routesLastFetched = performance.now()
     lastDataTs = response.timestamp
     isCurrentlyFetchingRoutes = false
-    if(zoomOnRunners) {
+    if(zoomOnRunners && runnerPoints.length) {
       map.fitBounds(runnerPoints)
     }
     $('#eventLoadingModal').remove()
