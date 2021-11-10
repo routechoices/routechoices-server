@@ -1036,7 +1036,15 @@ var drawCompetitors = function(){
           } else {
             competitor.mapMarker.setLatLng([loc.coords.latitude, loc.coords.longitude])
           }
-
+          var pointX = map.latLngToContainerPoint([loc.coords.latitude, loc.coords.longitude]).x
+          var mapMiddleX = map.getSize().x / 2
+          if (pointX > mapMiddleX && !competitor.isNameOnRight && competitor.nameMarker) {
+            map.removeLayer(competitor.nameMarker)
+            competitor.nameMarker = null
+          } else if (pointX <= mapMiddleX && competitor.isNameOnRight && competitor.nameMarker) {
+            map.removeLayer(competitor.nameMarker)
+            competitor.nameMarker = null
+          }
           if(competitor.nameMarker == undefined){
             
             var iconHtml = '<span style="opacity: 0.4;color: ' + competitor.color + '">' + $('<span/>').text(competitor.short_name).html() + '</span>'
