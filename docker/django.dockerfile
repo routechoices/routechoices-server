@@ -1,4 +1,4 @@
-FROM python:3-slim
+FROM python:3.9-slim
 
 # Copy in your requirements file
 ADD requirements.txt /requirements.txt

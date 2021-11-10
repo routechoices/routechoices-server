@@ -11,3 +11,7 @@
     font-family: 'Atkinson-Hyperlegible-Bold-102', sans-serif;
     white-space: nowrap;
 }
+
+.content {
+    margin-top: 15px;
+}
