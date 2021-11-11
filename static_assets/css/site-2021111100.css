@@ -17,8 +17,8 @@ body{
    -webkit-flex: 1 0 auto;
    min-height: 200px;
    margin-bottom: 30px;
+   margin-top: 15px;
 }
-
 
 .leaflet_map {
     height: 600px;
@@ -212,4 +212,7 @@ body{
     margin-bottom: 5px;
 }
 
-.navbar{padding-top:0.5rem;padding-bottom:0.5rem}
+.navbar{
+    padding-top:0.5rem;
+    padding-bottom:0.5rem
+}
