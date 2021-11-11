@@ -110,6 +110,8 @@ def import_map_from_gps_seuranta(club, map_data, name, event_id):
     if not created:
         return map_model
     if r.status_code != 200:
+        if created:
+            map_model.delete()
         raise MapImportError('API returned error code')
     map_file = ContentFile(r.content)
     with Image.open(map_file) as img:
