@@ -273,7 +273,10 @@ def check_records(domain):
         return
     
     try:
-        resp = requests.get(f'https://cloudflare-dns.com/dns-query?ct=application/dns-json&type=TXT&name={requests.utils.quote(domain)}')
+        resp = requests.get(
+            f'https://cloudflare-dns.com/dns-query?type=TXT&name={requests.utils.quote(domain)}',
+            headers={'accept': 'application/dns-json'}
+        )
     except Exception:
         return False
     
