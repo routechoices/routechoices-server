@@ -293,7 +293,7 @@ def check_records(domain):
     
     answer = data.get('Answer', [])
     for ans in answer:
-        if ans.get('data') == '"full-speed-no-mistakes"':
+        if ans.get('data') == '"full-speed-no-mistakes"' and ans.get('type') == 16:
             return True
     
     return False
