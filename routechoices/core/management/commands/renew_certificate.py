@@ -110,7 +110,7 @@ class Command(BaseCommand):
                 acct_key = AcmeAccount.create("secp256r1")
                 write_account_key(acct_key, os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key'))
 
-            cert_key = AcmeKey.from_file(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key'))
+            cert_key = AcmeKey.read_pem(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key'))
 
             client = sewer.client.Client(
                 domain_name=domain,
