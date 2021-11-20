@@ -4,6 +4,8 @@
 {% load hosts %}
 {% load markdownify %}
 
+{% if club.logo %}{% block favicon %}<link rel="icon" type="image/png" href="{{club.nice_url}}logo">{% endblock %}{% endif %}
+
 {% block head_title %}{% if club %}Events by {{club.name}} | Powered by {{site.name}}{% else %}Events on {{site.name}}{% endif %}{% endblock %}
 
 {% block extra_head %}
