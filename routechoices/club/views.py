@@ -79,7 +79,7 @@ def club_logo(request, **kwargs):
     if request.use_cname:
         return redirect(
             reverse(
-                'event_logo',
+                'club_logo',
                 host='clubs',
                 host_kwargs={
                    'club_slug': club_slug
