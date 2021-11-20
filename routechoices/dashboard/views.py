@@ -2,6 +2,7 @@ import os
 import math
 import tempfile
 import zipfile
+from django.http.response import HttpResponse
 
 import requests
 
@@ -179,7 +180,7 @@ def club_list_view(request):
 def club_create_view(request):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ClubForm(request.POST)
+        form = ClubForm(request.POST, request.FILES)
         # check whether it's valid:
         if form.is_valid():
             club = form.save(commit=False)
@@ -217,7 +218,7 @@ def club_edit_view(request, id):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = ClubForm(request.POST, instance=club)
+        form = ClubForm(request.POST, request.FILES, instance=club)
         # check whether it's valid:
         if form.is_valid():
             club = form.save()
@@ -885,6 +886,28 @@ def dashboard_map_download(request, id, *args, **kwargs):
             mime_type[6:]
         ),
         mime=mime_type
+    )
+
+
+@login_required
+def dashboard_logo_download(request, id, *args, **kwargs):
+    if request.user.is_superuser:
+        club = get_object_or_404(
+            Club,
+            aid=id,
+            logo__isnull=False
+        )
+    else:
+        club = Club.objects.filter(admins=request.user, aid=id, logo__isnull=False)
+    if not club:
+        raise Http404()
+    file_path = club.logo.name
+    return serve_from_s3(
+        'routechoices-maps',
+        request,
+        '/internal/' + file_path,
+        filename=f'{club.name}.png',
+        mime='image/png'
     )
 
 

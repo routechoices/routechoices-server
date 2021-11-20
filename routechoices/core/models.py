@@ -81,6 +81,19 @@ class Point(object):
         return f'x: {self.x}, y:{self.y}'
 
 
+def logo_upload_path(instance=None, file_name=None):
+    import os.path
+    tmp_path = [
+        'logos'
+    ]
+    time_hash = time_base64()
+    basename = instance.aid + '_' + time_hash
+    tmp_path.append(basename[0])
+    tmp_path.append(basename[1])
+    tmp_path.append(basename)
+    return os.path.join(*tmp_path)
+
+
 class Club(models.Model):
     aid = models.CharField(
          default=random_key,
@@ -120,6 +133,13 @@ Browse our events here.
         validators=[domain_validator, ]
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
+    logo = models.ImageField(
+        upload_to=logo_upload_path,
+        null=True,
+        blank=True,
+        help_text='Square image of width greater or equal to 128px', 
+        storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),
+    )
 
     class Meta:
         ordering = ['name']

@@ -20,6 +20,7 @@ from routechoices.core.models import (
 from routechoices.lib.helpers import initial_of_name, short_random_key
 from routechoices.site.forms import CompetitorForm, UploadGPXForm
 from routechoices.club import feeds
+from routechoices.api.views import serve_from_s3
 
 
 def club_view(request, **kwargs):
@@ -59,6 +60,36 @@ def club_view(request, **kwargs):
             'events': events,
             'live_events': live_events,
         }
+    )
+
+
+def club_logo(request, **kwargs):
+    if kwargs.get('club_slug'):
+        club_slug = kwargs.get('club_slug')
+        return redirect(
+            reverse(
+                'club_logo',
+                host='clubs',
+                host_kwargs={
+                    'club_slug': club_slug
+                }
+            )
+        )
+    club_slug = request.club_slug
+    club = get_object_or_404(
+        Club,
+        slug__iexact=club_slug,
+        logo__isnull=False
+    )
+    if not club:
+        raise Http404()
+    file_path = club.logo.name
+    return serve_from_s3(
+        'routechoices-maps',
+        request,
+        '/internal/' + file_path,
+        filename=f'{club.name}.png',
+        mime='image/png'
     )
 
 

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.urls import include
 from django.contrib.sitemaps.views import sitemap
-from routechoices.dashboard.views import dashboard_map_download
+from routechoices.dashboard.views import dashboard_map_download, dashboard_logo_download
 from routechoices.site.sitemaps import (
     StaticViewSitemap,
     DynamicViewSitemap,
@@ -50,6 +50,12 @@ urlpatterns = [
         r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',
         dashboard_map_download,
         name='dashboard_map_download',
+    ),
+    url(
+        r'^media/logos/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
+        r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',
+        dashboard_logo_download,
+        name='dashboard_logo_download',
     ),
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     url('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,

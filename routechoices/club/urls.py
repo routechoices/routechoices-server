@@ -9,6 +9,7 @@ def set_club(request, club_slug):
 
 urlpatterns = [
     url(r'^$', views.club_view, name='club_view'),
+    url(r'^logo/?$', views.club_logo, name='club_logo'),
     url(
         r'^feed/?$',
         views.club_live_event_feed,

@@ -3,6 +3,7 @@ from io import BytesIO
 from PIL import Image
 from django.core.exceptions import ValidationError
 from django.core.files import File
+from django.core.files.images import get_image_dimensions
 from django.core.validators import FileExtensionValidator
 from django.forms import (
     Form,
@@ -24,13 +25,39 @@ from routechoices.lib.validators import domain_validator
 class ClubForm(ModelForm):
     class Meta:
         model = Club
-        fields = ['name', 'slug', 'admins', 'description']
+        fields = ['name', 'slug', 'admins', 'logo', 'description']
 
     def clean_admins(self):
         admins = self.cleaned_data['admins']
         if admins.count() > 10:
             raise ValidationError('Clubs can only have a maximum of 10 admins')
         return admins
+    
+    def clean_logo(self):
+        logo = self.cleaned_data['logo']
+        if not logo:
+            return logo
+        w, h = get_image_dimensions(logo)
+        if w != h:
+            raise ValidationError("The image should be square")
+        if w < 128:
+            raise ValidationError("The image is too small, < 128px width")
+        fn = logo.name
+        with Image.open(logo.file) as image:
+            rgba_img = image.convert('RGBA')
+            target = 256
+            if image.size[0] > target:
+                scale = target / min(image.size[0], image.size[1])
+                new_w = image.size[0] * scale
+                rgba_img.thumbnail((new_w, new_w), Image.ANTIALIAS)
+            out_buffer = BytesIO()
+            params = {
+                'dpi': (72, 72),
+            }
+            rgba_img.save(out_buffer, 'PNG', **params)
+            f_new = File(out_buffer, name=fn)
+            return f_new
+
 
 class ClubDomainForm(ModelForm):
     domain = CharField(
