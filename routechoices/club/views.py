@@ -76,6 +76,16 @@ def club_logo(request, **kwargs):
             )
         )
     club_slug = request.club_slug
+    if request.use_cname:
+        return redirect(
+            reverse(
+                'event_logo',
+                host='clubs',
+                host_kwargs={
+                   'club_slug': club_slug
+                }
+            )
+        )
     club = get_object_or_404(
         Club,
         slug__iexact=club_slug,
