@@ -48,18 +48,7 @@ $(function() {
     $(this).closest('.page-alert').slideUp()
   })
 
-  $('#runners_show_button').on('click', function(e){
-    e.preventDefault()
-    if($('#sidebar').hasClass('d-none')){
-      $('#sidebar').removeClass('d-none').addClass('col-12')
-      $('#map').addClass('d-none').removeClass('col-12')
-    }else if(!chatDisplayed){
-      $('#sidebar').addClass('d-none').removeClass('col-12')
-      $('#map').removeClass('d-none').addClass('col-12')
-      map.invalidateSize()
-    }
-    displayCompetitorList(true)
-  })
+  $('#runners_show_button').on('click', toggleCompetitorList)
 
   $('#live_button').on('click', selectLiveMode)
   $('#replay_button').on('click', selectReplayMode)

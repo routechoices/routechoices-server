@@ -472,6 +472,19 @@ var updateCompetitor = function(newData) {
     }
 }
 
+function toggleCompetitorList(e){
+  e.preventDefault()
+  if($('#sidebar').hasClass('d-none')){
+    $('#sidebar').removeClass('d-none').addClass('col-12')
+    $('#map').addClass('d-none').removeClass('col-12')
+  }else if(!chatDisplayed){
+    $('#sidebar').addClass('d-none').removeClass('col-12')
+    $('#map').removeClass('d-none').addClass('col-12')
+    map.invalidateSize()
+  }
+  displayCompetitorList(true)
+}
+
 var displayCompetitorList = function(force){
     if (!force && (optionDisplayed || chatDisplayed)){
       return;
@@ -566,6 +579,13 @@ var displayCompetitorList = function(force){
     }
     if(searchText === null) {
       var mainDiv = $('<div id="competitorSidebar"/>')
+      mainDiv.append(
+        $('<div style="text-align:right; margin: -10px 0px 10px 0px;" class="d-block d-sm-none"/>').append(
+          $('<button class="btn btn-default btn-sm"/>')
+          .html('<i class="fa fa-times"></i>')
+          .on('click', toggleCompetitorList)
+        )
+      )
       if(competitorList.length){
         mainDiv.append(
           '<div>' +
@@ -629,6 +649,9 @@ var displayChat = function(ev) {
       $('#sidebar').addClass('d-none').removeClass('col-12')
       $('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
+      if(getResponsiveBreakpoint() !== 'xs') {
+        displayCompetitorList()
+      }
       return
     }
     if($('#sidebar').hasClass('d-none')){
@@ -641,10 +664,7 @@ var displayChat = function(ev) {
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
         $('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
-        .on('click', function(){
-          chatDisplayed = false
-          displayCompetitorList()
-        })
+        .on('click', displayChat)
       )
     )
     mainDiv.append(
@@ -702,6 +722,24 @@ var refreshMessageList = function() {
   $('#messageList').html(out)
 }
 
+function getResponsiveBreakpoint() {
+  var envs = {xs:"d-none", sm:"d-sm-none", md:"d-md-none", lg:"d-lg-none", xl:"d-xl-none"};
+  var env = "";
+
+  var $el = $("<div>");
+  $el.appendTo($("body"));
+
+  for (var i = Object.keys(envs).length - 1; i >= 0; i--) {
+      env = Object.keys(envs)[i];
+      $el.addClass(envs[env]);
+      if ($el.is(":hidden")) {
+          break; // env detected
+      }
+  }
+  $el.remove();
+  return env;
+};
+
 var displayOptions = function(ev) {
     ev.preventDefault()
     chatDisplayed = false
@@ -710,6 +748,9 @@ var displayOptions = function(ev) {
       $('#sidebar').addClass('d-none').removeClass('col-12')
       $('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
+      if(getResponsiveBreakpoint() !== 'xs') {
+        displayCompetitorList()
+      }
       return
     }
     if($('#sidebar').hasClass('d-none')){
@@ -723,10 +764,7 @@ var displayOptions = function(ev) {
       $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
         $('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
-        .on('click', function(){
-          optionDisplayed = false
-          displayCompetitorList()
-        })
+        .on('click', displayOptions)
       )
     )
     var qrDataUrl = null
