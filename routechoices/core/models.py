@@ -156,7 +156,7 @@ Browse our events here.
     @property
     def nice_url(self):
         if self.domain:
-            cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')
+            cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{self.domain}.crt')
             is_secure = os.path.exists(cert_path)
             os.path.exists(settings.BASE_DIR)
             return f"http{'s' if is_secure else ''}://{self.domain}/"
