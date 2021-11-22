@@ -77,7 +77,7 @@
         <div class="btn-group pull-right me-2 d-none" style="margin-bottom: 2px" id="chat_button_group">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="chat_show_button"><i class="fa fa-commenting-o"></i></a>
         </div>
-        <div class="btn-group pull-right me-2" role="group" id="share_buttons" style="margin-bottom: 2px">
+        <div class="btn-group pull-right me-2" role="group" id="options_buttons" style="margin-bottom: 2px">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="options_show_button"><i class="fa fa-cog"></i></a>
         </div>
         
@@ -97,7 +97,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body" style="text-align: center">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100px"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
         <h1>Loading...</h1>
       </div>
     </div><!-- /.modal-content -->
@@ -137,22 +137,22 @@
 </div>
 {% endblock %}
 {% block extra_body %}
-<script type="text/javascript" src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
-<script type="text/javascript" src="{% static '/js/leaflet.imageTransform.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/leaflet.lineUtils.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/leaflet-rotate-0.1.2/leaflet-rotate.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/server_clock.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/positioning-2021082902.js' %}"></script>
-<script type="text/javascript" src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
-<script type="text/javascript" src="{% static '/js/event-2021112100.js' %}"></script>
-<script type="text/javascript" src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
-<script type="text/javascript" src="{% static '/scripts/club/event.js' %}?_=2021112100"></script>
+<script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
+<script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
+<script src="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
+<script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+<script src="{% static '/js/leaflet.lineUtils.js' %}"></script>
+<script src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
+<script src="{% static '/vendor/leaflet-rotate-0.1.2/leaflet-rotate.js' %}"></script>
+<script src="{% static '/js/server_clock.js' %}"></script>
+<script src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
+<script src="{% static '/js/positioning-2021082902.js' %}"></script>
+<script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
+<script src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
+<script src="{% static '/js/event-2021112100.js' %}"></script>
+<script src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
+<script src="{% static '/scripts/club/event.js' %}?_=2021112100"></script>
 {% endblock %}
 

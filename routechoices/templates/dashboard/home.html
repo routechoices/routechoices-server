@@ -8,11 +8,11 @@
 {% block content %}
   <div class="row" style="margin-top:15px">
     <ul class="nav nav-tabs" style="margin-bottom:1em;">
-      <li role="nav-item"><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}">Account</a>
-      <li role="nav-item"><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}">Devices</a>
-      <li role="nav-item"><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_list_view' %}active{% endif %}" href="{% url 'dashboard:club_list_view' %}">Clubs</a>
-      <li role="nav-item"><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}" href="{% url 'dashboard:map_list_view' %}">Maps</a>
-      <li role="nav-item"><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}">Events</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}">Account</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}">Devices</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_list_view' %}active{% endif %}" href="{% url 'dashboard:club_list_view' %}">Clubs</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}" href="{% url 'dashboard:map_list_view' %}">Maps</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}">Events</a>
     </ul>
     <div class="col-12">
       <div class="row">
@@ -22,12 +22,12 @@
             <h3>Welcome to your dashboard.</h3>
             <p>
               Now that you have created an account you can:
-              <ul>
-                <li>Create a club</li>
-                <li>Upload your maps</li>
-                <li>Create and manage your events</li>
-              </ul>
             </p>
+            <ul>
+              <li>Create a club</li>
+              <li>Upload your maps</li>
+              <li>Create and manage your events</li>
+            </ul>
           </div>
         {% endblock %}
         </div>
