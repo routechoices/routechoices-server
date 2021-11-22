@@ -7,6 +7,7 @@ import logging
 import hashlib
 from operator import itemgetter
 import orjson as json
+import os.path
 import re
 import time
 from zipfile import ZipFile
@@ -155,7 +156,10 @@ Browse our events here.
     @property
     def nice_url(self):
         if self.domain:
-            return f'http://{self.domain}/'
+            cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')
+            is_secure = os.path.exists(cert_path)
+            os.path.exists(settings.BASE_DIR)
+            return f"http{'s' if is_secure else ''}://{self.domain}/"
         return reverse(
             'club_view',
             host='clubs',
