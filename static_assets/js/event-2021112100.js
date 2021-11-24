@@ -213,29 +213,32 @@ backdropMaps['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
   maxZoom: 18
 })
-backdropMaps['gmap-street'] = L.tileLayer('https://mt0.google.com/vt/x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
-  attribution: '\u0026copy\u003B Google'
+backdropMaps['gmap-street'] = L.tileLayer('https://mt0.google.com/vt/x={x}&y={y}&z={z}', {
+  attribution: '&copy; Google'
 })
-backdropMaps['gmap-hybrid'] = L.tileLayer('https://mt0.google.com/vt/lyrs\u003Dy\u0026hl\u003Den\u0026x\u003D{x}\u0026y\u003D{y}\u0026z\u003D{z}', {
-  attribution: '\u0026copy\u003B Google'
+backdropMaps['gmap-hybrid'] = L.tileLayer('https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', {
+  attribution: '&copy; Google'
 })
 backdropMaps['topo-fi'] = L.tileLayer('https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', {
-  attribution: '\u0026copy\u003B National Land Survey of Finland'
+  attribution: '&copy; National Land Survey of Finland'
 })
-backdropMaps['mapant-fi'] = L.tileLayer('https://wmts.mapant.fi/wmts_EPSG3857.php?z\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
-  attribution: 'MapAnt.fi and National Land Survey of Finland'
+backdropMaps['mapant-fi'] = L.tileLayer('https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}', {
+  attribution: '&copy; MapAnt.fi and National Land Survey of Finland'
 })
 backdropMaps['topo-no'] = L.tileLayer(
-  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers\u003Dtopo4\u0026zoom\u003D{z}\u0026x\u003D{x}\u0026y\u003D{y}', {
+  'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}', {
     attribution: ''
 })
 backdropMaps['mapant-no'] = L.tileLayer('https://mapant.no/osm-tiles/{z}/{x}/{y}.png', {
-  attribution: 'MapAnt.no'
+  attribution: '&copy; MapAnt.no'
 })
 backdropMaps['mapant-es'] = L.tileLayer.wms(
     'https://mapant.es/mapserv?map=/mapas/geotiff.map',
-    {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true, attribution: 'MapAnt.es'}
+    {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true, attribution: '&copy; MapAnt.es'}
 )
+backdropMaps['topo-world'] = L.tileLayer('https://{a|b|c}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenTopoMap (CC-BY-SA)'
+})
 
 function drawFinishLine (e) {
   finishLinePoints = []
