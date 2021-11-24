@@ -71,7 +71,7 @@ $(function(){
         L.TileLayer['finland-topo'] = L.TileLayer.Common.extend({url: 'https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg', options:{attribution: '&copy; National Land Survey of Finland'}});
         L.TileLayer['mapant-fi'] = L.TileLayer.Common.extend({url: 'https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}', options:{attribution: '&copy; MapAnt and National Land Survey of Finland'}});
         L.TileLayer['norway-topo'] = L.TileLayer.Common.extend({url: 'https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}', options:{attribution: ''}});
-        L.TileLayer['world-topo'] = L.TileLayer.Common.extend({url: 'https://{a|b|c}.tile.opentopomap.org/{z}/{x}/{y}.png', options:{attribution: '&copy; OpenTopoMap (CC-BY-SA)'}});
+        L.TileLayer['world-topo'] = L.TileLayer.Common.extend({url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', options:{attribution: '&copy; OpenTopoMap (CC-BY-SA)'}});
         L.TileLayer['mapant-no'] = L.TileLayer.Common.extend({url: 'https://mapant.no/osm-tiles/{z}/{x}/{y}.png', options: {attribution: '&copy; MapAnt.no'}});
         L.TileLayer['mapant-es'] = L.tileLayer.wms(
             'https://mapant.es/mapserv?map=/mapas/geotiff.map',

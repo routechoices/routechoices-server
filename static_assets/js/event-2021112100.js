@@ -236,7 +236,7 @@ backdropMaps['mapant-es'] = L.tileLayer.wms(
     'https://mapant.es/mapserv?map=/mapas/geotiff.map',
     {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true, attribution: '&copy; MapAnt.es'}
 )
-backdropMaps['topo-world'] = L.tileLayer('https://{a|b|c}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+backdropMaps['topo-world'] = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenTopoMap (CC-BY-SA)'
 })
 
