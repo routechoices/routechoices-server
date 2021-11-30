@@ -151,6 +151,7 @@ $(function() {
     var startEvent = new Date(response.event.start_date)
     var endEvent = new Date(response.event.end_date)
     if (startEvent > now) {
+      map.fitWorld({ animate: false }).zoomIn(null, { animate:false })
       $('#eventLoadingModal').remove()
       var preRaceModal = new bootstrap.Modal(document.getElementById("eventNotStartedModal"), {backdrop:'static', keyboard: false, })
       document.getElementById("eventNotStartedModal").addEventListener('hide.bs.modal', function(e){
