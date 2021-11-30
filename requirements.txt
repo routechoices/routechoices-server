@@ -1,4 +1,4 @@
-django>=3,<4.0
+django<4
 arrow
 pillow
 django-cors-headers
@@ -13,14 +13,15 @@ raven
 defusedxml
 cssselect
 tornado
-django-background-tasks
+django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
+django-compat @ git+https://github.com/rphlo/django-compat.git # requirement for background-tasks
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
-django-s3-storage
+django-s3-storage @ git+https://github.com/rphlo/django-s3-storage.git
 orjson
 drf-yasg
 fast-luhn
-django-hosts
-django-user-sessions
+django-hosts @ git+https://github.com/rphlo/django-hosts.git
+django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 geoip2
 gps-encoding-rust @ git+https://github.com/rphlo/gps_encoding.git
 pymemcache

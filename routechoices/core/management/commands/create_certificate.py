@@ -121,5 +121,3 @@ class Command(BaseCommand):
             nginx_need_restart = True
         if nginx_need_restart:
             print('Reload nginx for changes to take effect...')
-        
-

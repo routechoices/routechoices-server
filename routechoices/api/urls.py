@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import re_path, include
 
 from rest_framework import permissions
 
@@ -23,8 +23,8 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    url(
+    re_path(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    re_path(
         r'^$',
         schema_view.with_ui(
             'redoc',
@@ -32,108 +32,108 @@ urlpatterns = [
         ),
         name='api_doc'
     ),
-    url(r'^site-specs\.js$', views.site_specs_js, name='site_specs_js'),
-    url(r'^device_id/?$', views.get_device_id, name='device_id_api'),
-    url(r'^imei/?$', views.get_device_for_imei, name='device_imei_api'),
-    url(
+    re_path(r'^site-specs\.js$', views.site_specs_js, name='site_specs_js'),
+    re_path(r'^device_id/?$', views.get_device_id, name='device_id_api'),
+    re_path(r'^imei/?$', views.get_device_for_imei, name='device_imei_api'),
+    re_path(
         r'^gps_seuranta_proxy/?$',
         views.gps_seuranta_proxy,
         name='gps_seuranta_proxy'
     ),
-    url(r'^time/?$', views.get_time, name='time_api'),
-    url(r'^user/search/?$', views.user_search, name='user_search_api'),
-    url(r'^device/search/?$', views.device_search, name='device_search_api'),
-    url(r'^device/(?P<device_id>[^/]+)/registrations/?$', views.device_registrations, name='device_registrations_api'),
-    #url(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
-    #url(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
-    #url(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
-    url(r'^locations/?$', views.locations_api_gw, name='locations_api_gw'),
-    url(
+    re_path(r'^time/?$', views.get_time, name='time_api'),
+    re_path(r'^user/search/?$', views.user_search, name='user_search_api'),
+    re_path(r'^device/search/?$', views.device_search, name='device_search_api'),
+    re_path(r'^device/(?P<device_id>[^/]+)/registrations/?$', views.device_registrations, name='device_registrations_api'),
+    #re_path(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
+    #re_path(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
+    #re_path(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
+    re_path(r'^locations/?$', views.locations_api_gw, name='locations_api_gw'),
+    re_path(
         r'^events/?$',
         views.event_list,
         name='event_list'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)\.js$',
         views.event_js,
         name='event_js'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$',
         views.event_detail,
         name='event_detail'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/chat/?$',
         views.event_chat,
         name='event_chat'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_thumb/?$',
         views.event_map_thumb_download,
         name='event_map_thumb_download'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/register/?$',
         views.event_register,
         name='event_register'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/upload_route/?$',
         views.event_upload_route,
         name='event_upload_route'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$',
         views.event_delete_competitor,
         name='event_delete_competitor'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$',
         views.event_map_download,
         name='event_map_download'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/(?P<map_index>\d+)?$',
         views.event_kmz_download,
         name='event_kmz_download'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/data/?$',
         views.event_data,
         name='event_data'
     ),
-    url(
+    re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/data_load_test/?$',
         views.event_data_load_test,
         name='event_data_load_test'
     ),
-    url(
+    re_path(
         r'^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$',
         views.map_kmz_download,
         name='map_kmz_download',
     ),
-    url(
+    re_path(
         r'^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx/?$',
         views.competitor_gpx_download,
         name='competitor_gpx_download'
     ),
-    url(
+    re_path(
         r'^woo/race_status/get_info.json$',
         views.two_d_rerun_race_status,
         name='2d_rerun_race_status'
     ),
-    url(
+    re_path(
         r'^woo/race_status/get_data.json$',
         views.two_d_rerun_race_data,
         name='2d_rerun_race_data'
     ),
-    url(
+    re_path(
         r'^wms/?$',
         views.wms_service,
         name='wms_service'
     ),
-    url(
+    re_path(
         r'^check_latlon/?$',
         views.ip_latlon,
         name='ip_latlon'

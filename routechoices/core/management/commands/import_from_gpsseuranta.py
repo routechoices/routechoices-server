@@ -24,3 +24,4 @@ class Command(BaseCommand):
             except EventImportError:
                 self.stderr.write('Could not import event %s' % event_id)
                 continue
+        self.stderr.write('No events')

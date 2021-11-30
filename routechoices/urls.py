@@ -14,8 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.conf.urls import url
-from django.urls import include
+from django.urls import re_path, include
 from django.contrib.sitemaps.views import sitemap
 from routechoices.dashboard.views import dashboard_map_download, dashboard_logo_download
 from routechoices.site.sitemaps import (
@@ -34,32 +33,32 @@ sitemaps = {
 }
 
 urlpatterns = [
-    url(r'^accounts/', include('allauth.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
-    url(r'^captcha/', include('captcha.urls')),
-    url(
+    re_path(r'^accounts/', include('allauth.urls')),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
+    re_path(r'^captcha/', include('captcha.urls')),
+    re_path(
         r'^dashboard/',
         include(
             ('routechoices.dashboard.urls', 'dashboard'),
             namespace='dashboard'
         )
     ),
-    url(
+    re_path(
         r'^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
         r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',
         dashboard_map_download,
         name='dashboard_map_download',
     ),
-    url(
+    re_path(
         r'^media/logos/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/'
         r'(?P<id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?',
         dashboard_logo_download,
         name='dashboard_logo_download',
     ),
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
-    url('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,
+    re_path(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    re_path('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,
         {'sitemaps': sitemaps}, name='sitemap'),
-    url(r'', include('user_sessions.urls', 'user_sessions')),
-    url(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
+    re_path(r'', include('user_sessions.urls', 'user_sessions')),
+    re_path(r'', include(('routechoices.site.urls', 'site'), namespace='site')),
 ]

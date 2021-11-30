@@ -1,7 +1,7 @@
 import shutil
 import gzip
 from django.core.files.base import File
-from django_s3_storage.storage import S3Storage, S3File, _temporary_file, _wrap_errors
+from django_s3_storage.storage import S3Storage, S3File, _wrap_errors
 
 
 class OverwriteImageStorage(S3Storage):
@@ -32,7 +32,7 @@ class OverwriteImageStorage(S3Storage):
         if nbytes and nbytes > 1:
             params['Range'] = 'bytes={}-{}'.format(0, nbytes - 1)
         obj = self.s3_connection.get_object(**params)
-        content = _temporary_file()
+        content = self.new_temporary_file()
         shutil.copyfileobj(obj["Body"], content)
         content.seek(0)
         # Un-gzip if required.

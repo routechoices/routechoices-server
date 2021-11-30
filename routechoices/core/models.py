@@ -34,7 +34,7 @@ import gpxpy.gpx
 
 import gps_encoding
 
-import pytz
+import zoneinfo
 
 from PIL import Image, ImageDraw
 
@@ -64,7 +64,7 @@ from routechoices.lib.globalmaptiles import GlobalMercator
 logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
-
+UTC_TZ = zoneinfo.ZoneInfo('UTC')
 
 class Point(object):
     def __init__(self, x, y=None):
@@ -886,7 +886,7 @@ class Device(models.Model):
         if timestamp is not None:
             ts_datetime = datetime.datetime \
                 .utcfromtimestamp(timestamp) \
-                .replace(tzinfo=pytz.utc)
+                .replace(tzinfo=UTC_TZ)
         else:
             ts_datetime = now()
         locs = self.locations
@@ -993,7 +993,7 @@ class Device(models.Model):
         t = ll['timestamp']
         return datetime.datetime \
             .utcfromtimestamp(t) \
-            .replace(tzinfo=pytz.utc)
+            .replace(tzinfo=UTC_TZ)
 
     @cached_property
     def last_position(self):
