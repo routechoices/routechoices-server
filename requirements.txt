@@ -14,7 +14,6 @@ defusedxml
 cssselect
 tornado
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
-django-compat @ git+https://github.com/rphlo/django-compat.git # requirement for background-tasks
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-s3-storage @ git+https://github.com/rphlo/django-s3-storage.git
 orjson
