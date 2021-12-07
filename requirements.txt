@@ -1,4 +1,4 @@
-django<4
+django
 arrow
 pillow
 django-cors-headers
