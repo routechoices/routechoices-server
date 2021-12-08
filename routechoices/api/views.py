@@ -537,15 +537,46 @@ def event_register(request, event_id):
     device_id = request.data.get('device_id')
     device = Device.objects.filter(aid=device_id).first()
     
+    lang = request.GET.get('lang', 'en')
+    if lang not in ('en', 'fi', 'fr'):
+        lang = 'en'
+    
+    err_messages = {
+        'en': {
+            'no-device-id': 'Device ID not found',
+            'no-name': 'Name is missing',
+            'invalid-start-time': 'Start time could not be parsed',
+            'bad-start-time': 'Competitor start time should be during the event time',
+            'bad-name': 'Competitor with same name already registered',
+            'bad-sname': 'Competitor with same short name already registered',
+        },
+        'fr': {
+            'no-device-id': "Identifiant de l'appareil introuvable",
+            'no-name': 'Nom est manquant',
+            'invalid-start-time': "Impossible d'extraire l'heure de début",
+            'bad-start-time': "L'heure de départ du concurrent doit être durant l'événement",
+            'bad-name': 'Participant avec le même nom déjà inscrit',
+            'bad-sname': 'Participant avec le même nom court déjà inscrit',
+        },
+        'fi': {
+            'no-device-id': 'Laitetunnusta ei löydy',
+            'no-name': 'Nimi puuttuu',
+            'invalid-start-time': 'Aloitusaikaa ei voitu jäsentää',
+            'bad-start-time': 'Kilpailijan aloitusajan tulee olla tapahtuman aikana',
+            'bad-name': 'Kilpailija samalla nimellä jo rekisteröitynyt',
+            'bad-sname': 'Kilpailija samalla lyhyellä nyhyelläimellä jo rekisteröitynyt',
+        }
+    }
+
     errs = []
 
     if not device:
-        errs.append('No such device ID')
+        errs.append(err_messages[lang]['no-device-id'])
     
     name = request.data.get('name')
 
     if not name:
-        errs.append('Property name is missing')
+        errs.append(err_messages[lang]['no-name'])
     short_name = request.data.get('short_name')
     if not short_name:
         short_name = initial_of_name(name)
@@ -554,7 +585,7 @@ def event_register(request, event_id):
         try:
             start_time = arrow.get(start_time).datetime
         except Exception:
-            errs.append('Start time could not be parsed')
+            errs.append(err_messages[lang]['invalid-start-time'])
     elif event.start_date < now():
         start_time = now()
     else:
@@ -566,15 +597,13 @@ def event_register(request, event_id):
         (not event_end and event_start > start_time)
             or (event_end and (event_start > start_time
                                or start_time > event_end))):
-        errs.append(
-            'Competitor start time should be during the event time'
-        )
+        errs.append(err_messages[lang]['bad-start-time'])
     
     if event.competitors.filter(name=name).exists():
-        errs.append('Competitor with same name already registered')
+        errs.append(err_messages[lang]['bad-name'])
      
     if event.competitors.filter(short_name=short_name).exists():
-        errs.append('Competitor with same short name already registered')
+        errs.append(err_messages[lang]['bad-sname'])
     
     if errs:
         raise ValidationError('\r\n'.join(errs))
