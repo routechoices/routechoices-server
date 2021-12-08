@@ -12,7 +12,7 @@
           </ul>
           <ul class="nav navbar-nav d-flex">
             <li class="nav-item">
-              <a class="nav-link" href="{% if club %}{{ club.get_absolute_url }}{% else %}{{ event.club.get_absolute_url }}{% endif %}">Events by {% if club %}{{ club.name }}{% else %}{{ event.club.name }}{% endif %}</a>
+              <a class="nav-link" href="{% if club %}{{ club.get_absolute_url }}{% else %}{{ event.club.get_absolute_url }}{% endif %}" id="club-events-link-text">Events by {% if club %}{{ club.name }}{% else %}{{ event.club.name }}{% endif %}</a>
             </li>
           </ul>
         </div>

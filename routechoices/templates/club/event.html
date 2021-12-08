@@ -44,7 +44,7 @@
     <div id="map" class="d-sm-block col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main"></div>
     <div class="page-alerts col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main-alerts">
       <div class="alert alert-info page-alert alert-dismissible" id="alert-2">
-          <strong>Heads up!</strong> <span id="alert-text"></span>
+          <strong id="heads-up-text">Heads up!</strong> <span id="alert-text"></span>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     </div>
@@ -98,7 +98,7 @@
     <div class="modal-content">
       <div class="modal-body" style="text-align: center">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
-        <h1>Loading...</h1>
+        <h1 id="loading-text">Loading...</h1>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -108,10 +108,10 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-center">
-         <h2 class="modal-title" >Event not yet started</h2>
+         <h2 class="modal-title" id="event-not-started-text">Event not yet started</h2>
       </div>
       <div class="modal-body" style="text-align: center">
-        <h4>Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
+        <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -122,7 +122,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="colorModalLabel">Select new color for <span id="color-name"></span></h5>
+        <h5 class="modal-title" id="colorModalLabel"></span></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -137,10 +137,11 @@
 </div>
 {% endblock %}
 {% block extra_body %}
+<script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.js' %}"></script>
-<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?langs=en-es-fi-fr-se"></script>
 <script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
 <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
 <script src="{% static '/js/leaflet.lineUtils.js' %}"></script>
@@ -151,8 +152,8 @@
 <script src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
-<script src="{% static '/js/event-2021112400.js' %}"></script>
+<script src="{% static '/js/event-2021120600.js' %}"></script>
 <script src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
-<script src="{% static '/scripts/club/event.js' %}?_=2021113000"></script>
+<script src="{% static '/scripts/club/event.js' %}?_=2021120600"></script>
 {% endblock %}
 

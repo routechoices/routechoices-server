@@ -31,12 +31,12 @@ L.Control.Ranking = L.Control.extend({
 
   setValues: function(ranking) {
     var el = $('.leaflet-control-ranking')
-    var out = '<h6>Ranking</h6>'
+    var out = '<h6>' + banana.i18n('ranking') + '</h6>'
     ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
     ranking.forEach(function (c, i) {
       out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
     })
-    if(out === '<h6>Ranking</h6>' ) {
+    if(out === '<h6>' + banana.i18n('ranking') + '</h6>') {
       out += '<p>-</p>'
     }
     if (el.html() !== out){
@@ -79,13 +79,13 @@ L.Control.Grouping = L.Control.extend({
       if (i!==0){
         out+='<br>'
       }
-      out += '<h6>Group '+ alphabetizeNumber(i) +'</h6>'
+      out += '<h6>' + banana.i18n('group') + ' '+ alphabetizeNumber(i) +'</h6>'
       k.parts.forEach(function(ci) {
         out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + $('<span/>').text(c[ci].name).html() + '</span></div>'
       })
     })
     if(out === '' ) {
-      out = '<h6>No Groups</h6>'
+      out = '<h6>' + banana.i18n('no-group') + '</h6>'
     }
     if (el.html() !== out){
       el.html(out)
@@ -259,7 +259,7 @@ function removeFinishLine() {
     map.contextmenu.removeItem(removeFinishLineContextMenuItem)
     removeFinishLineContextMenuItem = null
     setFinishLineContextMenuItem = map.contextmenu.insertItem({
-      text: 'Draw finish line',
+      text: banana.i18n('draw-finish-line'),
       callback: drawFinishLine
     }, 1)
   }
@@ -275,7 +275,7 @@ function drawFinishLineEnd(e) {
   map.contextmenu.removeItem(setFinishLineContextMenuItem)
   setFinishLineContextMenuItem = null
   removeFinishLineContextMenuItem = map.contextmenu.insertItem({
-      text: 'Remove finish line',
+      text: banana.i18n('remove-finish-line'),
       callback: removeFinishLine
   }, 1)
 }
@@ -341,7 +341,7 @@ var selectReplayMode = function(e){
   $("#replay_control_buttons").show()
   if (!setMassStartContextMenuItem) {
     setMassStartContextMenuItem = map.contextmenu.insertItem({
-      text: 'Mass Start from here',
+      text: banana.i18n('mass-start-from-here'),
       callback: onPressCustomMassStart
     }, 2)
   }
@@ -511,7 +511,7 @@ var displayCompetitorList = function(force){
         </div>')
 
       $(div).find('.color-tag').on('click', function() {
-        $('#color-name').text(competitor.name)
+        $('#colorModalLabel').text(banana.i18n('select-color-for', competitor.name))
         var color = competitor.color
         var CP = $('<div/>')
         CP.colorpicker({inline: true, color: color}).on('colorpickerChange', function(ev){
@@ -577,7 +577,8 @@ var displayCompetitorList = function(force){
     })
     if (competitorList.length === 0) {
       var div = $('<div/>')
-      div.html('<h3>No Competitors Yet...</h3>')
+      var txt  = banana.i18n('no-competitors')
+      div.html('<h3>' + txt+ '</h3>')
       listDiv.append(div)
     }
     if(searchText === null) {
@@ -590,10 +591,12 @@ var displayCompetitorList = function(force){
         )
       )
       if(competitorList.length){
+        var hideAllTxt = banana.i18n('hide-all')
+        var showAllTxt = banana.i18n('show-all')
         mainDiv.append(
           '<div>' +
-          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> Hide All</button>' +
-          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> Show All</button>' +
+          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> ' + hideAllTxt + '</button>' +
+          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> ' + showAllTxt + '</button>' +
           '</div>'
         )
       }
@@ -625,7 +628,7 @@ var displayCompetitorList = function(force){
     })
       if(competitorList.length > 10) {
         mainDiv.append(
-          $('<input class="form-control" placeholder="Search Competitors" type="search" val=""/>').on('input', filterCompetitorList)
+          $('<input class="form-control" type="search" val=""/>').on('input', filterCompetitorList).attr('placeholder', banana.i18n('search-competitors'))
         )
       }
       mainDiv.append(listDiv)
@@ -672,15 +675,15 @@ var displayChat = function(ev) {
     )
     mainDiv.append(
       $('<div/>').html(
-        '<h4>Chat</h4>'
+        '<h4>' + banana.i18n('chat') + '</h4>'
       )
     )
     mainDiv.append(
       $('<form/>').html(
-        '<label class="form-label" for="nickname">Nickname</label>'+
-        '<input class="form-control" name="nickname" id="chatNick" placeholder="Nickname" maxlength="20" />'+
-        '<label class="form-label" for="message">Message</label>'+
-        '<input class="form-control" name="message" id="chatMessage" placeholder="Message" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
+        '<label class="form-label" for="nickname">' + banana.i18n('nickname') + '</label>'+
+        '<input class="form-control" name="nickname" id="chatNick" maxlength="20" />'+
+        '<label class="form-label" for="message">' + banana.i18n('message') + '</label>'+
+        '<input class="form-control" name="message" id="chatMessage" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
         '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
       ).on('submit', function(ev) {
         ev.preventDefault()
@@ -709,6 +712,9 @@ var displayChat = function(ev) {
     mainDiv.append($('<div style="clear: both"/>').attr('id', 'messageList'))
     $('#sidebar').html('')
     $('#sidebar').append(mainDiv)
+    $('#chatNick').attr('placeholder', banana.i18n('nickname'))
+    $('#chatMessage').attr('placeholder', banana.i18n('message'))
+    $('#chatSubmitBtn').attr('value', banana.i18n('send'))
     refreshMessageList()
     $('#chatNick').val(chatNick)
     $('#chatNick').on('change', function(ev){
@@ -779,18 +785,28 @@ var displayOptions = function(ev) {
     }
     mainDiv.append(
       $('<div/>').html(
-        '<h4>Tails</h4>' +
+        '<h4>' + banana.i18n('tails') + '</h4>' +
         '<div class="form-group">' +
-        '<label for="tailLengthInput">Length in seconds</label>' +
+        '<label for="tailLengthInput">' + banana.i18n('length-in-seconds') +'</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
         '</div>' +      
-        '<h4>Map Controls</h4>' +
-        '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showControls ? 'on' : 'off') + '"></i> Show Map Controls</button>' +
-        '<h4>Grouping</h4>' +
-        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showClusters ? 'on' : 'off') + '"></i> Show Groups</button>' +
-        (qrUrl ? ('<h4>QR Link</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '')
+        '<h4>' + banana.i18n('map-controls') + '</h4>' +
+        '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showControls ? 'on' : 'off') + '"></i> ' + banana.i18n('show-map-controls') + '</button>' +
+        '<h4>' + banana.i18n('groupings') + '</h4>' +
+        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showClusters ? 'on' : 'off') + '"></i> ' + banana.i18n('show-groupings') + '</button>' +
+        '<h4><i class="fa fa-language"></i> ' + banana.i18n('language') + '</h4>' +
+        '<select class="form-select" id="languageSelector">' +
+        Object.keys(supportedLanguages).map(function(l) {
+          return '<option value="' + l + '"' + (locale === l ? ' selected' : '') + '>' + lang[l] + '</option>'
+        }).join('') +
+        '</select>' + 
+        (qrUrl ? ('<h4>' + banana.i18n('qr-link') + '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '')
       )
     )
+    $(mainDiv).find('#languageSelector').on('change', function(e) {
+      window.localStorage.setItem('lang', e.target.value)
+      window.location.reload()
+    })
     $(mainDiv).find('#tailLengthInput').on('input', function(e){
       var v = parseInt(e.target.value)
       if (isNaN(v)) {
@@ -1392,7 +1408,7 @@ function onPressCustomMassStart (e) {
     prevShownTime = currentTime
     if (!resetMassStartContextMenuItem) {
       resetMassStartContextMenuItem = map.contextmenu.insertItem({
-          text: 'Reset Mass Start',
+          text: banana.i18n('reset-mass-start'),
           callback: onPressResetMassStart
       }, 2)
     }
