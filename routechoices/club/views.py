@@ -6,6 +6,8 @@ from django.db.models.functions import TruncYear
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
+from django.http import Http404
+from django.core.exceptions import BadRequest
 
 from django_hosts.resolvers import reverse
 
@@ -53,15 +55,14 @@ def club_view(request, **kwargs):
     years = sorted([y.year for y in set(event_list.annotate(
         year=TruncYear('start_date')
     ).values_list('year', flat=True))], reverse=True)
-    selected_year = None
-    try:
-        selected_year = request.GET.get('year', None)
-        if selected_year and int(selected_year) in years:
+    selected_year = request.GET.get('year', None)
+    if selected_year:
+        try:
             selected_year = int(selected_year)
-        else:
-            selected_year = None
-    except Exception:
-        selected_year = None
+        except Exception:
+            raise BadRequest('Invalid year')
+        if selected_year not in years:
+            raise Http404()
     if selected_year:
         event_list = event_list.filter(start_date__year=selected_year)
     paginator = Paginator(event_list, 25)
