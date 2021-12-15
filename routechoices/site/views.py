@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 
+from django.db.models.functions import TruncYear
 from django.core.paginator import Paginator
 from django.forms import HiddenInput
 from django.utils.timezone import now
@@ -44,6 +45,20 @@ def events_view(request):
         privacy=PRIVACY_PUBLIC
     ).select_related('club').prefetch_related('map_assignations')
     live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
+    years = sorted([y.year for y in set(event_list.annotate(
+        year=TruncYear('start_date')
+    ).values_list('year', flat=True))], reverse=True)
+    selected_year = None
+    try:
+        selected_year = request.GET.get('year', None)
+        if selected_year and int(selected_year) in years:
+            selected_year = int(selected_year)
+        else:
+            selected_year = None
+    except Exception:
+        selected_year = None
+    if selected_year:
+        event_list = event_list.filter(start_date__year=selected_year)
     paginator = Paginator(event_list, 25)
     page = request.GET.get('page')
     events = paginator.get_page(page)
@@ -52,7 +67,9 @@ def events_view(request):
         'site/event_list.html',
         {
             'events': events,
-            'live_events': live_events
+            'live_events': live_events,
+            'years': years,
+            'year': selected_year
         }
     )
 

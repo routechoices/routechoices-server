@@ -55,9 +55,12 @@
   {% endif%}
   <div>
     {% if club %}
-    <h2>All Events by {{ club.name }} <a href="{{event.club.nice_url}}feed"><i class="fa fa-rss"></i></a></h2>
+    <h2>All Events by {{ club.name }} <a href="{{club.nice_url}}feed"><i class="fa fa-rss"></i></a></h2>
     {% else %}<h2>All Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h2>
-    {% endif%}
+    {% endif %}
+    {% if club %}{% if year %}<a href="{{club.nice_url}}">All</a>{% endif%} {% for y in years %} {% if year == y %}{{ y }}{% else %}<a href="{{club.nice_url}}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}
+    {% else %}{% if year %}<a href="{% url 'site:events_view' %}">All</a>{% endif%} {% for y in years %} {% if year == y %}{{ y }}{% else %}<a href="{% url 'site:events_view' %}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}
+    {% endif %}
   </div>
 
   <div>
@@ -91,7 +94,7 @@
     </div>
   {% endfor %}
   </div>
-  {% bootstrap_pagination events extra=request.GET.urlencode %}
+  {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
 </div>
 {% endblock %}
 
