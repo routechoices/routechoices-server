@@ -24,7 +24,13 @@ var hasWebpSupport = false
 var hasAvifSupport = false
 
 ;(function (){
-  checkImageFormatCapability('webp').then(function(res){hasWebpSupport = res})
+  checkImageFormatCapability('webp').then(function(res){
+    hasWebpSupport = res
+    backdropMaps['blank'] = L.tileLayer(staticRoot + 'wood' + (hasWebpSupport ? '.webp' : '.jpg') , {
+      attribution: '',
+      maxZoom: 18
+    })
+  })
   checkImageFormatCapability('avif').then(function(res){hasAvifSupport = res})
 })()
 

@@ -205,10 +205,6 @@ var chatNick = ''
 var isChatConnecting = false
 var zoomOnRunners = false
 
-backdropMaps['blank'] = L.tileLayer('https://www.routechoices.com/static/wood.jpg', {
-  attribution: '',
-  maxZoom: 18
-})
 backdropMaps['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
   maxZoom: 18
