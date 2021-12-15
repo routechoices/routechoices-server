@@ -205,9 +205,12 @@ var chatNick = ''
 var isChatConnecting = false
 var zoomOnRunners = false
 
+backdropMaps['blank'] = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=', {
+  attribution: '',
+  tileSize: 2048
+})
 backdropMaps['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-  maxZoom: 18
 })
 backdropMaps['gmap-street'] = L.tileLayer('https://mt0.google.com/vt/x={x}&y={y}&z={z}', {
   attribution: '&copy; Google'
