@@ -55,7 +55,7 @@ def club_view(request, **kwargs):
     years = list(event_list.annotate(
         year=ExtractYear('start_date')
     ).values_list('year', flat=True).order_by('-year').distinct())
-    selected_year = request.GET.get('year', None)
+    selected_year = request.GET.get('year')
     if selected_year:
         try:
             selected_year = int(selected_year)

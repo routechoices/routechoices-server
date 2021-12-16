@@ -862,7 +862,6 @@ def event_upload_route(request, event_id):
 @api_view(['GET'])
 def event_data(request, event_id):
     t0 = time.time()
-    
     # First check if we have a live event cache
     # if we do return cache
     live_cache_ts = int(t0 // 10)
@@ -916,11 +915,11 @@ def event_data(request, event_id):
     all_devices_competitors = Competitor.objects.filter(
         start_time__gte=event.start_date,
         device_id__in=devices
-    ).order_by('start_time')
+    ).values('device_id', 'start_time').order_by('start_time')
     start_times_by_device = {}
     for c in all_devices_competitors:
-        start_times_by_device.setdefault(c.device_id, [])
-        start_times_by_device[c.device_id].append(c.start_time)
+        start_times_by_device.setdefault(c.get('device_id'), [])
+        start_times_by_device[c.get('device_id')].append(c.get('start_time'))
     nb_points = 0
     results = []
     for c in competitors:
@@ -937,11 +936,10 @@ def event_data(request, event_id):
                 next_competitor_start_time,
                 end_date
             )
-        if event.end_date:
-            end_date = min(
-                event.end_date,
-                end_date
-            )
+        end_date = min(
+            event.end_date,
+            end_date
+        )
         nb, encoded_data = (0, "")
         if c.device_id:
             nb, encoded_data = c.device.get_locations_between_dates(from_date, end_date, encoded=True)
