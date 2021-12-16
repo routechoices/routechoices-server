@@ -2,7 +2,7 @@ import gpxpy
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models.functions import TruncYear
+from django.db.models.functions import ExtractYear
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
@@ -52,9 +52,9 @@ def club_view(request, **kwargs):
         privacy=PRIVACY_PUBLIC
     ).select_related('club')
     live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
-    years = sorted([y.year for y in set(event_list.annotate(
-        year=TruncYear('start_date')
-    ).values_list('year', flat=True))], reverse=True)
+    years = list(event_list.annotate(
+        year=ExtractYear('start_date')
+    ).values_list('year', flat=True).order_by('-year').distinct())
     selected_year = request.GET.get('year', None)
     if selected_year:
         try:

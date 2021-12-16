@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 
-from django.db.models.functions import TruncYear
+from django.db.models.functions import ExtractYear
 from django.core.paginator import Paginator
 from django.forms import HiddenInput
 from django.utils.timezone import now
@@ -47,9 +47,9 @@ def events_view(request):
         privacy=PRIVACY_PUBLIC
     ).select_related('club').prefetch_related('map_assignations')
     live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
-    years = sorted([y.year for y in set(event_list.annotate(
-        year=TruncYear('start_date')
-    ).values_list('year', flat=True))], reverse=True)
+    years = list(event_list.annotate(
+        year=ExtractYear('start_date')
+    ).values_list('year', flat=True).order_by('-year').distinct())
     selected_year = request.GET.get('year', None)
     if selected_year:
         try:
