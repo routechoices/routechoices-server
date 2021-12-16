@@ -85,7 +85,6 @@ class Command(BaseCommand):
                     if competitor.start_time < last_start:
                         competitor.device = archive_dev
                         competitor.save()
-                        print(competitor.event)
         if force:
             self.stdout.write(
                 self.style.SUCCESS(
