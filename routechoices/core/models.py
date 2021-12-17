@@ -482,7 +482,7 @@ class Map(models.Model):
             try:
                 cache.set(cache_key, data_out, 3600*24*30)
             except Exception:
-                raise Exception('cache failed')
+                pass
         return data_out
 
     def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
