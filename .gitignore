@@ -22,6 +22,7 @@ env/*
 var/*
 log/*
 logs/*
+cache/*
 routechoices/local_settings.py
 cypress/screenshots/*
 cypress/videos/*
