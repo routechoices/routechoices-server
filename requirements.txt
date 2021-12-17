@@ -19,7 +19,7 @@ django-s3-storage
 orjson
 drf-yasg
 fast-luhn
-django-hosts @ git+https://github.com/rphlo/django-hosts.git
+django-hosts
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 geoip2
 gps-encoding-rust @ git+https://github.com/rphlo/gps_encoding.git
