@@ -300,9 +300,17 @@ EMAIL_PORT = 1025
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'LOCATION': 'memcached:11211',
-    }
+        'BACKEND': 'diskcache.DjangoCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache'),
+        'TIMEOUT': 300,
+        # ^-- Django setting for default timeout of each key.
+        'SHARDS': 4,
+        'DATABASE_TIMEOUT': 0.10,  # 10 milliseconds
+       # ^-- Timeout for each DjangoCache database transaction.
+        'OPTIONS': {
+            'size_limit': 2 ** 30   # 1 gigabyte
+        },
+    },
 }
 
 CACHE_TILES = True
