@@ -1,37 +1,36 @@
-django
 arrow
-pillow
-django-cors-headers
-requests
-djangorestframework
-gpxpy
-uwsgi
-psycopg2-binary
-django-allauth
-django-bootstrap5
-raven
+bs4
+cryptography
 defusedxml
-cssselect
-tornado
-django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
+django
+djangorestframework
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
+django-allauth
+django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
+django-bootstrap5
+django-cors-headers
+django-csp
+django-hosts
+django-markdownify
+django-oauth-toolkit
+django-qr-code
 django-s3-storage
-orjson
+django-simple-captcha
+django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 drf-yasg
 fast-luhn
-django-hosts
-django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 geoip2
 gps-encoding-rust @ git+https://github.com/rphlo/gps_encoding.git
-pymemcache
-django-markdownify
+gpxpy
 numpy
-sewer==0.8.4
-bs4
+orjson
+pillow
+psycopg2-binary
+pymemcache
 python-magic
-django-qr-code
-django-oauth-toolkit
-django-simple-captcha
-cryptography
+raven
+requests
+sewer==0.8.4
+tornado
+uwsgi
 GitPython
-django-csp
