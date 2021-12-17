@@ -12,7 +12,7 @@ import re
 import time
 from zipfile import ZipFile
 import magic
-
+import numpy as np
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Polygon, LinearRing
@@ -37,6 +37,8 @@ import gps_encoding
 import zoneinfo
 
 from PIL import Image, ImageDraw
+
+import cv2
 
 from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
@@ -452,32 +454,26 @@ class Map(models.Model):
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
 
-        p1 = [
-            (0, 0),
-            (self.width, 0),
-            (self.width, self.height),
-            (0, self.height),
-        ]
-        p2 = [
-            ((tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h),
-            ((tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h),
-            ((br[0] - min_lon)/r_w, (max_lat - br[1])/r_h),
-            ((bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h),
-        ]
-
-        coeffs = find_coeffs(p2, p1)
+        p1 = np.float32([
+            [0, 0],
+            [self.width, 0],
+            [self.width, self.height],
+            [0, self.height],
+        ])
+        p2 = np.float32([
+            [(tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h],
+            [(tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h],
+            [(br[0] - min_lon)/r_w, (max_lat - br[1])/r_h],
+            [(bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h],
+        ])
+        coeffs = cv2.getPerspectiveTransform(p1, p2)
         orig = self.image.open('rb').read()
         self.image.close()
-        img = Image.open(BytesIO(orig))
-        if img.mode != "RGBA":
-            img = img.convert("RGBA")
-        tile_img = img.transform(
-            (output_width, output_height),
-            Image.PERSPECTIVE,
-            coeffs,
-            Image.BILINEAR
+        img = cv2.imdecode(np.frombuffer(BytesIO(orig).getbuffer(), np.uint8), -1)
+        tile_img = cv2.warpPerspective(
+            img, coeffs, (output_width, output_height)
         )
-        img_out.paste(tile_img, (0, 0), tile_img)
+        img_out = tile_img
         if use_cache:
             try:
                 cache.set(cache_key, img_out, 3600*24*30)

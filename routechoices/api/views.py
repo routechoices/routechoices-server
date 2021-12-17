@@ -18,7 +18,7 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.utils.timezone import now
-
+import cv2
 from django_hosts.resolvers import reverse
 
 from drf_yasg.utils import swagger_auto_schema
@@ -1726,13 +1726,11 @@ def wms_service(request):
             )
         except Exception as e:
             raise e
-        output = BytesIO()
-        extra_args = {}
+        extra_args = []
         if format == 'image/webp':
-            extra_args = {'quality': 20}
-        out_image.save(output, format='png' if format == 'image/png' else 'webp', **extra_args)
-        data_out = output.getvalue()
-
+            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
+        _, buffer = cv2.imencode('.png' if format == 'image/png' else '.webp', out_image, extra_args)
+        data_out = BytesIO(buffer).getvalue()
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {

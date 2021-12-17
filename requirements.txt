@@ -24,6 +24,7 @@ geoip2
 gps-encoding-rust @ git+https://github.com/rphlo/gps_encoding.git
 gpxpy
 numpy
+opencv-python
 orjson
 pillow
 psycopg2-binary
