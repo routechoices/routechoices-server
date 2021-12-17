@@ -1,6 +1,5 @@
 from datetime import timedelta
 import logging
-import os.path
 import re
 import time
 import urllib.parse
@@ -9,7 +8,6 @@ from io import BytesIO
 import arrow
 import requests
 import hashlib
-import base64
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -40,7 +38,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
 )
-from routechoices.lib.helpers import short_random_key, initial_of_name
+from routechoices.lib.helpers import initial_of_name, safe64encode
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
@@ -68,29 +66,6 @@ class PostDataThrottle(AnonRateThrottle):
         if request.method == 'GET':
             return True
         return super().allow_request(request, view)
-
-
-def x_accel_redirect(request, path, filename='',
-                     mime='application/force-download'):
-    if settings.DEBUG:
-        from wsgiref.util import FileWrapper
-        path = os.path.join(settings.MEDIA_ROOT, path)
-        if not os.path.exists(path):
-            raise NotFound()
-        wrapper = FileWrapper(open(path, 'rb'))
-        response = HttpResponse(wrapper)
-        response['Content-Length'] = os.path.getsize(path)
-    else:
-        path = os.path.join('/internal/', path)
-        response = HttpResponse('', status=status.HTTP_206_PARTIAL_CONTENT)
-        response['X-Accel-Redirect'] = urllib.parse.quote(path.encode('utf-8'))
-        response['X-Accel-Buffering'] = 'no'
-        response['Accept-Ranges'] = 'bytes'
-    response['Content-Type'] = mime
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
-        filename.replace('\\', '_').replace('"', '\\"')
-    ).encode('utf-8')
-    return response
 
 
 def serve_from_s3(bucket, request, path, filename='',
@@ -429,7 +404,7 @@ def event_chat(request, event_id):
                 "nickname": msg.nickname,
                 "message": msg.message,
                 "timestamp": msg.creation_date.timestamp(),
-                "user_hash": base64.urlsafe_b64encode(hash_user.digest()).decode('ascii'),
+                "user_hash": safe64encode(hash_user.digest()),
             })
         return Response(out)
 
@@ -446,7 +421,7 @@ def event_chat(request, event_id):
         "nickname": nickname,
         "message": message,
         "timestamp": arrow.utcnow().timestamp(),
-        "user_hash": base64.urlsafe_b64encode(hash_user.digest()).decode('ascii'),
+        "user_hash": safe64encode(hash_user.digest()),
     }
     try:
         r = requests.post(

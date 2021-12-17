@@ -1,7 +1,6 @@
 from os import EX_CANTCREAT
 import requests
 import arrow
-import base64
 import tempfile
 import json
 from bs4 import BeautifulSoup
@@ -14,7 +13,7 @@ from django.contrib.auth.models import User
 from background_task import background
 
 from routechoices.core.models import Map, Event, Device, Competitor, Club
-from routechoices.lib.helpers import short_random_key, \
+from routechoices.lib.helpers import short_random_key, safe64encode, \
     three_point_calibration_to_corners, compute_corners_from_kml_latlonbox
 from routechoices.lib.mtb_decoder import MtbDecoder
 
@@ -485,7 +484,7 @@ def import_single_event_from_tractrac(event_id):
         raise EventImportError('API returned error code')
     event_data = r.json()
     event_name = event_data['eventName'] + ' - ' + event_data['raceName']
-    slug = base64.urlsafe_b64encode(UUID(hex=event_data['raceId']).bytes).rstrip(b'=').decode('ascii')
+    slug = safe64encode(UUID(hex=event_data['raceId']).bytes)
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,
@@ -630,7 +629,7 @@ def import_single_event_from_otracker(event_id):
         raise EventImportError('API returned error code')
     event_data = r.json()
     ft = event_data['event']['replay_time']['from_ts']
-    slug = base64.urlsafe_b64encode(UUID(hex=event_id).bytes).rstrip(b'=').decode('ascii')
+    slug = safe64encode(UUID(hex=event_id).bytes)
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,

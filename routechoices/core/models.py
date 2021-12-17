@@ -55,7 +55,7 @@ from routechoices.lib.helpers import (
     short_random_slug,
     general_2d_projection,
     adjugate_matrix, project, find_coeffs,
-    delete_domain, time_base64
+    delete_domain, time_base64, safe64encode
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -326,10 +326,7 @@ class Map(models.Model):
     def data_uri(self):
         data = self.data
         mime_type = magic.from_buffer(data, mime=True)
-        return 'data:{};base64,{}'.format(
-            mime_type,
-            base64.b64encode(data).decode('utf-8')
-        )
+        return f'data:{mime_type};base64,{base64.b64encode(data).decode()}'
 
     @data_uri.setter
     def data_uri(self, value):
@@ -541,7 +538,7 @@ class Map(models.Model):
         h = hashlib.sha256()
         h.update(self.path.encode('utf-8'))
         h.update(self.corners_coordinates.encode('utf-8'))
-        return base64.b64encode(h.digest()).decode('utf-8')
+        return safe64encode(h.digest())
 
     @property
     def bound(self):

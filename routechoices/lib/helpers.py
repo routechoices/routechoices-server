@@ -20,12 +20,16 @@ from user_sessions.templatetags.user_sessions import device as device_name
 from math import pi, cos, sin
 
 
+def safe64encode(b):
+    return base64.urlsafe_b64encode(b).decode().rstrip('=')
+
+
 def time_base64():
     t = int(time.time())
-    b = struct.pack(">Q", t)
+    b = struct.pack('>Q', t)
     while b.startswith(b'\x00'):
         b = b[1:]
-    return base64.urlsafe_b64encode(b).decode('utf-8').replace('=', '')
+    return safe64encode(b)
 
 
 def deg2rad(deg):
@@ -51,10 +55,8 @@ def get_aware_datetime(date_str):
 
 def random_key():
     rand_bytes = bytes(struct.pack('Q', secrets.randbits(64)))
-    b64 = base64.b64encode(rand_bytes).decode('ascii')
+    b64 = safe64encode(rand_bytes)
     b64 = b64[:11]
-    b64 = b64.replace('+', '-')
-    b64 = b64.replace('/', '_')
     try:
         validate_nice_slug(b64)
     except Exception:
