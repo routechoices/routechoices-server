@@ -1721,16 +1721,11 @@ def wms_service(request):
             raster_map = event.map_assignations.select_related('map').all()[int(map_index)-1].map
 
         try:
-            out_image = raster_map.create_tile(
-                out_w, out_h, min_lat, max_lat, min_lon, max_lon
+            data_out = raster_map.create_tile(
+                out_w, out_h, min_lat, max_lat, min_lon, max_lon, format
             )
         except Exception as e:
             raise e
-        extra_args = []
-        if format == 'image/webp':
-            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
-        _, buffer = cv2.imencode('.png' if format == 'image/png' else '.webp', out_image, extra_args)
-        data_out = BytesIO(buffer).getvalue()
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {

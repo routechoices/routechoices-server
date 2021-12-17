@@ -428,8 +428,8 @@ class Map(models.Model):
         return GLOBAL_MERCATOR.meters_to_latlon({'x': mx, 'y': my})
 
     def create_tile(self, output_width, output_height,
-                    min_lat, max_lat, min_lon, max_lon):
-        cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
+                    min_lat, max_lat, min_lon, max_lon, format):
+        cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{format}'
 
         use_cache = hasattr(settings, 'CACHE_TILES') and settings.CACHE_TILES
         cached = None
@@ -473,13 +473,17 @@ class Map(models.Model):
         tile_img = cv2.warpPerspective(
             img, coeffs, (output_width, output_height)
         )
-        img_out = tile_img
+        extra_args = []
+        if format == 'image/webp':
+            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
+        _, buffer = cv2.imencode('.png' if format == 'image/png' else '.webp', tile_img, extra_args)
+        data_out = BytesIO(buffer).getvalue()
         if use_cache:
             try:
-                cache.set(cache_key, img_out, 3600*24*30)
+                cache.set(cache_key, data_out, 3600*24*30)
             except Exception:
                 raise Exception('cache failed')
-        return img_out
+        return data_out
 
     def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
         tile_bounds_poly = Polygon(
