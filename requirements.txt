@@ -27,7 +27,6 @@ numpy
 orjson
 pillow
 psycopg2-binary
-pymemcache
 python-magic
 raven
 requests
