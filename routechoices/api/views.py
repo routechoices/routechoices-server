@@ -839,10 +839,11 @@ def event_data(request, event_id):
     t0 = time.time()
     # First check if we have a live event cache
     # if we do return cache
+    use_cache = hasattr(settings, 'CACHE_EVENT_DATA') and settings.CACHE_EVENT_DATA
     live_cache_ts = int(t0 // 10)
     live_cache_key = f'live_event_data:{event_id}:{live_cache_ts}'
     live_cached_res = cache.get(live_cache_key)
-    if live_cached_res and not settings.DEBUG:
+    if use_cache and live_cached_res:
         return Response(live_cached_res)
 
     event = get_object_or_404(
@@ -858,7 +859,7 @@ def event_data(request, event_id):
     # then if we have a cache for that
     # return it if we do
     cached_res = None
-    if not settings.DEBUG and not event.is_live:
+    if use_cache and not event.is_live:
         try:
             cached_res = cache.get(cache_key)
         except Exception:
@@ -867,7 +868,7 @@ def event_data(request, event_id):
         return Response(cached_res)
     # If we dont have cache check if we are currently generating cache
     # if so return previous cache data if available
-    elif cache.get(f'{cache_key}:processing') and not settings.DEBUG:
+    elif use_cache and cache.get(f'{cache_key}:processing'):
         try:
             cached_res = cache.get(prev_cache_key)
         except Exception:
@@ -875,7 +876,7 @@ def event_data(request, event_id):
         if cached_res:
             return Response(cached_res)
     # else generate data and set that we are generating cache
-    if not settings.DEBUG:
+    if use_cache:
         try:
             cache.set(f'{cache_key}:processing', 1, 15)
         except Exception:
@@ -932,7 +933,7 @@ def event_data(request, event_id):
         'duration': (time.time()-t0),
         'timestamp': arrow.utcnow().timestamp(),
     }
-    if not settings.DEBUG:
+    if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7*24*3600+60)
         except Exception:

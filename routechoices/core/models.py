@@ -429,13 +429,14 @@ class Map(models.Model):
                     min_lat, max_lat, min_lon, max_lon):
         cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}'
 
+        use_cache = hasattr(settings, 'CACHE_TILES') and settings.CACHE_TILES
         cached = None
-        if not settings.DEBUG:
+        if use_cache:
             try:
                 cached = cache.get(cache_key)
             except Exception:
                 pass
-        if cached and not settings.DEBUG:
+        if use_cache and cached:
             return cached
 
         img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
@@ -477,11 +478,11 @@ class Map(models.Model):
             Image.BILINEAR
         )
         img_out.paste(tile_img, (0, 0), tile_img)
-        if not settings.DEBUG:
+        if use_cache:
             try:
                 cache.set(cache_key, img_out, 3600*24*30)
             except Exception:
-                pass
+                raise Exception('cache failed')
         return img_out
 
     def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
