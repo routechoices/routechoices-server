@@ -120,13 +120,13 @@ class TMT250Connection():
             thread_sensitive=True
         )(imei)
         if not self.db_device:
-            print('imei not registered %s, %s' % (self.address, imei))
+            print(f'imei not registered {self.address}, {imei}')
             await self.stream.write(pack('b', 0))
             self.stream.close()
             return
         self.imei = imei
         await self.stream.write(pack('b', 1))
-        print('%s is connected' % (self.imei))
+        print(f'{(self.imei)} is connected')
 
         while await self._on_write_complete():
             pass
@@ -144,7 +144,7 @@ class TMT250Connection():
             data = bytearray(b'0' * 2048)
             try:
                 data_len = await self.stream.read_into(data, partial=True)
-                print('%s is sending %d bytes' % (self.imei, data_len))
+                print(f'{self.imei} is sending {data_len} bytes')
                 await self._on_read_line(data[:data_len])
             except Exception:
                 print('exception reading data')
@@ -193,12 +193,12 @@ class GL200Connection():
         self.db_device = None
 
     async def start_listening(self):
-        print('start listening from %s', self.address)
+        print(f'start listening from {self.address}')
         imei = None
         try:
             data_bin = await self.stream.read_until(b'$')
             data = data_bin.decode('ascii')
-            print('received data (%s)' % data)
+            print(f'received data ({data})')
             parts = data.split(',')
             if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
                     and parts[0][8:] in (
@@ -234,11 +234,11 @@ class GL200Connection():
             thread_sensitive=True
         )(imei)
         if not self.db_device:
-            print('imei not registered %s, %s' % (self.address, imei))
+            print(f'imei not registered {self.address}, {imei}')
             self.stream.close()
             return
         self.imei = imei
-        print('%s is connected' % (self.imei))
+        print(f'{(self.imei)} is connected')
         try:
             lon = float(parts[11])
             lat = float(parts[12])
@@ -254,7 +254,7 @@ class GL200Connection():
         try:
             data_bin = await self.stream.read_until(b'$')
             data = data_bin.decode('ascii')
-            print('received data (%s)' % data)
+            print(f'received data ({data})')
             parts = data.split(',')
             if parts[0][:8] in ('+RESP:GT', '+BUFF:GT') \
                     and parts[0][8:] in (
@@ -268,11 +268,7 @@ class GL200Connection():
                 tim = arrow.get(parts[13], 'YYYYMMDDHHmmss').int_timestamp
                 await self._on_data(lat, lon, tim)
             elif parts[0] == '+ACK:GTHBD':
-                self.stream.write(
-                    (
-                        '+SACK:GTHBD,%s,%s$' % (parts[1], parts[5])
-                    ).encode('ascii')
-                )
+                self.stream.write(f'+SACK:GTHBD,{parts[1]},{parts[5]}$'.encode('ascii'))
         except Exception:
             self.stream.close()
             return False

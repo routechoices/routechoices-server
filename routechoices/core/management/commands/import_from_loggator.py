@@ -16,11 +16,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for event_id in options['event_ids']:
             try:
-                self.stdout.write('Importing event %s' % event_id)
+                self.stdout.write(f'Importing event {event_id}')
                 if options['task']:
                     import_single_event_from_loggator(event_id)
                 else:
                     import_single_event_from_loggator.now(event_id)
             except EventImportError:
-                self.stderr.write('Could not import event %s' % event_id)
+                self.stderr.write(f'Could not import event {event_id}')
                 continue

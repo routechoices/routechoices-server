@@ -880,11 +880,7 @@ def dashboard_map_download(request, id, *args, **kwargs):
         'routechoices-maps',
         request,
         '/internal/' + file_path,
-        filename='{}_{}_.{}'.format(
-            raster_map.name,
-            raster_map.corners_coordinates_short.replace(',', '_'),
-            mime_type[6:]
-        ),
+        filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
         mime=mime_type
     )
 

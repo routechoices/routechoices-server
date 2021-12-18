@@ -4,8 +4,8 @@ FROM python:3.9-slim
 ADD requirements.txt /requirements.txt
 
 # Install GDAL dependencies
-RUN apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev python3-opencv --no-install-recommends && \
-    apt clean -y
+RUN apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 --no-install-recommends && \
+    apt clean -y && rm -rf /var/lib/apt/lists/*
 # OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
 # ADD requirements /requirements
 

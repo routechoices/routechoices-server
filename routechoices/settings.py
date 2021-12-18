@@ -355,7 +355,7 @@ MARKDOWNIFY = {
             'ol',
             'p',
             'strong',
-            'ul'
+            'ul',
         ],
         "WHITELIST_ATTRS": [
             'href',
@@ -366,7 +366,7 @@ MARKDOWNIFY = {
         "WHITELIST_STYLES": [
             'color',
             'width',
-            'height'
+            'height',
             'font-weight',
         ]
     }

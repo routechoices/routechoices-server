@@ -44,9 +44,6 @@ urlpatterns = [
     re_path(r'^user/search/?$', views.user_search, name='user_search_api'),
     re_path(r'^device/search/?$', views.device_search, name='device_search_api'),
     re_path(r'^device/(?P<device_id>[^/]+)/registrations/?$', views.device_registrations, name='device_registrations_api'),
-    #re_path(r'^traccar/?$', views.traccar_api_gw, name='traccar_api_gw'),
-    #re_path(r'^garmin/?$', views.garmin_api_gw, name='garmin_api_gw'),
-    #re_path(r'^pwa/?$', views.pwa_api_gw, name='pwa_api_gw'),
     re_path(r'^locations/?$', views.locations_api_gw, name='locations_api_gw'),
     re_path(
         r'^events/?$',

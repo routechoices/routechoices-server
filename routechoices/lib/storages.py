@@ -30,7 +30,7 @@ class OverwriteImageStorage(S3Storage):
         # content, but S3 doesn't support seeking, which is sometimes needed.
         params = self._object_params(name)
         if nbytes and nbytes > 1:
-            params['Range'] = 'bytes={}-{}'.format(0, nbytes - 1)
+            params['Range'] = f'bytes=0-{nbytes - 1}'
         obj = self.s3_connection.get_object(**params)
         content = self.new_temporary_file()
         shutil.copyfileobj(obj["Body"], content)

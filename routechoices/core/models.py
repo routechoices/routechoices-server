@@ -40,7 +40,6 @@ from PIL import Image, ImageDraw
 
 import cv2
 
-from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 from routechoices.lib.validators import (
      validate_domain_slug,
      validate_nice_slug,
@@ -68,7 +67,7 @@ logger = logging.getLogger(__name__)
 GLOBAL_MERCATOR = GlobalMercator()
 UTC_TZ = zoneinfo.ZoneInfo('UTC')
 
-class Point(object):
+class Point:
     def __init__(self, x, y=None):
         if isinstance(x, tuple):
             self.x = x[0]
@@ -252,7 +251,7 @@ class Map(models.Model):
         verbose_name_plural = 'maps'
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.club)
+        return f'{self.name} ({self.club})'
 
     @property
     def path(self):
@@ -276,40 +275,28 @@ class Map(models.Model):
         doc_img = self.data
         mime_type = magic.from_buffer(doc_img, mime=True)
         ext = mime_type[6:]
-        doc_kml = '''<?xml version="1.0" encoding="utf-8"?>
+        doc_kml = f'''<?xml version="1.0" encoding="utf-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"
      xmlns:gx="http://www.google.com/kml/ext/2.2">
   <Document>
     <Folder>
-      <name>{}</name>
+      <name>{self.name}</name>
       <GroundOverlay>
-        <name>{}</name>
+        <name>{self.name}</name>
         <drawOrder>50</drawOrder>
         <Icon>
-          <href>files/doc.{}</href>
+          <href>files/doc.{ext}</href>
         </Icon>
         <altitudeMode>clampToGround</altitudeMode>
         <gx:LatLonQuad>
           <coordinates>
-            {},{} {},{} {},{} {},{}
+            {self.bound["bottomLeft"]["lon"]},{self.bound["bottomLeft"]["lat"]} {self.bound["bottomRight"]["lon"]},{self.bound["bottomRight"]["lat"]} {self.bound["topRight"]["lon"]},{self.bound["topRight"]["lat"]} {self.bound["topLeft"]["lon"]},{self.bound["topLeft"]["lat"]}
           </coordinates>
         </gx:LatLonQuad>
       </GroundOverlay>
     </Folder>
   </Document>
-</kml>'''.format(
-            self.name,
-            self.name,
-            ext,
-            self.bound['bottomLeft']['lon'],
-            self.bound['bottomLeft']['lat'],
-            self.bound['bottomRight']['lon'],
-            self.bound['bottomRight']['lat'],
-            self.bound['topRight']['lon'],
-            self.bound['topRight']['lat'],
-            self.bound['topLeft']['lon'],
-            self.bound['topLeft']['lat'],
-        )
+</kml>'''
         kmz = BytesIO()
         with ZipFile(kmz, 'w') as fp:
             with fp.open('doc.kml', 'w') as file1:

@@ -19,11 +19,11 @@ class Command(BaseCommand):
                 prefix = 'https://live.tractrac.com/viewer/index.html?target='
                 if event_id.startswith(prefix):
                     event_id = event_id[len(prefix):]
-                self.stdout.write('Importing event %s' % event_id)
+                self.stdout.write(f'Importing event {event_id}')
                 if options['task']:
                     import_single_event_from_tractrac(event_id)
                 else:
                     import_single_event_from_tractrac.now(event_id)
             except EventImportError:
-                self.stderr.write('Could not import event %s' % event_id)
+                self.stderr.write(f'Could not import event {event_id}')
                 continue

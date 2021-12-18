@@ -30,7 +30,7 @@ def club_view(request, **kwargs):
     if kwargs.get('club_slug'):
         club_slug = kwargs.get('club_slug')
         if club_slug in ('api', 'admin', 'dashboard', 'oauth'):
-            return redirect('/{}/'.format(club_slug))
+            return redirect(f'/{club_slug}/')
         return redirect(
             reverse(
                 'club_view',

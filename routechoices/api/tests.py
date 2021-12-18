@@ -7,7 +7,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient, override_settings
 
 from routechoices.core.models import Device
-from routechoices.lib.gps_data_encoder import GeoLocationSeries, GeoLocation
 
 
 @override_settings(PARENT_HOST='localhost:8000')
@@ -17,7 +16,7 @@ class ApiTestCase(APITestCase):
 
     def reverse_and_check(self, path, expected):
         url = reverse(path, host='api')
-        self.assertEquals(url, '//api.localhost:8000' + expected)
+        self.assertEqual(url, '//api.localhost:8000' + expected)
         return url
 
     def get_device_id(self):
@@ -28,20 +27,20 @@ class ApiTestCase(APITestCase):
     def test_api_root(self):
         url = self.reverse_and_check('api_doc', '/')
         res = self.client.get(url, SERVER_NAME='api.localhost:8000')
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_get_time(self):
         url = self.reverse_and_check('time_api', '/time')
         t1 = time.time()
         res = self.client.get(url, SERVER_NAME='api.localhost:8000')
         t2 = time.time()
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(t1 < res.data.get('time') < t2)
 
     def test_get_device_id(self):
         url = self.reverse_and_check('device_id_api', '/device_id')
         res = self.client.post(url, SERVER_NAME='api.localhost:8000')
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data.get('device_id')) == 8)
         self.assertTrue(res.data.get('device_id') != self.get_device_id())
 
@@ -61,6 +60,6 @@ class ApiTestCase(APITestCase):
             },
             SERVER_NAME='api.localhost:8000'
         )
-        self.assertEquals(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         nb_points = len(Device.objects.get(aid=dev_id).locations['timestamps'])
-        self.assertEquals(nb_points, 2)
+        self.assertEqual(nb_points, 2)

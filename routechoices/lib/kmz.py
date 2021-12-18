@@ -39,12 +39,7 @@ def extract_ground_overlay_info(kml):
                     west,
                     rot
                 )
-                corners_coords = ','.join((
-                    '{},{}'.format(*nw),
-                    '{},{}'.format(*ne),
-                    '{},{}'.format(*se),
-                    '{},{}'.format(*sw),
-                ))
+                corners_coords = f'{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}'
             elif len(latlon_quad_nodes) > 0:
                 latlon_quad = latlon_quad_nodes[0]
                 sw, se, ne, nw = latlon_quad.getElementsByTagName('coordinates')[0] \
@@ -53,12 +48,7 @@ def extract_ground_overlay_info(kml):
                 ne = ne.split(',')[::-1]
                 se = se.split(',')[::-1]
                 sw = sw.split(',')[::-1]
-                corners_coords = ','.join((
-                    '{},{}'.format(*nw),
-                    '{},{}'.format(*ne),
-                    '{},{}'.format(*se),
-                    '{},{}'.format(*sw),
-                ))
+                corners_coords = f'{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}'
             else:
                 raise Exception('Invalid GroundOverlay')
         except Exception:

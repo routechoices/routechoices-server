@@ -48,10 +48,7 @@ class Command(BaseCommand):
             dev_del_loc_count = len(locs['timestamps']) - len(valid_indexes)
             if dev_del_loc_count:
                 self.stdout.write(
-                    'Device %s, extra %d locations' % (
-                        device.aid,
-                        dev_del_loc_count
-                    )
+                    f'Device {device.aid}, extra {dev_del_loc_count} locations'
                 )
             deleted_count += dev_del_loc_count
             if force and dev_del_loc_count:
@@ -68,8 +65,8 @@ class Command(BaseCommand):
         if force:
             self.stdout.write(
                 self.style.SUCCESS(
-                    'Successfully removed %d Locations' % deleted_count
+                    f'Successfully removed {deleted_count} Locations'
                 )
             )
         else:
-            self.stdout.write('Would remove %d Locations' % deleted_count)
+            self.stdout.write(f'Would remove {deleted_count} Locations')

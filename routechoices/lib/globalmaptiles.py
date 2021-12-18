@@ -1,7 +1,7 @@
 import math
 
 
-class GlobalMercator(object):
+class GlobalMercator:
     def __init__(self):
         self.originShift = 2 * math.pi * 6378137 / 2.0
         # 20037508.342789244

@@ -1,5 +1,4 @@
 import os.path
-import sys
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -49,9 +48,9 @@ server {{
 def write_account_key(self, filename):
     with open(filename, "wb") as f:
         if hasattr(self, '__kid') and self.__kid:
-            f.write(("KID: %s\n" % self.__kid).encode())
+            f.write(f'KID: {self.__kid}\n'.encode())
             if self._timestamp:
-                f.write(("Timestamp: %s\n" % self._timestamp).encode())
+                f.write(f'Timestamp: {self._timestamp}\n'.encode())
         f.write(self.to_pem())
 
 

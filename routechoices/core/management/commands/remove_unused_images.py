@@ -51,8 +51,8 @@ class Command(BaseCommand):
         if not dry_run:
             self.stdout.write(
                 self.style.SUCCESS(
-                    'Successfully removed %d files, keeping %d' % (self.n_image_removed, self.n_image_keeped)
+                    f'Successfully removed {self.n_image_removed} files, keeping {self.n_image_keeped}'
                 )
             )
         else:
-            self.stdout.write('Would remove %d files, keeping %d' % (self.n_image_removed, self.n_image_keeped))
+            self.stdout.write(f'Would remove {self.n_image_removed} files, keeping {self.n_image_keeped}')

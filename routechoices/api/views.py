@@ -40,7 +40,6 @@ from routechoices.core.models import (
 )
 from routechoices.lib.helpers import initial_of_name, safe64encode
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.gps_data_encoder import GeoLocationSeries
 from routechoices.lib.validators import validate_imei
 from routechoices.lib.s3 import s3_object_url
 
@@ -72,7 +71,7 @@ def serve_from_s3(bucket, request, path, filename='',
                   mime='application/force-download', headers=None):
     path = re.sub(r'^/internal/', '', path)
     url = s3_object_url(path, bucket)
-    url = '/s3{}'.format(url[len(settings.AWS_S3_ENDPOINT_URL):])
+    url = f'/s3{url[len(settings.AWS_S3_ENDPOINT_URL):]}'
 
     response_status = status.HTTP_200_OK
     if request.method == 'GET':
@@ -85,9 +84,8 @@ def serve_from_s3(bucket, request, path, filename='',
         response['X-Accel-Buffering'] = 'no'
     response['Accept-Ranges'] = 'bytes'
     response['Content-Type'] = mime
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
-        filename.replace('\\', '_').replace('"', '\\"')
-    ).encode('utf-8')
+    clean_filename = filename.replace('\\', '_').replace('"', '\\"')
+    response['Content-Disposition'] = f'attachment; filename="{clean_filename}"'.encode('utf-8')
     return response
 
 
@@ -1062,79 +1060,6 @@ def locations_api_gw(request):
     return Response({'status': 'ok', 'n': len(loc_array)})
 
 
-def garmin_api_gw(request):
-    return locations_api_gw(request)
-
-
-@swagger_auto_schema(
-    method='post',
-    operation_id='pwa_gateway',
-    operation_description='gateway for posting data from the pwa application',
-    tags=['post locations'],
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'device_id': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='your device id',
-            ),
-            'raw_data': openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description='a list of locations within last 10 minutes encoded according to our proprietary format',
-            ),
-        },
-        required=['device_id', 'raw_data'],
-    ),
-    responses={
-        '200': openapi.Response(
-            description='Success response',
-            examples={
-                'application/json': {
-                    'status': 'ok',
-                    'n': '<number of locations posted>'
-                }
-            }
-        ),
-        '400': openapi.Response(
-            description='Validation Error',
-            examples={
-                'application/json': [
-                    '<error message>'
-                ]
-            }
-        ),
-    }
-)
-@api_view(['POST'])
-def pwa_api_gw(request):
-    device_id = request.data.get('device_id')
-    if not device_id:
-        raise ValidationError(
-            'Missing device_id parameter'
-        )
-    devices = Device.objects.filter(aid=device_id)
-    if not devices.exists():
-        raise ValidationError('No such device ID')
-    device = devices.first()
-    raw_data = request.data.get('raw_data')
-    if not raw_data:
-        raise ValidationError('Missing raw_data argument')
-    locations = GeoLocationSeries(raw_data)
-    loc_array = []
-    for location in locations:
-        # dtime = abs(time.time() - int(location.timestamp))
-        # if dtime > API_LOCATION_TIMESTAMP_MAX_AGE:
-        #     continue
-        loc_array.append({
-            'timestamp': int(location.timestamp),
-            'latitude': location.coordinates.latitude,
-            'longitude': location.coordinates.longitude,
-        })
-    if len(loc_array) > 0:
-        device.add_locations(loc_array)
-    return Response({'status': 'ok', 'n': len(locations)})
-
-
 class DataRenderer(renderers.BaseRenderer):
     media_type = 'application/download'
     format = 'raw'
@@ -1342,11 +1267,7 @@ def event_map_download(request, event_id, map_index='0'):
         'routechoices-maps',
         request,
         '/internal/' + file_path,
-        filename='{}_{}_.{}'.format(
-            raster_map.name,
-            raster_map.corners_coordinates_short.replace(',', '_'),
-            mime_type[6:]
-        ),
+        filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
         mime=mime_type,
         headers=headers
     )
@@ -1417,9 +1338,8 @@ def event_kmz_download(request, event_id, map_index='0'):
         content_type='application/vnd.google-earth.kmz',
         headers=headers
     )
-    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
-        raster_map.name.replace('\\', '_').replace('"', '\\"')
-    )
+    clean_filename = raster_map.name.replace('\\', '_').replace('"', '\\"')
+    response['Content-Disposition'] = f'attachment; filename="{clean_filename}.kmz"'
     return response
 
 
@@ -1447,9 +1367,8 @@ def map_kmz_download(request, map_id, *args, **kwargs):
         kmz_data,
         content_type='application/vnd.google-earth.kmz'
     )
-    response['Content-Disposition'] = 'attachment; filename="{}.kmz"'.format(
-        raster_map.name.replace('\\', '_').replace('"', '\\"')
-    )
+    clean_filename = raster_map.name.replace('\\', '_').replace('"', '\\"')
+    response['Content-Disposition'] = f'attachment; filename="{clean_filename}.kmz"'
     return response
 
 
@@ -1480,11 +1399,9 @@ def competitor_gpx_download(request, competitor_id):
         content_type='application/gpx+xml',
         headers=headers,
     )
-
-    response['Content-Disposition'] = 'attachment; filename="{}.gpx"'.format(
-        competitor.event.name.replace('\\', '_').replace('"', '\\"') + ' - ' +
-        competitor.name.replace('\\', '_').replace('"', '\\"')
-    )
+    clean_e_name = competitor.event.name.replace('\\', '_').replace('"', '\\"')
+    clean_name =  competitor.name.replace('\\', '_').replace('"', '\\"')
+    response['Content-Disposition'] = f'attachment; filename="{clean_e_name} - {clean_name}.gpx"'
     return response
 
 

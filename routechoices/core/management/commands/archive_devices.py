@@ -20,7 +20,7 @@ class Command(BaseCommand):
         n_device_archived = 0
         two_weeks_ago = now() - timedelta(days=14)
         for device in devices:
-            print('Device %s' % (device.aid))
+            self.stdout.write(f'Device {(device.aid)}')
             loc_len = device.location_count
             if loc_len < 3600 * 24:
                 break
@@ -61,10 +61,7 @@ class Command(BaseCommand):
             if dev_archived_loc_count:
                 n_device_archived += 1
                 self.stdout.write(
-                    'Device %s, archiving %d locations' % (
-                        device.aid,
-                        dev_archived_loc_count
-                    )
+                    f'Device {device.aid}, archiving {dev_archived_loc_count} locations'
                 )
             if force and dev_archived_loc_count:
                 archived_locs = {
@@ -88,8 +85,8 @@ class Command(BaseCommand):
         if force:
             self.stdout.write(
                 self.style.SUCCESS(
-                    'Successfully archived %d devices' % n_device_archived
+                    f'Successfully archived {n_device_archived} devices'
                 )
             )
         else:
-            self.stdout.write('Would archive %d devices' % n_device_archived)
+            self.stdout.write(f'Would archive {n_device_archived} devices')

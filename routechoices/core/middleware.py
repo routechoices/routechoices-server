@@ -93,8 +93,7 @@ class XForwardedForMiddleware:
                 logger.warning(
                     'Not running behind as many reverse proxies as expected.' +
                     "\nThe right value for XFF_TRUSTED_PROXY_DEPTH for this " +
-                    'request is {} and {} is configured.'.format(
-                        len(levels), depth)
+                    f'request is {len(levels)} and {depth} is configured.'
                 )
                 if self.always_proxy:
                     return HttpResponseBadRequest()

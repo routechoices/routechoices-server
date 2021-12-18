@@ -9,11 +9,11 @@ from routechoices.core.models import Event, PRIVACY_PUBLIC
 class LiveEventsFeed(Feed):
     def title(self):
         site = Site.objects.get(id=settings.SITE_ID)
-        return "Live GPS Events on {}".format(site.name)
+        return f"Live GPS Events on {site.name}"
 
     def description(self):
         site = Site.objects.get(id=settings.SITE_ID)
-        return "Events on {}".format(site.name)
+        return f"Events on {site.name}"
 
     def link(self):
         return reverse('site:events_view')
@@ -27,7 +27,7 @@ class LiveEventsFeed(Feed):
         return item.name
 
     def item_description(self, item):
-        return 'Live GPS Tracking of {} by {}'.format(item.name, item.club)
+        return f'Live GPS Tracking of {item.name} by {item.club}'
 
     def item_pubdate(self, item):
         return item.start_date

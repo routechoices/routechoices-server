@@ -46,10 +46,11 @@ def read_account_key(cls, filename: str):
 def write_account_key(self, filename):
     with open(filename, "wb") as f:
         if hasattr(self, '__kid') and self.__kid:
-            f.write(("KID: %s\n" % self.__kid).encode())
+            f.write(f'KID: {self.__kid}\n'.encode())
             if self._timestamp:
-                f.write(("Timestamp: %s\n" % self._timestamp).encode())
+                f.write(f'Timestamp: {self._timestamp}\n'.encode())
         f.write(self.to_pem())
+
 
 class ClubProvider(ProviderBase):
     def __init__(self, club, **kwargs):
@@ -131,7 +132,7 @@ class Command(BaseCommand):
                 f.write(certificate)
             cert_key.write_pem(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key'))
             nginx_need_restart = True
-            self.stdout.write(f'Certificate renewed.')
+            self.stdout.write('Certificate renewed.')
         if nginx_need_restart:
             print('Reload nginx for changes to take effect...')
             if options['post-hook']:

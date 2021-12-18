@@ -145,12 +145,7 @@ def import_map_from_sportrec(club, event_id, map_data, name):
     n, e, s, w = [float(x) for x in coords.replace('(', '').replace(')', '').split(',')]
 
     nw, ne, se, sw = compute_corners_from_kml_latlonbox(n, e, s, w, -float(map_data['map_angle']))
-    corners_coords = ','.join((
-        '{},{}'.format(*nw),
-        '{},{}'.format(*ne),
-        '{},{}'.format(*se),
-        '{},{}'.format(*sw),
-    ))
+    corners_coords = f'{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}'
     map_model.image.save('imported_image', map_file, save=False)
     map_model.corners_coordinates = corners_coords
     map_model.save()

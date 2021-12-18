@@ -2,9 +2,9 @@ import json
 import requests
 
 
-class PatreonAPI(object):
+class PatreonAPI:
     def __init__(self, access_token):
-        super(PatreonAPI, self).__init__()
+        super().__init__()
         self.access_token = access_token
 
     def fetch_user(self):
