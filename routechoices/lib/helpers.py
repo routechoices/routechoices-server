@@ -20,6 +20,10 @@ from user_sessions.templatetags.user_sessions import device as device_name
 from math import pi, cos, sin
 
 
+def escape_filename(f):
+    return f.replace('\\', '_').replace('"', '\\"')
+
+
 def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip('=')
 

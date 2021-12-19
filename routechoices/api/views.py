@@ -38,7 +38,7 @@ from routechoices.core.models import (
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
 )
-from routechoices.lib.helpers import initial_of_name, safe64encode
+from routechoices.lib.helpers import initial_of_name, safe64encode, escape_filename
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.validators import validate_imei
 from routechoices.lib.s3 import s3_object_url
@@ -84,8 +84,7 @@ def serve_from_s3(bucket, request, path, filename='',
         response['X-Accel-Buffering'] = 'no'
     response['Accept-Ranges'] = 'bytes'
     response['Content-Type'] = mime
-    clean_filename = filename.replace('\\', '_').replace('"', '\\"')
-    response['Content-Disposition'] = f'attachment; filename="{clean_filename}"'.encode('utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{escape_filename(filename)}"'.encode('utf-8')
     return response
 
 
@@ -1338,8 +1337,7 @@ def event_kmz_download(request, event_id, map_index='0'):
         content_type='application/vnd.google-earth.kmz',
         headers=headers
     )
-    clean_filename = raster_map.name.replace('\\', '_').replace('"', '\\"')
-    response['Content-Disposition'] = f'attachment; filename="{clean_filename}.kmz"'
+    response['Content-Disposition'] = f'attachment; filename="{escape_filename(raster_map.name)}.kmz"'
     return response
 
 
@@ -1365,10 +1363,12 @@ def map_kmz_download(request, map_id, *args, **kwargs):
     kmz_data = raster_map.kmz
     response = HttpResponse(
         kmz_data,
-        content_type='application/vnd.google-earth.kmz'
+        content_type='application/vnd.google-earth.kmz',
+        headers={
+            'Cache-Control': 'Private'
+        }
     )
-    clean_filename = raster_map.name.replace('\\', '_').replace('"', '\\"')
-    response['Content-Disposition'] = f'attachment; filename="{clean_filename}.kmz"'
+    response['Content-Disposition'] = f'attachment; filename="{escape_filename(raster_map.name)}.kmz"'
     return response
 
 
@@ -1399,9 +1399,7 @@ def competitor_gpx_download(request, competitor_id):
         content_type='application/gpx+xml',
         headers=headers,
     )
-    clean_e_name = competitor.event.name.replace('\\', '_').replace('"', '\\"')
-    clean_name =  competitor.name.replace('\\', '_').replace('"', '\\"')
-    response['Content-Disposition'] = f'attachment; filename="{clean_e_name} - {clean_name}.gpx"'
+    response['Content-Disposition'] = f'attachment; filename="{escape_filename(competitor.event.name)} - {escape_filename(competitor.name)}.gpx"'
     return response
 
 

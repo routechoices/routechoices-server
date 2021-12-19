@@ -126,7 +126,7 @@ class TMT250Connection():
             return
         self.imei = imei
         await self.stream.write(pack('b', 1))
-        print(f'{(self.imei)} is connected')
+        print(f'{self.imei} is connected')
 
         while await self._on_write_complete():
             pass
@@ -238,7 +238,7 @@ class GL200Connection():
             self.stream.close()
             return
         self.imei = imei
-        print(f'{(self.imei)} is connected')
+        print(f'{self.imei} is connected')
         try:
             lon = float(parts[11])
             lat = float(parts[12])
