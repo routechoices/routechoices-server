@@ -13,12 +13,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.utils.timezone import now
-import cv2
+
 from django_hosts.resolvers import reverse
 
 from drf_yasg.utils import swagger_auto_schema
@@ -48,7 +49,6 @@ from rest_framework.decorators import api_view, renderer_classes, throttle_class
 from rest_framework.exceptions import (
     ValidationError,
     NotFound,
-    PermissionDenied
 )
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
