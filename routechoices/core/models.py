@@ -457,8 +457,9 @@ class Map(models.Model):
         orig = self.image.open('rb').read()
         self.image.close()
         img = cv2.imdecode(np.frombuffer(BytesIO(orig).getbuffer(), np.uint8), -1)
+        img_alpha = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA) 
         tile_img = cv2.warpPerspective(
-            img, coeffs, (output_width, output_height)
+            img_alpha, coeffs, (output_width, output_height)
         )
         extra_args = []
         if format == 'image/webp':
