@@ -537,6 +537,14 @@ def event_register(request, event_id):
             'bad-start-time': 'Kilpailijan aloitusajan tulee olla tapahtuman aikana',
             'bad-name': 'Kilpailija samalla nimellä jo rekisteröitynyt',
             'bad-sname': 'Kilpailija samalla lyhyellä nyhyelläimellä jo rekisteröitynyt',
+        },
+        'sv': {
+            'no-device-id': 'Enhets-ID hittades inte',
+            'no-name': 'Namn saknas',
+            'invalid-start-time': 'Starttiden kunde inte hittas',
+            'bad-start-time': 'Tävlandes starttid bör vara under evenemangstiden',
+            'bad-name': 'Tävlande med samma namn är redan registrerad',
+            'bad-sname': 'Tävlande med samma förkortning är redan registrerad',
         }
     }
 
