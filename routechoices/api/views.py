@@ -510,7 +510,7 @@ def event_register(request, event_id):
     device = Device.objects.filter(aid=device_id).first()
     
     lang = request.GET.get('lang', 'en')
-    if lang not in ('en', 'fi', 'fr'):
+    if lang not in ('en', 'fi', 'fr', 'sv'):
         lang = 'en'
     
     err_messages = {
