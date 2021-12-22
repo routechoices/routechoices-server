@@ -7,7 +7,6 @@ from sewer.crypto import AcmeKey, AcmeAccount
 from sewer.auth import ProviderBase
 
 from routechoices.core.models import Club
-from typing import cast
 
 
 def write_nginf_conf(domain):

@@ -12,7 +12,6 @@ from django.forms import (
     inlineformset_factory,
     ModelChoiceField,
     FileField,
-    FileInput,
     CharField
 )
 
@@ -142,8 +141,8 @@ class EventForm(ModelForm):
     def clean(self):
         super().clean()
         start_date = self.cleaned_data['start_date']
-        end_date = self.cleaned_data.get('end_date')
-        if end_date and end_date < start_date:
+        end_date = self.cleaned_data['end_date']
+        if end_date < start_date:
             raise ValidationError('Start Date must be before End Date')
 
     def clean_map(self):
@@ -202,13 +201,8 @@ class CompetitorForm(ModelForm):
     def clean_start_time(self):
         start = self.cleaned_data.get('start_time')
         event_start = get_aware_datetime(self.data.get('start_date'))
-        event_end = self.data.get('end_date')
-        if event_end:
-            event_end = get_aware_datetime(event_end)
-        if start and ((not event_end and event_start > start)
-                      or (event_end
-                          and (event_start > start
-                               or start > event_end))):
+        event_end = get_aware_datetime(self.data.get('end_date'))
+        if start and (event_start > start or start > event_end):
             raise ValidationError(
                 'Competitor start time should be during the event time'
             )

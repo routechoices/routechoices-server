@@ -28,10 +28,7 @@ class Command(BaseCommand):
                 if competitor.start_time:
                     start = competitor.start_time
                 end = None
-                if event.end_date:
-                    end = min(event.end_date, two_weeks_ago)
-                else:
-                    end = two_weeks_ago
+                end = min(event.end_date, two_weeks_ago)
                 periods_used.append((start, end))
             valid_indexes = []
             for idx, timestamp in enumerate(locs['timestamps']):

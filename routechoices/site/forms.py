@@ -85,8 +85,7 @@ class CompetitorForm(ModelForm):
     def clean(self):
         super().clean()
         event = self.cleaned_data.get('event')
-        event_end = event.end_date
-        if event_end and now() > event_end:
+        if event.end_date < now():
             raise ValidationError(
                 'Competition ended, registration is not possible anymore'
             )

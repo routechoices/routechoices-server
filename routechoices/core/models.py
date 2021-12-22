@@ -418,7 +418,7 @@ class Map(models.Model):
                     min_lat, max_lat, min_lon, max_lon, format):
         cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{format}'
 
-        use_cache = hasattr(settings, 'CACHE_TILES') and settings.CACHE_TILES
+        use_cache = getattr(settings, 'CACHE_TILES', False)
         cached = None
         if use_cache:
             try:
@@ -722,8 +722,9 @@ class Event(models.Model):
 
     @property
     def shortcut(self):
-        if hasattr(settings, 'SHORTCUT_BASE_URL'):
-            return settings.SHORTCUT_BASE_URL + self.aid
+        shortcut_url = getattr(settings, 'SHORTCUT_BASE_URL')
+        if shortcut_url:
+            return f'{shortcut_url}{self.aid}'
         return None
 
     @property
@@ -736,14 +737,11 @@ class Event(models.Model):
 
     @property
     def is_live(self):
-        if self.end_date:
-            return self.start_date <= now() <= self.end_date
-        else:
-            return self.start_date <= now()
+        return self.start_date <= now() <= self.end_date
 
     @property
     def ended(self):
-        return self.end_date and self.end_date < now()
+        return self.end_date < now()
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
@@ -1084,18 +1082,12 @@ class Competitor(models.Model):
             start_time__gt=from_date
         ).order_by('start_time').values_list('start_time', flat=True).first()
 
-        to_date = now()
+        to_date = min(now(), self.event.end_date),
         if next_competitor_start_time:
             to_date = min(
                 next_competitor_start_time,
                 to_date
             )
-        if self.event.end_date:
-            to_date = min(
-                self.event.end_date,
-                to_date
-            )
-
         _, locs = self.device.get_locations_between_dates(from_date, to_date)
         return locs
 

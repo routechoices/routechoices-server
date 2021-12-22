@@ -117,7 +117,7 @@ event_param = openapi.Parameter(
                         "id": "PlCG3xFS-f4",
                         "name": "Jukola 2019 - 1st Leg",
                         "start_date": "2019-06-15T20:00:00Z",
-                        "end_date": None,
+                        "end_date": "2019-06-16T00:00:00Z",
                         "slug": "Jukola-2019-1st-leg",
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
@@ -177,7 +177,7 @@ def event_list(request):
             'id': event.aid,
             'name': event.name,
             'start_date': event.start_date,
-            'end_date': (event.end_date if event.end_date else None),
+            'end_date': event.end_date,
             'slug': event.slug,
             'club': event.club.name,
             'club_slug': event.club.slug.lower(),
@@ -202,7 +202,7 @@ def event_list(request):
                         "id": "PlCG3xFS-f4",
                         "name": "Jukola 2019 - 1st Leg",
                         "start_date": "2019-06-15T20:00:00Z",
-                        "end_date": None,
+                        "end_date": "2019-06-16T00:00:00Z",
                         "slug": "Jukola-2019-1st-leg",
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
@@ -504,7 +504,7 @@ def event_register(request, event_id):
     if not is_user_event_admin:
         if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
             raise PermissionDenied()
-        if not event.open_registration or (event.end_date and event.end_date < now()):
+        if not event.open_registration or event.end_date < now():
             raise PermissionDenied()
     device_id = request.data.get('device_id')
     device = Device.objects.filter(aid=device_id).first()
@@ -573,10 +573,7 @@ def event_register(request, event_id):
     event_start = event.start_date
     event_end = event.end_date
     
-    if start_time and (
-        (not event_end and event_start > start_time)
-            or (event_end and (event_start > start_time
-                               or start_time > event_end))):
+    if start_time and (event_start > start_time or start_time > event_end):
         errs.append(err_messages[lang]['bad-start-time'])
     
     if event.competitors.filter(name=name).exists():
@@ -761,7 +758,7 @@ def event_upload_route(request, event_id):
                 'longitude': lon,
             })
     start_pt_dt = arrow.get(start_pt_ts).datetime
-    if start_pt_dt > event.end_date or event.start_date > start_pt_dt:
+    if event.start_date > start_pt_dt or start_pt_dt > event.end_date:
         start_pt_dt = event.start_date
     start_time = request.data.get('start_time')
     if start_time:
@@ -771,13 +768,11 @@ def event_upload_route(request, event_id):
             errs.append('Start time could not be parsed')
     else:
         start_time = start_pt_dt
+
     event_start = event.start_date
     event_end = event.end_date
     
-    if start_time and (
-        (not event_end and event_start > start_time)
-            or (event_end and (event_start > start_time
-                               or start_time > event_end))):
+    if start_time and (event_start > start_time or start_time > event_end):
         errs.append(
             'Competitor start time should be during the event time'
         )
@@ -844,7 +839,7 @@ def event_data(request, event_id):
     t0 = time.time()
     # First check if we have a live event cache
     # if we do return cache
-    use_cache = hasattr(settings, 'CACHE_EVENT_DATA') and settings.CACHE_EVENT_DATA
+    use_cache = getattr(settings, 'CACHE_EVENT_DATA', False)
     live_cache_ts = int(t0 // 10)
     live_cache_key = f'live_event_data:{event_id}:{live_cache_ts}'
     live_cached_res = cache.get(live_cache_key)

@@ -37,11 +37,7 @@ class Command(BaseCommand):
                 if not last_start or last_start < competitor.start_time:
                     if competitor.start_time < two_weeks_ago:
                         last_start = competitor.start_time
-                end = None
-                if event.end_date:
-                    end = min(event.end_date, now())
-                else:
-                    end = now()
+                end = min(event.end_date, now())
                 periods_used.append((start, end))
             archived_indexes = []
             if last_start is None:

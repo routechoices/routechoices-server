@@ -321,7 +321,7 @@ def event_registration_view(request, slug, **kwargs):
     club = event.club
     if club.domain and not request.use_cname:
         return redirect(f'{club.nice_url}{event.slug}/registration')
-    if event.end_date and event.end_date < now():
+    if event.end_date < now():
         return render(
             request,
             'club/event_registration_closed.html',
@@ -465,11 +465,7 @@ def event_route_upload_view(request, slug, **kwargs):
                     short_name=initial_of_name(competitor_name),
                     device=device,
                 )
-                if start_time and event.start_date <= start_time \
-                        and (
-                            not event.end_date
-                            or start_time <= event.end_date
-                        ):
+                if start_time and event.start_date <= start_time <= event.end_date:
                     competitor.start_time = start_time
                 competitor.save()
             
