@@ -1082,7 +1082,7 @@ class Competitor(models.Model):
             start_time__gt=from_date
         ).order_by('start_time').values_list('start_time', flat=True).first()
 
-        to_date = min(now(), self.event.end_date),
+        to_date = min(now(), self.event.end_date)
         if next_competitor_start_time:
             to_date = min(
                 next_competitor_start_time,
