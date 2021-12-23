@@ -117,7 +117,7 @@ class Club(models.Model):
         max_length=50,
         validators=[validate_domain_slug, ],
         unique=True,
-        help_text='.routechoices.com | <a href="custom_domain/">Add a custom domain</a>'
+        help_text='.routechoices.com'
     )
     admins = models.ManyToManyField(User)
     description = models.TextField(
@@ -155,17 +155,27 @@ Browse our events here.
         return self.nice_url
 
     @property
-    def nice_url(self):
+    def use_https(self):
+        is_secure = True
         if self.domain:
             cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{self.domain}.crt')
             is_secure = os.path.exists(cert_path)
-            os.path.exists(settings.BASE_DIR)
-            return f"http{'s' if is_secure else ''}://{self.domain}/"
-        return reverse(
+        return is_secure
+
+    @property
+    def url_protocol(self):
+        return f"http{'s' if self.use_https else ''}"
+
+    @property
+    def nice_url(self):
+        if self.domain:
+            return f"{self.url_protocol}://{self.domain}/"
+        path = reverse(
             'club_view',
             host='clubs',
             host_kwargs={'club_slug': self.slug.lower()}
         )
+        return f"{self.url_protocol}:{path}"
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)

@@ -4,6 +4,15 @@
 
 {% block sub_content %}
 <h1>Custom domain</h1>
+{% if club.domain %}
+<p>You use a custom domain <a href="{{club.nice_url}}">{{club.nice_url}}</a></p>
+{% if not club.use_https %}<p>{{ site.name }} can provide SSL certificates for your custom domains. Contact us to set it up.</p>{% endif %}
+<form method="POST" class="post-form">
+    {% csrf_token %}
+    <input type="hidden" name="domain" maxlength="128" class="form-control" id="id_domain"></input>
+<button class="btn btn-danger" type="submit" class="save btn btn-secondary">Remove</button>
+</form>
+{% else %}
 <p>If you don't have a domain of your own, get one <a href="https://gandi.link/f/1a96fb21" target="_blank">here</a></p>
 <h4>Set the following DNS record</h4>
 <table class="table">
@@ -36,7 +45,7 @@
 <small>
 It may take some time for the DNS records to propagate.
 <br>
-{{ site.name }} does not provide SSL certificates for custom domains. Use a CDN like Cloudflare and set the SSL connection type to Flexible to achieve this.
+{{ site.name }} can provide SSL certificates for your custom domains. Contact us to set it up.
 <!--We can issue a certificate for you, but this is currently only available to
 <a href="https://bearblog.dev/contribute" target="_blank">contributors</a>.
 --></small>
@@ -47,4 +56,5 @@ Having issues? More info
 <a href="https://github.com/HermanMartinus/bearblog/wiki/Custom-domains" target="_blank">here</a>.
 </p>
 -->
+{% endif %}
 {% endblock %}

@@ -76,10 +76,10 @@ class ClubDomainForm(ModelForm):
             return domain
         if not check_records(domain):
             raise ValidationError(f"TXT record for '{domain}' has not been set.")
-        matching_blogs = Club.objects.filter(domain__iexact=domain)
+        matching_clubs = Club.objects.filter(domain__iexact=domain)
         if self.instance:
-            matching_blogs = matching_blogs.exclude(pk=self.instance.pk)
-        if matching_blogs.exists():
+            matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
+        if matching_clubs.exists():
             raise ValidationError(f"Domain '{domain}'  already exists.")
         else:
             return domain.lower()
