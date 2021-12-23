@@ -110,8 +110,6 @@ def club_logo(request, **kwargs):
         slug__iexact=club_slug,
         logo__isnull=False
     )
-    if not club:
-        raise Http404()
     file_path = club.logo.name
     return serve_from_s3(
         'routechoices-maps',
@@ -183,7 +181,6 @@ def event_view(request, slug, **kwargs):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
-
     response = render(
         request,
         'club/event.html',
@@ -215,7 +212,20 @@ def event_export_view(request, slug, **kwargs):
         slug__iexact=slug,
         start_date__lt=now()
     )
-    if event.club.domain and not request.use_cname:
+    # If event is private, page needs to be sent with cookies to prove identity, cannot be done from custom domain
+    if event.privacy == PRIVACY_PRIVATE:
+        if request.use_cname:
+            return redirect(
+                reverse(
+                    'event_export_view',
+                    host='clubs',
+                    kwargs={'slug': slug},
+                    host_kwargs={
+                        'club_slug': club_slug
+                    }
+                )
+            )
+    elif event.club.domain and not request.use_cname:
         return redirect(f'{event.club.nice_url}{event.slug}/export')
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if not request.user.is_authenticated or \
@@ -311,16 +321,13 @@ def event_registration_view(request, slug, **kwargs):
             )
         )
     club_slug = request.club_slug
-    event = Event.objects.all().select_related('club').filter(
+    event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
         open_registration=True,
-    ).first()
-    if not event:
-        raise Http404()
-    club = event.club
-    if club.domain and not request.use_cname:
-        return redirect(f'{club.nice_url}{event.slug}/registration')
+    )
+    if event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}/registration')
     if event.end_date < now():
         return render(
             request,
@@ -340,7 +347,7 @@ def event_registration_view(request, slug, **kwargs):
                 request,
                 'Successfully registered for this event.'
             )
-            target_url = f'{club.nice_url}{event.slug}/registration_complete'
+            target_url = f'{event.club.nice_url}{event.slug}/registration_complete'
             return redirect(target_url)
         else:
             devices = Device.objects.none()
@@ -353,7 +360,7 @@ def event_registration_view(request, slug, **kwargs):
         if request.user.is_authenticated:
             devices = request.user.devices.all()
         form.fields['device'].queryset = devices
-    form.fields['device'].label = "Device ID"
+    form.fields['device'].label = 'Device ID'
     return render(
         request,
         'club/event_registration.html',
@@ -377,16 +384,13 @@ def event_registration_done_view(request, slug, **kwargs):
             )
         )
     club_slug = request.club_slug
-    event = Event.objects.all().select_related('club').filter(
+    event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
         open_registration=True,
-    ).first()
-    if not event:
-        raise Http404()
-    club = event.club
-    if club.domain and not request.use_cname:
-        return redirect(f'{club.nice_url}{event.slug}/registration_complete')
+    )
+    if event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}/registration_complete')
     return render(
         request,
         'club/event_registration_done.html',
@@ -409,18 +413,14 @@ def event_route_upload_view(request, slug, **kwargs):
             )
         )
     club_slug = request.club_slug
-    event = Event.objects.all().select_related('club').filter(
+    event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
         allow_route_upload=True,
-    ).filter(
         start_date__lte=now()
-    ).first()
-    if not event:
-        raise Http404()
-    club = event.club
-    if club.domain and not request.use_cname:
-        return redirect(f'{club.nice_url}{event.slug}/route_upload')
+    )
+    if event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}/route_upload')
     if request.method == 'POST':
         form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:
@@ -469,7 +469,7 @@ def event_route_upload_view(request, slug, **kwargs):
                     competitor.start_time = start_time
                 competitor.save()
             
-            target_url = f'{club.nice_url}{event.slug}/route_upload_complete'
+            target_url = f'{event.club.nice_url}{event.slug}/route_upload_complete'
             return redirect(target_url)
     else:
         form = UploadGPXForm()
@@ -496,18 +496,14 @@ def event_route_upload_done_view(request, slug, **kwargs):
             )
         )
     club_slug = request.club_slug
-    event = Event.objects.all().select_related('club').filter(
+    event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
         allow_route_upload=True,
-    ).filter(
         start_date__lte=now()
-    ).first()
-    if not event:
-        raise Http404()
-    club = event.club
-    if club.domain and not request.use_cname:
-        return redirect(f'{club.nice_url}{event.slug}/route_upload_complete')
+    )
+    if event.club.domain and not request.use_cname:
+        return redirect(f'{event.club.nice_url}{event.slug}/route_upload_complete')
     return render(
         request,
         'club/event_route_upload_done.html',

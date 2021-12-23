@@ -389,6 +389,10 @@ def event_chat(request, event_id):
         end_date__gte=now(),
         allow_live_chat=True,
     )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if not request.user.is_authenticated or \
+                not event.club.admins.filter(id=request.user.id).exists():
+            raise PermissionDenied()
     if request.method == 'GET':
         msgs = ChatMessage.objects.filter(event=event)
         out = []
@@ -403,12 +407,16 @@ def event_chat(request, event_id):
                 "timestamp": msg.creation_date.timestamp(),
                 "user_hash": safe64encode(hash_user.digest()),
             })
-        return Response(out)
+        response = Response(out)
+        if event.privacy == PRIVACY_PRIVATE:
+            response['Cache-Control'] = 'private'
+        response['Content-Type'] = "application/json"
+        return response
 
     nickname = request.data.get('nickname')
     message = request.data.get('message')
     if not nickname or not message:
-        raise ValidationError('Missing parameter>' + nickname + '><' + message)
+        raise ValidationError('Missing parameter')
     
     remote_ip = request.META['REMOTE_ADDR']
     hash_user = hashlib.sha256()
@@ -420,6 +428,7 @@ def event_chat(request, event_id):
         "timestamp": arrow.utcnow().timestamp(),
         "user_hash": safe64encode(hash_user.digest()),
     }
+    response = None
     try:
         r = requests.post(
             f'http://127.0.0.1:8009/{event_id}', #f'https://{settings.CHAT_SERVER}/{event_id}' if not settings.DEBUG else f'http://127.0.0.1:8009/{event_id}',
@@ -439,7 +448,6 @@ def event_chat(request, event_id):
         event=event
     )
     return Response({'status': 'sent'}, status=201)
-
 
 
 @swagger_auto_schema(
@@ -636,7 +644,7 @@ def event_delete_competitor(request, event_id, competitor_id):
         ),
         aid=event_id
     )
-    is_user_event_admin = request.user.is_authenticated and event.club.admins.filter(id=request.user.id).exists()
+    is_user_event_admin = request.user.is_superuser or (request.user.is_authenticated and event.club.admins.filter(id=request.user.id).exists())
     if not is_user_event_admin:
         raise PermissionDenied()
     c = event.competitors.filter(aid=competitor_id).first()
@@ -793,18 +801,13 @@ def event_upload_route(request, event_id):
         device=device,
     )
 
-    headers = None
-    if event.privacy == PRIVACY_PRIVATE:
-        headers = {
-            'Cache-Control': 'Private'
-        }
     return Response({
         'id': comp.aid,
         'device_id': device.aid if device else '',
         'name': name,
         'short_name': short_name,
         'start_time': start_time,
-    }, status=status.HTTP_201_CREATED, headers=headers)
+    }, status=status.HTTP_201_CREATED)
 
 
 @swagger_auto_schema(
