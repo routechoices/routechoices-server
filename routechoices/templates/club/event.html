@@ -153,7 +153,14 @@
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
 <script src="{% static '/js/event-2021121501.js' %}"></script>
-<script src="{% host_url 'event_js' event_id=event.aid host 'api' %}"></script>
-<script src="{% static '/scripts/club/event.js' %}?_=2021121502"></script>
+<script src="{% static '/scripts/club/event.js' %}?_=2021122300"
+        data-event-id="{{event.aid}}"
+        data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
+        data-wms-service-url="{% host_url 'wms_service' host 'api' %}"{% if event.allow_live_chat %}
+        data-chat-server-url="{{ chat_server }}"
+        data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
+        data-server-clock-url="{% host_url 'time_api' host 'api' %}"
+        data-club-name="{{ event.club.name|escapejs }}"
+        data-static-root="{% static '' %}"></script>
 {% endblock %}
 

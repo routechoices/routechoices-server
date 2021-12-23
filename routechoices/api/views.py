@@ -335,42 +335,6 @@ def event_detail(request, event_id):
     return Response(output, headers=headers)
 
 
-def site_specs_js(request):
-    response = render(
-        request,
-        'site_specs.js',
-    )
-    response['Content-Type'] = "application/javascript"
-    return response
-
-
-def event_js(request, event_id):
-    event = get_object_or_404(
-        Event.objects.select_related(
-            'club', 'notice'
-        ).prefetch_related(
-            'competitors',
-        ),
-        aid=event_id,
-    )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if not request.user.is_authenticated or \
-                not event.club.admins.filter(id=request.user.id).exists():
-            raise PermissionDenied()
-    response = render(
-        request,
-        'club/event.js',
-        {
-            'event': event,
-            'chat_server': settings.CHAT_SERVER
-        },
-    )
-    if event.privacy == PRIVACY_PRIVATE:
-        response['Cache-Control'] = 'private'
-    response['Content-Type'] = "application/javascript"
-    return response
-
-
 @swagger_auto_schema(
     method='get',
     auto_schema=None,

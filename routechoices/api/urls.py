@@ -32,7 +32,6 @@ urlpatterns = [
         ),
         name='api_doc'
     ),
-    re_path(r'^site-specs\.js$', views.site_specs_js, name='site_specs_js'),
     re_path(r'^device_id/?$', views.get_device_id, name='device_id_api'),
     re_path(r'^imei/?$', views.get_device_for_imei, name='device_imei_api'),
     re_path(
@@ -49,11 +48,6 @@ urlpatterns = [
         r'^events/?$',
         views.event_list,
         name='event_list'
-    ),
-    re_path(
-        r'^events/(?P<event_id>[0-9a-zA-Z_-]+)\.js$',
-        views.event_js,
-        name='event_js'
     ),
     re_path(
         r'^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$',

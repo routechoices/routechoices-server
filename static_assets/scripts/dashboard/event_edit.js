@@ -1,4 +1,6 @@
 
+var apiBaseUrl = document.currentScript.dataset.apiBaseUrl
+
 var seletizeOptions = {
     valueField: 'id',
     labelField: 'device_id',
@@ -8,7 +10,7 @@ var seletizeOptions = {
     load: function(query, callback) {
         if (!query.length || query.length < 4) return callback();
         $.ajax({
-            url: apiBaseURL + 'device/search?q=' + encodeURIComponent(query),
+            url: apiBaseUrl + 'device/search?q=' + encodeURIComponent(query),
             type: 'GET',
             error: function() {
                 callback();

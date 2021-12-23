@@ -1,3 +1,5 @@
+var apiBaseUrl = document.currentScript.dataset.apiBaseUrl
+
 $('#id_admins').selectize({
     valueField: 'id',
     labelField: 'username',
@@ -8,7 +10,7 @@ $('#id_admins').selectize({
     load: function(query, callback) {
         if (!query.length || query.length < 2) return callback();
         $.ajax({
-            url: apiBaseURL + 'user/search?q=' + encodeURIComponent(query),
+            url: apiBaseUrl + 'user/search?q=' + encodeURIComponent(query),
             type: 'GET',
             xhrFields: {
                 withCredentials: true

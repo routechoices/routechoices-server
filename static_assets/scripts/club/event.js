@@ -1,3 +1,13 @@
+var dataset = document.currentScript.dataset
+var eventId = dataset.eventId
+var eventUrl = dataset.eventUrl
+var wmsService = dataset.wmsServiceUrl
+var chatServer = dataset.chatServerUrl
+var chatMessagesEndpoint = dataset.chatMessagesEndpoint
+var clock = ServerClock({url: dataset.serverClockUrl})
+var clubName = dataset.clubName
+var staticRoot = dataset.staticRoot
+
 if (!navigator.canShare) {
   $('#share_buttons').hide()
 }

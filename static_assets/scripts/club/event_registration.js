@@ -1,4 +1,5 @@
 
+var apiBaseUrl = document.currentScript.dataset.apiBaseUrl
 function selectizeDeviceInput(){
     $("select[name='device']").selectize({
         valueField: 'id',
@@ -10,7 +11,7 @@ function selectizeDeviceInput(){
         load: function(query, callback) {
             if (!query.length || query.length < 4) return callback();
             $.ajax({
-                url: apiBaseURL + 'device/search?q=' + encodeURIComponent(query),
+                url: apiBaseUrl + 'device/search?q=' + encodeURIComponent(query),
                 type: 'GET',
                 error: function() {
                     callback();
