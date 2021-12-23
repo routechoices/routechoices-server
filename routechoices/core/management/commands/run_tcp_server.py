@@ -88,16 +88,13 @@ class TMT250Connection():
     async def start_listening(self):
         print('start listening from %s', self.address)
         data = bytearray(b'0' * 1024)
-        try:
-            data_len = await self.stream.read_into(data, partial=True)
-            if(data_len < 3):
-                print('too little data %s', self.address)
-                await self.stream.write(pack('b', 0))
-                self.stream.close()
-                return
-            data = data[:data_len]
-        except StreamClosedError:
+        data_len = await self.stream.read_into(data, partial=True)
+        if(data_len < 3):
+            print('too little data %s', self.address)
+            await self.stream.write(pack('b', 0))
+            self.stream.close()
             return
+        data = data[:data_len]
         imei_len = (data[0] << 8) + data[1]
         imei = ''
         is_valid_imei = True
@@ -180,7 +177,10 @@ class TMT250Connection():
 class TMT250Server(TCPServer):
     async def handle_stream(self, stream, address):
         c = TMT250Connection(stream, address)
-        await c.start_listening()
+        try:
+            await c.start_listening()
+        except StreamClosedError:
+            pass
 
 
 class GL200Connection():
@@ -293,7 +293,10 @@ class GL200Connection():
 class GL200Server(TCPServer):
     async def handle_stream(self, stream, address):
         c = GL200Connection(stream, address)
-        await c.start_listening()
+        try:
+            await c.start_listening()
+        except StreamClosedError:
+            pass
 
 
 class Command(BaseCommand):
