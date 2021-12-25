@@ -409,7 +409,7 @@ XFF_TRUSTED_PROXY_DEPTH = 1
 CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev', 'api.routechoices.dev', 'chat.routechoices.dev', 'wss://chat.routechoices.dev', 'www.routechoices.com', 'api.routechoices.com')
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", '*', 'data:')
-CSP_WORKER_SRC = ("'self'", 'blob:https://api.routechoices.dev')
+CSP_WORKER_SRC = ("'self'", 'blob:')
 
 try:
     from .local_settings import *
