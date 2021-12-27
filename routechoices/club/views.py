@@ -1,5 +1,6 @@
 import gpxpy
 from django.contrib import messages
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractYear
@@ -181,12 +182,15 @@ def event_view(request, slug, **kwargs):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied
+    resp_args = {
+        'event': event,
+    }
+    if event.is_chat_allowed:
+        resp_args['chat_server'] = settings.getattr('CHAT_SERVER')
     response = render(
         request,
         'club/event.html',
-        {
-            'event': event,
-        }
+        resp_args
     )
     if event.privacy == PRIVACY_PRIVATE:
         response['Cache-Control'] = 'private'
