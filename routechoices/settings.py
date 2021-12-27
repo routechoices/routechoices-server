@@ -411,6 +411,9 @@ CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", '*', 'data:')
 CSP_WORKER_SRC = ("'self'", 'blob:')
 
+CSRF_TRUSTED_ORIGINS = ['https://*.routechoices.dev']
+
+
 try:
     from .local_settings import *
 except ImportError:
