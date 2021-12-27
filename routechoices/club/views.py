@@ -186,7 +186,7 @@ def event_view(request, slug, **kwargs):
         'event': event,
     }
     if event.allow_live_chat:
-        resp_args['chat_server'] = settings.getattr('CHAT_SERVER')
+        resp_args['chat_server'] = getattr(settings, 'CHAT_SERVER')
     response = render(
         request,
         'club/event.html',
