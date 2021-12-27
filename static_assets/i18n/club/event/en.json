@@ -34,5 +34,7 @@
     "groupings": "Groupings",
     "show-groupings": "Show groupings",
     "qr-link": "QR Link",
-    "language": "Language"
+    "language": "Language",
+    "error-sending-msg": "Message could not be sent!",
+    "sending": "Sending..."
 }

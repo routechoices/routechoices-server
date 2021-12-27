@@ -686,10 +686,10 @@ var displayChat = function(ev) {
         '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
       ).on('submit', function(ev) {
         ev.preventDefault()
-        if($('#chatMessage').val() === '' || $('#chatNick').val() === '' || $('chatSubmitBtn').val() === 'Sending...'){
+        if($('#chatMessage').val() === '' || $('#chatNick').val() === '' || $('chatSubmitBtn').val() === banana.i18n('sending')){
           return
         }
-        $('#chatSubmitBtn').val('Sending...')
+        $('#chatSubmitBtn').val(banana.i18n('sending'))
         $.ajax(
           {
             url: 'https:'+ chatMessagesEndpoint,
@@ -703,8 +703,15 @@ var displayChat = function(ev) {
           }).success(function(){
             $('#chatMessage').val('')
             $('#chatMessage').focus()
+          }).fail(function(){
+            swal({
+              title: banana.i18n('error-sending-msg'),
+              text: '',
+              type: 'error',
+              confirmButtonText: 'OK'
+            })
           }).always(function(){
-            $('#chatSubmitBtn').val('Send')
+            $('#chatSubmitBtn').val(banana.i18n('send'))
           })
       })
     )

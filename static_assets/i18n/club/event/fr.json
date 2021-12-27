@@ -34,5 +34,7 @@
     "groupings": "Regroupments",
     "show-groupings": "Afficher les regroupments",
     "qr-link": "Lien QR code",
-    "language": "Langue"
+    "language": "Langue",
+    "error-sending-msg": "Le message n'a pas pu être envoyé!",
+    "sending": "Envoi en cours..."
 }

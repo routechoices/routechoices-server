@@ -34,5 +34,7 @@
     "groupings": "Ryhmittymiä",
     "show-groupings": "Näytä ryhmittymiä",
     "qr-link": "QR-linkki",
-    "language": "Kieli"
+    "language": "Kieli",
+    "error-sending-msg": "Viestiä ei voitu lähettää!",
+    "sending": "Lähetetään..."
 }
