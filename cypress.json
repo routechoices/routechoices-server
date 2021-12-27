@@ -1,4 +1,4 @@
 {
-  "baseUrl": "https://www.routechoices.dev",
+  "baseUrl": "https://www.routechoices.dev:8081",
   "chromeWebSecurity": false
 }

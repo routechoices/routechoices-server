@@ -1175,3 +1175,11 @@ class ChatMessage(models.Model):
     event = models.ForeignKey(Event, related_name='chat_messages', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=20)
     message = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['-creation_date']
+        verbose_name = 'chat message'
+        verbose_name_plural = 'chat messages'
+
+    def __str__(self):
+        return f'<{self.nickname}> in {self.event.name}: {self.message}'

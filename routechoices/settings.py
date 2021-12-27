@@ -95,7 +95,7 @@ SESSION_ENGINE = 'user_sessions.backends.db'
 ROOT_URLCONF = 'routechoices.urls'
 ROOT_HOSTCONF = 'routechoices.hosts'
 DEFAULT_HOST = 'www'
-PARENT_HOST = 'routechoices.dev'
+PARENT_HOST = 'routechoices.dev:8081'
 
 TEMPLATES = [
     {
@@ -175,12 +175,12 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_URL = '//www.routechoices.dev/accounts/login/'
+LOGIN_URL = '//www.routechoices.dev:8081/accounts/login/'
 REDIRECT_ALLOWED_DOMAINS = ['api.routechoices.dev', 'www.routechoices.dev']
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-SESSION_COOKIE_DOMAIN = ".routechoices.dev"
+SESSION_COOKIE_DOMAIN = '.routechoices.dev'
 SESSION_COOKIE_SAMESITE = None
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -397,21 +397,21 @@ SWAGGER_SETTINGS = {
    }
 }
 
-EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
+EMAIL_CUSTOMER_SERVICE = 'support@routechoices.dev'
 
-CHAT_SERVER = "chat.routechoices.dev"
+CHAT_SERVER = 'chat.routechoices.dev:8081'
 CHAT_INTERNAL_SECRET = '<change-me>'
 
 POST_LOCATION_SECRETS = ["<replace-me>"]
 
 XFF_TRUSTED_PROXY_DEPTH = 1
 
-CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev', 'api.routechoices.dev', 'chat.routechoices.dev', 'wss://chat.routechoices.dev', 'www.routechoices.com', 'api.routechoices.com')
+CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev:8081', 'api.routechoices.dev:8081', 'chat.routechoices.dev:8081', 'wss://chat.routechoices.dev:8081', 'www.routechoices.com', 'api.routechoices.com')
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", '*', 'data:')
 CSP_WORKER_SRC = ("'self'", 'blob:')
 
-CSRF_TRUSTED_ORIGINS = ['https://*.routechoices.dev']
+CSRF_TRUSTED_ORIGINS = ['https://*.routechoices.dev:8081', ]
 
 
 try:

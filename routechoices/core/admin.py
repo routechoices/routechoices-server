@@ -16,6 +16,7 @@ from allauth.account.models import EmailAddress
 from routechoices.lib.helpers import get_device_name
 
 from routechoices.core.models import (
+    ChatMessage,
     Club,
     Competitor,
     Device,
@@ -319,6 +320,20 @@ class MapAdmin(admin.ModelAdmin):
     list_filter = ('club', )
 
 
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = (
+        'creation_date',
+        'event',
+        'ip_address',
+        'nickname',
+        'message',
+    )
+    list_filter = ('event', )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('event')
+
+admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(ImeiDevice, ImeiDeviceAdmin)
