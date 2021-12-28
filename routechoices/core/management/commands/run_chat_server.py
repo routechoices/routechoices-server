@@ -12,8 +12,7 @@ import orjson as json
 import hashlib
 from routechoices.lib.helpers import safe64encode
 
-EVENTS_CHATS_EV = {}
-
+EVENT_NEW_MESSAGE = asyncio.Event()
 
 class HealthCheckHandler(tornado.web.RequestHandler):
     def get(self):
@@ -24,9 +23,7 @@ class LiveEventChatHandler(tornado.web.RequestHandler):
     def post(self, event_id):
         if self.request.headers.get("Authorization") != f'Bearer {settings.CHAT_INTERNAL_SECRET}':
             raise tornado.web.HTTPError(403)
-        ev = EVENTS_CHATS_EV.get(event_id)
-        if ev:
-            ev.set()
+        EVENT_NEW_MESSAGE.set()
 
 
 class LiveEventChatStream(tornado.web.RequestHandler):
@@ -62,9 +59,6 @@ class LiveEventChatStream(tornado.web.RequestHandler):
         )()
         if not event:
             self.set_status(404)
-        if not event_id in EVENTS_CHATS_EV.keys():
-            EVENTS_CHATS_EV[event_id] = asyncio.Event()
-        should_push_data = EVENTS_CHATS_EV[event_id]
         fetch_from = None
         first = True
         while True:
@@ -73,10 +67,9 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                 first = False
             else:
                 await self.publish('ping')
-                new_event = await self.wait_for_messages(should_push_data, 5.0)
+                new_event = await self.wait_for_messages(EVENT_NEW_MESSAGE, 5.0)
             if new_event:
-                should_push_data.clear()
-                fetch_until = now()
+                EVENT_NEW_MESSAGE.clear()
                 date_args = {}
                 if fetch_from:
                     date_args['creation_date__gt'] = fetch_from
@@ -84,7 +77,6 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                     lambda: list(ChatMessage.objects.filter(event_id=event.id, **date_args).all()),
                     thread_sensitive=True
                 )()
-                fetch_from = fetch_until
                 for new_message in new_messages:
                     hash_user = hashlib.sha256()
                     hash_user.update(new_message.nickname.encode('utf-8'))
@@ -95,6 +87,10 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                         'timestamp': new_message.creation_date.timestamp(),
                         'user_hash': safe64encode(hash_user.digest()),
                     }
+                    if fetch_from:
+                        fetch_from = max(new_message.creation_date, fetch_from)
+                    else:
+                        fetch_from = new_message.creation_date
                     await self.publish('message', **doc)
 
 
