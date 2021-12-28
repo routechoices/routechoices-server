@@ -12,7 +12,7 @@ import orjson as json
 import hashlib
 from routechoices.lib.helpers import safe64encode
 
-EVENT_NEW_MESSAGE = asyncio.Event()
+EVENT_NEW_MESSAGE = {}
 
 class HealthCheckHandler(tornado.web.RequestHandler):
     def get(self):
@@ -23,7 +23,9 @@ class LiveEventChatHandler(tornado.web.RequestHandler):
     def post(self, event_id):
         if self.request.headers.get("Authorization") != f'Bearer {settings.CHAT_INTERNAL_SECRET}':
             raise tornado.web.HTTPError(403)
-        EVENT_NEW_MESSAGE.set()
+        signal = EVENT_NEW_MESSAGE.get(event_id)
+        if signal:
+            signal.set()
 
 
 class LiveEventChatStream(tornado.web.RequestHandler):
@@ -61,16 +63,20 @@ class LiveEventChatStream(tornado.web.RequestHandler):
             self.set_status(404)
         fetch_from = None
         first = True
+        signal = EVENT_NEW_MESSAGE.get(event.aid)
+        if not signal:
+            signal = asyncio.Event()
+            EVENT_NEW_MESSAGE[event.aid] = signal
         while True:
             if first:
                 new_event = True
                 first = False
             else:
                 await self.publish('ping')
-                await EVENT_NEW_MESSAGE.wait()
+                await signal.wait()
                 new_event = True
             if new_event:
-                EVENT_NEW_MESSAGE.clear()
+                signal.clear()
                 date_args = {}
                 if fetch_from:
                     date_args['creation_date__gt'] = fetch_from
