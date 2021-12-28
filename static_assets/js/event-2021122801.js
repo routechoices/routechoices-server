@@ -200,9 +200,8 @@ var backdropMaps = {}
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"))
 var chatDisplayed = false
 var chatMessages = []
-var chatSocket = null
+var chatEventSource = null
 var chatNick = ''
-var isChatConnecting = false
 var zoomOnRunners = false
 
 backdropMaps['blank'] = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=', {
@@ -730,6 +729,11 @@ var displayChat = function(ev) {
 
 var refreshMessageList = function() {
   var out = ''
+  if(!chatEventSource){
+    out = '<div><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
+    $('#messageList').html(out)
+    return
+  }
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
   chatMessages.forEach(function(msg){
     out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>'
@@ -739,21 +743,21 @@ var refreshMessageList = function() {
 
 function getResponsiveBreakpoint() {
   var envs = {xs:"d-none", sm:"d-sm-none", md:"d-md-none", lg:"d-lg-none", xl:"d-xl-none"};
-  var env = "";
+  var env = ""
 
-  var $el = $("<div>");
-  $el.appendTo($("body"));
+  var $el = $("<div>")
+  $el.appendTo($("body"))
 
   for (var i = Object.keys(envs).length - 1; i >= 0; i--) {
-      env = Object.keys(envs)[i];
-      $el.addClass(envs[env]);
+      env = Object.keys(envs)[i]
+      $el.addClass(envs[env])
       if ($el.is(":hidden")) {
-          break; // env detected
+          break // env detected
       }
   }
-  $el.remove();
-  return env;
-};
+  $el.remove()
+  return env
+}
 
 var displayOptions = function(ev) {
     ev.preventDefault()
@@ -1468,26 +1472,57 @@ function pressProgressBar(e){
   prevShownTime = currentTime
 }
 
-function connectChat() {
-  if(isChatConnecting)return
-  isChatConnecting = true
-  try{
-    var chatSocket = new WebSocket('wss://'+chatServer+'/ws/'+eventId)
-    // Listen for messages
-    chatSocket.addEventListener('open', function (event) {
-      // TODO: keep status updated
-      isChatConnecting = false
-    })
-    chatSocket.addEventListener('message', function (event) {
-      chatMessages.push(JSON.parse(event.data))
-      refreshMessageList()
-    })
-    chatSocket.addEventListener('close', function(ev){
-      setTimeout(connectChat, 1e3)
-      chatSocket = null
-      isChatConnecting = false
-    })
-  } catch(e) {
-    isChatConnecting = false
+var connectChatAttempts
+var connectChatTimeoutMs
+
+function resetChatConnectTimeout() {
+  connectChatAttempts = 0
+  connectChatTimeoutMs = 100
+}
+resetChatConnectTimeout()
+
+function bumpChatConnectTimeout() {
+  connectChatAttempts++
+
+  if (connectChatTimeoutMs === 100 && connectChatAttempts === 20) {
+    connectChatAttempts = 0
+    connectChatTimeoutMs = 300
+  } else if (connectChatTimeoutMs === 300 && connectChatAttempts === 20) {
+    connectChatAttempts = 0
+    connectChatTimeoutMs = 1000
+  } else if (connectChatTimeoutMs === 1000 && connectChatAttempts === 20) {
+    connectChatAttempts = 0
+    connectChatTimeoutMs = 3000
   }
+  if (connectChatAttempts === 0) {
+    console.debug(
+      "😅 chat connection error, retrying every " +
+        connectChatTimeoutMs +
+        "ms"
+    )
+  }
+}
+
+function connectToChatEvents() {
+  chatEventSource = new EventSource(chatStreamUrl)
+  // Listen for messages
+  chatEventSource.addEventListener('open', function () {
+    chatMessages = []
+  })
+  chatEventSource.addEventListener('message', function (event) {
+    resetChatConnectTimeout()
+    const message = JSON.parse(event.data)
+    if (message.type === "ping") {
+      // pass
+    } else if (message.type === "message") {
+      chatMessages.push(message)
+      refreshMessageList()
+    }
+  })
+  chatEventSource.addEventListener('error', function(){
+    chatEventSource.close()
+    chatEventSource = null
+    bumpChatConnectTimeout()
+    setTimeout(connectToChatEvents, connectChatTimeoutMs)
+  })
 }

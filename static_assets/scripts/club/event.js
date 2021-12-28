@@ -2,7 +2,7 @@ var dataset = document.currentScript.dataset
 var eventId = dataset.eventId
 var eventUrl = dataset.eventUrl
 var wmsService = dataset.wmsServiceUrl
-var chatServer = dataset.chatServerUrl
+var chatStreamUrl = dataset.chatStreamUrl
 var chatMessagesEndpoint = dataset.chatMessagesEndpoint
 var clock = ServerClock({url: dataset.serverClockUrl})
 var clubName = dataset.clubName
@@ -214,13 +214,7 @@ $(function() {
           isLiveEvent = true
           if (response.event.chat_enabled) {
             $('#chat_button_group').removeClass('d-none')
-            $.ajax({
-              url: 'https:'+ chatMessagesEndpoint,
-              dataType: 'JSON'
-            }).success(function(data){
-              chatMessages = data
-            })
-            connectChat()
+            connectToChatEvents()
           }
         }
         qrUrl = response.event.shortcut

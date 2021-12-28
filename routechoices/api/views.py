@@ -4,10 +4,8 @@ import re
 import time
 import urllib.parse
 import orjson as json
-from io import BytesIO
 import arrow
 import requests
-import hashlib
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -17,7 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
 from django_hosts.resolvers import reverse
@@ -56,7 +54,6 @@ from rest_framework.throttling import AnonRateThrottle
 logger = logging.getLogger(__name__)
 # API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
 GLOBAL_MERCATOR = GlobalMercator()
-
 
 class PostDataThrottle(AnonRateThrottle):
     rate = '70/min'
@@ -336,14 +333,10 @@ def event_detail(request, event_id):
 
 
 @swagger_auto_schema(
-    method='get',
-    auto_schema=None,
-)
-@swagger_auto_schema(
     method='post',
     auto_schema=None,
 )
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @throttle_classes([PostDataThrottle, ])
 def event_chat(request, event_id):
     event = get_object_or_404(
@@ -357,25 +350,6 @@ def event_chat(request, event_id):
         if not request.user.is_authenticated or \
                 not event.club.admins.filter(id=request.user.id).exists():
             raise PermissionDenied()
-    if request.method == 'GET':
-        msgs = ChatMessage.objects.filter(event=event)
-        out = []
-        for msg in msgs:
-            remote_ip = msg.ip_address
-            hash_user = hashlib.sha256()
-            hash_user.update(msg.nickname.encode('utf-8'))
-            hash_user.update(remote_ip.encode('utf-8'))
-            out.append({
-                "nickname": msg.nickname,
-                "message": msg.message,
-                "timestamp": msg.creation_date.timestamp(),
-                "user_hash": safe64encode(hash_user.digest()),
-            })
-        response = Response(out)
-        if event.privacy == PRIVACY_PRIVATE:
-            response['Cache-Control'] = 'private'
-        response['Content-Type'] = "application/json"
-        return response
 
     nickname = request.data.get('nickname')
     message = request.data.get('message')
@@ -383,34 +357,20 @@ def event_chat(request, event_id):
         raise ValidationError('Missing parameter')
     
     remote_ip = request.META['REMOTE_ADDR']
-    hash_user = hashlib.sha256()
-    hash_user.update(nickname.encode('utf-8'))
-    hash_user.update(remote_ip.encode('utf-8'))
-    doc = {
-        "nickname": nickname,
-        "message": message,
-        "timestamp": arrow.utcnow().timestamp(),
-        "user_hash": safe64encode(hash_user.digest()),
-    }
-    response = None
-    try:
-        r = requests.post(
-            f'http://127.0.0.1:8009/{event_id}', #f'https://{settings.CHAT_SERVER}/{event_id}' if not settings.DEBUG else f'http://127.0.0.1:8009/{event_id}',
-            data=json.dumps(
-                doc
-            ),
-            headers={'Authorization': f'Bearer {settings.CHAT_INTERNAL_SECRET}'}
-        )
-    except Exception as e:
-        return Response({'status': 'failed', 'message': 'chat server offline'}, status=400)
-    if r.status_code != 200:
-        return Response({'status': 'failed', 'message': 'chat server bad response'}, status=400)
+
     ChatMessage.objects.create(
         nickname=nickname,
         message=message,
         ip_address=remote_ip,
         event=event
     )
+    try:
+        requests.post(
+            f'http://127.0.0.1:8009/{event_id}',
+            headers={'Authorization': f'Bearer {settings.CHAT_INTERNAL_SECRET}'}
+        )
+    except Exception:
+        pass
     return Response({'status': 'sent'}, status=201)
 
 

@@ -266,7 +266,7 @@ SLUG_BLACKLIST = [
     'script', 'sdk', 'search', 'secure', 'security', 'select', 'services',
     'session', 'sessions', 'settings', 'setup', 'share', 'shift', 'shop',
     'signin', 'signup', 'site', 'sitemap', 'sites', 'smtp', 'sort', 'source',
-    'sql', 'ssh', 'ssh-rsa', 'ssl', 'ssladmin', 'ssladministrator',
+    'sql', 'sse', 'ssh', 'ssh-rsa', 'ssl', 'ssladmin', 'ssladministrator',
     'sslwebmaster', 'stage', 'staging', 'stat', 'static', 'statistics',
     'stats', 'status', 'store', 'stripe', 'style', 'styles', 'stylesheet',
     'stylesheets',
@@ -406,7 +406,7 @@ POST_LOCATION_SECRETS = ["<replace-me>"]
 
 XFF_TRUSTED_PROXY_DEPTH = 1
 
-CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev:8081', 'api.routechoices.dev:8081', 'chat.routechoices.dev:8081', 'wss://chat.routechoices.dev:8081', 'www.routechoices.com', 'api.routechoices.com')
+CSP_DEFAULT_SRC = ("'self'", 'www.routechoices.dev:8081', 'api.routechoices.dev:8081', 'chat.routechoices.dev:8081', 'www.routechoices.com', 'api.routechoices.com')
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", '*', 'data:')
 CSP_WORKER_SRC = ("'self'", 'blob:')
