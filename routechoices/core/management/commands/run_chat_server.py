@@ -67,7 +67,8 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                 first = False
             else:
                 await self.publish('ping')
-                new_event = await self.wait_for_messages(EVENT_NEW_MESSAGE, 5.0)
+                await EVENT_NEW_MESSAGE.wait()
+                new_event = True
             if new_event:
                 EVENT_NEW_MESSAGE.clear()
                 date_args = {}
