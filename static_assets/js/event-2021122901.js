@@ -496,17 +496,17 @@ var displayCompetitorList = function(force){
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || getColor(ii)
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown
-      var div = $('<div/>')
+      
+      var div = $('<div class="card-body" style="padding:5px 10px 2px 10px;"/>')
       div.html('<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
-        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
-        <div><div class="btn-group btn-group-sm" role="group">\
-            <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
-            <button type="button" class="center_competitor_btn btn btn-default btn-sm"><i class="fa fa-map-marker"></i></button>\
-          </div>\
+        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
+        <div>\
+          <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
+          <button type="button" class="center_competitor_btn btn btn-default btn-sm"><i class="fa fa-map-marker"></i></button>\
           <span><small class="speedometer"></small></span>\
         </div>\
         </div>')
-
+      var diva = $('<div class="card" style="background-color:transparent; margin-top: 3px";/>').append(div)
       $(div).find('.color-tag').on('click', function() {
         $('#colorModalLabel').text(banana.i18n('select-color-for', competitor.name))
         var color = competitor.color
@@ -567,7 +567,7 @@ var displayCompetitorList = function(force){
         zoomOnCompetitor(competitor)
       })
       if(searchText === null || searchText === '' || competitor.name.toLowerCase().search(searchText) != -1) {
-        listDiv.append(div)
+        listDiv.append(diva)
       }
       competitor.div = div
       competitor.speedometer = div.find('.speedometer')
