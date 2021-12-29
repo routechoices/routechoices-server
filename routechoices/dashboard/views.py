@@ -23,6 +23,7 @@ from allauth.account.signals import password_reset, password_changed
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
     Club,
+    Competitor,
     Map,
     Event,
     Device,
@@ -90,12 +91,22 @@ def device_list_view(request):
     paginator = Paginator(device_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get('page')
     devices = paginator.get_page(page)
-
+    devices_listed = devices.object_list.all()
+    competitors = Competitor.objects.select_related('event').filter(
+        device__in=devices_listed
+    ).order_by('-start_time')
+    last_usage = {}
+    for competitor in competitors:
+        if not competitor.device_id in last_usage.keys():
+            last_usage[competitor.device_id] = f'{competitor.event} ({competitor})'
+            if len(last_usage.keys()) == len(devices_listed):
+                break
     return render(
         request,
         'dashboard/device_list.html',
         {
-            'devices': devices
+            'devices': devices,
+            'last_usage': last_usage
         }
     )
 
@@ -117,6 +128,8 @@ def device_add_view(request):
             ownership.save()
             messages.success(request, 'Device added successfully')
             return redirect('dashboard:device_list_view')
+        else:
+            form.fields['device'].queryset = Device.objects.none()
     else:
         form = DeviceForm()
         form.fields['device'].queryset = Device.objects.none()

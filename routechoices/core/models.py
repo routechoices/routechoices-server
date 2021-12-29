@@ -996,6 +996,34 @@ class Device(models.Model):
             return None
         return ll['latitude'], ll['longitude']
 
+    def get_competitor(self, at=None, load_event=False):
+        if not at:
+            at = now()
+        qs = self.competitor_set.filter(start_time__lte=at, event__end_date__gte=at).order_by('-start_time')
+        if load_event:
+            qs = qs.select_related('event')
+        return qs.first()
+    
+    def get_event(self, at=None):
+        if not at:
+            at = now()
+        c = self.get_competitor(at, True)
+        if c:
+            return c.event
+        return None
+
+    def get_last_competitor(self, load_event=False):
+        qs = self.competitor_set.all().order_by('-start_time')
+        if load_event:
+            qs = qs.select_related('event')
+        return qs.first()
+
+    def get_last_event(self):
+        c = self.get_last_competitor(True)
+        if c:
+            return c.event
+        return None
+
 
 class ImeiDevice(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
