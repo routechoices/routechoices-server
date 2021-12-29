@@ -1,56 +1,68 @@
 /* server_clock.js */
 var ServerClock = function(opts) {
-  if (!(this instanceof ServerClock)) return new ServerClock(opts);
+  if (!(this instanceof ServerClock)) return new ServerClock(opts)
 
   var defaultOptions = { url: null },
-      options = $.extend({}, defaultOptions, opts),
-      drifts = [];
+      options = {...defaultOptions, ...opts},
+      drifts = [],
+      refreshTimeout
 
   function getAverageDrift() {
-    var total_drift = 0;
-    for (var ii = 0; ii < drifts.length; ii++) {
-        total_drift += drifts[ii];
+    var total_drift = 0
+    for (var i = 0; i < drifts.length; i++) {
+        total_drift += drifts[ii]
     }
-    if (drifts.length === 0) {
-      return 0;
-    } else {
-      return total_drift/drifts.length;
-    }
+    return Math.round(total_drift / (drifts.length || 1))
   }
 
   function onServerResponse(requestTime) {
     return function(response) {
       var now = +new Date(),
           serverTime = response.time * 1e3,
-          drift = serverTime - (now + requestTime) / 2;
-      drifts.push(drift);
-    };
+          drift = serverTime - (now + requestTime) / 2
+      drifts.push(drift)
+    }
+  }
+
+  this.stopRefreshes = function () {
+    if(refreshTimeout){
+      clearTimeout(refreshTimeout)
+      refreshTimeout = null
+    }
+  }
+
+  this.startRefreshes = function () {
+    if (refreshTimeout) return;
+    ;(function syncClock() {
+      refreshTimeout = setTimeout(syncClock, 3*1e5)    // Every 5 minutes
+      drifts = []
+      ;(function fetchServerTime() {
+        if (drifts.length < 3) {
+          setTimeout(fetchServerTime, 500)    // Every 0.5 seconds
+          var clientRequestTime = +new Date()
+          fetch(
+            options.url,
+            {
+              method: 'GET', 
+              headers: {
+                'Accept': 'application/json'
+              }
+            }
+          )
+          .then(function(r){return r.json()})
+          .then(onServerResponse(clientRequestTime))
+        }
+      })()
+    })()
   }
 
   if(options.url) {
-    (function syncClock() {
-      setTimeout(syncClock, 3*1e5);    // Every 5 minutes
-      drifts = [];
-      (function fetchServerTime() {
-        if (drifts.length < 3) {
-          setTimeout(fetchServerTime, 500);    // Every 0.5 seconds
-          var clientRequestTime = +new Date();
-          $.ajax({
-            type: 'GET',
-            url: options.url,
-            dataType: 'json'
-          })
-          .done(onServerResponse(clientRequestTime));
-        }
-      })();
-    })();
+    this.startRefreshes()
   }
 
   this.now = function(){
-    return new Date(+new Date() + getAverageDrift());
-  };
+    return new Date(+new Date() + getAverageDrift())
+  }
 
-  this.getDrift = function(){
-    return getAverageDrift();
-  };
-};
+  this.getDrift = getAverageDrift
+}

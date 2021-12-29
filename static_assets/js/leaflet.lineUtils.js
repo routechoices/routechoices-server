@@ -7,7 +7,6 @@ L.Util.extend(L.LineUtil, {
 				this._checkCounterclockwise(p, p1, p2) !==
 				this._checkCounterclockwise(p, p1, p3);
 	},
-
 	// check to see if points are in counterclockwise order
 	_checkCounterclockwise: function (/*Point*/ p, /*Point*/ p1, /*Point*/ p2) {
 		return (p2.y - p.y) * (p1.x - p.x) > (p1.y - p.y) * (p2.x - p.x);

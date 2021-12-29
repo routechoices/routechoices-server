@@ -216,6 +216,8 @@ $(function() {
             $('#chat_button_group').removeClass('d-none')
             connectToChatEvents()
           }
+        } else {
+          clock.stopRefreshes()
         }
         qrUrl = response.event.shortcut
         liveUrl = response.data
