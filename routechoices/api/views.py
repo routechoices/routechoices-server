@@ -1112,7 +1112,7 @@ def get_device_for_imei(request):
 )
 @api_view(['GET'])
 def get_time(request):
-    return Response({'time': time.time()})
+    return Response({'time': time.time()}, headers={'Cache-Control': 'no-cache'})
 
 
 @swagger_auto_schema(
