@@ -32,6 +32,8 @@ def club_view(request, **kwargs):
         club_slug = kwargs.get('club_slug')
         if club_slug in ('api', 'admin', 'dashboard', 'oauth'):
             return redirect(f'/{club_slug}/')
+        if not Club.objects.filter(slug__iexact=club_slug).exists():
+            raise Http404()
         return redirect(
             reverse(
                 'club_view',
