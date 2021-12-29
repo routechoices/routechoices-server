@@ -27,22 +27,32 @@ from routechoices.club import feeds
 from routechoices.api.views import serve_from_s3
 
 
+def handle_legacy_request(view_name, club_slug=None, **kwargs):
+    if club_slug:
+        if not Club.objects.filter(slug__iexact=club_slug).exists():
+            raise Http404()
+        reverse_kwargs = kwargs
+        return redirect(
+            reverse(
+                view_name,
+                host='clubs',
+                host_kwargs={
+                    'club_slug': club_slug
+                },
+                kwargs=reverse_kwargs,
+            )
+        )
+    return False
+
+
 def club_view(request, **kwargs):
     if kwargs.get('club_slug'):
         club_slug = kwargs.get('club_slug')
         if club_slug in ('api', 'admin', 'dashboard', 'oauth'):
             return redirect(f'/{club_slug}/')
-        if not Club.objects.filter(slug__iexact=club_slug).exists():
-            raise Http404()
-        return redirect(
-            reverse(
-                'club_view',
-                host='clubs',
-                host_kwargs={
-                    'club_slug': club_slug
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('club_view', kwargs.get('club_slug'))
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(
         Club,
@@ -86,17 +96,9 @@ def club_view(request, **kwargs):
 
 
 def club_logo(request, **kwargs):
-    if kwargs.get('club_slug'):
-        club_slug = kwargs.get('club_slug')
-        return redirect(
-            reverse(
-                'club_logo',
-                host='clubs',
-                host_kwargs={
-                    'club_slug': club_slug
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('club_logo', kwargs.get('club_slug'))
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     if request.use_cname:
         return redirect(
@@ -124,17 +126,9 @@ def club_logo(request, **kwargs):
 
 
 def club_live_event_feed(request, **kwargs):
-    if kwargs.get('club_slug'):
-        club_slug = kwargs.get('club_slug')
-        return redirect(
-            reverse(
-                'club_feed',
-                host='clubs',
-                host_kwargs={
-                    'club_slug': club_slug
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('club_feed', kwargs.get('club_slug'))
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(
         Club,
@@ -146,17 +140,9 @@ def club_live_event_feed(request, **kwargs):
 
 
 def event_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     if not club_slug:
         club_slug = request.club_slug
@@ -200,17 +186,9 @@ def event_view(request, slug, **kwargs):
 
 
 def event_export_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_export_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_export_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(
         Event.objects.all().select_related('club').prefetch_related('competitors'),
@@ -251,17 +229,9 @@ def event_export_view(request, slug, **kwargs):
 
 
 def event_map_view(request, slug, index='0', **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_map_view',
-                host='clubs',
-                kwargs={'slug': slug, 'index': index},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_map_view', kwargs.get('club_slug'), slug=slug, index=index)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(
         Event.objects.all().select_related('club'),
@@ -283,17 +253,9 @@ def event_map_view(request, slug, index='0', **kwargs):
 
 
 def event_kmz_view(request, slug, index='0', **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_kmz_view',
-                host='clubs',
-                kwargs={'slug': slug, 'index': index},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_kmz_view', kwargs.get('club_slug'), slug=slug, index=index)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(
         Event.objects.all().select_related('club'),
@@ -315,17 +277,9 @@ def event_kmz_view(request, slug, index='0', **kwargs):
 
 
 def event_registration_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_registration_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_registration_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
@@ -378,17 +332,9 @@ def event_registration_view(request, slug, **kwargs):
 
 
 def event_registration_done_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_registration_done_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_registration_done_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
@@ -407,17 +353,9 @@ def event_registration_done_view(request, slug, **kwargs):
 
 
 def event_route_upload_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_route_upload_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_route_upload_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
@@ -490,17 +428,9 @@ def event_route_upload_view(request, slug, **kwargs):
 
 
 def event_route_upload_done_view(request, slug, **kwargs):
-    if kwargs.get('club_slug'):
-        return redirect(
-            reverse(
-                'event_route_upload_done_view',
-                host='clubs',
-                kwargs={'slug': slug},
-                host_kwargs={
-                    'club_slug': kwargs.get('club_slug')
-                }
-            )
-        )
+    bypass_resp = handle_legacy_request('event_route_upload_done_view', kwargs.get('club_slug'), slug=slug)
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(Event.objects.all().select_related('club'),
         club__slug__iexact=club_slug,
@@ -520,13 +450,13 @@ def event_route_upload_done_view(request, slug, **kwargs):
 
 
 def acme_challenge(request, challenge):
+    if not request.use_cname:
+        return Http404()
     club_slug = request.club_slug
     club = get_object_or_404(
-        Club,
+        Club.objects.all().exclude(domain=''),
         slug__iexact=club_slug
     )
-    if not club.domain or not request.use_cname:
-        return Http404()
     if challenge == club.acme_challenge.split('.')[0]:
         return HttpResponse(club.acme_challenge)
     else:

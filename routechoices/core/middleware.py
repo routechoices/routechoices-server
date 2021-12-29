@@ -168,6 +168,7 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
         raw_host = request.get_host()
         if ':' in raw_host:
             raw_host = raw_host[:raw_host.rfind(':')]
+        request.use_cname = False
         if not raw_host.endswith(default_domain) and not raw_host in ('localhost', '127.0.0.1'):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
