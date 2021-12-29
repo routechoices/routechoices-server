@@ -9,10 +9,12 @@ from routechoices.core.models import Event, ChatMessage
 from asgiref.sync import sync_to_async
 import asyncio
 import orjson as json
-import hashlib
-from routechoices.lib.helpers import safe64encode
+from routechoices.core.models import PRIVACY_PRIVATE
+from django.contrib.auth import get_user
+from importlib import import_module
+import urllib
 
-EVENT_NEW_MESSAGE = {}
+EVENT_CHAT_STREAMS = {}
 
 class HealthCheckHandler(tornado.web.RequestHandler):
     def get(self):
@@ -20,38 +22,60 @@ class HealthCheckHandler(tornado.web.RequestHandler):
 
 
 class LiveEventChatHandler(tornado.web.RequestHandler):    
-    def post(self, event_id):
+    async def post(self, event_id):
         if self.request.headers.get("Authorization") != f'Bearer {settings.CHAT_INTERNAL_SECRET}':
             raise tornado.web.HTTPError(403)
-        signal = EVENT_NEW_MESSAGE.get(event_id)
-        if signal:
-            signal.set()
+        try:
+            data = json.loads(self.request.body)
+        except Exception:
+            raise tornado.web.HTTPError(400)
+        ongoing_streams = EVENT_CHAT_STREAMS.get(event_id)
+        if ongoing_streams:
+            await asyncio.gather(*[stream.publish('message', **data) for stream in ongoing_streams])
 
 
 class LiveEventChatStream(tornado.web.RequestHandler):
+    def __init__(self, *args, **kwargs):
+        self.listening = False
+        return super().__init__(*args, **kwargs)
+
     def initialize(self):
+        self.set_header('Access-Control-Allow-Origin', self.request.headers.get('Origin', '*'))
+        self.set_header('Access-Control-Allow-Credentials', 'true');
+        self.set_header('Access-Control-Allow-Methods', 'GET');
         self.set_header('content-type', 'text/event-stream')
         self.set_header('cache-control', 'no-cache')
+    
+    async def get_current_user(self):
+        engine = import_module(settings.SESSION_ENGINE)
+        cookie = self.get_cookie(settings.SESSION_COOKIE_NAME)
+        if not cookie:
+            return None
+        class Dummy(object):
+            pass
+
+        django_request = Dummy()
+        django_request.session = engine.SessionStore(cookie)
+        user = await sync_to_async(get_user)(django_request)
+        return user
 
     async def publish(self, type_, **kwargs):
+        if not self.listening:
+            return
         try:
             jsonified = str(json.dumps({"type": type_, **kwargs}), 'utf-8')
             self.write(f'data: {jsonified}\n\n'.encode())
             await self.flush()
         except StreamClosedError:
-            pass
-    
-    async def wait_for_messages(self, evt, timeout):
-        try:
-            await asyncio.wait_for(evt.wait(), timeout)
-        except asyncio.TimeoutError:
-            pass
-        return evt.is_set()
+            self.listening = False
+            EVENT_CHAT_STREAMS[self.event_id].remove(self)
+            if len(EVENT_CHAT_STREAMS[self.event_id]) == 0:
+                EVENT_CHAT_STREAMS.pop(self.event_id, None)
 
     async def get(self, event_id):
         self.event_id = event_id
         event = await sync_to_async(
-            Event.objects.filter(
+            Event.objects.select_related('club').filter(
                 aid=event_id,
                 start_date__lte=now(),
                 end_date__gte=now(),
@@ -61,44 +85,33 @@ class LiveEventChatStream(tornado.web.RequestHandler):
         )()
         if not event:
             self.set_status(404)
-        fetch_from = None
-        first = True
-        signal = EVENT_NEW_MESSAGE.get(event.aid)
-        if not signal:
-            signal = asyncio.Event()
-            EVENT_NEW_MESSAGE[event.aid] = signal
-        while True:
-            if first:
-                new_event = True
-                first = False
-            else:
-                await self.publish('ping')
-                await signal.wait()
-                new_event = True
-            if new_event:
-                signal.clear()
-                date_args = {}
-                if fetch_from:
-                    date_args['creation_date__gt'] = fetch_from
-                new_messages = await sync_to_async(
-                    lambda: list(ChatMessage.objects.filter(event_id=event.id, **date_args).all()),
+        
+        if event.privacy == PRIVACY_PRIVATE:
+            user = await self.get_current_user()
+            if not user:
+                raise tornado.web.HTTPError(403)
+            if user.is_superuser:
+                if not user.is_authenticated:
+                    raise tornado.web.HTTPError(403)
+                is_admin = await sync_to_async(
+                    event.club.admins.filter(id=user.id).exists,
                     thread_sensitive=True
                 )()
-                for new_message in new_messages:
-                    hash_user = hashlib.sha256()
-                    hash_user.update(new_message.nickname.encode('utf-8'))
-                    hash_user.update(new_message.ip_address.encode('utf-8'))
-                    doc = {
-                        'nickname': new_message.nickname,
-                        'message': new_message.message,
-                        'timestamp': new_message.creation_date.timestamp(),
-                        'user_hash': safe64encode(hash_user.digest()),
-                    }
-                    if fetch_from:
-                        fetch_from = max(new_message.creation_date, fetch_from)
-                    else:
-                        fetch_from = new_message.creation_date
-                    await self.publish('message', **doc)
+                if not is_admin:
+                    raise tornado.web.HTTPError(403)
+        if not event_id in EVENT_CHAT_STREAMS.keys():
+            EVENT_CHAT_STREAMS[event_id] = []
+        EVENT_CHAT_STREAMS[event_id].append(self)
+        old_messages = await sync_to_async(
+            lambda: list(ChatMessage.objects.filter(event_id=event.id).all()),
+            thread_sensitive=True
+        )()
+        self.listening = True
+        await asyncio.gather(*[self.publish('message', **message.serialize()) for message in old_messages])
+        while self.listening:
+            await asyncio.sleep(5.0)
+            await self.publish('ping')
+
 
 
 class Command(BaseCommand):

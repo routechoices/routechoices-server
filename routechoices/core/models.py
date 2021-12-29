@@ -25,7 +25,7 @@ from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-
+import uuid
 from django_hosts.resolvers import reverse
 
 import gpxpy
@@ -1183,3 +1183,24 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f'<{self.nickname}> in {self.event.name}: {self.message}'
+
+    def user_hash(self):
+        hash_user = hashlib.sha256()
+        hash_user.update(self.nickname.encode('utf-8'))
+        hash_user.update(self.ip_address.encode('utf-8'))
+        return safe64encode(hash_user.digest())
+    
+    def preserialize(self):
+        return {
+            'nickname': self.nickname,
+            'message': self.message,
+            'timestamp': self.creation_date.timestamp(),
+            'user_hash': self.user_hash()
+        }
+
+    def serialize(self):
+        data = self.preserialize()
+        hash = hashlib.sha256()
+        hash.update(json.dumps(data))
+        data['hash'] = safe64encode(hash.digest())
+        return data

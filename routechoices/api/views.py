@@ -358,7 +358,7 @@ def event_chat(request, event_id):
     
     remote_ip = request.META['REMOTE_ADDR']
 
-    ChatMessage.objects.create(
+    msg = ChatMessage.objects.create(
         nickname=nickname,
         message=message,
         ip_address=remote_ip,
@@ -367,6 +367,7 @@ def event_chat(request, event_id):
     try:
         requests.post(
             f'http://127.0.0.1:8009/{event_id}',
+            data=str(json.dumps(msg.serialize()), 'utf-8'),
             headers={'Authorization': f'Bearer {settings.CHAT_INTERNAL_SECRET}'}
         )
     except Exception:

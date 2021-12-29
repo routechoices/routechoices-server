@@ -696,6 +696,9 @@ var displayChat = function(ev) {
               nickname: $('#chatNick').val(),
               message: $('#chatMessage').val()
             },
+            xhrFields: {
+              withCredentials: true
+            },
             method: 'POST',
             dataType: 'JSON',
             crossDomain: true
@@ -1504,7 +1507,7 @@ function bumpChatConnectTimeout() {
 }
 
 function connectToChatEvents() {
-  chatEventSource = new EventSource(chatStreamUrl)
+  chatEventSource = new EventSource(chatStreamUrl, {withCredentials: true})
   // Listen for messages
   chatEventSource.addEventListener('open', function () {
     chatMessages = []
