@@ -497,8 +497,7 @@ var displayCompetitorList = function(force){
       competitor.color = competitor.color || getColor(ii)
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown
       var div = $('<div/>')
-      div.html((listDiv.html() !== '' ? '<hr style="margin: 0 0 3px 0"/>' : '') +
-        '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
+      div.html('<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
         <div><div class="btn-group btn-group-sm" role="group">\
             <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\

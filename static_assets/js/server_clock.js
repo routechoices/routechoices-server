@@ -10,7 +10,7 @@ var ServerClock = function(opts) {
   function getAverageDrift() {
     var total_drift = 0
     for (var i = 0; i < drifts.length; i++) {
-        total_drift += drifts[ii]
+        total_drift += drifts[i]
     }
     return Math.round(total_drift / (drifts.length || 1))
   }
