@@ -90,7 +90,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
             user = await self.get_current_user()
             if not user:
                 raise tornado.web.HTTPError(403)
-            if user.is_superuser:
+            if not user.is_superuser:
                 if not user.is_authenticated:
                     raise tornado.web.HTTPError(403)
                 is_admin = await sync_to_async(

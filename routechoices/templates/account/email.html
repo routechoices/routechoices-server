@@ -1,6 +1,7 @@
 {% extends "dashboard/home.html" %}
 
 {% load i18n %}
+{% load static %}
 {% load django_bootstrap5 %}
 
 {% block head_title %}{% trans "Account" %}{% endblock %}
@@ -31,7 +32,7 @@
 </div>
   {% endfor %}
 
-<div class="buttonHolder">
+<div class="buttonHolder" style="margin-top:15px">
       <button class="secondaryAction btn btn-primary" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
       <button class="secondaryAction btn btn-secondary" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
       <button class="primaryAction btn btn-danger" type="submit" name="action_remove" ><i class="fa fa-trash"></i> {% trans 'Remove' %}</button>
