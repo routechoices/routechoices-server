@@ -581,7 +581,7 @@ var displayCompetitorList = function(force){
     if(searchText === null) {
       var mainDiv = $('<div id="competitorSidebar"/>')
       mainDiv.append(
-        $('<div style="text-align:right; margin: -10px 0px 10px 0px;" class="d-block d-sm-none"/>').append(
+        $('<div style="text-align:right;margin-bottom:-27px" class="d-block d-sm-none"/>').append(
           $('<button class="btn btn-default btn-sm"/>')
           .html('<i class="fa fa-times"></i>')
           .on('click', toggleCompetitorList)
@@ -664,7 +664,7 @@ var displayChat = function(ev) {
     chatDisplayed = true
     var mainDiv = $('<div/>')
     mainDiv.append(
-      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+      $('<div style="text-align:right;margin-bottom:-27px"/>').append(
         $('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
         .on('click', displayChat)
@@ -782,7 +782,7 @@ var displayOptions = function(ev) {
     searchText = null
     var mainDiv = $('<div/>')
     mainDiv.append(
-      $('<div style="text-align:right; margin: -10px 0px 10px 0px;"/>').append(
+      $('<div style="text-align:right;margin-bottom:-27px"/>').append(
         $('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
         .on('click', displayOptions)

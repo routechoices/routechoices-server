@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.css' %}"/>
-<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2021100200" />
+<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2021123000" />
 {% endblock %}
 
 
@@ -40,7 +40,7 @@
 
 <div class="container-fluid">
   <div class="row">
-    <div id="sidebar" class="d-none d-sm-block col-sm-4 col-lg-3 col-xxl-2 sidebar" style="z-index: 10001"></div>
+    <div id="sidebar" class="d-none d-sm-block col-sm-4 col-lg-3 col-xxl-2 sidebar" style="z-index: 10001;padding: 5px"></div>
     <div id="map" class="d-sm-block col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main"></div>
     <div class="page-alerts col-12 col-sm-8 offset-sm-4 col-lg-9 offset-lg-3 col-xxl-10 offset-xxl-2 main-alerts">
       <div class="alert alert-info page-alert alert-dismissible" id="alert-2">
@@ -151,8 +151,8 @@
 <script src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
 <script src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script src="{% static '/js/hash-avatar-2021100701.js' %}"></script>
-<script src="{% static '/js/event-2021122902.js' %}"></script>
+<script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
+<script src="{% static '/js/event.js' %}?_=2021123000"></script>
 <script src="{% static '/scripts/club/event.js' %}?_=2021122900"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"

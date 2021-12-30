@@ -139,3 +139,8 @@
   .time_bar .btn-secondary:focus {
     box-shadow: none
   }
+
+  .btn:focus{
+    outline: none;
+    box-shadow: none;
+  }
