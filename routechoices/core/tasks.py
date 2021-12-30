@@ -16,7 +16,7 @@ from routechoices.core.models import Map, Event, Device, Competitor, Club
 from routechoices.lib.helpers import short_random_key, safe64encode, \
     three_point_calibration_to_corners, compute_corners_from_kml_latlonbox
 from routechoices.lib.mtb_decoder import MtbDecoder
-
+from routechoices.lib.tractrac_ws_decoder import TracTracWSReader
 
 GPSSEURANTA_EVENT_URL = 'http://www.tulospalvelu.fi/gps/'
 LOGGATOR_EVENT_URL = 'https://loggator.com/api/events/'
@@ -504,21 +504,33 @@ def import_single_event_from_tractrac(event_id):
     data_url = event_id[:event_id.rfind('/')] + '/datafiles' + event_id[event_id.rfind('/'):-4] + 'mtb'
     print(data_url)
     response = requests.get(data_url, stream=True)
-    if response.status_code != 200:
+    if response.status_code == 200:
+        lf = tempfile.NamedTemporaryFile()
+        for block in response.iter_content(1024 * 8):
+            if not block:
+                break
+            lf.write(block)
+        lf.flush()
+        try:
+            device_map = MtbDecoder(lf.name).decode()
+        except:
+            if not event_data['parameters'].get('ws-uri'):
+                event.delete()
+                raise EventImportError('Could not decode mtb')
+        finally:
+            lf.close()
+    
+    if event_data['parameters'].get('ws-uri'):
+        try:
+            url = event_data['parameters'].get('ws-uri')+'/'+event_data['eventType']+'?snapping=false'
+            device_map = TracTracWSReader().read_data(url)
+        except:
+            event.delete()
+            raise EventImportError('Could not decode ws data')
+    else:
         event.delete()
-        raise EventImportError('API returned error code')
-    lf = tempfile.NamedTemporaryFile()
-    for block in response.iter_content(1024 * 8):
-        if not block:
-            break
-        lf.write(block)
-    lf.flush()
-    try:
-        device_map = MtbDecoder(lf.name).decode()
-    except:
-        event.delete()
-        raise EventImportError('Could not decode mtb')
-    lf.close()
+        raise EventImportError('Did not figure out how to get data')
+
     for c_data in event_data['competitors'].values():
         st = c_data.get('startTime')
         if not st:

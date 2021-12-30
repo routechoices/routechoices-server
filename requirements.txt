@@ -35,3 +35,4 @@ sewer==0.8.4
 tornado
 uwsgi
 GitPython
+websocket-client
