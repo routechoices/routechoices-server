@@ -501,33 +501,38 @@ def import_single_event_from_tractrac(event_id):
     if map_model:
         event.map = map_model
         event.save()
-    data_url = event_id[:event_id.rfind('/')] + '/datafiles' + event_id[event_id.rfind('/'):-4] + 'mtb'
-    print(data_url)
-    response = requests.get(data_url, stream=True)
-    if response.status_code == 200:
-        lf = tempfile.NamedTemporaryFile()
-        for block in response.iter_content(1024 * 8):
-            if not block:
-                break
-            lf.write(block)
-        lf.flush()
-        try:
-            device_map = MtbDecoder(lf.name).decode()
-        except:
-            if not event_data['parameters'].get('ws-uri'):
-                event.delete()
-                raise EventImportError('Could not decode mtb')
-        finally:
-            lf.close()
     
-    if event_data['parameters'].get('ws-uri'):
+    device_map = None
+    if event_data['parameters'].get('stored-uri'):
+        data_url = event_data['parameters'].get('stored-uri')
+        if not data_url.startswith('http'):
+            data_url = f'http:{data_url}'
+        response = requests.get(data_url, stream=True)
+        if response.status_code == 200:
+            lf = tempfile.NamedTemporaryFile()
+            for block in response.iter_content(1024 * 8):
+                if not block:
+                    break
+                lf.write(block)
+            lf.flush()
+            try:
+                device_map = MtbDecoder(lf.name).decode()
+            except:
+                if not event_data['parameters'].get('ws-uri'):
+                    event.delete()
+                    raise EventImportError('Could not decode mtb')
+            finally:
+                lf.close()
+    
+    if event_data['parameters'].get('ws-uri') and not device_map:
         try:
             url = event_data['parameters'].get('ws-uri')+'/'+event_data['eventType']+'?snapping=false'
             device_map = TracTracWSReader().read_data(url)
         except:
             event.delete()
             raise EventImportError('Could not decode ws data')
-    else:
+    
+    if not device_map:
         event.delete()
         raise EventImportError('Did not figure out how to get data')
 

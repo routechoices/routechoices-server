@@ -55,7 +55,7 @@ class TracTracWSReader():
                             'latitude': self.get_int32() / 1e7,
                             'timestamp': int(ts/1e3)
                         }
-                        if comp_id not in comp_data.keys():
+                        if not comp_data.get(comp_id):
                             comp_data[comp_id] = []
                         comp_data[comp_id].append(pos)
                         self.result = self.result[52 + (message_type == 19) * 8:]
