@@ -8,7 +8,6 @@ RUN set -ex \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install -r /requirements.txt \
-    && apt remove -y g++ cargo \
     && apt autoremove -y \
     && apt clean -y && rm -rf /var/lib/apt/lists/*
 
