@@ -1,10 +1,18 @@
 from django.contrib.sites.models import Site
 from django.conf import settings
-from git import Repo
+try:
+    from git import Repo
+except ImportError:
+    class Repo():
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError()
 
 
 def get_git_revision_hash():
-    repo = Repo(settings.BASE_DIR)
+    try:
+        repo = Repo(settings.BASE_DIR)
+    except NotImplementedError:
+        return 'dev'
     hc = repo.head.commit
     return hc.hexsha
 

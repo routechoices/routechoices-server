@@ -3,12 +3,14 @@ FROM python:3.9-slim
 # Copy in your requirements file
 ADD requirements.txt /requirements.txt
 
-# Install GDAL dependencies
-RUN apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 --no-install-recommends && \
-    apt clean -y && rm -rf /var/lib/apt/lists/*
-# OR, if you’re using a directory for your requirements, copy everything (comment out the above and uncomment this if so):
-# ADD requirements /requirements
-
+RUN set -ex \
+    && apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 --no-install-recommends \
+    && python -m venv /venv \
+    && /venv/bin/pip install --upgrade pip \
+    && /venv/bin/pip install -r /requirements.txt \
+    && apt remove -y g++ cargo git\
+    && apt autoremove -y \
+    && apt clean -y && rm -rf /var/lib/apt/lists/*
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /app/
@@ -16,10 +18,6 @@ WORKDIR /app/
 ADD . /app/
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
-RUN set -ex \
-    && python -m venv /venv \
-    && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /requirements.txt
 
 # uWSGI will listen on this port
 EXPOSE 8000
