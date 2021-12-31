@@ -503,7 +503,8 @@ def import_single_event_from_tractrac(event_id):
         event.save()
     
     device_map = None
-    if event_data['parameters'].get('stored-uri'):
+    mtb_url = event_data['parameters'].get('stored-uri')
+    if mtb_url and not mtb_url.startswith('tcp:') and '.mtb' in mtb_url:
         data_url = event_data['parameters'].get('stored-uri')
         if not data_url.startswith('http'):
             data_url = f'http:{data_url}'
