@@ -55,6 +55,7 @@ var browserLanguage = navigator.language.slice(0, 2)
 var supportedLanguages = {
   'en': "English",
   'fr': "Français",
+  'nl': "Nederlands",
   'fi': "Suomi"
 }
 var locale = window.localStorage.getItem('lang') || (Object.keys(supportedLanguages).includes(browserLanguage) ? browserLanguage : 'en')
@@ -62,8 +63,8 @@ const banana = new Banana()
 
 function updateText () {
     banana.setLocale(locale)
-    var langFile = staticRoot + 'i18n/club/event/' + locale + '.json'
-    return fetch(langFile+'?2021122700').then((response) => response.json()).then((messages) => {
+    var langFile = `${staticRoot}i18n/club/event/${locale}.json`
+    return fetch(`${langFile}?2022010100`).then((response) => response.json()).then((messages) => {
       banana.load(messages, banana.locale);      
     })
 }
