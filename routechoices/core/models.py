@@ -1199,6 +1199,11 @@ class SpotDevice(models.Model):
 
 class ChatMessage(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
+    uuid = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        unique=True
+    )
     ip_address = models.GenericIPAddressField()
     event = models.ForeignKey(Event, related_name='chat_messages', on_delete=models.CASCADE)
     nickname = models.CharField(max_length=20)
@@ -1218,17 +1223,11 @@ class ChatMessage(models.Model):
         hash_user.update(self.ip_address.encode('utf-8'))
         return safe64encode(hash_user.digest())
     
-    def preserialize(self):
+    def serialize(self):
         return {
+            'uuid': safe64encode(self.uuid.bytes),
             'nickname': self.nickname,
             'message': self.message,
             'timestamp': self.creation_date.timestamp(),
             'user_hash': self.user_hash()
         }
-
-    def serialize(self):
-        data = self.preserialize()
-        hash = hashlib.sha256()
-        hash.update(json.dumps(data))
-        data['hash'] = safe64encode(hash.digest())
-        return data
