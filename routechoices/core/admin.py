@@ -294,14 +294,16 @@ class DeviceAdmin(admin.ModelAdmin):
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
         'imei',
-        'device'
+        'device',
+        'creation_date',
     )
 
 
 class SpotDeviceAdmin(admin.ModelAdmin):
     list_display = (
         'messenger_id',
-        'device'
+        'device',
+        'creation_date',
     )
 
 
