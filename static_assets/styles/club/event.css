@@ -12,9 +12,9 @@
       top: 56px;
       bottom: 90px;
       left: 0;
-      z-index: 1000;
+      z-index: 10001;
       display: block;
-      padding: 20px;
+      padding: 5px;
       overflow-x: hidden;
       overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
       background-color: #f5f5f5;
