@@ -13,7 +13,7 @@ from routechoices.core.tasks import (
 
 
 class Command(BaseCommand):
-    help = 'Import race from tractrac.com'
+    help = 'Import race from livelox.com'
 
     def add_arguments(self, parser):
         parser.add_argument('event_ids', nargs='+', type=str)

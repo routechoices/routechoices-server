@@ -737,8 +737,8 @@ def draw_livelox_route(name, club, url, bound, routes, res):
         map_model.corners_coordinates = ','.join(coordinates)
         map_model.image.save('imported_image', img_blob, save=False)
         draw = ImageDraw.Draw(course)
-        circle_size = int(60 / res)
-        line_width = int(10 / res)
+        circle_size = int(60 * res)
+        line_width = int(10 * res)
         line_color = (128, 0, 128, 180)
         for route in routes:
             ctrls = [map_model.wsg84_to_map_xy(c['control']['position']['latitude'], c['control']['position']['longitude']) for c in route]
@@ -780,7 +780,7 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                     width=line_width
                 )
                 if i == (len(ctrls) - 2):
-                    inner_circle_size = int(45 / res)
+                    inner_circle_size = int(45 * res)
                     draw.ellipse(
                         [
                             int(pt_o[0] - inner_circle_size), int(pt_o[1] - inner_circle_size),
