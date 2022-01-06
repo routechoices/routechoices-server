@@ -854,8 +854,8 @@ def import_single_event_from_livelox(class_id):
             'name': event_name,
             'start_date': event_start,
             'end_date': event_end,
+            'map': map_model,
         },
-        map=map_model
     )
 
     #event.competitors.all().delete()
