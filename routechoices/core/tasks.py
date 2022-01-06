@@ -718,6 +718,19 @@ def import_single_event_from_otracker(event_id):
         )
 
 
+def distance(a, b):
+    R = 6373000
+    lat1 = math.radians(a['lat'])
+    lon1 = math.radians(a['lon'])
+    lat2 = math.radians(b['lat'])
+    lon2 = math.radians(b['lon'])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
+
 def draw_livelox_route(name, club, url, bound, routes, res):
     map_model, created = Map.objects.get_or_create(
         name=name,
@@ -737,8 +750,8 @@ def draw_livelox_route(name, club, url, bound, routes, res):
         map_model.corners_coordinates = ','.join(coordinates)
         map_model.image.save('imported_image', img_blob, save=False)
         draw = ImageDraw.Draw(course)
-        circle_size = 60
-        line_width = 10
+        circle_size = int(40 * res)
+        line_width = int(8 * res)
         line_color = (128, 0, 128, 180)
         for route in routes:
             ctrls = [map_model.wsg84_to_map_xy(c['control']['position']['latitude'], c['control']['position']['longitude']) for c in route]
@@ -780,7 +793,7 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                     width=line_width
                 )
                 if i == (len(ctrls) - 2):
-                    inner_circle_size = 45
+                    inner_circle_size = int(30 * res)
                     draw.ellipse(
                         [
                             int(pt_o[0] - inner_circle_size), int(pt_o[1] - inner_circle_size),
