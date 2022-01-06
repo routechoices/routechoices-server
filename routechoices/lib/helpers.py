@@ -24,6 +24,10 @@ def escape_filename(f):
     return f.replace('\\', '_').replace('"', '\\"')
 
 
+def safe32encode(b):
+    return base64.b32encode(b).decode().rstrip('=').lower()
+
+
 def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip('=')
 

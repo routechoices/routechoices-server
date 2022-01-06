@@ -370,6 +370,7 @@ admin.site.register(UserModel, MyUserAdmin)
 
 ADMIN_COMMAND_LIST = [
     'import_from_gpsseuranta',
+    'import_from_livelox',
     'import_from_loggator',
     'import_from_otracker',
     'import_from_sportrec',

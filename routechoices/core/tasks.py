@@ -6,15 +6,16 @@ import json
 from bs4 import BeautifulSoup
 
 from uuid import UUID
-from PIL import Image
+from PIL import Image, ImageDraw
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-
+from io import BytesIO
+import math
 from background_task import background
 
 from routechoices.core.models import Map, Event, Device, Competitor, Club
-from routechoices.lib.helpers import short_random_key, safe64encode, \
-    three_point_calibration_to_corners, compute_corners_from_kml_latlonbox
+from routechoices.lib.helpers import initial_of_name, short_random_key, safe32encode, \
+    three_point_calibration_to_corners, compute_corners_from_kml_latlonbox, project
 from routechoices.lib.mtb_decoder import MtbDecoder
 from routechoices.lib.tractrac_ws_decoder import TracTracWSReader
 
@@ -36,6 +37,20 @@ def get_gpsseuranta_club():
         slug='gpsseuranta',
         defaults={
             'name': 'GPS Seuranta'
+        }
+    )
+    if created:
+        club.admins.set(admins)
+        club.save()
+    return club
+
+
+def get_livelox_club():
+    admins = User.objects.filter(is_superuser=True)
+    club, created = Club.objects.get_or_create(
+        slug='livelox',
+        defaults={
+            'name': 'LiveLox'
         }
     )
     if created:
@@ -479,7 +494,7 @@ def import_single_event_from_tractrac(event_id):
         raise EventImportError('API returned error code')
     event_data = r.json()
     event_name = event_data['eventName'] + ' - ' + event_data['raceName']
-    slug = safe64encode(UUID(hex=event_data['raceId']).bytes)
+    slug = safe32encode(UUID(hex=event_data['raceId']).bytes)
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,
@@ -642,7 +657,7 @@ def import_single_event_from_otracker(event_id):
         raise EventImportError('API returned error code')
     event_data = r.json()
     ft = event_data['event']['replay_time']['from_ts']
-    slug = safe64encode(UUID(hex=event_id).bytes)
+    slug = safe32encode(UUID(hex=event_id).bytes)
     event, created = Event.objects.get_or_create(
         club=club,
         slug=slug,
@@ -700,4 +715,191 @@ def import_single_event_from_otracker(event_id):
             start_time=arrow.get(st).datetime,
             device=dev_model,
             event=event,
+        )
+
+
+def draw_livelox_route(name, club, url, bound, routes, res):
+    map_model, created = Map.objects.get_or_create(
+        name=name,
+        club=club,
+    )
+    if not created:
+        return map_model
+    r = requests.get(url)
+    if r.status_code != 200:
+        if created:
+            map_model.delete()
+        raise MapImportError('API returned error code')
+    img_blob = ContentFile(r.content)
+    with Image.open(img_blob).convert("RGBA") as img:
+        course = Image.new("RGBA", img.size, (255, 255, 255, 0))
+        coordinates = [f"{b['latitude']},{b['longitude']}" for b in bound[::-1]]
+        map_model.corners_coordinates = ','.join(coordinates)
+        map_model.image.save('imported_image', img_blob, save=False)
+        draw = ImageDraw.Draw(course)
+        circle_size = int(60 / res)
+        line_width = int(10 / res)
+        line_color = (128, 0, 128, 180)
+        for route in routes:
+            ctrls = [map_model.wsg84_to_map_xy(c['control']['position']['latitude'], c['control']['position']['longitude']) for c in route]
+            for i in range(len(ctrls) - 1):
+                if ctrls[i][0] == ctrls[i+1][0]:
+                    ctrls[i][0] -= 0.0001
+                start_from_a = ctrls[i][0] < ctrls[i+1][0]
+                pt_a = ctrls[i] if start_from_a else ctrls[i+1]
+                pt_b = ctrls[i] if not start_from_a else ctrls[i+1]
+                angle = math.atan((pt_b[1] - pt_a[1]) / (pt_b[0] - pt_a[0]))
+                if i == 0:
+                    pt_s = pt_a if start_from_a else pt_b
+                    draw.line(
+                        [
+                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle)),
+                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle + 2 * math.pi / 3)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle + 2 * math.pi / 3)),
+                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle - 2 * math.pi / 3)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle - 2 * math.pi / 3)),
+                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle))
+                        ],
+                        fill=line_color,
+                        width=line_width,
+                        joint='curve'
+                    )
+                draw.line(
+                    [
+                        int(pt_a[0] + circle_size * math.cos(angle)), int(pt_a[1] + circle_size * math.sin(angle)),
+                        int(pt_b[0] - circle_size * math.cos(angle)), int(pt_b[1] - circle_size * math.sin(angle))
+                    ],
+                    fill=line_color,
+                    width=line_width
+                )
+                pt_o = pt_b if start_from_a else pt_a
+                draw.ellipse(
+                    [
+                        int(pt_o[0] - circle_size), int(pt_o[1] - circle_size),
+                        int(pt_o[0] + circle_size), int(pt_o[1] + circle_size)
+                    ],
+                    outline=line_color,
+                    width=line_width
+                )
+                if i == (len(ctrls) - 2):
+                    inner_circle_size = int(45 / res)
+                    draw.ellipse(
+                        [
+                            int(pt_o[0] - inner_circle_size), int(pt_o[1] - inner_circle_size),
+                            int(pt_o[0] + inner_circle_size), int(pt_o[1] + inner_circle_size)
+                        ],
+                        outline=line_color,
+                        width=line_width
+                    )
+        out_buffer = BytesIO()
+        params = {
+            'dpi': (72, 72),
+        }
+        out = Image.alpha_composite(img, course)
+        out.save(out_buffer, 'PNG', **params)
+        out_buffer.seek(0)
+        f_new = ContentFile(out_buffer.read())
+        map_model.image.save('imported_image', f_new)
+    return map_model
+
+
+@background(schedule=0)
+def import_single_event_from_livelox(class_id):
+    club = get_livelox_club()
+    r = requests.post('https://www.livelox.com/Data/ClassBlob',
+        data={
+            "classIds":[class_id],
+            "courseIds": None,
+            "relayLegs": [],
+            "relayLegGroupIds": [],
+            "routeReductionProperties": {"distanceTolerance": 1,"speedTolerance": 0.1},
+            "includeMap": True,
+            "includeCourses": True,
+            "skipStoreInCache": False
+        }
+    )
+    if r.status_code != 200:
+        raise EventImportError('Can not fetch data')
+    data = r.json()
+    map_model = None
+    map_projection = None
+    try:
+        map_data = data['map']
+        map_url = map_data['url'];
+        map_bound = map_data['boundingQuadrilateral']['vertices']
+        map_resolution = map_data['resolution']
+        map_name = f"{map_data['name']} - {data['courses'][0]['name']}"
+        route_ctrls = [c['controls'] for c in data['courses']]
+        map_projection = data['map'].get('projection')
+        map_model = draw_livelox_route(map_name, club, map_url, map_bound, route_ctrls, map_resolution)
+    except Exception:
+        raise MapImportError('Could not import map')
+
+    participant_data = [d for d in data['participants'] if d.get('routeData')]
+    time_offset = 22089888e5
+
+    r = requests.post(
+        'https://www.livelox.com/Data/ClassInfo',
+        data={'classIds': [class_id], 'courseIds': [], 'relayLegs': [], 'relayLegGroupIds': []}
+
+    )
+    if r.status_code != 200:
+        raise EventImportError('Can not fetch event data')
+    event_data = r.json()
+    event_name = f"{event_data['general']['class']['event']['name']} - {event_data['general']['class']['name']}"
+    event_start = arrow.get(event_data['general']['class']['event']['timeInterval']['start']).datetime
+    event_end = arrow.get(event_data['general']['class']['event']['timeInterval']['end']).datetime
+    event, created = Event.objects.get_or_create(
+        club=club,
+        slug=f'{class_id}',
+        defaults={
+            'name': event_name,
+            'start_date': event_start,
+            'end_date': event_end,
+        },
+        map=map_model
+    )
+
+    #event.competitors.all().delete()
+    if not created:
+        return
+    
+    if map_projection:
+        matrix = map_projection['matrix'][0] + map_projection['matrix'][1] + map_projection['matrix'][2]
+
+    for p in participant_data:
+        lat = 0
+        lon = 0
+        t = -time_offset
+        pts = []
+        p_data = p['routeData'][1:]
+        min_t = None
+        for i in range((len(p_data) - 1) // 3):
+            t += p_data[3 * i]
+            lon += p_data[3 * i+1]
+            lat += p_data[3 * i+2]
+            min_t = t if not min_t else min(min_t, t)
+            if map_projection:
+                px, py = project(matrix, lon / 10, lat /10)
+                latlon = map_model.map_xy_to_wsg84(px, py)
+                pts.append({
+                    'timestamp': int(t/1e3),
+                    'latitude': latlon['lat'],
+                    'longitude': latlon['lon'],
+                })
+            else:
+                pts.append({
+                    'timestamp': int(t/1e3),
+                    'latitude': lat / 1e6,
+                    'longitude': lon / 1e6,
+                })
+        dev = Device.objects.create(aid=short_random_key() + '_LLX', is_gpx=True)
+        if pts:
+            dev.add_locations(pts)
+        c_name = f"{p.get('firstName')} {p.get('lastName')}"
+        c_sname = initial_of_name(c_name)
+        Competitor.objects.create(
+            name=c_name,
+            short_name=c_sname,
+            start_time=arrow.get(min_t).datetime,
+            event=event,
+            device=dev
         )
