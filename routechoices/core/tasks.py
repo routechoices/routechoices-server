@@ -50,7 +50,7 @@ def get_livelox_club():
     club, created = Club.objects.get_or_create(
         slug='livelox',
         defaults={
-            'name': 'LiveLox'
+            'name': 'Livelox'
         }
     )
     if created:
