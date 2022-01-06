@@ -723,8 +723,8 @@ def draw_livelox_route(name, club, url, bound, routes, res):
         name=name,
         club=club,
     )
-    if not created:
-        return map_model
+    #if not created:
+    #    return map_model
     r = requests.get(url)
     if r.status_code != 200:
         if created:
@@ -753,10 +753,10 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                     pt_s = pt_a if start_from_a else pt_b
                     draw.line(
                         [
-                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle)),
-                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle + 2 * math.pi / 3)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle + 2 * math.pi / 3)),
-                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle - 2 * math.pi / 3)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle - 2 * math.pi / 3)),
-                            int(pt_s[0] - (-1 * start_from_a) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 * start_from_a) * circle_size * math.sin(angle))
+                            int(pt_s[0] - (-1 if start_from_a else 1) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 if start_from_a else 1) * circle_size * math.sin(angle)),
+                            int(pt_s[0] - (-1 if start_from_a else 1) * circle_size * math.cos(angle + 2 * math.pi / 3)), int(pt_s[1] - (-1 if start_from_a else 1) * circle_size * math.sin(angle + 2 * math.pi / 3)),
+                            int(pt_s[0] - (-1 if start_from_a else 1) * circle_size * math.cos(angle - 2 * math.pi / 3)), int(pt_s[1] - (-1 if start_from_a else 1) * circle_size * math.sin(angle - 2 * math.pi / 3)),
+                            int(pt_s[0] - (-1 if start_from_a else 1) * circle_size * math.cos(angle)), int(pt_s[1] - (-1 if start_from_a else 1) * circle_size * math.sin(angle))
                         ],
                         fill=line_color,
                         width=line_width,
