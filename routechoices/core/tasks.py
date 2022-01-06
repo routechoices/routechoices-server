@@ -736,8 +736,8 @@ def draw_livelox_route(name, club, url, bound, routes, res):
         name=name,
         club=club,
     )
-    #if not created:
-    #    return map_model
+    if not created:
+        return map_model
     r = requests.get(url)
     if r.status_code != 200:
         if created:
