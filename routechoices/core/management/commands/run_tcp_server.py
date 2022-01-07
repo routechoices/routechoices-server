@@ -104,11 +104,7 @@ class TMT250Connection():
         except Exception:
             is_valid_imei = False
         if imei_len != len(imei) or not is_valid_imei:
-            print('invalid identification %s, %s, %d' % (
-                self.address,
-                imei,
-                imei_len
-            ))
+            print(f'invalid identification {self.address}, {imei}, {imei_len}')
             await self.stream.write(pack('b', 0))
             self.stream.close()
             return
@@ -206,11 +202,7 @@ class GL200Connection():
                         'PNL', 'NMR', 'DIS', 'DOG', 'IGL'):
                 imei = parts[2]
             elif parts[0] == '+ACK:GTHBD':
-                self.stream.write(
-                    (
-                        '+SACK:GTHBD,%s,%s$' % (parts[1], parts[5])
-                    ).encode('ascii')
-                )
+                self.stream.write(f'+SACK:GTHBD,{parts[1]},{parts[5]}$'.encode('ascii'))
                 imei = parts[2]
         except Exception as e:
             print(e)

@@ -27,7 +27,7 @@ class Command(BaseCommand):
                         parsed_url = urlparse(event_id)
                         event_id = parse_qs(parsed_url.query).get('classId')[0]
                     except Exception:
-                        self.stderr.write(f'Could not parse url')
+                        self.stderr.write('Could not parse url')
                 self.stdout.write(f'Importing event {event_id}')
                 if options['task']:
                     import_single_event_from_livelox(event_id)

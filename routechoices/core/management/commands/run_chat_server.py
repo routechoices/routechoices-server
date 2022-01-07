@@ -51,7 +51,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
         cookie = self.get_cookie(settings.SESSION_COOKIE_NAME)
         if not cookie:
             return None
-        class Dummy(object):
+        class Dummy:
             pass
 
         django_request = Dummy()

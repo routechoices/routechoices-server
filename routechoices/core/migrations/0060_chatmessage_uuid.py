@@ -22,10 +22,10 @@ class Migration(migrations.Migration):
             name='uuid',
             field=models.UUIDField(default=uuid.uuid4, editable=False, null=True),
         ),
-        migrations.RunPython(create_uuid),
+        migrations.RunPython(create_uuid, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='chatmessage',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-        )
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
+        ),
     ]
