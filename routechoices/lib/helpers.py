@@ -337,7 +337,7 @@ def distance_xy(ax, ay, bx, by):
 
 
 def distance_latlon(a, b):
-    R = 6373000
+    R = 6371009 # https://en.wikipedia.org/wiki/Great-circle_distance
     lat1 = math.radians(a['lat'])
     lon1 = math.radians(a['lon'])
     lat2 = math.radians(b['lat'])
