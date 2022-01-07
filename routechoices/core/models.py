@@ -55,7 +55,8 @@ from routechoices.lib.helpers import (
     random_device_id,
     short_random_slug,
     general_2d_projection,
-    adjugate_matrix, project, find_coeffs,
+    adjugate_matrix, project,
+    distance_latlon, distance_xy,
     delete_domain, time_base64, safe64encode
 )
 from routechoices.lib.storages import OverwriteImageStorage
@@ -423,6 +424,13 @@ class Map(models.Model):
     def map_xy_to_wsg84(self, x, y):
         mx, my = self.map_xy_to_spherical_mercator(x, y)
         return GLOBAL_MERCATOR.meters_to_latlon({'x': mx, 'y': my})
+
+    @property
+    def resolution(self):
+        """ Return map image resolution in pixels/meters """
+        ll_a = self.map_xy_to_wsg84(0, 0)
+        ll_b = self.map_xy_to_wsg84(self.width, self.height)
+        return distance_xy(0, 0, self.width, self.height) / distance_latlon(ll_a, ll_b)
 
     def create_tile(self, output_width, output_height,
                     min_lat, max_lat, min_lon, max_lon, format):

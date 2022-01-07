@@ -718,19 +718,6 @@ def import_single_event_from_otracker(event_id):
         )
 
 
-def distance(a, b):
-    R = 6373000
-    lat1 = math.radians(a['lat'])
-    lon1 = math.radians(a['lon'])
-    lat2 = math.radians(b['lat'])
-    lon2 = math.radians(b['lon'])
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c
-
-
 def draw_livelox_route(name, club, url, bound, routes, res):
     map_model, created = Map.objects.get_or_create(
         name=name,

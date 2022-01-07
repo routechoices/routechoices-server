@@ -7,6 +7,7 @@ import numpy
 import os
 import os.path
 import time
+import math
 
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
@@ -329,3 +330,20 @@ def delete_domain(domain):
     for file in (ngx_conf, crt_file, key_file, act_file):
         if os.path.exists(file):
             os.remove(file)
+
+
+def distance_xy(ax, ay, bx, by):
+    return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
+
+
+def distance_latlon(a, b):
+    R = 6373000
+    lat1 = math.radians(a['lat'])
+    lon1 = math.radians(a['lon'])
+    lat2 = math.radians(b['lat'])
+    lon2 = math.radians(b['lon'])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
