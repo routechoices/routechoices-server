@@ -318,6 +318,7 @@ class MapAdmin(admin.ModelAdmin):
         'name',
         'club',
         'creation_date',
+        'resolution',
     )
     list_filter = ('club', )
 
