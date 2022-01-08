@@ -106,7 +106,7 @@ $(function() {
 
     map = L.map('map', {
       center: [15, 0],
-      maxZoom: 17,
+      maxZoom: 18,
       minZoom: 1,
       zoom: 3,
       zoomControl: false,
