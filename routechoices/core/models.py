@@ -4,6 +4,7 @@ import datetime
 from decimal import Decimal
 from io import BytesIO
 import logging
+import math
 import hashlib
 from operator import itemgetter
 import orjson as json
@@ -431,6 +432,11 @@ class Map(models.Model):
         ll_a = self.map_xy_to_wsg84(0, 0)
         ll_b = self.map_xy_to_wsg84(self.width, self.height)
         return distance_xy(0, 0, self.width, self.height) / distance_latlon(ll_a, ll_b)
+
+    @property
+    def max_zoom(self):
+        r = self.resolution / 1.193
+        return math.ceil(math.log2(r)) + 18
 
     def create_tile(self, output_width, output_height,
                     min_lat, max_lat, min_lon, max_lon, format):
