@@ -319,6 +319,7 @@ class MapAdmin(admin.ModelAdmin):
         'club',
         'creation_date',
         'resolution',
+        'max_zoom',
     )
     list_filter = ('club', )
 
