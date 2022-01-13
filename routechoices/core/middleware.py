@@ -5,7 +5,7 @@ from re import compile
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
-from django.urls import NoReverseMatch, get_urlconf, set_urlconf
+from django.urls import get_urlconf, set_urlconf
 from django_hosts.middleware import HostsBaseMiddleware
 
 from routechoices.core.models import Club
@@ -133,7 +133,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if ":" in raw_host:
             raw_host = raw_host[: raw_host.rfind(":")]
         request.use_cname = False
-        if not raw_host.endswith(default_domain) and not raw_host in (
+        if not raw_host.endswith(default_domain) and raw_host not in (
             "localhost",
             "127.0.0.1",
         ):
@@ -173,7 +173,7 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
         if ":" in raw_host:
             raw_host = raw_host[: raw_host.rfind(":")]
         request.use_cname = False
-        if not raw_host.endswith(default_domain) and not raw_host in (
+        if not raw_host.endswith(default_domain) and raw_host not in (
             "localhost",
             "127.0.0.1",
         ):

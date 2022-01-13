@@ -2,7 +2,6 @@ import json
 import math
 import tempfile
 from io import BytesIO
-from os import EX_CANTCREAT
 from uuid import UUID
 
 import arrow
@@ -502,7 +501,7 @@ def import_single_event_from_tractrac(event_id):
             lf.flush()
             try:
                 device_map = MtbDecoder(lf.name).decode()
-            except:
+            except Exception:
                 if not event_data["parameters"].get("ws-uri"):
                     event.delete()
                     raise EventImportError("Could not decode mtb")
@@ -518,7 +517,7 @@ def import_single_event_from_tractrac(event_id):
                 + "?snapping=false"
             )
             device_map = TracTracWSReader().read_data(url)
-        except:
+        except Exception:
             event.delete()
             raise EventImportError("Could not decode ws data")
 

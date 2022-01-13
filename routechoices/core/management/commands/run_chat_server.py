@@ -1,5 +1,4 @@
 import asyncio
-import urllib
 from importlib import import_module
 
 import orjson as json
@@ -110,7 +109,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                 )()
                 if not is_admin:
                     raise tornado.web.HTTPError(403)
-        if not event_id in EVENT_CHAT_STREAMS.keys():
+        if event_id not in EVENT_CHAT_STREAMS.keys():
             EVENT_CHAT_STREAMS[event_id] = []
         EVENT_CHAT_STREAMS[event_id].append(self)
         old_messages = await sync_to_async(

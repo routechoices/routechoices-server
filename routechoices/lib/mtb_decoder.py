@@ -42,8 +42,8 @@ class MtbDecoder:
         return str(UUID(bytes=d))
 
     def get_string_nn(self):
-        l = self.get_int32()
-        return self.fp.read(l)
+        string_len = self.get_int32()
+        return self.fp.read(string_len)
 
     def skip_uuid(self):
         self.fp.read(16)
@@ -183,16 +183,16 @@ class MtbDecoder:
                 t = self.fp.read(1)
                 n -= 1
                 if b"\x03" == t or b"\x01" == t:
-                    e = self.get_int32() + 2147483648
+                    self.get_int32()
                     n -= 4
                 else:
-                    e = self.get_int64()
+                    self.get_int64()
                     n -= 8
                 if b"\x02" == t or b"\x03" == t:
-                    s = 1e3 * (self.get_int32() + 2147483648)
+                    self.get_int32()
                     n -= 4
                 else:
-                    s = self.get_int64()
+                    self.get_int64()
                     n -= 8
                 self.skip_bytes(28)
                 n -= 28

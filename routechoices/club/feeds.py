@@ -1,8 +1,4 @@
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
-from django.shortcuts import redirect
-from django_hosts.resolvers import reverse
 
 from routechoices.core.models import PRIVACY_PUBLIC, Club, Event
 
@@ -12,11 +8,9 @@ class ClubLiveEventsFeed(Feed):
         return Club.objects.get(slug__iexact=request.club_slug)
 
     def title(self, obj):
-        site = Site.objects.get(id=settings.SITE_ID)
         return f"Live GPS Events by {obj.name}"
 
     def description(self, obj):
-        site = Site.objects.get(id=settings.SITE_ID)
         return f"Events by {obj.name}"
 
     def link(self, obj):

@@ -1,9 +1,6 @@
-from io import BytesIO
 from urllib.parse import parse_qs, urlparse
 
-import requests
 from django.core.management.base import BaseCommand
-from PIL import Image
 
 from routechoices.core.tasks import EventImportError, import_single_event_from_livelox
 

@@ -2,26 +2,26 @@
 import random
 
 
-def getperm(l):
-    seed = sum([ord(a) for a in l])
+def getperm(word):
+    seed = sum([ord(a) for a in word])
     random.seed(seed)
-    perm = list(range(len(l)))
+    perm = list(range(len(word)))
     random.shuffle(perm)
     random.seed()  # optional, in order to not impact other code based on random
     return perm
 
 
-def shuffle(l):
-    perm = getperm(l)
-    j = [l[j] for j in perm]
+def shuffle(word):
+    perm = getperm(word)
+    j = [word[j] for j in perm]
     return "".join(j)
 
 
-def unshuffle(l):
-    perm = getperm(l)
-    res = [None] * len(l)
+def unshuffle(word):
+    perm = getperm(word)
+    res = [None] * len(word)
     for i, j in enumerate(perm):
-        res[j] = l[i]
+        res[j] = word[i]
     j = res
     return "".join(j)
 

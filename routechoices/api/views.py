@@ -41,7 +41,7 @@ from routechoices.core.models import (
     Map,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import escape_filename, initial_of_name, safe64encode
+from routechoices.lib.helpers import escape_filename, initial_of_name
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.validators import validate_imei
 

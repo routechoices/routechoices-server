@@ -246,7 +246,7 @@ class DeviceAdmin(admin.ModelAdmin):
             .annotate(competitor_count=Count("competitor_set"))
             .annotate(
                 last_position_at=RawSQL(
-                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp.*[,\[](\d+)]'))[1]",
+                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp.*[,\\[](\\d+)]'))[1]",
                     (),
                 )
             )

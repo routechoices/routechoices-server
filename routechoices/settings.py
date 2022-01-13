@@ -861,6 +861,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 try:
-    from .local_settings import *
+    from .local_settings import *  # noqa: F403, F401
 except ImportError:
     pass

@@ -13,7 +13,6 @@ from django.core.files import File
 from django.core.paginator import Paginator
 from django.dispatch import receiver
 from django.http import Http404
-from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from routechoices.api.views import serve_from_s3
@@ -100,7 +99,7 @@ def device_list_view(request):
     )
     last_usage = {}
     for competitor in competitors:
-        if not competitor.device_id in last_usage.keys():
+        if competitor.device_id not in last_usage.keys():
             last_usage[competitor.device_id] = f"{competitor.event} ({competitor})"
             if len(last_usage.keys()) == len(devices_listed):
                 break

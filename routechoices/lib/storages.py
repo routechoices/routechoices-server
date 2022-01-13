@@ -1,7 +1,6 @@
 import gzip
 import shutil
 
-from django.core.files.base import File
 from django_s3_storage.storage import S3File, S3Storage, _wrap_errors
 
 

@@ -13,6 +13,7 @@ repos:
     -   id: check-added-large-files
     -   id: check-json
     -   id: check-merge-conflict
+    -   id: check-case-conflict
 -   repo: https://github.com/psf/black
     rev: 21.12b0
     hooks:
@@ -21,3 +22,7 @@ repos:
     rev: 5.10.1
     hooks:
     - id: isort
+-   repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+    -   id: flake8

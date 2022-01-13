@@ -1,6 +1,5 @@
 from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator

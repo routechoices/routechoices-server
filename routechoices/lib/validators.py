@@ -1,4 +1,3 @@
-import os
 import re
 from decimal import Decimal
 
@@ -28,11 +27,13 @@ def validate_imei(number):
 
 
 def validate_esn(number):
-    """Check if the number provided is a valid IMEI number."""
+    """Check if the number provided is a valid ESN number."""
     try:
         matched = re.match(r"^\d-\d{7}$", number)
     except Exception:
         raise ValidationError("Invalid ESN")
+    if not matched:
+        raise ValidationError(_("Invalid ESN"))
 
 
 def validate_latitude(value):
