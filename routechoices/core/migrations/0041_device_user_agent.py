@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0040_device_modification_date'),
+        ("core", "0040_device_modification_date"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='device',
-            name='user_agent',
+            model_name="device",
+            name="user_agent",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

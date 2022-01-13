@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0012_auto_20190326_0948'),
+        ("core", "0012_auto_20190326_0948"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='open_registration',
-            field=models.BooleanField(default=False, help_text='Participants can register themselves to the event through a webpage.'),
+            model_name="event",
+            name="open_registration",
+            field=models.BooleanField(
+                default=False,
+                help_text="Participants can register themselves to the event through a webpage.",
+            ),
         ),
     ]

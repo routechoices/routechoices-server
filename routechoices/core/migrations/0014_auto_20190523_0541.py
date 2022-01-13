@@ -6,18 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0013_event_open_registration'),
+        ("core", "0013_event_open_registration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='device',
-            name='is_gpx',
+            model_name="device",
+            name="is_gpx",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='event',
-            name='allow_route_upload',
-            field=models.BooleanField(default=False, help_text='Participants can register themselves to the event through a webpage.'),
+            model_name="event",
+            name="allow_route_upload",
+            field=models.BooleanField(
+                default=False,
+                help_text="Participants can register themselves to the event through a webpage.",
+            ),
         ),
     ]

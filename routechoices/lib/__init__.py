@@ -6,6 +6,5 @@ def true(r):
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
-
     def enforce_csrf(self, request):
-        return  False
+        return False

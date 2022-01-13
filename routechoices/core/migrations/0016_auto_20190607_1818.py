@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('core', '0015_auto_20190607_1525'),
+        ("core", "0015_auto_20190607_1525"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='deviceownership',
-            unique_together={('device', 'user')},
+            name="deviceownership",
+            unique_together={("device", "user")},
         ),
     ]

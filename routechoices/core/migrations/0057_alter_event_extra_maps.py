@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0056_alter_event_backdrop_map'),
+        ("core", "0056_alter_event_backdrop_map"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='extra_maps',
-            field=models.ManyToManyField(related_name='+', through='core.MapAssignation', to='core.Map'),
+            model_name="event",
+            name="extra_maps",
+            field=models.ManyToManyField(
+                related_name="+", through="core.MapAssignation", to="core.Map"
+            ),
         ),
     ]

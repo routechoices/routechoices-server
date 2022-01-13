@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_auto_20190201_0757'),
+        ("core", "0003_auto_20190201_0757"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='competitor',
-            options={'ordering': ['start_time', 'name'], 'verbose_name': 'competitor', 'verbose_name_plural': 'competitors'},
+            name="competitor",
+            options={
+                "ordering": ["start_time", "name"],
+                "verbose_name": "competitor",
+                "verbose_name_plural": "competitors",
+            },
         ),
     ]

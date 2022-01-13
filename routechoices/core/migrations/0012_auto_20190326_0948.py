@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0011_event_privacy'),
+        ("core", "0011_event_privacy"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='competitor',
-            name='start_time',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Start time (UTC)'),
+            model_name="competitor",
+            name="start_time",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Start time (UTC)"
+            ),
         ),
     ]

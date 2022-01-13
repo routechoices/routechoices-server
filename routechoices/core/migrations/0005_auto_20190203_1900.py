@@ -11,29 +11,50 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0004_auto_20190201_1324'),
+        ("core", "0004_auto_20190201_1324"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='device',
-            name='creation_date',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="device",
+            name="creation_date",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='club',
-            name='slug',
-            field=models.CharField(max_length=50, unique=True, validators=[routechoices.lib.validators.validate_nice_slug]),
+            model_name="club",
+            name="slug",
+            field=models.CharField(
+                max_length=50,
+                unique=True,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+            ),
         ),
         migrations.AlterField(
-            model_name='device',
-            name='aid',
-            field=models.CharField(default=routechoices.lib.helpers.short_random_key, max_length=12, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')]),
+            model_name="device",
+            name="aid",
+            field=models.CharField(
+                default=routechoices.lib.helpers.short_random_key,
+                max_length=12,
+                unique=True,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        re.compile("^[-a-zA-Z0-9_]+\\Z"),
+                        "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                        "invalid",
+                    )
+                ],
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='slug',
-            field=models.CharField(db_index=True, max_length=50, validators=[routechoices.lib.validators.validate_nice_slug]),
+            model_name="event",
+            name="slug",
+            field=models.CharField(
+                db_index=True,
+                max_length=50,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+            ),
         ),
     ]

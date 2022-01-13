@@ -7,13 +7,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0042_club_description'),
+        ("core", "0042_club_description"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='club',
-            name='domain',
-            field=models.CharField(blank=True, default='', max_length=128, validators=[django.core.validators.RegexValidator('^([a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}$', 'Please enter a valid domain')]),
+            model_name="club",
+            name="domain",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=128,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        "^([a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}$",
+                        "Please enter a valid domain",
+                    )
+                ],
+            ),
         ),
     ]

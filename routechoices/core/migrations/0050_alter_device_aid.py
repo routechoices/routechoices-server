@@ -9,13 +9,24 @@ import routechoices.lib.helpers
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0049_alter_spotfeed_feed_id'),
+        ("core", "0049_alter_spotfeed_feed_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='device',
-            name='aid',
-            field=models.CharField(default=routechoices.lib.helpers.random_device_id, max_length=12, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
+            model_name="device",
+            name="aid",
+            field=models.CharField(
+                default=routechoices.lib.helpers.random_device_id,
+                max_length=12,
+                unique=True,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        re.compile("^[-a-zA-Z0-9_]+\\Z"),
+                        "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                        "invalid",
+                    )
+                ],
+            ),
         ),
     ]

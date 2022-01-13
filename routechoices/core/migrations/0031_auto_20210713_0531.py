@@ -9,29 +9,39 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0030_auto_20210303_1805'),
+        ("core", "0030_auto_20210303_1805"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='end_date',
-            field=models.DateTimeField(default=datetime.datetime(2099, 12, 31, 23, 59, 59, 999), verbose_name='End Date (UTC) (*)'),
+            model_name="event",
+            name="end_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(2099, 12, 31, 23, 59, 59, 999),
+                verbose_name="End Date (UTC) (*)",
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='event',
-            name='name',
-            field=models.CharField(max_length=255, verbose_name='name (*)'),
+            model_name="event",
+            name="name",
+            field=models.CharField(max_length=255, verbose_name="name (*)"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='slug',
-            field=models.CharField(db_index=True, default=routechoices.lib.helpers.short_random_slug, help_text='This is used to build the url of this event', max_length=50, validators=[routechoices.lib.validators.validate_nice_slug], verbose_name='Slug (*)'),
+            model_name="event",
+            name="slug",
+            field=models.CharField(
+                db_index=True,
+                default=routechoices.lib.helpers.short_random_slug,
+                help_text="This is used to build the url of this event",
+                max_length=50,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+                verbose_name="Slug (*)",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='start_date',
-            field=models.DateTimeField(verbose_name='Start Date (UTC) (*)'),
+            model_name="event",
+            name="start_date",
+            field=models.DateTimeField(verbose_name="Start Date (UTC) (*)"),
         ),
     ]

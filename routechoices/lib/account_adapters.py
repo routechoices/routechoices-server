@@ -12,6 +12,7 @@ class NoNewUsersAccountAdapter(DefaultAccountAdapter):
         """
         return False
 
+
 class SiteAccountAdapter(DefaultAccountAdapter):
     def is_safe_url(self, url):
         try:
@@ -21,4 +22,6 @@ class SiteAccountAdapter(DefaultAccountAdapter):
                 is_safe_url as url_has_allowed_host_and_scheme,
             )
 
-        return url_has_allowed_host_and_scheme(url, allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS)
+        return url_has_allowed_host_and_scheme(
+            url, allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS
+        )

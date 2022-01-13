@@ -1,1 +1,1 @@
-default_app_config = 'routechoices.core.apps.CoreConfig'
+default_app_config = "routechoices.core.apps.CoreConfig"

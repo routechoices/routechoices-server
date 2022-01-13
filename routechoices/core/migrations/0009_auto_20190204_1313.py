@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0008_auto_20190204_0823'),
+        ("core", "0008_auto_20190204_0823"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='competitor',
-            name='start_time',
+            model_name="competitor",
+            name="start_time",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AlterUniqueTogether(
-            name='event',
-            unique_together={('club', 'slug'), ('club', 'name')},
+            name="event",
+            unique_together={("club", "slug"), ("club", "name")},
         ),
     ]

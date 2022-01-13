@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0058_alter_club_slug'),
+        ("core", "0058_alter_club_slug"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='chatmessage',
-            options={'ordering': ['-creation_date'], 'verbose_name': 'chat message', 'verbose_name_plural': 'chat messages'},
+            name="chatmessage",
+            options={
+                "ordering": ["-creation_date"],
+                "verbose_name": "chat message",
+                "verbose_name_plural": "chat messages",
+            },
         ),
     ]

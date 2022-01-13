@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0048_spotdevice_spotfeed'),
+        ("core", "0048_spotdevice_spotfeed"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='spotfeed',
-            name='feed_id',
+            model_name="spotfeed",
+            name="feed_id",
             field=models.CharField(max_length=64, unique=True),
         ),
     ]

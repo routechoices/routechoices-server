@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0041_device_user_agent'),
+        ("core", "0041_device_user_agent"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='club',
-            name='description',
-            field=models.TextField(blank=True, default='# GPS tracking powered by routechoices.com\n        \nBrowse our events here.\n        ', help_text='This text will be displayed on your site frontpage, use markdown formatting'),
+            model_name="club",
+            name="description",
+            field=models.TextField(
+                blank=True,
+                default="# GPS tracking powered by routechoices.com\n        \nBrowse our events here.\n        ",
+                help_text="This text will be displayed on your site frontpage, use markdown formatting",
+            ),
         ),
     ]

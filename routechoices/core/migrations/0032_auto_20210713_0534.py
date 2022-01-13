@@ -7,18 +7,23 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0031_auto_20210713_0531'),
+        ("core", "0031_auto_20210713_0531"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='club',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='events', to='core.club', verbose_name='Club (*)'),
+            model_name="event",
+            name="club",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="events",
+                to="core.club",
+                verbose_name="Club (*)",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='name',
-            field=models.CharField(max_length=255, verbose_name='Name (*)'),
+            model_name="event",
+            name="name",
+            field=models.CharField(max_length=255, verbose_name="Name (*)"),
         ),
     ]

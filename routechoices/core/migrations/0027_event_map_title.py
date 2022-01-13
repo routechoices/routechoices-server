@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0026_auto_20210206_0815'),
+        ("core", "0026_auto_20210206_0815"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='map_title',
-            field=models.CharField(blank=True, default='', help_text='Leave blank if you are not using extra maps', max_length=255),
+            model_name="event",
+            name="map_title",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Leave blank if you are not using extra maps",
+                max_length=255,
+            ),
         ),
     ]

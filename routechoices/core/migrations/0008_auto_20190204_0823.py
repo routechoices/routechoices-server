@@ -7,13 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0007_auto_20190203_2159'),
+        ("core", "0007_auto_20190203_2159"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='map',
-            field=models.ForeignKey(blank=True, help_text='Pick a map from the club organizing', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='core.Map'),
+            model_name="event",
+            name="map",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Pick a map from the club organizing",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="core.Map",
+            ),
         ),
     ]

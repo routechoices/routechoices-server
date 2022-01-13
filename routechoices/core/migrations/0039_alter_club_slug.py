@@ -7,13 +7,18 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0038_auto_20210713_0756'),
+        ("core", "0038_auto_20210713_0756"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='slug',
-            field=models.CharField(help_text='This is used in the urls of your events', max_length=50, unique=True, validators=[routechoices.lib.validators.validate_domain_slug]),
+            model_name="club",
+            name="slug",
+            field=models.CharField(
+                help_text="This is used in the urls of your events",
+                max_length=50,
+                unique=True,
+                validators=[routechoices.lib.validators.validate_domain_slug],
+            ),
         ),
     ]

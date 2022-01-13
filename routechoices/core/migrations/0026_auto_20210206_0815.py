@@ -8,23 +8,39 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0025_auto_20210129_1442'),
+        ("core", "0025_auto_20210129_1442"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='slug',
-            field=models.CharField(help_text='This will be used in the urls', max_length=50, unique=True, validators=[routechoices.lib.validators.validate_nice_slug]),
+            model_name="club",
+            name="slug",
+            field=models.CharField(
+                help_text="This will be used in the urls",
+                max_length=50,
+                unique=True,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='map',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='core.map'),
+            model_name="event",
+            name="map",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="core.map",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='slug',
-            field=models.CharField(db_index=True, help_text='This will be used in the url', max_length=50, validators=[routechoices.lib.validators.validate_nice_slug]),
+            model_name="event",
+            name="slug",
+            field=models.CharField(
+                db_index=True,
+                help_text="This will be used in the url",
+                max_length=50,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+            ),
         ),
     ]

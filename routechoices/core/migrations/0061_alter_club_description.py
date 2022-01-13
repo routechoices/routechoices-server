@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0060_chatmessage_uuid'),
+        ("core", "0060_chatmessage_uuid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='description',
-            field=models.TextField(blank=True, default='# GPS tracking powered by routechoices.com\n\nBrowse our events here.', help_text='This text will be displayed on your site frontpage, use markdown formatting'),
+            model_name="club",
+            name="description",
+            field=models.TextField(
+                blank=True,
+                default="# GPS tracking powered by routechoices.com\n\nBrowse our events here.",
+                help_text="This text will be displayed on your site frontpage, use markdown formatting",
+            ),
         ),
     ]

@@ -16,10 +16,10 @@ class LiveEventsFeed(Feed):
         return f"Events on {site.name}"
 
     def link(self):
-        return reverse('site:events_view')
+        return reverse("site:events_view")
 
     def items(self):
-        return Event.objects.select_related('club').filter(
+        return Event.objects.select_related("club").filter(
             privacy=PRIVACY_PUBLIC,
         )[:25]
 
@@ -27,7 +27,7 @@ class LiveEventsFeed(Feed):
         return item.name
 
     def item_description(self, item):
-        return f'Live GPS Tracking of {item.name} by {item.club}'
+        return f"Live GPS Tracking of {item.name} by {item.club}"
 
     def item_pubdate(self, item):
         return item.start_date

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0027_event_map_title'),
+        ("core", "0027_event_map_title"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='mapassignation',
-            unique_together={('map', 'event'), ('event', 'title')},
+            name="mapassignation",
+            unique_together={("map", "event"), ("event", "title")},
         ),
     ]

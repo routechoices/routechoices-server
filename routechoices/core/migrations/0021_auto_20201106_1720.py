@@ -9,32 +9,44 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('core', '0020_auto_20201001_0944'),
+        ("core", "0020_auto_20201001_0944"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='creator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="club",
+            name="creator",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='competitor',
-            name='device',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='competitor_set', to='core.device'),
+            model_name="competitor",
+            name="device",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="competitor_set",
+                to="core.device",
+            ),
         ),
         migrations.AlterField(
-            model_name='competitor',
-            name='short_name',
-            field=models.CharField(default='X', max_length=32),
+            model_name="competitor",
+            name="short_name",
+            field=models.CharField(default="X", max_length=32),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='device',
-            name='locations_raw',
-            field=models.TextField(blank=True, default=''),
+            model_name="device",
+            name="locations_raw",
+            field=models.TextField(blank=True, default=""),
         ),
         migrations.DeleteModel(
-            name='Location',
+            name="Location",
         ),
     ]

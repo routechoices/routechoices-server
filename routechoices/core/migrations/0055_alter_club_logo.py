@@ -8,13 +8,21 @@ import routechoices.lib.storages
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0054_club_logo'),
+        ("core", "0054_club_logo"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='logo',
-            field=models.ImageField(blank=True, help_text='Square image of width greater or equal to 128px', null=True, storage=routechoices.lib.storages.OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'), upload_to=routechoices.core.models.logo_upload_path),
+            model_name="club",
+            name="logo",
+            field=models.ImageField(
+                blank=True,
+                help_text="Square image of width greater or equal to 128px",
+                null=True,
+                storage=routechoices.lib.storages.OverwriteImageStorage(
+                    aws_s3_bucket_name="routechoices-maps"
+                ),
+                upload_to=routechoices.core.models.logo_upload_path,
+            ),
         ),
     ]

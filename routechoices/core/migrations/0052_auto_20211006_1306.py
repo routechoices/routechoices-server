@@ -7,24 +7,42 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0051_alter_map_image'),
+        ("core", "0051_alter_map_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='allow_live_chat',
-            field=models.BooleanField(default=False, help_text='Spectator will have a chat enabled during the live.'),
+            model_name="event",
+            name="allow_live_chat",
+            field=models.BooleanField(
+                default=False,
+                help_text="Spectator will have a chat enabled during the live.",
+            ),
         ),
         migrations.CreateModel(
-            name='ChatMessage',
+            name="ChatMessage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(auto_now_add=True)),
-                ('ip_address', models.GenericIPAddressField()),
-                ('username', models.CharField(max_length=20)),
-                ('message', models.CharField(max_length=100)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chat_messages', to='core.event')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("creation_date", models.DateTimeField(auto_now_add=True)),
+                ("ip_address", models.GenericIPAddressField()),
+                ("username", models.CharField(max_length=20)),
+                ("message", models.CharField(max_length=100)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="chat_messages",
+                        to="core.event",
+                    ),
+                ),
             ],
         ),
     ]

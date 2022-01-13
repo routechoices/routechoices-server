@@ -6,13 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0055_alter_club_logo'),
+        ("core", "0055_alter_club_logo"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='backdrop_map',
-            field=models.CharField(choices=[('blank', 'Blank'), ('osm', 'Open Street Map'), ('gmap-street', 'Google Map Street'), ('gmap-hybrid', 'Google Map Satellite'), ('mapant-fi', 'Mapant Finland'), ('mapant-no', 'Mapant Norway'), ('mapant-es', 'Mapant Spain'), ('topo-fi', 'Topo Finland'), ('topo-no', 'Topo Norway'), ('topo-world', 'Topo World')], default='blank', max_length=16),
+            model_name="event",
+            name="backdrop_map",
+            field=models.CharField(
+                choices=[
+                    ("blank", "Blank"),
+                    ("osm", "Open Street Map"),
+                    ("gmap-street", "Google Map Street"),
+                    ("gmap-hybrid", "Google Map Satellite"),
+                    ("mapant-fi", "Mapant Finland"),
+                    ("mapant-no", "Mapant Norway"),
+                    ("mapant-es", "Mapant Spain"),
+                    ("topo-fi", "Topo Finland"),
+                    ("topo-no", "Topo Norway"),
+                    ("topo-world", "Topo World"),
+                ],
+                default="blank",
+                max_length=16,
+            ),
         ),
     ]

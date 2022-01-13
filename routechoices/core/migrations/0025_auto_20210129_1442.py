@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0024_auto_20210128_1128'),
+        ("core", "0024_auto_20210128_1128"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='mapassignation',
-            options={'ordering': ['id']},
+            name="mapassignation",
+            options={"ordering": ["id"]},
         ),
     ]

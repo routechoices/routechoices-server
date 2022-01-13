@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0046_alter_event_backdrop_map'),
+        ("core", "0046_alter_event_backdrop_map"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='event',
-            options={'ordering': ['-start_date', 'name'], 'verbose_name': 'event', 'verbose_name_plural': 'events'},
+            name="event",
+            options={
+                "ordering": ["-start_date", "name"],
+                "verbose_name": "event",
+                "verbose_name_plural": "events",
+            },
         ),
     ]

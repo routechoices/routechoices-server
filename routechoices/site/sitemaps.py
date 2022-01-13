@@ -8,21 +8,21 @@ class StaticViewSitemap(Sitemap):
     protocol = "https"
 
     def get_domain(self, site=None):
-        return ''
+        return ""
 
     def items(self):
         return [
-            'site:home_view',
-            'site:trackers_view',
-            'site:contact_view',
-            'site:pricing_view',
-            'site:tos_view',
-            'site:privacy_policy_view',
+            "site:home_view",
+            "site:trackers_view",
+            "site:contact_view",
+            "site:pricing_view",
+            "site:tos_view",
+            "site:privacy_policy_view",
         ]
 
     def location(self, item):
         path = reverse(item)
-        if path.startswith('//'):
+        if path.startswith("//"):
             return path[2:]
         return path
 
@@ -33,15 +33,15 @@ class DynamicViewSitemap(Sitemap):
     protocol = "https"
 
     def get_domain(self, site=None):
-        return ''
+        return ""
 
     def items(self):
         return [
-            'site:events_view',
+            "site:events_view",
         ]
 
     def location(self, item):
         path = reverse(item)
-        if path.startswith('//'):
+        if path.startswith("//"):
             return path[2:]
         return path

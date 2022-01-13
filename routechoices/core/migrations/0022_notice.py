@@ -7,17 +7,39 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0021_auto_20201106_1720'),
+        ("core", "0021_auto_20201106_1720"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notice',
+            name="Notice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('modification_date', models.DateTimeField(auto_now=True)),
-                ('text', models.CharField(blank=True, help_text='This will be displayed one the event page.', max_length=280)),
-                ('event', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='notice', to='core.event')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("modification_date", models.DateTimeField(auto_now=True)),
+                (
+                    "text",
+                    models.CharField(
+                        blank=True,
+                        help_text="This will be displayed one the event page.",
+                        max_length=280,
+                    ),
+                ),
+                (
+                    "event",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notice",
+                        to="core.event",
+                    ),
+                ),
             ],
         ),
     ]

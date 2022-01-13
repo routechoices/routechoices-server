@@ -9,33 +9,45 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0032_auto_20210713_0534'),
+        ("core", "0032_auto_20210713_0534"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='club',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='events', to='core.club', verbose_name='Club*'),
+            model_name="event",
+            name="club",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="events",
+                to="core.club",
+                verbose_name="Club*",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='end_date',
-            field=models.DateTimeField(verbose_name='End Date (UTC)*'),
+            model_name="event",
+            name="end_date",
+            field=models.DateTimeField(verbose_name="End Date (UTC)*"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='name',
-            field=models.CharField(max_length=255, verbose_name='Name*'),
+            model_name="event",
+            name="name",
+            field=models.CharField(max_length=255, verbose_name="Name*"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='slug',
-            field=models.CharField(db_index=True, default=routechoices.lib.helpers.short_random_slug, help_text='This is used to build the url of this event', max_length=50, validators=[routechoices.lib.validators.validate_nice_slug], verbose_name='Slug*'),
+            model_name="event",
+            name="slug",
+            field=models.CharField(
+                db_index=True,
+                default=routechoices.lib.helpers.short_random_slug,
+                help_text="This is used to build the url of this event",
+                max_length=50,
+                validators=[routechoices.lib.validators.validate_nice_slug],
+                verbose_name="Slug*",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='start_date',
-            field=models.DateTimeField(verbose_name='Start Date (UTC)*'),
+            model_name="event",
+            name="start_date",
+            field=models.DateTimeField(verbose_name="Start Date (UTC)*"),
         ),
     ]

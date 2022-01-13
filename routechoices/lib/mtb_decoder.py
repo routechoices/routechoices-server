@@ -1,7 +1,8 @@
 import struct
 from uuid import UUID
 
-class MtbDecoder():
+
+class MtbDecoder:
     def __init__(self, filename):
         self.device_map = {}
         self.filename = filename
@@ -10,31 +11,31 @@ class MtbDecoder():
         d = self.fp.read(4)
         if not d:
             return None
-        return struct.unpack('>f', d)[0]
+        return struct.unpack(">f", d)[0]
 
     def get_double(self):
         d = self.fp.read(8)
         if not d:
             return None
-        return struct.unpack('>d', d)[0]
+        return struct.unpack(">d", d)[0]
 
     def get_int16(self):
         d = self.fp.read(2)
         if not d:
             return None
-        return struct.unpack('>h', d)[0]
+        return struct.unpack(">h", d)[0]
 
     def get_int32(self):
         d = self.fp.read(4)
         if not d:
             return None
-        return struct.unpack('>i', d)[0]
+        return struct.unpack(">i", d)[0]
 
     def get_int64(self):
         d = self.fp.read(8)
         if not d:
             return None
-        return struct.unpack('>q', d)[0]
+        return struct.unpack(">q", d)[0]
 
     def get_uuid(self):
         d = self.fp.read(16)
@@ -57,7 +58,7 @@ class MtbDecoder():
         self.fp.read(n)
 
     def decode(self):
-        with open(self.filename, 'rb') as fp:
+        with open(self.filename, "rb") as fp:
             self.fp = fp
             while True:
                 self.current_size = self.get_int32()
@@ -71,10 +72,10 @@ class MtbDecoder():
                 elif t == 6:
                     self.read_race_sequence_type()
                 elif not t:
-                    print('done')
+                    print("done")
                     break
                 else:
-                    raise Exception('Bad Format')
+                    raise Exception("Bad Format")
         return self.device_map
 
     def read_event_latest_type(self):
@@ -85,7 +86,7 @@ class MtbDecoder():
         elif t == 37:
             self.fp.read(self.current_size - 20)
         else:
-            raise Exception('Bad format')
+            raise Exception("Bad format")
 
     def read_event_sequence_type(self):
         self.skip_uuid()
@@ -97,13 +98,13 @@ class MtbDecoder():
                 a -= 4
                 e = self.fp.read(1)
                 a -= 1
-                if b'\x01' == e or b'\x03' == e:
+                if b"\x01" == e or b"\x03" == e:
                     self.get_int32()
                     a -= 4
                 else:
                     self.get_int64()
                     a -= 8
-                if b'\x02' == e or b'\x03' == e:
+                if b"\x02" == e or b"\x03" == e:
                     self.get_int32()
                     a -= 4
                 else:
@@ -111,7 +112,7 @@ class MtbDecoder():
                     a -= 8
                 self.skip_bytes(36)
         else:
-            raise Exception('Bad Format')
+            raise Exception("Bad Format")
 
     def read_race_latest_type(self):
         self.skip_bytes(32)
@@ -135,7 +136,7 @@ class MtbDecoder():
         elif t == 36:
             self.skip_bytes(44)
         elif t == 37:
-            self.skip_bytes(self.current_size-36)
+            self.skip_bytes(self.current_size - 36)
         elif t == 39:
             c = self.current_size - 36
             while c > 0:
@@ -149,7 +150,7 @@ class MtbDecoder():
                     self.skip_bytes(16)
                     c -= 16
         else:
-            raise Exception('Bad Format')
+            raise Exception("Bad Format")
 
     def read_route(self):
         c = 0
@@ -181,13 +182,13 @@ class MtbDecoder():
                 r = n
                 t = self.fp.read(1)
                 n -= 1
-                if b'\x03' == t or b'\x01' == t:
+                if b"\x03" == t or b"\x01" == t:
                     e = self.get_int32() + 2147483648
                     n -= 4
                 else:
                     e = self.get_int64()
                     n -= 8
-                if b'\x02' == t or b'\x03' == t:
+                if b"\x02" == t or b"\x03" == t:
                     s = 1e3 * (self.get_int32() + 2147483648)
                     n -= 4
                 else:
@@ -198,11 +199,11 @@ class MtbDecoder():
                 h = self.get_string_nn()
                 n -= len(h) + 4
                 self.get_int16()
-                n -= 2,
+                n -= (2,)
                 self.skip_bytes(i - (r - n))
                 n -= i - (r - n)
         else:
-            raise Exception('Bad Format')
+            raise Exception("Bad Format")
 
     def read_competitor_data(self, t):
         h = self.current_size - 36
@@ -213,13 +214,13 @@ class MtbDecoder():
             h -= 4
             s = self.fp.read(1)
             h -= 1
-            if b'\x03' == s or b'\x01' == s:
+            if b"\x03" == s or b"\x01" == s:
                 r = self.get_int32() + 2147483648
                 h -= 4
             else:
                 r = self.get_int64()
                 h -= 8
-            if b'\x02' == s or b'\x03' == s:
+            if b"\x02" == s or b"\x03" == s:
                 a = 1e3 * (self.get_int32() + 2147483648)
                 h -= 4
             else:
@@ -235,15 +236,15 @@ class MtbDecoder():
 
     def read_position(self, t, e):
         s = {
-            'longitude': self.get_int32() / 1e7,
-            'latitude': self.get_int32() / 1e7,
-            'height': self.get_float(),
-            'speed': self.get_int16() / 10,
-            'direction': self.get_int16() / 10,
-            'm': None,
-            'timestamp': int(t/1e3)
+            "longitude": self.get_int32() / 1e7,
+            "latitude": self.get_int32() / 1e7,
+            "height": self.get_float(),
+            "speed": self.get_int16() / 10,
+            "direction": self.get_int16() / 10,
+            "m": None,
+            "timestamp": int(t / 1e3),
         }
-        s['m'] = self.get_double() if e else None
+        s["m"] = self.get_double() if e else None
         return s
 
     def add_position(self, id, t, p):

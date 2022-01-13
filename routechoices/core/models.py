@@ -42,23 +42,27 @@ from PIL import Image, ImageDraw
 import cv2
 
 from routechoices.lib.validators import (
-     validate_domain_slug,
-     validate_nice_slug,
-     validate_latitude,
-     validate_longitude,
-     validate_corners_coordinates,
-     validate_imei,
-     validate_esn,
-     domain_validator,
+    validate_domain_slug,
+    validate_nice_slug,
+    validate_latitude,
+    validate_longitude,
+    validate_corners_coordinates,
+    validate_imei,
+    validate_esn,
+    domain_validator,
 )
 from routechoices.lib.helpers import (
     random_key,
     random_device_id,
     short_random_slug,
     general_2d_projection,
-    adjugate_matrix, project,
-    distance_latlon, distance_xy,
-    delete_domain, time_base64, safe64encode
+    adjugate_matrix,
+    project,
+    distance_latlon,
+    distance_xy,
+    delete_domain,
+    time_base64,
+    safe64encode,
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -67,7 +71,8 @@ from routechoices.lib.globalmaptiles import GlobalMercator
 logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
-UTC_TZ = zoneinfo.ZoneInfo('UTC')
+UTC_TZ = zoneinfo.ZoneInfo("UTC")
+
 
 class Point:
     def __init__(self, x, y=None):
@@ -75,23 +80,22 @@ class Point:
             self.x = x[0]
             self.y = x[1]
         elif isinstance(x, dict):
-            self.x = x.get('x')
-            self.y = x.get('y')
+            self.x = x.get("x")
+            self.y = x.get("y")
         else:
             self.x = x
             self.y = y
 
     def __repr__(self):
-        return f'x: {self.x}, y:{self.y}'
+        return f"x: {self.x}, y:{self.y}"
 
 
 def logo_upload_path(instance=None, file_name=None):
     import os.path
-    tmp_path = [
-        'logos'
-    ]
+
+    tmp_path = ["logos"]
     time_hash = time_base64()
-    basename = instance.aid + '_' + time_hash
+    basename = instance.aid + "_" + time_hash
     tmp_path.append(basename[0])
     tmp_path.append(basename[1])
     tmp_path.append(basename)
@@ -100,54 +104,58 @@ def logo_upload_path(instance=None, file_name=None):
 
 class Club(models.Model):
     aid = models.CharField(
-         default=random_key,
-         max_length=12,
-         editable=False,
-         unique=True,
+        default=random_key,
+        max_length=12,
+        editable=False,
+        unique=True,
     )
     creator = models.ForeignKey(
-         User,
-         related_name='+',
-         blank=True,
-         null=True,
-         on_delete=models.SET_NULL,
+        User,
+        related_name="+",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255, unique=True)
     slug = models.CharField(
         max_length=50,
-        validators=[validate_domain_slug, ],
+        validators=[
+            validate_domain_slug,
+        ],
         unique=True,
-        help_text='.routechoices.com'
+        help_text=".routechoices.com",
     )
     admins = models.ManyToManyField(User)
     description = models.TextField(
         blank=True,
-        default='''# GPS tracking powered by routechoices.com
+        default="""# GPS tracking powered by routechoices.com
 
-Browse our events here.''',
-        help_text='This text will be displayed on your site frontpage, use markdown formatting'
+Browse our events here.""",
+        help_text="This text will be displayed on your site frontpage, use markdown formatting",
     )
     domain = models.CharField(
         max_length=128,
         blank=True,
-        default='',
-        validators=[domain_validator, ]
+        default="",
+        validators=[
+            domain_validator,
+        ],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
     logo = models.ImageField(
         upload_to=logo_upload_path,
         null=True,
         blank=True,
-        help_text='Square image of width greater or equal to 128px',
-        storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),
+        help_text="Square image of width greater or equal to 128px",
+        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
     )
 
     class Meta:
-        ordering = ['name']
-        verbose_name = 'club'
-        verbose_name_plural = 'clubs'
+        ordering = ["name"]
+        verbose_name = "club"
+        verbose_name_plural = "clubs"
 
     def __str__(self):
         return self.name
@@ -159,7 +167,9 @@ Browse our events here.''',
     def use_https(self):
         is_secure = True
         if self.domain:
-            cert_path = os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{self.domain}.crt')
+            cert_path = os.path.join(
+                settings.BASE_DIR, "nginx", "certs", f"{self.domain}.crt"
+            )
             is_secure = os.path.exists(cert_path)
         return is_secure
 
@@ -172,9 +182,7 @@ Browse our events here.''',
         if self.domain:
             return f"{self.url_protocol}://{self.domain}/"
         path = reverse(
-            'club_view',
-            host='clubs',
-            host_kwargs={'club_slug': self.slug.lower()}
+            "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
         )
         return f"{self.url_protocol}:{path}"
 
@@ -184,7 +192,7 @@ Browse our events here.''',
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
-            raise ValidationError('Club with this slug already exists.')
+            raise ValidationError("Club with this slug already exists.")
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -197,7 +205,7 @@ Browse our events here.''',
         return super().save(*args, **kwargs)
 
 
-@receiver(pre_delete, sender=Club, dispatch_uid='club_delete_signal')
+@receiver(pre_delete, sender=Club, dispatch_uid="club_delete_signal")
 def delete_club_receiver(sender, instance, using, **kwargs):
     if instance.domain:
         delete_domain(instance.domain)
@@ -205,11 +213,10 @@ def delete_club_receiver(sender, instance, using, **kwargs):
 
 def map_upload_path(instance=None, file_name=None):
     import os.path
-    tmp_path = [
-        'maps'
-    ]
+
+    tmp_path = ["maps"]
     time_hash = time_base64()
-    basename = instance.aid + '_' + time_hash
+    basename = instance.aid + "_" + time_hash
     tmp_path.append(basename[0])
     tmp_path.append(basename[1])
     tmp_path.append(basename)
@@ -225,24 +232,16 @@ class Map(models.Model):
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
-    club = models.ForeignKey(
-        Club,
-        related_name='maps',
-        on_delete=models.CASCADE
-    )
+    club = models.ForeignKey(Club, related_name="maps", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     image = models.ImageField(
         upload_to=map_upload_path,
         max_length=255,
-        height_field='height',
-        width_field='width',
-        storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),
+        height_field="height",
+        width_field="width",
+        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
     )
-    height = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        editable=False
-    )
+    height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     width = models.PositiveIntegerField(
         null=True,
         blank=True,
@@ -250,19 +249,19 @@ class Map(models.Model):
     )
     corners_coordinates = models.CharField(
         max_length=255,
-        help_text='Latitude and longitude of map corners separated by commas '
-        'in following order Top Left, Top right, Bottom Right, Bottom left. '
-        'eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073',
-        validators=[validate_corners_coordinates]
+        help_text="Latitude and longitude of map corners separated by commas "
+        "in following order Top Left, Top right, Bottom Right, Bottom left. "
+        "eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073",
+        validators=[validate_corners_coordinates],
     )
 
     class Meta:
-        ordering = ['-creation_date']
-        verbose_name = 'map'
-        verbose_name_plural = 'maps'
+        ordering = ["-creation_date"]
+        verbose_name = "map"
+        verbose_name_plural = "maps"
 
     def __str__(self):
-        return f'{self.name} ({self.club})'
+        return f"{self.name} ({self.club})"
 
     @property
     def path(self):
@@ -270,14 +269,14 @@ class Map(models.Model):
 
     @property
     def data(self):
-        with self.image.open('rb') as fp:
+        with self.image.open("rb") as fp:
             data = fp.read()
         return data
 
     @property
     def corners_coordinates_short(self):
-        coords = ','.join(
-            [str(round(Decimal(x), 5)) for x in self.corners_coordinates.split(',')]
+        coords = ",".join(
+            [str(round(Decimal(x), 5)) for x in self.corners_coordinates.split(",")]
         )
         return coords
 
@@ -286,7 +285,7 @@ class Map(models.Model):
         doc_img = self.data
         mime_type = magic.from_buffer(doc_img, mime=True)
         ext = mime_type[6:]
-        doc_kml = f'''<?xml version="1.0" encoding="utf-8"?>
+        doc_kml = f"""<?xml version="1.0" encoding="utf-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"
      xmlns:gx="http://www.google.com/kml/ext/2.2">
   <Document>
@@ -307,18 +306,18 @@ class Map(models.Model):
       </GroundOverlay>
     </Folder>
   </Document>
-</kml>'''
+</kml>"""
         kmz = BytesIO()
-        with ZipFile(kmz, 'w') as fp:
-            with fp.open('doc.kml', 'w') as file1:
-                file1.write(doc_kml.encode('utf-8'))
-            with fp.open(f'files/doc.{ext}', 'w') as file2:
+        with ZipFile(kmz, "w") as fp:
+            with fp.open("doc.kml", "w") as file1:
+                file1.write(doc_kml.encode("utf-8"))
+            with fp.open(f"files/doc.{ext}", "w") as file2:
                 file2.write(doc_img)
         return kmz.getbuffer()
 
     @property
     def mime_type(self):
-        with self.image.storage.open(self.image.name, mode='rb', nbytes=2048) as fp:
+        with self.image.storage.open(self.image.name, mode="rb", nbytes=2048) as fp:
             data = fp.read()
             return magic.from_buffer(data, mime=True)
 
@@ -326,36 +325,34 @@ class Map(models.Model):
     def data_uri(self):
         data = self.data
         mime_type = magic.from_buffer(data, mime=True)
-        return f'data:{mime_type};base64,{base64.b64encode(data).decode()}'
+        return f"data:{mime_type};base64,{base64.b64encode(data).decode()}"
 
     @data_uri.setter
     def data_uri(self, value):
         if not value:
-            raise ValueError('Value can not be null')
+            raise ValueError("Value can not be null")
         data_matched = re.match(
-            r'^data:image/(?P<format>jpeg|png|gif);base64,'
-            r'(?P<data_b64>(?:[A-Za-z0-9+/]{4})*'
-            r'(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$',
-            value
+            r"^data:image/(?P<format>jpeg|png|gif);base64,"
+            r"(?P<data_b64>(?:[A-Za-z0-9+/]{4})*"
+            r"(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$",
+            value,
         )
         if data_matched:
             self.image.save(
-                'filename',
-                ContentFile(
-                    base64.b64decode(data_matched.group('data_b64'))
-                ),
-                save=False
+                "filename",
+                ContentFile(base64.b64decode(data_matched.group("data_b64"))),
+                save=False,
             )
             self.image.close()
         else:
-            raise ValueError('Not a base 64 encoded data URI of an image')
+            raise ValueError("Not a base 64 encoded data URI of an image")
 
     @property
     def thumbnail(self):
-        orig = self.image.open('rb').read()
+        orig = self.image.open("rb").read()
         img = Image.open(BytesIO(orig))
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
+        if img.mode != "RGB":
+            img = img.convert("RGB")
         img = img.transform(
             (1200, 630),
             Image.QUAD,
@@ -367,35 +364,47 @@ class Map(models.Model):
                 int(self.width) / 2 + 300,
                 int(self.height) / 2 + 157,
                 int(self.width) / 2 + 300,
-                int(self.height) / 2 - 158
-            )
+                int(self.height) / 2 - 158,
+            ),
         )
         return img
 
     @property
     def size(self):
-        return {'width': self.width, 'height': self.height}
+        return {"width": self.width, "height": self.height}
 
     @property
     def alignment_points(self):
         r1_a = Point(0, 0)
-        r1_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['topLeft']))
+        r1_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topLeft"]))
         r2_a = Point(0, self.height)
-        r2_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['bottomLeft']))
+        r2_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomLeft"]))
         r3_a = Point(self.width, 0)
-        r3_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['topRight']))
+        r3_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topRight"]))
         r4_a = Point(self.width, self.height)
-        r4_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound['bottomRight']))
+        r4_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomRight"]))
         return r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b
 
     @property
     def matrix_3d(self):
         r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b = self.alignment_points
         m = general_2d_projection(
-            r1_a.x, r1_a.y, r1_b.x, r1_b.y,
-            r2_a.x, r2_a.y, r2_b.x, r2_b.y,
-            r3_a.x, r3_a.y, r3_b.x, r3_b.y,
-            r4_a.x, r4_a.y, r4_b.x, r4_b.y
+            r1_a.x,
+            r1_a.y,
+            r1_b.x,
+            r1_b.y,
+            r2_a.x,
+            r2_a.y,
+            r2_b.x,
+            r2_b.y,
+            r3_a.x,
+            r3_a.y,
+            r3_b.x,
+            r3_b.y,
+            r4_a.x,
+            r4_a.y,
+            r4_b.x,
+            r4_b.y,
         )
         if not m[8]:
             return
@@ -418,16 +427,16 @@ class Map(models.Model):
         return lambda x, y: project(self.matrix_3d_inverse, x, y)
 
     def wsg84_to_map_xy(self, lat, lon):
-        xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': lat, 'lon': lon})
-        return self.spherical_mercator_to_map_xy(xy['x'], xy['y'])
+        xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": lat, "lon": lon})
+        return self.spherical_mercator_to_map_xy(xy["x"], xy["y"])
 
     def map_xy_to_wsg84(self, x, y):
         mx, my = self.map_xy_to_spherical_mercator(x, y)
-        return GLOBAL_MERCATOR.meters_to_latlon({'x': mx, 'y': my})
+        return GLOBAL_MERCATOR.meters_to_latlon({"x": mx, "y": my})
 
     @property
     def resolution(self):
-        """ Return map image resolution in pixels/meters """
+        """Return map image resolution in pixels/meters"""
         ll_a = self.map_xy_to_wsg84(0, 0)
         ll_b = self.map_xy_to_wsg84(self.width, self.height)
         return distance_xy(0, 0, self.width, self.height) / distance_latlon(ll_a, ll_b)
@@ -437,11 +446,12 @@ class Map(models.Model):
         r = self.resolution / 1.193
         return math.ceil(math.log2(r)) + 18
 
-    def create_tile(self, output_width, output_height,
-                    min_lat, max_lat, min_lon, max_lon, format):
-        cache_key = f'tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{format}'
+    def create_tile(
+        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, format
+    ):
+        cache_key = f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{format}"
 
-        use_cache = getattr(settings, 'CACHE_TILES', False)
+        use_cache = getattr(settings, "CACHE_TILES", False)
         cached = None
         if use_cache:
             try:
@@ -451,47 +461,51 @@ class Map(models.Model):
         if use_cache and cached:
             return cached
 
-        img_out = Image.new('RGBA', (output_width, output_height), (255, 255, 255, 0))
+        img_out = Image.new("RGBA", (output_width, output_height), (255, 255, 255, 0))
 
         if not self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
             return img_out
 
-        r_w = (max_lon - min_lon)/output_width
-        r_h = (max_lat - min_lat)/output_height
+        r_w = (max_lon - min_lon) / output_width
+        r_h = (max_lat - min_lat) / output_height
 
         tl = self.map_xy_to_spherical_mercator(0, 0)
         tr = self.map_xy_to_spherical_mercator(self.width, 0)
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
 
-        p1 = np.float32([
-            [0, 0],
-            [self.width, 0],
-            [self.width, self.height],
-            [0, self.height],
-        ])
-        p2 = np.float32([
-            [(tl[0] - min_lon)/r_w, (max_lat - tl[1])/r_h],
-            [(tr[0] - min_lon)/r_w, (max_lat - tr[1])/r_h],
-            [(br[0] - min_lon)/r_w, (max_lat - br[1])/r_h],
-            [(bl[0] - min_lon)/r_w, (max_lat - bl[1])/r_h],
-        ])
+        p1 = np.float32(
+            [
+                [0, 0],
+                [self.width, 0],
+                [self.width, self.height],
+                [0, self.height],
+            ]
+        )
+        p2 = np.float32(
+            [
+                [(tl[0] - min_lon) / r_w, (max_lat - tl[1]) / r_h],
+                [(tr[0] - min_lon) / r_w, (max_lat - tr[1]) / r_h],
+                [(br[0] - min_lon) / r_w, (max_lat - br[1]) / r_h],
+                [(bl[0] - min_lon) / r_w, (max_lat - bl[1]) / r_h],
+            ]
+        )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
-        orig = self.image.open('rb').read()
+        orig = self.image.open("rb").read()
         self.image.close()
         img = cv2.imdecode(np.frombuffer(BytesIO(orig).getbuffer(), np.uint8), -1)
         img_alpha = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-        tile_img = cv2.warpPerspective(
-            img_alpha, coeffs, (output_width, output_height)
-        )
+        tile_img = cv2.warpPerspective(img_alpha, coeffs, (output_width, output_height))
         extra_args = []
-        if format == 'image/webp':
+        if format == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
-        _, buffer = cv2.imencode('.png' if format == 'image/png' else '.webp', tile_img, extra_args)
+        _, buffer = cv2.imencode(
+            ".png" if format == "image/png" else ".webp", tile_img, extra_args
+        )
         data_out = BytesIO(buffer).getvalue()
         if use_cache:
             try:
-                cache.set(cache_key, data_out, 3600*24*30)
+                cache.set(cache_key, data_out, 3600 * 24 * 30)
             except Exception:
                 pass
         return data_out
@@ -502,7 +516,7 @@ class Map(models.Model):
                 (min_lon, min_lat),
                 (min_lon, max_lat),
                 (max_lon, max_lat),
-                (max_lon, min_lat ),
+                (max_lon, min_lat),
                 (min_lon, min_lat),
             )
         )
@@ -522,7 +536,7 @@ class Map(models.Model):
         if self.image.closed:
             self.image.open()
         with Image.open(self.image.file) as image:
-            rgba_img = image.convert('RGBA')
+            rgba_img = image.convert("RGBA")
             MAX = 3000
             if image.size[0] > MAX and image.size[1] > MAX:
                 scale = MAX / min(image.size[0], image.size[1])
@@ -533,13 +547,13 @@ class Map(models.Model):
             rgb_img = Image.new("RGB", rgba_img.size, (255, 255, 255))
             rgb_img.paste(rgba_img, mask=rgba_img.split()[3])
             params = {
-                'dpi': (72, 72),
-                'quality': 60,
+                "dpi": (72, 72),
+                "quality": 60,
             }
-            rgb_img.save(out_buffer, 'JPEG', **params)
+            rgb_img.save(out_buffer, "JPEG", **params)
             f_new = File(out_buffer, name=self.image.name)
             self.image.save(
-                'filename',
+                "filename",
                 f_new,
                 save=False,
             )
@@ -548,18 +562,18 @@ class Map(models.Model):
     @property
     def hash(self):
         h = hashlib.sha256()
-        h.update(self.path.encode('utf-8'))
-        h.update(self.corners_coordinates.encode('utf-8'))
+        h.update(self.path.encode("utf-8"))
+        h.update(self.corners_coordinates.encode("utf-8"))
         return safe64encode(h.digest())
 
     @property
     def bound(self):
-        coords = [float(x) for x in self.corners_coordinates.split(',')]
+        coords = [float(x) for x in self.corners_coordinates.split(",")]
         return {
-            'topLeft': {'lat': coords[0], 'lon': coords[1]},
-            'topRight': {'lat': coords[2], 'lon': coords[3]},
-            'bottomRight': {'lat': coords[4], 'lon': coords[5]},
-            'bottomLeft': {'lat': coords[6], 'lon': coords[7]},
+            "topLeft": {"lat": coords[0], "lon": coords[1]},
+            "topRight": {"lat": coords[2], "lon": coords[3]},
+            "bottomRight": {"lat": coords[4], "lon": coords[5]},
+            "bottomLeft": {"lat": coords[6], "lon": coords[7]},
         }
 
     @classmethod
@@ -579,109 +593,116 @@ class Map(models.Model):
             min_lon = min(min_lon, min(lons))
             max_lon = max(max_lon, max(lons))
 
-        tl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': min_lon})
-        tr_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': max_lat, 'lon': max_lon})
-        br_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': max_lon})
-        bl_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': min_lat, 'lon': min_lon})
+        tl_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": max_lat, "lon": min_lon})
+        tr_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": max_lat, "lon": max_lon})
+        br_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": max_lon})
+        bl_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": min_lon})
 
         MAX = 2000
         offset = 30
-        width = tr_xy['x'] - tl_xy['x'] + offset * 2
-        height = tr_xy['y'] - br_xy['y'] + offset * 2
+        width = tr_xy["x"] - tl_xy["x"] + offset * 2
+        height = tr_xy["y"] - br_xy["y"] + offset * 2
 
         scale = 1
         if width > MAX or height > MAX:
             scale = max(width, height) / MAX
 
-        tl_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tl_xy['x'] - offset*scale, 'y': tl_xy['y'] + offset*scale})
-        tr_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tr_xy['x'] + offset*scale, 'y': tr_xy['y'] + offset*scale})
-        br_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': br_xy['x'] + offset*scale, 'y': br_xy['y'] - offset*scale})
-        bl_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': bl_xy['x'] - offset*scale, 'y': bl_xy['y'] - offset*scale})
+        tl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
+            {"x": tl_xy["x"] - offset * scale, "y": tl_xy["y"] + offset * scale}
+        )
+        tr_latlon = GLOBAL_MERCATOR.meters_to_latlon(
+            {"x": tr_xy["x"] + offset * scale, "y": tr_xy["y"] + offset * scale}
+        )
+        br_latlon = GLOBAL_MERCATOR.meters_to_latlon(
+            {"x": br_xy["x"] + offset * scale, "y": br_xy["y"] - offset * scale}
+        )
+        bl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
+            {"x": bl_xy["x"] - offset * scale, "y": bl_xy["y"] - offset * scale}
+        )
 
         new_map.corners_coordinates = f"{tl_latlon['lat']},{tl_latlon['lon']},{tr_latlon['lat']},{tr_latlon['lon']},{br_latlon['lat']},{br_latlon['lon']},{bl_latlon['lat']},{bl_latlon['lon']}"
-        im = Image.new('RGBA', (int(width / scale), int(height / scale)), (255, 255, 255, 0))
+        im = Image.new(
+            "RGBA", (int(width / scale), int(height / scale)), (255, 255, 255, 0)
+        )
         new_map.width = int(width / scale)
         new_map.height = int(height / scale)
         draw = ImageDraw.Draw(im)
         for pts in seg:
             map_pts = [new_map.wsg84_to_map_xy(pt[0], pt[1]) for pt in pts]
-            draw.line(map_pts, (255, 0, 0, 200), 15, joint='curve')
-            draw.line(map_pts, (255, 255, 255, 200), 10, joint='curve')
+            draw.line(map_pts, (255, 0, 0, 200), 15, joint="curve")
+            draw.line(map_pts, (255, 255, 255, 200), 10, joint="curve")
 
         out_buffer = BytesIO()
-        im.save(out_buffer, 'PNG', dpi=(300, 300))
+        im.save(out_buffer, "PNG", dpi=(300, 300))
         f_new = File(out_buffer)
         new_map.image.save(
-            'filename',
+            "filename",
             f_new,
             save=False,
         )
         return new_map
 
-PRIVACY_PUBLIC = 'public'
-PRIVACY_SECRET = 'secret'
-PRIVACY_PRIVATE = 'private'
+
+PRIVACY_PUBLIC = "public"
+PRIVACY_SECRET = "secret"
+PRIVACY_PRIVATE = "private"
 PRIVACY_CHOICES = (
-    (PRIVACY_PUBLIC, 'Public'),
-    (PRIVACY_SECRET, 'Secret'),
-    (PRIVACY_PRIVATE, 'Private'),
+    (PRIVACY_PUBLIC, "Public"),
+    (PRIVACY_SECRET, "Secret"),
+    (PRIVACY_PRIVATE, "Private"),
 )
 
-MAP_BLANK = 'blank'
-MAP_OSM = 'osm'
-MAP_GOOGLE_STREET = 'gmap-street'
-MAP_GOOGLE_SAT = 'gmap-hybrid'
-MAP_MAPANT_FI = 'mapant-fi'
-MAP_MAPANT_NO = 'mapant-no'
-MAP_MAPANT_ES = 'mapant-es'
-MAP_TOPO_FI = 'topo-fi'
-MAP_TOPO_NO = 'topo-no'
-MAP_TOPO_WRLD = 'topo-world'
+MAP_BLANK = "blank"
+MAP_OSM = "osm"
+MAP_GOOGLE_STREET = "gmap-street"
+MAP_GOOGLE_SAT = "gmap-hybrid"
+MAP_MAPANT_FI = "mapant-fi"
+MAP_MAPANT_NO = "mapant-no"
+MAP_MAPANT_ES = "mapant-es"
+MAP_TOPO_FI = "topo-fi"
+MAP_TOPO_NO = "topo-no"
+MAP_TOPO_WRLD = "topo-world"
 
 MAP_CHOICES = (
-    (MAP_BLANK, 'Blank'),
-    (MAP_OSM, 'Open Street Map'),
-    (MAP_GOOGLE_STREET, 'Google Map Street'),
-    (MAP_GOOGLE_SAT, 'Google Map Satellite'),
-    (MAP_MAPANT_FI, 'Mapant Finland'),
-    (MAP_MAPANT_NO, 'Mapant Norway'),
-    (MAP_MAPANT_ES, 'Mapant Spain'),
-    (MAP_TOPO_FI, 'Topo Finland'),
-    (MAP_TOPO_NO, 'Topo Norway'),
-    (MAP_TOPO_WRLD, 'Topo World'),
+    (MAP_BLANK, "Blank"),
+    (MAP_OSM, "Open Street Map"),
+    (MAP_GOOGLE_STREET, "Google Map Street"),
+    (MAP_GOOGLE_SAT, "Google Map Satellite"),
+    (MAP_MAPANT_FI, "Mapant Finland"),
+    (MAP_MAPANT_NO, "Mapant Norway"),
+    (MAP_MAPANT_ES, "Mapant Spain"),
+    (MAP_TOPO_FI, "Topo Finland"),
+    (MAP_TOPO_NO, "Topo Norway"),
+    (MAP_TOPO_WRLD, "Topo World"),
 )
 
 
 class Event(models.Model):
     aid = models.CharField(
-         default=random_key,
-         max_length=12,
-         editable=False,
-         unique=True,
+        default=random_key,
+        max_length=12,
+        editable=False,
+        unique=True,
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
-         Club,
-         verbose_name='Club',
-         related_name='events',
-         on_delete=models.CASCADE
+        Club, verbose_name="Club", related_name="events", on_delete=models.CASCADE
     )
-    name = models.CharField(
-        verbose_name='Name',
-        max_length=255
-    )
+    name = models.CharField(verbose_name="Name", max_length=255)
     slug = models.CharField(
-        verbose_name='Slug',
+        verbose_name="Slug",
         max_length=50,
-        validators=[validate_nice_slug, ],
+        validators=[
+            validate_nice_slug,
+        ],
         db_index=True,
-        help_text='This is used to build the url of this event',
+        help_text="This is used to build the url of this event",
         default=short_random_slug,
     )
-    start_date = models.DateTimeField(verbose_name='Start Date (UTC)')
+    start_date = models.DateTimeField(verbose_name="Start Date (UTC)")
     end_date = models.DateTimeField(
-        verbose_name='End Date (UTC)',
+        verbose_name="End Date (UTC)",
     )
     privacy = models.CharField(
         max_length=8,
@@ -695,7 +716,7 @@ class Event(models.Model):
     )
     map = models.ForeignKey(
         Map,
-        related_name='+',
+        related_name="+",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -703,14 +724,14 @@ class Event(models.Model):
     map_title = models.CharField(
         max_length=255,
         blank=True,
-        default='',
-        help_text='Leave blank if you are not using extra maps',
+        default="",
+        help_text="Leave blank if you are not using extra maps",
     )
     extra_maps = models.ManyToManyField(
         Map,
-        through='MapAssignation',
-        related_name='+',
-        through_fields=('event', 'map'),
+        through="MapAssignation",
+        related_name="+",
+        through_fields=("event", "map"),
     )
     open_registration = models.BooleanField(
         default=False,
@@ -726,28 +747,28 @@ class Event(models.Model):
     )
 
     class Meta:
-        ordering = ['-start_date', 'name']
-        unique_together = (('club', 'slug'), ('club', 'name'))
-        verbose_name = 'event'
-        verbose_name_plural = 'events'
+        ordering = ["-start_date", "name"]
+        unique_together = (("club", "slug"), ("club", "name"))
+        verbose_name = "event"
+        verbose_name_plural = "events"
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return f'{self.club.nice_url}{self.slug}'
+        return f"{self.club.nice_url}{self.slug}"
 
     def get_absolute_map_url(self):
-        return f'{self.club.nice_url}{self.slug}/map/'
+        return f"{self.club.nice_url}{self.slug}/map/"
 
     def get_absolute_export_url(self):
-        return f'{self.club.nice_url}{self.slug}/export'
+        return f"{self.club.nice_url}{self.slug}/export"
 
     @property
     def shortcut(self):
-        shortcut_url = getattr(settings, 'SHORTCUT_BASE_URL')
+        shortcut_url = getattr(settings, "SHORTCUT_BASE_URL")
         if shortcut_url:
-            return f'{shortcut_url}{self.aid}'
+            return f"{shortcut_url}{self.aid}"
         return None
 
     @property
@@ -769,39 +790,32 @@ class Event(models.Model):
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Event.objects.filter(
-            club__slug__iexact=self.club.slug,
-            slug__iexact=self.slug
+            club__slug__iexact=self.club.slug, slug__iexact=self.slug
         )
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
-            raise ValidationError(
-                'Event with this Club and Slug already exists.'
-            )
+            raise ValidationError("Event with this Club and Slug already exists.")
 
     def invalidate_cache(self):
         t0 = time.time()
-        cache_ts = int(t0 // (10 if self.is_live else 7*24*3600))
-        cache_prefix = 'live' if self.is_live else 'archived'
-        cache_key = f'{cache_prefix}_event_data:{self.aid}:{cache_ts}'
+        cache_ts = int(t0 // (10 if self.is_live else 7 * 24 * 3600))
+        cache_prefix = "live" if self.is_live else "archived"
+        cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
         cache.delete(cache_key)
 
     @property
     def has_notice(self):
-        return hasattr(self, 'notice')
+        return hasattr(self, "notice")
 
 
 class Notice(models.Model):
     modification_date = models.DateTimeField(auto_now=True)
-    event = models.OneToOneField(
-        Event,
-        related_name='notice',
-        on_delete=models.CASCADE
-    )
+    event = models.OneToOneField(Event, related_name="notice", on_delete=models.CASCADE)
     text = models.CharField(
         max_length=280,
         blank=True,
-        help_text='Optional text that will be displayed on the event page',
+        help_text="Optional text that will be displayed on the event page",
     )
 
     def __str__(self):
@@ -810,20 +824,16 @@ class Notice(models.Model):
 
 class MapAssignation(models.Model):
     event = models.ForeignKey(
-        Event,
-        related_name='map_assignations',
-        on_delete=models.CASCADE
+        Event, related_name="map_assignations", on_delete=models.CASCADE
     )
     map = models.ForeignKey(
-        Map,
-        related_name='map_assignations',
-        on_delete=models.CASCADE
+        Map, related_name="map_assignations", on_delete=models.CASCADE
     )
     title = models.CharField(max_length=255)
 
     class Meta:
-        unique_together = (('map', 'event'), ('event', 'title'))
-        ordering = ['id']
+        unique_together = (("map", "event"), ("event", "title"))
+        ordering = ["id"]
 
 
 class Device(models.Model):
@@ -833,22 +843,24 @@ class Device(models.Model):
         default=random_device_id,
         max_length=12,
         unique=True,
-        validators=[validate_slug, ]
+        validators=[
+            validate_slug,
+        ],
     )
     user_agent = models.CharField(max_length=200, blank=True)
     is_gpx = models.BooleanField(default=False)
     owners = models.ManyToManyField(
         User,
-        through='DeviceOwnership',
-        related_name='devices',
-        through_fields=('device', 'user'),
+        through="DeviceOwnership",
+        related_name="devices",
+        through_fields=("device", "user"),
     )
-    locations_raw = models.TextField(blank=True, default='')
+    locations_raw = models.TextField(blank=True, default="")
 
     class Meta:
-        ordering = ['aid']
-        verbose_name = 'device'
-        verbose_name_plural = 'devices'
+        ordering = ["aid"]
+        verbose_name = "device"
+        verbose_name_plural = "devices"
 
     def __str__(self):
         return self.aid
@@ -856,28 +868,27 @@ class Device(models.Model):
     @property
     def locations(self):
         if not self.locations_raw:
-            return {'timestamps': [], 'latitudes': [], 'longitudes': []}
+            return {"timestamps": [], "latitudes": [], "longitudes": []}
         return json.loads(self.locations_raw)
 
     @locations.setter
     def locations(self, locs):
-        self.locations_raw = str(json.dumps(locs), 'utf-8')
+        self.locations_raw = str(json.dumps(locs), "utf-8")
 
     def get_locations_between_dates(self, from_date, end_date, encoded=False):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
-        d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
+        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
 
         locs = [
             {
-                'timestamp': i[0],
-                'latitude': i[1],
-                'longitude': i[2],
-            } for i in sorted(
-                d,
-                key=itemgetter(0)
-            ) if from_ts < i[0] < end_ts
+                "timestamp": i[0],
+                "latitude": i[1],
+                "longitude": i[2],
+            }
+            for i in sorted(d, key=itemgetter(0))
+            if from_ts < i[0] < end_ts
         ]
         if not encoded:
             return len(locs), locs
@@ -891,9 +902,9 @@ class Device(models.Model):
         except Exception:
             return
         if timestamp is not None:
-            ts_datetime = datetime.datetime \
-                .utcfromtimestamp(timestamp) \
-                .replace(tzinfo=UTC_TZ)
+            ts_datetime = datetime.datetime.utcfromtimestamp(timestamp).replace(
+                tzinfo=UTC_TZ
+            )
         else:
             ts_datetime = now()
         locs = self.locations
@@ -902,11 +913,11 @@ class Device(models.Model):
             lat = float(lat)
         if isinstance(lon, Decimal):
             lon = float(lon)
-        all_ts = set(locs['timestamps'])
+        all_ts = set(locs["timestamps"])
         if ts not in all_ts:
-            locs['timestamps'].append(ts)
-            locs['latitudes'].append(round(lat, 5))
-            locs['longitudes'].append(round(lon, 5))
+            locs["timestamps"].append(ts)
+            locs["latitudes"].append(round(lat, 5))
+            locs["longitudes"].append(round(lon, 5))
             self.locations = locs
             if save:
                 self.save()
@@ -916,11 +927,11 @@ class Device(models.Model):
         new_lat = []
         new_lon = []
         locs = self.locations
-        all_ts = set(locs['timestamps'])
+        all_ts = set(locs["timestamps"])
         for loc in loc_array:
-            ts = int(loc['timestamp'])
-            lat = loc['latitude']
-            lon = loc['longitude']
+            ts = int(loc["timestamp"])
+            lat = loc["latitude"]
+            lon = loc["longitude"]
             if ts in all_ts:
                 continue
             try:
@@ -935,9 +946,9 @@ class Device(models.Model):
             new_ts.append(ts)
             new_lat.append(round(lat, 5))
             new_lon.append(round(lon, 5))
-        locs['timestamps'] += new_ts
-        locs['latitudes'] += new_lat
-        locs['longitudes'] += new_lon
+        locs["timestamps"] += new_ts
+        locs["latitudes"] += new_lat
+        locs["longitudes"] += new_lon
         self.locations = locs
         if save:
             self.save()
@@ -945,7 +956,7 @@ class Device(models.Model):
     @property
     def location_count(self):
         try:
-            return len(self.locations['timestamps'])
+            return len(self.locations["timestamps"])
         except Exception:
             return 0
 
@@ -953,11 +964,8 @@ class Device(models.Model):
         if self.location_count == 0:
             return
         qs = self.locations
-        d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
-        sorted_locs = sorted(
-            d,
-            key=itemgetter(0)
-        )
+        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
+        sorted_locs = sorted(d, key=itemgetter(0))
         loc_list = []
         prev_t = None
         for loc in sorted_locs:
@@ -969,8 +977,8 @@ class Device(models.Model):
             tims, lats, lons = [], [], []
         else:
             tims, lats, lons = zip(*loc_list)
-        new_locs = {'timestamps': tims, 'latitudes': lats, 'longitudes': lons}
-        new_raw = str(json.dumps(new_locs), 'utf-8')
+        new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
+        new_raw = str(json.dumps(new_locs), "utf-8")
         if save and self.locations_raw != new_raw:
             self.save()
 
@@ -979,16 +987,14 @@ class Device(models.Model):
         if self.location_count == 0:
             return None
         qs = self.locations
-        d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
+        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
         locs = [
             {
-                'timestamp': i[0],
-                'latitude': i[1],
-                'longitude': i[2],
-            } for i in sorted(
-                d,
-                key=itemgetter(0)
-            )
+                "timestamp": i[0],
+                "latitude": i[1],
+                "longitude": i[2],
+            }
+            for i in sorted(d, key=itemgetter(0))
         ]
         return locs[-1]
 
@@ -997,24 +1003,24 @@ class Device(models.Model):
         ll = self.last_location
         if not ll:
             return None
-        t = ll['timestamp']
-        return datetime.datetime \
-            .utcfromtimestamp(t) \
-            .replace(tzinfo=UTC_TZ)
+        t = ll["timestamp"]
+        return datetime.datetime.utcfromtimestamp(t).replace(tzinfo=UTC_TZ)
 
     @cached_property
     def last_position(self):
         ll = self.last_location
         if not ll:
             return None
-        return ll['latitude'], ll['longitude']
+        return ll["latitude"], ll["longitude"]
 
     def get_competitor(self, at=None, load_event=False):
         if not at:
             at = now()
-        qs = self.competitor_set.filter(start_time__lte=at, event__end_date__gte=at).order_by('-start_time')
+        qs = self.competitor_set.filter(
+            start_time__lte=at, event__end_date__gte=at
+        ).order_by("-start_time")
         if load_event:
-            qs = qs.select_related('event')
+            qs = qs.select_related("event")
         return qs.first()
 
     def get_event(self, at=None):
@@ -1026,9 +1032,9 @@ class Device(models.Model):
         return None
 
     def get_last_competitor(self, load_event=False):
-        qs = self.competitor_set.all().order_by('-start_time')
+        qs = self.competitor_set.all().order_by("-start_time")
         if load_event:
-            qs = qs.select_related('event')
+            qs = qs.select_related("event")
         return qs.first()
 
     def get_last_event(self):
@@ -1043,18 +1049,18 @@ class ImeiDevice(models.Model):
     imei = models.CharField(
         max_length=32,
         unique=True,
-        validators=[validate_imei, ]
+        validators=[
+            validate_imei,
+        ],
     )
     device = models.OneToOneField(
-        Device,
-        related_name='physical_device',
-        on_delete=models.CASCADE
+        Device, related_name="physical_device", on_delete=models.CASCADE
     )
 
     class Meta:
-        ordering = ['imei']
-        verbose_name = 'imei device'
-        verbose_name_plural = 'imei devices'
+        ordering = ["imei"]
+        verbose_name = "imei device"
+        verbose_name_plural = "imei devices"
 
     def __str__(self):
         return self.imei
@@ -1062,19 +1068,13 @@ class ImeiDevice(models.Model):
 
 class DeviceOwnership(models.Model):
     device = models.ForeignKey(
-        Device,
-        related_name='ownerships',
-        on_delete=models.CASCADE
+        Device, related_name="ownerships", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(
-        User,
-        related_name='ownerships',
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(User, related_name="ownerships", on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = (('device', 'user'), )
+        unique_together = (("device", "user"),)
 
 
 class Competitor(models.Model):
@@ -1086,28 +1086,26 @@ class Competitor(models.Model):
     )
     event = models.ForeignKey(
         Event,
-        related_name='competitors',
+        related_name="competitors",
         on_delete=models.CASCADE,
     )
     device = models.ForeignKey(
         Device,
-        related_name='competitor_set',
+        related_name="competitor_set",
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
     )
     name = models.CharField(max_length=64)
     short_name = models.CharField(max_length=32)
     start_time = models.DateTimeField(
-        verbose_name='Start time (UTC)',
-        null=True,
-        blank=True
+        verbose_name="Start time (UTC)", null=True, blank=True
     )
 
     class Meta:
-        ordering = ['start_time', 'name']
-        verbose_name = 'competitor'
-        verbose_name_plural = 'competitors'
+        ordering = ["start_time", "name"]
+        verbose_name = "competitor"
+        verbose_name_plural = "competitors"
 
     def __str__(self):
         return self.name
@@ -1129,16 +1127,16 @@ class Competitor(models.Model):
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
-        next_competitor_start_time = self.device.competitor_set.filter(
-            start_time__gt=from_date
-        ).order_by('start_time').values_list('start_time', flat=True).first()
+        next_competitor_start_time = (
+            self.device.competitor_set.filter(start_time__gt=from_date)
+            .order_by("start_time")
+            .values_list("start_time", flat=True)
+            .first()
+        )
 
         to_date = min(now(), self.event.end_date)
         if next_competitor_start_time:
-            to_date = min(
-                next_competitor_start_time,
-                to_date
-            )
+            to_date = min(next_competitor_start_time, to_date)
         _, locs = self.device.get_locations_between_dates(from_date, to_date)
         return locs
 
@@ -1158,9 +1156,9 @@ class Competitor(models.Model):
         for location in locs:
             gpx_segment.points.append(
                 gpxpy.gpx.GPXTrackPoint(
-                    location['latitude'],
-                    location['longitude'],
-                    time=arrow.get(location['timestamp']).datetime
+                    location["latitude"],
+                    location["longitude"],
+                    time=arrow.get(location["timestamp"]).datetime,
                 )
             )
         gpx_track.segments.append(gpx_segment)
@@ -1168,11 +1166,11 @@ class Competitor(models.Model):
 
     def get_absolute_gpx_url(self):
         return reverse(
-            'competitor_gpx_download',
-            host='api',
+            "competitor_gpx_download",
+            host="api",
             kwargs={
-                'competitor_id': self.aid,
-            }
+                "competitor_id": self.aid,
+            },
         )
 
 
@@ -1193,18 +1191,18 @@ class SpotDevice(models.Model):
     messenger_id = models.CharField(
         max_length=32,
         unique=True,
-        validators=[validate_esn, ]
+        validators=[
+            validate_esn,
+        ],
     )
     device = models.OneToOneField(
-        Device,
-        related_name='spot_device',
-        on_delete=models.CASCADE
+        Device, related_name="spot_device", on_delete=models.CASCADE
     )
 
     class Meta:
-        ordering = ['messenger_id']
-        verbose_name = 'spot device'
-        verbose_name_plural = 'spot devices'
+        ordering = ["messenger_id"]
+        verbose_name = "spot device"
+        verbose_name_plural = "spot devices"
 
     def __str__(self):
         return self.messenger_id
@@ -1212,35 +1210,33 @@ class SpotDevice(models.Model):
 
 class ChatMessage(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
-    uuid = models.UUIDField(
-        default = uuid.uuid4,
-        editable = False,
-        unique=True
-    )
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     ip_address = models.GenericIPAddressField()
-    event = models.ForeignKey(Event, related_name='chat_messages', on_delete=models.CASCADE)
+    event = models.ForeignKey(
+        Event, related_name="chat_messages", on_delete=models.CASCADE
+    )
     nickname = models.CharField(max_length=20)
     message = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ['-creation_date']
-        verbose_name = 'chat message'
-        verbose_name_plural = 'chat messages'
+        ordering = ["-creation_date"]
+        verbose_name = "chat message"
+        verbose_name_plural = "chat messages"
 
     def __str__(self):
-        return f'<{self.nickname}> in {self.event.name}: {self.message}'
+        return f"<{self.nickname}> in {self.event.name}: {self.message}"
 
     def user_hash(self):
         hash_user = hashlib.sha256()
-        hash_user.update(self.nickname.encode('utf-8'))
-        hash_user.update(self.ip_address.encode('utf-8'))
+        hash_user.update(self.nickname.encode("utf-8"))
+        hash_user.update(self.ip_address.encode("utf-8"))
         return safe64encode(hash_user.digest())
 
     def serialize(self):
         return {
-            'uuid': safe64encode(self.uuid.bytes),
-            'nickname': self.nickname,
-            'message': self.message,
-            'timestamp': self.creation_date.timestamp(),
-            'user_hash': self.user_hash()
+            "uuid": safe64encode(self.uuid.bytes),
+            "nickname": self.nickname,
+            "message": self.message,
+            "timestamp": self.creation_date.timestamp(),
+            "user_hash": self.user_hash(),
         }

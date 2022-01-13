@@ -7,13 +7,18 @@ import routechoices.lib.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0044_club_acme_challenge'),
+        ("core", "0044_club_acme_challenge"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='slug',
-            field=models.CharField(help_text='.routechoices.com | <a href="custom_domain/">Add a custom domain</a>', max_length=50, unique=True, validators=[routechoices.lib.validators.validate_domain_slug]),
+            model_name="club",
+            name="slug",
+            field=models.CharField(
+                help_text='.routechoices.com | <a href="custom_domain/">Add a custom domain</a>',
+                max_length=50,
+                unique=True,
+                validators=[routechoices.lib.validators.validate_domain_slug],
+            ),
         ),
     ]

@@ -8,13 +8,21 @@ import routechoices.lib.storages
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0050_alter_device_aid'),
+        ("core", "0050_alter_device_aid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='map',
-            name='image',
-            field=models.ImageField(height_field='height', max_length=255, storage=routechoices.lib.storages.OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'), upload_to=routechoices.core.models.map_upload_path, width_field='width'),
+            model_name="map",
+            name="image",
+            field=models.ImageField(
+                height_field="height",
+                max_length=255,
+                storage=routechoices.lib.storages.OverwriteImageStorage(
+                    aws_s3_bucket_name="routechoices-maps"
+                ),
+                upload_to=routechoices.core.models.map_upload_path,
+                width_field="width",
+            ),
         ),
     ]

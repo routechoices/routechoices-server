@@ -10,8 +10,11 @@ from routechoices.core.models import Club
 
 
 def write_nginf_conf(domain):
-    with open(os.path.join(settings.BASE_DIR, 'nginx', 'custom_domains', f'{domain}'), 'w') as f:
-        f.write(f'''server {{
+    with open(
+        os.path.join(settings.BASE_DIR, "nginx", "custom_domains", f"{domain}"), "w"
+    ) as f:
+        f.write(
+            f"""server {{
     server_name {domain};
     if ($host = {domain}) {{
         return 302 https://$host$request_uri;
@@ -41,15 +44,16 @@ server {{
        uwsgi_intercept_errors  off;
        include                 uwsgi_params;
     }}
-}}''')
+}}"""
+        )
 
 
 def write_account_key(self, filename):
     with open(filename, "wb") as f:
-        if hasattr(self, '__kid') and self.__kid:
-            f.write(f'KID: {self.__kid}\n'.encode())
+        if hasattr(self, "__kid") and self.__kid:
+            f.write(f"KID: {self.__kid}\n".encode())
             if self._timestamp:
-                f.write(f'Timestamp: {self._timestamp}\n'.encode())
+                f.write(f"Timestamp: {self._timestamp}\n".encode())
         f.write(self.to_pem())
 
 
@@ -61,7 +65,7 @@ class ClubProvider(ProviderBase):
         self.chal_type = "http-01"
 
     def setup(self, challenges):
-        self.club.acme_challenge = challenges[0]['key_auth']
+        self.club.acme_challenge = challenges[0]["key_auth"]
         self.club.save()
         return []
 
@@ -70,28 +74,29 @@ class ClubProvider(ProviderBase):
         return []
 
     def clear(self, challenges):
-        self.club.acme_challenge = ''
+        self.club.acme_challenge = ""
         self.club.save()
         return []
 
 
-
 class Command(BaseCommand):
-    help = 'Create letsencrypt certificate for club custom domain'
+    help = "Create letsencrypt certificate for club custom domain"
 
     def add_arguments(self, parser):
-        parser.add_argument('domains', nargs='+', type=str)
+        parser.add_argument("domains", nargs="+", type=str)
 
     def handle(self, *args, **options):
         nginx_need_restart = False
-        for domain in options['domains']:
+        for domain in options["domains"]:
             club = Club.objects.filter(domain=domain).first()
             if not club:
-                self.stderr.write('No club with this domain')
+                self.stderr.write("No club with this domain")
                 continue
 
-            if os.path.exists(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')):
-                self.stderr.write('Certificates for this domain already exists')
+            if os.path.exists(
+                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
+            ):
+                self.stderr.write("Certificates for this domain already exists")
                 continue
 
             acct_key = AcmeAccount.create("secp256r1")
@@ -102,20 +107,29 @@ class Command(BaseCommand):
                 account=acct_key,
                 cert_key=AcmeKey.create("secp256r1"),
                 is_new_acct=True,
-                contact_email='raphael@routechoices.com'
+                contact_email="raphael@routechoices.com",
             )
             try:
                 certificate = client.get_certificate()
             except Exception:
-                self.stderr.write('Failed to create certificate...')
+                self.stderr.write("Failed to create certificate...")
                 continue
             cert_key = client.cert_key
 
-            with open(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt'), 'w') as f:
+            with open(
+                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"), "w"
+            ) as f:
                 f.write(certificate)
-            cert_key.write_pem(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key'))
-            write_account_key(acct_key, os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key'))
+            cert_key.write_pem(
+                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
+            )
+            write_account_key(
+                acct_key,
+                os.path.join(
+                    settings.BASE_DIR, "nginx", "certs", "accounts", f"{domain}.key"
+                ),
+            )
             write_nginf_conf(domain)
             nginx_need_restart = True
         if nginx_need_restart:
-            print('Reload nginx for changes to take effect...')
+            print("Reload nginx for changes to take effect...")

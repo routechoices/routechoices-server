@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0029_auto_20210303_1738'),
+        ("core", "0029_auto_20210303_1738"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notice',
-            name='text',
-            field=models.CharField(blank=True, help_text='Optional text that will be displayed on the event page', max_length=280),
+            model_name="notice",
+            name="text",
+            field=models.CharField(
+                blank=True,
+                help_text="Optional text that will be displayed on the event page",
+                max_length=280,
+            ),
         ),
     ]

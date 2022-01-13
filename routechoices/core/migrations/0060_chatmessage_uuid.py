@@ -3,29 +3,30 @@
 from django.db import migrations, models
 import uuid
 
+
 def create_uuid(apps, schema_editor):
-    MyModel = apps.get_model('core', 'ChatMessage')
+    MyModel = apps.get_model("core", "ChatMessage")
     for row in MyModel.objects.all():
         row.uuid = uuid.uuid4()
-        row.save(update_fields=['uuid'])
+        row.save(update_fields=["uuid"])
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0059_alter_chatmessage_options'),
+        ("core", "0059_alter_chatmessage_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chatmessage',
-            name='uuid',
+            model_name="chatmessage",
+            name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, null=True),
         ),
         migrations.RunPython(create_uuid, migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='chatmessage',
-            name='uuid',
+            model_name="chatmessage",
+            name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

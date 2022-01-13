@@ -20,10 +20,10 @@ class ClubLiveEventsFeed(Feed):
         return f"Events by {obj.name}"
 
     def link(self, obj):
-        return f'{obj.nice_url}'
+        return f"{obj.nice_url}"
 
     def items(self, obj):
-        return Event.objects.select_related('club').filter(
+        return Event.objects.select_related("club").filter(
             privacy=PRIVACY_PUBLIC,
             club=obj,
         )[:25]
@@ -32,7 +32,7 @@ class ClubLiveEventsFeed(Feed):
         return item.name
 
     def item_description(self, item):
-        return f'Live GPS Tracking of {item.name} by {item.club}'
+        return f"Live GPS Tracking of {item.name} by {item.club}"
 
     def item_pubdate(self, item):
         return item.start_date
