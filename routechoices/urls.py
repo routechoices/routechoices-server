@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import re_path, include
+from django.urls import re_path, include, path
 from django.contrib.sitemaps.views import sitemap
 from routechoices.dashboard.views import dashboard_map_download, dashboard_logo_download
 from routechoices.site.sitemaps import (
@@ -33,12 +33,12 @@ sitemaps = {
 }
 
 urlpatterns = [
-    re_path(r'^accounts/', include('allauth.urls')),
-    re_path(r'^admin/', admin.site.urls),
-    re_path(r'^api/', include(('routechoices.api.urls', 'api'), namespace='api')),
-    re_path(r'^captcha/', include('captcha.urls')),
-    re_path(
-        r'^dashboard/',
+    path('accounts/', include('allauth.urls')),
+    path('admin/', admin.site.urls),
+    path('api/', include(('routechoices.api.urls', 'api'), namespace='api')),
+    path('captcha/', include('captcha.urls')),
+    path(
+        'dashboard/',
         include(
             ('routechoices.dashboard.urls', 'dashboard'),
             namespace='dashboard'
@@ -56,7 +56,7 @@ urlpatterns = [
         dashboard_logo_download,
         name='dashboard_logo_download',
     ),
-    re_path(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     re_path('^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$', sitemap,
         {'sitemaps': sitemaps}, name='sitemap'),
     re_path(r'', include('user_sessions.urls', 'user_sessions')),

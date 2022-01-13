@@ -125,9 +125,8 @@ class Club(models.Model):
     description = models.TextField(
         blank=True,
         default='''# GPS tracking powered by routechoices.com
-        
-Browse our events here.
-        ''',
+
+Browse our events here.''',
         help_text='This text will be displayed on your site frontpage, use markdown formatting'
     )
     domain = models.CharField(
@@ -141,7 +140,7 @@ Browse our events here.
         upload_to=logo_upload_path,
         null=True,
         blank=True,
-        help_text='Square image of width greater or equal to 128px', 
+        help_text='Square image of width greater or equal to 128px',
         storage=OverwriteImageStorage(aws_s3_bucket_name='routechoices-maps'),
     )
 
@@ -481,7 +480,7 @@ class Map(models.Model):
         orig = self.image.open('rb').read()
         self.image.close()
         img = cv2.imdecode(np.frombuffer(BytesIO(orig).getbuffer(), np.uint8), -1)
-        img_alpha = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA) 
+        img_alpha = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
         tile_img = cv2.warpPerspective(
             img_alpha, coeffs, (output_width, output_height)
         )
@@ -593,7 +592,7 @@ class Map(models.Model):
         scale = 1
         if width > MAX or height > MAX:
             scale = max(width, height) / MAX
-        
+
         tl_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tl_xy['x'] - offset*scale, 'y': tl_xy['y'] + offset*scale})
         tr_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': tr_xy['x'] + offset*scale, 'y': tr_xy['y'] + offset*scale})
         br_latlon = GLOBAL_MERCATOR.meters_to_latlon({'x': br_xy['x'] + offset*scale, 'y': br_xy['y'] - offset*scale})
@@ -869,7 +868,7 @@ class Device(models.Model):
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
         d = zip(qs['timestamps'], qs['latitudes'], qs['longitudes'])
-        
+
         locs = [
             {
                 'timestamp': i[0],
@@ -1017,7 +1016,7 @@ class Device(models.Model):
         if load_event:
             qs = qs.select_related('event')
         return qs.first()
-    
+
     def get_event(self, at=None):
         if not at:
             at = now()
@@ -1236,7 +1235,7 @@ class ChatMessage(models.Model):
         hash_user.update(self.nickname.encode('utf-8'))
         hash_user.update(self.ip_address.encode('utf-8'))
         return safe64encode(hash_user.digest())
-    
+
     def serialize(self):
         return {
             'uuid': safe64encode(self.uuid.bytes),
