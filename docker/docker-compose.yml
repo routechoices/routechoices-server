@@ -1,4 +1,4 @@
-version: '2'  
+version: '2'
 services:
   db:
     container_name: rc_postgres
@@ -49,6 +49,7 @@ services:
       - ../:/app/:rw
     environment:
       DATABASE_URL: postgres://app_user:changeme@db/app_db
+      DJANGO_WATCHMAN_TIMEOUT: 20
     ports:
       - "2000:2000"
       - "2002:2002"
@@ -59,4 +60,4 @@ services:
       - db
       - minio
       - smtp
-    user: ${USERID}:${GROUPID}
+    command: ['/venv/bin/python3.9', './manage.py', 'runserver', '0.0.0.0:8000']

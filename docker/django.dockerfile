@@ -24,7 +24,7 @@ ADD . /app/
 
 # uWSGI will listen on this port
 EXPOSE 8000
-# 
+#
 EXPOSE 2000
 EXPOSE 2002
 
@@ -41,6 +41,4 @@ RUN DATABASE_URL=none /venv/bin/python manage.py collectstatic --noinput
 # CMD ["/venv/bin/uwsgi", "--http-auto-chunked", "--http-keepalive"]
 
 ADD docker/wait-for-it.sh /wait-for-it.sh
-ADD docker/run-django.sh /run.sh
-RUN chmod 755 /wait-for-it.sh /run.sh
-ENTRYPOINT ["/run.sh"]
+RUN chmod 755 /wait-for-it.sh
