@@ -11,7 +11,8 @@
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <link rel="shortcut icon" href="{% static 'favicon.ico' %}">{% endif %}{% endblock %}
 
-{% block head_title %}{% if club %}Events by {{club.name}} | Powered by {{site.name}}{% else %}Events on {{site.name}}{% endif %}{% endblock %}
+{% block head_title %}{% if club %}Events by {{club.name}} | Powered by {{site.name}}{% else %}Events on {{site.name}}{% endif %} | Live GPS tracking for orienteering{% endblock %}
+{% block head_description %}This is the list of public events {% if club %} by {{club.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
 
 {% block extra_head %}
 <link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
