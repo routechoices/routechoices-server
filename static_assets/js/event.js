@@ -307,7 +307,7 @@ var selectLiveMode = function(e){
   $("#replay_button").removeClass('active')
   $("#replay_mode_buttons").hide()
   $("#replay_control_buttons").hide()
-  timeOffsetSec = -30
+  timeOffsetSec = -15
   isLiveMode=true
   isRealTime=true
 
