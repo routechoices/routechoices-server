@@ -21,7 +21,7 @@ class HealthCheckHandler(tornado.web.RequestHandler):
         self.write(tornado.escape.json_encode({'status': 'ok'}))
 
 
-class LiveEventChatHandler(tornado.web.RequestHandler):    
+class LiveEventChatHandler(tornado.web.RequestHandler):
     async def post(self, event_id):
         if self.request.headers.get("Authorization") != f'Bearer {settings.CHAT_INTERNAL_SECRET}':
             raise tornado.web.HTTPError(403)
@@ -45,7 +45,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
         self.set_header('Access-Control-Allow-Methods', 'GET');
         self.set_header('content-type', 'text/event-stream')
         self.set_header('cache-control', 'no-cache')
-    
+
     async def get_current_user(self):
         engine = import_module(settings.SESSION_ENGINE)
         cookie = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -85,7 +85,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
         )()
         if not event:
             self.set_status(404)
-        
+
         if event.privacy == PRIVACY_PRIVATE:
             user = await self.get_current_user()
             if not user:

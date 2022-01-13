@@ -11,4 +11,3 @@ then
 else
   echo 'proccess not running'
 fi
-

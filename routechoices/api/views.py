@@ -355,7 +355,7 @@ def event_chat(request, event_id):
     message = request.data.get('message')
     if not nickname or not message:
         raise ValidationError('Missing parameter')
-    
+
     remote_ip = request.META['REMOTE_ADDR']
 
     msg = ChatMessage.objects.create(
@@ -441,11 +441,11 @@ def event_register(request, event_id):
             raise PermissionDenied()
     device_id = request.data.get('device_id')
     device = Device.objects.filter(aid=device_id).first()
-    
+
     lang = request.GET.get('lang', 'en')
     if lang not in ('en', 'fi', 'fr', 'sv'):
         lang = 'en'
-    
+
     err_messages = {
         'en': {
             'no-device-id': 'Device ID not found',
@@ -485,7 +485,7 @@ def event_register(request, event_id):
 
     if not device:
         errs.append(err_messages[lang]['no-device-id'])
-    
+
     name = request.data.get('name')
 
     if not name:
@@ -505,16 +505,16 @@ def event_register(request, event_id):
         start_time = event.start_date
     event_start = event.start_date
     event_end = event.end_date
-    
+
     if start_time and (event_start > start_time or start_time > event_end):
         errs.append(err_messages[lang]['bad-start-time'])
-    
+
     if event.competitors.filter(name=name).exists():
         errs.append(err_messages[lang]['bad-name'])
-     
+
     if event.competitors.filter(short_name=short_name).exists():
         errs.append(err_messages[lang]['bad-sname'])
-    
+
     if errs:
         raise ValidationError('\r\n'.join(errs))
 
@@ -653,7 +653,7 @@ def event_upload_route(request, event_id):
         if not event.allow_route_upload or event.start_date > now():
             raise PermissionDenied()
     errs = []
-    
+
     name = request.data.get('name')
 
     if not name:
@@ -661,10 +661,10 @@ def event_upload_route(request, event_id):
     short_name = request.data.get('short_name')
     if not short_name:
         short_name = initial_of_name(name)
-    
+
     if event.competitors.filter(name=name).exists():
         errs.append('Competitor with same name already registered')
-     
+
     if event.competitors.filter(short_name=short_name).exists():
         errs.append('Competitor with same short name already registered')
 
@@ -704,12 +704,12 @@ def event_upload_route(request, event_id):
 
     event_start = event.start_date
     event_end = event.end_date
-    
+
     if start_time and (event_start > start_time or start_time > event_end):
         errs.append(
             'Competitor start time should be during the event time'
         )
-    
+
     if errs:
         raise ValidationError('\r\n'.join(errs))
 
@@ -1257,7 +1257,7 @@ def event_kmz_download(request, event_id, map_index='0'):
     else:
         raster_map = event.map_assignations.select_related('map').all()[int(map_index)-1].map
     kmz_data = raster_map.kmz
-    
+
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {
@@ -1429,7 +1429,7 @@ http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={ev
             [
                 event.map.bound['bottomLeft']['lon'],
                 event.map.bound['bottomLeft']['lat'],
-                0, 
+                0,
                 event.map.height
             ]
         ],
@@ -1446,7 +1446,7 @@ http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={ev
     if callback:
         response_raw = f'/**/{callback}({response_raw});'
         content_type = 'text/javascript; charset=utf-8'
-    
+
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {
@@ -1502,7 +1502,7 @@ def two_d_rerun_race_data(request):
     if callback:
         response_raw = f'/**/{callback}({response_raw});'
         content_type = 'text/javascript; charset=utf-8'
-    
+
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {
@@ -1550,7 +1550,7 @@ def wms_service(request):
                 map_index = 0
         except Exception:
             return HttpResponseBadRequest('invalid parameters')
-        
+
         event = get_object_or_404(Event.objects.select_related('club'), aid=layer_id)
         if map_index == 0 and not event.map:
             raise NotFound()

@@ -147,7 +147,7 @@ var PositionArchive = function(){
     this.push = function(pos) {
         positions.push(pos);
     }
-    
+
     this.eraseInterval = function(start, end){
         var index_s=_locationOf({timestamp: start}),
             index_e=_locationOf({timestamp: end});
@@ -244,7 +244,7 @@ PositionArchive.fromEncoded = function(encoded) {
         r,
         is_first = true,
         offset = 0;
-   
+
     while (offset < enc_len) {
         for(var i = 0; i < 3; i++) {
             if(i === 0) {

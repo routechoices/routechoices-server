@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('--dry-run', action='store_true', default=False)
 
     def scan_map_directory(self):
-        
+
         # Should use v2 but wasabi fails to list all files with it
         # paginator = s3.get_paginator('list_objects_v2')
         paginator = self.s3.get_paginator('list_objects')

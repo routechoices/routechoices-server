@@ -59,7 +59,7 @@ class UploadGPXForm(Form):
         if self.event and self.event.competitors.filter(name=name).exists():
             raise ValidationError('Name already taken')
         return name
-        
+
 
 class CompetitorForm(ModelForm):
     device = ModelChoiceField(required=True, queryset=Device.objects.all())

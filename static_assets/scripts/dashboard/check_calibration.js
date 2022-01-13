@@ -38,7 +38,7 @@ $(function(){
             window.close();
         }
     }
-    
+
     function isValidCalibString(s){
         return s.match(/^(\-?\d+\.\d+,){7}\-?\d+\.\d+$/)
 
@@ -64,7 +64,7 @@ $(function(){
         map = L.map('preview_map');
         var baseLayers = {};
         L.TileLayer.Common = L.TileLayer.extend({initialize: function(options){L.TileLayer.prototype.initialize.call(this, this.url, options);}});
-        
+
         L.TileLayer['osm'] = L.TileLayer.Common.extend({url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', options:{attribution: '&copy; OpenStreetMap contributors'}});
         L.TileLayer['gmap-street'] = L.TileLayer.Common.extend({url: 'https://mt0.google.com/vt/x={x}&y={y}&z={z}', options:{attribution: '&copy; Google'}});
         L.TileLayer['gmap-hybrid'] = L.TileLayer.Common.extend({url: 'https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', options:{attribution: '&copy; Google'}});
@@ -77,7 +77,7 @@ $(function(){
             'https://mapant.es/mapserv?map=/mapas/geotiff.map',
             {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true}
         );
-        
+
         var defaultLayer = new L.TileLayer['osm'];
         baseLayers["Open Street Map"] = defaultLayer;
         baseLayers["Google Map Street"] = new L.TileLayer['gmap-street'];

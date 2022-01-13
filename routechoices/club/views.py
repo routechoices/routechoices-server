@@ -412,7 +412,7 @@ def event_route_upload_view(request, slug, **kwargs):
                 if start_time and event.start_date <= start_time <= event.end_date:
                     competitor.start_time = start_time
                 competitor.save()
-            
+
             target_url = f'{event.club.nice_url}{event.slug}/route_upload_complete'
             return redirect(target_url)
     else:

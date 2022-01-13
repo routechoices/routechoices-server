@@ -31,7 +31,7 @@ class ClubForm(ModelForm):
         if admins.count() > 10:
             raise ValidationError('Clubs can only have a maximum of 10 admins')
         return admins
-    
+
     def clean_logo(self):
         logo = self.cleaned_data['logo']
         if not logo:

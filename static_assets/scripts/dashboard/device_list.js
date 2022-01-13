@@ -6,7 +6,7 @@ $(function(){
     });
     $('.copy-btn').on('click', function(ev){
         var $el = $(ev.currentTarget)
-        var tooltip = new bootstrap.Tooltip(ev.currentTarget, 
+        var tooltip = new bootstrap.Tooltip(ev.currentTarget,
             {'placement': 'right', 'title': 'copied'}
         )
         tooltip.show()

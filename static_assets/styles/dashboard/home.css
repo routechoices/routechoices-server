@@ -6,20 +6,20 @@
            -o-transition: all .25s ease-out;
               transition: all .25s ease-out;
     }
-  
+
     .row-offcanvas-left {
       left: 0;
     }
-  
+
     .row-offcanvas-left
     .sidebar-offcanvas {
       left: -50%; /* 6 columns */
     }
-  
+
     .row-offcanvas-left.active {
       left: 50%; /* 6 columns */
     }
-  
+
     .sidebar-offcanvas {
       position: absolute;
       top: 0;

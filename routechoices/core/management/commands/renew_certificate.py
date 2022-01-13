@@ -63,7 +63,7 @@ class ClubProvider(ProviderBase):
         self.club.acme_challenge = challenges[0]['key_auth']
         self.club.save()
         return []
-    
+
     def unpropagated(self, challenges):
         # could add confirmation here, but it's just a demo
         return []
@@ -103,7 +103,7 @@ class Command(BaseCommand):
             if not is_expirying(domain):
                 self.stderr.write('Domain is not yet expiring')
                 continue
-            
+
             account_exists = os.path.exists(os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key'))
             if account_exists:
                 acct_key = read_account_key(AcmeAccount, os.path.join(settings.BASE_DIR, 'nginx', 'certs', 'accounts', f'{domain}.key'))

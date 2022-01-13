@@ -316,7 +316,7 @@ var selectLiveMode = function(e){
       fetchCompetitorRoutes()
     }
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
-      fetchNotice() 
+      fetchNotice()
     }
     currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3
     drawCompetitors()
@@ -350,13 +350,13 @@ var selectReplayMode = function(e){
   prevDisplayRefresh = performance.now()
   ;(function whileReplay(){
     if(isLiveEvent && ((performance.now() - routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes){
-      fetchCompetitorRoutes() 
+      fetchCompetitorRoutes()
     }
     if(isLiveEvent && ((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
-      fetchNotice() 
+      fetchNotice()
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate
-    
+
     currentTime = Math.max(getCompetitionStartDate(), prevShownTime + (performance.now() - prevDisplayRefresh) * actualPlaybackRate)
     var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration()
     if (isCustomStart) {
@@ -496,7 +496,7 @@ var displayCompetitorList = function(force){
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || getColor(ii)
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown
-      
+
       var div = $('<div class="card-body" style="padding:5px 10px 2px 10px;"/>')
       div.html('<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
@@ -521,7 +521,7 @@ var displayCompetitorList = function(force){
           competitor.color = color
           colorModal.hide()
           displayCompetitorList()
-          
+
           if(competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker)
           }
@@ -801,7 +801,7 @@ var displayOptions = function(ev) {
         '<div class="form-group">' +
         '<label for="tailLengthInput">' + banana.i18n('length-in-seconds') +'</label>' +
         '<input type="number" min="0" class="form-control" id="tailLengthInput" value="'+ tailLength +'"/>' +
-        '</div>' +      
+        '</div>' +
         '<h4>' + banana.i18n('map-controls') + '</h4>' +
         '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (showControls ? 'on' : 'off') + '"></i> ' + banana.i18n('show-map-controls') + '</button>' +
         '<h4>' + banana.i18n('groupings') + '</h4>' +
@@ -811,7 +811,7 @@ var displayOptions = function(ev) {
         Object.keys(supportedLanguages).map(function(l) {
           return '<option value="' + l + '"' + (locale === l ? ' selected' : '') + '>' + supportedLanguages[l] + '</option>'
         }).join('') +
-        '</select>' + 
+        '</select>' +
         (qrUrl ? ('<h4>' + banana.i18n('qr-link') + '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '')
       )
     )
@@ -860,7 +860,7 @@ var displayOptions = function(ev) {
         $('.toggle_controls_btn')
           .find('.fa-toggle-off')
           .removeClass('fa-toggle-off')
-          .addClass('fa-toggle-on')        
+          .addClass('fa-toggle-on')
         map.addControl(panControl)
         map.addControl(zoomControl)
         map.addControl(rotateControl)
@@ -955,7 +955,7 @@ var getProgressBarText = function(currentTime){
           viewedTime -= getCompetitionStartDate()
         }
         var t = viewedTime / 1e3
-        
+
         to2digits = function(x){return ('0'+Math.floor(x)).slice(-2)},
         result += t > 3600 ? Math.floor(t/3600) + ':': ''
         result += to2digits((t / 60) % 60) + ':' + to2digits(t % 60)
@@ -1031,7 +1031,7 @@ var drawCompetitors = function(){
               }
               if (getRelativeTime(competitorTime) > 0) {
                 finishLineCrosses.push({
-                  competitor: competitor, 
+                  competitor: competitor,
                   time: competitorTime,
                   idx: oldCrossing.idx
                 })
@@ -1062,7 +1062,7 @@ var drawCompetitors = function(){
               }
               if (getRelativeTime(competitorTime) > 0) {
                 finishLineCrosses.push({
-                  competitor: competitor, 
+                  competitor: competitor,
                   time: competitorTime,
                   idx: i
                 })
@@ -1116,7 +1116,7 @@ var drawCompetitors = function(){
             competitor.nameMarker = null
           }
           if(competitor.nameMarker == undefined){
-            
+
             var iconHtml = '<span style="opacity: 0.4;color: ' + competitor.color + '">' + $('<span/>').text(competitor.short_name).html() + '</span>'
             var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color)
             var nameTagEl = document.createElement('div')
@@ -1248,7 +1248,7 @@ var drawCompetitors = function(){
       }
     }
   })
-  
+
   // Create cluster
   if(showClusters) {
     var listCompWithMarker = []
@@ -1273,7 +1273,7 @@ var drawCompetitors = function(){
       .data(gpsPointData)
     var gpsPointAssignmentResult = dbscanner()
     var clusterCenters = dbscanner.getClusters()
-    
+
     Object.keys(clusters).forEach(function(k) {
       if (gpsPointAssignmentResult.indexOf(k) === -1) {
         if (clusters[k].mapMarker) {
@@ -1286,7 +1286,7 @@ var drawCompetitors = function(){
         }
       }
     })
-    
+
     gpsPointAssignmentResult.forEach(function(d, i) {
       if (d != 0) {
         var cluster = clusters[d] || {}
@@ -1363,7 +1363,7 @@ var drawCompetitors = function(){
 
     groupControl.setValues(listCompWithMarker, clusterCenters)
   }
-  if(finishLinePoly) { 
+  if(finishLinePoly) {
     rankControl.setValues(finishLineCrosses)
   }
 }
@@ -1461,7 +1461,7 @@ function pressPlayPauseButton(e){
   e.preventDefault()
   playbackPaused = !playbackPaused
 }
-  
+
 function pressProgressBar(e){
   var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width()
   if (isRealTime) {

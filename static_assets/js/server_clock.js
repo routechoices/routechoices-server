@@ -43,7 +43,7 @@ var ServerClock = function(opts) {
           fetch(
             options.url,
             {
-              method: 'GET', 
+              method: 'GET',
               headers: {
                 'Accept': 'application/json'
               }

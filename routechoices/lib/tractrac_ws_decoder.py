@@ -26,7 +26,7 @@ class TracTracWSReader():
         if not d:
             return None
         return str(UUID(bytes=d))
-    
+
 
     def read_data(self, url):
         ws = websocket.create_connection(url, sslopt={"cert_reqs": ssl.CERT_NONE}, timeout=5)

@@ -75,7 +75,7 @@ class MtbDecoder():
                     break
                 else:
                     raise Exception('Bad Format')
-        return self.device_map     
+        return self.device_map
 
     def read_event_latest_type(self):
         self.skip_uuid()
@@ -86,7 +86,7 @@ class MtbDecoder():
             self.fp.read(self.current_size - 20)
         else:
             raise Exception('Bad format')
-        
+
     def read_event_sequence_type(self):
         self.skip_uuid()
         t = self.get_int32()
@@ -184,7 +184,7 @@ class MtbDecoder():
                 if b'\x03' == t or b'\x01' == t:
                     e = self.get_int32() + 2147483648
                     n -= 4
-                else: 
+                else:
                     e = self.get_int64()
                     n -= 8
                 if b'\x02' == t or b'\x03' == t:

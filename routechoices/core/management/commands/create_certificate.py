@@ -64,7 +64,7 @@ class ClubProvider(ProviderBase):
         self.club.acme_challenge = challenges[0]['key_auth']
         self.club.save()
         return []
-    
+
     def unpropagated(self, challenges):
         # could add confirmation here, but it's just a demo
         return []
@@ -89,11 +89,11 @@ class Command(BaseCommand):
             if not club:
                 self.stderr.write('No club with this domain')
                 continue
-        
+
             if os.path.exists(os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')):
                 self.stderr.write('Certificates for this domain already exists')
                 continue
-            
+
             acct_key = AcmeAccount.create("secp256r1")
 
             client = sewer.client.Client(

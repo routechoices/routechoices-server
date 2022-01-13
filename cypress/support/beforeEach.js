@@ -5,4 +5,3 @@ beforeEach(function () {
     //cy.exec(`./da reset_db_for_tests`);
     cy.wait(1000);
   });
-  

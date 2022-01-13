@@ -170,7 +170,7 @@ def import_map_from_sportrec(club, event_id, map_data, name):
 def import_map_from_tractrac(club, map_info, name):
     map_url = map_info.get('location')
     r = requests.get(map_url)
-    
+
     if r.status_code != 200:
         raise MapImportError('API returned error code')
     map_file = ContentFile(r.content)
@@ -510,13 +510,13 @@ def import_single_event_from_tractrac(event_id):
         return
     maps = [m for m in event_data['maps'] if m.get('is_default_loaded')]
     map_model = None
-    if maps:  
+    if maps:
         map_info = maps[0]
         map_model = import_map_from_tractrac(club, map_info, event_name)
     if map_model:
         event.map = map_model
         event.save()
-    
+
     device_map = None
     mtb_url = event_data['parameters'].get('stored-uri')
     if mtb_url and not mtb_url.startswith('tcp:') and '.mtb' in mtb_url:
@@ -539,7 +539,7 @@ def import_single_event_from_tractrac(event_id):
                     raise EventImportError('Could not decode mtb')
             finally:
                 lf.close()
-    
+
     if event_data['parameters'].get('ws-uri') and not device_map:
         try:
             url = event_data['parameters'].get('ws-uri')+'/'+event_data['eventType']+'?snapping=false'
@@ -547,7 +547,7 @@ def import_single_event_from_tractrac(event_id):
         except:
             event.delete()
             raise EventImportError('Could not decode ws data')
-    
+
     if not device_map:
         event.delete()
         raise EventImportError('Did not figure out how to get data')
@@ -861,7 +861,7 @@ def import_single_event_from_livelox(class_id):
     #event.competitors.all().delete()
     if not created:
         return
-    
+
     if map_projection:
         matrix = map_projection['matrix'][0] + map_projection['matrix'][1] + map_projection['matrix'][2]
 

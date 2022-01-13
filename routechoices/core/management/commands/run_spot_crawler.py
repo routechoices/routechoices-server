@@ -68,4 +68,3 @@ class Command(BaseCommand):
             except KeyboardInterrupt:
                 break
         print('Goodbye!')
-

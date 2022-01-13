@@ -127,7 +127,7 @@ $(function(){
         'https://mapant.es/mapserv?map=/mapas/geotiff.map',
         {layers: 'geotiff', format: 'image/png', version: '1.3.0', transparent: true}
     );
-    
+
     function color_icon(color){
         return new L.Icon({
             iconUrl: "/static/vendor/leaflet-color-markers-1.0.0/img/marker-icon-2x-" + color + '.png',

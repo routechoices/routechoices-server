@@ -1,4 +1,4 @@
-/* 
+/*
  Author: Corneliu S. (github.com/upphiminn)
  2013
  */
@@ -14,7 +14,7 @@ const jDBSCAN = function() {
 	let graph = [];
 	let distance = euclidean_distance;
 	let time_distance = timestamp_distance;
-	
+
 	// utils
 	function array_min(array, f) {
 		let i = -1;
@@ -79,8 +79,8 @@ const jDBSCAN = function() {
 
 		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		const d = R * c;
-		
-		return d.toPrecision(precision); 
+
+		return d.toPrecision(precision);
 	}
 
 	// core algorithm related

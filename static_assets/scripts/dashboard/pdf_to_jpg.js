@@ -12,7 +12,7 @@ var onPDF = function(ev, filename) {
             var viewport = page.getViewport({scale: 1});;
             var width = Math.floor(viewport.width * CSS_UNITS) + 'px';
             var height = Math.floor(viewport.height * CSS_UNITS) + 'px';
-            
+
             // Prepare canvas using PDF page dimensions
             var canvas = document.createElement('canvas');
             canvas.height = Math.floor(viewport.height * PRINT_UNITS);

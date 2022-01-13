@@ -1,8 +1,8 @@
 /* Make the default zoom control align with the pan control.
-   
-   This is ugly. 
-   The parent box (class="leaflet-top leaflet-left") 
-   should make all the child boxes be center-aligned instead. 
+
+   This is ugly.
+   The parent box (class="leaflet-top leaflet-left")
+   should make all the child boxes be center-aligned instead.
    Not sure if that is possible though.
 */
 .leaflet-left.has-leaflet-pan-control .leaflet-control-zoom {
@@ -14,10 +14,10 @@
 	right: 24px;
 }
 
-/* 
-   Make the zoomSlider control 
-   (https://github.com/mattiasbengtsson/Leaflet.zoomslider) 
-   align with the pan control. 
+/*
+   Make the zoomSlider control
+   (https://github.com/mattiasbengtsson/Leaflet.zoomslider)
+   align with the pan control.
 */
 .leaflet-left.has-leaflet-pan-control .leaflet-control-zoomslider {
 	position: relative;
@@ -29,13 +29,13 @@
 }
 
 .leaflet-control-pan  {
-	   /* 
-	     .leaflet-control-pan-right-wrap: right 
+	   /*
+	     .leaflet-control-pan-right-wrap: right
 	   + .leaflet-control-pan a: width
 	   = 52 + 24 = 76
 	   */
-	width: 76px; 
-	   /* 
+	width: 76px;
+	   /*
 	     .leaflet-control-pan-down-wrap: top
 	   + .leaflet-control-pan a: height
 	   = 52 + 24 = 76
@@ -80,7 +80,7 @@
 }
 .leaflet-control-pan-right-wrap {
 	position:absolute;
-	left:52px;	
+	left:52px;
 	top:26px;
 }
 .leaflet-control-pan-down-wrap {

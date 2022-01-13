@@ -26,7 +26,7 @@
 import 'cypress-file-upload';
 import 'cypress-real-events/support';
 
-Cypress.Commands.add("login", (username='admin', password='pa$$word123') => { 
+Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.visit('/accounts/login/')
   cy.get('#id_login').type(username)
   cy.get('#id_password').type(password + '{enter}')
@@ -65,7 +65,7 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.url().should('match', /\/dashboard\/map$/)
   cy.get('a').contains('Create new map').click()
   cy.url().should('match', /\/dashboard\/map\/new$/)
-  
+
   cy.get('#id_club').select('Halden SK')
   cy.get('#id_name').type('Jukola 2019 - 1st Leg')
   const mapFileName = 'Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg'
@@ -73,7 +73,7 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
   cy.get("input[value='Save']").click()
   cy.url().should('match', /\/dashboard\/map$/)
  })
- 
+
  Cypress.Commands.add('forceVisit', url => {
   cy.window().then(win => {
     return win.open(url, '_self');
