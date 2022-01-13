@@ -14,3 +14,4 @@ Makefile
 package.json
 README.md
 yarn.lock
+requirements.txt

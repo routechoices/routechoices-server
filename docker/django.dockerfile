@@ -1,18 +1,22 @@
 FROM python:3.9-slim
 
 # Copy in your requirements file
-ADD requirements.txt /requirements.txt
+ADD requirements.in /requirements.in
+
+RUN mkdir /app/
 
 RUN set -ex \
-    && apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 --no-install-recommends \
+    && apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 watchman --no-install-recommends \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /requirements.txt \
+    && /venv/bin/pip install pip-tools \
+    && /venv/bin/pip-compile /requirements.in --no-header --no-annotate --output-file /app/requirements.txt \
+    && /venv/bin/pip install -r /app/requirements.txt \
     && apt autoremove -y \
     && apt clean -y && rm -rf /var/lib/apt/lists/*
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
-RUN mkdir /app/
+
 WORKDIR /app/
 ADD . /app/
 
