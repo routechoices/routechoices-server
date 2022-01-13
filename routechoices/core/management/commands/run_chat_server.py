@@ -1,18 +1,19 @@
-from django.conf import settings
+import asyncio
+import urllib
+from importlib import import_module
+
+import orjson as json
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-from tornado.iostream import StreamClosedError
-from django.utils.timezone import now
-from django.core.management.base import BaseCommand
-from routechoices.core.models import Event, ChatMessage
 from asgiref.sync import sync_to_async
-import asyncio
-import orjson as json
-from routechoices.core.models import PRIVACY_PRIVATE
+from django.conf import settings
 from django.contrib.auth import get_user
-from importlib import import_module
-import urllib
+from django.core.management.base import BaseCommand
+from django.utils.timezone import now
+from tornado.iostream import StreamClosedError
+
+from routechoices.core.models import PRIVACY_PRIVATE, ChatMessage, Event
 
 EVENT_CHAT_STREAMS = {}
 

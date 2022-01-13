@@ -1,8 +1,7 @@
-from django.urls import re_path, include
+from django.urls import include, re_path
 from django.views.generic import TemplateView
 
-from routechoices.site import views, feeds
-
+from routechoices.site import feeds, views
 
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),

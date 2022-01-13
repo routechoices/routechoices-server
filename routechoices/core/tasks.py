@@ -1,26 +1,26 @@
-from os import EX_CANTCREAT
-import requests
-import arrow
-import tempfile
 import json
-from bs4 import BeautifulSoup
-
-from uuid import UUID
-from PIL import Image, ImageDraw
-from django.core.files.base import ContentFile
-from django.contrib.auth.models import User
-from io import BytesIO
 import math
-from background_task import background
+import tempfile
+from io import BytesIO
+from os import EX_CANTCREAT
+from uuid import UUID
 
-from routechoices.core.models import Map, Event, Device, Competitor, Club
+import arrow
+import requests
+from background_task import background
+from bs4 import BeautifulSoup
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from PIL import Image, ImageDraw
+
+from routechoices.core.models import Club, Competitor, Device, Event, Map
 from routechoices.lib.helpers import (
-    initial_of_name,
-    short_random_key,
-    safe32encode,
-    three_point_calibration_to_corners,
     compute_corners_from_kml_latlonbox,
+    initial_of_name,
     project,
+    safe32encode,
+    short_random_key,
+    three_point_calibration_to_corners,
 )
 from routechoices.lib.mtb_decoder import MtbDecoder
 from routechoices.lib.tractrac_ws_decoder import TracTracWSReader

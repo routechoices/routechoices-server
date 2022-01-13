@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django_hosts.resolvers import reverse
 
-from routechoices.core.models import Event, PRIVACY_PUBLIC
+from routechoices.core.models import PRIVACY_PUBLIC, Event
 
 
 class LiveEventsFeed(Feed):

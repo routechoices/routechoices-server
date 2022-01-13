@@ -14,14 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import re_path, include, path
 from django.contrib.sitemaps.views import sitemap
-from routechoices.dashboard.views import dashboard_map_download, dashboard_logo_download
-from routechoices.site.sitemaps import (
-    StaticViewSitemap,
-    DynamicViewSitemap,
-)
+from django.urls import include, path, re_path
 
+from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
+from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 admin.site.site_header = "Routechoices.com Admin"
 admin.site.site_title = "Routechoices.com Admin Site"

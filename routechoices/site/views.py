@@ -1,24 +1,18 @@
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.mail import EmailMessage
-
-from django.db.models.functions import ExtractYear
-from django.core.paginator import Paginator
-from django.forms import HiddenInput
-from django.utils.timezone import now
-from django.shortcuts import get_object_or_404, redirect, render
-from django.http import Http404
 from django.core.exceptions import BadRequest
+from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
+from django.db.models.functions import ExtractYear
+from django.forms import HiddenInput
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.timezone import now
 
-from allauth.account.models import EmailAddress
-
-from routechoices.core.models import (
-    Event,
-    PRIVACY_PUBLIC,
-)
-
-from routechoices.site.forms import ContactForm
+from routechoices.core.models import PRIVACY_PUBLIC, Event
 from routechoices.lib.patreon_api import PatreonAPI
+from routechoices.site.forms import ContactForm
 
 
 def home_view(request):

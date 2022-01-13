@@ -2,15 +2,13 @@
 import logging
 from re import compile
 
+from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
-from django.urls import NoReverseMatch, set_urlconf, get_urlconf
-
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.urls import NoReverseMatch, get_urlconf, set_urlconf
 from django_hosts.middleware import HostsBaseMiddleware
 
 from routechoices.core.models import Club
-from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
-
 
 XFF_EXEMPT_URLS = []
 if hasattr(settings, "XFF_EXEMPT_URLS"):

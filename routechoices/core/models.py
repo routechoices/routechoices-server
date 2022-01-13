@@ -1,72 +1,66 @@
-import arrow
 import base64
 import datetime
-from decimal import Decimal
-from io import BytesIO
+import hashlib
 import logging
 import math
-import hashlib
-from operator import itemgetter
-import orjson as json
 import os.path
 import re
 import time
+import uuid
+import zoneinfo
+from decimal import Decimal
+from io import BytesIO
+from operator import itemgetter
 from zipfile import ZipFile
+
+import arrow
+import cv2
+import gps_encoding
+import gpxpy
+import gpxpy.gpx
 import magic
 import numpy as np
+import orjson as json
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.gis.geos import Polygon, LinearRing
+from django.contrib.gis.geos import LinearRing, Polygon
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.validators import validate_slug
 from django.db import models
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-import uuid
 from django_hosts.resolvers import reverse
-
-import gpxpy
-import gpxpy.gpx
-
-
-import gps_encoding
-
-import zoneinfo
-
 from PIL import Image, ImageDraw
 
-import cv2
-
-from routechoices.lib.validators import (
-    validate_domain_slug,
-    validate_nice_slug,
-    validate_latitude,
-    validate_longitude,
-    validate_corners_coordinates,
-    validate_imei,
-    validate_esn,
-    domain_validator,
-)
+from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
-    random_key,
-    random_device_id,
-    short_random_slug,
-    general_2d_projection,
     adjugate_matrix,
-    project,
+    delete_domain,
     distance_latlon,
     distance_xy,
-    delete_domain,
-    time_base64,
+    general_2d_projection,
+    project,
+    random_device_id,
+    random_key,
     safe64encode,
+    short_random_slug,
+    time_base64,
 )
 from routechoices.lib.storages import OverwriteImageStorage
-from routechoices.lib.globalmaptiles import GlobalMercator
-
+from routechoices.lib.validators import (
+    domain_validator,
+    validate_corners_coordinates,
+    validate_domain_slug,
+    validate_esn,
+    validate_imei,
+    validate_latitude,
+    validate_longitude,
+    validate_nice_slug,
+)
 
 logger = logging.getLogger(__name__)
 

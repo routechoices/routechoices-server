@@ -1,10 +1,10 @@
 import os.path
-from django.core.management.base import BaseCommand
-from django.conf import settings
 
 import sewer.client
-from sewer.crypto import AcmeKey, AcmeAccount
+from django.conf import settings
+from django.core.management.base import BaseCommand
 from sewer.auth import ProviderBase
+from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
 

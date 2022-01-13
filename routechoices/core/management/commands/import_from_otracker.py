@@ -1,9 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from routechoices.core.tasks import (
-    import_single_event_from_otracker,
-    EventImportError,
-)
+from routechoices.core.tasks import EventImportError, import_single_event_from_otracker
 
 
 class Command(BaseCommand):

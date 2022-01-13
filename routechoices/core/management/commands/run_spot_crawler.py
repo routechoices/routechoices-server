@@ -1,10 +1,9 @@
 # coding=utf-8
-import arrow
 import time
+
+import arrow
 import requests
-
 from defusedxml import minidom
-
 from django.core.management.base import BaseCommand
 
 from routechoices.core.models import Device, SpotFeed

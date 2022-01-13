@@ -1,15 +1,11 @@
-from django.core.management.base import BaseCommand
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-import requests
-from PIL import Image
 from io import BytesIO
+from urllib.parse import parse_qs, urlparse
 
+import requests
+from django.core.management.base import BaseCommand
+from PIL import Image
 
-from routechoices.core.tasks import (
-    import_single_event_from_livelox,
-    EventImportError,
-)
+from routechoices.core.tasks import EventImportError, import_single_event_from_livelox
 
 
 class Command(BaseCommand):

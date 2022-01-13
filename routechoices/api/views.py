@@ -1,10 +1,11 @@
-from datetime import timedelta
 import logging
 import re
 import time
 import urllib.parse
-import orjson as json
+from datetime import timedelta
+
 import arrow
+import orjson as json
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -17,39 +18,32 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-
 from django_hosts.resolvers import reverse
-
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import renderers, status
+from rest_framework.decorators import api_view, renderer_classes, throttle_classes
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.core.models import (
+    PRIVACY_PRIVATE,
+    PRIVACY_PUBLIC,
+    PRIVACY_SECRET,
+    ChatMessage,
     Club,
     Competitor,
     Device,
     Event,
     ImeiDevice,
     Map,
-    ChatMessage,
-    PRIVACY_PRIVATE,
-    PRIVACY_PUBLIC,
-    PRIVACY_SECRET,
 )
-from routechoices.lib.helpers import initial_of_name, safe64encode, escape_filename
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.validators import validate_imei
+from routechoices.lib.helpers import escape_filename, initial_of_name, safe64encode
 from routechoices.lib.s3 import s3_object_url
-
-from rest_framework import renderers, status
-from rest_framework.decorators import api_view, renderer_classes, throttle_classes
-from rest_framework.exceptions import (
-    ValidationError,
-    NotFound,
-)
-from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from routechoices.lib.validators import validate_imei
 
 logger = logging.getLogger(__name__)
 # API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10

@@ -1,30 +1,26 @@
 import gpxpy
-from django.contrib import messages
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.contrib import messages
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractYear
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
-from django.http import Http404
-from django.core.exceptions import BadRequest
-
 from django_hosts.resolvers import reverse
 
-
+from routechoices.api.views import serve_from_s3
+from routechoices.club import feeds
 from routechoices.core.models import (
+    PRIVACY_PRIVATE,
+    PRIVACY_PUBLIC,
     Club,
     Competitor,
     Device,
     Event,
-    PRIVACY_PUBLIC,
-    PRIVACY_PRIVATE,
 )
 from routechoices.lib.helpers import initial_of_name, short_random_key
 from routechoices.site.forms import CompetitorForm, UploadGPXForm
-from routechoices.club import feeds
-from routechoices.api.views import serve_from_s3
 
 
 def handle_legacy_request(view_name, club_slug=None, **kwargs):

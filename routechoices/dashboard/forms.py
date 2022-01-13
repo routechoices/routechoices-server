@@ -1,30 +1,30 @@
 from io import BytesIO
 
-from PIL import Image
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.images import get_image_dimensions
 from django.core.validators import FileExtensionValidator
 from django.forms import (
-    Form,
-    ModelForm,
-    DateTimeInput,
-    inlineformset_factory,
-    ModelChoiceField,
-    FileField,
     CharField,
+    DateTimeInput,
+    FileField,
+    Form,
+    ModelChoiceField,
+    ModelForm,
+    inlineformset_factory,
 )
+from PIL import Image
 
 from routechoices.core.models import (
     Club,
-    Map,
-    Event,
     Competitor,
     Device,
-    Notice,
+    Event,
+    Map,
     MapAssignation,
+    Notice,
 )
-from routechoices.lib.helpers import get_aware_datetime, check_records
+from routechoices.lib.helpers import check_records, get_aware_datetime
 from routechoices.lib.validators import domain_validator
 
 

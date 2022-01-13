@@ -1,19 +1,16 @@
 from datetime import timedelta
-import arrow
 
+import arrow
+from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count, Case, Value, When
-from django.utils.timezone import now
-from django.db.models.expressions import RawSQL
-from django.utils.safestring import mark_safe
-from django.utils.functional import cached_property
 from django.core.paginator import Paginator
-
-from allauth.account.models import EmailAddress
-
-from routechoices.lib.helpers import get_device_name
+from django.db.models import Case, Count, Value, When
+from django.db.models.expressions import RawSQL
+from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 
 from routechoices.core.models import (
     ChatMessage,
@@ -23,11 +20,12 @@ from routechoices.core.models import (
     Event,
     ImeiDevice,
     Map,
-    Notice,
     MapAssignation,
+    Notice,
     SpotDevice,
     SpotFeed,
 )
+from routechoices.lib.helpers import get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):

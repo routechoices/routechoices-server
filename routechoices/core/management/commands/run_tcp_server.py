@@ -1,21 +1,17 @@
 # coding=utf-8
+from struct import pack, unpack
+
 import arrow
-
-from struct import unpack, pack
 from asgiref.sync import sync_to_async
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
-from django.conf import settings
-
-from tornado.tcpserver import TCPServer
-from tornado.iostream import StreamClosedError
 from tornado.ioloop import IOLoop
+from tornado.iostream import StreamClosedError
+from tornado.tcpserver import TCPServer
 
 from routechoices.core.models import Device
-from routechoices.lib.validators import (
-    validate_imei,
-)
+from routechoices.lib.validators import validate_imei
 
 
 def _get_device(imei):

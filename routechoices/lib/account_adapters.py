@@ -1,5 +1,5 @@
-from django.conf import settings
 from allauth.account.adapter import DefaultAccountAdapter
+from django.conf import settings
 
 
 class NoNewUsersAccountAdapter(DefaultAccountAdapter):
@@ -18,9 +18,7 @@ class SiteAccountAdapter(DefaultAccountAdapter):
         try:
             from django.utils.http import url_has_allowed_host_and_scheme
         except ImportError:
-            from django.utils.http import (
-                is_safe_url as url_has_allowed_host_and_scheme,
-            )
+            from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
 
         return url_has_allowed_host_and_scheme(
             url, allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS

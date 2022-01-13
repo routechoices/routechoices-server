@@ -1,51 +1,46 @@
-import os
 import math
+import os
 import tempfile
 import zipfile
-from django.http.response import HttpResponse
-
-import requests
 
 import gpxpy
-
+import requests
+from allauth.account.signals import password_changed, password_reset
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.paginator import Paginator
-from django.http import Http404
-from django.shortcuts import render, redirect, get_object_or_404
 from django.dispatch import receiver
-
-from allauth.account.signals import password_reset, password_changed
-
+from django.http import Http404
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
     Club,
     Competitor,
-    Map,
-    Event,
     Device,
     DeviceOwnership,
+    Event,
+    Map,
     Notice,
 )
 from routechoices.dashboard.forms import (
+    ClubDomainForm,
     ClubForm,
-    MapForm,
-    EventForm,
     CompetitorFormSet,
+    DeviceForm,
+    EventForm,
+    ExtraMapFormSet,
+    MapForm,
+    NoticeForm,
     UploadGPXForm,
     UploadKmzForm,
-    DeviceForm,
-    NoticeForm,
-    ExtraMapFormSet,
-    ClubDomainForm,
     UploadMapGPXForm,
 )
-from routechoices.lib.kmz import extract_ground_overlay_info
 from routechoices.lib.helpers import short_random_key
-
+from routechoices.lib.kmz import extract_ground_overlay_info
 
 DEFAULT_PAGE_SIZE = 25
 

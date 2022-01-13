@@ -1,24 +1,22 @@
 import base64
-import secrets
-import struct
-import requests
-import requests
-import numpy
+import math
 import os
 import os.path
+import secrets
+import struct
 import time
-import math
+from math import cos, pi, sin
 
+import numpy
+import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
+from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
 from routechoices.lib.validators import validate_nice_slug
-
-from user_sessions.templatetags.user_sessions import device as device_name
-from math import pi, cos, sin
 
 
 def escape_filename(f):

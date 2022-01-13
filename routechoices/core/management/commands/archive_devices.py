@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
-from django.db.models.functions import Length
 from datetime import timedelta
 
+from django.core.management.base import BaseCommand
+from django.db.models.functions import Length
 from django.utils.timezone import now
 
 from routechoices.core.models import Device

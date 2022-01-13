@@ -1,10 +1,9 @@
 import time
 
 from django.conf import settings
-
 from django_hosts.resolvers import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, override_settings
+from rest_framework.test import APIClient, APITestCase, override_settings
 
 from routechoices.core.models import Device
 

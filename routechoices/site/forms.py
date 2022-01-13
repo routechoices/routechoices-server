@@ -1,24 +1,22 @@
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
+from allauth.account.utils import filter_users_by_email
+from captcha.fields import CaptchaField
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.forms import (
     CharField,
+    EmailField,
     FileField,
     Form,
     HiddenInput,
     ModelChoiceField,
     ModelForm,
-    EmailField,
     Textarea,
 )
-from django_hosts.resolvers import reverse
 from django.utils.timezone import now
-from django.contrib.sites.shortcuts import get_current_site
-
-from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
-from allauth.account.adapter import get_adapter
-from allauth.account.utils import filter_users_by_email
-
-from captcha.fields import CaptchaField
+from django_hosts.resolvers import reverse
 
 from routechoices.core.models import Competitor, Device
 

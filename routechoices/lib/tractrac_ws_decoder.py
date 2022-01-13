@@ -1,8 +1,9 @@
-import websocket
+import json
 import ssl
 import struct
-import json
 from uuid import UUID
+
+import websocket
 
 
 class TracTracWSReader:

@@ -1,12 +1,11 @@
-import re
 import os
+import re
 from decimal import Decimal
 
+import fast_luhn as luhn
 from django.conf import settings
 from django.core.validators import RegexValidator, ValidationError
 from django.utils.translation import gettext_lazy as _
-
-import fast_luhn as luhn
 
 FLOAT_RE = re.compile(r"^(\-?[0-9]+(\.[0-9]+)?)$")
 
