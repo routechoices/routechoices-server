@@ -4,8 +4,11 @@ from django_hosts.resolvers import reverse
 
 class StaticViewSitemap(Sitemap):
     changefreq = "yearly"
-    priority = 0.6
+    priority = 0.7
     protocol = "https"
+
+    def get_domain(self, site=None):
+        return ''
 
     def items(self):
         return [
@@ -18,13 +21,19 @@ class StaticViewSitemap(Sitemap):
         ]
 
     def location(self, item):
-        return reverse(item)
+        path = reverse(item)
+        if path.startswith('//'):
+            return path[2:]
+        return path
 
 
 class DynamicViewSitemap(Sitemap):
     changefreq = "daily"
-    priority = 0.7
+    priority = 0.8
     protocol = "https"
+
+    def get_domain(self, site=None):
+        return ''
 
     def items(self):
         return [
@@ -32,4 +41,7 @@ class DynamicViewSitemap(Sitemap):
         ]
 
     def location(self, item):
-        return reverse(item)
+        path = reverse(item)
+        if path.startswith('//'):
+            return path[2:]
+        return path
