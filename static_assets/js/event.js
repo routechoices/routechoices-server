@@ -163,7 +163,7 @@ var competitorList = []
 var competitorRoutes = {}
 var routesLastFetched = -Infinity
 var noticeLastFetched = -Infinity
-var timeOffsetSec = 0
+var fetchPositionInterval = 10
 var playbackRate = 1
 var playbackPaused = true
 var prevDisplayRefresh = 0
@@ -307,18 +307,18 @@ var selectLiveMode = function(e){
   $("#replay_button").removeClass('active')
   $("#replay_mode_buttons").hide()
   $("#replay_control_buttons").hide()
-  timeOffsetSec = -15
-  isLiveMode=true
-  isRealTime=true
+
+  isLiveMode = true
+  isRealTime = true
 
   ;(function whileLive(){
-    if (((performance.now()-routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes) {
+    if (((performance.now()-routesLastFetched) > (fetchPositionInterval * 1e3)) && !isCurrentlyFetchingRoutes) {
       fetchCompetitorRoutes()
     }
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
     }
-    currentTime = +clock.now() - 5 * 1e3 + timeOffsetSec * 1e3
+    currentTime = +clock.now() - (fetchPositionInterval * 2) * 1e3
     drawCompetitors()
     if (isLiveMode) {
       setTimeout(whileLive, 101)
@@ -349,7 +349,7 @@ var selectReplayMode = function(e){
   playbackRate = 1
   prevDisplayRefresh = performance.now()
   ;(function whileReplay(){
-    if(isLiveEvent && ((performance.now() - routesLastFetched) > (-timeOffsetSec * 1e3)) && !isCurrentlyFetchingRoutes){
+    if(isLiveEvent && ((performance.now() - routesLastFetched) > (fetchPositionInterval * 1e3)) && !isCurrentlyFetchingRoutes){
       fetchCompetitorRoutes()
     }
     if(isLiveEvent && ((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
@@ -378,7 +378,7 @@ var selectReplayMode = function(e){
 var fetchCompetitorRoutes = function(url){
   isCurrentlyFetchingRoutes = true
   url = url || liveUrl
-  var data = {lastDataTs: Math.round(lastDataTs/15)*15}
+  var data = {lastDataTs: Math.round(lastDataTs / fetchPositionInterval) * fetchPositionInterval}
   $.ajax({
     url: url,
     data: data,
