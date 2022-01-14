@@ -31,7 +31,7 @@ from routechoices.lib.validators import domain_validator
 class ClubForm(ModelForm):
     class Meta:
         model = Club
-        fields = ["name", "slug", "admins", "logo", "description"]
+        fields = ["name", "slug", "admins", "website", "logo", "description"]
 
     def clean_admins(self):
         admins = self.cleaned_data["admins"]

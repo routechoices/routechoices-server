@@ -40,19 +40,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sites",
-    "django.contrib.sitemaps",
-    "django_hosts",
-    "corsheaders",
     "routechoices",
     "routechoices.core",
     "routechoices.site",
     "routechoices.lib",
+    "django_hosts",
+    "corsheaders",
     "user_sessions",
     "allauth",
     "allauth.account",
@@ -68,6 +61,13 @@ INSTALLED_APPS = [
     "raven.contrib.django.raven_compat",
     "qr_code",
     "captcha",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
 ]
 
 MIDDLEWARE = [
@@ -95,9 +95,16 @@ PARENT_HOST = "routechoices.dev:8081"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
         "OPTIONS": {
+            "loaders": [
+                (
+                    "django.template.loaders.cached.Loader",
+                    [
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
+                    ],
+                ),
+            ],
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",

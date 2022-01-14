@@ -138,6 +138,7 @@ Browse our events here.""",
         ],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
+    website = models.URLField(max_length=200, blank=True)
     logo = models.ImageField(
         upload_to=logo_upload_path,
         null=True,
