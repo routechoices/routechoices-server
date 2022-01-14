@@ -1,11 +1,19 @@
 {% load static %}
 {% load hosts %}
+{% load define_action %}
+
+{% if event.club %}
+  {% define event.club as club %}
+{% endif %}
+
 <header class="navbar navbar-expand-md navbar-light bg-light" style="z-index: 110001">
     <div class="container">
-        {% if club.logo or event.club.logo %}
-          {% if club.website or event.club.website %}<a href="{% if club %}{{ club.website }}{% else %}}{{ event.club.website }}{% endif %}">{% endif %}<span style="display:inline-block;"><img src="{% if club %}{{club.nice_url}}{% else %}{{event.club.nice_url}}{% endif %}logo" alt="_" height="40"></span>{% if club.website or event.club.website %}</a>{% endif %}
-        {% elif club.website or event.club.website %}
-          <a href="{% if club %}{{ club.website }}{% else %}}{{ event.club.website }}{% endif %}"><i class="fa fa-home fa-2x"></i></a></span>
+        {% if club.logo and club.website %}
+          <a href="{{ club.website }}"><span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span></a>
+        {% elif club.logo %}
+          <span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span>
+        {% elif club.website %}
+          <a href="{{ club.website }}"><i class="fa fa-home fa-2x"></i></a></span>
         {% else %}
           <a class="navbar-brand site-name" href="{% host_url 'site:events_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
         {% endif %}
@@ -13,15 +21,13 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-        {% if club or event.club %}
           <ul class="nav navbar-nav me-auto mb-2 mb-lg-0">
           </ul>
           <ul class="nav navbar-nav d-flex">
             <li class="nav-item">
-              <a class="nav-link" href="{% if club %}{{ club.get_absolute_url }}{% else %}{{ event.club.get_absolute_url }}{% endif %}" id="club-events-link-text">Events by {% if club %}{{ club.name }}{% else %}{{ event.club.name }}{% endif %}</a>
+              <a class="nav-link" href="{{ club.get_absolute_url }}" id="club-events-link-text">Events by {{ club.name }}</a>
             </li>
           </ul>
         </div>
-        {% endif %}
     </div>
   </header>

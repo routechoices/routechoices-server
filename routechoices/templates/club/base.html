@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load define_action %}
 
-{% block favicon %}{% if club.logo or event.club.logo %}<link rel="icon" type="image/png" href="{% if club %}{{club.nice_url}}{% else %}{{event.club.nice_url}}{% endif %}logo">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+{% if event.club %}
+  {% define event.club as club %}
+{% endif %}
+
+{% block favicon %}{% if club.logo %}<link rel="icon" type="image/png" href="{{club.nice_url}}logo">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
 <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
 <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
 <link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}" color="#5bbad5">
