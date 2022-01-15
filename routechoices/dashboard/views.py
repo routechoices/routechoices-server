@@ -96,7 +96,7 @@ def device_list_view(request):
         Competitor.objects.select_related("event")
         .filter(device__in=devices_listed)
         .order_by("device_id", "-start_time")
-        .distinct('device_id")
+        .distinct("device_id")
     )
     last_usage = {}
     for competitor in competitors:
