@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.urls import get_urlconf, set_urlconf
 from django_hosts.middleware import HostsBaseMiddleware
 
+from django.shortcuts import redirect
 from routechoices.core.models import Club
 
 XFF_EXEMPT_URLS = []
@@ -142,6 +143,8 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
                 return HttpResponse(status=204)
             raw_host = f"{club.slug.lower()}.{default_domain}"
             request.use_cname = True
+        if raw_host == default_domain:
+            return redirect(f'//www.{settings.PARENT_HOST}{request.get_full_path()}')
         host, kwargs = self.get_host(raw_host)
         # This is the main part of this middleware
         request.urlconf = host.urlconf
