@@ -95,14 +95,12 @@ def device_list_view(request):
     competitors = (
         Competitor.objects.select_related("event")
         .filter(device__in=devices_listed)
-        .order_by("-start_time")
+        .order_by("device_id", "-start_time")
+        .distinct('device_id")
     )
     last_usage = {}
     for competitor in competitors:
-        if competitor.device_id not in last_usage.keys():
-            last_usage[competitor.device_id] = f"{competitor.event} ({competitor})"
-            if len(last_usage.keys()) == len(devices_listed):
-                break
+        last_usage[competitor.device_id] = f"{competitor.event} ({competitor})"
     return render(
         request,
         "dashboard/device_list.html",
