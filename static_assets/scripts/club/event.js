@@ -72,6 +72,7 @@ function updateText () {
 $(function() {
   updateText().then(function(){
     $('#heads-up-text').text(banana.i18n('heads-up-text'))
+    $('#chat-btn-text').text(banana.i18n('chat'))
     $('#loading-text').text(banana.i18n('loading-text'))
     $('#event-not-started-text').text(banana.i18n('event-not-started-text'))
     $('#club-events-link-text').text(banana.i18n('club-events-link-text', clubName))
@@ -191,7 +192,7 @@ $(function() {
         })
         $('#prev_button').on('click', function(e){
           e.preventDefault()
-          playbackRate = Math.max(1, playbackRate/2)
+          playbackRate = Math.max(1, playbackRate / 2)
         })
         $('#real_time_button').on('click', function(e) {
           e.preventDefault()

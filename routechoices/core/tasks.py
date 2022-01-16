@@ -264,7 +264,7 @@ def import_single_event_from_gps_seuranta(event_id):
     event_url = GPSSEURANTA_EVENT_URL + event_id + "/init.txt"
     r = requests.get(event_url)
     if r.status_code != 200:
-        raise EventImportError("API returned error code")
+        raise EventImportError("API returned error code" + event_url)
     event_raw_data = r.text
     event_data = {"COMPETITOR": []}
     for line in event_raw_data.split("\n"):
@@ -680,7 +680,7 @@ def import_single_event_from_otracker(event_id):
         with open(lf.name, "r") as f:
             orig_device_map = json.load(f)
             device_map = {}
-            for d in orig_device_map.keys():
+            for d in orig_device_map:
                 device_map[d] = [
                     {
                         "timestamp": x["fix_time"] + ft,

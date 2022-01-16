@@ -6,6 +6,7 @@ import zipfile
 import gpxpy
 import requests
 from allauth.account.signals import password_changed, password_reset
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -816,6 +817,23 @@ def event_delete_view(request, id):
         {
             "event": event,
         },
+    )
+
+
+@login_required
+def event_chat_moderation_view(request, id):
+    if request.user.is_superuser:
+        event = get_object_or_404(
+            Event,
+            aid=id,
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        event = get_object_or_404(Event, aid=id, club__in=club_list)
+    return render(
+        request,
+        "dashboard/event_chat_moderation.html",
+        {"event": event, "chat_server": getattr(settings, "CHAT_SERVER", None)},
     )
 
 

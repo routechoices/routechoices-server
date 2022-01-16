@@ -31,6 +31,10 @@ def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip("=")
 
 
+def safe64decode(b):
+    return base64.urlsafe_b64decode(b.encode() + b"==")
+
+
 def time_base64():
     t = int(time.time())
     b = struct.pack(">Q", t)

@@ -144,6 +144,7 @@ class EventForm(ModelForm):
             "privacy",
             "open_registration",
             "allow_route_upload",
+            "allow_live_chat",
             "start_date",
             "end_date",
             "backdrop_map",

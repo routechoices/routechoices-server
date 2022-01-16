@@ -39,6 +39,25 @@ class LiveEventChatHandler(tornado.web.RequestHandler):
                 *[stream.publish("message", **data) for stream in ongoing_streams]
             )
 
+    async def delete(self, event_id):
+        if (
+            self.request.headers.get("Authorization")
+            != f"Bearer {settings.CHAT_INTERNAL_SECRET}"
+        ):
+            raise tornado.web.HTTPError(403)
+        try:
+            data = json.loads(self.request.body)
+        except Exception:
+            raise tornado.web.HTTPError(400)
+        ongoing_streams = EVENT_CHAT_STREAMS.get(event_id)
+        if ongoing_streams:
+            await asyncio.gather(
+                *[
+                    stream.publish("delete", uuid=data["uuid"])
+                    for stream in ongoing_streams
+                ]
+            )
+
 
 class LiveEventChatStream(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
@@ -109,8 +128,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
                 )()
                 if not is_admin:
                     raise tornado.web.HTTPError(403)
-        if event_id not in EVENT_CHAT_STREAMS.keys():
-            EVENT_CHAT_STREAMS[event_id] = []
+        EVENT_CHAT_STREAMS.setdefault(event_id, [])
         EVENT_CHAT_STREAMS[event_id].append(self)
         old_messages = await sync_to_async(
             lambda: list(ChatMessage.objects.filter(event_id=event.id).all()),

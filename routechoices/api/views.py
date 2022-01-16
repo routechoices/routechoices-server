@@ -2,6 +2,7 @@ import logging
 import re
 import time
 import urllib.parse
+import uuid
 from datetime import timedelta
 
 import arrow
@@ -41,7 +42,7 @@ from routechoices.core.models import (
     Map,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import escape_filename, initial_of_name
+from routechoices.lib.helpers import escape_filename, initial_of_name, safe64decode
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.validators import validate_imei
 
@@ -326,7 +327,7 @@ def event_detail(request, event_id):
     method="post",
     auto_schema=None,
 )
-@api_view(["POST"])
+@api_view(["POST", "DELETE"])
 @throttle_classes(
     [
         PostDataThrottle,
@@ -346,6 +347,33 @@ def event_chat(request, event_id):
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
+
+    if request.method == "DELETE":
+        if not request.user.is_superuser:
+            if (
+                not request.user.is_authenticated
+                or not event.club.admins.filter(id=request.user.id).exists()
+            ):
+                raise PermissionDenied()
+        msg_uuid = request.data.get("uuid")
+        if not msg_uuid:
+            raise ValidationError("Missing parameter")
+        msg = ChatMessage.objects.get(
+            uuid=uuid.UUID(bytes=safe64decode(request.data.get("uuid")))
+        )
+        if msg:
+            msg.delete()
+            try:
+                requests.delete(
+                    f"http://127.0.0.1:8009/{event_id}",
+                    data=json.dumps(msg.serialize()),
+                    headers={
+                        "Authorization": f"Bearer {settings.CHAT_INTERNAL_SECRET}"
+                    },
+                )
+            except Exception:
+                pass
+        return Response({"status": "deleted"}, status=201)
 
     nickname = request.data.get("nickname")
     message = request.data.get("message")
@@ -803,13 +831,13 @@ def event_data(request, event_id):
         Competitor.objects.filter(
             start_time__gte=event.start_date, device_id__in=devices
         )
-        .values("device_id", "start_time")
+        .only("device_id", "start_time")
         .order_by("start_time")
     )
     start_times_by_device = {}
     for c in all_devices_competitors:
-        start_times_by_device.setdefault(c.get("device_id"), [])
-        start_times_by_device[c.get("device_id")].append(c.get("start_time"))
+        start_times_by_device.setdefault(c.device_id, [])
+        start_times_by_device[c.device_id].append(c.start_time)
     nb_points = 0
     results = []
     for c in competitors:

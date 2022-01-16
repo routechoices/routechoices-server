@@ -761,7 +761,7 @@ class Event(models.Model):
 
     @property
     def shortcut(self):
-        shortcut_url = getattr(settings, "SHORTCUT_BASE_URL")
+        shortcut_url = getattr(settings, "SHORTCUT_BASE_URL", None)
         if shortcut_url:
             return f"{shortcut_url}{self.aid}"
         return None
@@ -1122,6 +1122,7 @@ class Competitor(models.Model):
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
+
         next_competitor_start_time = (
             self.device.competitor_set.filter(start_time__gt=from_date)
             .order_by("start_time")

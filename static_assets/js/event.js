@@ -164,7 +164,7 @@ var competitorRoutes = {}
 var routesLastFetched = -Infinity
 var noticeLastFetched = -Infinity
 var fetchPositionInterval = 10 * 2 // tracker buffer is 10 seconds
-var playbackRate = 1
+var playbackRate = 16
 var playbackPaused = true
 var prevDisplayRefresh = 0
 var tailLength = 60
@@ -346,8 +346,8 @@ var selectReplayMode = function(e){
   isLiveMode = false
   prevShownTime = getCompetitionStartDate()
   playbackPaused = true
-  playbackRate = 1
   prevDisplayRefresh = performance.now()
+  playbackRate = 16
   ;(function whileReplay(){
     if(isLiveEvent && ((performance.now() - routesLastFetched) > (fetchPositionInterval * 1e3)) && !isCurrentlyFetchingRoutes){
       fetchCompetitorRoutes()
@@ -738,7 +738,11 @@ var refreshMessageList = function() {
   }
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
   chatMessages.forEach(function(msg){
-    out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>'
+    if (msg.removed) {
+      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <i>Message removed by moderator</i></div>'
+    } else {
+      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>'
+    }
   })
   $('#messageList').html(out)
 }
@@ -970,12 +974,12 @@ var getProgressBarText = function(currentTime){
 var drawCompetitors = function(){
   // play/pause button
   if(playbackPaused){
-    var html = '<i class="fa fa-play"></i> x'+playbackRate
+    var html = '<i class="fa fa-play"></i> x' + playbackRate
     if($('#play_pause_button').html() != html){
       $('#play_pause_button').html(html)
     }
   } else {
-    var html = '<i class="fa fa-pause"></i> x'+playbackRate
+    var html = '<i class="fa fa-pause"></i> x' + playbackRate
     if($('#play_pause_button').html() != html){
       $('#play_pause_button').html(html)
     }
@@ -1518,6 +1522,9 @@ function connectToChatEvents() {
       // pass
     } else if (message.type === "message") {
       chatMessages.push(message)
+      refreshMessageList()
+    } else if (message.type === "delete") {
+      chatMessages = chatMessages.map(function(msg) {if(msg.uuid === message.uuid){msg.removed = true}return msg})
       refreshMessageList()
     }
   })
