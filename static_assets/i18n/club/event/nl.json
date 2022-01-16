@@ -36,5 +36,6 @@
     "qr-link": "Qr link",
     "language": "Taal",
     "error-sending-msg": "Bericht kon niet worden verstuurd!",
-    "sending": "Sturen..."
+    "sending": "Sturen...",
+    "message-removed": "Bericht verwijderd door een moderator"
 }

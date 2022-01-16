@@ -36,5 +36,6 @@
     "qr-link": "Lien QR code",
     "language": "Langue",
     "error-sending-msg": "Le message n'a pas pu être envoyé!",
-    "sending": "Envoi en cours..."
+    "sending": "Envoi en cours...",
+    "message-removed": "Message supprimé par un modérateur"
 }

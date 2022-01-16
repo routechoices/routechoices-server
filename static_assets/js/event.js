@@ -739,7 +739,7 @@ var refreshMessageList = function() {
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
   chatMessages.forEach(function(msg){
     if (msg.removed) {
-      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <i>Message removed by moderator</i></div>'
+      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <i>' + banana.i18n('message-removed') + '</i></div>'
     } else {
       out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>'
     }

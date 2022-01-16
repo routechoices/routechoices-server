@@ -36,5 +36,6 @@
     "qr-link": "QR-linkki",
     "language": "Kieli",
     "error-sending-msg": "Viestiä ei voitu lähettää!",
-    "sending": "Lähetetään..."
+    "sending": "Lähetetään...",
+    "message-removed": "Moderaattori poisti viestin"
 }

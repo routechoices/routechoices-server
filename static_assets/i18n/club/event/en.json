@@ -36,5 +36,6 @@
     "qr-link": "QR Link",
     "language": "Language",
     "error-sending-msg": "Message could not be sent!",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "message-removed": "Message removed by a moderator"
 }
