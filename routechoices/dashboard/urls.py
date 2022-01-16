@@ -6,7 +6,7 @@ urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
     re_path(r"^calibrate_map/?$", views.calibration_view, name="calibration_view"),
-    re_path(r"^pdf_to_jpg/?$", views.pdf_to_jpg, name="pdf_to_jpg"),
+    re_path(r"^pdf-to-jpg/?$", views.pdf_to_jpg, name="pdf_to_jpg"),
     re_path(
         r"^check_calibration/?$",
         views.check_calibration_view,
@@ -25,7 +25,7 @@ urlpatterns = [
         r"^club/(?P<id>[A-Za-z0-9_-]+)/$", views.club_edit_view, name="club_edit_view"
     ),
     re_path(
-        r"^club/(?P<id>[A-Za-z0-9_-]+)/custom_domain/?$",
+        r"^club/(?P<id>[A-Za-z0-9_-]+)/custom-domain/?$",
         views.club_custom_domain_view,
         name="club_custom_domain_view",
     ),
@@ -37,10 +37,10 @@ urlpatterns = [
     re_path(r"^map/?$", views.map_list_view, name="map_list_view"),
     re_path(r"^map/new/?$", views.map_create_view, name="map_create_view"),
     re_path(
-        r"^map/upload_kmz/?$", views.map_kmz_upload_view, name="map_upload_kmz_view"
+        r"^map/upload-kmz/?$", views.map_kmz_upload_view, name="map_upload_kmz_view"
     ),
     re_path(
-        r"^map/upload_gpx/?$", views.map_gpx_upload_view, name="map_upload_gpx_view"
+        r"^map/upload-gpx/?$", views.map_gpx_upload_view, name="map_upload_gpx_view"
     ),
     re_path(
         r"^map/(?P<id>[A-Za-z0-9_-]+)/?$", views.map_edit_view, name="map_edit_view"
@@ -63,12 +63,12 @@ urlpatterns = [
         name="event_delete_view",
     ),
     re_path(
-        r"^event/(?P<id>[A-Za-z0-9_-]+)/chat_moderation/?$",
+        r"^event/(?P<id>[A-Za-z0-9_-]+)/chat-moderation/?$",
         views.event_chat_moderation_view,
         name="event_chat_moderation_view",
     ),
     re_path(
-        r"^event/(?P<id>[A-Za-z0-9_-]+)/route_upload/?$",
+        r"^event/(?P<id>[A-Za-z0-9_-]+)/route-upload/?$",
         views.event_route_upload_view,
         name="event_gpx_upload_view",
     ),

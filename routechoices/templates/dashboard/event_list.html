@@ -31,7 +31,7 @@
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> Open</a>
                     {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export Page</a>{% endif %}
                     {% if not event.ended and event.open_registration %} <a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
-                    {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}{{event.slug}}/route_upload" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
+                    {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}{{event.slug}}/route-upload" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
                     {% if event.is_live and event.allow_live_chat %} <a href="{% url 'dashboard:event_chat_moderation_view' id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-comments"></i> Chat Moderation</a>{% endif %}
                     {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noreferrer" class="btn btn-sm btn-secondary " style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
                 </td>

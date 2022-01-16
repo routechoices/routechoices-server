@@ -37,17 +37,17 @@ urlpatterns = [
         name="event_registration_view",
     ),
     re_path(
-        r"(?P<slug>[0-9a-zA-Z_-]+)/registration_complete/?$",
+        r"(?P<slug>[0-9a-zA-Z_-]+)/registration-complete/?$",
         views.event_registration_done_view,
         name="event_registration_done_view",
     ),
     re_path(
-        r"(?P<slug>[0-9a-zA-Z_-]+)/route_upload/?$",
+        r"(?P<slug>[0-9a-zA-Z_-]+)/route-upload/?$",
         views.event_route_upload_view,
         name="event_route_upload_view",
     ),
     re_path(
-        r"(?P<slug>[0-9a-zA-Z_-]+)/route_upload_complete/?$",
+        r"(?P<slug>[0-9a-zA-Z_-]+)/route-upload-complete/?$",
         views.event_route_upload_done_view,
         name="event_route_upload_done_view",
     ),

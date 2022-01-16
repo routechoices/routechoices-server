@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.timezone import now
 
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
@@ -822,14 +823,25 @@ def event_delete_view(request, id):
 
 @login_required
 def event_chat_moderation_view(request, id):
+
     if request.user.is_superuser:
         event = get_object_or_404(
             Event,
             aid=id,
+            allow_live_chat=True,
+            start_date__lte=now(),
+            end_date__gte=now(),
         )
     else:
         club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(Event, aid=id, club__in=club_list)
+        event = get_object_or_404(
+            Event,
+            aid=id,
+            club__in=club_list,
+            allow_live_chat=True,
+            start_date__lte=now(),
+            end_date__gte=now(),
+        )
     return render(
         request,
         "dashboard/event_chat_moderation.html",

@@ -284,7 +284,7 @@ def event_registration_view(request, slug, **kwargs):
             competitor.short_name = initial_of_name(competitor.name)
             competitor.save()
             messages.success(request, "Successfully registered for this event.")
-            target_url = f"{event.club.nice_url}{event.slug}/registration_complete"
+            target_url = f"{event.club.nice_url}{event.slug}/registration-complete"
             return redirect(target_url)
         else:
             devices = Device.objects.none()
@@ -322,7 +322,7 @@ def event_registration_done_view(request, slug, **kwargs):
         open_registration=True,
     )
     if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/registration_complete")
+        return redirect(f"{event.club.nice_url}{event.slug}/registration-complete")
     return render(
         request,
         "club/event_registration_done.html",
@@ -347,7 +347,7 @@ def event_route_upload_view(request, slug, **kwargs):
         start_date__lte=now(),
     )
     if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/route_upload")
+        return redirect(f"{event.club.nice_url}{event.slug}/route-upload")
     if request.method == "POST":
         form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:
@@ -390,7 +390,7 @@ def event_route_upload_view(request, slug, **kwargs):
                     competitor.start_time = start_time
                 competitor.save()
 
-            target_url = f"{event.club.nice_url}{event.slug}/route_upload_complete"
+            target_url = f"{event.club.nice_url}{event.slug}/route-upload-complete"
             return redirect(target_url)
     else:
         form = UploadGPXForm()
@@ -419,7 +419,7 @@ def event_route_upload_done_view(request, slug, **kwargs):
         start_date__lte=now(),
     )
     if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/route_upload_complete")
+        return redirect(f"{event.club.nice_url}{event.slug}/route-upload-complete")
     return render(
         request,
         "club/event_route_upload_done.html",

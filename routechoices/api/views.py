@@ -23,7 +23,7 @@ from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import renderers, status
-from rest_framework.decorators import api_view, renderer_classes, throttle_classes
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -1010,23 +1010,6 @@ class DataRenderer(renderers.BaseRenderer):
 
     def render(self, data, media_type=None, renderer_context=None):
         return data
-
-
-GPS_SEURANTA_URL_RE = r"^https?://(gps|www)\.tulospalvelu\.fi/gps/(.*)$"
-
-
-@swagger_auto_schema(
-    method="get",
-    auto_schema=None,
-)
-@api_view(["GET"])
-@renderer_classes((DataRenderer,))
-def gps_seuranta_proxy(request):
-    url = request.GET.get("url")
-    if not url or not re.match(GPS_SEURANTA_URL_RE, url):
-        raise ValidationError("Not a gps seuranta url")
-    response = requests.get(url)
-    return Response(response.content)
 
 
 @swagger_auto_schema(

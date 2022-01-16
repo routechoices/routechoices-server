@@ -24,9 +24,6 @@ urlpatterns = [
     re_path(r"^$", schema_view.with_ui("redoc", cache_timeout=0), name="api_doc"),
     re_path(r"^device_id/?$", views.get_device_id, name="device_id_api"),
     re_path(r"^imei/?$", views.get_device_for_imei, name="device_imei_api"),
-    re_path(
-        r"^gps_seuranta_proxy/?$", views.gps_seuranta_proxy, name="gps_seuranta_proxy"
-    ),
     re_path(r"^time/?$", views.get_time, name="time_api"),
     re_path(r"^user/search/?$", views.user_search, name="user_search_api"),
     re_path(r"^device/search/?$", views.device_search, name="device_search_api"),
@@ -48,7 +45,7 @@ urlpatterns = [
         name="event_chat",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map_thumb/?$",
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map-thumb/?$",
         views.event_map_thumb_download,
         name="event_map_thumb_download",
     ),
@@ -58,7 +55,7 @@ urlpatterns = [
         name="event_register",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/upload_route/?$",
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/upload-route/?$",
         views.event_upload_route,
         name="event_upload_route",
     ),
@@ -83,7 +80,7 @@ urlpatterns = [
         name="event_data",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/data_load_test/?$",
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/data-load-test/?$",
         views.event_data_load_test,
         name="event_data_load_test",
     ),
@@ -108,5 +105,5 @@ urlpatterns = [
         name="2d_rerun_race_data",
     ),
     re_path(r"^wms/?$", views.wms_service, name="wms_service"),
-    re_path(r"^check_latlon/?$", views.ip_latlon, name="ip_latlon"),
+    re_path(r"^check-latlon/?$", views.ip_latlon, name="ip_latlon"),
 ]
