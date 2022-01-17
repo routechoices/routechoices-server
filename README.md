@@ -5,3 +5,5 @@ routechoices-server
 ==================
 
 Server for live GPS tracking in orienteering events context.
+
+This project is based on the python django framework.
