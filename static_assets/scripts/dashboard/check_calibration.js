@@ -99,7 +99,7 @@
         map.fitBounds(bounds);
     }
 
-    document.getElementById('back_button').addEventListener('click', function(e){
+    u('#back_button').on('click', function(e){
         e.preventDefault();
         window.close();
     });

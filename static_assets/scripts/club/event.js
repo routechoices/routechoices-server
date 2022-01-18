@@ -9,7 +9,7 @@ var clubName = dataset.clubName
 var staticRoot = dataset.staticRoot
 
 if (!navigator.canShare) {
-  $('#share_buttons').hide()
+  u('#share_buttons').hide()
 }
 
 function checkImageFormatCapability(format) {
@@ -41,8 +41,8 @@ var hasAvifSupport = false
 function shareUrl (e) {
   e.preventDefault()
   var shareData = {
-    title: $('meta[property="og:title"]').attr('content'),
-    text: $('meta[property="og:description"]').attr('content'),
+    title: u('meta[property="og:title"]').attr('content'),
+    text: u('meta[property="og:description"]').attr('content'),
     url: window.location
   }
   try {
@@ -69,19 +69,19 @@ function updateText () {
     })
 }
 
-$(function() {
+;(function() {
   updateText().then(function(){
-    $('#heads-up-text').text(banana.i18n('heads-up-text'))
-    $('#chat-btn-text').text(banana.i18n('chat'))
-    $('#loading-text').text(banana.i18n('loading-text'))
-    $('#event-not-started-text').text(banana.i18n('event-not-started-text'))
-    $('#club-events-link-text').text(banana.i18n('club-events-link-text', clubName))
+    u('#heads-up-text').text(banana.i18n('heads-up-text'))
+    u('#chat-btn-text').text(banana.i18n('chat'))
+    u('#loading-text').text(banana.i18n('loading-text'))
+    u('#event-not-started-text').text(banana.i18n('event-not-started-text'))
+    u('#club-events-link-text').text(banana.i18n('club-events-link-text', clubName))
 
 
-    $('.page-alerts').hide()
-    $('.page-alert .close').on('click', function(e) {
+    u('.page-alerts').hide()
+    u('.page-alert .close').on('click', function(e) {
       e.preventDefault()
-      $(this).closest('.page-alert').slideUp()
+      u(this).closest('.page-alert').hide()
     })
 
     var thumb = document.querySelector('#full_progress_bar')
@@ -98,12 +98,12 @@ $(function() {
         return false
     }
 
-    $('.date-utc').each(function(i, el){
-      $el = $(el)
+    u('.date-utc').each(function(el){
+      $el = u(el)
       $el.text(dayjs($el.data('date')).local().locale(locale).format('LLLL'))
     })
-    var startDateTxt = $('#event-start-date-text').find('.date-utc').text()
-    $('#event-start-date-text').text(banana.i18n('event-start-date-text', startDateTxt))
+    var startDateTxt = u('#event-start-date-text').find('.date-utc').text()
+    u('#event-start-date-text').text(banana.i18n('event-start-date-text', startDateTxt))
 
     map = L.map('map', {
       center: [15, 0],
@@ -156,21 +156,10 @@ $(function() {
       var startEvent = new Date(response.event.start_date)
       var endEvent = new Date(response.event.end_date)
       if (startEvent > now) {
-        $('#runners_show_button').hide()
-        $('#live_button').hide()
-        $('#replay_button').hide()
-        $('#play_pause_button').hide()
-        $('#next_button').hide()
-        $('#prev_button').hide()
-        $('#real_time_button').hide()
-        $('#mass_start_button').hide()
-        $('#chat_show_button').hide()
-        $('#options_show_button').hide()
-        $('#full_progress_bar').hide()
-        $('#share_button').hide()
+        u('.event-tool').hide()
 
         map.fitWorld({ animate: false }).zoomIn(null, { animate:false })
-        $('#eventLoadingModal').remove()
+        u('#eventLoadingModal').remove()
         var preRaceModal = new bootstrap.Modal(document.getElementById("eventNotStartedModal"), {backdrop:'static', keyboard: false, })
         document.getElementById("eventNotStartedModal").addEventListener('hide.bs.modal', function(e){
             e.preventDefault()
@@ -182,40 +171,40 @@ $(function() {
           }
         }, 1e3)
       } else {
-        $('#runners_show_button').on('click', toggleCompetitorList)
-        $('#live_button').on('click', selectLiveMode).text(banana.i18n('live-mode'))
-        $('#replay_button').on('click', selectReplayMode).text(banana.i18n('replay-mode'))
-        $('#play_pause_button').on('click', pressPlayPauseButton)
-        $('#next_button').on('click', function(e){
+        u('#runners_show_button').on('click', toggleCompetitorList)
+        u('#live_button').on('click', selectLiveMode).text(banana.i18n('live-mode'))
+        u('#replay_button').on('click', selectReplayMode).text(banana.i18n('replay-mode'))
+        u('#play_pause_button').on('click', pressPlayPauseButton)
+        u('#next_button').on('click', function(e){
           e.preventDefault()
           playbackRate = playbackRate * 2
         })
-        $('#prev_button').on('click', function(e){
+        u('#prev_button').on('click', function(e){
           e.preventDefault()
           playbackRate = Math.max(1, playbackRate / 2)
         })
-        $('#real_time_button').on('click', function(e) {
+        u('#real_time_button').on('click', function(e) {
           e.preventDefault()
           isRealTime = true
           if (resetMassStartContextMenuItem) {
             map.contextmenu.removeItem(resetMassStartContextMenuItem)
             resetMassStartContextMenuItem = null
           }
-          $('#real_time_button').addClass('active')
-          $('#mass_start_button').removeClass('active')
+          u('#real_time_button').addClass('active')
+          u('#mass_start_button').removeClass('active')
         }).text(banana.i18n('real-time'))
-        $('#mass_start_button').on('click', function(e) {
+        u('#mass_start_button').on('click', function(e) {
           e.preventDefault()
           onPressResetMassStart()
         }).text(banana.i18n('mass-start'))
-        $('#chat_show_button').on('click', displayChat)
-        $('#options_show_button').on('click', displayOptions)
-        $('#full_progress_bar').on('click', pressProgressBar)
-        $('#share_button').on('click', shareUrl)
+        u('#chat_show_button').on('click', displayChat)
+        u('#options_show_button').on('click', displayOptions)
+        u('#full_progress_bar').on('click', pressProgressBar)
+        u('#share_button').on('click', shareUrl)
         if (endEvent > now) {
           isLiveEvent = true
           if (response.event.chat_enabled) {
-            $('#chat_button_group').removeClass('d-none')
+            u('#chat_button_group').removeClass('d-none')
             connectToChatEvents()
           }
         } else {
@@ -229,7 +218,7 @@ $(function() {
           for (var i=0; i < response.maps.length; i++) {
             var m = response.maps[i]
             if (m.default) {
-              m.title = m.title ? $('<span/>').text(m.title).html() : '<i class="fa fa-star"></i> Main Map'
+              m.title = m.title ? u('<span/>').text(m.title).html() : '<i class="fa fa-star"></i> Main Map'
               mapHash = m.hash
               mapUrl = m.url + '?map_hash=' + mapHash
               var bounds = [
@@ -272,10 +261,8 @@ $(function() {
         }
         if (response.announcement) {
           prevNotice = response.announcement
-          $('#alert-text').text(prevNotice)
-          $('.page-alert').slideUp(0)
-          $('.page-alerts').show()
-          $('.page-alert').slideDown()
+          u('#alert-text').text(prevNotice)
+          u('.page-alerts').show()
         }
         if (!setFinishLineContextMenuItem) {
           setFinishLineContextMenuItem = map.contextmenu.insertItem({
@@ -286,8 +273,8 @@ $(function() {
         onStart()
       }
     }).fail(function(){
-      $('#eventLoadingModal').remove()
+      u('#eventLoadingModal').remove()
       swal({text: 'Something went wrong', title: 'error', type: 'error'})
     })
   })
-})
+})()

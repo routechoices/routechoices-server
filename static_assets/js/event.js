@@ -30,11 +30,11 @@ L.Control.Ranking = L.Control.extend({
   },
 
   setValues: function(ranking) {
-    var el = $('.leaflet-control-ranking')
+    var el = u('.leaflet-control-ranking')
     var out = '<h6>' + banana.i18n('ranking') + '</h6>'
     ranking.sort(function(a, b) {return getRelativeTime(a.time) - getRelativeTime(b.time)})
     ranking.forEach(function (c, i) {
-      out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + $('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
+      out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' + (i+1) + ' <span style="color: '+ c.competitor.color +'">⬤</span> ' + u('<span/>').text(c.competitor.name).html() + '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' + getProgressBarText(c.time) + '</span></div>'
     })
     if(out === '<h6>' + banana.i18n('ranking') + '</h6>') {
       out += '<p>-</p>'
@@ -45,8 +45,8 @@ L.Control.Ranking = L.Control.extend({
   },
 
   onRemove: function(map) {
-    $('.leaflet-control-ranking').remove()
-    $('.tmp').remove()
+    u('.leaflet-control-ranking').remove()
+    u('.tmp').remove()
   }
 })
 
@@ -73,7 +73,7 @@ L.Control.Grouping = L.Control.extend({
   },
 
   setValues: function(c, cl) {
-    var el = $('.leaflet-control-grouping')
+    var el = u('.leaflet-control-grouping')
     var out = ''
     cl.forEach(function(k, i) {
       if (i!==0){
@@ -81,7 +81,7 @@ L.Control.Grouping = L.Control.extend({
       }
       out += '<h6>' + banana.i18n('group') + ' '+ alphabetizeNumber(i) +'</h6>'
       k.parts.forEach(function(ci) {
-        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + $('<span/>').text(c[ci].name).html() + '</span></div>'
+        out += '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: '+ c[ci].color +'">⬤</span> ' + u('<span/>').text(c[ci].name).html() + '</span></div>'
       })
     })
     if(out === '' ) {
@@ -93,8 +93,8 @@ L.Control.Grouping = L.Control.extend({
   },
 
   onRemove: function(map) {
-    $('.leaflet-control-grouping').remove()
-    $('.tmp2').remove()
+    u('.leaflet-control-grouping').remove()
+    u('.tmp2').remove()
   }
 })
 
@@ -282,7 +282,7 @@ var onStart = function(){
   if(isLiveEvent){
     selectLiveMode()
   } else {
-    $("#live_button").remove()
+    u("#live_button").remove()
     selectReplayMode()
   }
   fetchCompetitorRoutes()
@@ -303,10 +303,10 @@ var selectLiveMode = function(e){
      map.contextmenu.removeItem(resetMassStartContextMenuItem)
      resetMassStartContextMenuItem = null
   }
-  $("#live_button").addClass('active')
-  $("#replay_button").removeClass('active')
-  $("#replay_mode_buttons").hide()
-  $("#replay_control_buttons").hide()
+  u("#live_button").addClass('active')
+  u("#replay_button").removeClass('active')
+  u("#replay_mode_buttons").hide()
+  u("#replay_control_buttons").hide()
 
   isLiveMode = true
   isRealTime = true
@@ -330,13 +330,13 @@ var selectReplayMode = function(e){
   if(e !== undefined){
     e.preventDefault()
   }
-  if(!isLiveMode && $("#replay_button").hasClass('active')){
+  if(!isLiveMode && u("#replay_button").hasClass('active')){
     return
   }
-  $("#live_button").removeClass('active')
-  $("#replay_button").addClass('active')
-  $("#replay_mode_buttons").show()
-  $("#replay_control_buttons").show()
+  u("#live_button").removeClass('active')
+  u("#replay_button").addClass('active')
+  u("#replay_mode_buttons").css({display:'inline-block'})
+  u("#replay_control_buttons").css({display:'inline-block'})
   if (!setMassStartContextMenuItem) {
     setMassStartContextMenuItem = map.contextmenu.insertItem({
       text: banana.i18n('mass-start-from-here'),
@@ -410,7 +410,7 @@ var fetchCompetitorRoutes = function(url){
     if(zoomOnRunners && runnerPoints.length) {
       map.fitBounds(runnerPoints)
     }
-    $('#eventLoadingModal').remove()
+    u('#eventLoadingModal').remove()
   }).fail(function(){
     isCurrentlyFetchingRoutes = false
   })
@@ -429,8 +429,8 @@ var fetchNotice = function() {
     isCurrentlyFetchingNotice = false
     if (response.announcement && response.announcement != prevNotice) {
       prevNotice = response.announcement
-      $('#alert-text').text(prevNotice)
-      $('.page-alert').slideDown()
+      u('#alert-text').text(prevNotice)
+      u('.page-alert').show()
     } else {
       isCurrentlyFetchingNotice = false
     }
@@ -475,12 +475,12 @@ var updateCompetitor = function(newData) {
 
 function toggleCompetitorList(e){
   e.preventDefault()
-  if($('#sidebar').hasClass('d-none')){
-    $('#sidebar').removeClass('d-none').addClass('col-12')
-    $('#map').addClass('d-none').removeClass('col-12')
+  if(u('#sidebar').hasClass('d-none')){
+    u('#sidebar').removeClass('d-none').addClass('col-12')
+    u('#map').addClass('d-none').removeClass('col-12')
   }else if(!chatDisplayed){
-    $('#sidebar').addClass('d-none').removeClass('col-12')
-    $('#map').removeClass('d-none').addClass('col-12')
+    u('#sidebar').addClass('d-none').removeClass('col-12')
+    u('#map').removeClass('d-none').addClass('col-12')
     map.invalidateSize()
   }
   displayCompetitorList(true)
@@ -492,32 +492,32 @@ var displayCompetitorList = function(force){
     }
     optionDisplayed =false
     chatDisplayed = false
-    var listDiv = $('<div id="listCompetitor"/>')
+    var listDiv = u('<div id="listCompetitor"/>')
     competitorList.forEach(function(competitor, ii){
       competitor.color = competitor.color || getColor(ii)
       competitor.isShown = (typeof competitor.isShown === "undefined") ? true : competitor.isShown
 
-      var div = $('<div class="card-body" style="padding:5px 10px 2px 10px;"/>')
+      var div = u('<div class="card-body" style="padding:5px 10px 2px 10px;"/>')
       div.html('<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' + competitor.color + '"></i></div>\
-        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>'+ $('<div/>').text(competitor.name).html() +'</b></div>\
+        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>'+ u('<div/>').text(competitor.name).html() +'</b></div>\
         <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">\
           <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' + (competitor.isShown ? 'on' : 'off') + '"></i></button>\
           <button type="button" class="center_competitor_btn btn btn-default btn-sm"><i class="fa fa-map-marker"></i></button>\
           <span><small class="speedometer"></small></span>\
         </div>\
         </div>')
-      var diva = $('<div class="card" style="background-color:transparent; margin-top: 3px";/>').append(div)
-      $(div).find('.color-tag').on('click', function() {
-        $('#colorModalLabel').text(banana.i18n('select-color-for', competitor.name))
+      var diva = u('<div class="card" style="background-color:transparent; margin-top: 3px";/>').append(div)
+      u(div).find('.color-tag').on('click', function() {
+        u('#colorModalLabel').text(banana.i18n('select-color-for', competitor.name))
         var color = competitor.color
-        var CP = $('<div/>')
+        var CP = $('<div style="text-align: center"/>')
         CP.colorpicker({inline: true, color: color}).on('colorpickerChange', function(ev){
           color = ev.color.toString()
         })
-        $('#color-picker').text('')
-        $('#color-picker').append(CP)
+        u('#color-picker').text('')
+        u('#color-picker').append(CP)
         colorModal.show()
-        $('#save-color').on('click', function(){
+        u('#save-color').on('click', function(){
           competitor.color = color
           colorModal.hide()
           displayCompetitorList()
@@ -535,12 +535,12 @@ var displayCompetitorList = function(force){
           competitor.nameMarker = null
           competitor.tail = null
 
-          $('#save-color').off('click')
+          u('#save-color').off('click')
         })
       })
-      $(div).find('.toggle_competitor_btn').on('click', function(e){
+      u(div).find('.toggle_competitor_btn').on('click', function(e){
         e.preventDefault()
-        var icon = $(this).find('i')
+        var icon = u(this).find('i')
         if(icon.hasClass('fa-toggle-on')){
           icon.removeClass('fa-toggle-on').addClass('fa-toggle-off')
           competitor.isShown = false
@@ -563,7 +563,7 @@ var displayCompetitorList = function(force){
           updateCompetitor(competitor)
         }
       })
-      $(div).find('.center_competitor_btn').on('click', function(){
+      u(div).find('.center_competitor_btn').on('click', function(){
         zoomOnCompetitor(competitor)
       })
       if(searchText === null || searchText === '' || competitor.name.toLowerCase().search(searchText) != -1) {
@@ -573,16 +573,16 @@ var displayCompetitorList = function(force){
       competitor.speedometer = div.find('.speedometer')
     })
     if (competitorList.length === 0) {
-      var div = $('<div/>')
+      var div = u('<div/>')
       var txt  = banana.i18n('no-competitors')
       div.html('<h3>' + txt+ '</h3>')
       listDiv.append(div)
     }
     if(searchText === null) {
-      var mainDiv = $('<div id="competitorSidebar"/>')
+      var mainDiv = u('<div id="competitorSidebar"/>')
       mainDiv.append(
-        $('<div style="text-align:right;margin-bottom:-27px" class="d-block d-sm-none"/>').append(
-          $('<button class="btn btn-default btn-sm"/>')
+        u('<div style="text-align:right;margin-bottom:-27px" class="d-block d-sm-none"/>').append(
+          u('<button class="btn btn-default btn-sm"/>')
           .html('<i class="fa fa-times"></i>')
           .on('click', toggleCompetitorList)
         )
@@ -597,7 +597,7 @@ var displayCompetitorList = function(force){
           '</div>'
         )
       }
-      $(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
+      u(mainDiv).find('#hideAllCompetitorBtn').on('click', function(){
         competitorList.forEach(function(competitor){
           competitor.isShown = false
           if(competitor.mapMarker) {
@@ -616,7 +616,7 @@ var displayCompetitorList = function(force){
         })
         displayCompetitorList()
       })
-      $(mainDiv).find('#showAllCompetitorBtn').on('click', function(){
+      u(mainDiv).find('#showAllCompetitorBtn').on('click', function(){
       competitorList.forEach(function(competitor){
         competitor.isShown = true
         updateCompetitor(competitor)
@@ -625,21 +625,21 @@ var displayCompetitorList = function(force){
     })
       if(competitorList.length > 10) {
         mainDiv.append(
-          $('<input class="form-control" type="search" val=""/>').on('input', filterCompetitorList).attr('placeholder', banana.i18n('search-competitors'))
+          u('<input class="form-control" type="search" val=""/>').on('input', filterCompetitorList).attr('placeholder', banana.i18n('search-competitors'))
         )
       }
       mainDiv.append(listDiv)
-      $('#sidebar').html('')
-      $('#sidebar').append(mainDiv)
+      u('#sidebar').html('')
+      u('#sidebar').append(mainDiv)
     } else {
-      $('#listCompetitor').remove()
-      var mainDiv = $('#competitorSidebar')
+      u('#listCompetitor').remove()
+      var mainDiv = u('#competitorSidebar')
       mainDiv.append(listDiv)
     }
 }
 
 var filterCompetitorList = function(e) {
-    var inputVal = $(e.target).val()
+    var inputVal = u(e.target).val()
     searchText = inputVal.toLowerCase()
     displayCompetitorList()
 }
@@ -649,34 +649,34 @@ var displayChat = function(ev) {
     optionDisplayed = false
     if(chatDisplayed) {
       chatDisplayed = false
-      $('#sidebar').addClass('d-none').removeClass('col-12')
-      $('#map').removeClass('d-none').addClass('col-12')
+      u('#sidebar').addClass('d-none').removeClass('col-12')
+      u('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
       if(getResponsiveBreakpoint() !== 'xs') {
         displayCompetitorList()
       }
       return
     }
-    if($('#sidebar').hasClass('d-none')){
-      $('#sidebar').removeClass('d-none').addClass('col-12')
-      $('#map').addClass('d-none').removeClass('col-12')
+    if(u('#sidebar').hasClass('d-none')){
+      u('#sidebar').removeClass('d-none').addClass('col-12')
+      u('#map').addClass('d-none').removeClass('col-12')
     }
     chatDisplayed = true
-    var mainDiv = $('<div/>')
+    var mainDiv = u('<div/>')
     mainDiv.append(
-      $('<div style="text-align:right;margin-bottom:-27px"/>').append(
-        $('<button class="btn btn-default btn-sm"/>')
+      u('<div style="text-align:right;margin-bottom:-27px"/>').append(
+        u('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
         .on('click', displayChat)
       )
     )
     mainDiv.append(
-      $('<div/>').html(
+      u('<div/>').html(
         '<h4>' + banana.i18n('chat') + '</h4>'
       )
     )
     mainDiv.append(
-      $('<form/>').html(
+      u('<form/>').html(
         '<label class="form-label" for="nickname">' + banana.i18n('nickname') + '</label>'+
         '<input class="form-control" name="nickname" id="chatNick" maxlength="20" />'+
         '<label class="form-label" for="message">' + banana.i18n('message') + '</label>'+
@@ -684,16 +684,16 @@ var displayChat = function(ev) {
         '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
       ).on('submit', function(ev) {
         ev.preventDefault()
-        if($('#chatMessage').val() === '' || $('#chatNick').val() === '' || $('chatSubmitBtn').val() === banana.i18n('sending')){
+        if(u('#chatMessage').val() === '' || u('#chatNick').val() === '' || u('chatSubmitBtn').val() === banana.i18n('sending')){
           return
         }
-        $('#chatSubmitBtn').val(banana.i18n('sending'))
+        u('#chatSubmitBtn').val(banana.i18n('sending'))
         $.ajax(
           {
             url: 'https:'+ chatMessagesEndpoint,
             data: {
-              nickname: $('#chatNick').val(),
-              message: $('#chatMessage').val()
+              nickname: u('#chatNick').val(),
+              message: u('#chatMessage').val()
             },
             xhrFields: {
               withCredentials: true
@@ -702,8 +702,8 @@ var displayChat = function(ev) {
             dataType: 'JSON',
             crossDomain: true
           }).success(function(){
-            $('#chatMessage').val('')
-            $('#chatMessage').focus()
+            u('#chatMessage').val('')
+            document.getElementById('chatMessage').focus()
           }).fail(function(){
             swal({
               title: banana.i18n('error-sending-msg'),
@@ -712,19 +712,19 @@ var displayChat = function(ev) {
               confirmButtonText: 'OK'
             })
           }).always(function(){
-            $('#chatSubmitBtn').val(banana.i18n('send'))
+            u('#chatSubmitBtn').val(banana.i18n('send'))
           })
       })
     )
-    mainDiv.append($('<div style="clear: both"/>').attr('id', 'messageList'))
-    $('#sidebar').html('')
-    $('#sidebar').append(mainDiv)
-    $('#chatNick').attr('placeholder', banana.i18n('nickname'))
-    $('#chatMessage').attr('placeholder', banana.i18n('message'))
-    $('#chatSubmitBtn').attr('value', banana.i18n('send'))
+    mainDiv.append(u('<div style="clear: both"/>').attr('id', 'messageList'))
+    u('#sidebar').html('')
+    u('#sidebar').append(mainDiv)
+    u('#chatNick').attr('placeholder', banana.i18n('nickname'))
+    u('#chatMessage').attr('placeholder', banana.i18n('message'))
+    u('#chatSubmitBtn').attr('value', banana.i18n('send'))
     refreshMessageList()
-    $('#chatNick').val(chatNick)
-    $('#chatNick').on('change', function(ev){
+    u('#chatNick').val(chatNick)
+    u('#chatNick').on('change', function(ev){
       chatNick = ev.target.value
     })
 }
@@ -733,7 +733,7 @@ var refreshMessageList = function() {
   var out = ''
   if(!chatEventSource){
     out = '<div><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
-    $('#messageList').html(out)
+    u('#messageList').html(out)
     return
   }
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
@@ -741,18 +741,18 @@ var refreshMessageList = function() {
     if (msg.removed) {
       out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <i>' + banana.i18n('message-removed') + '</i></div>'
     } else {
-      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '</div>'
+      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>' + u('<span/>').text(msg.nickname).html()+'</b></span>: ' + u('<span/>').text(msg.message).html()+ '</div>'
     }
   })
-  $('#messageList').html(out)
+  u('#messageList').html(out)
 }
 
 function getResponsiveBreakpoint() {
-  var envs = {xs:"d-none", sm:"d-sm-none", md:"d-md-none", lg:"d-lg-none", xl:"d-xl-none"};
+  var envs = {xs: "d-none", sm: "d-sm-none", md: "d-md-none", lg: "d-lg-none", xl: "d-xl-none"};
   var env = ""
 
-  var $el = $("<div>")
-  $el.appendTo($("body"))
+  var $el = u("<div>")
+  u("body").append($el)
 
   for (var i = Object.keys(envs).length - 1; i >= 0; i--) {
       env = Object.keys(envs)[i]
@@ -765,29 +765,29 @@ function getResponsiveBreakpoint() {
   return env
 }
 
-var displayOptions = function(ev) {
+var displayOptions = function(ev) {
     ev.preventDefault()
     chatDisplayed = false
     if(optionDisplayed) {
       optionDisplayed = false
-      $('#sidebar').addClass('d-none').removeClass('col-12')
-      $('#map').removeClass('d-none').addClass('col-12')
+      u('#sidebar').addClass('d-none').removeClass('col-12')
+      u('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
       if(getResponsiveBreakpoint() !== 'xs') {
         displayCompetitorList()
       }
       return
     }
-    if($('#sidebar').hasClass('d-none')){
-      $('#sidebar').removeClass('d-none').addClass('col-12')
-      $('#map').addClass('d-none').removeClass('col-12')
+    if(u('#sidebar').hasClass('d-none')){
+      u('#sidebar').removeClass('d-none').addClass('col-12')
+      u('#map').addClass('d-none').removeClass('col-12')
     }
     optionDisplayed = true
     searchText = null
-    var mainDiv = $('<div/>')
+    var mainDiv = u('<div/>')
     mainDiv.append(
-      $('<div style="text-align:right;margin-bottom:-27px"/>').append(
-        $('<button class="btn btn-default btn-sm"/>')
+      u('<div style="text-align:right;margin-bottom:-27px"/>').append(
+        u('<button class="btn btn-default btn-sm"/>')
         .html('<i class="fa fa-times"></i>')
         .on('click', displayOptions)
       )
@@ -800,7 +800,7 @@ var displayOptions = function(ev) {
       qrDataUrl = qr.createDataURL(4)
     }
     mainDiv.append(
-      $('<div/>').html(
+      u('<div/>').html(
         '<h4>' + banana.i18n('tails') + '</h4>' +
         '<div class="form-group">' +
         '<label for="tailLengthInput">' + banana.i18n('length-in-seconds') +'</label>' +
@@ -819,40 +819,40 @@ var displayOptions = function(ev) {
         (qrUrl ? ('<h4>' + banana.i18n('qr-link') + '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' + qrDataUrl + '" alt="qr"><br/><a class="small" href="'+ qrUrl +'">'+qrUrl.replace(/^https?:\/\//, '')+'</a></p>') : '')
       )
     )
-    $(mainDiv).find('#languageSelector').on('change', function(e) {
+    u(mainDiv).find('#languageSelector').on('change', function(e) {
       window.localStorage.setItem('lang', e.target.value)
       window.location.reload()
     })
-    $(mainDiv).find('#tailLengthInput').on('input', function(e){
+    u(mainDiv).find('#tailLengthInput').on('input', function(e){
       var v = parseInt(e.target.value)
       if (isNaN(v)) {
         v = 0
       }
       tailLength = Math.max(0, v)
     })
-    $(mainDiv).find('.toggle_cluster_btn').on('click', function(e){
+    u(mainDiv).find('.toggle_cluster_btn').on('click', function(e){
       if (showClusters){
-        $('.toggle_cluster_btn')
+        u('.toggle_cluster_btn')
           .find('.fa-toggle-on')
           .removeClass('fa-toggle-on')
           .addClass('fa-toggle-off')
         showClusters = false
         map.removeControl(groupControl)
-        $('.leaflet-control-ranking').css('top', '62px')
+        u('.leaflet-control-ranking').css({top: '62px'})
       } else {
-        $('.toggle_cluster_btn')
+        u('.toggle_cluster_btn')
           .find('.fa-toggle-off')
           .removeClass('fa-toggle-off')
           .addClass('fa-toggle-on')
         groupControl = L.control.grouping({ position: 'topright' })
         map.addControl(groupControl)
         showClusters = true
-        $('.leaflet-control-ranking').css('top', '262px')
+        u('.leaflet-control-ranking').css({top: '262px'})
       }
     })
-    $(mainDiv).find('.toggle_controls_btn').on('click', function(e){
+    u(mainDiv).find('.toggle_controls_btn').on('click', function(e){
       if (showControls){
-        $('.toggle_controls_btn')
+        u('.toggle_controls_btn')
           .find('.fa-toggle-on')
           .removeClass('fa-toggle-on')
           .addClass('fa-toggle-off')
@@ -861,7 +861,7 @@ var displayOptions = function(ev) {
         map.removeControl(zoomControl)
         map.removeControl(rotateControl)
       } else {
-        $('.toggle_controls_btn')
+        u('.toggle_controls_btn')
           .find('.fa-toggle-off')
           .removeClass('fa-toggle-off')
           .addClass('fa-toggle-on')
@@ -871,8 +871,8 @@ var displayOptions = function(ev) {
         showControls = true
       }
     })
-    $('#sidebar').html('')
-    $('#sidebar').append(mainDiv)
+    u('#sidebar').html('')
+    u('#sidebar').append(mainDiv)
 }
 
 var getCompetitionStartDate = function() {
@@ -975,13 +975,13 @@ var drawCompetitors = function(){
   // play/pause button
   if(playbackPaused){
     var html = '<i class="fa fa-play"></i> x' + playbackRate
-    if($('#play_pause_button').html() != html){
-      $('#play_pause_button').html(html)
+    if(u('#play_pause_button').html() != html){
+      u('#play_pause_button').html(html)
     }
   } else {
     var html = '<i class="fa fa-pause"></i> x' + playbackRate
-    if($('#play_pause_button').html() != html){
-      $('#play_pause_button').html(html)
+    if(u('#play_pause_button').html() != html){
+      u('#play_pause_button').html(html)
     }
   }
   // progress bar
@@ -995,8 +995,8 @@ var drawCompetitors = function(){
       perc = (currentTime - getCompetitionStartDate()) / getCompetitorsMaxDuration() * 100
     }
   }
-  $('#progress_bar').css('width', perc+'%').attr('aria-valuenow', perc)
-  $('#progress_bar_text').html(getProgressBarText(currentTime))
+  u('#progress_bar').css({width: perc+'%'}).attr('aria-valuenow', perc)
+  u('#progress_bar_text').html(getProgressBarText(currentTime))
   var oldFinishCrosses = finishLineCrosses.slice()
   finishLineCrosses = []
   competitorList.forEach(function(competitor){
@@ -1121,7 +1121,7 @@ var drawCompetitors = function(){
           }
           if(competitor.nameMarker == undefined){
 
-            var iconHtml = '<span style="opacity: 0.4;color: ' + competitor.color + '">' + $('<span/>').text(competitor.short_name).html() + '</span>'
+            var iconHtml = '<span style="opacity: 0.4;color: ' + competitor.color + '">' + u('<span/>').text(competitor.short_name).html() + '</span>'
             var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color)
             var nameTagEl = document.createElement('div')
             nameTagEl.className = iconClass
@@ -1186,7 +1186,7 @@ var drawCompetitors = function(){
           competitor.nameMarker = null
         }
         if(competitor.nameMarker == undefined){
-          var iconHtml = '<span style="color: '+competitor.color+'">' + $('<span/>').text(competitor.short_name).html() + '</span>'
+          var iconHtml = '<span style="color: '+competitor.color+'">' + u('<span/>').text(competitor.short_name).html() + '</span>'
           var iconClass = 'runner-icon ' + 'runner-icon-' + getContrastYIQ(competitor.color)
           var nameTagEl = document.createElement('div')
           nameTagEl.className = iconClass
@@ -1417,8 +1417,8 @@ function onPressCustomMassStart (e) {
     isRealTime = false
     isCustomStart = true
 
-    $('#real_time_button').removeClass('active')
-    $('#mass_start_button').removeClass('active')
+    u('#real_time_button').removeClass('active')
+    u('#mass_start_button').removeClass('active')
     setCustomStart(e.latlng)
     currentTime = getCompetitionStartDate()-getCompetitorsMaxDuration()
     prevShownTime = currentTime
@@ -1442,8 +1442,8 @@ function onPressResetMassStart (e) {
     resetMassStartContextMenuItem = null
   }
 
-  $('#real_time_button').removeClass('active')
-  $('#mass_start_button').addClass('active')
+  u('#real_time_button').removeClass('active')
+  u('#mass_start_button').addClass('active')
 }
 
 function zoomIn (e) {
@@ -1467,7 +1467,7 @@ function pressPlayPauseButton(e){
 }
 
 function pressProgressBar(e){
-  var perc = (e.pageX - $('#full_progress_bar').offset().left)/$('#full_progress_bar').width()
+  var perc = (e.pageX - document.getElementById('full_progress_bar').offsetLeft) / u('#full_progress_bar').size().width
   if (isRealTime) {
     currentTime = getCompetitionStartDate()+(Math.min(clock.now(), getCompetitionEndDate())-getCompetitionStartDate()) * perc
   } else if (isCustomStart) {
