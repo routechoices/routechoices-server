@@ -9,25 +9,27 @@ function selectizeDeviceInput(){
         create: false,
         plugins: [ 'preserve_on_blur' ],
         load: function(query, callback) {
-            if (!query.length || query.length < 4) return callback();
+            if (!query.length || query.length < 4) {
+              return callback()
+            }
             $.ajax({
                 url: apiBaseUrl + 'search/device?q=' + encodeURIComponent(query),
                 type: 'GET',
                 error: function() {
-                    callback();
+                    callback()
                 },
                 success: function(res) {
-                    callback(res.results);
+                    callback(res.results)
                 }
-            });
+            })
         }
-    });
+    })
 }
 
-$(function(){
+$(function() {
     $('.date-utc').each(function(i, el){
-        $el = $(el);
-        $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'));
-    });
-    selectizeDeviceInput();
+        $el = $(el)
+        $el.text(dayjs($el.data('date')).local().format('MMMM D, YYYY [at] HH:mm:ss'))
+    })
+    selectizeDeviceInput()
 })

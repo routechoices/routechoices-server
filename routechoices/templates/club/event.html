@@ -137,6 +137,7 @@
 </div>
 {% endblock %}
 {% block extra_body %}
+<script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}?_=2022011800"></script>
 <script src="{% static '/js/server_clock.js' %}?2021122901"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
@@ -153,7 +154,7 @@
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
 <script src="{% static '/js/event.js' %}?_=2022011700"></script>
-<script src="{% static '/scripts/club/event.js' %}?_=2022011601"
+<script src="{% static '/scripts/club/event.js' %}?_=2022011800"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
         data-wms-service-url="{% host_url 'wms_service' host 'api' %}"{% if event.allow_live_chat %}

@@ -24,8 +24,7 @@
 {% endblock %}
 
 {% block extra_body %}
-{{ block.super }}
+<script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/selectize-0.13.3/selectize.min.js' %}"></script>
-{% if context != 'edit' %}<script src="{% static '/scripts/dashboard/club_edit_case_new.js' %}?_=2021100100"></script>{% endif %}
-<script src="{% static '/scripts/dashboard/club_edit.js' %}?_=2021122300" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+<script src="{% static '/scripts/dashboard/club_edit.js' %}?_=2022011800" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {%  endblock %}

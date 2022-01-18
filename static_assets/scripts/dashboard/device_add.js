@@ -1,6 +1,7 @@
 var apiBaseUrl = document.currentScript.dataset.apiBaseUrl
 
-$('#id_device').selectize({
+$(function(){
+  $('#id_device').selectize({
     valueField: 'id',
     labelField: 'device_id',
     searchField: 'device_id',
@@ -13,11 +14,12 @@ $('#id_device').selectize({
             url: apiBaseUrl + 'search/device?q=' + encodeURIComponent(query),
             type: 'GET',
             error: function() {
-                callback();
+                callback()
             },
             success: function(res) {
                 callback(res.results);
             }
-        });
+        })
     }
-});
+  })
+})

@@ -1,6 +1,7 @@
 var apiBaseUrl = document.currentScript.dataset.apiBaseUrl
 
-$('#id_admins').selectize({
+$(function() {
+  $('#id_admins').selectize({
     valueField: 'id',
     labelField: 'username',
     searchField: 'username',
@@ -22,6 +23,7 @@ $('#id_admins').selectize({
             success: function(res) {
                 callback(res.results);
             }
-        });
+        })
     }
-});
+  })
+})

@@ -7,8 +7,8 @@ $(function(){
                 text: 'File is too big!',
                 type: 'error',
                 confirmButtonText: 'OK'
-            });
-            this.value = "";
+            })
+            this.value = ""
         }
-    });
+    })
 })
