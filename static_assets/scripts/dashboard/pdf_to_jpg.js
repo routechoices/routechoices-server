@@ -28,17 +28,25 @@ var onPDF = function(ev, filename) {
             renderTask.promise.then(function () {
                 var ext = filename.split('.').pop();
                 filename = filename.slice(0, filename.length - ext.length) + 'jpg';
-                canvas.toBlob(function(blob){saveAs(blob, filename);$('#step1').hide();$('#step2').show();}, 'image/jpeg', 0.8);
+                canvas.toBlob(
+                  function(blob){
+                    saveAs(blob, filename);
+                    u('#step1').hide();
+                    u('#step2').show();
+                  },
+                  'image/jpeg',
+                  0.8
+                );
             });
         });
     });
 }
-$(function(){
-    $('#step2').hide()
-    $('#pdfInputFile').on('change', function(ev) {
+;(function(){
+    u('#step2').hide()
+    u('#pdfInputFile').on('change', function(ev) {
         var file = ev.target.files[0];
         var fr = new FileReader();
         fr.onload = function(ev) {onPDF(ev, file.name)};
         fr.readAsArrayBuffer(file);
     });
-})
+})()

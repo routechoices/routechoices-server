@@ -93,7 +93,7 @@ function project(m, x, y) {
     return [v[0] / v[2], v[1] / v[2]];
 }
 
-$(function(){
+;(function(){
     var map_a = null;
     var map_b = null;
     var map_c = null;
@@ -102,7 +102,7 @@ $(function(){
     var raster_map_image;
     var corners_latlng = [];
     var calib_string = null;
-    var icon_scale = (jQuery.browser.mobile ? 2:1);
+    var icon_scale = (browser.mobile ? 2:1);
     var icons = [
         color_icon('blue'),
         color_icon('red'),
@@ -145,7 +145,7 @@ $(function(){
 
     function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
-        var imageURL = $(imageInput).parent().find('a').attr('href');
+        var imageURL = u(imageInput).parent().find('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {
@@ -154,7 +154,7 @@ $(function(){
                     function(imgDataURI) {
                         var img = new Image();
                         img.onload = function () {
-                            $('#help_text').text(help_texts[0]);
+                            u('#help_text').text(help_texts[0]);
                             display_raster_map(img);
                             display_world_map();
                         };
@@ -166,7 +166,7 @@ $(function(){
         } else if (imageURL) {
             var img = new Image();
             img.addEventListener("load", function () {
-                $('#help_text').text(help_texts[0]);
+                u('#help_text').text(help_texts[0]);
                 display_raster_map(img);
                 display_world_map();
             });
@@ -247,9 +247,9 @@ $(function(){
 
     function check_calib(){
         if(markers_a.length == 4 && markers_b.length==4){
-            $('#to_step3_button').removeClass('disabled');
+            u('#to_step3_button').removeClass('disabled');
         } else {
-            $('#to_step3_button').addClass('disabled');
+            u('#to_step3_button').addClass('disabled');
         }
     }
 
@@ -293,42 +293,42 @@ $(function(){
         calib_string = parts.join(',');
     }
 
-    $('#reset_raster_markers_button').on('click', function(e){
+    u('#reset_raster_markers_button').on('click', function(e){
         e.preventDefault();
         for(var i=0; i< markers_a.length; i++){
             markers_a[i].remove();
         }
         markers_a = [];
 
-        $('#to_step3_button').addClass('disabled');
+        u('#to_step3_button').addClass('disabled');
     });
 
-    $('#reset_world_markers_button').on('click', function(e){
+    u('#reset_world_markers_button').on('click', function(e){
         e.preventDefault();
         for(var i=0; i< markers_b.length; i++){
             markers_b[i].remove()
         }
         markers_b = [];
 
-        $('#to_step3_button').addClass('disabled');
+        u('#to_step3_button').addClass('disabled');
     });
-    $('#to_step3_button').on('click', function(e){
+    u('#to_step3_button').on('click', function(e){
         e.preventDefault();
         compute_calib_string();
-        $('#step2').addClass('d-none');
-        $('#step3').removeClass('d-none');
-        $('#help_text').text(help_texts[1]);
+        u('#step2').addClass('d-none');
+        u('#step3').removeClass('d-none');
+        u('#help_text').text(help_texts[1]);
         display_preview_map();
     });
-    $('#back_step2_button').on('click', function(e){
+    u('#back_step2_button').on('click', function(e){
         e.preventDefault();
         map_c.remove();
-        $('#help_text').text(help_texts[0]);
-        $('#step3').addClass('d-none');
-        $('#step2').removeClass('d-none');
+        u('#help_text').text(help_texts[0]);
+        u('#step3').addClass('d-none');
+        u('#step2').removeClass('d-none');
     });
 
-    $('#to_step4_button').on('click', function(e){
+    u('#to_step4_button').on('click', function(e){
         e.preventDefault();
         var el = window.opener.document.querySelector('#id_corners_coordinates');
         el.value = calib_string;
@@ -342,4 +342,4 @@ $(function(){
     } else {
         loadMapImage()
     }
-})
+})()

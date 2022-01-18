@@ -1,4 +1,4 @@
-$(function(){
+;(function(){
     var map = null;
     var raster_map_image;
     var corners_latlng = [];
@@ -10,7 +10,7 @@ $(function(){
 
     function loadMapImage() {
         var imageInput = window.opener.document.querySelector('#id_image');
-        var imageURL = $(imageInput).parent().find('a').attr('href');
+        var imageURL = u(imageInput).parent().find('a').attr('href');
         if (imageInput.files && imageInput.files[0]) {
             var fr = new FileReader();
             fr.onload = function (e) {
@@ -99,7 +99,7 @@ $(function(){
         map.fitBounds(bounds);
     }
 
-    $('#back_button').on('click', function(e){
+    document.getElementById('back_button').addEventListener('click', function(e){
         e.preventDefault();
         window.close();
     });
@@ -110,4 +110,4 @@ $(function(){
         loadCalibString();
         loadMapImage()
     }
-})
+})()

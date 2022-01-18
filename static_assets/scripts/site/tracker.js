@@ -1,22 +1,22 @@
-$(function() {
-  $('.error-message').hide();
-  $('#imeiForm').on('submit', function(e) {
+;(function() {
+  u('.error-message').hide();
+  u('#imeiForm').on('submit', function(e) {
     e.preventDefault();
-    $('#imeiRes').text($('#IMEI').val())
+    u('#imeiRes').text(u('#IMEI').val())
     $.ajax({
       type: 'POST',
       url: '/api/imei/',
       dataType: 'json',
       data: {imei: $('#IMEI').val()}
     }).done(function(response) {
-      $('#IMEIDiv').removeClass('is-invalid')
-      $('#imeiDevId').removeClass('d-none')
-      $('.imeiDevId').text(response.device_id);
-      $('#imeiErrorMsg').addClass('d-none');
+      u('#IMEI').removeClass('is-invalid')
+      u('#imeiDevId').removeClass('d-none')
+      u('.imeiDevId').text(response.device_id);
+      u('#imeiErrorMsg').addClass('d-none');
     }).fail(function() {
-      $('#imeiErrorMsg').removeClass('d-none');
-      $('#IMEI').addClass('is-invalid')
-      $('#imeiDevId').addClass('d-none')
+      u('#imeiErrorMsg').removeClass('d-none');
+      u('#IMEI').addClass('is-invalid')
+      u('#imeiDevId').addClass('d-none')
     })
   })
-});
+})()

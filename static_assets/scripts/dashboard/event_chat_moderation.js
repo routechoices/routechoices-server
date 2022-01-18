@@ -63,18 +63,18 @@ function connectToChatEvents() {
 }
 
 function refreshMessageList() {
-  $('#messages').html('')
+  u('#messages').html('')
   if(!chatEventSource){
     out = '<div><i class="fa fa-spinner fa-spin fa-2x"></i> Reconnecting to server...</div>'
-    $('#messages').html(out)
+    u('#messages').html(out)
     return
   }
   chatMessages.sort((a, b) => b.timestamp - a.timestamp)
   chatMessages.forEach(function(msg){
-    $('#messages').append('<hr/><div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+$('<span/>').text(msg.nickname).html()+'</b></span>: '+ $('<span/>').text(msg.message).html()+ '<button class="btn btn-danger btn-sm float-end remove-msg-btn" data-msg-id="' + msg.uuid + '">Remove</button></div>')
+    u('#messages').append('<hr/><div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>'+u('<span/>').text(msg.nickname).html()+'</b></span>: '+ u('<span/>').text(msg.message).html()+ '<button class="btn btn-danger btn-sm float-end remove-msg-btn" data-msg-id="' + msg.uuid + '">Remove</button></div>')
   })
-  $('#messages').append('<hr/>')
-  $('#messages').find('.remove-msg-btn').on('click', function(ev){
+  u('#messages').append('<hr/>')
+  u('#messages').find('.remove-msg-btn').on('click', function(ev){
     var uuid = ev.target.dataset.msgId
     swal({
         title: 'Confirm',
@@ -104,7 +104,7 @@ function refreshMessageList() {
   })
 }
 
-$(function() {
-  $("#messages").html('<i class="fa fa-spinner fa-spin fa-2x"></i> Connecting to chat server...')
+;(function() {
+  u("#messages").html('<i class="fa fa-spinner fa-spin fa-2x"></i> Connecting to chat server...')
   connectToChatEvents()
-})
+})()

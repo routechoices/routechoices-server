@@ -1,6 +1,7 @@
-$(function(){
-    $('#id_file').attr('accept', '.kml, .kmz')
-    $('#id_file').on('change', function(){
+;(function(){
+    var $field = $('#id_file')
+    $field.attr('accept', '.kml, .kmz')
+    $field.on('change', function(){
         if(this.files[0].size > 1e7){
             swal({
                 title: 'Error!',
@@ -8,7 +9,7 @@ $(function(){
                 type: 'error',
                 confirmButtonText: 'OK'
             });
-            this.value = ""
+            this.value = ''
         }
     })
-})
+})()
