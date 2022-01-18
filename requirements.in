@@ -37,3 +37,4 @@ tornado
 uwsgi
 GitPython
 websocket-client
+django-read-only

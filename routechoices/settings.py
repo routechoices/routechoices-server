@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "raven.contrib.django.raven_compat",
     "qr_code",
     "captcha",
+    "django_read_only",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
