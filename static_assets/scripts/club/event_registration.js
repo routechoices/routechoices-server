@@ -11,7 +11,7 @@ function selectizeDeviceInput(){
         load: function(query, callback) {
             if (!query.length || query.length < 4) return callback();
             $.ajax({
-                url: apiBaseUrl + 'device/search?q=' + encodeURIComponent(query),
+                url: apiBaseUrl + 'search/device?q=' + encodeURIComponent(query),
                 type: 'GET',
                 error: function() {
                     callback();

@@ -10,7 +10,7 @@ $('#id_admins').selectize({
     load: function(query, callback) {
         if (!query.length || query.length < 2) return callback();
         $.ajax({
-            url: apiBaseUrl + 'user/search?q=' + encodeURIComponent(query),
+            url: apiBaseUrl + 'search/user?q=' + encodeURIComponent(query),
             type: 'GET',
             xhrFields: {
                 withCredentials: true

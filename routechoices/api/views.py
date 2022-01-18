@@ -27,7 +27,6 @@ from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
-from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.core.models import (
     PRIVACY_PRIVATE,
@@ -890,52 +889,6 @@ def event_data_load_test(request, event_id):
 
 
 @swagger_auto_schema(
-    method="post",
-    auto_schema=None,
-)
-@api_view(["POST"])
-def traccar_api_gw(request):
-    traccar_id = request.query_params.get("id")
-    if not traccar_id:
-        raise ValidationError("Use Traccar App on android or IPhone")
-    device_id = traccar_id
-    devices = Device.objects.filter(aid=device_id)
-    if not devices.exists():
-        raise ValidationError("No such device ID")
-    device = devices.first()
-    if not device.user_agent:
-        device.user_agent = "Traccar"
-        dev_name = device_name(request.session.user_agent[:200])
-        if dev_name:
-            device.user_agent += f" {dev_name}"
-    lat = request.query_params.get("lat")
-    lon = request.query_params.get("lon")
-    tim = request.query_params.get("timestamp")
-    try:
-        lat = float(lat)
-        lon = float(lon)
-        tim = int(float(tim))
-    except ValueError:
-        logger.debug("Wrong data format")
-        raise ValidationError({"status": "error", "message": "Invalid data format"})
-
-    # if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
-    #    logger.debug('Too old position')
-    #    raise ValidationError('Position too old to add from API')
-
-    if lat and lon and tim:
-        device.add_location(lat, lon, tim)
-        return Response({"status": "ok"})
-    if not lat:
-        logger.debug("No lat")
-    if not lon:
-        logger.debug("No lon")
-    if not tim:
-        logger.debug("No timestamp")
-    raise ValidationError("Missing lat, lon, or time")
-
-
-@swagger_auto_schema(
     method="get",
     auto_schema=None,
 )
@@ -972,9 +925,9 @@ def locations_api_gw(request):
     device = devices.first()
     if not device.user_agent:
         device.user_agent = request.session.user_agent[:200]
-    lats = request.data.get("latitudes", "").split(",")
-    lons = request.data.get("longitudes", "").split(",")
-    times = request.data.get("timestamps", "").split(",")
+    lats = [x for x in request.data.get("latitudes", "").split(",") if x]
+    lons = [x for x in request.data.get("longitudes", "").split(",") if x]
+    times = [x for x in request.data.get("timestamps", "").split(",") if x]
     if len(lats) != len(lons) != len(times):
         raise ValidationError(
             "latitudes, longitudes, and timestamps, should have same ammount of points"

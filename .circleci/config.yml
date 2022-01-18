@@ -19,7 +19,7 @@ jobs:
     - run: ./da createcachetable
     - run: ./dc restart django
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev:8081)" != "200" ]]; do sleep 5; done' || false
-    - run: ./da test
+    - run: ./da test --parallel
     - run: ./dc restart django
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev

@@ -24,15 +24,15 @@ urlpatterns = [
     re_path(r"^$", schema_view.with_ui("redoc", cache_timeout=0), name="api_doc"),
     re_path(r"^device_id/?$", views.get_device_id, name="device_id_api"),
     re_path(r"^imei/?$", views.get_device_for_imei, name="device_imei_api"),
+    re_path(r"^locations/?$", views.locations_api_gw, name="locations_api_gw"),
     re_path(r"^time/?$", views.get_time, name="time_api"),
-    re_path(r"^user/search/?$", views.user_search, name="user_search_api"),
-    re_path(r"^device/search/?$", views.device_search, name="device_search_api"),
+    re_path(r"^search/device/?$", views.device_search, name="device_search_api"),
+    re_path(r"^search/user/?$", views.user_search, name="user_search_api"),
     re_path(
         r"^device/(?P<device_id>[^/]+)/registrations/?$",
         views.device_registrations,
         name="device_registrations_api",
     ),
-    re_path(r"^locations/?$", views.locations_api_gw, name="locations_api_gw"),
     re_path(r"^events/?$", views.event_list, name="event_list"),
     re_path(
         r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$",
