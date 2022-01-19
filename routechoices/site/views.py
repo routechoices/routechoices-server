@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
-from django.db.models.functions import ExtractYear
+from django.db.models.functions import ExtractMonth, ExtractYear
 from django.forms import HiddenInput
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -48,7 +48,9 @@ def events_view(request):
         .order_by("-year")
         .distinct()
     )
+    months = None
     selected_year = request.GET.get("year")
+    selected_month = request.GET.get("month")
     if selected_year:
         try:
             selected_year = int(selected_year)
@@ -58,6 +60,21 @@ def events_view(request):
             raise Http404()
     if selected_year:
         event_list = event_list.filter(start_date__year=selected_year)
+        months = list(
+            event_list.annotate(month=ExtractMonth("start_date"))
+            .values_list("month", flat=True)
+            .order_by("-month")
+            .distinct()
+        )
+        if selected_month:
+            try:
+                selected_month = int(selected_month)
+            except Exception:
+                raise BadRequest("Invalid month")
+            if selected_month not in months:
+                raise Http404()
+        if selected_month:
+            event_list = event_list.filter(start_date__month=selected_month)
     paginator = Paginator(event_list, 25)
     page = request.GET.get("page")
     events = paginator.get_page(page)
@@ -68,7 +85,24 @@ def events_view(request):
             "events": events,
             "live_events": live_events,
             "years": years,
+            "months": months,
             "year": selected_year,
+            "month": selected_month,
+            "month_names": [
+                "",
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ],
         },
     )
 
