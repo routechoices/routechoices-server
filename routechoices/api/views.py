@@ -457,7 +457,7 @@ def event_register(request, event_id):
     device = Device.objects.filter(aid=device_id).first()
 
     lang = request.GET.get("lang", "en")
-    if lang not in ("en", "fi", "fr", "sv"):
+    if lang not in ("en", "fi", "fr", "nl", "sv"):
         lang = "en"
 
     err_messages = {
@@ -484,6 +484,14 @@ def event_register(request, event_id):
             "bad-start-time": "Kilpailijan aloitusajan tulee olla tapahtuman aikana",
             "bad-name": "Kilpailija samalla nimellä jo rekisteröitynyt",
             "bad-sname": "Kilpailija samalla lyhyellä nyhyelläimellä jo rekisteröitynyt",
+        },
+        "nl": {
+            "no-device-id": "Toestel ID niet gevonden",
+            "no-name": "Naam ontbreekt",
+            "invalid-start-time": "Start tijd kan niet worden ontleed",
+            "bad-start-time": "Starttijd van de atleet is tijdens de event tijd",
+            "bad-name": "Atleet met zelfde naam bestaat al",
+            "bad-sname": "Atleet met zelfde korte naam bestaat al",
         },
         "sv": {
             "no-device-id": "Enhets-ID hittades inte",
