@@ -478,7 +478,7 @@ function toggleCompetitorList(e){
   if(u('#sidebar').hasClass('d-none')){
     u('#sidebar').removeClass('d-none').addClass('col-12')
     u('#map').addClass('d-none').removeClass('col-12')
-  }else if(!chatDisplayed){
+  }else if(!(chatDisplayed||optionDisplayed)){
     u('#sidebar').addClass('d-none').removeClass('col-12')
     u('#map').removeClass('d-none').addClass('col-12')
     map.invalidateSize()
@@ -510,12 +510,10 @@ var displayCompetitorList = function(force){
       u(div).find('.color-tag').on('click', function() {
         u('#colorModalLabel').text(banana.i18n('select-color-for', competitor.name))
         var color = competitor.color
-        var CP = $('<div style="text-align: center"/>')
-        CP.colorpicker({inline: true, color: color}).on('colorpickerChange', function(ev){
-          color = ev.color.toString()
+        u('#color-picker').html('')
+        new iro.ColorPicker('#color-picker', {color, width: 150, display: 'inline-block'}).on('color:change', function(c){
+          color = c.hexString
         })
-        u('#color-picker').text('')
-        u('#color-picker').append(CP)
         colorModal.show()
         u('#save-color').on('click', function(){
           competitor.color = color
@@ -652,9 +650,7 @@ var displayChat = function(ev) {
       u('#sidebar').addClass('d-none').removeClass('col-12')
       u('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
-      if(getResponsiveBreakpoint() !== 'xs') {
-        displayCompetitorList()
-      }
+      displayCompetitorList()
       return
     }
     if(u('#sidebar').hasClass('d-none')){
@@ -747,24 +743,6 @@ var refreshMessageList = function() {
   u('#messageList').html(out)
 }
 
-function getResponsiveBreakpoint() {
-  var envs = {xs: "d-none", sm: "d-sm-none", md: "d-md-none", lg: "d-lg-none", xl: "d-xl-none"};
-  var env = ""
-
-  var $el = u("<div>")
-  u("body").append($el)
-
-  for (var i = Object.keys(envs).length - 1; i >= 0; i--) {
-      env = Object.keys(envs)[i]
-      $el.addClass(envs[env])
-      if ($el.is(":hidden")) {
-          break // env detected
-      }
-  }
-  $el.remove()
-  return env
-}
-
 var displayOptions = function(ev) {
     ev.preventDefault()
     chatDisplayed = false
@@ -773,9 +751,7 @@ var displayOptions = function(ev) {
       u('#sidebar').addClass('d-none').removeClass('col-12')
       u('#map').removeClass('d-none').addClass('col-12')
       map.invalidateSize()
-      if(getResponsiveBreakpoint() !== 'xs') {
-        displayCompetitorList()
-      }
+      displayCompetitorList()
       return
     }
     if(u('#sidebar').hasClass('d-none')){

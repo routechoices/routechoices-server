@@ -125,7 +125,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="color-picker"></div>
+        <div id="color-picker" style="text-align:center"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -136,14 +136,13 @@
 </div>
 {% endblock %}
 {% block extra_body %}
-<!-- Still need jQuery for bootstrap color picker, (also uses $.ajax) -->
-<script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}?_=2022011800"></script>
+<script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>s
 <script src="{% static '/js/server_clock.js' %}?2021122901"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
-<script src="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.js' %}"></script>
+<script src="{% static '/vendor/iro-5/iro.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
 <script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
 <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
@@ -154,7 +153,7 @@
 <script src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
-<script src="{% static '/js/event.js' %}?_=2022011801"></script>
+<script src="{% static '/js/event.js' %}?_=2022011900"></script>
 <script src="{% static '/scripts/club/event.js' %}?_=2022011900"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
