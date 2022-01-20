@@ -140,7 +140,7 @@ class LocationApiTestCase(EssentialApiBase):
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 2)
 
-    def test_locations_api_gw_invalid(self):
+    def test_locations_api_gw_invalid_cast(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
@@ -149,13 +149,79 @@ class LocationApiTestCase(EssentialApiBase):
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
-                "longitudes": "3.1,",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},NaN",
+                "secret": settings.POST_LOCATION_SECRETS[0],
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Invalid data format" in errors[0])
+
+    def test_locations_api_gw_invalid_lon(self):
+        url = self.reverse_and_check("locations_api_gw", "/locations")
+        dev_id = self.get_device_id()
+        t = time.time()
+        res = self.client.post(
+            url,
+            {
+                "device_id": dev_id,
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,182",
                 "timestamps": f"{t},{t+1}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
             SERVER_NAME="api.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Invalid longitude value" in errors[0])
+
+    def test_locations_api_gw_invalid_lat(self):
+        url = self.reverse_and_check("locations_api_gw", "/locations")
+        dev_id = self.get_device_id()
+        t = time.time()
+        res = self.client.post(
+            url,
+            {
+                "device_id": dev_id,
+                "latitudes": "1.1,100",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+                "secret": settings.POST_LOCATION_SECRETS[0],
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Invalid latitude value" in errors[0])
+
+    def test_locations_api_gw_invalid_length(self):
+        url = self.reverse_and_check("locations_api_gw", "/locations")
+        dev_id = self.get_device_id()
+        t = time.time()
+        res = self.client.post(
+            url,
+            {
+                "device_id": dev_id,
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1",
+                "timestamps": f"{t},{t+1}",
+                "secret": settings.POST_LOCATION_SECRETS[0],
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue(
+            "Latitudes, longitudes, and timestamps, should have same amount of points"
+            in errors[0]
+        )
 
     def test_locations_api_gw_bad_secret(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
@@ -177,12 +243,11 @@ class LocationApiTestCase(EssentialApiBase):
     def test_locations_api_gw_old_dev_id_valid(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
         d = Device.objects.create(aid="abcd1234")
-        dev_id = d.aid
         t = time.time()
         res = self.client.post(
             url,
             {
-                "device_id": dev_id,
+                "device_id": d.aid,
                 "latitudes": "1.1,1.2",
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},{t+1}",
@@ -192,7 +257,7 @@ class LocationApiTestCase(EssentialApiBase):
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    def test_locations_api_gw_old_no_device(self):
+    def test_locations_api_gw_no_device(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
         t = time.time()
         res = self.client.post(
@@ -207,6 +272,9 @@ class LocationApiTestCase(EssentialApiBase):
             SERVER_NAME="api.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("No such device ID" in errors[0])
 
 
 @override_settings(PARENT_HOST="localhost:8000")

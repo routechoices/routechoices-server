@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
@@ -48,7 +49,11 @@ from routechoices.lib.helpers import (
     safe64decode,
 )
 from routechoices.lib.s3 import s3_object_url
-from routechoices.lib.validators import validate_imei
+from routechoices.lib.validators import (
+    validate_imei,
+    validate_latitude,
+    validate_longitude,
+)
 
 logger = logging.getLogger(__name__)
 # API_LOCATION_TIMESTAMP_MAX_AGE = 60 * 10
@@ -938,24 +943,32 @@ def locations_api_gw(request):
     device = devices.first()
     if not device.user_agent:
         device.user_agent = request.session.user_agent[:200]
-    lats = [x for x in request.data.get("latitudes", "").split(",") if x]
-    lons = [x for x in request.data.get("longitudes", "").split(",") if x]
-    times = [x for x in request.data.get("timestamps", "").split(",") if x]
+    try:
+        lats = [float(x) for x in request.data.get("latitudes", "").split(",") if x]
+        lons = [float(x) for x in request.data.get("longitudes", "").split(",") if x]
+        times = [
+            int(float(x)) for x in request.data.get("timestamps", "").split(",") if x
+        ]
+    except ValueError:
+        raise ValidationError("Invalid data format")
     if len(lats) != len(lons) != len(times):
         raise ValidationError(
-            "latitudes, longitudes, and timestamps, should have same ammount of points"
+            "Latitudes, longitudes, and timestamps, should have same amount of points"
         )
     loc_array = []
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
+            lat = lats[i]
+            lon = lons[i]
+            tim = times[i]
             try:
-                lat = float(lats[i])
-                lon = float(lons[i])
-                tim = int(float(times[i]))
-            except ValueError:
-                continue
-            # if abs(time.time() - tim) > API_LOCATION_TIMESTAMP_MAX_AGE:
-            #     continue
+                validate_longitude(lon)
+            except DjangoValidationError:
+                raise ValidationError("Invalid longitude value")
+            try:
+                validate_latitude(lat)
+            except DjangoValidationError:
+                raise ValidationError("Invalid latitude value")
             loc_array.append(
                 {
                     "timestamp": tim,
