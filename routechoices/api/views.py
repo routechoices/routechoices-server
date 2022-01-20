@@ -542,7 +542,7 @@ def event_register(request, event_id):
         errs.append(err_messages[lang]["bad-sname"])
 
     if errs:
-        raise ValidationError("\r\n".join(errs))
+        raise ValidationError(errs)
 
     comp = Competitor.objects.create(
         name=name,

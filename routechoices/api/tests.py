@@ -1,3 +1,4 @@
+import json
 import time
 
 import arrow
@@ -7,7 +8,7 @@ from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase, override_settings
 
-from routechoices.core.models import Club, Device, Event
+from routechoices.core.models import PRIVACY_PRIVATE, Club, Device, Event
 
 
 class EssentialApiBase(APITestCase):
@@ -191,11 +192,15 @@ class RegistrationApiTestCase(EssentialApiBase):
             {
                 "device_id": device_id,
                 "name": "Alice",
-                "short_name": "🇺🇸 AB",
+                "short_name": "🇺🇸 Al",
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Competitor with same name already registered" in errors[0])
         # short_name exists
         res = self.client.post(
             url,
@@ -205,20 +210,32 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "short_name": "🇺🇸 A",
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue(
+            "Competitor with same short name already registered" in errors[0]
+        )
         # bad start_time
         res = self.client.post(
             url,
             {
                 "device_id": device_id,
                 "name": "Albert",
-                "short_name": "🇺🇸 A",
+                "short_name": "🇺🇸 Al",
                 "start_time": arrow.get().shift(hours=-1).datetime,
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue(
+            "Competitor start time should be during the event time" in errors[0]
+        )
         # invalid start_time
         res = self.client.post(
             url,
@@ -229,7 +246,11 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "start_time": "unreadable",
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Start time could not be parsed" in errors[0])
         # no name
         res = self.client.post(
             url,
@@ -239,18 +260,26 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "short_name": "🇺🇸 B",
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Name is missing" in errors[0])
         # no device
         res = self.client.post(
             url,
             {
                 "device_id": "does not exists",
-                "name": "",
+                "name": "Bob",
                 "short_name": "🇺🇸 B",
             },
             SERVER_NAME="api.localhost:8000",
+            format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertTrue("Device ID not found" in errors[0])
         # ok
         res = self.client.post(
             url,
@@ -259,6 +288,74 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Bob",
                 "short_name": "🇺🇸 B",
                 "start_time": arrow.get().shift(minutes=+1).datetime,
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # ended event
+        event.start_date = arrow.get().shift(hours=-1).datetime
+        event.end_date = arrow.get().shift(minutes=-1).datetime
+        event.save()
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Charles",
+                "short_name": "🇺🇸 C",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        # ok event
+        event.end_date = arrow.get().shift(minutes=1).datetime
+        event.save()
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Charles",
+                "short_name": "🇺🇸 C",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # private event not logged in
+        event.end_date = arrow.get().shift(minutes=1).datetime
+        event.privacy = PRIVACY_PRIVATE
+        event.save()
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Dylan",
+                "short_name": "🇺🇸 D",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        # private event logged in as not admin
+        user_not_admin = User.objects.create_user(
+            "bob", "bob@example.com", "pa$$word123"
+        )
+        self.client.force_login(user_not_admin)
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Dylan",
+                "short_name": "🇺🇸 D",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        # private event logged in as admin ok
+        self.client.force_login(user)
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Dylan",
+                "short_name": "🇺🇸 D",
             },
             SERVER_NAME="api.localhost:8000",
         )
