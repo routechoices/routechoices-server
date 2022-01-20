@@ -126,6 +126,7 @@ def validate_corners_coordinates(val):
             )
         if i % 2 == 0:
             validate_latitude(val)
+        # do not validate longitude for map over the international date line
 
 
 custom_username_validators = [
