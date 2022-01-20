@@ -89,12 +89,11 @@
         </div>
       </div>
     </div>
-    {% with is_event_page=True %}
-    {% include "club/footer.html" %}
-    {% endwith %}
   </div>
 </div>
-
+{% with is_event_page=True %}
+{% include "club/footer.html" %}
+{% endwith %}
 <div class="modal" tabindex="-1" role="dialog" id="eventLoadingModal" style="display: block; z-index: 10002">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
