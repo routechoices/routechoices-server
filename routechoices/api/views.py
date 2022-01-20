@@ -444,15 +444,18 @@ def event_chat(request, event_id):
 @api_view(["POST"])
 def event_register(request, event_id):
     event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
-    is_user_event_admin = (
-        request.user.is_authenticated
-        and event.club.admins.filter(id=request.user.id).exists()
-    )
-    if not is_user_event_admin:
-        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+
+    if not event.open_registration or event.end_date < now():
+        raise PermissionDenied()
+
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        is_user_event_admin = (
+            request.user.is_authenticated
+            and event.club.admins.filter(id=request.user.id).exists()
+        )
+        if not is_user_event_admin:
             raise PermissionDenied()
-        if not event.open_registration or event.end_date < now():
-            raise PermissionDenied()
+
     device_id = request.data.get("device_id")
     device = Device.objects.filter(aid=device_id).first()
 
@@ -520,6 +523,7 @@ def event_register(request, event_id):
         try:
             start_time = arrow.get(start_time).datetime
         except Exception:
+            start_time = None
             errs.append(err_messages[lang]["invalid-start-time"])
     elif event.start_date < now():
         start_time = now()
@@ -548,9 +552,6 @@ def event_register(request, event_id):
         device=device,
     )
 
-    headers = None
-    if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
     return Response(
         {
             "id": comp.aid,
@@ -560,7 +561,6 @@ def event_register(request, event_id):
             "start_time": start_time,
         },
         status=status.HTTP_201_CREATED,
-        headers=headers,
     )
 
 

@@ -1,11 +1,13 @@
 import time
 
+import arrow
 from django.conf import settings
+from django.contrib.auth.models import User
 from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase, override_settings
 
-from routechoices.core.models import Device
+from routechoices.core.models import Club, Device, Event
 
 
 class EssentialApiBase(APITestCase):
@@ -155,3 +157,109 @@ class LocationApiTestCase(EssentialApiBase):
             SERVER_NAME="api.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+@override_settings(PARENT_HOST="localhost:8000")
+class RegistrationApiTestCase(EssentialApiBase):
+    def test_registration(self):
+        device_id = self.get_device_id()
+        user = User.objects.create_user("alice", "alice@example.com", "pa$$word123")
+        club = Club.objects.create(name="Test club", slug="club")
+        club.admins.set([user])
+        event = Event.objects.create(
+            club=club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        url = reverse("event_register", host="api", kwargs={"event_id": event.aid})
+        self.assertEqual(url, f"//api.localhost:8000/events/{event.aid}/register")
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Alice",
+                "short_name": "🇺🇸 A",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # name exists
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Alice",
+                "short_name": "🇺🇸 AB",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # short_name exists
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Albert",
+                "short_name": "🇺🇸 A",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # bad start_time
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Albert",
+                "short_name": "🇺🇸 A",
+                "start_time": arrow.get().shift(hours=-1).datetime,
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # invalid start_time
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Bob",
+                "short_name": "🇺🇸 B",
+                "start_time": "unreadable",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        # no name
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "",
+                "short_name": "🇺🇸 B",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        # no device
+        res = self.client.post(
+            url,
+            {
+                "device_id": "does not exists",
+                "name": "",
+                "short_name": "🇺🇸 B",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # ok
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Bob",
+                "short_name": "🇺🇸 B",
+                "start_time": arrow.get().shift(minutes=+1).datetime,
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
