@@ -126,6 +126,8 @@ def validate_corners_coordinates(val):
             )
         if i % 2 == 0:
             validate_latitude(val)
+        else:
+            validate_longitude(val)
 
 
 custom_username_validators = [
