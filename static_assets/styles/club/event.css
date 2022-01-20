@@ -10,7 +10,7 @@
   .sidebar {
       position: fixed;
       top: 56px;
-      bottom: 90px;
+      bottom: 140px;
       left: 0;
       z-index: 10001;
       display: block;
@@ -26,15 +26,8 @@
       padding-top: 15px;
       bottom: 0px;
       left: 0px;
-      height: 90px;
+      height: 140px;
       background-color: #e5e5e5;
-  }
-
-  @media only screen
-  and (max-device-width : 500px) {
-    .time_bar{
-      height: 120px;
-    }
   }
 
   /* Sidebar navigation */
@@ -62,7 +55,7 @@
    .main {
       position: fixed;
       top: 56px;
-      bottom: 90px;
+      bottom: 140px;
       right: 0px;
       left: 0px;
   }
@@ -93,15 +86,16 @@
       padding: 0 15px;
       white-space: nowrap;
   }
-  @media (max-device-width : 767px){
+
+  @media only screen and (max-width : 486px) {
     .time_bar{
-      height: 120px;
+      height: 160px;
     }
     .main {
-      bottom: 120px;
+      bottom: 160px;
     }
     .sidebar {
-      bottom: 120px;
+      bottom: 160px;
     }
   }
 

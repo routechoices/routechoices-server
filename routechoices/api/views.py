@@ -336,6 +336,10 @@ def event_detail(request, event_id):
     method="post",
     auto_schema=None,
 )
+@swagger_auto_schema(
+    method="delete",
+    auto_schema=None,
+)
 @api_view(["POST", "DELETE"])
 @throttle_classes(
     [

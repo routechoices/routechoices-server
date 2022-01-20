@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.css' %}"/>
-<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022010500" />
+<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022012000" />
 {% endblock %}
 
 
@@ -74,7 +74,7 @@
         <div class="btn-group pull-right me-2" role="group" id="share_buttons" style="margin-bottom: 2px">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="share_button"><i class="fa fa-share-alt"></i></a>
         </div>
-        <div class="btn-group pull-right me-2" role="group" id="options_buttons" style="margin-bottom: 2px">
+        <div class="btn-group pull-right me-2" role="group" id="options_buttons" style="margin-bottom: 2px;margin-left: 2px;">
           <a href="#" role="button" class="btn btn-sm btn-secondary" id="options_show_button"><i class="fa fa-cog"></i></a>
         </div>
         <div class="btn-group pull-right me-2 d-none" style="margin-bottom: 2px" id="chat_button_group">
@@ -89,6 +89,9 @@
         </div>
       </div>
     </div>
+    {% with is_event_page=True %}
+    {% include "club/footer.html" %}
+    {% endwith %}
   </div>
 </div>
 
@@ -134,6 +137,7 @@
     </div>
   </div>
 </div>
+
 {% endblock %}
 {% block extra_body %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
