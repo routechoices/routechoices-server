@@ -41,7 +41,12 @@ from routechoices.core.models import (
     Map,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import escape_filename, initial_of_name, safe64decode
+from routechoices.lib.helpers import (
+    escape_filename,
+    initial_of_name,
+    random_device_id,
+    safe64decode,
+)
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.validators import validate_imei
 
@@ -1024,21 +1029,16 @@ def get_device_for_imei(request):
         validate_imei(imei)
     except Exception as e:
         raise ValidationError("Invalid IMEI: " + str(e))
-    idevice = None
     try:
         idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
         device = idevice.device
-    except ImeiDevice.DoesNotExist:
-        pass
-    if idevice:
-        if re.match(r"/[^0-9]/", device.aid):
+        if re.search(r"[^0-9]", device.aid):
             if not device.competitor_set.filter(event__end_date__gte=now()).exists():
-                device = Device.objects.create()
-                idevice.device = device
-                idevice.save()
-    else:
+                device.aid = random_device_id()
+    except ImeiDevice.DoesNotExist:
         device = Device.objects.create()
         idevice = ImeiDevice.objects.create(imei=imei, device=device)
+
     return Response({"status": "ok", "device_id": device.aid, "imei": imei})
 
 

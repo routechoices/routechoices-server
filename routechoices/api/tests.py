@@ -8,7 +8,7 @@ from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase, override_settings
 
-from routechoices.core.models import PRIVACY_PRIVATE, Club, Device, Event
+from routechoices.core.models import PRIVACY_PRIVATE, Club, Competitor, Device, Event
 
 
 class EssentialApiBase(APITestCase):
@@ -66,8 +66,57 @@ class ImeiApiTestCase(EssentialApiBase):
             url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(res.data.get("device_id")) == 8)
-        self.assertTrue(res.data.get("device_id") != self.get_device_id())
+        dev_id = res.data.get("device_id")
+        self.assertTrue(dev_id.isdigit())
+        self.assertEqual(len(dev_id), 8)
+        self.assertNotEqual(dev_id, self.get_device_id())
+
+        # test device with alpha character get new id with only digits
+        device = Device.objects.get(aid=dev_id)
+        device.aid = "1234abcd"
+        device.save()
+        res = self.client.post(
+            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_dev_id = res.data.get("device_id")
+        self.assertNotEqual(new_dev_id, "1234abcd")
+        self.assertTrue(dev_id.isdigit())
+        self.assertEqual(len(new_dev_id), 8)
+        self.assertNotEqual(new_dev_id, self.get_device_id())
+
+        # test device with alpha character dont get new id if assigned a competitor in future
+        club = Club.objects.create(name="Test club", slug="club")
+        event = Event.objects.create(
+            club=club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().shift(minutes=-1).datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        Competitor.objects.create(
+            name="Alice", short_name="A", event=event, device=device
+        )
+        device.aid = "1234abcd"
+        device.save()
+        res = self.client.post(
+            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_dev_id = res.data.get("device_id")
+        self.assertEqual(new_dev_id, "1234abcd")
+
+        # test device with alpha character get new id if assigned a competitor in past
+        event.end_date = arrow.get().shift(seconds=-1).datetime
+        event.save()
+        res = self.client.post(
+            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_dev_id = res.data.get("device_id")
+        self.assertNotEqual(new_dev_id, "1234abcd")
+        self.assertTrue(dev_id.isdigit())
+        self.assertEqual(len(new_dev_id), 8)
 
 
 @override_settings(PARENT_HOST="localhost:8000")
