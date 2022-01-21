@@ -51,7 +51,7 @@ context('Cypress tests', () => {
       cy.get('#id_competitors-0-short_name').type('Halden')
       cy.get('#id_competitors-0-start_time').focus().realType('2019-06-15 20:00:10')
 
-      cy.intercept('POST', '/dashboard/event/new').as('eventSubmit');
+      cy.intercept('POST', '/dashboard/events/new').as('eventSubmit');
       cy.get("input[value='Save']").click()
       cy.wait('@eventSubmit').then(({ request, response }) => {
             expect(response.statusCode).to.eq(302);
@@ -61,7 +61,7 @@ context('Cypress tests', () => {
       cy.forceVisit('/halden-sk/Jukola-2019-1st-leg-2')
 
       // trigger as many errors has possible
-      cy.visit('/dashboard/event')
+      cy.visit('/dashboard/events')
       cy.url().should('match', /\/dashboard\/events$/)
       cy.get('a').contains('Create new event').click()
       cy.url().should('match', /\/dashboard\/events\/new$/)
