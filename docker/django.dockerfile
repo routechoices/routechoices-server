@@ -6,7 +6,7 @@ ADD requirements.in /requirements.in
 RUN mkdir /app/
 
 RUN set -ex \
-    && apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 watchman --no-install-recommends \
+    && apt update && apt install -y libgdal-dev g++ cargo git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install pip-tools \
