@@ -19,7 +19,6 @@ django-s3-storage
 django-simple-captcha
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 drf-yasg
-fast-luhn
 geoip2
 gps-encoding-rust @ git+https://github.com/rphlo/gps_encoding.git
 gpxpy
