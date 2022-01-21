@@ -17,10 +17,10 @@ context('Cypress tests', () => {
       cy.createMap()
 
       // Create Event with minimal info
-      cy.visit('/dashboard/event')
-      cy.url().should('match', /\/dashboard\/event$/)
+      cy.visit('/dashboard/events')
+      cy.url().should('match', /\/dashboard\/events$/)
       cy.get('a').contains('Create new event').click()
-      cy.url().should('match', /\/dashboard\/event\/new$/)
+      cy.url().should('match', /\/dashboard\/events\/new$/)
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg')
@@ -30,15 +30,15 @@ context('Cypress tests', () => {
       cy.get('#id_map').select('Jukola 2019 - 1st Leg (Halden SK)')
 
       cy.get("input[value='Save']").click()
-      cy.url().should('match', /\/dashboard\/event$/)
+      cy.url().should('match', /\/dashboard\/events$/)
 
       cy.forceVisit('/halden-sk/Jukola-2019-1st-leg')
 
       // Create Event with all fields info
-      cy.visit('/dashboard/event')
-      cy.url().should('match', /\/dashboard\/event$/)
+      cy.visit('/dashboard/events')
+      cy.url().should('match', /\/dashboard\/events$/)
       cy.get('a').contains('Create new event').click()
-      cy.url().should('match', /\/dashboard\/event\/new$/)
+      cy.url().should('match', /\/dashboard\/events\/new$/)
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg (2)')
@@ -57,14 +57,14 @@ context('Cypress tests', () => {
             expect(response.statusCode).to.eq(302);
             expect(request.body).to.contain('&competitors-0-device=1&');
       });
-      cy.url().should('match', /\/dashboard\/event$/)
+      cy.url().should('match', /\/dashboard\/events$/)
       cy.forceVisit('/halden-sk/Jukola-2019-1st-leg-2')
 
       // trigger as many errors has possible
       cy.visit('/dashboard/event')
-      cy.url().should('match', /\/dashboard\/event$/)
+      cy.url().should('match', /\/dashboard\/events$/)
       cy.get('a').contains('Create new event').click()
-      cy.url().should('match', /\/dashboard\/event\/new$/)
+      cy.url().should('match', /\/dashboard\/events\/new$/)
 
       cy.get('#id_club').select('Halden SK')
       cy.get('#id_name').type('Jukola 2019 - 1st Leg (2)')
@@ -75,7 +75,7 @@ context('Cypress tests', () => {
       cy.get('#id_competitors-0-device-selectized').type(this.devId).wait(1000)
       cy.get('#id_competitors-0-start_time').focus().realType('2019-06-16 20:00:10')
       cy.get("input[value='Save']").click()
-      cy.url().should('match', /\/dashboard\/event\/new$/)
+      cy.url().should('match', /\/dashboard\/events\/new$/)
       cy.contains('Start Date must be before End Date')
       cy.contains('Event with this Club and Slug already exists.')
       cy.contains('Event with this Club and Name already exists.')

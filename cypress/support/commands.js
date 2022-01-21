@@ -35,9 +35,9 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
  Cypress.Commands.add("createClub", () => {
   cy.visit('/dashboard/')
   cy.get('a').contains('Clubs').click()
-  cy.url().should('match', /\/dashboard\/club$/)
+  cy.url().should('match', /\/dashboard\/clubs$/)
   cy.get('a').contains('Create new club').click()
-  cy.url().should('match', /\/dashboard\/club\/new$/)
+  cy.url().should('match', /\/dashboard\/clubs\/new$/)
   cy.get('#id_name').type('Halden SK')
   cy.get('#id_slug').type('halden-sk')
   cy.get('#id_admins').next('').type('admin{enter}')
@@ -62,16 +62,16 @@ Cypress.Commands.add("login", (username='admin', password='pa$$word123') => {
  Cypress.Commands.add("createMap", () => {
   cy.visit('/dashboard/')
   cy.get('a').contains('Maps').click()
-  cy.url().should('match', /\/dashboard\/map$/)
+  cy.url().should('match', /\/dashboard\/maps$/)
   cy.get('a').contains('Create new map').click()
-  cy.url().should('match', /\/dashboard\/map\/new$/)
+  cy.url().should('match', /\/dashboard\/maps\/new$/)
 
   cy.get('#id_club').select('Halden SK')
   cy.get('#id_name').type('Jukola 2019 - 1st Leg')
   const mapFileName = 'Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg'
   cy.get('#id_image').attachFile(mapFileName)
   cy.get("input[value='Save']").click()
-  cy.url().should('match', /\/dashboard\/map$/)
+  cy.url().should('match', /\/dashboard\/maps$/)
  })
 
  Cypress.Commands.add('forceVisit', url => {
