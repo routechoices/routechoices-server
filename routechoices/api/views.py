@@ -1048,13 +1048,14 @@ def get_device_for_imei(request):
         raise ValidationError("Invalid IMEI: " + str(e))
     try:
         idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
+    except ImeiDevice.DoesNotExist:
+        device = Device.objects.create()
+        idevice = ImeiDevice.objects.create(imei=imei, device=device)
+    else:
         device = idevice.device
         if re.search(r"[^0-9]", device.aid):
             if not device.competitor_set.filter(event__end_date__gte=now()).exists():
                 device.aid = random_device_id()
-    except ImeiDevice.DoesNotExist:
-        device = Device.objects.create()
-        idevice = ImeiDevice.objects.create(imei=imei, device=device)
 
     return Response({"status": "ok", "device_id": device.aid, "imei": imei})
 
