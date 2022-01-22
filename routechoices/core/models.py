@@ -494,6 +494,7 @@ class Map(models.Model):
             img_alpha,
             coeffs,
             (output_width, output_height),
+            flags=cv2.INTER_AREA,
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(255, 255, 255, 0),
         )
