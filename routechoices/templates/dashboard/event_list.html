@@ -26,7 +26,7 @@
                 <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}" style="white-space: nowrap;font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
                 <td><span style="white-space: nowrap;"><i class="fa fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
                 <td>{% if event.is_live %}<i style="color:green" class="fa fa-check-circle"></i>{% else %}<i style="color:red" class="fa fa-times-circle"></i>{% endif %}</a></td>
-                <td>{{ event.club }}</td>
+                <td><a href="{{event.club.nice_url}}">{{ event.club }}</a></td>
                 <td>
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> Open</a>
                     {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export Page</a>{% endif %}
