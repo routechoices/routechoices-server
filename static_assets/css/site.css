@@ -164,6 +164,9 @@ body{
     color: #00aced;
 }
 
+.loginBtn {
+    margin-bottom: 0
+}
 @media screen and (max-width: 767px) {
     #myFooter {
         text-align: center;
@@ -171,6 +174,10 @@ body{
 
     #myFooter .info{
         text-align: center;
+    }
+
+    .loginBtn {
+        margin-bottom: 5px
     }
 }
 

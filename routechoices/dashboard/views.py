@@ -87,6 +87,18 @@ def account_edit_view(request):
 
 
 @login_required
+def account_delete_view(request):
+    if request.method == "POST":
+        request.user.delete()
+        messages.success(request, "Account deleted.")
+        return redirect("site:home_view")
+    return render(
+        request,
+        "dashboard/account_delete.html",
+    )
+
+
+@login_required
 def device_list_view(request):
     device_list = Device.objects.filter(owners=request.user)
 

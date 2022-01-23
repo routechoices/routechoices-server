@@ -1056,7 +1056,6 @@ def get_device_for_imei(request):
         if re.search(r"[^0-9]", device.aid):
             if not device.competitor_set.filter(event__end_date__gte=now()).exists():
                 device.aid = random_device_id()
-
     return Response({"status": "ok", "device_id": device.aid, "imei": imei})
 
 

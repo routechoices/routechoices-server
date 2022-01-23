@@ -5,6 +5,9 @@ from routechoices.dashboard import views
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
+    re_path(
+        r"^account/delete/?$", views.account_delete_view, name="account_delete_view"
+    ),
     re_path(r"^calibrate_map/?$", views.calibration_view, name="calibration_view"),
     re_path(r"^pdf-to-jpg/?$", views.pdf_to_jpg, name="pdf_to_jpg"),
     re_path(

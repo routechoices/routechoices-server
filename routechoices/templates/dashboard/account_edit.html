@@ -11,6 +11,8 @@
         <p><a href="{% url 'account_set_password' %}" class="btn btn-primary">Change password</a></p>
         <h4>Sessions</h4>
         <p><a href="{% url 'user_sessions:session_list' %}" class="btn btn-primary">Review active sessions</a></p>
+        <h4>Account Deletion</h4>
+        <p><a href="{% url 'dashboard:account_delete_view' %}" class="btn btn-danger">Delete your account</a></p>
     </div>
 </div>
 {% endblock %}
