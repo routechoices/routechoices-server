@@ -1,5 +1,5 @@
 ;(function(){
-    var $field = $('#id_file')
+    var $field = u('#id_file')
     $field.attr('accept', '.kml, .kmz')
     $field.on('change', function(){
         if(this.files[0].size > 1e7){

@@ -1,5 +1,5 @@
 ;(function(){
-    var $field = $('#id_gpx_file')
+    var $field = u('#id_gpx_file')
     $field.attr('accept', '.gpx')
     $field.on('change', function(){
         if(this.files[0].size > 1e7){
