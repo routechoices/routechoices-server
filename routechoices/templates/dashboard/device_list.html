@@ -22,7 +22,7 @@
             </tr>
             {% endfor %}
         </table>
-        {% bootstrap_pagination devices extra=request.GET.urlencode %}
+        {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
         {% endif %}
     </div>
 </div>

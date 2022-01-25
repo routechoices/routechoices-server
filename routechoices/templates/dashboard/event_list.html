@@ -38,7 +38,7 @@
             </tr>
             {% endfor %}
         </table>
-        {% bootstrap_pagination events extra=request.GET.urlencode %}
+        {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
         {% endif %}
     </div>
 </div>

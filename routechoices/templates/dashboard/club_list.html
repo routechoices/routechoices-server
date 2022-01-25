@@ -16,7 +16,7 @@
             <tr><td><a href="{% url 'dashboard:club_edit_view' id=club.aid %}">{{ club.name }}</a></td></tr>
             {% endfor %}
         </table>
-        {% bootstrap_pagination clubs extra=request.GET.urlencode %}
+        {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
         {% endif %}
     </div>
 </div>
