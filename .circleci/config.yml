@@ -16,7 +16,9 @@ jobs:
     - run: ./dc pipinstall
     - run: ./da migrate
     - run: ./da collectstatic
-    - run: ./da createcachetable
+    - run: ./da compress
+    - run: sudo chmod -R 755 .
+    - run: ./dc restart nginx
     - run: ./dc restart django
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev:8081)" != "200" ]]; do sleep 5; done' || false
     - run: ./da test --parallel

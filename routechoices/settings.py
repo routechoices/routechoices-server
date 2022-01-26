@@ -874,6 +874,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 
 try:
     from .local_settings import *  # noqa: F403, F401

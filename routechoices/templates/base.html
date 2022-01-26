@@ -61,16 +61,18 @@
       integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
       crossorigin="anonymous">
     </script>
+    {% if enable_analytics %}
     {% compress js %}
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
-    {% if enable_analytics %}
-    <!-- Matomo -->
     <script src="{% static '/scripts/analytics.js' %}?_=2021100100"></script>
-    {% endif %}
     {% endcompress %}
-    {% if enable_analytics %}
     <noscript><p><img src="https://stats.io.rphlo.com/revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    {% else %}
+    {% compress js %}
+    <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
+    {% endcompress %}
     {% endif %}
     <!-- End Matomo Code -->
     {% block extra_body %}

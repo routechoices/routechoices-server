@@ -15,5 +15,6 @@ then
   pip install -U -r requirements.txt
 fi
 ./manage.py collectstatic --noinput
+./manage.py compress
 ./manage.py migrate --noinput
 ./bin/restart_all
