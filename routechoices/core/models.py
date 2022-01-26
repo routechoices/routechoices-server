@@ -456,10 +456,21 @@ class Map(models.Model):
         if use_cache and cached:
             return cached
 
-        img_out = Image.new("RGBA", (output_width, output_height), (255, 255, 255, 0))
-
         if not self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
-            return img_out
+            n_channels = 4
+            transparent_img = np.zeros(
+                (output_height, output_width, n_channels), dtype=np.uint8
+            )
+            extra_args = []
+            if format == "image/webp":
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
+            _, buffer = cv2.imencode(
+                ".png" if format == "image/png" else ".webp",
+                transparent_img,
+                extra_args,
+            )
+            data_out = BytesIO(buffer).getvalue()
+            return data_out
 
         r_w = (max_lon - min_lon) / output_width
         r_h = (max_lat - min_lat) / output_height
