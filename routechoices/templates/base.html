@@ -1,4 +1,4 @@
-{% load static %}{% load django_bootstrap5 %}{% load raven %}{% load hosts %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}{% load raven %}{% load hosts %}{% load compress %}<!DOCTYPE html>
 <html lang='en-US'>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -16,11 +16,13 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="description" content="{% block head_description %}{{site.name}} is a free and open source live GPS tracking solution for orienteering events. View the competitors locations in the forest on your computer or phone screen.{% endblock %}">
     <title>{% block head_title %}{{site.name}} | Live GPS tracking for orienteering{% endblock %}</title>
+    {% compress css %}
     <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.1/bootstrap.min.css' %}"/>
     <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
     <link rel="stylesheet" href="{%  static '/vendor/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'css/site.css' %}?_=2022012300" />
     <link rel="stylesheet" href="{% static 'styles/base.css' %}?_=2021111100" />
+    {% endcompress %}
     {% block extra_head %}
     {% endblock %}
   </head>
@@ -48,6 +50,7 @@
         {% endif %}
         {% endblock %}
     {% endblock %}
+
     <script
       src="https://browser.sentry-cdn.com/6.10.0/bundle.min.js"
       integrity="sha384-nsIkfmMh0uiqg+AwegHcT1SMiPNWnhZmjFDwTshLTxur6ZPNaGT8vwT+vHwI5Jag"
@@ -58,14 +61,18 @@
       integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
       crossorigin="anonymous">
     </script>
+    {% compress js %}
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
     {% if enable_analytics %}
     <!-- Matomo -->
     <script src="{% static '/scripts/analytics.js' %}?_=2021100100"></script>
-    <noscript><p><img src="https://stats.io.rphlo.com/revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
-    <!-- End Matomo Code -->
     {% endif %}
+    {% endcompress %}
+    {% if enable_analytics %}
+    <noscript><p><img src="https://stats.io.rphlo.com/revmatomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    {% endif %}
+    <!-- End Matomo Code -->
     {% block extra_body %}
     {% endblock %}
   </body>

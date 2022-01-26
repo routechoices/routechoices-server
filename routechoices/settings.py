@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "qr_code",
     "captcha",
     "django_read_only",
+    "compressor",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -174,6 +175,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static_assets"),
 ]
+STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -867,6 +869,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.routechoices.dev:8081",
 ]
 
+COMPRESS_ENABLED = True
 
 try:
     from .local_settings import *  # noqa: F403, F401

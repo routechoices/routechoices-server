@@ -2,6 +2,7 @@
 {% load static %}
 {% load django_bootstrap5 %}
 {% load hosts %}
+{% load compress %}
 
 {% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
 {% block head_description %}Live GPS Tracking of {{ event.name }} by {{ event.club.name }}{% endblock %}
@@ -26,11 +27,13 @@
 <meta property="og:image:height" content="512" />
 {% endif %}
 <link rel="canonical" href="{{ event.get_absolute_url }}">
+{% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-colorpicker-3.4.0/bootstrap-colorpicker.css' %}"/>
 <link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022012000" />
+{% endcompress %}
 {% endblock %}
 
 
@@ -139,6 +142,7 @@
 
 {% endblock %}
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>s
 <script src="{% static '/js/server_clock.js' %}?2021122901"></script>
@@ -157,6 +161,7 @@
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
 <script src="{% static '/js/event.js' %}?_=2022011900"></script>
+{% endcompress %}
 <script src="{% static '/scripts/club/event.js' %}?_=2022011900"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
@@ -166,4 +171,5 @@
         data-server-clock-url="{% host_url 'time_api' host 'api' %}"
         data-club-name="{{ event.club.name }}"
         data-static-root="{% static '' %}"></script>
+
 {% endblock %}

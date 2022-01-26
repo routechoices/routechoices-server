@@ -38,3 +38,4 @@ GitPython
 websocket-client
 django-read-only
 tblib
+django_compressor
