@@ -36,8 +36,9 @@ services:
     ports:
       - "8081:443"
     volumes:
-      - ../:/usr/share/nginx/html/
-      - ../nginx/routechoices.conf:/etc/nginx/conf.d/routechoices.conf
+      - ../static/:/usr/share/nginx/html/:ro
+      - ../nginx/certs:/usr/share/nginx/certs/:ro
+      - ../nginx/routechoices.conf:/etc/nginx/conf.d/routechoices.conf:ro
     links:
       - minio
       - django
