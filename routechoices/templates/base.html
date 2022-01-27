@@ -50,17 +50,16 @@
         {% endif %}
         {% endblock %}
     {% endblock %}
-
     <script
-      src="https://browser.sentry-cdn.com/6.10.0/bundle.min.js"
-      integrity="sha384-nsIkfmMh0uiqg+AwegHcT1SMiPNWnhZmjFDwTshLTxur6ZPNaGT8vwT+vHwI5Jag"
-      crossorigin="anonymous">
-    </script>
+      src="https://browser.sentry-cdn.com/6.17.2/bundle.min.js"
+      integrity="sha384-iweRxhvAFbKxdRFQ1uPsP+XFOxTW74MyMjjh80MaNFQor+3zNOkbY9izqBiwbpYN"
+      crossorigin="anonymous"
+    ></script>
     <script
-      src="https://browser.sentry-cdn.com/6.10.0/bundle.tracing.min.js"
-      integrity="sha384-WPWd3xprDfTeciiueRO3yyPDiTpeh3M238axk2b+A0TuRmqebVE3hLm3ALEnnXtU"
-      crossorigin="anonymous">
-    </script>
+      src="https://browser.sentry-cdn.com/6.17.2/bundle.tracing.min.js"
+      integrity="sha384-/06LGwfzQ1pgdFsQEtOB+4auE4K6SV85cy/7wKx5H+8Uhtmb5dajgm6/AM31blzh"
+      crossorigin="anonymous"
+    ></script>
     {% if enable_analytics %}
     {% compress js %}
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
