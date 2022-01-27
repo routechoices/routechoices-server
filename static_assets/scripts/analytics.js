@@ -2,8 +2,7 @@
 Sentry.init({
     dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
     release: "master@{{version}}",
-    integrations: [new Sentry.Integrations.BrowserTracing()],
-    tracesSampleRate: 0.05,
+    integrations: [],
 });
 
 var _paq = window._paq = window._paq || [];
