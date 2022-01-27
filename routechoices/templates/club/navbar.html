@@ -7,27 +7,27 @@
 {% endif %}
 
 <header class="navbar navbar-expand-md navbar-light bg-light" style="z-index: 110001">
-    <div class="container">
-        {% if club.logo and club.website %}
-          <a href="{{ club.website }}"><span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span></a>
-        {% elif club.logo %}
-          <span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span>
-        {% elif club.website %}
-          <a href="{{ club.website }}"><i class="fa fa-home fa-2x"></i></a></span>
-        {% else %}
-          <a class="navbar-brand site-name" href="{{club.nice_url}}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
-        {% endif %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="nav navbar-nav me-auto mb-2 mb-lg-0">
-          </ul>
-          <ul class="nav navbar-nav d-flex">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ club.get_absolute_url }}" id="club-events-link-text">Events by {{ club.name }}</a>
-            </li>
-          </ul>
-        </div>
+  <div class="container">
+    {% if club.logo and club.website %}
+    <a href="{{ club.website }}"><span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span></a>
+    {% elif club.logo %}
+    <span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span>
+    {% elif club.website %}
+    <a href="{{ club.website }}"><i class="fa fa-home fa-2x"></i></a></span>
+    {% else %}
+    <a class="navbar-brand site-name" href="{{club.nice_url}}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
+    {% endif %}
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="nav navbar-nav me-auto mb-2 mb-lg-0">
+      </ul>
+      <ul class="nav navbar-nav d-flex">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ club.get_absolute_url }}" id="club-events-link-text">Events by {{ club.name }}</a>
+        </li>
+      </ul>
     </div>
-  </header>
+  </div>
+</header>

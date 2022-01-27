@@ -4,12 +4,11 @@ var eventUrl = dataset.eventUrl
 var wmsService = dataset.wmsServiceUrl
 var chatStreamUrl = dataset.chatStreamUrl
 var chatMessagesEndpoint = dataset.chatMessagesEndpoint
-var clock = ServerClock({url: dataset.serverClockUrl})
 var clubName = dataset.clubName
 var staticRoot = dataset.staticRoot
 
 if (!navigator.canShare) {
-  u('#share_buttons').hide()
+  document.getElementById('share_buttons').remove()
 }
 
 function checkImageFormatCapability(format) {
@@ -38,19 +37,6 @@ var hasAvifSupport = false
   checkImageFormatCapability('avif').then(function(res){hasAvifSupport = res})
 })()
 
-function shareUrl (e) {
-  e.preventDefault()
-  var shareData = {
-    title: u('meta[property="og:title"]').attr('content'),
-    text: u('meta[property="og:description"]').attr('content'),
-    url: window.location
-  }
-  try {
-    navigator.share(shareData).then(function () {}).catch(function () {})
-  } catch(err) {
-  }
-}
-
 var browserLanguage = navigator.language.slice(0, 2)
 var supportedLanguages = {
   'en': "English",
@@ -59,17 +45,17 @@ var supportedLanguages = {
   'fi': "Suomi"
 }
 var locale = window.localStorage.getItem('lang') || (Object.keys(supportedLanguages).includes(browserLanguage) ? browserLanguage : 'en')
-const banana = new Banana()
-
-function updateText () {
-    banana.setLocale(locale)
-    var langFile = `${staticRoot}i18n/club/event/${locale}.json`
-    return fetch(`${langFile}?2022011900`).then((response) => response.json()).then((messages) => {
-      banana.load(messages, banana.locale)
-    })
-}
 
 ;(function() {
+  eventId = dataset.eventId
+  eventUrl = dataset.eventUrl
+  wmsService = dataset.wmsServiceUrl
+  chatStreamUrl = dataset.chatStreamUrl
+  chatMessagesEndpoint = dataset.chatMessagesEndpoint
+  clock = ServerClock({url: dataset.serverClockUrl})
+  clubName = dataset.clubName
+  staticRoot = dataset.staticRoot
+  banana = new Banana()
   updateText().then(function(){
     u('#heads-up-text').text(banana.i18n('heads-up-text'))
     u('#chat-btn-text').text(banana.i18n('chat'))

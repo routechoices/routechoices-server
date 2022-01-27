@@ -158,7 +158,6 @@ var liveUrl = null
 var isLiveEvent = false
 var isRealTime = true
 var isCustomStart = false
-var openStreetMap = null
 var competitorList = []
 var competitorRoutes = {}
 var routesLastFetched = -Infinity
@@ -203,6 +202,8 @@ var chatMessages = []
 var chatEventSource = null
 var chatNick = ''
 var zoomOnRunners = false
+var clock = null
+var banana = null
 
 backdropMaps['blank'] = L.tileLayer('data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>', {
   attribution: '',
@@ -1510,4 +1511,26 @@ function connectToChatEvents() {
     bumpChatConnectTimeout()
     setTimeout(connectToChatEvents, connectChatTimeoutMs)
   })
+}
+
+function shareUrl (e) {
+  e.preventDefault()
+  var shareData = {
+    title: u('meta[property="og:title"]').attr('content'),
+    text: u('meta[property="og:description"]').attr('content'),
+    url: window.location
+  }
+  try {
+    navigator.share(shareData).then(function () {}).catch(function () {})
+  } catch(err) {
+  }
+}
+
+
+function updateText () {
+    banana.setLocale(locale)
+    var langFile = `${staticRoot}i18n/club/event/${locale}.json`
+    return fetch(`${langFile}?2022011900`).then((response) => response.json()).then((messages) => {
+      banana.load(messages, banana.locale)
+    })
 }
