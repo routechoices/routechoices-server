@@ -84,7 +84,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "routechoices.core.middleware.HostsResponseMiddleware",
 ]
 
 SESSION_ENGINE = "user_sessions.backends.db"
