@@ -15,8 +15,9 @@
     {% elif club.website %}
     <a href="{{ club.website }}"><i class="fa fa-home fa-2x"></i></a></span>
     {% else %}
-    <a class="navbar-brand site-name" href="{{club.nice_url}}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
+    <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
     {% endif %}
+    {% if club %}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -29,5 +30,6 @@
         </li>
       </ul>
     </div>
+    {% endif %}
   </div>
 </header>
