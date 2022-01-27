@@ -44,6 +44,7 @@ var ServerClock = function(opts) {
             options.url,
             {
               method: 'GET',
+              mode: 'cors',
               headers: {
                 'Accept': 'application/json'
               }
