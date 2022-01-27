@@ -45,7 +45,6 @@ gitpython==3.1.26
 gps-encoding @ git+https://github.com/rphlo/gps_encoding.git
 gpxpy==1.5.0
 idna==3.3
-importlib-metadata==4.10.0
 inflection==0.5.1
 itypes==1.2.0
 jinja2==3.0.3
@@ -93,4 +92,3 @@ webencodings==0.5.1
 websocket-client==1.2.3
 wrapt==1.13.3
 yarl==1.7.2
-zipp==3.7.0
