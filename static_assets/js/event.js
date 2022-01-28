@@ -162,7 +162,7 @@ var competitorList = []
 var competitorRoutes = {}
 var routesLastFetched = -Infinity
 var noticeLastFetched = -Infinity
-var fetchPositionInterval = 10 * 2 // tracker buffer is 10 seconds
+var fetchPositionInterval = 10
 var playbackRate = 16
 var playbackPaused = true
 var prevDisplayRefresh = 0
@@ -319,7 +319,7 @@ var selectLiveMode = function(e){
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
     }
-    currentTime = +clock.now() - (fetchPositionInterval + 1)  * 1e3
+    currentTime = +clock.now() - (fetchPositionInterval + 5)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec)
     drawCompetitors()
     if (isLiveMode) {
       setTimeout(whileLive, 101)

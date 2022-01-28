@@ -798,8 +798,9 @@ def event_data(request, event_id):
     t0 = time.time()
     # First check if we have a live event cache
     # if we do return cache
+    cache_interval = 5
     use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
-    live_cache_ts = int(t0 // 10)
+    live_cache_ts = int(t0 // cache_interval)
     live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
     live_cached_res = cache.get(live_cache_key)
     if use_cache and live_cached_res:
@@ -809,7 +810,7 @@ def event_data(request, event_id):
         Event.objects.select_related("club"), aid=event_id, start_date__lt=now()
     )
 
-    cache_ts = int(t0 // (10 if event.is_live else 7 * 24 * 3600))
+    cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
     cache_prefix = "live" if event.is_live else "archived"
     cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
     prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
