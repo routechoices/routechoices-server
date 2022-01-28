@@ -500,7 +500,7 @@ class Map(models.Model):
 
         orig = self.image.open("rb").read()
         self.image.close()
-        img = Image.open(BytesIO(orig))
+        img = Image.open(BytesIO(orig)).convert("RGBA")
         img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
 
         tile_img = cv2.warpPerspective(
