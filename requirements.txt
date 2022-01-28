@@ -54,7 +54,7 @@ markdown==3.3.6
 markupsafe==2.0.1
 maxminddb==2.2.0
 multidict==5.2.0
-numpy==1.22.0
+numpy==1.22.1
 oauthlib==3.1.1
 opencv-python==4.5.5.62
 orjson==3.6.5
