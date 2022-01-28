@@ -497,10 +497,12 @@ class Map(models.Model):
             ]
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
+
         orig = self.image.open("rb").read()
         self.image.close()
-        img = cv2.imdecode(np.frombuffer(BytesIO(orig).getbuffer(), np.uint8), -1)
-        img_alpha = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+        img = Image.open(BytesIO(orig))
+        img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
+
         tile_img = cv2.warpPerspective(
             img_alpha,
             coeffs,
