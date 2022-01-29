@@ -319,7 +319,7 @@ var selectLiveMode = function(e){
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
     }
-    currentTime = +clock.now() - (fetchPositionInterval + 5)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec)
+    currentTime = +clock.now() - (fetchPositionInterval + 5 + 5)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (5sec)
     drawCompetitors()
     if (isLiveMode) {
       setTimeout(whileLive, 101)
