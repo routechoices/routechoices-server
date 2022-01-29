@@ -1,6 +1,7 @@
 var dataset = document.currentScript.dataset
 var chatStreamUrl = dataset.chatStreamUrl
 var chatMessagesEndpoint = dataset.chatMessagesEndpoint
+var csrfToken = dataset.csrfToken
 var chatMessages = []
 
 var connectChatAttempts
@@ -86,18 +87,24 @@ function refreshMessageList() {
       },
       function(isConfirmed){
         if(isConfirmed){
-          $.ajax({
-            url: 'https:'+ chatMessagesEndpoint,
-            data: {
-              uuid: uuid
-            },
-            xhrFields: {
-              withCredentials: true
-            },
-            method: 'DELETE',
-            dataType: 'JSON',
-            crossDomain: true
-          })
+          $.ajax(
+            {
+              url: 'https:'+ chatMessagesEndpoint,
+              headers: {
+                'X-CSRFToken': csrfToken
+              },
+              data: {
+                uuid: uuid,
+                csrfmiddlewaretoken: csrfToken
+              },
+              method: 'DELETE',
+              dataType: 'JSON',
+              xhrFields: {
+                   withCredentials: true
+              },
+              crossDomain: true
+            }
+          )
         }
       }
     )

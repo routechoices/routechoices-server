@@ -688,9 +688,13 @@ var displayChat = function(ev) {
         $.ajax(
           {
             url: 'https:'+ chatMessagesEndpoint,
+            headers: {
+              'X-CSRFToken': csrfToken
+            },
             data: {
               nickname: u('#chatNick').val(),
-              message: u('#chatMessage').val()
+              message: u('#chatMessage').val(),
+              csrfmiddlewaretoken: csrfToken
             },
             xhrFields: {
               withCredentials: true

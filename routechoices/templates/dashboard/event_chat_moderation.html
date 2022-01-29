@@ -19,5 +19,6 @@
 <script src="{% static '/scripts/dashboard/event_chat_moderation.js' %}?_=2022011801"
     data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
     data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"
+    data-csrf-token="{{ csrf_token }}"
 ></script>
 {%  endblock %}

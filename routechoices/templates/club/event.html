@@ -169,5 +169,7 @@
         data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
         data-server-clock-url="{% host_url 'time_api' host 'api' %}"
         data-club-name="{{ event.club.name }}"
-        data-static-root="{% static '' %}"></script>
+        data-static-root="{% static '' %}"
+        data-csrf-token="{{ csrf_token }}"
+></script>
 {% endblock %}

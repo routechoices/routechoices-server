@@ -363,6 +363,7 @@ def event_chat(request, event_id):
 
     if request.method == "DELETE":
         if not request.user.is_superuser:
+            raise Exception("not superuser " + request.user)
             if (
                 not request.user.is_authenticated
                 or not event.club.admins.filter(id=request.user.id).exists()
