@@ -16,7 +16,7 @@
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
-<script src="{% static '/scripts/dashboard/event_chat_moderation.js' %}?_=2022011801"
+<script src="{% static '/scripts/dashboard/event_chat_moderation.js' %}?_=2022012900"
     data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
     data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"
     data-csrf-token="{{ csrf_token }}"
