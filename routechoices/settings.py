@@ -761,7 +761,7 @@ CACHES = {
         "SHARDS": 4,
         "DATABASE_TIMEOUT": 0.10,  # 10 milliseconds
         # ^-- Timeout for each DjangoCache database transaction.
-        "OPTIONS": {"size_limit": 2 ** 30},  # 1 gigabyte
+        "OPTIONS": {"size_limit": 2**30},  # 1 gigabyte
     },
 }
 
