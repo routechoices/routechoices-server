@@ -21,7 +21,7 @@ def is_expirying(domain):
     with open(cert_path, "rb") as fp:
         data = fp.read()
     cert = x509.load_pem_x509_certificate(data)
-    return arrow.utcnow().shift(weeks=1) > arrow.get(cert.not_valid_after)
+    return arrow.utcnow().shift(days=11) > arrow.get(cert.not_valid_after)
 
 
 def read_account_key(cls, filename: str):
