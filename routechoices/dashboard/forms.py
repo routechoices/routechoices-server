@@ -134,6 +134,7 @@ class EventForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["start_date"].help_text = '<span class="local_time"></span>'
         self.fields["end_date"].help_text = '<span class="local_time"></span>'
+        self.fields["send_interval"].widget.attrs["min"] = 1
 
     class Meta:
         model = Event
@@ -147,6 +148,7 @@ class EventForm(ModelForm):
             "allow_live_chat",
             "start_date",
             "end_date",
+            "send_interval",
             "backdrop_map",
             "map",
             "map_title",

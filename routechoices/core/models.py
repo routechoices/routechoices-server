@@ -27,7 +27,7 @@ from django.contrib.gis.geos import LinearRing, Polygon
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
-from django.core.validators import validate_slug
+from django.core.validators import MinValueValidator, validate_slug
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
@@ -760,7 +760,12 @@ class Event(models.Model):
         default=False,
         help_text="Spectator will have a chat enabled during the live.",
     )
-    send_interval = models.PositiveIntegerField(default=5)
+    send_interval = models.PositiveIntegerField(
+        "Send interval (seconds)",
+        default=5,
+        help_text="If you use dedicated trackers, enter here the sending interval you set your devices to, if you use the official smartphone app leave the value at 5 seconds",
+        validators=[MinValueValidator(1)],
+    )
 
     class Meta:
         ordering = ["-start_date", "name"]
