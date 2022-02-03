@@ -204,6 +204,7 @@ var chatNick = ''
 var zoomOnRunners = false
 var clock = null
 var banana = null
+var sendInterval = 0
 
 backdropMaps['blank'] = L.tileLayer('data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>', {
   attribution: '',
@@ -319,7 +320,7 @@ var selectLiveMode = function(e){
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
     }
-    currentTime = +clock.now() - (fetchPositionInterval + 5 + 15)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (5sec) //15sec for chami adventure
+    currentTime = +clock.now() - (fetchPositionInterval + 5 + sendInterval)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     drawCompetitors()
     if (isLiveMode) {
       setTimeout(whileLive, 101)

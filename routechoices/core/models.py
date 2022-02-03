@@ -760,6 +760,7 @@ class Event(models.Model):
         default=False,
         help_text="Spectator will have a chat enabled during the live.",
     )
+    send_interval = models.PositiveIntegerField(default=5)
 
     class Meta:
         ordering = ["-start_date", "name"]

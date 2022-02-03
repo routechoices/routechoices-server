@@ -212,6 +212,7 @@ def event_list(request):
                         "url": "https://www.routechoices.com/ksk/Jukola-2019-1st-leg",
                         "shortcut": "https://routechoic.es/PlCG3xFS-f4",
                         "backdrop": "osm",
+                        "send_interval": 5,
                     },
                     "competitors": [
                         {
@@ -273,6 +274,7 @@ def event_detail(request, event_id):
             "url": request.build_absolute_uri(event.get_absolute_url()),
             "shortcut": event.shortcut,
             "backdrop": event.backdrop_map,
+            "send_interval": event.send_interval,
         },
         "competitors": [],
         "data": request.build_absolute_uri(

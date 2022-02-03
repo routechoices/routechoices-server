@@ -199,7 +199,7 @@ var locale = window.localStorage.getItem('lang') || (Object.keys(supportedLangua
         }
         qrUrl = response.event.shortcut
         liveUrl = response.data
-
+        sendInterval = response.event.send_interval
         if(response.maps.length) {
           var MapLayers = {}
           for (var i=0; i < response.maps.length; i++) {
