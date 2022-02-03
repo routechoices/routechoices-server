@@ -41,6 +41,7 @@ var hasAvifSupport = false
 var browserLanguage = navigator.language.slice(0, 2)
 var supportedLanguages = {
   'en': "English",
+  'es': "Español",
   'fr': "Français",
   'nl': "Nederlands",
   'fi': "Suomi"
