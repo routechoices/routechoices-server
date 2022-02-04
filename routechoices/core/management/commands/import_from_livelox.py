@@ -2,7 +2,10 @@ from urllib.parse import parse_qs, urlparse
 
 from django.core.management.base import BaseCommand
 
-from routechoices.core.tasks import EventImportError, import_single_event_from_livelox
+from routechoices.core.bg_tasks import (
+    EventImportError,
+    import_single_event_from_livelox,
+)
 
 
 class Command(BaseCommand):

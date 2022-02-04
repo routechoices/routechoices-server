@@ -1,6 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from routechoices.core.tasks import EventImportError, import_single_event_from_loggator
+from routechoices.core.bg_tasks import (
+    EventImportError,
+    import_single_event_from_loggator,
+)
 
 
 class Command(BaseCommand):
