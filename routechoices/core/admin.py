@@ -245,9 +245,9 @@ class DeviceAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .annotate(competitor_count=Count("competitor_set"))
             .annotate(
-                last_position_at=RawSQL(
-                    "(SELECT REGEXP_MATCHES(locations_raw, 'timestamp.*[,\\[](\\d+)]'))[1]",
-                    (),
+                last_position_at=Case(
+                    When(locations_raw="", then=Value("")),
+                    default=RawSQL("SELECT locations_raw::json->'timestamps'->>-1", ()),
                 )
             )
             .annotate(
