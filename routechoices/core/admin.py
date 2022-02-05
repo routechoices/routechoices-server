@@ -247,7 +247,7 @@ class DeviceAdmin(admin.ModelAdmin):
             .annotate(
                 last_position_at=Case(
                     When(locations_raw="", then=Value("")),
-                    default=RawSQL("SELECT locations_raw::json->'timestamps'->>-1", ()),
+                    default=RawSQL("locations_raw::json->'timestamps'->>-1", ()),
                 )
             )
             .annotate(
