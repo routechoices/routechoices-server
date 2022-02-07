@@ -863,9 +863,10 @@ CSP_DEFAULT_SRC = (
     "chat.routechoices.dev:8081",
     "www.routechoices.com",
     "api.routechoices.com",
+    "twemoji.maxcdn.com",
 )
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
-CSP_IMG_SRC = ("'self'", "*", "data:")
+CSP_IMG_SRC = ("'self'", "*", "data:", "twemoji.maxcdn.com")
 CSP_WORKER_SRC = ("'self'", "blob:")
 
 CSRF_TRUSTED_ORIGINS = [

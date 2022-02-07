@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
-<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022012000" />
+<link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022020700" />
 {% endcompress %}
 {% endblock %}
 
@@ -159,8 +159,8 @@
 <script src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
-<script src="{% static '/js/event.js' %}?_=2022020700"></script>
-{% endcompress %}
+<script src="{% static '/js/event.js' %}?_=2022020701"></script>
+{% endcompress %}{% if event.allow_live_chat %}<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>{% endif %}
 <script src="{% static '/scripts/club/event.js' %}?_=2022020700"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"

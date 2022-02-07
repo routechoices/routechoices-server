@@ -768,7 +768,11 @@ var refreshMessageList = function() {
     if (msg.removed) {
       out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <i>' + banana.i18n('message-removed') + '</i></div>'
     } else {
-      out += '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>' + u('<span/>').text(msg.nickname).html()+'</b></span>: ' + u('<span/>').text(msg.message).html()+ '</div>'
+      var div = document.createElement('div');
+      var innerHTML = '<div><span>' + hashAvatar(msg.user_hash, 20) + ' <b>' + u('<span/>').text(msg.nickname).html()+'</b></span>: ' + u('<span/>').text(msg.message).html()+ '</div>'
+      div.innerHTML = innerHTML;
+      twemoji.parse(div, {folder: 'svg', ext: '.svg'});
+      out += div.innerHTML
     }
   })
   u('#messageList').html(out)
