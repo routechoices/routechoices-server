@@ -842,7 +842,6 @@ def event_chat_moderation_view(request, id):
             aid=id,
             allow_live_chat=True,
             start_date__lte=now(),
-            end_date__gte=now(),
         )
     else:
         club_list = Club.objects.filter(admins=request.user)
@@ -852,7 +851,6 @@ def event_chat_moderation_view(request, id):
             club__in=club_list,
             allow_live_chat=True,
             start_date__lte=now(),
-            end_date__gte=now(),
         )
     return render(
         request,
