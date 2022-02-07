@@ -37,5 +37,6 @@
   "language": "Lenguaje",
   "error-sending-msg": "¡No se pudo enviar el mensaje!",
   "sending": "Enviando",
-  "message-removed": "Mensaje eliminado por el moderador"
+  "message-removed": "Mensaje eliminado por el moderador",
+  "chat-closed": "El chat está cerrado"
 }

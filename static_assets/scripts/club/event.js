@@ -142,7 +142,7 @@ var locale = window.localStorage.getItem('lang') || (Object.keys(supportedLangua
       backdropMaps[response.event.backdrop].addTo(map)
       var now = new Date()
       var startEvent = new Date(response.event.start_date)
-      var endEvent = new Date(response.event.end_date)
+      endEvent = new Date(response.event.end_date)
       if (startEvent > now) {
         u('.event-tool').hide()
 
@@ -189,12 +189,12 @@ var locale = window.localStorage.getItem('lang') || (Object.keys(supportedLangua
         u('#options_show_button').on('click', displayOptions)
         u('#full_progress_bar').on('click', pressProgressBar)
         u('#share_button').on('click', shareUrl)
-        if (endEvent > now) {
-          isLiveEvent = true
-          if (response.event.chat_enabled) {
+        if (response.event.chat_enabled) {
             u('#chat_button_group').removeClass('d-none')
             connectToChatEvents()
-          }
+        }
+        if (endEvent > now) {
+          isLiveEvent = true
         } else {
           clock.stopRefreshes()
         }

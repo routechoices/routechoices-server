@@ -37,5 +37,6 @@
     "language": "Language",
     "error-sending-msg": "Message could not be sent!",
     "sending": "Sending...",
-    "message-removed": "Message removed by a moderator"
+    "message-removed": "Message removed by a moderator",
+    "chat-closed": "Chat is closed"
 }

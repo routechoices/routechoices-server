@@ -37,5 +37,6 @@
     "language": "Kieli",
     "error-sending-msg": "Viestiä ei voitu lähettää!",
     "sending": "Lähetetään...",
-    "message-removed": "Moderaattori poisti viestin"
+    "message-removed": "Moderaattori poisti viestin",
+    "chat-closed": "Chat on suljettu"
 }

@@ -107,7 +107,6 @@ class LiveEventChatStream(tornado.web.RequestHandler):
             .filter(
                 aid=event_id,
                 start_date__lte=now(),
-                end_date__gte=now(),
                 allow_live_chat=True,
             )
             .first,

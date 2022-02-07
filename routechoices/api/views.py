@@ -353,15 +353,8 @@ def event_chat(request, event_id):
         Event,
         aid=event_id,
         start_date__lte=now(),
-        end_date__gte=now(),
         allow_live_chat=True,
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
 
     if request.method == "DELETE":
         if not request.user.is_superuser:
@@ -389,6 +382,16 @@ def event_chat(request, event_id):
             except Exception:
                 pass
         return Response({"status": "deleted"}, status=201)
+
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if (
+            not request.user.is_authenticated
+            or not event.club.admins.filter(id=request.user.id).exists()
+        ):
+            raise PermissionDenied()
+
+    if event.end_date <= now():
+        raise Http404()
 
     nickname = request.data.get("nickname")
     message = request.data.get("message")

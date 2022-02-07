@@ -37,5 +37,6 @@
     "language": "Taal",
     "error-sending-msg": "Bericht kon niet worden verstuurd!",
     "sending": "Sturen...",
-    "message-removed": "Bericht verwijderd door een moderator"
+    "message-removed": "Bericht verwijderd door een moderator",
+    "chat-closed": "Chatten is gesloten"
 }

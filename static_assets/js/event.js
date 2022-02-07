@@ -205,7 +205,7 @@ var zoomOnRunners = false
 var clock = null
 var banana = null
 var sendInterval = 0
-
+var endEvent = null
 backdropMaps['blank'] = L.tileLayer('data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>', {
   attribution: '',
   tileSize: 512
@@ -322,6 +322,12 @@ var selectLiveMode = function(e){
     }
     currentTime = +clock.now() - (fetchPositionInterval + 5 + sendInterval)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     drawCompetitors()
+    var wasLive = isLiveMode
+    isLiveMode = (+endEvent >= +clock.now())
+    if (wasLive !== isLiveMode) {
+      u("#live_button").remove()
+      selectReplayMode()
+    }
     if (isLiveMode) {
       setTimeout(whileLive, 101)
     }
@@ -673,51 +679,70 @@ var displayChat = function(ev) {
         '<h4>' + banana.i18n('chat') + '</h4>'
       )
     )
-    mainDiv.append(
-      u('<form/>').html(
-        '<label class="form-label" for="nickname">' + banana.i18n('nickname') + '</label>'+
-        '<input class="form-control" name="nickname" id="chatNick" maxlength="20" />'+
-        '<label class="form-label" for="message">' + banana.i18n('message') + '</label>'+
-        '<input class="form-control" name="message" id="chatMessage" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
-        '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
-      ).on('submit', function(ev) {
-        ev.preventDefault()
-        if(u('#chatMessage').val() === '' || u('#chatNick').val() === '' || u('chatSubmitBtn').val() === banana.i18n('sending')){
-          return
-        }
-        u('#chatSubmitBtn').val(banana.i18n('sending'))
-        $.ajax(
-          {
-            url: 'https:'+ chatMessagesEndpoint,
-            headers: {
-              'X-CSRFToken': csrfToken
-            },
-            data: {
-              nickname: u('#chatNick').val(),
-              message: u('#chatMessage').val(),
-              csrfmiddlewaretoken: csrfToken
-            },
-            xhrFields: {
-              withCredentials: true
-            },
-            method: 'POST',
-            dataType: 'JSON',
-            crossDomain: true
-          }).success(function(){
-            u('#chatMessage').val('')
-            document.getElementById('chatMessage').focus()
-          }).fail(function(){
+    if (endEvent > new Date()) {
+      mainDiv.append(
+        u('<form id="chatForm"/>').html(
+          '<label class="form-label" for="nickname">' + banana.i18n('nickname') + '</label>'+
+          '<input class="form-control" name="nickname" id="chatNick" maxlength="20" />'+
+          '<label class="form-label" for="message">' + banana.i18n('message') + '</label>'+
+          '<input class="form-control" name="message" id="chatMessage" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>'+
+          '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
+        ).on('submit', function(ev) {
+          ev.preventDefault()
+          if(u('#chatMessage').val() === '' || u('#chatNick').val() === '' || u('chatSubmitBtn').val() === banana.i18n('sending')){
+            return
+          }
+          if (+endEvent <= +clock.now()) {
             swal({
-              title: banana.i18n('error-sending-msg'),
+              title: banana.i18n('chat-closed'),
               text: '',
               type: 'error',
               confirmButtonText: 'OK'
             })
-          }).always(function(){
-            u('#chatSubmitBtn').val(banana.i18n('send'))
-          })
-      })
-    )
+            u('#chatForm').after(
+              u('<div/>').html('<h4><i>' + banana.i18n('chat-closed') + '</i></h4>')
+            )
+            u('#chatForm').remove()
+            return
+          }
+          u('#chatSubmitBtn').val(banana.i18n('sending'))
+          $.ajax(
+            {
+              url: 'https:'+ chatMessagesEndpoint,
+              headers: {
+                'X-CSRFToken': csrfToken
+              },
+              data: {
+                nickname: u('#chatNick').val(),
+                message: u('#chatMessage').val(),
+                csrfmiddlewaretoken: csrfToken
+              },
+              xhrFields: {
+                withCredentials: true
+              },
+              method: 'POST',
+              dataType: 'JSON',
+              crossDomain: true
+            }).success(function(){
+              u('#chatMessage').val('')
+              document.getElementById('chatMessage').focus()
+            }).fail(function(){
+              swal({
+                title: banana.i18n('error-sending-msg'),
+                text: '',
+                type: 'error',
+                confirmButtonText: 'OK'
+              })
+            }).always(function(){
+              u('#chatSubmitBtn').val(banana.i18n('send'))
+            })
+        })
+      )
+    } else {
+      mainDiv.append(
+        u('<div/>').html('<h4><i>' + banana.i18n('chat-closed') + '</i></h4>')
+      )
+    }
     mainDiv.append(u('<div style="clear: both"/>').attr('id', 'messageList'))
     u('#sidebar').html('')
     u('#sidebar').append(mainDiv)
@@ -1535,7 +1560,7 @@ function shareUrl (e) {
 function updateText () {
     banana.setLocale(locale)
     var langFile = `${staticRoot}i18n/club/event/${locale}.json`
-    return fetch(`${langFile}?20220020300`).then((response) => response.json()).then((messages) => {
+    return fetch(`${langFile}?20220020700`).then((response) => response.json()).then((messages) => {
       banana.load(messages, banana.locale)
     })
 }
