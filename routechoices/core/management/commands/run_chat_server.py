@@ -114,7 +114,7 @@ class LiveEventChatStream(tornado.web.RequestHandler):
             thread_sensitive=True,
         )()
         if not event:
-            self.set_status(404)
+            raise tornado.web.HTTPError(404)
 
         if event.privacy == PRIVACY_PRIVATE:
             user = await self.get_current_user()
