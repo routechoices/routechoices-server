@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractMonth, ExtractYear
+from django.forms import ValidationError
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
@@ -423,7 +424,8 @@ def event_route_upload_view(request, slug, **kwargs):
                 if start_time and event.start_date <= start_time <= event.end_date:
                     competitor.start_time = start_time
                 competitor.save()
-
+            else:
+                raise ValidationError(error)
             target_url = f"{event.club.nice_url}{event.slug}/route-upload-complete"
             return redirect(target_url)
     else:
