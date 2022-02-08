@@ -99,6 +99,19 @@
     }
   }
 
+  @media only screen and (max-width : 359px) {
+    /* spanish width */
+    .time_bar{
+      height: 190px;
+    }
+    .main {
+      bottom: 190px;
+    }
+    .sidebar {
+      bottom: 190px;
+    }
+  }
+
   .close {
       margin-bottom: 3px;
   }
@@ -137,6 +150,10 @@
   .btn:focus{
     outline: none;
     box-shadow: none;
+  }
+
+  .btn-group>.btn-group:not(:first-child), .btn-group>.btn:not(:first-child) {
+    margin-left: -4px;
   }
 
   img.emoji {
