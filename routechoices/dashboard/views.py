@@ -5,16 +5,23 @@ import zipfile
 
 import gpxpy
 import requests
+from allauth.account import app_settings as allauth_settings
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import default_token_generator
 from allauth.account.signals import password_changed, password_reset
+from allauth.account.utils import user_username
+from allauth.utils import build_absolute_uri
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.files import File
 from django.core.paginator import Paginator
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.timezone import now
 
 from routechoices.api.views import serve_from_s3
@@ -88,13 +95,65 @@ def account_edit_view(request):
 
 @login_required
 def account_delete_view(request):
+    token_generator = default_token_generator
+    token_generator.key_salt = "AccountDeletionTokenGenerator"
+    user = request.user
     if request.method == "POST":
-        request.user.delete()
-        messages.success(request, "Account deleted.")
-        return redirect("site:home_view")
+        conf_key = request.POST.get("confirmation_key")
+        if conf_key:
+            if token_generator.check_token(user, conf_key):
+                request.user.delete()
+                messages.success(request, "Account deleted.")
+                return redirect("site:home_view")
+            return render(
+                request,
+                "dashboard/account_delete_confirm.html",
+                {"confirmation": True, "confirmation_valid": False},
+            )
+        else:
+            temp_key = token_generator.make_token(user)
+            current_site = get_current_site(request)
+            url = build_absolute_uri(request, reverse("dashboard:account_delete_view"))
+            context = {
+                "current_site": current_site,
+                "user": user,
+                "account_deletion_url": f"{url}?confirmation_key={temp_key}",
+                "request": request,
+            }
+            if (
+                allauth_settings.AUTHENTICATION_METHOD
+                != allauth_settings.AuthenticationMethod.EMAIL
+            ):
+                context["username"] = user_username(user)
+            get_adapter(request).send_mail(
+                "account/email/account_delete", request.user.email, context
+            )
+            return render(
+                request,
+                "dashboard/account_delete_confirm.html",
+                {"confirmation": False, "sent": True},
+            )
+    conf_key = request.GET.get("confirmation_key")
+    if conf_key:
+        if token_generator.check_token(user, conf_key):
+            return render(
+                request,
+                "dashboard/account_delete_confirm.html",
+                {
+                    "confirmation": True,
+                    "confirmation_valid": True,
+                    "confirmation_key": conf_key,
+                },
+            )
+        return render(
+            request,
+            "dashboard/account_delete_confirm.html",
+            {"confirmation": True, "confirmation_valid": False},
+        )
     return render(
         request,
-        "dashboard/account_delete.html",
+        "dashboard/account_delete_confirm.html",
+        {"confirmation": False, "sent": False},
     )
 
 

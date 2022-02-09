@@ -1,0 +1,43 @@
+{% extends "dashboard/home.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block sub_content %}
+{% if confirmation %}
+{% if confirmation_valid %}
+<div class="row">
+    <div class="col-12">
+        <h4>Delete your account?</h4>
+        <p><i class="fa fa-warning"></i> This is permanent!</p>
+        <p><form method="post" action="">
+            <input type="hidden" name="confirmation_key" value="{{confirmation_key}}" />
+            <input type="submit" class="btn btn-danger" value="Delete account" />
+            {% csrf_token %}
+        </form></p>
+    </div>
+</div>
+{% else %}
+<p>This account deletion confirmation link expired or is invalid. Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.</p>
+{% endif %}
+{% else %}
+{% if sent %}
+<div class="row">
+  <div class="col-12">
+    <p>An email message with a confirmation link has been sent to your primary address.</p>
+  </div>
+</div>
+{% else %}
+<div class="row">
+  <div class="col-12">
+      <h4>Delete your account?</h4>
+      <p>Note that deleting your account does NOT delete your clubs, clubs maps, or clubs events.</p>
+      <p>To ensure your identity we will send you an email with a confirmation link.</p>
+      <p><form method="post" action="">
+          <input type="submit" class="btn btn-danger" value="Send the link" />
+          {% csrf_token %}
+      </form></p>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

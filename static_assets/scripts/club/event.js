@@ -9,7 +9,7 @@ var staticRoot = dataset.staticRoot
 var csrfToken = dataset.csrfToken
 
 if (!navigator.canShare) {
-  document.getElementById('share_buttons').remove()
+  //document.getElementById('share_buttons').remove()
 }
 
 function checkImageFormatCapability(format) {
