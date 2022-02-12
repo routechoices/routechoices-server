@@ -1451,12 +1451,12 @@ def two_d_rerun_race_data(request):
         results += [
             [
                 c.aid,
-                ll["latitude"],
-                ll["longitude"],
+                ll[1],
+                ll[2],
                 0,
-                arrow.get(ll["timestamp"]).datetime,
+                arrow.get(ll[0]).datetime,
             ]
-            for ll in c.locations
+            for ll in locations
         ]
     response_json = {
         "containslastpos": 1,
