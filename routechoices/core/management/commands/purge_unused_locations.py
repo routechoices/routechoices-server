@@ -17,7 +17,9 @@ class Command(BaseCommand):
         deleted_count = 0
         devices = Device.objects.all()
         for device in devices:
+            orig_pts_count = device.location_count
             device.remove_duplicates(force)
+            pts_count_after_deduplication = device.location_count
             locs = device.locations
             periods_used = []
             two_weeks_ago = now() - timedelta(days=14)
@@ -44,13 +46,21 @@ class Command(BaseCommand):
                         break
                 if is_valid:
                     valid_indexes.append(idx)
-            dev_del_loc_count = len(locs["timestamps"]) - len(valid_indexes)
-            if dev_del_loc_count:
-                self.stdout.write(
-                    f"Device {device.aid}, extra {dev_del_loc_count} locations"
-                )
-            deleted_count += dev_del_loc_count
-            if force and dev_del_loc_count:
+            dev_del_loc_count_total = orig_pts_count - len(valid_indexes)
+            dev_del_loc_count_invalids = pts_count_after_deduplication - len(
+                valid_indexes
+            )
+            if dev_del_loc_count_total:
+                if orig_pts_count - pts_count_after_deduplication > 0:
+                    self.stdout.write(
+                        f"Device {device.aid}, extra {dev_del_loc_count_total} locations, including {orig_pts_count - pts_count_after_deduplication} duplicates"
+                    )
+                else:
+                    self.stdout.write(
+                        f"Device {device.aid}, extra {dev_del_loc_count_total} locations"
+                    )
+            deleted_count += dev_del_loc_count_total
+            if force and dev_del_loc_count_invalids:
                 new_locs = {
                     "timestamps": [locs["timestamps"][i] for i in valid_indexes],
                     "latitudes": [locs["latitudes"][i] for i in valid_indexes],

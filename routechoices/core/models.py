@@ -995,9 +995,10 @@ class Device(models.Model):
             tims, lats, lons = zip(*loc_list)
         new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
         new_raw = str(json.dumps(new_locs), "utf-8")
-        if save and self.locations_raw != new_raw:
+        if self.locations_raw != new_raw:
             self.locations_raw = new_raw
-            self.save()
+            if save:
+                self.save()
 
     @cached_property
     def last_location(self):
