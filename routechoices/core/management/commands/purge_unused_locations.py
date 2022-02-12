@@ -15,6 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         force = options["force"]
         deleted_count = 0
+        two_weeks_ago = now() - timedelta(days=14)
         devices = Device.objects.all()
         for device in devices:
             orig_pts_count = device.location_count
@@ -22,7 +23,6 @@ class Command(BaseCommand):
             pts_count_after_deduplication = device.location_count
             locs = device.locations
             periods_used = []
-            two_weeks_ago = now() - timedelta(days=14)
             competitors = device.competitor_set.all()
             for competitor in competitors:
                 event = competitor.event
@@ -31,19 +31,18 @@ class Command(BaseCommand):
                     start = competitor.start_time
                 end = None
                 end = min(event.end_date, two_weeks_ago)
-                periods_used.append((start, end))
+                if start < end:
+                    periods_used.append((start, end))
             valid_indexes = []
             for idx, timestamp in enumerate(locs["timestamps"]):
                 is_valid = False
                 if timestamp >= two_weeks_ago.timestamp():
                     is_valid = True
-                for p in periods_used:
-                    if (
-                        p[0].timestamp() <= timestamp <= p[1].timestamp()
-                        or timestamp >= two_weeks_ago.timestamp()
-                    ):
-                        is_valid = True
-                        break
+                if not is_valid:
+                    for p in periods_used:
+                        if p[0].timestamp() <= timestamp <= p[1].timestamp():
+                            is_valid = True
+                            break
                 if is_valid:
                     valid_indexes.append(idx)
             dev_del_loc_count_total = orig_pts_count - len(valid_indexes)
