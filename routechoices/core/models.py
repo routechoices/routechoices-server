@@ -1,4 +1,5 @@
 import base64
+import bisect
 import datetime
 import hashlib
 import logging
@@ -900,17 +901,11 @@ class Device(models.Model):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
-        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
-
-        locs = [
-            {
-                "timestamp": i[0],
-                "latitude": i[1],
-                "longitude": i[2],
-            }
-            for i in sorted(d, key=itemgetter(0))
-            if from_ts < i[0] < end_ts
-        ]
+        locs = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
+        locs = list(sorted(locs, key=itemgetter(0)))
+        from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
+        end_idx = bisect.bisect_right(locs, end_ts, key=itemgetter(0))
+        locs = locs[from_idx:end_idx]
         if not encoded:
             return len(locs), locs
         result = gps_encoding.encode_data(locs)
