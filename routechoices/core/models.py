@@ -996,6 +996,7 @@ class Device(models.Model):
         new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
         new_raw = str(json.dumps(new_locs), "utf-8")
         if save and self.locations_raw != new_raw:
+            self.locations_raw = new_raw
             self.save()
 
     @cached_property
