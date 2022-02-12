@@ -1175,9 +1175,9 @@ class Competitor(models.Model):
         for location in locs:
             gpx_segment.points.append(
                 gpxpy.gpx.GPXTrackPoint(
-                    location["latitude"],
-                    location["longitude"],
-                    time=arrow.get(location["timestamp"]).datetime,
+                    location[1],
+                    location[0],
+                    time=arrow.get(location[0]).datetime,
                 )
             )
         gpx_track.segments.append(gpx_segment)
