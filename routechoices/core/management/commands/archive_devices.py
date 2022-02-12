@@ -1,7 +1,8 @@
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand
-from django.db.models.functions import Length
+from django.db.models import Case, Value, When
+from django.db.models.expressions import RawSQL
 from django.utils.timezone import now
 
 from routechoices.core.models import Device
@@ -16,16 +17,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         force = options["force"]
-        devices = Device.objects.filter(is_gpx=False).order_by(
-            Length("locations_raw").desc()
-        )
+        devices = Device.objects.annotate(
+            location_count_sql=Case(
+                When(locations_raw="", then=Value(0)),
+                default=RawSQL(
+                    "json_array_length(locations_raw::json->'timestamps')", ()
+                ),
+            )
+        ).filter(location_count_sql__gt=3600 * 24)
         n_device_archived = 0
         two_weeks_ago = now() - timedelta(days=14)
         for device in devices:
             self.stdout.write(f"Device {(device.aid)}")
-            loc_len = device.location_count
-            if loc_len < 3600 * 24:
-                break
             competitors = device.competitor_set.all()
             periods_used = []
             last_start = None
