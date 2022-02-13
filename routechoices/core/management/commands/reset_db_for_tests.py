@@ -3,6 +3,8 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
+from routechoices.core.models import Device
+
 
 class Command(BaseCommand):
     help = "Reset the DB before tests"
@@ -15,3 +17,4 @@ class Command(BaseCommand):
         s.name = "Routechoices.com"
         s.save()
         User.objects.create_user("admin", "admin@routechoices.com", "pa$$word123")
+        Device.objects.create(aid=12345678)

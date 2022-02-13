@@ -67,7 +67,7 @@
             <h3>Announcement</h3>
             {% bootstrap_form notice_form %}
 
-            <h3>Competitors{% if event.started %} <a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary">Upload Competitors Routes</a>{% endif %}</h3>
+            <h3>Competitors{% if event.started %} <a href="{% url 'dashboard:event_gpx_upload_view' id=event.aid %}" class="btn btn-primary" id="upload_route_btn">Upload Competitors Routes</a>{% endif %}</h3>
             {% bootstrap_formset_errors formset %}
             <table class="table competitor_table">
             {{ formset.management_form }}
@@ -104,7 +104,7 @@
                 Follow the following format for the CSV:<br/>
                 Column A - Full name / displayed in the menu on the left during the event /<br/>
                 Column B - Shortname / displayed next to the marker on the live event /<br/>
-                Column C - Start time for the competitor in the following format (2014-05-31 08:57:00). Make sure this column is formatted as Text.<br/>
+                Column C - UTC Start time for the competitor in the following format (2014-05-31 08:57:00). Make sure this column is formatted as Text.<br/>
                 Column D - The ID of the GPS device
             </div>
             <hr/>
@@ -125,5 +125,5 @@
 <script src="{% static '/vendor/selectize-0.13.3/selectize.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/papaparse-5.0.0-beta/papaparse.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/dashboard/event_edit.js' %}?_=2022011800" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+<script src="{% static '/scripts/dashboard/event_edit.js' %}?_=2022021300" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {%  endblock %}

@@ -32,7 +32,23 @@ context('Cypress tests', () => {
       cy.get("input[value='Save']").click()
       cy.url().should('match', /\/dashboard\/events$/)
 
+      cy.get('a').contains('Jukola 2019 - 1st Leg').click()
+      const startListFileName = 'startlist.csv'
+      cy.get('#csv_input').attachFile(startListFileName)
+      cy.get("button[name='save_continue']").click()
+
+      cy.get('#upload_route_btn').click()
+      cy.get('#id_competitor').select('Daniel Hubman')
+
+      const gpxFileName = 'Jukola_1st_leg.gpx'
+      cy.get('#id_gpx_file').attachFile(gpxFileName)
+      cy.get("input[value='Upload']").click()
+
+      cy.contains('The upload of the GPX file was successful')
+
       cy.forceVisit('/halden-sk/Jukola-2019-1st-leg')
+      cy.contains("Olav Lundanes")
+      cy.contains("KooVee")
 
       // Create Event with all fields info
       cy.visit('/dashboard/events')
@@ -55,7 +71,7 @@ context('Cypress tests', () => {
       cy.get("input[value='Save']").click()
       cy.wait('@eventSubmit').then(({ request, response }) => {
             expect(response.statusCode).to.eq(302);
-            expect(request.body).to.contain('&competitors-0-device=1&');
+            expect(request.body).to.contain('&competitors-0-device=2&');
       });
       cy.url().should('match', /\/dashboard\/events$/)
       cy.forceVisit('/halden-sk/Jukola-2019-1st-leg-2')

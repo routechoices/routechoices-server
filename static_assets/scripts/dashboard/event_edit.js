@@ -39,9 +39,9 @@ function onAddedCompetitorRow(row) {
 
 function onCsvParsed(result){
     document.getElementById("csv_input").value = ""
-    var errors = false
+    var errors = ""
     if (result.errors.length>0) {
-        errors = true
+        errors = "No line found"
     }
     if(!errors) {
         result.data.forEach(function(l){
@@ -49,11 +49,15 @@ function onCsvParsed(result){
             if(l.length==1 && l[0] == "") {
                 empty = true
             }
-            if(!empty && l.length != 3 && l.length != 4) {
-                errors = true
+            if(!empty && l.length != 4) {
+                errors = "Each row should have 4 columns"
             } else {
-                if(!empty && !l[2].match(/^\d{4}-[01]\d-[0-3]\d[ T][0-2]\d:[0-5]\d(:[0-5]\d)?Z?$/)){
-                    errors = true
+                if(!empty && l[2]){
+                    try {
+                      new Date(l[2])
+                    } catch (e) {
+                      errors = "One row contains an invalid date"
+                    }
                 }
             }
         })
@@ -61,7 +65,7 @@ function onCsvParsed(result){
     if(errors){
         swal({
             title: 'Error!',
-            text: 'Could not parse this file',
+            text: 'Could not parse this file: ' + errors,
             type: 'error',
             confirmButtonText: 'OK'
         })
