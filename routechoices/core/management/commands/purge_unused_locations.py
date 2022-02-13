@@ -11,12 +11,17 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--force", action="store_true", default=False)
+        parser.add_argument("--incremental", action="store_true", default=False)
 
     def handle(self, *args, **options):
         force = options["force"]
+        incremental = options["incremental"]
         deleted_count = 0
         two_weeks_ago = now() - timedelta(days=14)
         devices = Device.objects.all()
+        if incremental:
+            two_weeks_two_days_ago = now() - timedelta(days=16)
+            devices = devices.filter(modification_date__gte=two_weeks_two_days_ago)
         for device in devices:
             orig_pts_count = device.location_count
             device.remove_duplicates(force)
