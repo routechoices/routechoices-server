@@ -35,7 +35,7 @@ context('Cypress tests', () => {
       cy.get('a').contains('Jukola 2019 - 1st Leg').click()
       const startListFileName = 'startlist.csv'
       cy.get('#csv_input').attachFile(startListFileName)
-      cy.contains("Frederic Tranchand")
+      cy.get('#id_competitors-2-name').should('have.value', 'Frederic Tranchand')
       cy.get("button[name='save_continue']").click()
 
       cy.get('#upload_route_btn').click()
