@@ -210,12 +210,12 @@ def decode_track_line(device, data, min_date=None, max_date=None):
         "lon": int(o_pt[1]) * 2.0 / 1e5,
         "ts": t,
     }
-    device.add_location(prev_loc["lat"], prev_loc["lon"], t.timestamp(), False)
+    loc_array = []
+    loc_array.append((t, prev_loc["lat"], prev_loc["lon"]))
     if min_date is None or t < min_date:
         min_date = t
     if max_date is None or t > max_date:
         max_date = t
-    loc_array = []
     for p in data[1:]:
         if len(p) < 3:
             continue

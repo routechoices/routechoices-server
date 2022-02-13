@@ -924,12 +924,10 @@ class Device(models.Model):
             validate_longitude(lon)
         except Exception:
             return
-        if timestamp is not None:
-            ts_datetime = epoch_to_datetime(timestamp)
-        else:
-            ts_datetime = now()
+        if timestamp is None:
+            timestamp = time.time()
         locs = self.locations
-        ts = int(ts_datetime.timestamp())
+        ts = int(timestamp)
         if isinstance(lat, Decimal):
             lat = float(lat)
         if isinstance(lon, Decimal):
@@ -964,6 +962,7 @@ class Device(models.Model):
                 lat = float(lat)
             if isinstance(lon, Decimal):
                 lon = float(lon)
+            all_ts.add(ts)
             new_ts.append(ts)
             new_lat.append(round(lat, 5))
             new_lon.append(round(lon, 5))
