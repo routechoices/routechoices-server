@@ -34,17 +34,19 @@ server {{
 
     location / {{
        client_max_body_size    10M;
-       proxy_set_header Host   $host;
+       proxy_set_header        Host $host;
        proxy_set_header        X-Real-IP $remote_addr;
        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
        uwsgi_pass              unix://{os.path.join(settings.BASE_DIR, 'var', 'django.sock')};
        uwsgi_pass_header       Authorization;
        uwsgi_hide_header       X-Accel-Redirect;
        uwsgi_hide_header       X-Sendfile;
+       uwsgi_pass_header       Set-Cookie;
        uwsgi_intercept_errors  off;
        include                 uwsgi_params;
     }}
-}}"""
+}}
+"""
         )
 
 
