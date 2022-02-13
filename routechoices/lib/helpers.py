@@ -24,7 +24,7 @@ UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
 def epoch_to_datetime(t):
-    return datetime.utcfromtimestamp(t).replace(tzinfo=UTC_TZ)
+    return datetime.utcfromtimestamp(int(t)).replace(tzinfo=UTC_TZ)
 
 
 def escape_filename(f):
