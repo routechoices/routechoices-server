@@ -275,7 +275,7 @@ class DeviceAdmin(admin.ModelAdmin):
     def last_position_at(self, obj):
         if not obj.last_position_at:
             return None
-        return epoch_to_datetime(int(obj.last_position_at))
+        return epoch_to_datetime(obj.last_position_at)
 
     location_count.admin_order_field = "location_count_sql"
     competitor_count.admin_order_field = "competitor_count"
