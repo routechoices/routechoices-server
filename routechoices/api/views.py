@@ -30,6 +30,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 from routechoices.core.models import (
+    EVENT_CACHE_INTERVAL,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
@@ -803,7 +804,7 @@ def event_data(request, event_id):
     t0 = time.time()
     # First check if we have a live event cache
     # if we do return cache
-    cache_interval = 5
+    cache_interval = EVENT_CACHE_INTERVAL
     use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
     live_cache_ts = int(t0 // cache_interval)
     live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"

@@ -67,6 +67,7 @@ logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
+EVENT_CACHE_INTERVAL = 5
 
 
 class Point:
@@ -774,6 +775,10 @@ class Event(models.Model):
         verbose_name = "event"
         verbose_name_plural = "events"
 
+    def save(self, *args, **kwargs):
+        self.invalidate_cache()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -821,7 +826,8 @@ class Event(models.Model):
 
     def invalidate_cache(self):
         t0 = time.time()
-        cache_ts = int(t0 // (10 if self.is_live else 7 * 24 * 3600))
+        cache_interval = EVENT_CACHE_INTERVAL
+        cache_ts = int(t0 // (cache_interval if self.is_live else 7 * 24 * 3600))
         cache_prefix = "live" if self.is_live else "archived"
         cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
         cache.delete(cache_key)
