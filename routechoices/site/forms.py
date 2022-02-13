@@ -66,7 +66,7 @@ class CompetitorForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields[
             "device"
-        ].help_text = f"<find out how to get a device ID from the <a href=\"{reverse('site:trackers_view')}\">trackers page</a>"
+        ].help_text = f"find out how to get a device ID from the <a href=\"{reverse('site:trackers_view')}\">trackers page</a>"
 
     class Meta:
         model = Competitor
