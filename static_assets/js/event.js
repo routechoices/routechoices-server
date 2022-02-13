@@ -322,9 +322,8 @@ var selectLiveMode = function(e){
     }
     currentTime = +clock.now() - (fetchPositionInterval + 5 + sendInterval)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     drawCompetitors()
-    var wasLive = isLiveMode
-    isLiveMode = (+endEvent >= +clock.now())
-    if (wasLive !== isLiveMode) {
+    var isStillLive = (+endEvent >= +clock.now())
+    if (!isStillLive) {
       u("#live_button").remove()
       selectReplayMode()
     }
