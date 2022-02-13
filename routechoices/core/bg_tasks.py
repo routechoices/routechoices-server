@@ -15,6 +15,7 @@ from PIL import Image, ImageDraw
 from routechoices.core.models import Club, Competitor, Device, Event, Map
 from routechoices.lib.helpers import (
     compute_corners_from_kml_latlonbox,
+    epoch_to_datetime,
     initial_of_name,
     project,
     safe32encode,
@@ -203,11 +204,11 @@ def decode_track_line(device, data, min_date=None, max_date=None):
     o_pt = data[0].split("_")
     if o_pt[0] == "*" or o_pt[1] == "*" or o_pt[2] == "*":
         return min_date, max_date
-    t = arrow.get(int(o_pt[0]) + 1136073600).datetime
+    t = int(o_pt[0] + 1136073600)
     prev_loc = {
         "lat": int(o_pt[2]) * 1.0 / 1e5,
         "lon": int(o_pt[1]) * 2.0 / 1e5,
-        "datetime": t,
+        "ts": t,
     }
     device.add_location(prev_loc["lat"], prev_loc["lon"], t.timestamp(), False)
     if min_date is None or t < min_date:
@@ -236,20 +237,14 @@ def decode_track_line(device, data, min_date=None, max_date=None):
             dt = chars.index(p[0]) - 31
             dlon = chars.index(p[1]) - 31
             dlat = chars.index(p[2]) - 31
-        t = arrow.get(prev_loc["datetime"].timestamp() + dt).datetime
+        t = prev_loc["ts"] + dt
 
         prev_loc = {
             "lat": ((prev_loc["lat"] * 100000) + dlat) / 100000,
             "lon": ((prev_loc["lon"] * 50000) + dlon) / 50000,
-            "datetime": t,
+            "ts": t,
         }
-        loc_array.append(
-            {
-                "timestamp": t.timestamp(),
-                "latitude": prev_loc["lat"],
-                "longitude": prev_loc["lon"],
-            }
-        )
+        loc_array.append((t, prev_loc["lat"], prev_loc["lon"]))
         if t < min_date:
             min_date = t
         if t > max_date:
@@ -434,13 +429,7 @@ def import_single_event_from_loggator(event_id):
                     is_gpx=True,
                 )
                 loc_array_map[int(d[0])] = []
-            loc_array_map[int(d[0])].append(
-                {
-                    "timestamp": arrow.get(int(d[4])).timestamp(),
-                    "latitude": float(d[1]),
-                    "longitude": float(d[2]),
-                }
-            )
+            loc_array_map[int(d[0])].append((int(d[4]), float(d[1]), float(d[2])))
 
     for c_data in event_data["competitors"]:
         Competitor.objects.create(
@@ -597,11 +586,7 @@ def import_single_event_from_sportrec(event_id):
             device_data = json.load(f)
             for d in device_data["locations"]:
                 device_map[d["device_id"]] = [
-                    {
-                        "timestamp": float(x["aq"]) / 1e3,
-                        "latitude": float(x["lat"]),
-                        "longitude": float(x["lon"]),
-                    }
+                    int((float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
                     for x in d["locations"]
                 ]
     except Exception:
@@ -684,11 +669,7 @@ def import_single_event_from_otracker(event_id):
             device_map = {}
             for d in orig_device_map:
                 device_map[d] = [
-                    {
-                        "timestamp": x["fix_time"] + ft,
-                        "latitude": x["lat"],
-                        "longitude": x["lon"],
-                    }
+                    (int(x["fix_time"] + ft), x["lat"], x["lon"])
                     for x in orig_device_map[d]
                 ]
     except Exception:
@@ -948,21 +929,9 @@ def import_single_event_from_livelox(class_id):
             if map_projection:
                 px, py = project(matrix, lon / 10, lat / 10)
                 latlon = map_model.map_xy_to_wsg84(px, py)
-                pts.append(
-                    {
-                        "timestamp": int(t / 1e3),
-                        "latitude": latlon["lat"],
-                        "longitude": latlon["lon"],
-                    }
-                )
+                pts.append((int(t / 1e3), latlon["lat"], latlon["lon"]))
             else:
-                pts.append(
-                    {
-                        "timestamp": int(t / 1e3),
-                        "latitude": lat / 1e6,
-                        "longitude": lon / 1e6,
-                    }
-                )
+                pts.append((int(t / 1e3), lat / 1e6, lon / 1e6))
         dev = Device.objects.create(aid=short_random_key() + "_LLX", is_gpx=True)
         if pts:
             dev.add_locations(pts)
@@ -971,7 +940,7 @@ def import_single_event_from_livelox(class_id):
         Competitor.objects.create(
             name=c_name,
             short_name=c_sname,
-            start_time=arrow.get(min_t).datetime,
+            start_time=epoch_to_datetime(min_t),
             event=event,
             device=dev,
         )

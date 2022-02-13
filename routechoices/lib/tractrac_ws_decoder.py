@@ -48,14 +48,14 @@ class TracTracWSReader:
                         self.get_int64()
                         ts = self.get_int64()
                         comp_id = self.get_uuid()
-                        pos = {
-                            "longitude": self.get_int32() / 1e7,
-                            "latitude": self.get_int32() / 1e7,
-                            "timestamp": int(ts / 1e3),
-                        }
+                        pos_longitude = self.get_int32() / 1e7
+                        pos_latitude = self.get_int32() / 1e7
+                        pos_timestamp = int(ts / 1e3)
                         if not comp_data.get(comp_id):
                             comp_data[comp_id] = []
-                        comp_data[comp_id].append(pos)
+                        comp_data[comp_id].append(
+                            (pos_timestamp, pos_latitude, pos_longitude)
+                        )
                         self.result = self.result[52 + (message_type == 19) * 8 :]
                         self.offset = 0
                         message_type = self.get_int32()

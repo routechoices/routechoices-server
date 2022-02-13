@@ -31,6 +31,9 @@ from rest_framework.throttling import AnonRateThrottle
 
 from routechoices.core.models import (
     EVENT_CACHE_INTERVAL,
+    LOCATION_LATITUDE_INDEX,
+    LOCATION_LONGITUDE_INDEX,
+    LOCATION_TIMESTAMP_INDEX,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
@@ -44,6 +47,7 @@ from routechoices.core.models import (
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
+    epoch_to_datetime,
     escape_filename,
     initial_of_name,
     random_device_id,
@@ -716,15 +720,9 @@ def event_upload_route(request, event_id):
                 start_pt_ts = min(tim, start_pt_ts)
             except ValueError:
                 continue
+            loc_array.append((tim, lat, lon))
 
-            loc_array.append(
-                {
-                    "timestamp": tim,
-                    "latitude": lat,
-                    "longitude": lon,
-                }
-            )
-    start_pt_dt = arrow.get(start_pt_ts).datetime
+    start_pt_dt = epoch_to_datetime(start_pt_ts)
     if event.start_date > start_pt_dt or start_pt_dt > event.end_date:
         start_pt_dt = event.start_date
     start_time = request.data.get("start_time")
@@ -899,7 +897,7 @@ def event_data(request, event_id):
         "competitors": results,
         "nb_points": nb_points,
         "duration": (time.time() - t0),
-        "timestamp": arrow.utcnow().timestamp(),
+        "timestamp": time.time(),
     }
     if use_cache:
         try:
@@ -980,13 +978,7 @@ def locations_api_gw(request):
                 validate_latitude(lat)
             except DjangoValidationError:
                 raise ValidationError("Invalid latitude value")
-            loc_array.append(
-                {
-                    "timestamp": tim,
-                    "latitude": lat,
-                    "longitude": lon,
-                }
-            )
+            loc_array.append((tim, lat, lon))
     if len(loc_array) > 0:
         device.add_locations(loc_array)
     return Response({"status": "ok", "n": len(loc_array)})
@@ -1452,12 +1444,12 @@ def two_d_rerun_race_data(request):
         results += [
             [
                 c.aid,
-                ll[1],
-                ll[2],
+                location[LOCATION_LATITUDE_INDEX],
+                location[LOCATION_LONGITUDE_INDEX],
                 0,
-                arrow.get(ll[0]).datetime,
+                epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
             ]
-            for ll in locations
+            for location in locations
         ]
     response_json = {
         "containslastpos": 1,

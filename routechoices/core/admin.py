@@ -25,7 +25,7 @@ from routechoices.core.models import (
     SpotDevice,
     SpotFeed,
 )
-from routechoices.lib.helpers import get_device_name
+from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
@@ -275,7 +275,7 @@ class DeviceAdmin(admin.ModelAdmin):
     def last_position_at(self, obj):
         if not obj.last_position_at:
             return None
-        return arrow.get(int(obj.last_position_at)).datetime
+        return epoch_to_datetime(obj.last_position_at)
 
     location_count.admin_order_field = "location_count_sql"
     competitor_count.admin_order_field = "competitor_count"

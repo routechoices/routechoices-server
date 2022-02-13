@@ -151,13 +151,7 @@ class TMT250Connection:
         else:
             loc_array = []
             for r in decoded.get("records", []):
-                loc_array.append(
-                    {
-                        "timestamp": r["timestamp"],
-                        "latitude": r["latlon"][0],
-                        "longitude": r["latlon"][1],
-                    }
-                )
+                loc_array.append((int(r["timestamp"]), r["latlon"][0], r["latlon"][1]))
             if not self.db_device.user_agent:
                 self.db_device.user_agent = "Teltonika"
             self.db_device.add_locations(loc_array, save=False)

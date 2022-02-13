@@ -37,13 +37,7 @@ class Command(BaseCommand):
                     )
                 except Exception:
                     continue
-                devices[messenger_id].append(
-                    {
-                        "timestamp": ts,
-                        "latitude": lat,
-                        "longitude": lon,
-                    }
-                )
+                devices[messenger_id].append((ts, lat, lon))
         n = 0
         for m_id in devices.keys:
             try:

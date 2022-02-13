@@ -5,6 +5,8 @@ import os.path
 import secrets
 import struct
 import time
+import zoneinfo
+from datetime import datetime
 from math import cos, pi, sin
 
 import numpy
@@ -17,6 +19,12 @@ from user_sessions.templatetags.user_sessions import device as device_name
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.random_strings import generate_random_string
 from routechoices.lib.validators import validate_nice_slug
+
+UTC_TZ = zoneinfo.ZoneInfo("UTC")
+
+
+def epoch_to_datetime(t):
+    return datetime.utcfromtimestamp(t).replace(tzinfo=UTC_TZ)
 
 
 def escape_filename(f):

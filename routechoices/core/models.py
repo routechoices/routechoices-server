@@ -1,6 +1,5 @@
 import base64
 import bisect
-import datetime
 import hashlib
 import logging
 import math
@@ -8,13 +7,11 @@ import os.path
 import re
 import time
 import uuid
-import zoneinfo
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
 from zipfile import ZipFile
 
-import arrow
 import cv2
 import gps_encoding
 import gpxpy
@@ -43,6 +40,7 @@ from routechoices.lib.helpers import (
     delete_domain,
     distance_latlon,
     distance_xy,
+    epoch_to_datetime,
     general_2d_projection,
     project,
     random_device_id,
@@ -66,8 +64,11 @@ from routechoices.lib.validators import (
 logger = logging.getLogger(__name__)
 
 GLOBAL_MERCATOR = GlobalMercator()
-UTC_TZ = zoneinfo.ZoneInfo("UTC")
 EVENT_CACHE_INTERVAL = 5
+
+LOCATION_TIMESTAMP_INDEX = 0
+LOCATION_LATITUDE_INDEX = 1
+LOCATION_LONGITUDE_INDEX = 2
 
 
 class Point:
@@ -924,9 +925,7 @@ class Device(models.Model):
         except Exception:
             return
         if timestamp is not None:
-            ts_datetime = datetime.datetime.utcfromtimestamp(timestamp).replace(
-                tzinfo=UTC_TZ
-            )
+            ts_datetime = epoch_to_datetime(timestamp)
         else:
             ts_datetime = now()
         locs = self.locations
@@ -951,9 +950,9 @@ class Device(models.Model):
         locs = self.locations
         all_ts = set(locs["timestamps"])
         for loc in loc_array:
-            ts = int(loc["timestamp"])
-            lat = loc["latitude"]
-            lon = loc["longitude"]
+            ts = int(loc[LOCATION_TIMESTAMP_INDEX])
+            lat = loc[LOCATION_LATITUDE_INDEX]
+            lon = loc[LOCATION_LONGITUDE_INDEX]
             if ts in all_ts:
                 continue
             try:
@@ -1011,31 +1010,24 @@ class Device(models.Model):
         if self.location_count == 0:
             return None
         qs = self.locations
-        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
-        locs = [
-            {
-                "timestamp": i[0],
-                "latitude": i[1],
-                "longitude": i[2],
-            }
-            for i in sorted(d, key=itemgetter(0))
-        ]
+        locs = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
+        locs = list(sorted(locs, key=itemgetter(0)))
         return locs[-1]
 
     @property
     def last_date_viewed(self):
-        ll = self.last_location
-        if not ll:
+        loc = self.last_location
+        if not loc:
             return None
-        t = ll["timestamp"]
-        return datetime.datetime.utcfromtimestamp(t).replace(tzinfo=UTC_TZ)
+        t = loc[LOCATION_TIMESTAMP_INDEX]
+        return epoch_to_datetime(t)
 
     @cached_property
     def last_position(self):
-        ll = self.last_location
-        if not ll:
+        loc = self.last_location
+        if not loc:
             return None
-        return ll["latitude"], ll["longitude"]
+        return loc[LOCATION_LATITUDE_INDEX], loc[LOCATION_LONGITUDE_INDEX]
 
     def get_competitor(self, at=None, load_event=False):
         if not at:
@@ -1181,9 +1173,9 @@ class Competitor(models.Model):
         for location in locs:
             gpx_segment.points.append(
                 gpxpy.gpx.GPXTrackPoint(
-                    location[1],
-                    location[2],
-                    time=arrow.get(location[0]).datetime,
+                    location[LOCATION_LATITUDE_INDEX],
+                    location[LOCATION_LONGITUDE_INDEX],
+                    time=epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
                 )
             )
         gpx_track.segments.append(gpx_segment)

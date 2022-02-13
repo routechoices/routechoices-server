@@ -248,6 +248,5 @@ class MtbDecoder:
         return s
 
     def add_position(self, id, t, p):
-        if not self.device_map.get(id):
-            self.device_map[id] = []
-        self.device_map[id].append(p)
+        self.device_map.setdefault(id, [])
+        self.device_map[id].append((p["timestamp"], p["latitude"], p["longitude"]))
