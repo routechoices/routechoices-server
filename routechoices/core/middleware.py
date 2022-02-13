@@ -5,8 +5,10 @@ from re import compile
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
+from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect
 from django.urls import get_urlconf, set_urlconf
+from django.utils.functional import cached_property
 from django_hosts.middleware import HostsBaseMiddleware
 
 from routechoices.core.models import Club
@@ -197,3 +199,18 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
 class CorsMiddleware(OrigCorsMiddleware):
     def is_enabled(self, request):
         return request.host.name == "api" and super().is_enabled(request)
+
+
+class CsrfViewMiddleware(OrigCsrfViewMiddleware):
+    @cached_property
+    def allowed_origin_subdomains(self):
+        allowed = super().allowed_origin_subdomains
+        domains = (
+            Club.objects.exclude(domain__isnull=True)
+            .exclude(domain="")
+            .values_list("domain", flat=True)
+        )
+        for domain in domains:
+            allowed["http"].append(domain)
+            allowed["https"].append(domain)
+        return allowed

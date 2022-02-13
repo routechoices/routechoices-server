@@ -80,7 +80,7 @@ MIDDLEWARE = [
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    "routechoices.core.middleware.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",

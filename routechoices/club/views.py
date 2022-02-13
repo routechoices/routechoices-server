@@ -300,8 +300,6 @@ def event_registration_view(request, slug, **kwargs):
         slug__iexact=slug,
         open_registration=True,
     )
-    if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/registration")
     if event.end_date < now():
         return render(
             request,
@@ -326,6 +324,8 @@ def event_registration_view(request, slug, **kwargs):
                 devices = request.user.devices.all()
             form.fields["device"].queryset = devices
     else:
+        if event.club.domain and not request.use_cname:
+            return redirect(f"{event.club.nice_url}{event.slug}/registration")
         form = CompetitorForm(initial={"event": event})
         devices = Device.objects.none()
         if request.user.is_authenticated:
@@ -380,8 +380,6 @@ def event_route_upload_view(request, slug, **kwargs):
         allow_route_upload=True,
         start_date__lte=now(),
     )
-    if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/route-upload")
     if request.method == "POST":
         form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:
@@ -430,6 +428,8 @@ def event_route_upload_view(request, slug, **kwargs):
             else:
                 messages.error(request, error)
     else:
+        if event.club.domain and not request.use_cname:
+            return redirect(f"{event.club.nice_url}{event.slug}/route-upload")
         form = UploadGPXForm()
     return render(
         request,
