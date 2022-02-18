@@ -6,7 +6,7 @@ routechoices-server
 
 ![screenshot](https://cdn.rphlo.com/routechoices-screenshot.png)
 
-Server for live GPS tracking in orienteering events context.
+Server solution for live GPS tracking of orienteering events.
 
 This project is based on the python django framework.
 
