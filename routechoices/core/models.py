@@ -516,7 +516,7 @@ class Map(models.Model):
         )
         extra_args = []
         if format == "image/webp":
-            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
+            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
         _, buffer = cv2.imencode(
             ".png" if format == "image/png" else ".webp", tile_img, extra_args
         )
