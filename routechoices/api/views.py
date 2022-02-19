@@ -484,7 +484,7 @@ def event_register(request, event_id):
     device = Device.objects.filter(aid=device_id).first()
 
     lang = request.GET.get("lang", "en")
-    if lang not in ("en", "fi", "fr", "nl", "sv"):
+    if lang not in ("en", "es", "fi", "fr", "nl", "sv"):
         lang = "en"
 
     err_messages = {
@@ -495,6 +495,14 @@ def event_register(request, event_id):
             "bad-start-time": "Competitor start time should be during the event time",
             "bad-name": "Competitor with same name already registered",
             "bad-sname": "Competitor with same short name already registered",
+        },
+        "es": {
+            "no-device-id": "ID del dispositivo no encontrado",
+            "no-name": "Falta el nombre",
+            "invalid-start-time": "La hora de inicio no pudo ser analizada",
+            "bad-start-time": "La hora de inicio del competidor debe ser durante la hora del evento.",
+            "bad-name": "Competidor con el mismo nombre ya registrado",
+            "bad-sname": "Competidor con el mismo nombre corto ya registrado",
         },
         "fr": {
             "no-device-id": "Identifiant de l'appareil introuvable",
