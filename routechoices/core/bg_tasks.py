@@ -249,7 +249,7 @@ def decode_track_line(device, data, min_date=None, max_date=None):
             min_date = t
         if t > max_date:
             max_date = t
-    device.add_locations(loc_array, False)
+    device.add_locations(loc_array, False, False)
     return min_date, max_date
 
 
@@ -441,7 +441,9 @@ def import_single_event_from_loggator(event_id):
         )
         dev = device_map.get(c_data["device_id"])
         if dev:
-            dev.add_locations(loc_array_map.get(c_data["device_id"]))
+            dev.add_locations(
+                loc_array_map.get(c_data["device_id"]), push_forward=False
+            )
     return event
 
 
@@ -527,7 +529,7 @@ def import_single_event_from_tractrac(event_id):
                 aid=short_random_key() + "_TRC",
                 is_gpx=True,
             )
-            dev_model.add_locations(dev)
+            dev_model.add_locations(dev, push_forward=False)
         Competitor.objects.create(
             name=c_data["name"],
             short_name=c_data["nameShort"],
@@ -605,7 +607,7 @@ def import_single_event_from_sportrec(event_id):
                 aid=short_random_key() + "_SPR",
                 is_gpx=True,
             )
-            dev_model.add_locations(dev)
+            dev_model.add_locations(dev, push_forward=False)
         Competitor.objects.create(
             name=c_data["fullname"],
             short_name=c_data["shortname"],
@@ -686,7 +688,7 @@ def import_single_event_from_otracker(event_id):
                 aid=short_random_key() + "_OTR",
                 is_gpx=True,
             )
-            dev_model.add_locations(dev)
+            dev_model.add_locations(dev, push_forward=False)
         Competitor.objects.create(
             name=c_data["name"],
             short_name=c_data["short_name"],
@@ -934,7 +936,7 @@ def import_single_event_from_livelox(class_id):
                 pts.append((int(t / 1e3), lat / 1e6, lon / 1e6))
         dev = Device.objects.create(aid=short_random_key() + "_LLX", is_gpx=True)
         if pts:
-            dev.add_locations(pts)
+            dev.add_locations(pts, push_forward=False)
         c_name = f"{p.get('firstName')} {p.get('lastName')}"
         c_sname = initial_of_name(c_name)
         Competitor.objects.create(

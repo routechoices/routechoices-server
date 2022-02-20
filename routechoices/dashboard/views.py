@@ -1016,18 +1016,19 @@ def event_route_upload_view(request, id):
                     aid=f"{short_random_key()}_GPX", is_gpx=True
                 )
                 start_time = None
-                points = {"timestamps": [], "latitudes": [], "longitudes": []}
+                points = []
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
                             if point.time and point.latitude and point.longitude:
-                                points["timestamps"].append(int(point.time.timestamp()))
-                                points["latitudes"].append(round(point.latitude, 5))
-                                points["longitudes"].append(round(point.longitude, 5))
+                                points.append(
+                                    int(point.time.timestamp()),
+                                    round(point.latitude, 5),
+                                    round(point.longitude, 5),
+                                )
                                 if not start_time:
                                     start_time = point.time
-                device.locations = points
-                device.save()
+                device.add_locations(points, push_forward=False)
                 competitor = form.cleaned_data["competitor"]
                 competitor.device = device
                 if start_time and event.start_date <= start_time <= event.end_date:

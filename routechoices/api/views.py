@@ -756,7 +756,7 @@ def event_upload_route(request, event_id):
         device = Device.objects.create(
             user_agent=request.session.user_agent[:200], is_gpx=True
         )
-        device.add_locations(loc_array)
+        device.add_locations(loc_array, push_forward=False)
 
     comp = Competitor.objects.create(
         name=name,

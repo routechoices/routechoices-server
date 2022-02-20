@@ -398,19 +398,20 @@ def event_route_upload_view(request, slug, **kwargs):
                 device = Device.objects.create(
                     aid=f"{short_random_key()}_GPX", is_gpx=True
                 )
-                points = {"timestamps": [], "latitudes": [], "longitudes": []}
+                points = []
                 start_time = None
                 for track in gpx.tracks:
                     for segment in track.segments:
                         for point in segment.points:
                             if point.time and point.latitude and point.longitude:
-                                points["timestamps"].append(int(point.time.timestamp()))
-                                points["latitudes"].append(round(point.latitude, 5))
-                                points["longitudes"].append(round(point.longitude, 5))
+                                points.append(
+                                    int(point.time.timestamp()),
+                                    round(point.latitude, 5),
+                                    round(point.longitude, 5),
+                                )
                                 if not start_time:
                                     start_time = point.time
-                device.locations = points
-                device.save()
+                device.add_locations(points, push_forward=False)
                 competitor_name = form.cleaned_data["name"]
                 competitor = Competitor.objects.create(
                     event=event,
