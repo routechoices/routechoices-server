@@ -957,16 +957,18 @@ class Device(models.Model):
             try:
                 competitor = self.get_competitor(load_event=True)
                 if competitor:
-                    event_id = competitor.event.aid
-                    requests.post(
-                        f"http://127.0.0.1:8010/{event_id}",
-                        data=json.dumps(
-                            {"competitor": competitor.aid, "data": new_data}
-                        ),
-                        headers={
-                            "Authorization": f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
-                        },
-                    )
+                    event = competitor.event.aid
+                    if event.is_live:
+                        event_id = event.aid
+                        requests.post(
+                            f"http://127.0.0.1:8010/{event_id}",
+                            data=json.dumps(
+                                {"competitor": competitor.aid, "data": new_data}
+                            ),
+                            headers={
+                                "Authorization": f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
+                            },
+                        )
             except Exception:
                 pass
         return new_data
