@@ -231,7 +231,7 @@ class GL200Connection:
             lon = float(parts[11])
             lat = float(parts[12])
             tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
-            await self._on_data(lat, lon, tim)
+            await self._on_data(tim, lat, lon)
         except Exception:
             self.stream.close()
             return
@@ -262,7 +262,7 @@ class GL200Connection:
                 lon = float(parts[11])
                 lat = float(parts[12])
                 tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
-                await self._on_data(lat, lon, tim)
+                await self._on_data(tim, lat, lon)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
         except Exception:
@@ -273,10 +273,10 @@ class GL200Connection:
     def _on_close(self):
         print("client quit", self.address)
 
-    async def _on_data(self, lat, lon, timestamp):
-        self.db_device.add_location(lat, lon, timestamp, save=False)
+    async def _on_data(self, timestamp, lat, lon):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
+        self.db_device.add_locations([(timestamp, lat, lon)], save=False)
         await sync_to_async(self.db_device.save, thread_sensitive=True)()
         print("data wrote to db")
 

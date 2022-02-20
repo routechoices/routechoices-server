@@ -918,29 +918,6 @@ class Device(models.Model):
         result = gps_encoding.encode_data(locs)
         return len(locs), result
 
-    def add_location(self, lat, lon, timestamp=None, save=True):
-        try:
-            validate_latitude(lat)
-            validate_longitude(lon)
-        except Exception:
-            return
-        if timestamp is None:
-            timestamp = time.time()
-        locs = self.locations
-        ts = int(timestamp)
-        if isinstance(lat, Decimal):
-            lat = float(lat)
-        if isinstance(lon, Decimal):
-            lon = float(lon)
-        all_ts = set(locs["timestamps"])
-        if ts not in all_ts:
-            locs["timestamps"].append(ts)
-            locs["latitudes"].append(round(lat, 5))
-            locs["longitudes"].append(round(lon, 5))
-            self.locations = locs
-            if save:
-                self.save()
-
     def add_locations(self, loc_array, save=True):
         new_ts = []
         new_lat = []
@@ -972,6 +949,9 @@ class Device(models.Model):
         self.locations = locs
         if save:
             self.save()
+
+    def add_location(self, timestamp, lat, lon, save=True):
+        self.add_locations([(timestamp, lat, lon)], save)
 
     @property
     def location_count(self):
