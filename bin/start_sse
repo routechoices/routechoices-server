@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=$(dirname $DIR)
-PID_FILE=${BASEDIR}/var/chat.pid
+PID_FILE=${BASEDIR}/var/sse.pid
 if [ -f $PID_FILE ];
 then
  pid=`cat $PID_FILE`
@@ -11,11 +11,11 @@ then
   echo "already running"
  else
   echo "starting"
-  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_chat_server > ${BASEDIR}/log/chat.log 2> ${BASEDIR}/log/chat.error.log &
+  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_sse_server > ${BASEDIR}/log/sse.log 2> ${BASEDIR}/log/sse.error.log &
   echo $! > $PID_FILE
  fi
 else
  echo "starting"
- nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_chat_server > ${BASEDIR}/log/chat.log 2> ${BASEDIR}/log/chat.error.log &
+ nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_sse_server > ${BASEDIR}/log/sse.log 2> ${BASEDIR}/log/sse.error.log &
  echo $! > $PID_FILE
 fi

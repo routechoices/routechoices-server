@@ -19,6 +19,7 @@ import gpxpy.gpx
 import magic
 import numpy as np
 import orjson as json
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
@@ -918,7 +919,7 @@ class Device(models.Model):
         result = gps_encoding.encode_data(locs)
         return len(locs), result
 
-    def add_locations(self, loc_array, save=True):
+    def add_locations(self, loc_array, save=True, push_forward=True):
         new_ts = []
         new_lat = []
         new_lon = []
@@ -949,9 +950,35 @@ class Device(models.Model):
         self.locations = locs
         if save:
             self.save()
+        new_locs = list(zip(new_ts, new_lat, new_lon))
+        new_locs = list(sorted(new_locs, key=itemgetter(0)))
+        new_data = gps_encoding.encode_data(new_locs)
+        if push_forward:
+            try:
+                competitor = self.get_competitor(load_event=True)
+                if competitor:
+                    event_id = competitor.event.aid
+                    requests.post(
+                        f"http://127.0.0.1:8010/{event_id}",
+                        data=json.dumps(
+                            {"competitor": competitor.aid, "data": new_data}
+                        ),
+                        headers={
+                            "Authorization": f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
+                        },
+                    )
+            except Exception:
+                pass
+        return new_data
 
-    def add_location(self, timestamp, lat, lon, save=True):
-        self.add_locations([(timestamp, lat, lon)], save)
+    def add_location(self, timestamp, lat, lon, save=True, push_forward=True):
+        self.add_locations(
+            [
+                (timestamp, lat, lon),
+            ],
+            save,
+            push_forward,
+        )
 
     @property
     def location_count(self):
@@ -1011,9 +1038,11 @@ class Device(models.Model):
     def get_competitor(self, at=None, load_event=False):
         if not at:
             at = now()
-        qs = self.competitor_set.filter(
-            start_time__lte=at, event__end_date__gte=at
-        ).order_by("-start_time")
+        qs = (
+            self.competitor_set.all()
+            .filter(start_time__lte=at, event__end_date__gte=at)
+            .order_by("-start_time")
+        )
         if load_event:
             qs = qs.select_related("event")
         return qs.first()

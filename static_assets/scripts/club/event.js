@@ -3,10 +3,12 @@ var eventId = dataset.eventId
 var eventUrl = dataset.eventUrl
 var wmsService = dataset.wmsServiceUrl
 var chatStreamUrl = dataset.chatStreamUrl
+var gpsStreamUrl = dataset.gpsStreamUrl
 var chatMessagesEndpoint = dataset.chatMessagesEndpoint
 var clubName = dataset.clubName
 var staticRoot = dataset.staticRoot
 var csrfToken = dataset.csrfToken
+var noDelay = dataset.noDelay === "true"
 
 if (!navigator.canShare) {
   //document.getElementById('share_buttons').remove()

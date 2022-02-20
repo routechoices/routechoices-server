@@ -134,8 +134,8 @@ class TMT250Connection:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
                 await self._on_read_line(data[:data_len])
-            except Exception:
-                print("exception reading data")
+            except Exception as e:
+                print("exception reading data " + str(e))
                 return False
         return True
 
@@ -154,10 +154,10 @@ class TMT250Connection:
                 loc_array.append((int(r["timestamp"]), r["latlon"][0], r["latlon"][1]))
             if not self.db_device.user_agent:
                 self.db_device.user_agent = "Teltonika"
-            self.db_device.add_locations(loc_array, save=False)
-            await sync_to_async(self.db_device.save, thread_sensitive=True)()
+            await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+                loc_array
+            )
             self.waiting_for_content = True
-
             await self.stream.write(self.decoder.generate_response())
 
 
@@ -198,6 +198,7 @@ class GL200Connection:
                 "DIS",
                 "DOG",
                 "IGL",
+                "INF",
             ):
                 imei = parts[2]
             elif parts[0] == "+ACK:GTHBD":
@@ -227,14 +228,15 @@ class GL200Connection:
             return
         self.imei = imei
         print(f"{self.imei} is connected")
-        try:
-            lon = float(parts[11])
-            lat = float(parts[12])
-            tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
-            await self._on_data(tim, lat, lon)
-        except Exception:
-            self.stream.close()
-            return
+        if parts[0][8:] != "INF":
+            try:
+                lon = float(parts[11])
+                lat = float(parts[12])
+                tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
+                await self._on_data(tim, lat, lon)
+            except Exception:
+                self.stream.close()
+                return
         while await self._read_line():
             pass
 
@@ -276,8 +278,10 @@ class GL200Connection:
     async def _on_data(self, timestamp, lat, lon):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
-        self.db_device.add_locations([(timestamp, lat, lon)], save=False)
-        await sync_to_async(self.db_device.save, thread_sensitive=True)()
+        loc_array = [(timestamp, lat, lon)]
+        await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+            loc_array
+        )
         print("data wrote to db")
 
 

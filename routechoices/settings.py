@@ -852,6 +852,9 @@ EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 CHAT_SERVER = "chat.routechoices.dev:8081"
 CHAT_INTERNAL_SECRET = "<change-me>"
 
+GPS_SSE_SERVER = "data.routechoices.dev:8081"
+LIVESTREAM_INTERNAL_SECRET = "<change-me>"
+
 POST_LOCATION_SECRETS = ["<replace-me>"]
 
 XFF_TRUSTED_PROXY_DEPTH = 1
@@ -861,6 +864,7 @@ CSP_DEFAULT_SRC = (
     "www.routechoices.dev:8081",
     "api.routechoices.dev:8081",
     "chat.routechoices.dev:8081",
+    "data.routechoices.dev:8081",
     "www.routechoices.com",
     "api.routechoices.com",
     "twemoji.maxcdn.com",

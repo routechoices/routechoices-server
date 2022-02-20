@@ -894,7 +894,6 @@ def event_delete_view(request, id):
 
 @login_required
 def event_chat_moderation_view(request, id):
-
     if request.user.is_superuser:
         event = get_object_or_404(
             Event,
@@ -916,6 +915,34 @@ def event_chat_moderation_view(request, id):
         "dashboard/event_chat_moderation.html",
         {"event": event, "chat_server": getattr(settings, "CHAT_SERVER", None)},
     )
+
+
+@login_required
+def event_view_live(request, id):
+    if request.user.is_superuser:
+        event = get_object_or_404(
+            Event,
+            aid=id,
+            start_date__lte=now(),
+            end_date__gte=now(),
+        )
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+        event = get_object_or_404(
+            Event,
+            aid=id,
+            club__in=club_list,
+            start_date__lte=now(),
+            end_date__gte=now(),
+        )
+    resp_args = {
+        "event": event,
+        "no_delay": True,
+        "gps_server": getattr(settings, "GPS_SSE_SERVER", None),
+    }
+    if event.allow_live_chat:
+        resp_args["chat_server"] = getattr(settings, "CHAT_SERVER", None)
+    return render(request, "club/event.html", resp_args)
 
 
 @login_required

@@ -206,6 +206,9 @@ var clock = null
 var banana = null
 var sendInterval = 0
 var endEvent = null
+var initialCompetitorDataLoaded = false
+var gpsEventSource = null
+
 backdropMaps['blank'] = L.tileLayer('data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>', {
   attribution: '',
   tileSize: 512
@@ -315,12 +318,17 @@ var selectLiveMode = function(e){
 
   ;(function whileLive(){
     if (((performance.now()-routesLastFetched) > (fetchPositionInterval * 1e3)) && !isCurrentlyFetchingRoutes) {
-      fetchCompetitorRoutes()
+      if (!noDelay) {
+        fetchCompetitorRoutes()
+      }
     }
     if(((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
     }
     currentTime = +clock.now() - (fetchPositionInterval + 5 + sendInterval)  * 1e3 // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
+    if (noDelay) {
+      currentTime = +clock.now()
+    }
     drawCompetitors()
     var isStillLive = (+endEvent >= +clock.now())
     if (!isStillLive) {
@@ -357,7 +365,9 @@ var selectReplayMode = function(e){
   playbackRate = 16
   ;(function whileReplay(){
     if(isLiveEvent && ((performance.now() - routesLastFetched) > (fetchPositionInterval * 1e3)) && !isCurrentlyFetchingRoutes){
-      fetchCompetitorRoutes()
+      if(!noDelay){
+        fetchCompetitorRoutes()
+      }
     }
     if(isLiveEvent && ((performance.now() - noticeLastFetched) > (30 * 1e3)) && !isCurrentlyFetchingNotice){
       fetchNotice()
@@ -410,12 +420,17 @@ var fetchCompetitorRoutes = function(url){
     })
 
     updateCompetitorList(response.competitors)
+    if (!initialCompetitorDataLoaded && noDelay) {
+      initialCompetitorDataLoaded = true
+      connectToGpsEvents()
+    }
     displayCompetitorList()
     routesLastFetched = performance.now()
     lastDataTs = response.timestamp
     isCurrentlyFetchingRoutes = false
     if(zoomOnRunners && runnerPoints.length) {
       map.fitBounds(runnerPoints)
+      zoomOnRunners = false
     }
     u('#eventLoadingModal').remove()
   }).fail(function(){
@@ -1543,6 +1558,66 @@ function connectToChatEvents() {
     chatEventSource = null
     bumpChatConnectTimeout()
     setTimeout(connectToChatEvents, connectChatTimeoutMs)
+  })
+}
+
+var connectGpsAttempts
+var connectGpsTimeoutMs
+
+function resetGpsConnectTimeout() {
+  connectGpsAttempts = 0
+  connectGpsTimeoutMs = 100
+}
+resetGpsConnectTimeout()
+
+function bumpGpsConnectTimeout() {
+  connectGpsAttempts++
+
+  if (connectGpsTimeoutMs === 100 && connectGpsAttempts === 20) {
+    connectGpsAttempts = 0
+    connectGpsTimeoutMs = 300
+  } else if (connectGpsTimeoutMs === 300 && connectGpsAttempts === 20) {
+    connectGpsAttempts = 0
+    connectGpsTimeoutMs = 1000
+  } else if (connectGpsTimeoutMs === 1000 && connectGpsAttempts === 20) {
+    connectGpsAttempts = 0
+    connectGpsTimeoutMs = 3000
+  }
+  if (connectGpsAttempts === 0) {
+    console.debug(
+      "😅 chat connection error, retrying every " +
+        connectGpsTimeoutMs +
+        "ms"
+    )
+  }
+}
+
+function connectToGpsEvents() {
+  gpsEventSource = new EventSource(gpsStreamUrl, {withCredentials: true})
+  // Listen for messages
+  gpsEventSource.addEventListener('open', function () {
+  })
+  gpsEventSource.addEventListener('message', function (event) {
+    resetGpsConnectTimeout()
+    const message = JSON.parse(event.data)
+    if (message.type === "ping") {
+      // pass
+    } else if (message.type === "locations") {
+      var route = PositionArchive.fromEncoded(message.data)
+      if (competitorRoutes[message.competitor]) {
+        for(var i = 0; i < route.getPositionsCount(); i++) {
+          competitorRoutes[message.competitor].add(route.getByIndex(i))
+        }
+      } else {
+        competitorRoutes[message.competitor] = route
+      }
+    }
+  })
+  gpsEventSource.addEventListener('error', function(){
+    gpsEventSource.close()
+    gpsEventSource = null
+    bumpGpsConnectTimeout()
+    setTimeout(connectToGpsEvents, connectGpsTimeoutMs)
   })
 }
 

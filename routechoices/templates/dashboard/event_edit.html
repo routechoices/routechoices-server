@@ -26,6 +26,7 @@
             {% if not event.ended and event.open_registration %} <a href="{{event.club.nice_url}}{{event.slug}}/registration" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-user-plus"></i> Registration Page</a>{% endif %}
             {% if event.started and event.allow_route_upload %} <a href="{{event.club.nice_url}}{{event.slug}}/route-upload" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-upload"></i> Route Upload Page</a>{% endif %}
             {% if event.started and event.allow_live_chat %} <a href="{% url 'dashboard:event_chat_moderation_view' id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-comments"></i> Chat Moderation</a>{% endif %}
+            {% if event.is_live %} <a href="{% url 'dashboard:event_view_live' id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-bolt"></i> View without delay</a>{% endif %}
         </div>
         {% endif%}
         <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
