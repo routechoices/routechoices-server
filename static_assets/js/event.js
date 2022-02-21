@@ -1626,7 +1626,7 @@ function shareUrl (e) {
   var shareData = {
     title: u('meta[property="og:title"]').attr('content'),
     text: u('meta[property="og:description"]').attr('content'),
-    url: window.location
+    url: qrUrl
   }
   try {
     navigator.share(shareData).then(function () {}).catch(function () {})

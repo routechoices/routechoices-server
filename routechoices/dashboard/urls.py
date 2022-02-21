@@ -71,7 +71,7 @@ urlpatterns = [
         name="event_chat_moderation_view",
     ),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/view-live/?$",
+        r"^events/(?P<id>[A-Za-z0-9_-]+)/live/?$",
         views.event_view_live,
         name="event_view_live",
     ),

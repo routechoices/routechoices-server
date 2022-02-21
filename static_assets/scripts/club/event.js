@@ -11,7 +11,7 @@ var csrfToken = dataset.csrfToken
 var noDelay = dataset.noDelay === "true"
 
 if (!navigator.canShare) {
-  //document.getElementById('share_buttons').remove()
+  document.getElementById('share_buttons').remove()
 }
 
 function checkImageFormatCapability(format) {
