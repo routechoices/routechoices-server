@@ -249,7 +249,7 @@ def decode_track_line(device, data, min_date=None, max_date=None):
             min_date = t
         if t > max_date:
             max_date = t
-    device.add_locations(loc_array, False, False)
+    device.add_locations(loc_array, save=False, push_forward=False)
     return min_date, max_date
 
 

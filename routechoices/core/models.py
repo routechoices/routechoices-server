@@ -919,7 +919,7 @@ class Device(models.Model):
         result = gps_encoding.encode_data(locs)
         return len(locs), result
 
-    def add_locations(self, loc_array, save=True, push_forward=True):
+    def add_locations(self, loc_array, *, save=True, push_forward=True):
         new_ts = []
         new_lat = []
         new_lon = []
@@ -977,8 +977,8 @@ class Device(models.Model):
             [
                 (timestamp, lat, lon),
             ],
-            save,
-            push_forward,
+            save=save,
+            push_forward=push_forward,
         )
 
     @property
