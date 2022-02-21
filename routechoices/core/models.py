@@ -950,16 +950,16 @@ class Device(models.Model):
         self.locations = locs
         if save:
             self.save()
-        new_locs = list(zip(new_ts, new_lat, new_lon))
-        new_locs = list(sorted(new_locs, key=itemgetter(0)))
-        new_data = gps_encoding.encode_data(new_locs)
         if push_forward:
             try:
                 competitor = self.get_competitor(load_event=True)
                 if competitor:
-                    event = competitor.event.aid
+                    event = competitor.event
                     if event.is_live:
                         event_id = event.aid
+                        new_locs = list(zip(new_ts, new_lat, new_lon))
+                        new_locs = list(sorted(new_locs, key=itemgetter(0)))
+                        new_data = gps_encoding.encode_data(new_locs)
                         requests.post(
                             f"http://127.0.0.1:8010/{event_id}",
                             data=json.dumps(
@@ -971,7 +971,6 @@ class Device(models.Model):
                         )
             except Exception:
                 pass
-        return new_data
 
     def add_location(self, timestamp, lat, lon, save=True, push_forward=True):
         self.add_locations(
