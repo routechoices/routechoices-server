@@ -188,7 +188,14 @@ function project(m, x, y) {
     }
     function display_world_map(){
         map_b = L.map('tile_map').setView([0,0], 2);
-
+        L.Control.geocoder({
+          defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+          var bbox = e.geocode.bbox;
+          map_b.fitBounds(bbox);
+        })
+        .addTo(map_b);
         var baseLayers = {};
         var defaultLayer = new L.TileLayer['osm'];
         baseLayers["Open Street Map"] = defaultLayer;
