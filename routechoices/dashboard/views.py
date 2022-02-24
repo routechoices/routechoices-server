@@ -1021,11 +1021,13 @@ def event_route_upload_view(request, id):
                     for segment in track.segments:
                         for point in segment.points:
                             if point.time and point.latitude and point.longitude:
-                                points.append((
-                                    int(point.time.timestamp()),
-                                    round(point.latitude, 5),
-                                    round(point.longitude, 5),
-                                ))
+                                points.append(
+                                    (
+                                        int(point.time.timestamp()),
+                                        round(point.latitude, 5),
+                                        round(point.longitude, 5),
+                                    )
+                                )
                                 if not start_time:
                                     start_time = point.time
                 device.add_locations(points, push_forward=False)
