@@ -85,11 +85,10 @@ body{
     width: auto;
     height: auto;
     z-index: -100;
-    background: rgb(0,0,0, 0.1);
+    background: rgb(20,30,50,0.5);
 }
 .video_text_overlay {
     color: #eee;
-    text-shadow: 1px 1px #000000;
 }
 #myFooter {
     background-color: #3a3f46;
