@@ -188,6 +188,7 @@ var qrUrl = null
 var finishLineCrosses = []
 var finishLinePoints = []
 var finishLinePoly = null
+var finishLineSet = false
 var rankControl = null
 var groupControl = null
 var panControl = null
@@ -249,9 +250,11 @@ function drawFinishLine (e) {
     map.removeLayer(finishLinePoly)
     map.removeControl(rankControl)
     finishLinePoly = null
+    finishLineSet = false
   }
 	finishLinePoints.push(e.latlng)
   map.on('click', drawFinishLineEnd)
+  map.on('mousemove', drawFinishLineTmp)
 }
 
 function removeFinishLine() {
@@ -259,6 +262,7 @@ function removeFinishLine() {
     map.removeLayer(finishLinePoly)
     map.removeControl(rankControl)
     finishLinePoly = null
+    finishLineSet = false
     map.contextmenu.removeItem(removeFinishLineContextMenuItem)
     removeFinishLineContextMenuItem = null
     setFinishLineContextMenuItem = map.contextmenu.insertItem({
@@ -269,12 +273,17 @@ function removeFinishLine() {
 }
 
 function drawFinishLineEnd(e) {
+  if(finishLinePoly) {
+    map.removeLayer(finishLinePoly)
+  }
   finishLinePoints.push(e.latlng)
   finishLinePoly = L.polyline(finishLinePoints, {color: 'purple'})
   map.off('click', drawFinishLineEnd)
+  map.off('mousemove', drawFinishLineTmp)
   rankControl = L.control.ranking({ position: 'topright' })
   map.addControl(rankControl)
   map.addLayer(finishLinePoly)
+  finishLineSet = true
   map.contextmenu.removeItem(setFinishLineContextMenuItem)
   setFinishLineContextMenuItem = null
   removeFinishLineContextMenuItem = map.contextmenu.insertItem({
@@ -282,6 +291,17 @@ function drawFinishLineEnd(e) {
       callback: removeFinishLine
   }, 1)
 }
+
+function drawFinishLineTmp(e) {
+  finishLinePoints[1] = e.latlng
+  if(!finishLinePoly) {
+    finishLinePoly = L.polyline(finishLinePoints, {color: 'purple'})
+    map.addLayer(finishLinePoly)
+  } else {
+    finishLinePoly.setLatLngs(finishLinePoints)
+  }
+}
+
 
 var onStart = function(){
   if(isLiveEvent){
@@ -1037,7 +1057,7 @@ var drawCompetitors = function(){
       if(!isLiveMode && !isRealTime && isCustomStart && competitor.custom_offset){
         viewedTime += Math.max(0, new Date(competitor.custom_offset) - getCompetitionStartDate())
       }
-      if(finishLinePoly) {
+      if(finishLineSet) {
         var allPoints = route.getArray()
         var oldCrossing = oldFinishCrosses.find(function(el){return el.competitor.id === competitor.id})
         var useOldCrossing = false
@@ -1392,7 +1412,7 @@ var drawCompetitors = function(){
 
     groupControl.setValues(listCompWithMarker, clusterCenters)
   }
-  if(finishLinePoly) {
+  if(finishLineSet) {
     rankControl.setValues(finishLineCrosses)
   }
 }

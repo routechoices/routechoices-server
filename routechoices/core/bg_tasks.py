@@ -942,7 +942,7 @@ def import_single_event_from_livelox(class_id):
         Competitor.objects.create(
             name=c_name,
             short_name=c_sname,
-            start_time=epoch_to_datetime(min_t),
+            start_time=epoch_to_datetime(min_t / 1e3),
             event=event,
             device=dev,
         )
