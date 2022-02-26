@@ -1,13 +1,15 @@
-{% load static %}{% load django_bootstrap5 %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}{% load compress %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calibrate Map</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.1/bootstrap.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css' %}" />
 <link rel="stylesheet" href="{% static 'styles/dashboard/calibration.css' %}?_=2021100200" />
+{% endcompress %}
 </head>
 <body>
 <div class="container">
@@ -59,12 +61,14 @@
      </div>
      <!-- Copyright -->
  </footer>
+ {% compress js %}
  <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
  <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
  <script src="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.js' %}"></script>
-<script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
-<script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
-<script src="{% static '/vendor/detectmobilebrowser-20140801/detectmobilebrowser.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/dashboard/calibration.js' %}?_=2022022400"></script>
+ <script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
+ <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+ <script src="{% static '/vendor/detectmobilebrowser-20140801/detectmobilebrowser.js' %}?_=2022011800"></script>
+ <script src="{% static '/scripts/dashboard/calibration.js' %}?_=2022022600"></script>
+ {% endcompress %}
 </body>
 </html>

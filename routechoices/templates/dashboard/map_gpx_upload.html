@@ -1,6 +1,7 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block sub_content %}
 <div class="row">
@@ -16,6 +17,8 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
 <script src="{% static '/scripts/dashboard/map_gpx_upload.js' %}?_=2022012400"></script>
+{% endcompress %}
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "club/base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block content %}
 <div class="row">
@@ -16,6 +17,8 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/club/event_route_upload.js' %}?_=2022011801"></script>
+<script src="{% static '/scripts/club/event_route_upload.js' %}?_=2022022600"></script>
+{% endcompress %}
 {% endblock %}

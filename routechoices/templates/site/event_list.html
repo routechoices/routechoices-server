@@ -4,6 +4,7 @@
 {% load hosts %}
 {% load markdownify %}
 {% load index %}
+{% load compress %}
 
 {% block favicon %}{% if club.logo %}<link rel="icon" type="image/png" href="{{club.nice_url}}logo">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
 <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
@@ -111,7 +112,9 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?_=2022011800"></script>
 <script src="{% static '/scripts/site/event_list.js' %}?_=2022020500"></script>
+{% endcompress %}
 {% endblock %}

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'styles/site/tracker.css' %}?_=2021100200" />
+<link rel="stylesheet" href="{% static 'styles/site/tracker.css' %}?_=2022022600" />
 {% endblock %}
 
 {% block content %}
@@ -253,7 +253,9 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
+{% endcompress %}
 <script src="{% static '/scripts/site/tracker.js' %}?_=2022012900" data-csrf-token="{{ csrf_token }}"></script>
 {% endblock %}

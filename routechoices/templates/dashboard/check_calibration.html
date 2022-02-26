@@ -1,12 +1,14 @@
-{% load static %}{% load django_bootstrap5 %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}{% load compress %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Check Map Calibration</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.1.1/bootstrap.min.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
-<link rel="stylesheet" href="{% static 'styles/dashboard/check_calibration.css' %}?_=2021100200" />
+<link rel="stylesheet" href="{% static 'styles/dashboard/check_calibration.css' %}?_=2022022600" />
+{% endcompress %}
 </head>
 <body>
 <div class="container">
@@ -32,10 +34,12 @@
      </div>
      <!-- Copyright -->
  </footer>
+ {% compress js %}
  <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
-<script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
-<script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
-<script src="{% static '/scripts/dashboard/check_calibration.js' %}?_=2022011801"></script>
+ <script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
+ <script src="{% static '/vendor/load-image-5.14.0/load-image.all.min.js' %}"></script>
+ <script src="{% static '/js/leaflet.imageTransform.js' %}"></script>
+ <script src="{% static '/scripts/dashboard/check_calibration.js' %}?_=2022011801"></script>
+ {% endcompress %}
 </body>
 </html>

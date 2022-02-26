@@ -2,6 +2,7 @@
 {% load static %}
 {% load django_bootstrap5 %}
 {% load hosts %}
+{% load compress %}
 {%  block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/selectize-0.13.3/selectize.bootstrap5.css' %}" />
@@ -21,7 +22,9 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}?_=2022011800"></script>
 <script src="{%  static '/vendor/selectize-0.13.3/selectize.min.js' %}?_=2022011800"></script>
+{% endcompress %}
 <script src="{% static '/scripts/dashboard/device_add.js' %}?_=2022011800" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {%  endblock %}

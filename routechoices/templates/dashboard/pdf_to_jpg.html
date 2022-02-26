@@ -1,4 +1,4 @@
-{% load static %}{% load django_bootstrap5 %}<!DOCTYPE html>
+{% load static %}{% load django_bootstrap5 %}{% load compress %}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -33,9 +33,11 @@
      </div>
      <!-- Copyright -->
  </footer>
+ {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/pdfjs-2.7.570/pdf.min.js' %}"></script>
 <script src="{% static '/vendor/filesaver-2.0.5/filesaver.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/pdf_to_jpg.js' %}?_=2022011800"></script>
+{% endcompress %}
 </body>
 </html>

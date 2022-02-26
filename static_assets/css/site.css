@@ -1,224 +1,222 @@
-html{
-    height: 100%;
+html {
+  height: 100%;
 }
 
-body{
-    display: flex;
-    display: -webkit-flex;
-    flex-direction: column;
-    -webkit-flex-direction: column;
-    height: 100%;
-    padding-top:
-    0px;
+body {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  height: 100%;
+  padding-top: 0px;
 }
 
-.content{
-   flex: 1 0 auto;
-   -webkit-flex: 1 0 auto;
-   min-height: 200px;
-   margin-bottom: 30px;
-   margin-top: 15px;
+.content {
+  flex: 1 0 auto;
+  -webkit-flex: 1 0 auto;
+  min-height: 200px;
+  margin-bottom: 30px;
+  margin-top: 15px;
 }
 
 .leaflet_map {
-    height: 600px;
-    background: #f5f5f5;
-    border: 1px solid #000;
-    margin-bottom: 5px;
+  height: 600px;
+  background: #f5f5f5;
+  border: 1px solid #000;
+  margin-bottom: 5px;
 }
 
 .map_preview {
-   position: relative;
-   width: 100%;
-   padding: 15px 0;
+  position: relative;
+  width: 100%;
+  padding: 15px 0;
 }
 .map_preview img {
-   border: 1px solid #000;
-   border-radius: 5px;
-   max-width: 100%;
+  border: 1px solid #000;
+  border-radius: 5px;
+  max-width: 100%;
 }
 .map_preview .location {
-    position: absolute;
-   top: 20px;
-   left: 5px;
-   width: 45px;
-   margin: 0;
+  position: absolute;
+  top: 20px;
+  left: 5px;
+  width: 45px;
+  margin: 0;
 }
 .map_preview h2 {
-   position: absolute;
-   top: 60px;
-   left: 0px;
-   width: 100%;
-   margin: 0;
+  position: absolute;
+  top: 60px;
+  left: 0px;
+  width: 100%;
+  margin: 0;
 }
 .map_preview h2 span {
-   color: white;
-   font: bold 15px/30px Helvetica, Sans-Serif;
-   letter-spacing: -1px;
-   background: rgb(0, 0, 0); /* fallback color */
-   background: rgba(0, 0, 0, 0.7);
-   padding: 0 10px 0 30px;
-   margin: 0;
+  color: white;
+  font: bold 15px/30px Helvetica, Sans-Serif;
+  letter-spacing: -1px;
+  background: rgb(0, 0, 0); /* fallback color */
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0 10px 0 30px;
+  margin: 0;
 }
 
 .bg_video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100;
-    transform: translate(-50%, -50%);
-    -webkit-transform: translate(-50%, -50%);
-    transition: 1s opacity;
-    object-fit: contain;
-    vertical-align: baseline;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transition: 1s opacity;
+  object-fit: contain;
+  vertical-align: baseline;
 }
 .video_cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100;
-    background: rgb(20,30,50,0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  background: rgb(20, 30, 50, 0.5);
 }
 .video_text_overlay {
-    color: #eee;
+  color: #eee;
 }
 #myFooter {
-    background-color: #3a3f46;
-    color: white;
+  background-color: #3a3f46;
+  color: white;
 }
 
 #myFooter .row {
-    margin-bottom: 60px;
+  margin-bottom: 60px;
 }
 
-#myFooter .info{
-    text-align: justify;
-    color: #afb0b1;
+#myFooter .info {
+  text-align: justify;
+  color: #afb0b1;
 }
 
 #myFooter ul {
-    list-style-type: none;
-    padding-left: 0;
-    line-height: 1.7;
+  list-style-type: none;
+  padding-left: 0;
+  line-height: 1.7;
 }
 
 #myFooter h5 {
-    font-size: 18px;
-    color: white;
-    font-weight: bold;
-    margin-top: 30px;
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+  margin-top: 30px;
 }
 
 #myFooter a {
-    color: #d2d1d1;
-    text-decoration: none;
+  color: #d2d1d1;
+  text-decoration: none;
 }
 
 #myFooter a:hover,
 #myFooter a:focus {
-    text-decoration: none;
-    color: white;
+  text-decoration: none;
+  color: white;
 }
 
 #myFooter .second-bar {
-    text-align: center;
-    background-color: #33373e;
-    text-align: center;
+  text-align: center;
+  background-color: #33373e;
+  text-align: center;
 }
 
 #myFooter .second-bar a {
-    font-size: 22px;
-    color: #9fa3a9;
-    padding: 10px;
-    transition: 0.2s;
-    line-height: 68px;
+  font-size: 22px;
+  color: #9fa3a9;
+  padding: 10px;
+  transition: 0.2s;
+  line-height: 68px;
 }
 
 #myFooter .second-bar a:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 #myFooter .social-icons {
-    float:right;
+  float: right;
 }
 
-
 #myFooter .facebook:hover {
-    color: #0077e2;
+  color: #0077e2;
 }
 
 #myFooter .google:hover {
-    color: #ef1a1a;
+  color: #ef1a1a;
 }
 
 #myFooter .twitter:hover {
-    color: #00aced;
+  color: #00aced;
 }
 
 .loginBtn {
-    margin-bottom: 0
+  margin-bottom: 0;
 }
 @media screen and (max-width: 767px) {
-    #myFooter {
-        text-align: center;
-    }
+  #myFooter {
+    text-align: center;
+  }
 
-    #myFooter .info{
-        text-align: center;
-    }
+  #myFooter .info {
+    text-align: center;
+  }
 
-    .loginBtn {
-        margin-bottom: 5px
-    }
+  .loginBtn {
+    margin-bottom: 5px;
+  }
 }
 
-#myFooter{
-   flex: 0 0 auto;
-   -webkit-flex: 0 0 auto;
+#myFooter {
+  flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
 }
 
-#myFooter .logo{
-    margin-top: 10px;
+#myFooter .logo {
+  margin-top: 10px;
 }
 
-#myFooter .second-bar .logo a{
-    color:white;
-    font-size: 28px;
-    float: left;
-    font-weight: bold;
-    line-height: 68px;
-    margin: 0;
-    padding: 0;
+#myFooter .second-bar .logo a {
+  color: white;
+  font-size: 28px;
+  float: left;
+  font-weight: bold;
+  line-height: 68px;
+  margin: 0;
+  padding: 0;
 }
 
-#myFooter .logosmall{
-    margin-top: 5px;
+#myFooter .logosmall {
+  margin-top: 5px;
 }
 
-#myFooter .second-bar .logosmall a{
-    color:white;
-    font-size: 17px;
-    float: left;
-    font-weight: bold;
-    line-height: 38px;
-    margin: 0 0 5px 0;
-    padding: 0;
+#myFooter .second-bar .logosmall a {
+  color: white;
+  font-size: 17px;
+  float: left;
+  font-weight: bold;
+  line-height: 38px;
+  margin: 0 0 5px 0;
+  padding: 0;
 }
 
 .captcha {
-    display: block;
-    margin-bottom: 5px;
+  display: block;
+  margin-bottom: 5px;
 }
 
-.navbar{
-    padding-top:0.5rem;
-    padding-bottom:0.5rem
+.navbar {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
