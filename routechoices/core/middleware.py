@@ -4,12 +4,14 @@ from re import compile
 
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
+from django.contrib.gis.geoip2 import GeoIP2
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect
 from django.urls import get_urlconf, set_urlconf
 from django.utils.functional import cached_property
 from django_hosts.middleware import HostsBaseMiddleware
+from geoip2.errors import AddressNotFoundError
 
 from routechoices.core.models import Club
 
@@ -214,3 +216,26 @@ class CsrfViewMiddleware(OrigCsrfViewMiddleware):
             allowed.add(f"http://{domain}")
             allowed.add(f"https://{domain}")
         return allowed
+
+
+class BanRussiaMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.process_request(request)
+        if not response:
+            response = self.get_response(request)
+        return response
+
+    def process_request(self, request):
+        g = GeoIP2()
+        try:
+            country = g.country_code(request.META["REMOTE_ADDR"])
+        except AddressNotFoundError:
+            country = None
+        if country == "RU":
+            return HttpResponse(
+                "Sorry, We block IPs from Russia following actions in Ukraine."
+            )
+        return None

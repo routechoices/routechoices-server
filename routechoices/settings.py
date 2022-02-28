@@ -77,6 +77,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "routechoices.core.middleware.XForwardedForMiddleware",
     "user_sessions.middleware.SessionMiddleware",
+    "routechoices.core.middleware.BanRussiaMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
     "django.middleware.common.CommonMiddleware",
