@@ -1,4 +1,5 @@
 # coding=utf-8
+import json
 from struct import pack, unpack
 
 import arrow
@@ -294,17 +295,121 @@ class GL200Server(TCPServer):
             pass
 
 
+class TrackTapeConnection:
+    def __init__(self, stream, address):
+        print("received a new connection from %s", address)
+        self.imei = None
+        self.address = address
+        self.stream = stream
+        self.stream.set_close_callback(self._on_close)
+        self.db_device = None
+
+    async def start_listening(self):
+        print(f"start listening from {self.address}")
+        imei = None
+        try:
+            data_bin = await self.stream.read_until(b"\n")
+            data_raw = data_bin.decode("ascii")
+            print(f"received data ({data_raw})")
+            data = json.loads(data_raw)
+            imei = data.get("id")
+        except Exception as e:
+            print(e)
+            self.stream.close()
+            return
+        is_valid_imei = True
+        try:
+            validate_imei(imei)
+        except ValidationError:
+            is_valid_imei = False
+        if not imei:
+            print("no imei")
+            self.stream.close()
+            return
+        elif not is_valid_imei:
+            print("invalid imei")
+            self.stream.close()
+            return
+        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        if not self.db_device:
+            print(f"imei not registered {self.address}, {imei}")
+            self.stream.close()
+            return
+        self.imei = imei
+        print(f"{self.imei} is connected")
+        if data.get("locations"):
+            locs = data.get("locations", [])
+            loc_array = []
+            for loc in locs:
+                try:
+                    tim = arrow.get(loc.get("timestamp")).int_timestamp
+                    lon = float(loc.get("lon"))
+                    lat = float(loc.get("lat"))
+                    loc_array.append((tim, lat, lon))
+                except Exception:
+                    continue
+            if not self.db_device.user_agent:
+                self.db_device.user_agent = "TrackTape"
+            await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+                loc_array
+            )
+        while await self._read_line():
+            pass
+
+    async def _read_line(self):
+        try:
+            data_bin = await self.stream.read_until(b"\n")
+            data_raw = data_bin.decode("ascii")
+            print(f"received data ({data_raw})")
+            data = json.loads(data_raw)
+            imei = data.get("id")
+            if imei != self.imei:
+                return False
+            locs = data.get("locations", [])
+            loc_array = []
+            for loc in locs:
+                try:
+                    tim = arrow.get(loc.get("timestamp")).int_timestamp
+                    lon = float(loc.get("lon"))
+                    lat = float(loc.get("lat"))
+                    loc_array.append((tim, lat, lon))
+                except Exception:
+                    continue
+            await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+                loc_array
+            )
+        except Exception:
+            self.stream.close()
+            return False
+        return True
+
+    def _on_close(self):
+        print("client quit", self.address)
+
+
+class TrackTapeServer(TCPServer):
+    async def handle_stream(self, stream, address):
+        c = TrackTapeConnection(stream, address)
+        try:
+            await c.start_listening()
+        except StreamClosedError:
+            pass
+
+
 class Command(BaseCommand):
     help = "Run a tcp server for GPS trackers."
 
     def handle(self, *args, **options):
         tmt250_server = TMT250Server()
         gl200_server = GL200Server()
+        tracktape_server = TrackTapeServer()
         tmt250_server.listen(settings.TMT250_PORT)
         gl200_server.listen(settings.GL200_PORT)
+        tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
             IOLoop.current().start()
         except KeyboardInterrupt:
             tmt250_server.stop()
             gl200_server.stop()
+            tracktape_server.stop()
             IOLoop.current().stop()

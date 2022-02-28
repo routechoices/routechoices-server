@@ -770,6 +770,7 @@ CACHE_EVENT_DATA = True
 
 TMT250_PORT = 2000
 GL200_PORT = 2002
+TRACKTAPE_PORT = 2004
 
 
 # The AWS region to connect to.
