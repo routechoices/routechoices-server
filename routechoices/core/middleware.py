@@ -234,8 +234,8 @@ class BanRussiaMiddleware:
             country = g.country_code(request.META["REMOTE_ADDR"])
         except (GeoIP2Exception, GeoIP2Error):
             country = None
-        if country == "RU":
+        if country in ("BY", "RU"):
             return HttpResponse(
-                "Sorry, we block IP addresses from Russia following actions in Ukraine."
+                "Sorry, we block IP addresses from Russia and Belarus following actions in Ukraine."
             )
         return None
