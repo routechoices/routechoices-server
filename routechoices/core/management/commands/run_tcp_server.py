@@ -74,7 +74,7 @@ class TMT250Decoder:
 
 class TMT250Connection:
     def __init__(self, stream, address):
-        print("received a new connection from %s", address)
+        print(f"received a new connection from {address} on port 2000")
         self.imei = None
         self.address = address
         self.stream = stream
@@ -89,7 +89,7 @@ class TMT250Connection:
         data = bytearray(b"0" * 1024)
         data_len = await self.stream.read_into(data, partial=True)
         if data_len < 3:
-            print("too little data %s", self.address)
+            print("too little data", flush=True)
             await self.stream.write(pack("b", 0))
             self.stream.close()
             return
@@ -103,19 +103,21 @@ class TMT250Connection:
         except Exception:
             is_valid_imei = False
         if imei_len != len(imei) or not is_valid_imei:
-            print(f"invalid identification {self.address}, {imei}, {imei_len}")
+            print(
+                f"invalid identification {self.address}, {imei}, {imei_len}", flush=True
+            )
             await self.stream.write(pack("b", 0))
             self.stream.close()
             return
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
-            print(f"imei not registered {self.address}, {imei}")
+            print(f"imei not registered {self.address}, {imei}", flush=True)
             await self.stream.write(pack("b", 0))
             self.stream.close()
             return
         self.imei = imei
         await self.stream.write(pack("b", 1))
-        print(f"{self.imei} is connected")
+        print(f"{self.imei} is connected", flush=True)
 
         while await self._on_write_complete():
             pass
@@ -173,7 +175,7 @@ class TMT250Server(TCPServer):
 
 class GL200Connection:
     def __init__(self, stream, address):
-        print("received a new connection from %s", address)
+        print(f"received a new connection from {address} on port 2002")
         self.imei = None
         self.address = address
         self.stream = stream
@@ -186,7 +188,7 @@ class GL200Connection:
         try:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
-            print(f"received data ({data})")
+            print(f"received data ({data})", flush=True)
             parts = data.split(",")
             if parts[0][:8] in ("+RESP:GT", "+BUFF:GT") and parts[0][8:] in (
                 "FRI",
@@ -206,7 +208,7 @@ class GL200Connection:
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
                 imei = parts[2]
         except Exception as e:
-            print(e)
+            print(e, flush=True)
             self.stream.close()
             return
         is_valid_imei = True
