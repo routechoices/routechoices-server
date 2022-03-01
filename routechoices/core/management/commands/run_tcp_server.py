@@ -363,7 +363,10 @@ class TrackTapeConnection:
             data_bin = await self.stream.read_until(b"\n")
             data_raw = data_bin.decode("ascii")
             print(f"received data ({data_raw})")
-            data = json.loads(data_raw)
+            if data_raw.strip():
+                data = json.loads(data_raw)
+            else:
+                return True
             imei = data.get("id")
             if imei != self.imei:
                 return False
