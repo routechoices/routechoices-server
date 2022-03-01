@@ -310,8 +310,10 @@ class TrackTapeConnection:
         print(f"start listening from {self.address}")
         imei = None
         try:
-            data_bin = await self.stream.read_until(b"\n")
-            data_raw = data_bin.decode("ascii")
+            data_raw = ''
+            while not data_raw:
+                data_bin = await self.stream.read_until(b"\n")
+                data_raw = data_bin.decode("ascii").strip()
             print(f"received data ({data_raw})", flush=True)
             data = json.loads(data_raw)
             imei = data.get("id")
@@ -360,13 +362,12 @@ class TrackTapeConnection:
 
     async def _read_line(self):
         try:
-            data_bin = await self.stream.read_until(b"\n")
-            data_raw = data_bin.decode("ascii")
+            data_raw = ''
+            while not data_raw:
+                data_bin = await self.stream.read_until(b"\n")
+                data_raw = data_bin.decode("ascii").strip()
             print(f"received data ({data_raw})")
-            if data_raw.strip():
-                data = json.loads(data_raw)
-            else:
-                return True
+            data = json.loads(data_raw)
             imei = data.get("id")
             if imei != self.imei:
                 return False
