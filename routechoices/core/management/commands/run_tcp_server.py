@@ -310,11 +310,11 @@ class TrackTapeConnection:
         try:
             data_bin = await self.stream.read_until(b"\n")
             data_raw = data_bin.decode("ascii")
-            print(f"received data ({data_raw})")
+            print(f"received data ({data_raw})", flush=True)
             data = json.loads(data_raw)
             imei = data.get("id")
         except Exception as e:
-            print(e)
+            print(e, flush=True)
             self.stream.close()
             return
         is_valid_imei = True
