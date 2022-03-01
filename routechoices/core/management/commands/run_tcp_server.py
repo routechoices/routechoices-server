@@ -339,19 +339,19 @@ class TrackTapeConnection:
             return
         self.imei = imei
         print(f"{self.imei} is connected")
-        if data.get("locations"):
-            locs = data.get("locations", [])
-            loc_array = []
-            for loc in locs:
-                try:
-                    tim = arrow.get(loc.get("timestamp")).int_timestamp
-                    lon = float(loc.get("lon"))
-                    lat = float(loc.get("lat"))
-                    loc_array.append((tim, lat, lon))
-                except Exception:
-                    continue
-            if not self.db_device.user_agent:
-                self.db_device.user_agent = "TrackTape"
+        locs = data.get("positions", [])
+        loc_array = []
+        for loc in locs:
+            try:
+                tim = arrow.get(loc.get("timestamp")).int_timestamp
+                lon = float(loc.get("lon"))
+                lat = float(loc.get("lat"))
+                loc_array.append((tim, lat, lon))
+            except Exception:
+                continue
+        if not self.db_device.user_agent:
+            self.db_device.user_agent = "TrackTape"
+        if loc_array:
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
@@ -367,7 +367,7 @@ class TrackTapeConnection:
             imei = data.get("id")
             if imei != self.imei:
                 return False
-            locs = data.get("locations", [])
+            locs = data.get("positions", [])
             loc_array = []
             for loc in locs:
                 try:
@@ -377,9 +377,10 @@ class TrackTapeConnection:
                     loc_array.append((tim, lat, lon))
                 except Exception:
                     continue
-            await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
-                loc_array
-            )
+            if loc_array:
+                await sync_to_async(
+                    self.db_device.add_locations, thread_sensitive=True
+                )(loc_array)
         except Exception:
             self.stream.close()
             return False
