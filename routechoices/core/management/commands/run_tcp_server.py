@@ -297,7 +297,7 @@ class GL200Server(TCPServer):
 
 class TrackTapeConnection:
     def __init__(self, stream, address):
-        print("received a new connection from %s", address)
+        print(f"received a new connection from {address} on port 2004")
         self.imei = None
         self.address = address
         self.stream = stream
