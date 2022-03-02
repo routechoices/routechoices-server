@@ -1,10 +1,10 @@
 from allauth_2fa.utils import user_has_valid_totp_device
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django_otp.forms import OTPAuthenticationFormMixin
 
 
-class AdminSiteAuthForm(OTPAuthenticationFormMixin, AuthenticationForm):
+class AdminSiteAuthForm(OTPAuthenticationFormMixin, AdminAuthenticationForm):
     otp_token = forms.IntegerField(
         label="Token", min_value=1, max_value=int("9" * 6), required=False
     )
