@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path
 
-from routechoices import views
+from routechoices import forms, views
 from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 admin.site.site_header = "Routechoices.com Admin"
 admin.site.site_title = "Routechoices.com Admin Site"
 admin.site.index_title = "Welcome to Routechoices.com Administration Site"
+admin.site.login_form = forms.AdminSiteAuthForm
 
 sitemaps = {
     "static": StaticViewSitemap,
