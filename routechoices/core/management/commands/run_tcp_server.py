@@ -310,7 +310,7 @@ class TrackTapeConnection:
         print(f"start listening from {self.address}")
         imei = None
         try:
-            data_raw = ''
+            data_raw = ""
             while not data_raw:
                 data_bin = await self.stream.read_until(b"\n")
                 data_raw = data_bin.decode("ascii").strip()
@@ -362,7 +362,7 @@ class TrackTapeConnection:
 
     async def _read_line(self):
         try:
-            data_raw = ''
+            data_raw = ""
             while not data_raw:
                 data_bin = await self.stream.read_until(b"\n")
                 data_raw = data_bin.decode("ascii").strip()
