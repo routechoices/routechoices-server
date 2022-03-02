@@ -1,19 +1,8 @@
-from allauth.account.adapter import DefaultAccountAdapter
+from allauth_2fa.adapter import OTPAdapter
 from django.conf import settings
 
 
-class NoNewUsersAccountAdapter(DefaultAccountAdapter):
-    def is_open_for_signup(self, request):
-        """
-        Checks whether or not the site is open for signups.
-
-        Next to simply returning True/False you can also intervene the
-        regular flow by raising an ImmediateHttpResponse
-        """
-        return False
-
-
-class SiteAccountAdapter(DefaultAccountAdapter):
+class SiteAccountAdapter(OTPAdapter):
     def is_safe_url(self, url):
         try:
             from django.utils.http import url_has_allowed_host_and_scheme

@@ -63,6 +63,10 @@ INSTALLED_APPS = [
     "captcha",
     "django_read_only",
     "compressor",
+    "django_otp",
+    "django_otp.plugins.otp_static",
+    "django_otp.plugins.otp_totp",
+    "allauth_2fa",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -83,6 +87,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "routechoices.core.middleware.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
+    "allauth_2fa.middleware.AllauthTwoFactorMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -890,7 +896,7 @@ CSRF_COOKIE_HTTPONLY = False
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
-
+ALLAUTH_2FA_ALWAYS_REVEAL_BACKUP_TOKENS = False
 try:
     from .local_settings import *  # noqa: F403, F401
 except ImportError:

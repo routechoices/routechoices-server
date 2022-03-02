@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path
 
+from routechoices import views
 from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
@@ -30,6 +31,12 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path(
+        "accounts/two_factor/setup",
+        views.TwoFactorSetup.as_view(),
+        name="two-factor-setup",
+    ),
+    path("accounts/", include("allauth_2fa.urls")),
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
@@ -57,6 +64,6 @@ urlpatterns = [
         {"sitemaps": sitemaps},
         name="sitemap",
     ),
-    re_path(r"", include("user_sessions.urls", "user_sessions")),
-    re_path(r"", include(("routechoices.site.urls", "site"), namespace="site")),
+    path("", include("user_sessions.urls", "user_sessions")),
+    path("", include(("routechoices.site.urls", "site"), namespace="site")),
 ]
