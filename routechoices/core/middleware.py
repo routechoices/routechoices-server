@@ -12,6 +12,7 @@ from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect
 from django.urls import get_urlconf, set_urlconf
 from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import http_date
 from django_hosts.middleware import HostsBaseMiddleware
@@ -245,7 +246,7 @@ class BanRussiaMiddleware:
         return None
 
 
-class SessionMiddleware:
+class SessionMiddleware(MiddlewareMixin):
     """
     Middleware that provides ip and user_agent to the session store.
     """
