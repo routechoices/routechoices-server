@@ -1,6 +1,7 @@
 """ XFF Middleware """
 import logging
 import time
+from importlib import import_module
 from re import compile
 
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
@@ -13,7 +14,6 @@ from django.urls import get_urlconf, set_urlconf
 from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property
 from django.utils.http import http_date
-from django.utils.importlib import import_module
 from django_hosts.middleware import HostsBaseMiddleware
 from geoip2.errors import GeoIP2Error
 
