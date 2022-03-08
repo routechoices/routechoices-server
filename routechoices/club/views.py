@@ -316,7 +316,7 @@ def event_registration_view(request, slug, **kwargs):
             competitor.short_name = initial_of_name(competitor.name)
             competitor.save()
             messages.success(request, "Successfully registered for this event.")
-            target_url = f"{event.club.nice_url}{event.slug}/registration-complete"
+            target_url = f"{event.club.nice_url}{event.slug}/registration"
             return redirect(target_url)
         else:
             devices = Device.objects.none()
@@ -338,30 +338,6 @@ def event_registration_view(request, slug, **kwargs):
         {
             "event": event,
             "form": form,
-        },
-    )
-
-
-def event_registration_done_view(request, slug, **kwargs):
-    bypass_resp = handle_legacy_request(
-        "event_registration_done_view", kwargs.get("club_slug"), slug=slug
-    )
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
-        open_registration=True,
-    )
-    if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/registration-complete")
-    return render(
-        request,
-        "club/event_registration_done.html",
-        {
-            "event": event,
         },
     )
 
@@ -424,7 +400,7 @@ def event_route_upload_view(request, slug, **kwargs):
                 if start_time and event.start_date <= start_time <= event.end_date:
                     competitor.start_time = start_time
                 competitor.save()
-                target_url = f"{event.club.nice_url}{event.slug}/route-upload-complete"
+                target_url = f"{event.club.nice_url}{event.slug}/route-upload"
             if not error:
                 messages.success(request, "The upload of the GPX file was successful")
                 return redirect(target_url)
@@ -440,31 +416,6 @@ def event_route_upload_view(request, slug, **kwargs):
         {
             "event": event,
             "form": form,
-        },
-    )
-
-
-def event_route_upload_done_view(request, slug, **kwargs):
-    bypass_resp = handle_legacy_request(
-        "event_route_upload_done_view", kwargs.get("club_slug"), slug=slug
-    )
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
-        allow_route_upload=True,
-        start_date__lte=now(),
-    )
-    if event.club.domain and not request.use_cname:
-        return redirect(f"{event.club.nice_url}{event.slug}/route-upload-complete")
-    return render(
-        request,
-        "club/event_route_upload_done.html",
-        {
-            "event": event,
         },
     )
 

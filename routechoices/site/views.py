@@ -1,5 +1,6 @@
 from allauth.account.models import EmailAddress
 from django.conf import settings
+from django.contrib import messages
 from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
@@ -170,7 +171,8 @@ def contact(request):
             )
             msg.content_subtype = "html"
             msg.send()
-            return redirect("site:contact_email_sent_view")
+            messages.success(request, "Message sent succesfully")
+            return redirect("site:contact_view")
     else:
         form = ContactForm()
     if request.user.is_authenticated:

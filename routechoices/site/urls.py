@@ -6,11 +6,6 @@ from routechoices.site import feeds, views
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^contact/?$", views.contact, name="contact_view"),
-    re_path(
-        r"^contact/success/?$",
-        TemplateView.as_view(template_name="site/contact_email_sent.html"),
-        name="contact_email_sent_view",
-    ),
     re_path(r"^events/?$", views.events_view, name="events_view"),
     re_path(r"^events/feed/?$", feeds.live_event_feed, name="events_feed"),
     re_path(r"^tracker/?$", views.tracker_view, name="tracker_view"),
