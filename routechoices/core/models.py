@@ -501,7 +501,6 @@ class Map(models.Model):
             ]
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
-
         orig = self.image.open("rb").read()
         self.image.close()
         img = Image.open(BytesIO(orig)).convert("RGBA")
