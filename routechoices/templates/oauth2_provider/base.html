@@ -29,10 +29,11 @@
     {% block navbar %}
     {% include "oauth2_provider/navbar.html" %}
     {% endblock %}
+    <div class="container content">
     {% block content %}
     {% endblock %}
-    {% endblock %}
     </div>
+    {% endblock %}
     <script
       src="https://browser.sentry-cdn.com/6.10.0/bundle.min.js"
       integrity="sha384-nsIkfmMh0uiqg+AwegHcT1SMiPNWnhZmjFDwTshLTxur6ZPNaGT8vwT+vHwI5Jag"
