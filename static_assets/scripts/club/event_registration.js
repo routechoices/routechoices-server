@@ -1,4 +1,3 @@
-var apiBaseUrl = document.currentScript.dataset.apiBaseUrl;
 function selectizeDeviceInput() {
   $("select[name='device']").selectize({
     valueField: "id",

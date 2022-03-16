@@ -253,9 +253,10 @@
 {% endblock %}
 
 {% block extra_body %}
+<script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-csrf-token="{{ csrf_token }}"></script>
 {% compress js %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
+<script src="{% static '/scripts/site/tracker.js' %}?_=2022031600"></script>
 {% endcompress %}
-<script src="{% static '/scripts/site/tracker.js' %}?_=2022012900" data-csrf-token="{{ csrf_token }}"></script>
 {% endblock %}

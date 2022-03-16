@@ -1,5 +1,3 @@
-var apiBaseUrl = document.currentScript.dataset.apiBaseUrl;
-
 $(function () {
   $("#id_device").selectize({
     valueField: "id",

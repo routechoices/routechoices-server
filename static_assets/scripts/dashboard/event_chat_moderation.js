@@ -1,7 +1,3 @@
-var dataset = document.currentScript.dataset;
-var chatStreamUrl = dataset.chatStreamUrl;
-var chatMessagesEndpoint = dataset.chatMessagesEndpoint;
-var csrfToken = dataset.csrfToken;
 var chatMessages = [];
 
 var connectChatAttempts;

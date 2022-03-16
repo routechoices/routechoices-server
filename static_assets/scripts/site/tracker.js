@@ -1,5 +1,3 @@
-var dataset = document.currentScript.dataset;
-var csrfToken = dataset.csrfToken;
 (function () {
   u(".error-message").hide();
   u("#imeiForm").on("submit", function (e) {

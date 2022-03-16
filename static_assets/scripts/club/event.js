@@ -1,14 +1,4 @@
-var dataset = document.currentScript.dataset;
-var eventId = dataset.eventId;
-var eventUrl = dataset.eventUrl;
-var wmsService = dataset.wmsServiceUrl;
-var chatStreamUrl = dataset.chatStreamUrl;
-var gpsStreamUrl = dataset.gpsStreamUrl;
-var chatMessagesEndpoint = dataset.chatMessagesEndpoint;
-var clubName = dataset.clubName;
-var staticRoot = dataset.staticRoot;
-var csrfToken = dataset.csrfToken;
-var noDelay = dataset.noDelay === "true";
+var noDelay = noDelay === "true";
 
 if (!navigator.canShare) {
   document.getElementById("share_buttons").remove();
@@ -59,14 +49,7 @@ var locale =
     : "en");
 
 (function () {
-  eventId = dataset.eventId;
-  eventUrl = dataset.eventUrl;
-  wmsService = dataset.wmsServiceUrl;
-  chatStreamUrl = dataset.chatStreamUrl;
-  chatMessagesEndpoint = dataset.chatMessagesEndpoint;
-  clock = ServerClock({ url: dataset.serverClockUrl });
-  clubName = dataset.clubName;
-  staticRoot = dataset.staticRoot;
+  clock = ServerClock({ url: serverClockUrl });
   banana = new Banana();
   updateText().then(function () {
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
@@ -264,7 +247,7 @@ var locale =
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                MapLayers[m.title] = L.tileLayer.wms(wmsService + "?", {
+                MapLayers[m.title] = L.tileLayer.wms(wmsServiceUrl + "?", {
                   layers: eventId + "/" + i,
                   bounds: bounds,
                   tileSize: 512,

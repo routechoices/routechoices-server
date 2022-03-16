@@ -1854,7 +1854,7 @@ function addRasterMap(bounds, src, fit) {
     fit = false;
   }
   rasterMap = L.tileLayer
-    .wms(wmsService + "?", {
+    .wms(wmsServiceUrl + "?", {
       layers: eventId,
       bounds: bounds,
       tileSize: 512,

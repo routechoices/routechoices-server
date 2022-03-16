@@ -22,9 +22,11 @@
 {% endblock %}
 
 {% block extra_body %}
+<script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {% compress js %}
 <script src="{% static '/vendor/jquery-1.12.4/jquery.min.js' %}?_=2022011800"></script>
 <script src="{%  static '/vendor/selectize-0.13.3/selectize.min.js' %}?_=2022011800"></script>
+<script src="{% static '/scripts/dashboard/device_add.js' %}?_=2022031600"></script>
 {% endcompress %}
-<script src="{% static '/scripts/dashboard/device_add.js' %}?_=2022011800" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+
 {%  endblock %}

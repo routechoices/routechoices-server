@@ -1,5 +1,3 @@
-var apiBaseUrl = document.currentScript.dataset.apiBaseUrl;
-
 var seletizeOptions = {
   valueField: "id",
   labelField: "device_id",
