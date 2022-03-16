@@ -10,26 +10,29 @@ function selectizeDeviceInput() {
       if (!query.length || query.length < 4) {
         return callback();
       }
-      $.ajax({
+      reqwest({
         url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
-        type: "GET",
-        error: function () {
-          callback();
-        },
+        method: "get",
+        type: "json",
+        withCredentials: true,
+        crossOrigin: true,
         success: function (res) {
           callback(res.results);
+        },
+        error: function () {
+          callback();
         },
       });
     },
   });
 }
 
-$(function () {
-  $(".date-utc").each(function (i, el) {
-    $el = $(el);
-    $el.text(
-      dayjs($el.data("date")).local().format("MMMM D, YYYY [at] HH:mm:ss")
+(function () {
+  u(".date-utc").each(function (i, el) {
+    var _el = u(el);
+    _el.text(
+      dayjs(_el.data("date")).local().format("MMMM D, YYYY [at] HH:mm:ss")
     );
   });
   selectizeDeviceInput();
-});
+})();

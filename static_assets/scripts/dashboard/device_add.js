@@ -1,4 +1,4 @@
-$(function () {
+(function () {
   $("#id_device").selectize({
     valueField: "id",
     labelField: "device_id",
@@ -8,16 +8,19 @@ $(function () {
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {
       if (!query.length || query.length < 4) return callback();
-      $.ajax({
+      reqwest({
         url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
-        type: "GET",
-        error: function () {
-          callback();
-        },
+        method: "get",
+        type: "json",
+        withCredentials: true,
+        crossOrigin: true,
         success: function (res) {
           callback(res.results);
+        },
+        error: function () {
+          callback();
         },
       });
     },
   });
-});
+})();

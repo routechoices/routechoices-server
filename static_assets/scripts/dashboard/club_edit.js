@@ -1,4 +1,4 @@
-$(function () {
+(function () {
   $("#id_admins").selectize({
     valueField: "id",
     labelField: "username",
@@ -8,20 +8,19 @@ $(function () {
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {
       if (!query.length || query.length < 2) return callback();
-      $.ajax({
+      reqwest({
         url: apiBaseUrl + "search/user?q=" + encodeURIComponent(query),
-        type: "GET",
-        xhrFields: {
-          withCredentials: true,
-        },
-        crossDomain: true,
-        error: function () {
-          callback();
-        },
+        method: "get",
+        type: "json",
+        withCredentials: true,
+        crossOrigin: true,
         success: function (res) {
           callback(res.results);
+        },
+        error: function () {
+          callback();
         },
       });
     },
   });
-});
+})();

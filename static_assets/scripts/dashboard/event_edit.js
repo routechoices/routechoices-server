@@ -6,14 +6,17 @@ var seletizeOptions = {
   plugins: ["preserve_on_blur"],
   load: function (query, callback) {
     if (!query.length || query.length < 4) return callback();
-    $.ajax({
+    reqwest({
       url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
-      type: "GET",
-      error: function () {
-        callback();
-      },
+      method: "get",
+      type: "json",
+      withCredentials: true,
+      crossOrigin: true,
       success: function (res) {
         callback(res.results);
+      },
+      error: function () {
+        callback();
       },
     });
   },
@@ -29,13 +32,19 @@ function onAddedCompetitorRow(row) {
       },
     },
   };
-  var el = $(row).find(".datetimepicker")[0];
+  var el = u(row).find(".datetimepicker").first();
   new tempusDominus.TempusDominus(el, options);
   $(row).find('select[name$="-device"]').selectize(seletizeOptions);
+
+  u(el).attr("autocomplete", "off");
+  showLocalTime(el);
+  el.addEventListener(tempusDominus.Namespace.events.change, function (e) {
+    showLocalTime(e.target);
+  });
 }
 
 function onCsvParsed(result) {
-  document.getElementById("csv_input").value = "";
+  u("#csv_input").val("");
   var errors = "";
   if (result.errors.length > 0) {
     errors = "No line found";
@@ -69,47 +78,50 @@ function onCsvParsed(result) {
     return;
   }
   // clear empty lines
-  $(".formset_row").each(function (j, e) {
+  u(".formset_row").each(function (e) {
     if (
-      $(e)
+      u(e)
         .find("input")
-        .filter(function (i, el) {
-          return $(el).attr("type") != "hidden" && el.value != "";
+        .filter(function (el) {
+          return u(el).attr("type") != "hidden" && el.value != "";
         }).length == 0
     ) {
-      $(e).find(".delete-row").click();
+      u(e).find(".delete-row").first().click();
     }
   });
   result.data.forEach(function (l) {
-    $(".add-competitor-btn").click();
+    u(".add-competitor-btn").first().click();
     if (l.length != 1) {
-      var inputs = $(".formset_row").last().find("input");
+      var inputs = u(u(".formset_row").last()).find("input").nodes;
       if (l.length > 3) {
         inputs[2].value = l[3];
       }
+      if (l[2]) {
+        inputs[5].value = dayjs(l[2]).utc().format("YYYY-MM-DD HH:mm:ss");
+        u(inputs[5]).trigger("change");
+      }
       inputs[3].value = l[0];
       inputs[4].value = l[1];
-      inputs[5].value = l[2];
     }
   });
-  $(".add-competitor-btn").click();
+  u(".add-competitor-btn").first().click();
 }
 
 function showLocalTime(el) {
-  var val = $(el).val();
+  var val = u(el).val();
   if (val) {
     var local = dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss");
-    $(el)
+    u(el)
       .parent()
       .find(".local_time")
       .text(local + " Local time");
   } else {
-    $(el).parent().find(".local_time").text("");
+    u(el).parent().find(".local_time").text("");
   }
 }
 
-$(function () {
-  $(".datetimepicker").map(function (i, el) {
+(function () {
+  u(".datetimepicker").map(function (el) {
     var options = {
       useCurrent: false,
       display: {
@@ -119,8 +131,7 @@ $(function () {
         },
       },
     };
-    $el = $(el);
-    var val = $el.val();
+    var val = u(el).val();
     if (val) {
       val = val.substring(0, 10) + "T" + val.substring(11, 19) + "Z";
       options.defaultDate = new Date(
@@ -129,7 +140,7 @@ $(function () {
     }
     new tempusDominus.TempusDominus(el, options);
   });
-  $('label[for$="-DELETE"]').parents(".form-group").hide();
+  u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
     addText: '<i class="fa fa-plus-circle"></i> Add Competitor',
     addCssClass: "btn btn-primary add-competitor-btn",
@@ -147,30 +158,25 @@ $(function () {
   // next line must come after formset initialization
   $('select[name$="-device"]').selectize(seletizeOptions);
 
-  var originalEventStart = $("#id_start_date").val();
-  var competitorsWithSameStartAsEvents = $(".competitor_table .datetimepicker")
-    .filter(function (idx, el) {
-      return originalEventStart !== "" && $(el).val() == originalEventStart;
-    })
-    .map(function (idx, el) {
-      return $(el).attr("id");
-    })
-    .toArray();
-
-  $("#csv_input").on("change", function () {
-    Papa.parse($("#csv_input")[0].files[0], { complete: onCsvParsed });
+  var originalEventStart = u("#id_start_date").val();
+  var competitorsStartTimeElsWithSameStartAsEvents = u(
+    ".competitor_table .datetimepicker"
+  ).filter(function (el) {
+    return originalEventStart !== "" && u(el).val() == originalEventStart;
+  }).nodes;
+  u("#csv_input").on("change", function (e) {
+    Papa.parse(e.target.files[0], { complete: onCsvParsed });
   });
-  $(".datetimepicker").each(function (idx, el) {
-    $(el).attr("autocomplete", "off");
+  u(".datetimepicker").each(function (el) {
+    u(el).attr("autocomplete", "off");
     showLocalTime(el);
     el.addEventListener(tempusDominus.Namespace.events.change, function (e) {
-      var elId = $(e.target).attr("id");
-      if (competitorsWithSameStartAsEvents.includes(elId)) {
-        const index = competitorsWithSameStartAsEvents.indexOf(elId);
-        if (index > -1) {
-          competitorsWithSameStartAsEvents.splice(index, 1);
-        }
-      }
+      var elId = u(e.target).attr("id");
+      competitorsStartTimeElsWithSameStartAsEvents = u(
+        competitorsStartTimeElsWithSameStartAsEvents
+      ).filter(function (_e) {
+        return u(_e).attr("id") != elId;
+      }).nodes;
       showLocalTime(e.target);
     });
   });
@@ -181,14 +187,14 @@ $(function () {
     ("0" + Math.floor(Math.abs(utcOffset / 60))).slice(-2) +
     ":" +
     ("0" + Math.round(utcOffset % 60)).slice(-2);
-  $(".utc-offset").text("(UTC Offset " + utcOffsetText + ")");
+  u(".utc-offset").text("(UTC Offset " + utcOffsetText + ")");
 
-  document
-    .getElementById("id_start_date")
+  u("#id_start_date")
+    .first()
     .addEventListener(tempusDominus.Namespace.events.change, function (e) {
-      var newValue = $(e.target).val();
-      $(competitorsWithSameStartAsEvents).each(function (idx, id) {
-        $("#" + id).val(newValue);
+      var newValue = u(e.target).val();
+      u(competitorsStartTimeElsWithSameStartAsEvents).each(function (el) {
+        u(el).val(newValue);
       });
     });
-});
+})();

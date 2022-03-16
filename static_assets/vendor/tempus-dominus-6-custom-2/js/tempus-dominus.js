@@ -493,7 +493,7 @@
          * a date/datetime object.
          */
         dateString() {
-            console.warn(`${this.base} Using a string for date options is not recommended unless you specify an ISO string.`);
+            // console.warn(`${this.base} Using a string for date options is not recommended unless you specify an ISO string.`);
         }
     }
 
