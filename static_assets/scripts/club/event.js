@@ -139,7 +139,6 @@ var locale =
       crossOrigin: true,
       type: "json",
       success: function (response) {
-        console.log(response);
         backdropMaps[response.event.backdrop].addTo(map);
         var now = new Date();
         var startEvent = new Date(response.event.start_date);
