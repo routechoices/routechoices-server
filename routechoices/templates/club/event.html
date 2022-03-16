@@ -64,7 +64,7 @@
       </div>
       <div style="padding-top:5px;" class="event-tool">
         <div id="full_progress_bar" class="progress" style="cursor: pointer">
-          <div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span id="progress_bar_text" style="padding:5px"></span></div>
+          <div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-progressbar-name="time" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span id="progress_bar_text" style="padding:5px"></span></div>
         </div>
       </div>
     </div>
@@ -132,8 +132,8 @@
         data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}"false"{% endif %}
 ></script>
 {% compress js %}
-<script src="{% static '/vendor/jquery-1.12.4/jquery-ajax.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>s
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
 <script src="{% static '/js/server_clock.js' %}?2022012700"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>

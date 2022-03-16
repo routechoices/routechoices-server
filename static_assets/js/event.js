@@ -511,15 +511,13 @@ var fetchCompetitorRoutes = function (url) {
     lastDataTs:
       Math.round(lastDataTs / fetchPositionInterval) * fetchPositionInterval,
   };
-  $.ajax({
+  reqwest({
     url: url,
     data: data,
-    xhrFields: {
-      withCredentials: true,
-    },
-    crossDomain: true,
-  })
-    .done(function (response) {
+    crossOrigin: true,
+    withCredentials: true,
+    type: "json",
+    success: function (response) {
       var runnerPoints = [];
       response.competitors.forEach(function (competitor) {
         if (competitor.encoded_data) {
@@ -551,30 +549,31 @@ var fetchCompetitorRoutes = function (url) {
         zoomOnRunners = false;
       }
       u("#eventLoadingModal").remove();
-    })
-    .fail(function () {
+    },
+    error: function () {
       isCurrentlyFetchingRoutes = false;
-    });
+    },
+  });
 };
 
 var fetchNotice = function () {
   isCurrentlyFetchingNotice = true;
-  $.ajax({
+  reqwest({
     url: eventUrl,
-    xhrFields: {
-      withCredentials: true,
-    },
-    crossDomain: true,
-  }).done(function (response) {
-    noticeLastFetched = performance.now();
-    isCurrentlyFetchingNotice = false;
-    if (response.announcement && response.announcement != prevNotice) {
-      prevNotice = response.announcement;
-      u("#alert-text").text(prevNotice);
-      u(".page-alert").show();
-    } else {
+    withCredentials: true,
+    crossOrigin: true,
+    type: "json",
+    success: function (response) {
+      noticeLastFetched = performance.now();
       isCurrentlyFetchingNotice = false;
-    }
+      if (response.announcement && response.announcement != prevNotice) {
+        prevNotice = response.announcement;
+        u("#alert-text").text(prevNotice);
+        u(".page-alert").show();
+      } else {
+        isCurrentlyFetchingNotice = false;
+      }
+    },
   });
 };
 
@@ -652,10 +651,12 @@ var displayCompetitorList = function (force) {
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
         <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">\
-          <button type="button" class="toggle_competitor_btn btn btn-default btn-sm"><i class="fa fa-toggle-' +
+          <button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
+        (competitor.isShown ? "off" : "on") +
+        '"><i class="fa fa-toggle-' +
         (competitor.isShown ? "on" : "off") +
         '"></i></button>\
-          <button type="button" class="center_competitor_btn btn btn-default btn-sm"><i class="fa fa-map-marker"></i></button>\
+          <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus"><i class="fa fa-map-marker"></i></button>\
           <span><small class="speedometer"></small></span>\
         </div>\
         </div>'
@@ -890,22 +891,20 @@ var displayChat = function (ev) {
             return;
           }
           u("#chatSubmitBtn").val(banana.i18n("sending"));
-          $.ajax({
+          reqwest({
             url: "https:" + chatMessagesEndpoint,
-            headers: {
-              "X-CSRFToken": csrfToken,
-            },
             data: {
               nickname: u("#chatNick").val(),
               message: u("#chatMessage").val(),
               csrfmiddlewaretoken: csrfToken,
             },
-            xhrFields: {
-              withCredentials: true,
+            headers: {
+              "X-CSRFToken": csrfToken,
             },
-            method: "POST",
-            dataType: "JSON",
-            crossDomain: true,
+            crossOrigin: true,
+            withCredentials: true,
+            method: "post",
+            type: "json",
           })
             .success(function () {
               u("#chatMessage").val("");

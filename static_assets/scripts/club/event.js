@@ -81,8 +81,8 @@ var locale =
     };
 
     u(".date-utc").each(function (el) {
-      $el = u(el);
-      $el.text(dayjs($el.data("date")).local().locale(locale).format("LLLL"));
+      var _el = u(el);
+      _el.text(dayjs(_el.data("date")).local().locale(locale).format("LLLL"));
     });
     var startDateTxt = u("#event-start-date-text").find(".date-utc").text();
     u("#event-start-date-text").text(
@@ -133,14 +133,13 @@ var locale =
       drawCompetitors();
     });
 
-    $.ajax({
+    reqwest({
       url: eventUrl,
-      xhrFields: {
-        withCredentials: true,
-      },
-      crossDomain: true,
-    })
-      .done(function (response) {
+      withCredentials: true,
+      crossOrigin: true,
+      type: "json",
+      success: function (response) {
+        console.log(response);
         backdropMaps[response.event.backdrop].addTo(map);
         var now = new Date();
         var startEvent = new Date(response.event.start_date);
@@ -284,10 +283,11 @@ var locale =
           }
           onStart();
         }
-      })
-      .fail(function () {
+      },
+      error: function () {
         u("#eventLoadingModal").remove();
         swal({ text: "Something went wrong", title: "error", type: "error" });
-      });
+      },
+    });
   });
 })();

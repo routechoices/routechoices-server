@@ -97,21 +97,19 @@ function refreshMessageList() {
         },
         function (isConfirmed) {
           if (isConfirmed) {
-            $.ajax({
+            reqwest({
               url: "https:" + chatMessagesEndpoint,
-              headers: {
-                "X-CSRFToken": csrfToken,
-              },
+              method: "delete",
               data: {
                 uuid: uuid,
                 csrfmiddlewaretoken: csrfToken,
               },
-              method: "DELETE",
-              dataType: "JSON",
-              xhrFields: {
-                withCredentials: true,
+              type: "json",
+              headers: {
+                "X-CSRFToken": csrfToken,
               },
-              crossDomain: true,
+              withCredentials: true,
+              crossOrigin: true,
             });
           }
         }
