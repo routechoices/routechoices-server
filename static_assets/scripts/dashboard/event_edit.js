@@ -2,10 +2,14 @@ var seletizeOptions = {
   valueField: "id",
   labelField: "device_id",
   searchField: "device_id",
-  create: false,
-  plugins: ["preserve_on_blur"],
+  create: true,
+  createOnBlur: true,
+  persist: false,
+  plugins: ["preserve_on_blur", "change_listener"],
   load: function (query, callback) {
-    if (!query.length || query.length < 4) return callback();
+    if (query.length < 4) {
+      return callback();
+    }
     reqwest({
       url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
       method: "get",
@@ -22,6 +26,7 @@ var seletizeOptions = {
   },
 };
 
+var lastDeviceSelectInput = null;
 function onAddedCompetitorRow(row) {
   var options = {
     useCurrent: false,
@@ -34,7 +39,11 @@ function onAddedCompetitorRow(row) {
   };
   var el = u(row).find(".datetimepicker").first();
   new tempusDominus.TempusDominus(el, options);
-  $(row).find('select[name$="-device"]').selectize(seletizeOptions);
+  u(row)
+    .find('select[name$="-device"]')
+    .each(function (el) {
+      lastDeviceSelectInput = new TomSelect(el, seletizeOptions);
+    });
 
   u(el).attr("autocomplete", "off");
   showLocalTime(el);
@@ -94,7 +103,21 @@ function onCsvParsed(result) {
     if (l.length != 1) {
       var inputs = u(u(".formset_row").last()).find("input").nodes;
       if (l.length > 3) {
-        inputs[2].value = l[3];
+        var myDeviceSelectInput = lastDeviceSelectInput;
+        reqwest({
+          url: apiBaseUrl + "search/device?q=" + l[3],
+          method: "get",
+          type: "json",
+          withCredentials: true,
+          crossOrigin: true,
+          success: function (res) {
+            if (res.results.length == 1) {
+              var r = res.results[0];
+              myDeviceSelectInput.addOption(r);
+              myDeviceSelectInput.setValue(r[seletizeOptions.valueField]);
+            }
+          },
+        });
       }
       if (l[2]) {
         inputs[5].value = dayjs(l[2]).utc().format("YYYY-MM-DD HH:mm:ss");
@@ -156,7 +179,9 @@ function showLocalTime(el) {
     formCssClass: "extra_map_formset_row",
   });
   // next line must come after formset initialization
-  $('select[name$="-device"]').selectize(seletizeOptions);
+  u('select[name$="-device"]').each(function (el) {
+    new TomSelect(el, seletizeOptions);
+  });
 
   var originalEventStart = u("#id_start_date").val();
   var competitorsStartTimeElsWithSameStartAsEvents = u(

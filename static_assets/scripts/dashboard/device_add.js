@@ -1,13 +1,16 @@
 (function () {
-  $("#id_device").selectize({
+  new TomSelect("#id_device", {
     valueField: "id",
     labelField: "device_id",
     searchField: "device_id",
-    multiple: true,
-    create: false,
+    create: true,
+    createOnBlur: true,
+    persist: false,
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {
-      if (!query.length || query.length < 4) return callback();
+      if (query.length < 4) {
+        return callback();
+      }
       reqwest({
         url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
         method: "get",

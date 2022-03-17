@@ -1,10 +1,9 @@
 (function () {
-  $("#id_admins").selectize({
+  new TomSelect("#id_admins", {
     valueField: "id",
     labelField: "username",
     searchField: "username",
     multiple: true,
-    create: false,
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {
       if (!query.length || query.length < 2) return callback();

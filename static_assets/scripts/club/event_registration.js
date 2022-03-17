@@ -1,13 +1,14 @@
 function selectizeDeviceInput() {
-  $("select[name='device']").selectize({
+  new TomSelect("select[name='device']", {
     valueField: "id",
     labelField: "device_id",
     searchField: "device_id",
-    multiple: true,
-    create: false,
+    create: true,
+    createOnBlur: true,
+    persist: false,
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {
-      if (!query.length || query.length < 4) {
+      if (query.length < 4) {
         return callback();
       }
       reqwest({
