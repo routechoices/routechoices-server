@@ -3,8 +3,8 @@ function selectizeDeviceInput() {
     valueField: "id",
     labelField: "device_id",
     searchField: "device_id",
-    create: true,
-    createOnBlur: true,
+    create: false,
+    createOnBlur: false,
     persist: false,
     plugins: ["preserve_on_blur"],
     load: function (query, callback) {

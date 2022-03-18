@@ -724,9 +724,13 @@ def event_create_view(request):
                 return redirect("dashboard:event_edit_view", id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
-            dev_qs = Device.objects.none()
+            all_devices = set()
+            for cform in formset.forms:
+                if cform.cleaned_data.get("device"):
+                    all_devices.add(cform.cleaned_data.get("device").id)
+            dev_qs = Device.objects.filter(id__in=all_devices)
             if request.user.is_authenticated:
-                dev_qs = request.user.devices.all()
+                dev_qs |= request.user.devices.all()
             c = [
                 ["", "---------"],
             ] + [[d.id, d.aid] for d in dev_qs]
@@ -827,6 +831,9 @@ def event_edit_view(request, id):
                 return redirect("dashboard:event_edit_view", id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
+            for cform in formset.forms:
+                if cform.cleaned_data.get("device"):
+                    all_devices.add(cform.cleaned_data.get("device").id)
             dev_qs = Device.objects.filter(id__in=all_devices)
             c = [
                 ["", "---------"],
