@@ -33,7 +33,7 @@ jobs:
           nvm install v16 && nvm use v16 && nvm alias default v16
           node -v
           curl -o- -L https://yarnpkg.com/install.sh | bash
-          ~/.yarn/bin/yarn add cypress cypress-file-upload cypress-real-events
+          ~/.yarn/bin/yarn add cypress@6 cypress-file-upload cypress-real-events
           ~/.yarn/bin/yarn cypress install
           ~/.yarn/bin/yarn cypress run
     - store_artifacts:
