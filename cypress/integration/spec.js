@@ -8,6 +8,10 @@ context("Cypress tests", () => {
     cy.visit("/");
   });
 
+  after(() => {
+    cy.wait(1000);
+  });
+
   it("Create an Event", function () {
     cy.login();
     cy.url().should("match", /\/dashboard\/$/);
