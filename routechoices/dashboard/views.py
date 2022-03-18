@@ -724,6 +724,7 @@ def event_create_view(request):
                 return redirect("dashboard:event_edit_view", id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
+            formset.is_valid()
             all_devices = set()
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
@@ -831,6 +832,7 @@ def event_edit_view(request, id):
                 return redirect("dashboard:event_edit_view", id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
+            formset.is_valid()
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
                     all_devices.add(cform.cleaned_data.get("device").id)
