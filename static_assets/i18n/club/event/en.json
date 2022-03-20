@@ -28,7 +28,7 @@
     "nickname": "Nickname",
     "send": "Send",
     "tails": "Tails",
-    "length-in-seconds": "Length in seconds",
+    "length-in-seconds": "Length (Hours, Minutes, Seconds)",
     "map-controls": "Map controls",
     "show-map-controls": "Show map controls",
     "groupings": "Groupings",

@@ -28,7 +28,7 @@
   "nickname": "Sobrenombre",
   "send": "Enviar",
   "tails": "Cola",
-  "length-in-seconds": "Duración en segundos",
+  "length-in-seconds": "Duración (Horas, Minutos, Segundos)",
   "map-controls": "Controles del mapa",
   "show-map-controls": "Ver controles del mapa",
   "groupings": "Agrupar",

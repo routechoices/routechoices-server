@@ -28,7 +28,7 @@
     "nickname": "Nimi",
     "send": "Lähettää",
     "tails": "Hännät",
-    "length-in-seconds": "Pituus sekunneissa",
+    "length-in-seconds": "Pituus (Tuntia, Minuuttia, Sekuntia)",
     "map-controls": "Kartan hallintalaitteet",
     "show-map-controls": "Näytä kartan hallintalaitteet",
     "groupings": "Ryhmittymiä",

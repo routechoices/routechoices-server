@@ -1016,9 +1016,17 @@ var displayOptions = function (ev) {
         '<label for="tailLengthInput">' +
         banana.i18n("length-in-seconds") +
         "</label>" +
-        '<input type="number" min="0" class="form-control" id="tailLengthInput" value="' +
-        tailLength +
-        '"/>' +
+        '<div class="row g-3">' +
+        '<div class="col-auto"><input type="number" min="0" max="99999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
+        Math.floor(tailLength / 3600) +
+        '" style="::after{content:":"}"/></div>' +
+        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
+        (Math.floor(tailLength / 60) % 60) +
+        '"/></div>' +
+        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
+        (tailLength % 60) +
+        '"/></div>' +
+        "</div>" +
         "</div>" +
         "<h4>" +
         banana.i18n("map-controls") +
@@ -1074,13 +1082,19 @@ var displayOptions = function (ev) {
       window.location.reload();
     });
   u(mainDiv)
-    .find("#tailLengthInput")
+    .find(".tailLengthControl")
     .on("input", function (e) {
-      var v = parseInt(e.target.value);
+      var h = parseInt(u(tailLengthHoursInput).val() || 0);
+      var m = parseInt(u(tailLengthMinutesInput).val() || 0);
+      var s = parseInt(u(tailLengthSecondsInput).val() || 0);
+      var v = 3600 * h + 60 * m + s;
       if (isNaN(v)) {
-        v = 0;
+        return;
       }
       tailLength = Math.max(0, v);
+      u(tailLengthHoursInput).val(Math.floor(tailLength / 3600));
+      u(tailLengthMinutesInput).val(Math.floor((tailLength / 60) % 60));
+      u(tailLengthSecondsInput).val(Math.floor(tailLength % 60));
     });
   u(mainDiv)
     .find(".toggle_cluster_btn")
@@ -2085,7 +2099,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?20220020700`)
+  return fetch(`${langFile}?2022032000`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

@@ -28,7 +28,7 @@
     "nickname": "Nom",
     "send": "Envoyer",
     "tails": "Queues",
-    "length-in-seconds": "Durée en secondes",
+    "length-in-seconds": "Durée (Heures, Minutes, Secondes)",
     "map-controls": "Contrôles de la carte",
     "show-map-controls": "Afficher les contrôles de la carte",
     "groupings": "Regroupments",
