@@ -1017,7 +1017,7 @@ var displayOptions = function (ev) {
         banana.i18n("length-in-seconds") +
         "</label>" +
         '<div class="row g-3">' +
-        '<div class="col-auto"><input type="number" min="0" max="99999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
+        '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
         Math.floor(tailLength / 3600) +
         '" style="::after{content:":"}"/></div>' +
         '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
