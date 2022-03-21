@@ -1516,21 +1516,24 @@ var drawCompetitors = function () {
               u("<span/>").text(competitor.short_name).html() +
               "</span>";
             var iconClass =
-              "runner-icon " +
-              "runner-icon-" +
-              getContrastYIQ(competitor.color);
+              "runner-icon runner-icon-" + getContrastYIQ(competitor.color);
+            var ic2 =
+              iconClass +
+              " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
+            getContrastYIQ(competitor.color);
             var nameTagEl = document.createElement("div");
-            nameTagEl.className = iconClass;
+            nameTagEl.className = ic2;
             nameTagEl.innerHTML = iconHtml;
-            document.body.appendChild(nameTagEl);
+            var mapEl = document.getElementById("map");
+            mapEl.appendChild(nameTagEl);
             var nameTagWidth =
               nameTagEl.childNodes[0].getBoundingClientRect().width;
-            document.body.removeChild(nameTagEl);
+            mapEl.removeChild(nameTagEl);
             competitor.isNameOnRight = pointX > mapMiddleX;
             var runnerIcon = L.divIcon({
               className: iconClass,
               html: iconHtml,
-              iconAnchor: [competitor.isNameOnRight ? nameTagWidth - 5 : 0, 0],
+              iconAnchor: [competitor.isNameOnRight ? nameTagWidth : 0, 0],
             });
             competitor.nameMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
@@ -1613,19 +1616,23 @@ var drawCompetitors = function () {
             u("<span/>").text(competitor.short_name).html() +
             "</span>";
           var iconClass =
-            "runner-icon " + "runner-icon-" + getContrastYIQ(competitor.color);
+            "runner-icon runner-icon-" + getContrastYIQ(competitor.color);
+          var ic2 =
+            iconClass +
+            " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
           var nameTagEl = document.createElement("div");
-          nameTagEl.className = iconClass;
+          nameTagEl.className = ic2;
           nameTagEl.innerHTML = iconHtml;
-          document.body.appendChild(nameTagEl);
+          var mapEl = document.getElementById("map");
+          mapEl.appendChild(nameTagEl);
           var nameTagWidth =
             nameTagEl.childNodes[0].getBoundingClientRect().width;
-          document.body.removeChild(nameTagEl);
+          mapEl.removeChild(nameTagEl);
           competitor.isNameOnRight = pointX > mapMiddleX;
           var runnerIcon = L.divIcon({
             className: iconClass,
             html: iconHtml,
-            iconAnchor: [competitor.isNameOnRight ? nameTagWidth - 5 : 0, 0],
+            iconAnchor: [competitor.isNameOnRight ? nameTagWidth : 0, 0],
           });
           competitor.nameMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
@@ -1808,19 +1815,23 @@ var drawCompetitors = function () {
             alphabetizeNumber(d - 1) +
             "</span>";
           var iconClass =
-            "runner-icon " + "runner-icon-" + getContrastYIQ(cluster.color);
+            "runner-icon runner-icon-" + getContrastYIQ(cluster.color);
+          var ic2 =
+            iconClass +
+            " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
           var nameTagEl = document.createElement("div");
-          nameTagEl.className = iconClass;
+          nameTagEl.className = ic2;
           nameTagEl.innerHTML = iconHtml;
-          document.body.appendChild(nameTagEl);
+          var mapEl = document.getElementById("map");
+          mapEl.appendChild(nameTagEl);
           var nameTagWidth =
             nameTagEl.childNodes[0].getBoundingClientRect().width;
-          document.body.removeChild(nameTagEl);
+          mapEl.removeChild(nameTagEl);
           cluster.isNameOnRight = pointX > mapMiddleX;
           var runnerIcon = L.divIcon({
             className: iconClass,
             html: iconHtml,
-            iconAnchor: [cluster.isNameOnRight ? nameTagWidth - 5 : 0, 0],
+            iconAnchor: [cluster.isNameOnRight ? nameTagWidth : 0, 0],
           });
           cluster.nameMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
