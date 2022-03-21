@@ -56,7 +56,7 @@
 </div>
  <footer class="page-footer font-small blue pt-4">
      <!-- Copyright -->
-     <div class="footer-copyright text-center py-3">&copy; <script>document.write(new Date().getFullYear())</script> Copyright:
+     <div class="footer-copyright text-center py-3">&copy; {% now 'Y' %} Copyright:
          <a href="{% url 'site:home_view' %}"> {{  site.name }}</a>
      </div>
      <!-- Copyright -->
