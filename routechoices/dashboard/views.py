@@ -551,15 +551,19 @@ def map_kmz_upload_view(request):
                     new_map.image.save("file", image_file, save=False)
                     dest.close()
                 except Exception:
-                    error = (
-                        "An error occured while extracting the map from " "your file."
-                    )
+                    error = "An error occured while extracting the map from your file."
             elif file.name.lower().endswith(".kmz"):
                 try:
                     dest = tempfile.mkdtemp("_kmz")
                     zf = zipfile.ZipFile(file)
                     zf.extractall(dest)
-                    with open(os.path.join(dest, "doc.kml"), "r") as f:
+                    if os.path.exists(os.path.join(dest, "Doc.kml")):
+                        doc_file = "Doc.kml"
+                    elif os.path.exists(os.path.join(dest, "doc.kml")):
+                        doc_file = "doc.kml"
+                    else:
+                        raise Exception("No valid doc.kml file")
+                    with open(os.path.join(dest, doc_file), "r") as f:
                         kml = f.read().encode("utf8")
                     name, image_path, corners_coords = extract_ground_overlay_info(kml)
                     if not name:
