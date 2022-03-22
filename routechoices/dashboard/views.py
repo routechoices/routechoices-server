@@ -602,9 +602,10 @@ def map_kmz_upload_view(request):
             if new_map:
                 try:
                     new_map.strip_exif()
-                    new_map.save()
                 except Image.DecompressionBombError:
                     error = "Image is too large, try to use lower resolution."
+                else:
+                    new_map.save()
             if error:
                 messages.error(request, error)
             else:
