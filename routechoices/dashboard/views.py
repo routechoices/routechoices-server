@@ -23,6 +23,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.timezone import now
+from PIL import Image
 
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
@@ -602,8 +603,8 @@ def map_kmz_upload_view(request):
                 try:
                     new_map.strip_exif()
                     new_map.save()
-                except Exception:
-                    error = "An error occured while extracting the map from your file."
+                except Image.DecompressionBombError:
+                    error = "Image is too large, try to use lower resolution."
             if error:
                 messages.error(request, error)
             else:
