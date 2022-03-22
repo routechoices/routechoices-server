@@ -562,13 +562,11 @@ class Map(models.Model):
                 new_h = image.size[1] * scale
                 rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
             out_buffer = BytesIO()
-            rgb_img = Image.new("RGB", rgba_img.size, (255, 255, 255))
-            rgb_img.paste(rgba_img, mask=rgba_img.split()[3])
             params = {
                 "dpi": (72, 72),
                 "quality": 60,
             }
-            rgb_img.save(out_buffer, "JPEG", **params)
+            rgba_img.save(out_buffer, "WEBP", **params)
             f_new = File(out_buffer, name=self.image.name)
             self.image.save(
                 "filename",
