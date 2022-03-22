@@ -597,12 +597,13 @@ def map_kmz_upload_view(request):
                         )
                         new_map.image.save("file", image_file, save=False)
                 except Exception:
-                    error = (
-                        "An error occured while extracting the map from " "your file."
-                    )
+                    error = "An error occured while extracting the map from your file."
             if new_map:
-                new_map.strip_exif()
-                new_map.save()
+                try:
+                    new_map.strip_exif()
+                    new_map.save()
+                except Exception:
+                    error = "An error occured while extracting the map from your file."
             if error:
                 messages.error(request, error)
             else:
