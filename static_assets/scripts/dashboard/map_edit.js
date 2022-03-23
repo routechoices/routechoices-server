@@ -1,5 +1,5 @@
 var extractCornersCoordsFromFilename = function (filename) {
-  var re = /(_\d+\.\d+){8}_\.(gif|png|jpg|jpeg)$/gi;
+  var re = /(_\d+\.\d+){8}_\.(gif|png|jpg|jpeg|webp)$/gi;
   var found = filename.match(re);
   if (!found) {
     return false;
