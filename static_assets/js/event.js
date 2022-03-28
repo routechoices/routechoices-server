@@ -1106,6 +1106,11 @@ var displayOptions = function (ev) {
           .addClass("fa-toggle-off");
         showClusters = false;
         map.removeControl(groupControl);
+        Object.values(clusters).forEach(function (c) {
+          map.removeLayer(c.mapMarker);
+          map.removeLayer(c.nameMarker);
+        });
+        clusters = {};
         u(".leaflet-control-ranking").css({ top: "62px" });
       } else {
         u(".toggle_cluster_btn")
