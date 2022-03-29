@@ -645,8 +645,8 @@ class Map(models.Model):
         draw = ImageDraw.Draw(im)
         for pts in seg:
             map_pts = [new_map.wsg84_to_map_xy(pt[0], pt[1]) for pt in pts]
-            draw.line(map_pts, (255, 0, 0, 200), 15, joint="curve")
-            draw.line(map_pts, (255, 255, 255, 200), 10, joint="curve")
+            draw.line(map_pts, (255, 0, 0, 160), 15, joint="curve")
+            draw.line(map_pts, (255, 255, 255, 100), 10, joint="curve")
 
         out_buffer = BytesIO()
         im.save(out_buffer, "PNG", dpi=(300, 300))
