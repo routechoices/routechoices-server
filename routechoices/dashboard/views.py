@@ -425,7 +425,7 @@ def map_gpx_upload_view(request):
                 gpx_file = form.cleaned_data["gpx_file"].read()
                 data = minidom.parseString(gpx_file)
                 gpx_file = data.toxml(encoding="utf-8")
-            except UnicodeDecodeError:
+            except Exception:
                 error = "Couldn't decode file"
             if not error:
                 try:
@@ -1022,8 +1022,10 @@ def event_route_upload_view(request, id):
         if form.is_valid():
             error = None
             try:
-                gpx_file = form.cleaned_data["gpx_file"].read().decode("utf8")
-            except UnicodeDecodeError:
+                gpx_file = form.cleaned_data["gpx_file"].read()
+                data = minidom.parseString(gpx_file)
+                gpx_file = data.toxml(encoding="utf-8")
+            except Exception:
                 error = "Couldn't decode file"
             if not error:
                 try:
