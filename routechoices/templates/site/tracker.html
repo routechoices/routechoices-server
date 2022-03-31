@@ -15,8 +15,9 @@
             <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/gl300.png' %}"/></div>
             <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
-          <p>You can upload your location to provide live GPS tracking in two different way. Using a smartphone or using a dedicated GPS tracker.</p>
-          <p>For each method we need to generate for the device a unique device ID that can be trasmitted to the organizer.</p>
+          <p>You can upload your location to provide live GPS tracking in two different way. Using our smartphone application or using one of the supported dedicated GPS trackers.</p>
+          <p>For each method, we assign devices a unique "device ID" that can be used on this website.</p>
+          <p>If you are interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
           <p>Select below your desired option for more detail instructions:</p>
           <p style="margin-top:2em; text-align:center">
             <a role="button" class="btn btn-info" id="android-btn" data-bs-toggle="modal" data-bs-target="#android-modal" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
@@ -36,7 +37,7 @@
             </div>
             <div class="modal-body">
               <p>
-                Download the {{ site.name }} Live Tracker app from the Connect IQ store.
+                Download the {{ site.name }} Tracker app from the Connect IQ store.
               </p>
               <p>
                  <a href="https://apps.garmin.com/en-US/apps/50396179-a687-4720-a0d9-c5f1e9b2485b" target="_blank"><i class="fa fa-external-link"></i> Connect IQ store</a>
@@ -117,7 +118,7 @@
             </div>
             <div class="modal-body">
               <p>
-                Download the Routechoices Tracker for iOS device.
+                Download the Routechoices Tracker app for iOS device.
               </p>
               <p>
                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
@@ -125,8 +126,8 @@
               <p>
                 When you'll open the app, it will display your device ID.
                </p>
-               <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
-               <p>Once you have good GPS signal the Device ID should turn green and the app will start streaming your position.</p>
+               <p>Before you start your race, toggle the button to start sharing your position with us. And when your race is over, you can turn off the service from within the app.</p>
+               <p>Once you have good GPS signal, the device ID should turn green and the app starts streaming your position.</p>
                <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone and that GPS access is allowed all the time.</p>
              <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
@@ -163,8 +164,8 @@
              <p>
               When you'll open the app, it will display your device ID.
              </p>
-             <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
-             <p>Once you have good GPS signal the Device ID should turn green and the app will start streaming your position.</p>
+             <p>Before you start your race, toggle the button to start sharing your position with us. And when your race is over, you can turn off the service from within the app.</p>
+             <p>Once you have good GPS signal, the device ID should turn green and the app starts streaming your position.</p>
              <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone and that GPS access is allowed all the time.</p>
              <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
@@ -208,11 +209,13 @@
                   <li>Teltonika devices: <code>port 2000</code></li>
                   <li>Queclink devices: <code>port 2002</code></li>
                 </ul>
+                Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on your usage as this settings can affect battery life.<br/>
                 For more detailed configurations contact us.
               </p>
-              <p>You should then get a device ID for your tracker (see below) that you can share with events organizers.</p>
-              <p>Then simply turn on your tracker during your races and its positions will be saved to the server.</p>
-              <h3>Get a device ID for your Tracker <small>(Required only once)</small></h3>
+              <h3>Device ID</h3>
+              <p>You must register your device with us by geting a device ID for your tracker (see below) that you can use on this website.</p>
+              <p>Once done you can simply turn on your tracker during your races and its positions will be saved to the server.</p>
+              <h4>Get a device ID for your Tracker</h4>
               <form id="imeiForm">
                 <div class="form-group" id=IMEIDiv>
                   <label for="IMEI">IMEI</label>
@@ -222,12 +225,12 @@
                     <i class="fa fa-warning"></i> Invalid IMEI
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Generate</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
               </form>
               <br/>
               <ul id="imeiDevId" class="well d-none" >
                 <li>IMEI <code id="imeiRes"></code></li>
-                <li>Device ID: <code class="imeiDevId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
+                <li>Device ID: <code class="imeiDevId roboto"></code> <button class="btn btn-small" id="copyDevIdBtn"><i class="fa fa-copy fa-fw"></i></button></li>
               </ul>
             </div>
             <div class="modal-footer">

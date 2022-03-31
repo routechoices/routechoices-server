@@ -1,5 +1,6 @@
 (function () {
   u(".error-message").hide();
+
   u("#imeiForm").on("submit", function (e) {
     e.preventDefault();
     u("#imeiRes").text(u("#IMEI").val());
@@ -18,11 +19,21 @@
         u("#imeiDevId").removeClass("d-none");
         u(".imeiDevId").text(response.device_id);
         u("#imeiErrorMsg").addClass("d-none");
+        u("#copyDevIdBtn").off("click");
+        u("#copyDevIdBtn").on("click", function () {
+          navigator.clipboard.writeText(response.device_id);
+        });
       },
-      error: function () {
+      error: function (req) {
         u("#imeiErrorMsg").removeClass("d-none");
         u("#IMEI").addClass("is-invalid");
         u("#imeiDevId").addClass("d-none");
+        try {
+          u("#imeiErrorMsg").html(
+            '<i class="fa fa-warning"></i> ' +
+              u("<div/>").text(JSON.parse(req.responseText)[0]).text()
+          );
+        } catch {}
       },
     });
   });

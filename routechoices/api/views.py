@@ -1052,7 +1052,7 @@ def get_device_for_imei(request):
     try:
         validate_imei(imei)
     except Exception as e:
-        raise ValidationError("Invalid IMEI: " + str(e))
+        raise ValidationError(str(e.message))
     try:
         idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
     except ImeiDevice.DoesNotExist:
