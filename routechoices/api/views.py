@@ -1499,7 +1499,9 @@ def wms_service(request):
         else:
             format = "image/png"
 
-        format = request.GET.get("format", request.GET.get("FORMAT", format))
+        asked_format = request.GET.get("format", request.GET.get("FORMAT", format))
+        if asked_format in ("image/png", "image/webp", "image/avif"):
+            format = asked_format
 
         if format not in ("image/png", "image/webp", "image/avif"):
             return HttpResponseBadRequest("invalid format")
