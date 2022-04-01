@@ -1888,7 +1888,6 @@ function addRasterMap(bounds, src, fit) {
       bounds: bounds,
       tileSize: 512,
       noWrap: true,
-      format: hasWebpSupport ? "image/webp" : "image/png",
     })
     .addTo(map);
   if (fit) {

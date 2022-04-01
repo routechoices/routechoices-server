@@ -4,36 +4,6 @@ if (!navigator.canShare) {
   document.getElementById("share_buttons").remove();
 }
 
-function checkImageFormatCapability(format) {
-  return new Promise(function (res) {
-    var kTestImages = {
-      webp: "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==",
-      avif: "data:image/avif;base64,AAAAFGZ0eXBhdmlmAAAAAG1pZjEAAACgbWV0YQAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAC8AAAAGwAAACNpaW5mAAAAAAABAAAAFWluZmUCAAAAAAEAAGF2MDEAAAAARWlwcnAAAAAoaXBjbwAAABRpc3BlAAAAAAAAAAQAAAAEAAAADGF2MUOBAAAAAAAAFWlwbWEAAAAAAAAAAQABAgECAAAAI21kYXQSAAoIP8R8hAQ0BUAyDWeeUy0JG+QAACANEkA=",
-    };
-    var img = new Image();
-    img.onload = function () {
-      var result = img.width > 0 && img.height > 0;
-      res(result);
-    };
-    img.onerror = function () {
-      res(false);
-    };
-    img.src = kTestImages[format];
-  });
-}
-
-var hasWebpSupport = false;
-var hasAvifSupport = false;
-
-(function () {
-  checkImageFormatCapability("webp").then(function (res) {
-    hasWebpSupport = res;
-  });
-  checkImageFormatCapability("avif").then(function (res) {
-    hasAvifSupport = res;
-  });
-})();
-
 var browserLanguage = navigator.language.slice(0, 2);
 var supportedLanguages = {
   en: "English",
@@ -250,7 +220,6 @@ var locale =
                   bounds: bounds,
                   tileSize: 512,
                   noWrap: true,
-                  format: hasWebpSupport ? "image/webp" : "image/png",
                 });
               }
             }

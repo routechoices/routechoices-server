@@ -40,3 +40,4 @@ django-read-only
 tblib
 django_compressor
 django-allauth-2fa @ git+https://github.com/valohai/django-allauth-2fa.git
+pillow-avif-plugin

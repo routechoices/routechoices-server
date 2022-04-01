@@ -1490,9 +1490,18 @@ def wms_service(request):
         bbox_raw = request.GET.get("bbox", request.GET.get("BBOX"))
         width_raw = request.GET.get("width", request.GET.get("WIDTH"))
         heigth_raw = request.GET.get("height", request.GET.get("HEIGHT"))
-        format = request.GET.get("format", request.GET.get("FORMAT"))
 
-        if format not in ("image/png", "image/webp"):
+        http_accept = request.META.get("HTTP_ACCEPT", "")
+        if "image/avif" in http_accept.split(","):
+            format = "image/avif"
+        elif "image/webp" in http_accept.split(","):
+            format = "image/webp"
+        else:
+            format = "image/png"
+
+        format = request.GET.get("format", request.GET.get("FORMAT", format))
+
+        if format not in ("image/png", "image/webp", "image/avif"):
             return HttpResponseBadRequest("invalid format")
 
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:

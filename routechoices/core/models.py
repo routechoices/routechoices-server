@@ -34,6 +34,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
 from PIL import Image, ImageDraw
+from pillow_avif import AvifImagePlugin  # noqa: F401
 
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
@@ -517,10 +518,18 @@ class Map(models.Model):
         extra_args = []
         if format == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
-        _, buffer = cv2.imencode(
-            ".png" if format == "image/png" else ".webp", tile_img, extra_args
-        )
-        data_out = BytesIO(buffer).getvalue()
+
+        if format == "image/avif":
+            color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_RGBA2BGRA)
+            pil_image = Image.fromarray(color_coverted)
+            buffer = BytesIO()
+            pil_image.save(buffer, "AVIF")
+            data_out = buffer.getvalue()
+        else:
+            _, buffer = cv2.imencode(
+                ".png" if format == "image/png" else ".webp", tile_img, extra_args
+            )
+            data_out = BytesIO(buffer).getvalue()
         if use_cache:
             try:
                 cache.set(cache_key, data_out, 3600 * 24 * 30)
