@@ -523,7 +523,7 @@ class Map(models.Model):
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_RGBA2BGRA)
             pil_image = Image.fromarray(color_coverted)
             buffer = BytesIO()
-            pil_image.save(buffer, "AVIF")
+            pil_image.save(buffer, "AVIF", quality=80)
             data_out = buffer.getvalue()
         else:
             _, buffer = cv2.imencode(
