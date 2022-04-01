@@ -1483,7 +1483,7 @@ def two_d_rerun_race_data(request):
     )
 
 
-def latest_mod(request):
+def latest_tile_modifaction(request):
     if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
         layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
         if not layers_raw:
@@ -1518,11 +1518,11 @@ def latest_mod(request):
                 .all()[int(map_index) - 1]
                 .map
             )
-        return raster_map.modification_date
+        return max(raster_map.modification_date, event.modification_date)
     return None
 
 
-@last_modified(latest_mod)
+@last_modified(latest_tile_modifaction)
 def wms_service(request):
     if "WMS" not in [request.GET.get("service"), request.GET.get("SERVICE")]:
         return HttpResponseBadRequest("Service must be WMS")
