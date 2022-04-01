@@ -20,6 +20,7 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.views.decorators.http import last_modified
 from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -1482,6 +1483,46 @@ def two_d_rerun_race_data(request):
     )
 
 
+def latest_mod(request):
+    if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
+        layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
+        if not layers_raw:
+            return None
+        try:
+            if "/" in layers_raw:
+                layer_id, map_index = layers_raw.split("/")
+                map_index = int(map_index)
+            else:
+                layer_id = layers_raw
+                map_index = 0
+        except Exception:
+            return None
+
+        event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
+        if map_index == 0 and not event.map:
+            return None
+        elif event.extra_maps.all().count() < int(map_index):
+            return None
+
+        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+            if (
+                not request.user.is_authenticated
+                or not event.club.admins.filter(id=request.user.id).exists()
+            ):
+                return None
+        if map_index == 0:
+            raster_map = event.map
+        else:
+            raster_map = (
+                event.map_assignations.select_related("map")
+                .all()[int(map_index) - 1]
+                .map
+            )
+        return raster_map.modification_date
+    return None
+
+
+@last_modified(latest_mod)
 def wms_service(request):
     if "WMS" not in [request.GET.get("service"), request.GET.get("SERVICE")]:
         return HttpResponseBadRequest("Service must be WMS")
