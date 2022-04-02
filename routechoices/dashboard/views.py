@@ -169,7 +169,7 @@ def device_list_view(request):
     devices_listed = devices.object_list.all()
     competitors = (
         Competitor.objects.select_related("event")
-        .filter(device__in=devices_listed)
+        .filter(device__in=devices_listed, start_time__lt=now())
         .order_by("device_id", "-start_time")
         .distinct("device_id")
     )
