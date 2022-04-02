@@ -1455,6 +1455,16 @@ var drawCompetitors = function () {
         viewedTime
       );
       var loc = route.getByTime(viewedTime);
+
+      if (viewedTime < route.getByIndex(0).timestamp) {
+        ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+          if (competitor[layerName]) {
+            map.removeLayer(competitor[layerName]);
+          }
+          competitor[layerName] = null;
+        });
+      }
+
       if (viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec) {
         if (!competitor.idle) {
           ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
