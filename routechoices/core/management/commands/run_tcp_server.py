@@ -236,10 +236,16 @@ class GL200Connection:
                 nb_pts = int(parts[6])
                 pts = []
                 for i in range(nb_pts):
-                    lon = float(parts[11 + i * 12])
-                    lat = float(parts[12 + i * 12])
-                    tim = arrow.get(parts[13 + i * 12], "YYYYMMDDHHmmss").int_timestamp
-                    pts.append((tim, lat, lon))
+                    try:
+                        lon = float(parts[11 + i * 12])
+                        lat = float(parts[12 + i * 12])
+                        tim = arrow.get(
+                            parts[13 + i * 12], "YYYYMMDDHHmmss"
+                        ).int_timestamp
+                    except Exception:
+                        pass
+                    else:
+                        pts.append((tim, lat, lon))
                 await self._on_data(pts)
             except Exception:
                 self.stream.close()
@@ -271,10 +277,16 @@ class GL200Connection:
                 nb_pts = int(parts[6])
                 pts = []
                 for i in range(nb_pts):
-                    lon = float(parts[11 + i * 12])
-                    lat = float(parts[12 + i * 12])
-                    tim = arrow.get(parts[13 + i * 12], "YYYYMMDDHHmmss").int_timestamp
-                    pts.append((tim, lat, lon))
+                    try:
+                        lon = float(parts[11 + i * 12])
+                        lat = float(parts[12 + i * 12])
+                        tim = arrow.get(
+                            parts[13 + i * 12], "YYYYMMDDHHmmss"
+                        ).int_timestamp
+                    except Exception:
+                        pass
+                    else:
+                        pts.append((tim, lat, lon))
                 await self._on_data(pts)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
