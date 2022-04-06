@@ -17,6 +17,7 @@ from routechoices.core.models import (
     Club,
     Competitor,
     Device,
+    DeviceArchiveReference,
     Event,
     ImeiDevice,
     Map,
@@ -291,6 +292,14 @@ class DeviceAdmin(admin.ModelAdmin):
         return get_device_name(obj.user_agent) or obj.user_agent
 
 
+class DeviceArchiveReferenceAdmin(admin.ModelAdmin):
+    list_display = (
+        "creation_date",
+        "original",
+        "archive",
+    )
+
+
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
         "imei",
@@ -339,6 +348,7 @@ class ChatMessageAdmin(admin.ModelAdmin):
 admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
+admin.site.register(DeviceArchiveReference, DeviceArchiveReferenceAdmin)
 admin.site.register(ImeiDevice, ImeiDeviceAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Map, MapAdmin)

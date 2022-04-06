@@ -744,7 +744,7 @@ def event_create_view(request):
                 dev_qs |= request.user.devices.all()
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.aid] for d in dev_qs]
+            ] + [[d.id, f"{d}"] for d in dev_qs]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
@@ -762,7 +762,7 @@ def event_create_view(request):
             dev_qs = request.user.devices.all()
         c = [
             ["", "---------"],
-        ] + [[d.id, d.aid] for d in dev_qs]
+        ] + [[d.id, f"{d}"] for d in dev_qs]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c
@@ -849,7 +849,7 @@ def event_edit_view(request, id):
             dev_qs = Device.objects.filter(id__in=all_devices)
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.aid] for d in dev_qs]
+            ] + [[d.id, f"{d}"] for d in dev_qs]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
@@ -868,7 +868,7 @@ def event_edit_view(request, id):
         dev_qs = Device.objects.filter(id__in=all_devices)
         c = [
             ["", "---------"],
-        ] + [[d.id, d.aid] for d in dev_qs]
+        ] + [[d.id, f"{d}"] for d in dev_qs]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c

@@ -5,7 +5,7 @@ from django.db.models import Case, Value, When
 from django.db.models.expressions import RawSQL
 from django.utils.timezone import now
 
-from routechoices.core.models import Device
+from routechoices.core.models import Device, DeviceArchiveReference
 from routechoices.lib.helpers import short_random_key
 
 
@@ -72,12 +72,15 @@ class Command(BaseCommand):
                     "latitudes": [locs["latitudes"][i] for i in archived_indexes],
                     "longitudes": [locs["longitudes"][i] for i in archived_indexes],
                 }
-                archive_dev = Device.objects.create(
-                    aid=short_random_key() + "_ARC",
+                archive_dev = Device(
+                    aid=f"{short_random_key()}_ARC",
                     is_gpx=True,
                 )
                 archive_dev.locations = archived_locs
                 archive_dev.save()
+                DeviceArchiveReference.objects.create(
+                    original_device=device, achive=archive
+                )
                 for competitor in competitors:
                     if competitor.start_time < last_start:
                         competitor.device = archive_dev

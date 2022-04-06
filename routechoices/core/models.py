@@ -899,6 +899,9 @@ class Device(models.Model):
         verbose_name_plural = "devices"
 
     def __str__(self):
+        original_device = self.get_original_device()
+        if original_device:
+            return f"{original_device.aid}*"
         return self.aid
 
     @property
@@ -1073,6 +1076,25 @@ class Device(models.Model):
         if c:
             return c.event
         return None
+
+    def get_original_device(self):
+        if (
+            self.aid.endswith("_ARC")
+            and hasattr(self, "original_ref")
+            and self.original_ref is not None
+        ):
+            return self.original_ref.original
+        return None
+
+
+class DeviceArchiveReference(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
+    archive = models.OneToOneField(
+        Device, related_name="original_ref", on_delete=models.CASCADE
+    )
+    original = models.ForeignKey(
+        Device, related_name="archives_ref", on_delete=models.CASCADE
+    )
 
 
 class ImeiDevice(models.Model):
