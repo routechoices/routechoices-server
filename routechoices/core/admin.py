@@ -294,9 +294,9 @@ class DeviceAdmin(admin.ModelAdmin):
 
 class DeviceArchiveReferenceAdmin(admin.ModelAdmin):
     list_display = (
-        "creation_date",
-        "original",
         "archive",
+        "original",
+        "creation_date",
     )
 
 

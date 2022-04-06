@@ -178,10 +178,22 @@ function showLocalTime(el) {
     prefix: "map_assignations",
     formCssClass: "extra_map_formset_row",
   });
+
   // next line must come after formset initialization
+  var hasArchivedDeivices = false;
   u('select[name$="-device"]').each(function (el) {
+    if (el.options[el.selectedIndex].text.endsWith("*")) {
+      hasArchivedDeivices = true;
+    }
     new TomSelect(el, seletizeOptions);
   });
+  if (hasArchivedDeivices) {
+    u(".add-competitor-btn")
+      .parent()
+      .append(
+        '<div class="form-text"><span>* Archive of original device</span></div>'
+      );
+  }
 
   var originalEventStart = u("#id_start_date").val();
   var competitorsStartTimeElsWithSameStartAsEvents = u(

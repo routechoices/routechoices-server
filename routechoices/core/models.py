@@ -899,6 +899,10 @@ class Device(models.Model):
         verbose_name_plural = "devices"
 
     def __str__(self):
+        return self.aid
+
+    @property
+    def display_str(self):
         original_device = self.get_original_device()
         if original_device:
             return f"{original_device.aid}*"
