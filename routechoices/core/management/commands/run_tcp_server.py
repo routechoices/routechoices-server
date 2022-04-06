@@ -243,7 +243,7 @@ class GL200Connection:
                             parts[13 + i * 12], "YYYYMMDDHHmmss"
                         ).int_timestamp
                     except Exception:
-                        pass
+                        continue
                     else:
                         pts.append((tim, lat, lon))
                 await self._on_data(pts)
@@ -284,7 +284,7 @@ class GL200Connection:
                             parts[13 + i * 12], "YYYYMMDDHHmmss"
                         ).int_timestamp
                     except Exception:
-                        pass
+                        continue
                     else:
                         pts.append((tim, lat, lon))
                 await self._on_data(pts)
