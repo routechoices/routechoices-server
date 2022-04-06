@@ -233,10 +233,14 @@ class GL200Connection:
         print(f"{self.imei} is connected")
         if parts[0][8:] != "INF":
             try:
-                lon = float(parts[11])
-                lat = float(parts[12])
-                tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
-                await self._on_data(tim, lat, lon)
+                nb_pts = int(parts[6])
+                pts = []
+                for i in range(nb_pts):
+                    lon = float(parts[11 + i * 12])
+                    lat = float(parts[12 + i * 12])
+                    tim = arrow.get(parts[13 + i * 12], "YYYYMMDDHHmmss").int_timestamp
+                    pts.append((tim, lat, lon))
+                await self._on_data(pts)
             except Exception:
                 self.stream.close()
                 return
@@ -264,10 +268,14 @@ class GL200Connection:
                 imei = parts[2]
                 if imei != self.imei:
                     raise Exception("Cannot change IMEI while connected")
-                lon = float(parts[11])
-                lat = float(parts[12])
-                tim = arrow.get(parts[13], "YYYYMMDDHHmmss").int_timestamp
-                await self._on_data(tim, lat, lon)
+                nb_pts = int(parts[6])
+                pts = []
+                for i in range(nb_pts):
+                    lon = float(parts[11 + i * 12])
+                    lat = float(parts[12 + i * 12])
+                    tim = arrow.get(parts[13 + i * 12], "YYYYMMDDHHmmss").int_timestamp
+                    pts.append((tim, lat, lon))
+                await self._on_data(pts)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
         except Exception:
@@ -278,10 +286,10 @@ class GL200Connection:
     def _on_close(self):
         print("client quit", self.address)
 
-    async def _on_data(self, timestamp, lat, lon):
+    async def _on_data(self, pts):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
-        loc_array = [(timestamp, lat, lon)]
+        loc_array = pts
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             loc_array
         )
