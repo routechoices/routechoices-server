@@ -487,6 +487,7 @@ SLUG_BLACKLIST = [
     "localhost",
     "lock",
     "login",
+    "logo",
     "logout",
     "lost-password",
     "mail",
