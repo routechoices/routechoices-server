@@ -25,6 +25,7 @@ def _get_device(imei):
 class TMT250Decoder:
     def __init__(self):
         self.packet = {}
+        self.battery_level = -1
 
     def generate_response(self, success=True):
         s = self.packet["num_data"] if success else 0
@@ -52,7 +53,12 @@ class TMT250Decoder:
             lat = unpack(">i", buffer[pointer + 13 : pointer + 17])[0] / 1e7
 
             n1 = buffer[pointer + 26]
-            pointer += 27 + n1 * 2
+            pointer += 27
+            for i in range(n1):
+                avl_id = buffer[pointer + i * 2]
+                if avl_id == 113:
+                    self.battery_level = buffer[pointer + 1 + i * 2]
+            pointer += n1 * 2
 
             n2 = buffer[pointer]
             pointer += 1 + 3 * n2
@@ -157,6 +163,8 @@ class TMT250Connection:
                 loc_array.append((int(r["timestamp"]), r["latlon"][0], r["latlon"][1]))
             if not self.db_device.user_agent:
                 self.db_device.user_agent = "Teltonika"
+            if self.decoder.battery_level != -1:
+                self.db_device.battery_level = self.decoder.battery_level
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
@@ -246,7 +254,8 @@ class GL200Connection:
                         continue
                     else:
                         pts.append((tim, lat, lon))
-                await self._on_data(pts)
+                batt = int(parts[nb_pts * 12 + 7])
+                await self._on_data(pts, batt)
             except Exception:
                 self.stream.close()
                 return
@@ -287,7 +296,8 @@ class GL200Connection:
                         continue
                     else:
                         pts.append((tim, lat, lon))
-                await self._on_data(pts)
+                batt = int(parts[nb_pts * 12 + 7])
+                await self._on_data(pts, batt)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
         except Exception:
@@ -298,9 +308,10 @@ class GL200Connection:
     def _on_close(self):
         print("client quit", self.address)
 
-    async def _on_data(self, pts):
+    async def _on_data(self, pts, batt):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
+        self.db_device.battery_level = batt
         loc_array = pts
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             loc_array
@@ -363,6 +374,7 @@ class TrackTapeConnection:
         print(f"{self.imei} is connected")
         locs = data.get("positions", [])
         loc_array = []
+        # TODO: Read battery level
         for loc in locs:
             try:
                 tim = arrow.get(loc.get("timestamp")).int_timestamp

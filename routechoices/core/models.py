@@ -892,6 +892,7 @@ class Device(models.Model):
         through_fields=("device", "user"),
     )
     locations_raw = models.TextField(blank=True, default="")
+    battery_level = models.PositiveIntegerField(null=True, default=None)
 
     class Meta:
         ordering = ["aid"]

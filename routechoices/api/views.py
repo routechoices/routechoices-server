@@ -947,6 +947,7 @@ def ip_latlon(request):
 @throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
     secret_provided = request.data.get("secret")
+    battery_level = request.data.get("battery")
     device_id = request.data.get("device_id")
     if not device_id:
         raise ValidationError("Missing device_id parameter")
@@ -988,8 +989,19 @@ def locations_api_gw(request):
             except DjangoValidationError:
                 raise ValidationError("Invalid latitude value")
             loc_array.append((tim, lat, lon))
+    if battery_level:
+        try:
+            battery_level = int(battery_level)
+            if battery_level < 0:
+                battery_level = None
+        except Exception:
+            battery_level = None
+    else:
+        battery_level = None
+    device.battery_level = battery_level
     if len(loc_array) > 0:
-        device.add_locations(loc_array)
+        device.add_locations(loc_array, save=False)
+    device.save()
     return Response({"status": "ok", "n": len(loc_array)})
 
 

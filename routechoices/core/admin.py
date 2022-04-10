@@ -222,6 +222,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "last_position_at",
         "last_position",
         "location_count",
+        "battery_level",
         "competitor_count",
     )
     actions = ["clean_positions"]
