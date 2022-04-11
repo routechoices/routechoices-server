@@ -26,7 +26,7 @@ from django.contrib.gis.geos import LinearRing, Polygon
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
-from django.core.validators import MinValueValidator, validate_slug
+from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
@@ -892,7 +892,9 @@ class Device(models.Model):
         through_fields=("device", "user"),
     )
     locations_raw = models.TextField(blank=True, default="")
-    battery_level = models.PositiveIntegerField(null=True, default=None)
+    battery_level = models.PositiveIntegerField(
+        null=True, default=None, validators=[MaxValueValidator(100)]
+    )
 
     class Meta:
         ordering = ["aid"]

@@ -992,10 +992,11 @@ def locations_api_gw(request):
     if battery_level:
         try:
             battery_level = int(battery_level)
-            if battery_level < 0:
-                battery_level = None
         except Exception:
             battery_level = None
+        else:
+            if battery_level < 0 or battery_level > 100:
+                battery_level = None
     else:
         battery_level = None
     device.battery_level = battery_level

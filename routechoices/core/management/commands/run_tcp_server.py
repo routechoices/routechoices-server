@@ -25,7 +25,7 @@ def _get_device(imei):
 class TMT250Decoder:
     def __init__(self):
         self.packet = {}
-        self.battery_level = -1
+        self.battery_level = None
 
     def generate_response(self, success=True):
         s = self.packet["num_data"] if success else 0
@@ -163,7 +163,7 @@ class TMT250Connection:
                 loc_array.append((int(r["timestamp"]), r["latlon"][0], r["latlon"][1]))
             if not self.db_device.user_agent:
                 self.db_device.user_agent = "Teltonika"
-            if self.decoder.battery_level != -1:
+            if self.decoder.battery_level:
                 self.db_device.battery_level = self.decoder.battery_level
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
