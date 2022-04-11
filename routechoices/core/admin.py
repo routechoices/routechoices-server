@@ -30,14 +30,14 @@ from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
-    title = "When Was It Modified"
+    title = "when was it wodified"
     parameter_name = "modified"
 
     def lookups(self, request, model_admin):
         return [
+            ("whenever", "All"),
             (None, "Today"),
-            ("week", "This Week"),
-            ("all", "All"),
+            ("last_week", "This Week"),
         ]
 
     def choices(self, cl):
@@ -55,7 +55,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         from_date = arrow.utcnow().shift(days=-1).datetime
-        if self.value() == "week":
+        if self.value() == "last_week":
             from_date = arrow.utcnow().shift(weeks=-1).datetime
             return queryset.filter(modification_date__gte=from_date)
         elif self.value():
@@ -64,48 +64,48 @@ class ModifiedDateFilter(admin.SimpleListFilter):
 
 
 class HasLocationFilter(admin.SimpleListFilter):
-    title = "Wether It Has Locations"
+    title = "wether it has locations"
     parameter_name = "has_locations"
 
     def lookups(self, request, model_admin):
         return [
-            ("has_locations", "With locations"),
-            ("has_no_locations", "Without locations"),
+            ("true", "With locations"),
+            ("false", "Without locations"),
         ]
 
     def queryset(self, request, queryset):
-        if self.value() == "has_no_locations":
+        if self.value() == "false":
             return queryset.filter(location_count_sql=0)
         elif self.value():
             return queryset.filter(location_count_sql__gt=0)
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
-    title = "Wether It Has Competitors"
+    title = "wether it has competitors associated with"
     parameter_name = "has_competitors"
 
     def lookups(self, request, model_admin):
         return [
-            ("has_competitors", "With competitors"),
-            ("has_no_competitors", "Without competitors"),
+            ("true", "With competitors"),
+            ("false", "Without competitors"),
         ]
 
     def queryset(self, request, queryset):
-        if self.value() == "has_no_competitors":
+        if self.value() == "false":
             return queryset.filter(competitor_count=0)
         elif self.value():
             return queryset.filter(competitor_count__gt=0)
 
 
 class IsGPXFilter(admin.SimpleListFilter):
-    title = "Wether It Is From An External System"
-    parameter_name = "is_live"
+    title = "wether it is an actual device"
+    parameter_name = "device_type"
 
     def lookups(self, request, model_admin):
         return [
-            (None, "Supported Device"),
-            ("gpx", "External Device"),
             ("all", "All"),
+            (None, "Real Devices"),
+            ("fake", "Fake Devices"),
         ]
 
     def choices(self, cl):
@@ -122,7 +122,7 @@ class IsGPXFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() == "gpx":
+        if self.value() == "fake":
             return queryset.filter(is_gpx=True)
         elif self.value():
             return queryset.all()

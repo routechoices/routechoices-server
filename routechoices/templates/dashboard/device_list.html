@@ -13,13 +13,13 @@
             <p>You haven't added any devices as yours yet.</p>
         {% else %}
         <table class="table table-striped">
-            <tr><th>Device ID</th><th>Last Date Seen</th><th>Last Position Coordinates</th><th>Battery %</th><th>Last Used</th><th>Action</th></tr>
+            <tr><th>Device ID</th><th>Last Date Seen</th><th>Position</th><th>Battery %</th><th>Last Used By</th><th>Action</th></tr>
             {% for device in devices %}
             <tr>
                 <td><button class="btn btn-sm copy-btn btn-dark" data-value="{{ device.aid }}">{{ device.aid }} <i class="fa fa-copy"></i></button></td>
                 <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_date_viewed|date:"c"}}">{{device.last_date_viewed|date:'Y-m-d H:i:s'}} UTC</span>{% else %}-{% endif %}</td>
-                <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }}{% else %}-{% endif %}</td>
-                <td>{% if device.battery_level %}{{ device.battery_level }}%{% else %}-{% endif %}</td>
+                <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }} <a class="btn btn-sm" target="_blank" rel="noreferrer" href="http://www.openstreetmap.org/?mlat={{ device.last_position.0 }}&mlon={{ device.last_position.1 }}"><i class="fa fa-external-link"></i></a>{% else %}-{% endif %}</td>
+                <td>{% if device.battery_level %}{{ device.battery_level }}% <i class="fa fa-battery-{{ device.battery_level_0_4 }}" style="color: {% if device.battery_level_0_4 == 0 %}red{% elif device.battery_level_0_4 == 1 %}orange{% elif device.battery_level_0_4 == 2 %}#EFCC00{% else %}green{% endif%}"></i>{% else %}-{% endif %}</td>
                 <td>{% if last_usage|hash:device.id %}{{ last_usage|hash:device.id }}{% else %}-{% endif %}</td>
                 <td><a class="btn btn-danger" href="{% url 'dashboard:device_remove_view' id=device.aid %}"><i class="fa fa-times"></i> Remove</a></td>
             </tr>

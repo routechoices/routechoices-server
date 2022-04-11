@@ -912,6 +912,10 @@ class Device(models.Model):
         return self.aid
 
     @property
+    def battery_level_0_4(self):
+        return round(self.battery_level / 25)
+
+    @property
     def locations(self):
         if not self.locations_raw:
             return {"timestamps": [], "latitudes": [], "longitudes": []}
