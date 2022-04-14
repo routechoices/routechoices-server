@@ -1689,19 +1689,23 @@ var drawCompetitors = function () {
       if (!hasPointInTail) {
         competitor.speedometer.text("--'--\"/km");
       } else {
-        var distance = 0;
-        var prevPos = null;
-        tail30s.getArray().forEach(function (pos) {
-          if (prevPos && !isNaN(pos.coords.latitude)) {
-            distance += pos.distance(prevPos);
-          }
-          prevPos = pos;
-        });
-        var speed = (30 / distance) * 1000;
-        competitor.speedometer.text(formatSpeed(speed));
+        if (checkVisible(competitor.speedometer.nodes[0])) {
+          var distance = 0;
+          var prevPos = null;
+          tail30s.getArray().forEach(function (pos) {
+            if (prevPos && !isNaN(pos.coords.latitude)) {
+              distance += pos.distance(prevPos);
+            }
+            prevPos = pos;
+          });
+          var speed = (30 / distance) * 1000;
+          competitor.speedometer.text(formatSpeed(speed));
+        }
       }
-      var totalDistance = route.distanceUntil(viewedTime);
-      competitor.odometer.text((totalDistance / 1000).toFixed(1) + "km");
+      if (checkVisible(competitor.odometer.nodes[0])) {
+        var totalDistance = route.distanceUntil(viewedTime);
+        competitor.odometer.text((totalDistance / 1000).toFixed(1) + "km");
+      }
     }
   });
 
@@ -1866,6 +1870,15 @@ function formatSpeed(s) {
     return "--'--\"/km";
   }
   return min + "'" + ("0" + sec).slice(-2) + '"/km';
+}
+
+function checkVisible(elm) {
+  var rect = elm.getBoundingClientRect();
+  var viewHeight = Math.max(
+    document.documentElement.clientHeight,
+    window.innerHeight
+  );
+  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
 }
 
 function getParameterByName(name) {
