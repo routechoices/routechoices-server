@@ -12,7 +12,9 @@ schema_view = get_schema_view(
         description="Routechoices.com API",
         terms_of_service="https://www.routechoices.com/tos/",
         contact=openapi.Contact(email="info@routechoices.com"),
-        license=openapi.License(name="BSD License"),
+        license=openapi.License(
+            name="GPLv3", url="https://www.gnu.org/licenses/gpl-3.0.en.html"
+        ),
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
