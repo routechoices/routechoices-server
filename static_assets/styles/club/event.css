@@ -168,7 +168,10 @@ img.emoji {
   vertical-align: -0.2em;
 }
 
-.speedometer {
+.speedometer,
+.odometer {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
+  color: #666;
+  font-size: 0.6em;
 }

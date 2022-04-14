@@ -260,6 +260,18 @@ var PositionArchive = function () {
       return now - positions[0].timestamp;
     }
   };
+  this.distanceUntil = function (t) {
+    var result = 0;
+    if (this.getPositionsCount() === 0) {
+      return 0;
+    }
+    var npositions = this.extractInterval(positions[0].timestamp, +t);
+    var nn = npositions.getPositionsCount();
+    for (var i = 0; i < nn - 1; i++) {
+      result += npositions.getByIndex(i).distance(npositions.getByIndex(i + 1));
+    }
+    return result;
+  };
 };
 
 PositionArchive.fromEncoded = function (encoded) {

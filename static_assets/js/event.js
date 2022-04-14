@@ -657,7 +657,7 @@ var displayCompetitorList = function (force) {
         (competitor.isShown ? "on" : "off") +
         '"></i></button>\
           <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus"><i class="fa fa-map-marker"></i></button>\
-          <span><small class="speedometer"></small></span>\
+          <span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
         </div>\
         </div>'
     );
@@ -742,6 +742,7 @@ var displayCompetitorList = function (force) {
     }
     competitor.div = div;
     competitor.speedometer = div.find(".speedometer");
+    competitor.odometer = div.find(".odometer");
   });
   if (competitorList.length === 0) {
     var div = u("<div/>");
@@ -1686,7 +1687,7 @@ var drawCompetitors = function () {
         viewedTime
       );
       if (!hasPointInTail) {
-        competitor.speedometer.text("");
+        competitor.speedometer.text("--'--\"/km");
       } else {
         var distance = 0;
         var prevPos = null;
@@ -1699,6 +1700,8 @@ var drawCompetitors = function () {
         var speed = (30 / distance) * 1000;
         competitor.speedometer.text(formatSpeed(speed));
       }
+      var totalDistance = route.distanceUntil(viewedTime);
+      competitor.odometer.text((totalDistance / 1000).toFixed(1) + "km");
     }
   });
 
