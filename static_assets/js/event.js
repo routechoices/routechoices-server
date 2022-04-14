@@ -657,7 +657,7 @@ var displayCompetitorList = function (force) {
         (competitor.isShown ? "on" : "off") +
         '"></i></button>\
           <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus"><i class="fa fa-map-marker"></i></button>\
-          <span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
+          <span class="float-end"><small class="speedometer">--\'--"/km</small> <small class="odometer"></small></span>\
         </div>\
         </div>'
     );
