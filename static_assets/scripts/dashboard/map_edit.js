@@ -12,7 +12,7 @@ var extractCornersCoordsFromFilename = function (filename) {
 };
 (function () {
   u("#id_image").on("change", function () {
-    if (this.files[0].size > 1e7) {
+    if (this.files.length > 0 && this.files[0].size > 1e7) {
       swal({
         title: "Error!",
         text: "File is too big!",
@@ -21,7 +21,7 @@ var extractCornersCoordsFromFilename = function (filename) {
       });
       this.value = "";
     }
-    if (this.value) {
+    if (this.files.length > 0 && this.value) {
       var bounds = extractCornersCoordsFromFilename(this.files[0].name);
       if (bounds && !u("#id_corners_coordinates").val()) {
         u("#id_corners_coordinates").val(bounds);
