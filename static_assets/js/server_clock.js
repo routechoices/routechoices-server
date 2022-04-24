@@ -50,7 +50,8 @@ var ServerClock = function (opts) {
             .then(function (r) {
               return r.json();
             })
-            .then(onServerResponse(clientRequestTime));
+            .then(onServerResponse(clientRequestTime))
+            .catch(function () {});
         }
       })();
     })();
