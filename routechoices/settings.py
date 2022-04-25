@@ -127,16 +127,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "routechoices.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "app_db",
-        "USER": "app_user",
-        "PASSWORD": "changeme",
-        "HOST": "db",
-        "PORT": "",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",
     }
 }
 

@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
 from routechoices.core.models import (
+    IS_DB_SQLITE,
     ChatMessage,
     Club,
     Competitor,
@@ -206,7 +207,10 @@ class DevicePaginator(Paginator):
             location_count_sql=Case(
                 When(locations_raw="", then=Value(0)),
                 default=RawSQL(
-                    "json_array_length(locations_raw::json->'timestamps')", ()
+                    'json_array_length(locations_raw, "$.timestamps")'
+                    if IS_DB_SQLITE
+                    else "json_array_length(locations_raw::json->'timestamps')",
+                    (),
                 ),
             )
         )
@@ -249,14 +253,22 @@ class DeviceAdmin(admin.ModelAdmin):
             .annotate(
                 last_position_at=Case(
                     When(locations_raw="", then=Value("")),
-                    default=RawSQL("locations_raw::json->'timestamps'->>-1", ()),
+                    default=RawSQL(
+                        'json_extract(locations_raw, "$.timestamps[#-1]")'
+                        if IS_DB_SQLITE
+                        else "locations_raw::json->'timestamps'->>-1",
+                        (),
+                    ),
                 )
             )
             .annotate(
                 location_count_sql=Case(
                     When(locations_raw="", then=Value(0)),
                     default=RawSQL(
-                        "json_array_length(locations_raw::json->'timestamps')", ()
+                        'json_array_length(json_extract(locations_raw, "$.timestamps"))'
+                        if IS_DB_SQLITE
+                        else "json_array_length(locations_raw::json->'timestamps')",
+                        (),
                     ),
                 )
             )

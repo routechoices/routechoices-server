@@ -1,15 +1,5 @@
 version: '3.7'
 services:
-  db:
-    container_name: rc_postgres
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: app_db
-      POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: changeme
-    restart: always
-    expose:
-      - "5432"
   minio:
     container_name: rc_minio
     image: minio/minio:edge
@@ -57,7 +47,6 @@ services:
       - "2000"
       - "2002"
     links:
-      - db
       - minio
       - smtp
     command: ['/venv/bin/python3.10', './manage.py', 'runserver', '0.0.0.0:8000']

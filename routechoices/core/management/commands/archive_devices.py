@@ -5,7 +5,7 @@ from django.db.models import Case, Value, When
 from django.db.models.expressions import RawSQL
 from django.utils.timezone import now
 
-from routechoices.core.models import Device, DeviceArchiveReference
+from routechoices.core.models import IS_DB_SQLITE, Device, DeviceArchiveReference
 from routechoices.lib.helpers import short_random_key
 
 
@@ -21,7 +21,10 @@ class Command(BaseCommand):
             location_count_sql=Case(
                 When(locations_raw="", then=Value(0)),
                 default=RawSQL(
-                    "json_array_length(locations_raw::json->'timestamps')", ()
+                    'json_array_length(locations_raw, "$.timestamps")'
+                    if IS_DB_SQLITE
+                    else "json_array_length(locations_raw::json->'timestamps')",
+                    (),
                 ),
             )
         ).filter(location_count_sql__gt=3600 * 24)
