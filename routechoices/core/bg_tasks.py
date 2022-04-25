@@ -839,20 +839,30 @@ def draw_livelox_route(name, club, url, bound, routes, res):
 
 @background(schedule=0)
 def import_single_event_from_livelox(class_id):
+    livelox_headers = {
+        "content-type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+    }
     club = get_livelox_club()
-    r = requests.post(
-        "https://www.livelox.com/Data/ClassBlob",
-        data={
-            "classIds": [class_id],
-            "courseIds": None,
-            "relayLegs": [],
-            "relayLegGroupIds": [],
-            "routeReductionProperties": {"distanceTolerance": 1, "speedTolerance": 0.1},
-            "includeMap": True,
-            "includeCourses": True,
-            "skipStoreInCache": False,
-        },
+    r_info = requests.post(
+        "https://www.livelox.com/Data/ClassInfo",
+        data=json.dumps(
+            {
+                "classIds": [class_id],
+                "courseIds": [],
+                "relayLegs": [],
+                "relayLegGroupIds": [],
+            }
+        ),
+        headers=livelox_headers,
     )
+    if r_info.status_code != 200:
+        raise EventImportError("Can not fetch data")
+    event_data = r_info.json().get("general", {})
+    blob_url = event_data.get("classBlobUrl")
+    if not blob_url or not blob_url.startswith("https://livelox.blob.core.windows.net"):
+        raise EventImportError("Can not fetch data")
+    r = requests.get(blob_url, headers=livelox_headers)
     if r.status_code != 200:
         raise EventImportError("Can not fetch data")
     data = r.json()
@@ -875,25 +885,13 @@ def import_single_event_from_livelox(class_id):
     participant_data = [d for d in data["participants"] if d.get("routeData")]
     time_offset = 22089888e5
 
-    r = requests.post(
-        "https://www.livelox.com/Data/ClassInfo",
-        data={
-            "classIds": [class_id],
-            "courseIds": [],
-            "relayLegs": [],
-            "relayLegGroupIds": [],
-        },
+    event_name = (
+        f"{event_data['class']['event']['name']} - {event_data['class']['name']}"
     )
-    if r.status_code != 200:
-        raise EventImportError("Can not fetch event data")
-    event_data = r.json()
-    event_name = f"{event_data['general']['class']['event']['name']} - {event_data['general']['class']['name']}"
     event_start = arrow.get(
-        event_data["general"]["class"]["event"]["timeInterval"]["start"]
+        event_data["class"]["event"]["timeInterval"]["start"]
     ).datetime
-    event_end = arrow.get(
-        event_data["general"]["class"]["event"]["timeInterval"]["end"]
-    ).datetime
+    event_end = arrow.get(event_data["class"]["event"]["timeInterval"]["end"]).datetime
     event, created = Event.objects.get_or_create(
         club=club,
         slug=f"{class_id}",
@@ -921,6 +919,8 @@ def import_single_event_from_livelox(class_id):
         lon = 0
         t = -time_offset
         pts = []
+        if not p.get("routeData"):
+            continue
         p_data = p["routeData"][1:]
         min_t = None
         for i in range((len(p_data) - 1) // 3):
