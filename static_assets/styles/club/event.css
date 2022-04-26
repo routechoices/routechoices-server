@@ -175,3 +175,11 @@ img.emoji {
   color: #666;
   font-size: 0.6em;
 }
+
+#live_button {
+  background-color: #8e1600;
+}
+
+#live_button.active {
+  background-color: #e50000;
+}
