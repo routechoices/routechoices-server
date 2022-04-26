@@ -103,6 +103,10 @@
       url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
       options: { attribution: "&copy; OpenTopoMap (CC-BY-SA)" },
     });
+    L.TileLayer["world-topo-alt"] = L.TileLayer.Common.extend({
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+      options: { attribution: "&copy; Argis Online" },
+    });
     L.TileLayer["mapant-no"] = L.TileLayer.Common.extend({
       url: "https://mapant.no/osm-tiles/{z}/{x}/{y}.png",
       options: { attribution: "&copy; MapAnt.no" },
@@ -126,7 +130,8 @@
     baseLayers["Mapant Spain"] = L.TileLayer["mapant-es"];
     baseLayers["Topo Finland"] = new L.TileLayer["finland-topo"]();
     baseLayers["Topo Norway"] = new L.TileLayer["norway-topo"]();
-    baseLayers["Topo World"] = new L.TileLayer["world-topo"]();
+    baseLayers["Topo World (OpenTopo)"] = new L.TileLayer["world-topo"]();
+    baseLayers["Topo World (Arcgis)"] = new L.TileLayer["world-topo-alt"]();
 
     map.addLayer(defaultLayer);
     var bounds = corners_latlng;
