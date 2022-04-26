@@ -178,8 +178,11 @@ img.emoji {
 
 #live_button {
   background-color: #8e1600;
+  border-color: #8e1600;
+  text-transform: uppercase;
 }
 
 #live_button.active {
   background-color: #e50000;
+  border-color: #e50000;
 }
