@@ -28,6 +28,7 @@ from PIL import Image
 
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
+    IS_DB_SQLITE,
     Club,
     Competitor,
     Device,
@@ -171,8 +172,19 @@ def device_list_view(request):
         Competitor.objects.select_related("event")
         .filter(device__in=devices_listed, start_time__lt=now())
         .order_by("device_id", "-start_time")
-        .distinct("device_id")
     )
+
+    if not IS_DB_SQLITE:
+        competitors = competitors.distinct("device_id")
+    else:
+        unique_devid = set()
+        unique_competitors = []
+        for c in competitors:
+            if c.device_id not in unique_devid:
+                unique_devid.add(c.device_id)
+                unique_competitors.append(c)
+        competitors = unique_competitors
+
     last_usage = {}
     for competitor in competitors:
         last_usage[competitor.device_id] = f"{competitor.event} ({competitor})"
