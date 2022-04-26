@@ -13,6 +13,7 @@
         {% if not maps %}
             <p>You haven't created any map yet.</p>
         {% else %}
+        {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
             <tr><th>Name</th><th>Club</th><th>Download</th></tr>
             {% for map in maps %}

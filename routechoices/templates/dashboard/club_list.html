@@ -10,6 +10,7 @@
         {% if not clubs %}
             <p>You haven't created any club yet.</p>
         {% else %}
+        {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
             <tr><th>Name</th></tr>
             {% for club in clubs %}

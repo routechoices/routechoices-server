@@ -12,6 +12,7 @@
         {% if not devices %}
             <p>You haven't added any devices as yours yet.</p>
         {% else %}
+        {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
             <tr><th>Device ID</th><th>Last Date Seen</th><th>Position</th><th>Battery %</th><th>Last Used By</th><th>Action</th></tr>
             {% for device in devices %}
