@@ -1219,7 +1219,7 @@
                 .getElementsByTagName('div');
             switcher.setAttribute(Namespace.css.daysContainer, this._context._viewDate.format({
                 month: this._context._options.localization.dayViewHeaderFormat,
-            }));
+            }) + " " + this._context._viewDate.getFullYear());
             this._context._validation.isValid(this._context._viewDate.clone.manipulate(-1, Unit.month), Unit.month)
                 ? previous.classList.remove(Namespace.css.disabled)
                 : previous.classList.add(Namespace.css.disabled);
@@ -2261,9 +2261,6 @@
                     previous.setAttribute('title', this._context._options.localization.previousMonth);
                     switcher.setAttribute('title', this._context._options.localization.selectMonth);
                     next.setAttribute('title', this._context._options.localization.nextMonth);
-                    switcher.innerText = this._context._viewDate.format({
-                        month: this._context._options.localization.dayViewHeaderFormat,
-                    });
                     break;
             }
             switcher.innerText = switcher.getAttribute(showing);
