@@ -73,7 +73,7 @@
                     break;
                 case 'weekDay':
                     this.startOf(Unit.date);
-                    this.manipulate(0 - this.weekDay, Unit.date);
+                    this.manipulate(1 - (this.weekDay === 0 ? 7 : this.weekDay), Unit.date);
                     break;
                 case 'month':
                     this.startOf(Unit.date);
@@ -110,7 +110,7 @@
                     break;
                 case 'weekDay':
                     this.startOf(Unit.date);
-                    this.manipulate(6 - this.weekDay, Unit.date);
+                    this.manipulate(7 - (this.weekDay === 0 ? 7 : this.weekDay), Unit.date);
                     break;
                 case 'month':
                     this.endOf(Unit.date);
@@ -1274,6 +1274,7 @@
          */
         _daysOfTheWeek() {
             let innerDate = this._context._viewDate.clone
+                .startOf('month')
                 .startOf('weekDay')
                 .startOf(Unit.date);
             const row = [];
