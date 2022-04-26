@@ -846,7 +846,7 @@ class Migration(migrations.Migration):
                     ("topo-fi", "Topo Finland"),
                     ("topo-no", "Topo Norway"),
                     ("topo-world", "Topo World (OpenTopo)"),
-                    ("topo-world-alt", "Topo World (Arcgis)"),
+                    ("topo-world-alt", "Topo World (ArcGIS)"),
                 ],
                 default="blank",
                 max_length=16,

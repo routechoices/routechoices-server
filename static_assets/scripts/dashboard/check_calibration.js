@@ -131,7 +131,7 @@
     baseLayers["Topo Finland"] = new L.TileLayer["finland-topo"]();
     baseLayers["Topo Norway"] = new L.TileLayer["norway-topo"]();
     baseLayers["Topo World (OpenTopo)"] = new L.TileLayer["world-topo"]();
-    baseLayers["Topo World (Arcgis)"] = new L.TileLayer["world-topo-alt"]();
+    baseLayers["Topo World (ArcGIS)"] = new L.TileLayer["world-topo-alt"]();
 
     map.addLayer(defaultLayer);
     var bounds = corners_latlng;

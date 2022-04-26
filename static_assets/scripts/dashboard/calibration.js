@@ -169,7 +169,7 @@ function project(m, x, y) {
   });
   L.TileLayer["world-topo-alt"] = L.TileLayer.Common.extend({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-    options: { attribution: "&copy; Arcgis Online" },
+    options: { attribution: "&copy; ArcGIS Online" },
   });
   L.TileLayer["mapant-no"] = L.TileLayer.Common.extend({
     url: "https://mapant.no/osm-tiles/{z}/{x}/{y}.png",
@@ -274,7 +274,7 @@ function project(m, x, y) {
     baseLayers["Topo Finland"] = new L.TileLayer["finland-topo"]();
     baseLayers["Topo Norway"] = new L.TileLayer["norway-topo"]();
     baseLayers["Topo World (OpenTopo)"] = new L.TileLayer["world-topo"]();
-    baseLayers["Topo World (Arcgis)"] = new L.TileLayer["world-topo-alt"]();
+    baseLayers["Topo World (ArcGIS)"] = new L.TileLayer["world-topo-alt"]();
 
     map_b.addLayer(defaultLayer);
     map_b.addControl(new L.Control.Layers(baseLayers));
@@ -301,7 +301,7 @@ function project(m, x, y) {
     baseLayers["Topo Finland"] = new L.TileLayer["finland-topo"]();
     baseLayers["Topo Norway"] = new L.TileLayer["norway-topo"]();
     baseLayers["Topo World (OpenTopo)"] = new L.TileLayer["world-topo"]();
-    baseLayers["Topo World (Arcgis)"] = new L.TileLayer["world-topo-alt"]();
+    baseLayers["Topo World (ArcGIS)"] = new L.TileLayer["world-topo-alt"]();
 
     map_c.addLayer(defaultLayer);
     map_c.addControl(

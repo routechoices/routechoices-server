@@ -708,7 +708,7 @@ MAP_CHOICES = (
     (MAP_TOPO_FI, "Topo Finland"),
     (MAP_TOPO_NO, "Topo Norway"),
     (MAP_TOPO_WRLD, "Topo World (OpenTopo)"),
-    (MAP_TOPO_WRLD_ALT, "Topo World (Arcgis)"),
+    (MAP_TOPO_WRLD_ALT, "Topo World (ArcGIS)"),
 )
 
 

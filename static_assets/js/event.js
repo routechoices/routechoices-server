@@ -306,7 +306,7 @@ backdropMaps["topo-world"] = L.tileLayer(
 backdropMaps["topo-world-alt"] = L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   {
-    attribution: "&copy; Arcgis Online",
+    attribution: "&copy; ArcGIS Online",
   }
 );
 
