@@ -357,6 +357,16 @@ class Map(models.Model):
 
     @property
     def thumbnail(self):
+        cache_key = f"thumb_{self.aid}_{self.hash}"
+        use_cache = getattr(settings, "CACHE_THUMBS", False)
+        cached = None
+        if use_cache:
+            try:
+                cached = cache.get(cache_key)
+            except Exception:
+                pass
+        if use_cache and cached:
+            return cached
         orig = self.image.open("rb").read()
         img = Image.open(BytesIO(orig))
         if img.mode != "RGB":
@@ -375,7 +385,15 @@ class Map(models.Model):
                 int(self.height) / 2 - 158,
             ),
         )
-        return img
+        buffer = BytesIO()
+        img.save(buffer, "JPEG", quality=80)
+        data_out = buffer.getvalue()
+        if use_cache:
+            try:
+                cache.set(cache_key, data_out, 3600 * 24 * 30)
+            except Exception:
+                pass
+        return data_out
 
     @property
     def size(self):

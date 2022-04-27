@@ -1207,9 +1207,8 @@ def event_map_thumb_download(request, event_id):
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
-    response = HttpResponse(content_type="image/jpeg", headers=headers)
-    raster_map.thumbnail.save(response, "JPEG", quality=80)
-    return response
+    data_out = raster_map.thumbnail
+    return HttpResponse(data_out, content_type="image/jpeg", headers=headers)
 
 
 @swagger_auto_schema(
@@ -1496,7 +1495,7 @@ def two_d_rerun_race_data(request):
     )
 
 
-def tile_latest_modifaction(request):
+def tile_latest_modification(request):
     if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
         layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
         if not layers_raw:
@@ -1535,7 +1534,7 @@ def tile_latest_modifaction(request):
     return None
 
 
-@last_modified(tile_latest_modifaction)
+@last_modified(tile_latest_modification)
 def wms_service(request):
     if "WMS" not in [request.GET.get("service"), request.GET.get("SERVICE")]:
         return HttpResponseBadRequest("Service must be WMS")
