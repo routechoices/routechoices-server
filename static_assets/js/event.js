@@ -912,22 +912,22 @@ var displayChat = function (ev) {
             withCredentials: true,
             method: "post",
             type: "json",
-          })
-            .success(function () {
+            success: function () {
               u("#chatMessage").val("");
               document.getElementById("chatMessage").focus();
-            })
-            .fail(function () {
+            },
+            fail: function () {
               swal({
                 title: banana.i18n("error-sending-msg"),
                 text: "",
                 type: "error",
                 confirmButtonText: "OK",
               });
-            })
-            .always(function () {
+            },
+            complete: function () {
               u("#chatSubmitBtn").val(banana.i18n("send"));
-            });
+            },
+          });
         })
     );
   } else {
