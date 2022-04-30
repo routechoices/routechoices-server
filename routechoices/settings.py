@@ -888,7 +888,7 @@ CSP_CHILD_SRC = ("'self'", "blob:")
 CSRF_TRUSTED_ORIGINS = [
     "https://*.routechoices.dev:8081",
 ]
-CSRF_USE_SESSIONS = False
+CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = False
 
 COMPRESS_ENABLED = True
