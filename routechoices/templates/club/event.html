@@ -38,7 +38,9 @@
 
 {% block body %}
 <!-- Fixed navbar -->
+{% with is_event_page=True %}
 {% include "club/navbar.html" %}
+{% endwith %}
 
 <div class="container-fluid">
   <div class="row">

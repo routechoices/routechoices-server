@@ -4,7 +4,7 @@
 <footer id="myFooter" {% if is_event_page %}style="z-index: 110002;position: absolute; bottom: 0;width: 100%;"{% endif %}>
     <div class="second-bar">
         <div class="container{% if is_event_page %}-fluid{% endif %}">
-            <h2 class="logosmall site-name"><a href="{% host_url 'site:home_view' host 'www'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35" style="vertical-align: top;"> Powered by {{site.name}}</a></h2>
+            <h2 class="logosmall site-name"><a {% if is_event_page %}target="_blank"{% endif %} href="{% host_url 'site:home_view' host 'www'%}"><img src="{% static 'img/logo.svg' %}" alt="_" height="35" style="vertical-align: top;"> Powered by {{site.name}}</a></h2>
         </div>
     </div>
 </footer>
