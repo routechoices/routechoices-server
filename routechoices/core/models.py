@@ -813,6 +813,7 @@ class Event(models.Model):
     tail_length = models.PositiveIntegerField(
         "Tail length (seconds)",
         default=60,
+        help_text="Default tail length when a user open the event. Can be overriden by the viewers in the event page settings tab.",
     )
 
     class Meta:
