@@ -8,6 +8,7 @@ from django.db.models.functions import ExtractMonth, ExtractYear
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
 
 from routechoices.api.views import serve_from_s3
@@ -153,6 +154,7 @@ def club_live_event_feed(request, **kwargs):
     return feeds.club_live_event_feed(request, **kwargs)
 
 
+@xframe_options_exempt
 def event_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
         "event_view", kwargs.get("club_slug"), slug=slug
