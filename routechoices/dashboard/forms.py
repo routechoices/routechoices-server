@@ -16,6 +16,7 @@ from django.forms import (
 from PIL import Image
 
 from routechoices.core.models import (
+    WEBP_MAX_SIZE,
     Club,
     Competitor,
     Device,
@@ -117,6 +118,8 @@ class MapForm(ModelForm):
                 new_w = image.size[0] * scale
                 new_h = image.size[1] * scale
                 rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
+            if rgba_img.size[0] > WEBP_MAX_SIZE or rgba_img.size[1] > WEBP_MAX_SIZE:
+                raise ValidationError("Image too large")
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),

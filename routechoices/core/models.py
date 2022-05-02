@@ -68,6 +68,8 @@ logger = logging.getLogger(__name__)
 GLOBAL_MERCATOR = GlobalMercator()
 EVENT_CACHE_INTERVAL = 5
 
+WEBP_MAX_SIZE = 16383
+
 LOCATION_TIMESTAMP_INDEX = 0
 LOCATION_LATITUDE_INDEX = 1
 LOCATION_LONGITUDE_INDEX = 2
@@ -79,6 +81,10 @@ if settings.DATABASES["default"]["ENGINE"] not in (
     raise Exception("DB not supported")
 
 IS_DB_SQLITE = settings.DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3"
+
+
+class ImageTooLargeException(Exception):
+    pass
 
 
 class Point:
@@ -596,6 +602,8 @@ class Map(models.Model):
                 new_w = image.size[0] * scale
                 new_h = image.size[1] * scale
                 rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
+            if rgba_img.size[0] > WEBP_MAX_SIZE or rgba_img.size[1] > WEBP_MAX_SIZE:
+                raise ImageTooLargeException()
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),

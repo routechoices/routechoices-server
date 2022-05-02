@@ -34,6 +34,7 @@ from routechoices.core.models import (
     Device,
     DeviceOwnership,
     Event,
+    ImageTooLargeException,
     Map,
     Notice,
 )
@@ -623,6 +624,8 @@ def map_kmz_upload_view(request):
                     new_map.strip_exif()
                 except Image.DecompressionBombError:
                     error = "Image is too large, try to use lower resolution."
+                except ImageTooLargeException:
+                    error = "Image is too large"
                 else:
                     new_map.save()
             if error:
