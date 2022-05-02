@@ -1091,17 +1091,17 @@ var displayOptions = function (ev) {
   u(mainDiv)
     .find(".tailLengthControl")
     .on("input", function (e) {
-      var h = parseInt(u(tailLengthHoursInput).val() || 0);
-      var m = parseInt(u(tailLengthMinutesInput).val() || 0);
-      var s = parseInt(u(tailLengthSecondsInput).val() || 0);
+      var h = parseInt(u("#tailLengthHoursInput").val() || 0);
+      var m = parseInt(u("#tailLengthMinutesInput").val() || 0);
+      var s = parseInt(u("#tailLengthSecondsInput").val() || 0);
       var v = 3600 * h + 60 * m + s;
       if (isNaN(v)) {
         return;
       }
       tailLength = Math.max(0, v);
-      u(tailLengthHoursInput).val(Math.floor(tailLength / 3600));
-      u(tailLengthMinutesInput).val(Math.floor((tailLength / 60) % 60));
-      u(tailLengthSecondsInput).val(Math.floor(tailLength % 60));
+      u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
+      u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
+      u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
     });
   u(mainDiv)
     .find(".toggle_cluster_btn")

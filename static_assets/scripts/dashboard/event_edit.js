@@ -234,4 +234,37 @@ function showLocalTime(el) {
         u(el).val(newValue);
       });
     });
+
+  var tailLength = u("#id_tail_length").addClass("d-none").val();
+  u('[for="id_tail_length"]').text("Tail length (Hours, Minutes, Seconds)");
+  var tailLengthInput = u(
+    '<div class="row g-3">' +
+      '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
+      Math.floor(tailLength / 3600) +
+      '"/></div>' +
+      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
+      (Math.floor(tailLength / 60) % 60) +
+      '"/></div>' +
+      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
+      (tailLength % 60) +
+      '"/></div>' +
+      "</div>"
+  );
+  u("#id_tail_length").after(tailLengthInput);
+  u(tailLengthInput)
+    .find(".tailLengthControl")
+    .on("input", function (e) {
+      var h = parseInt(u("#tailLengthHoursInput").val() || 0);
+      var m = parseInt(u("#tailLengthMinutesInput").val() || 0);
+      var s = parseInt(u("#tailLengthSecondsInput").val() || 0);
+      var v = 3600 * h + 60 * m + s;
+      if (isNaN(v)) {
+        return;
+      }
+      tailLength = Math.max(0, v);
+      u("#id_tail_length").val(tailLength);
+      u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
+      u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
+      u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
+    });
 })();
