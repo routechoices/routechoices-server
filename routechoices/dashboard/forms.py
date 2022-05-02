@@ -152,6 +152,7 @@ class EventForm(ModelForm):
             "start_date",
             "end_date",
             "send_interval",
+            "tail_length",
             "backdrop_map",
             "map",
             "map_title",

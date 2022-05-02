@@ -219,6 +219,7 @@ def event_list(request):
                         "shortcut": "https://routechoic.es/PlCG3xFS-f4",
                         "backdrop": "osm",
                         "send_interval": 5,
+                        "tail_length": 60,
                     },
                     "competitors": [
                         {
@@ -281,6 +282,7 @@ def event_detail(request, event_id):
             "shortcut": event.shortcut,
             "backdrop": event.backdrop_map,
             "send_interval": event.send_interval,
+            "tail_length": event.tail_length,
         },
         "competitors": [],
         "data": request.build_absolute_uri(

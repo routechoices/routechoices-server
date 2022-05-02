@@ -184,6 +184,7 @@ var locale =
           qrUrl = response.event.shortcut;
           liveUrl = response.data;
           sendInterval = response.event.send_interval;
+          tailLength = response.event.tail_length;
           if (response.maps.length) {
             var MapLayers = {};
             for (var i = 0; i < response.maps.length; i++) {
