@@ -112,20 +112,22 @@ class MapForm(ModelForm):
         fn = f_orig.name
         with Image.open(f_orig.file) as image:
             rgba_img = image.convert("RGBA")
-            MAX = 3000
+            MAX = 4000
             if image.size[0] > MAX and image.size[1] > MAX:
                 scale = MAX / min(image.size[0], image.size[1])
                 new_w = image.size[0] * scale
                 new_h = image.size[1] * scale
                 rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
+            format = "WEBP"
             if rgba_img.size[0] > WEBP_MAX_SIZE or rgba_img.size[1] > WEBP_MAX_SIZE:
-                raise ValidationError("Image too large")
+                format = "PNG"
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),
-                "quality": 60,
             }
-            rgba_img.save(out_buffer, "WEBP", **params)
+            if format == "WEBP":
+                params["quality"] = 60
+            rgba_img.save(out_buffer, format, **params)
             f_new = File(out_buffer, name=fn)
             return f_new
 
