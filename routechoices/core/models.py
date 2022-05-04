@@ -1081,11 +1081,17 @@ class Device(models.Model):
         return locs[-1]
 
     @property
-    def last_date_viewed(self):
+    def last_timestamp(self):
         loc = self.last_location
         if not loc:
             return None
-        t = loc[LOCATION_TIMESTAMP_INDEX]
+        return loc[LOCATION_TIMESTAMP_INDEX]
+
+    @property
+    def last_date_viewed(self):
+        t = self.last_timestamp
+        if not t:
+            return None
         return epoch_to_datetime(t)
 
     @cached_property
@@ -1110,7 +1116,7 @@ class Device(models.Model):
     def get_event(self, at=None):
         if not at:
             at = now()
-        c = self.get_competitor(at, True)
+        c = self.get_competitor(at=at, load_event=True)
         if c:
             return c.event
         return None
@@ -1122,7 +1128,7 @@ class Device(models.Model):
         return qs.first()
 
     def get_last_event(self):
-        c = self.get_last_competitor(True)
+        c = self.get_last_competitor(load_event=True)
         if c:
             return c.event
         return None
@@ -1135,6 +1141,13 @@ class Device(models.Model):
         ):
             return self.original_ref.original
         return None
+
+
+@receiver(post_save, sender=Device)
+def invalidate_ended_event_using_device_cache(sender, instance, **kwargs):
+    event = instance.get_event(at=instance.last_date_viewed)
+    if event and event.ended:
+        event.invalidate_cache()
 
 
 class DeviceArchiveReference(models.Model):
@@ -1279,7 +1292,7 @@ class Competitor(models.Model):
 
 
 @receiver([post_save, post_delete], sender=Competitor)
-def save_profile(sender, instance, **kwargs):
+def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
 
 
