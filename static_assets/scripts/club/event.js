@@ -4,7 +4,6 @@ if (!navigator.canShare) {
   document.getElementById("share_buttons").remove();
 }
 
-var browserLanguage = navigator.language.slice(0, 2);
 var supportedLanguages = {
   en: "English",
   es: "Español",
@@ -12,11 +11,19 @@ var supportedLanguages = {
   nl: "Nederlands",
   fi: "Suomi",
 };
-var locale =
-  window.localStorage.getItem("lang") ||
-  (Object.keys(supportedLanguages).includes(browserLanguage)
-    ? browserLanguage
-    : "en");
+
+function getLangIfSupported(code) {
+  return Object.keys(supportedLanguages).includes(code) ? code : null;
+}
+
+var queryString = window.location.search;
+var urlParams = new URLSearchParams(queryString);
+
+var urlLanguage = getLangIfSupported(urlParams.get("lang"));
+var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
+var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
+
+var locale = urlLanguage || storedLanguage || browserLanguage || "en";
 
 (function () {
   clock = ServerClock({ url: serverClockUrl });

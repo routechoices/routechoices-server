@@ -1086,7 +1086,7 @@ var displayOptions = function (ev) {
     .find("#languageSelector")
     .on("change", function (e) {
       window.localStorage.setItem("lang", e.target.value);
-      window.location.reload();
+      window.location.search = `lang=${e.target.value}`;
     });
   u(mainDiv)
     .find(".tailLengthControl")
