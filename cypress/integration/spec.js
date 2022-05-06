@@ -14,10 +14,12 @@ context("Cypress tests", () => {
 
   it("Create an Event", function () {
     cy.login();
-    cy.url().should("match", /\/dashboard\/$/);
+    cy.url().should("match", /\/dashboard\/select-club$/);
 
     // Create club
     cy.createClub();
+
+    cy.contains("Halden SK").click();
 
     // Create Map
     cy.createMap();
@@ -28,7 +30,6 @@ context("Cypress tests", () => {
     cy.get("a").contains("Create new event").click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
-    cy.get("#id_club").select("Halden SK");
     cy.get("#id_name").type("Jukola 2019 - 1st Leg");
     cy.get("#id_slug").clear().type("Jukola-2019-1st-leg");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
@@ -63,7 +64,6 @@ context("Cypress tests", () => {
     cy.get("a").contains("Create new event").click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
-    cy.get("#id_club").select("Halden SK");
     cy.get("#id_name").type("Jukola 2019 - 1st Leg (2)");
     cy.get("#id_slug").clear().type("Jukola-2019-1st-leg-2");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
@@ -91,7 +91,6 @@ context("Cypress tests", () => {
     cy.get("a").contains("Create new event").click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
-    cy.get("#id_club").select("Halden SK");
     cy.get("#id_name").type("Jukola 2019 - 1st Leg (2)");
     cy.get("#id_slug").clear().type("Jukola-2019-1st-leg-2");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");

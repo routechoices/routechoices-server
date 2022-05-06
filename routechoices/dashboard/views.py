@@ -742,7 +742,6 @@ def event_create_view(request):
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES)
-        form.instance.club = club
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet(request.POST)
         extra_map_formset = ExtraMapFormSet(request.POST)
@@ -750,11 +749,13 @@ def event_create_view(request):
             mform.fields["map"].queryset = map_list
         notice_form = NoticeForm(request.POST)
         # check whether it's valid:
-        if (
-            form.is_valid()
-            and formset.is_valid()
-            and notice_form.is_valid()
-            and extra_map_formset.is_valid()
+        if all(
+            [
+                form.is_valid(),
+                formset.is_valid(),
+                notice_form.is_valid(),
+                extra_map_formset.is_valid(),
+            ]
         ):
             event = form.save()
             formset.instance = event
@@ -783,8 +784,7 @@ def event_create_view(request):
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
     else:
-        form = EventForm()
-        form.instance.club = club
+        form = EventForm(initial={"club": club})
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet()
         extra_map_formset = ExtraMapFormSet()
@@ -834,7 +834,6 @@ def event_edit_view(request, id):
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, instance=event)
-        form.instance.club = club
         form.fields["map"].queryset = map_list
         extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
         for mform in extra_map_formset.forms:
@@ -889,7 +888,6 @@ def event_edit_view(request, id):
                 cform.fields["device"].choices = c
     else:
         form = EventForm(instance=event)
-        form.instance.club = club
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet(instance=event)
         extra_map_formset = ExtraMapFormSet(instance=event)

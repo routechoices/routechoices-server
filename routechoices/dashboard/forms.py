@@ -9,6 +9,7 @@ from django.forms import (
     DateTimeInput,
     FileField,
     Form,
+    HiddenInput,
     ModelChoiceField,
     ModelForm,
     inlineformset_factory,
@@ -143,6 +144,7 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = [
+            "club",
             "name",
             "slug",
             "privacy",
@@ -158,6 +160,7 @@ class EventForm(ModelForm):
             "map_title",
         ]
         widgets = {
+            "club": HiddenInput(),
             "start_date": DateTimeInput(
                 attrs={"class": "datetimepicker", "autocomplete": "off"}
             ),

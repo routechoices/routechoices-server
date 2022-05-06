@@ -12,11 +12,7 @@ def transfer_ownership(apps, schema_editor):
     DeviceClubOwnership = apps.get_model("core", "DeviceClubOwnership")
 
     for do in DeviceOwnership.objects.all():
-        # print user object
-        print(do.device.aid)
-        print(do.user.username)
         for club in do.user.club_set.all():
-            print(club.name)
             DeviceClubOwnership.objects.get_or_create(
                 device=do.device,
                 club=club,

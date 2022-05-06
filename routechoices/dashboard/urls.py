@@ -18,7 +18,7 @@ urlpatterns = [
     re_path(r"^devices/?$", views.device_list_view, name="device_list_view"),
     re_path(r"^devices/add/?$", views.device_add_view, name="device_add_view"),
     re_path(r"^select-club/?$", views.club_select_view, name="club_select_view"),
-    re_path(r"^new-club?$", views.club_create_view, name="club_create_view"),
+    re_path(r"^new-club/?$", views.club_create_view, name="club_create_view"),
     re_path(
         r"^club/set/(?P<id>[A-Za-z0-9_-]+)/$", views.club_set_view, name="club_set_view"
     ),

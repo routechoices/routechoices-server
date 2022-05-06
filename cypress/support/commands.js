@@ -36,11 +36,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("createClub", () => {
-  cy.visit("/dashboard/");
-  cy.get("a").contains("Clubs").click();
-  cy.url().should("match", /\/dashboard\/clubs$/);
-  cy.get("a").contains("Create new club").click();
-  cy.url().should("match", /\/dashboard\/clubs\/new$/);
+  cy.visit("/dashboard/new-club");
   cy.get("#id_name").type("Halden SK");
   cy.get("#id_slug").type("halden-sk");
   cy.get("#id_admins").next("").type("admin{enter}");
@@ -65,13 +61,7 @@ Cypress.Commands.add("getDeviceId", () => {
 });
 
 Cypress.Commands.add("createMap", () => {
-  cy.visit("/dashboard/");
-  cy.get("a").contains("Maps").click();
-  cy.url().should("match", /\/dashboard\/maps$/);
-  cy.get("a").contains("Create new map").click();
-  cy.url().should("match", /\/dashboard\/maps\/new$/);
-
-  cy.get("#id_club").select("Halden SK");
+  cy.visit("/dashboard/maps/new");
   cy.get("#id_name").type("Jukola 2019 - 1st Leg");
   const mapFileName =
     "Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg";
