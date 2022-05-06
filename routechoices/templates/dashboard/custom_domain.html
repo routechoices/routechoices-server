@@ -1,9 +1,9 @@
-{% extends "dashboard/home.html" %}
+{% extends "dashboard/club_view.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
 
-{% block sub_content %}
-<h1>Custom domain</h1>
+{% block sub_sub_content %}
+<h3>Custom domain</h3>
 {% if club.domain %}
 <p>You use a custom domain <a href="{{club.nice_url}}">{{club.nice_url}}</a></p>
 {% if not club.use_https %}<p>{{ site.name }} can provide SSL certificates for your custom domains. Contact us to set it up.</p>{% endif %}

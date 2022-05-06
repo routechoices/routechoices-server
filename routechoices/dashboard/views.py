@@ -32,7 +32,7 @@ from routechoices.core.models import (
     Club,
     Competitor,
     Device,
-    DeviceOwnership,
+    DeviceClubOwnership,
     Event,
     Map,
     Notice,
@@ -56,12 +56,39 @@ from routechoices.lib.kmz import extract_ground_overlay_info
 DEFAULT_PAGE_SIZE = 25
 
 
+def handle_session_club(request):
+    if "dashboard_club" not in request.session:
+        return False, redirect("dashboard:club_select_view")
+    session_club = request.session["dashboard_club"]
+    if request.user.is_superuser:
+        club = Club.objects.filter(aid=session_club).first()
+    else:
+        club = Club.objects.filter(admins=request.user, aid=session_club).first()
+    if not club:
+        return False, redirect("dashboard:club_select_view")
+    return True, club
+
+
 @login_required
 def home_view(request):
-    return render(
-        request,
-        "dashboard/home.html",
-    )
+    is_club, bypass = handle_session_club(request)
+    if not is_club:
+        return bypass
+    return redirect("dashboard:club_view")
+
+
+@login_required
+def club_select_view(request):
+    if request.user.is_superuser:
+        club_list = Club.objects.all()
+    else:
+        club_list = Club.objects.filter(admins=request.user)
+
+    paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get("page")
+    clubs = paginator.get_page(page)
+
+    return render(request, "dashboard/club_list.html", {"clubs": clubs})
 
 
 @login_required
@@ -162,15 +189,24 @@ def account_delete_view(request):
 
 @login_required
 def device_list_view(request):
-    device_list = Device.objects.filter(owners=request.user)
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
 
-    paginator = Paginator(device_list, DEFAULT_PAGE_SIZE)
+    device_owned_list = (
+        DeviceClubOwnership.objects.filter(club=club)
+        .select_related("club", "device")
+        .order_by("device__aid")
+    )
+    paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
     devices = paginator.get_page(page)
-    devices_listed = devices.object_list.all()
+    devices_listed = devices.object_list.values_list("device__id")
     competitors = (
         Competitor.objects.select_related("event")
-        .filter(device__in=devices_listed, start_time__lt=now())
+        .filter(device_id__in=devices_listed, start_time__lt=now())
         .order_by("device_id", "-start_time")
     )
 
@@ -191,22 +227,29 @@ def device_list_view(request):
     return render(
         request,
         "dashboard/device_list.html",
-        {"devices": devices, "last_usage": last_usage},
+        {"club": club, "devices": devices, "last_usage": last_usage},
     )
 
 
 @login_required
 def device_add_view(request):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = DeviceForm(request.POST)
         # check whether it's valid:
-        form.fields["device"].queryset = Device.objects.exclude(owners=request.user)
+        form.fields["device"].queryset = Device.objects.exclude(owners=club)
         if form.is_valid():
             device = form.cleaned_data["device"]
-            ownership = DeviceOwnership()
-            ownership.user = request.user
+            ownership = DeviceClubOwnership()
+            ownership.club = club
             ownership.device = device
+            ownership.nickname = form.cleaned_data["nickname"]
             ownership.save()
             messages.success(request, "Device added successfully")
             return redirect("dashboard:device_list_view")
@@ -219,48 +262,10 @@ def device_add_view(request):
         request,
         "dashboard/device_add.html",
         {
+            "club": club,
             "form": form,
         },
     )
-
-
-@login_required
-def device_remove_view(request, id):
-    ownership = (
-        DeviceOwnership.objects.select_related("device")
-        .filter(device__aid=id, user=request.user)
-        .first()
-    )
-
-    if not ownership:
-        raise Http404("No such device owned.")
-
-    if request.method == "POST":
-        # create a form instance and populate it with data from the request:
-        ownership.delete()
-        messages.success(request, "Device removed")
-        return redirect("dashboard:device_list_view")
-    return render(
-        request,
-        "dashboard/device_remove.html",
-        {
-            "device": ownership.device,
-        },
-    )
-
-
-@login_required
-def club_list_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-
-    paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
-    page = request.GET.get("page")
-    clubs = paginator.get_page(page)
-
-    return render(request, "dashboard/club_list.html", {"clubs": clubs})
 
 
 @login_required
@@ -275,22 +280,21 @@ def club_create_view(request):
             club.save()
             form.save_m2m()
             messages.success(request, "Club created successfully")
-            return redirect("dashboard:club_edit_view", id=club.aid)
+            return redirect("dashboard:club_select_view")
     else:
         form = ClubForm()
     form.fields["admins"].queryset = User.objects.filter(id=request.user.id)
     return render(
         request,
-        "dashboard/club_edit.html",
+        "dashboard/club_create.html",
         {
-            "context": "create",
             "form": form,
         },
     )
 
 
 @login_required
-def club_edit_view(request, id):
+def club_set_view(request, id):
     if request.user.is_superuser:
         club = get_object_or_404(
             Club,
@@ -298,23 +302,32 @@ def club_edit_view(request, id):
         )
     else:
         club = get_object_or_404(Club, aid=id, admins=request.user)
+    request.session["dashboard_club"] = club.aid
+    return redirect("dashboard:club_view")
 
+
+@login_required
+def club_view(request):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = ClubForm(request.POST, request.FILES, instance=club)
         # check whether it's valid:
         if form.is_valid():
-            club = form.save()
+            form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:club_edit_view", id=club.aid)
+            return redirect("dashboard:club_view")
     else:
         form = ClubForm(instance=club)
     form.fields["admins"].queryset = User.objects.filter(id__in=club.admins.all())
     return render(
         request,
-        "dashboard/club_edit.html",
+        "dashboard/club_view.html",
         {
-            "context": "edit",
             "club": club,
             "form": form,
         },
@@ -322,23 +335,21 @@ def club_edit_view(request, id):
 
 
 @login_required
-def club_custom_domain_view(request, id):
-    if request.user.is_superuser:
-        club = get_object_or_404(
-            Club,
-            aid=id,
-        )
+def club_custom_domain_view(request):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club = get_object_or_404(Club, aid=id, admins=request.user)
+        return bypass
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = ClubDomainForm(request.POST, instance=club)
         # check whether it's valid:
         if form.is_valid():
-            club = form.save()
+            form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:club_custom_domain_view", id=club.aid)
+            return redirect("dashboard:club_custom_domain_view")
     else:
         form = ClubDomainForm(instance=club)
     return render(
@@ -352,20 +363,18 @@ def club_custom_domain_view(request, id):
 
 
 @login_required
-def club_delete_view(request, id):
-    if request.user.is_superuser:
-        club = get_object_or_404(
-            Club,
-            aid=id,
-        )
+def club_delete_view(request):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club = get_object_or_404(Club, aid=id, admins=request.user)
+        return bypass
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         club.delete()
         messages.success(request, "Club deleted")
-        return redirect("dashboard:club_list_view")
+        return redirect("dashboard:club_select_view")
     return render(
         request,
         "dashboard/club_delete.html",
@@ -377,31 +386,31 @@ def club_delete_view(request, id):
 
 @login_required
 def map_list_view(request):
-    if request.user.is_superuser:
-        map_list = Map.objects.all().select_related("club")
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user).values_list(
-            "id", flat=True
-        )
-        map_list = Map.objects.filter(club_id__in=club_list).select_related("club")
+        return bypass
 
+    map_list = Map.objects.filter(club=club).select_related("club")
     paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
     maps = paginator.get_page(page)
-
-    return render(request, "dashboard/map_list.html", {"maps": maps})
+    return render(request, "dashboard/map_list.html", {"club": club, "maps": maps})
 
 
 @login_required
 def map_create_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
+        return bypass
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = MapForm(request.POST, request.FILES)
-        form.fields["club"].queryset = club_list
+        form.instance.club = club
         # check whether it's valid:
         if form.is_valid():
             form.save()
@@ -409,11 +418,11 @@ def map_create_view(request):
             return redirect("dashboard:map_list_view")
     else:
         form = MapForm()
-        form.fields["club"].queryset = club_list
     return render(
         request,
         "dashboard/map_edit.html",
         {
+            "club": club,
             "context": "create",
             "form": form,
         },
@@ -421,15 +430,72 @@ def map_create_view(request):
 
 
 @login_required
-def map_gpx_upload_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
+def map_edit_view(request, id):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
+        return bypass
+
+    rmap = get_object_or_404(Map, aid=id, club=club)
+
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = MapForm(request.POST, request.FILES, instance=rmap)
+        form.instance.club = club
+        # check whether it's valid:
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Changes saved successfully")
+            return redirect("dashboard:map_list_view")
+    else:
+        form = MapForm(instance=rmap)
+    return render(
+        request,
+        "dashboard/map_edit.html",
+        {
+            "club": club,
+            "context": "edit",
+            "map": rmap,
+            "form": form,
+        },
+    )
+
+
+@login_required
+def map_delete_view(request, id):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
+
+    rmap = get_object_or_404(Map, aid=id, club=club)
+    if request.method == "POST":
+        rmap.delete()
+        messages.success(request, "Map deleted")
+        return redirect("dashboard:map_list_view")
+    return render(
+        request,
+        "dashboard/map_delete.html",
+        {
+            "club": club,
+            "map": rmap,
+        },
+    )
+
+
+@login_required
+def map_gpx_upload_view(request):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = UploadMapGPXForm(request.POST, request.FILES)
-        form.fields["club"].queryset = club_list
         # check whether it's valid:
         if form.is_valid():
             error = None
@@ -502,7 +568,7 @@ def map_gpx_upload_view(request):
                 else:
                     new_map = Map.from_points(segments)
                     new_map.name = form.cleaned_data["gpx_file"].name[:-4]
-                    new_map.club = form.cleaned_data["club"]
+                    new_map.club = club
                     new_map.save()
             if error:
                 messages.error(request, error)
@@ -515,6 +581,7 @@ def map_gpx_upload_view(request):
         request,
         "dashboard/map_gpx_upload.html",
         {
+            "club": club,
             "form": form,
         },
     )
@@ -522,14 +589,15 @@ def map_gpx_upload_view(request):
 
 @login_required
 def map_kmz_upload_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
+        return bypass
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = UploadKmzForm(request.POST, request.FILES)
-        form.fields["club"].queryset = club_list
         # check whether it's valid:
         if form.is_valid():
             new_map = None
@@ -558,8 +626,8 @@ def map_kmz_upload_view(request):
                         raise Exception("Could not reach image source")
                     dest.write(r.content)
                     new_map = Map(
+                        club=club,
                         name=name,
-                        club=form.cleaned_data["club"],
                         corners_coordinates=corners_coords,
                     )
                     image_file = File(open(dest.name, "rb"))
@@ -600,7 +668,7 @@ def map_kmz_upload_view(request):
                         image_file = File(open(dest.name, "rb"))
                         new_map = Map(
                             name=name,
-                            club=form.cleaned_data["club"],
+                            club=club,
                             corners_coordinates=corners_coords,
                         )
                         new_map.image.save("file", image_file, save=True)
@@ -612,7 +680,7 @@ def map_kmz_upload_view(request):
                         image_file = File(open(image_path, "rb"))
                         new_map = Map(
                             name=name,
-                            club=form.cleaned_data["club"],
+                            club=club,
                             corners_coordinates=corners_coords,
                         )
                         new_map.image.save("file", image_file, save=False)
@@ -632,94 +700,49 @@ def map_kmz_upload_view(request):
                 return redirect("dashboard:map_list_view")
     else:
         form = UploadKmzForm()
-        form.fields["club"].queryset = club_list
     return render(
         request,
         "dashboard/map_kmz_upload.html",
         {
+            "club": club,
             "form": form,
-        },
-    )
-
-
-@login_required
-def map_edit_view(request, id):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-    rmap = get_object_or_404(Map, aid=id, club__in=club_list)
-
-    if request.method == "POST":
-        # create a form instance and populate it with data from the request:
-        form = MapForm(request.POST, request.FILES, instance=rmap)
-        form.fields["club"].queryset = club_list
-        # check whether it's valid:
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:map_list_view")
-    else:
-        form = MapForm(instance=rmap)
-        form.fields["club"].queryset = club_list
-    return render(
-        request,
-        "dashboard/map_edit.html",
-        {
-            "context": "edit",
-            "map": rmap,
-            "form": form,
-        },
-    )
-
-
-@login_required
-def map_delete_view(request, id):
-    if request.user.is_superuser:
-        rmap = get_object_or_404(Map, aid=id)
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-        rmap = get_object_or_404(Map, aid=id, club__in=club_list)
-    if request.method == "POST":
-        rmap.delete()
-        messages.success(request, "Map deleted")
-        return redirect("dashboard:map_list_view")
-    return render(
-        request,
-        "dashboard/map_delete.html",
-        {
-            "map": rmap,
         },
     )
 
 
 @login_required
 def event_list_view(request):
-    if request.user.is_superuser:
-        event_list = Event.objects.all().select_related("club")
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
-        event_list = Event.objects.filter(club__in=club_list).select_related("club")
+        return bypass
+
+    event_list = Event.objects.filter(club=club).select_related("club")
 
     paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
     events = paginator.get_page(page)
 
-    return render(request, "dashboard/event_list.html", {"events": events})
+    return render(
+        request, "dashboard/event_list.html", {"club": club, "events": events}
+    )
 
 
 @login_required
 def event_create_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
-    map_list = Map.objects.filter(club__in=club_list).select_related("club")
+        return bypass
+
+    map_list = Map.objects.filter(club=club).select_related("club")
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES)
-        form.fields["club"].queryset = club_list
+        form.instance.club = club
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet(request.POST)
         extra_map_formset = ExtraMapFormSet(request.POST)
@@ -752,17 +775,16 @@ def event_create_view(request):
                 if cform.cleaned_data.get("device"):
                     all_devices.add(cform.cleaned_data.get("device").id)
             dev_qs = Device.objects.filter(id__in=all_devices)
-            if request.user.is_authenticated:
-                dev_qs |= request.user.devices.all()
+            dev_qs |= club.devices.all()
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.display_str] for d in dev_qs]
+            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
     else:
         form = EventForm()
-        form.fields["club"].queryset = club_list
+        form.instance.club = club
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet()
         extra_map_formset = ExtraMapFormSet()
@@ -770,11 +792,10 @@ def event_create_view(request):
             mform.fields["map"].queryset = map_list
         notice_form = NoticeForm()
         dev_qs = Device.objects.none()
-        if request.user.is_authenticated:
-            dev_qs = request.user.devices.all()
+        dev_qs = club.devices.all()
         c = [
             ["", "---------"],
-        ] + [[d.id, d.display_str] for d in dev_qs]
+        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c
@@ -782,6 +803,7 @@ def event_create_view(request):
         request,
         "dashboard/event_edit.html",
         {
+            "club": club,
             "context": "create",
             "form": form,
             "formset": formset,
@@ -793,26 +815,26 @@ def event_create_view(request):
 
 @login_required
 def event_edit_view(request, id):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
-    map_list = Map.objects.filter(club__in=club_list).select_related("club")
+        return bypass
+
+    map_list = Map.objects.filter(club=club).select_related("club")
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=id,
-        club__in=club_list,
+        club=club,
     )
     comp_devices_id = event.competitors.all().values_list("device", flat=True)
-    own_devices = Device.objects.none()
-    if request.user.is_authenticated:
-        own_devices = request.user.devices.all()
+    own_devices = club.devices.all()
     own_devices_id = own_devices.values_list("id", flat=True)
     all_devices = set(list(comp_devices_id) + list(own_devices_id))
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, instance=event)
-        form.fields["club"].queryset = club_list
+        form.instance.club = club
         form.fields["map"].queryset = map_list
         extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
         for mform in extra_map_formset.forms:
@@ -861,13 +883,13 @@ def event_edit_view(request, id):
             dev_qs = Device.objects.filter(id__in=all_devices)
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.display_str] for d in dev_qs]
+            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
     else:
         form = EventForm(instance=event)
-        form.fields["club"].queryset = club_list
+        form.instance.club = club
         form.fields["map"].queryset = map_list
         formset = CompetitorFormSet(instance=event)
         extra_map_formset = ExtraMapFormSet(instance=event)
@@ -880,7 +902,7 @@ def event_edit_view(request, id):
         dev_qs = Device.objects.filter(id__in=all_devices)
         c = [
             ["", "---------"],
-        ] + [[d.id, d.display_str] for d in dev_qs]
+        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c
@@ -889,6 +911,7 @@ def event_edit_view(request, id):
         request,
         "dashboard/event_edit.html",
         {
+            "club": club,
             "context": "edit",
             "event": event,
             "form": form,
@@ -901,15 +924,13 @@ def event_edit_view(request, id):
 
 @login_required
 def event_delete_view(request, id):
-    if request.user.is_superuser:
-        event = get_object_or_404(
-            Event,
-            aid=id,
-        )
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(Event, aid=id, club__in=club_list)
+        return bypass
 
+    event = get_object_or_404(Event, aid=id, club=club)
     if request.method == "POST":
         event.delete()
         messages.success(request, "Event deleted")

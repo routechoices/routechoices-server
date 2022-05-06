@@ -1,25 +1,28 @@
-{% extends "dashboard/home.html" %}
+{% extends "dashboard/club_view.html" %}
 {% load static %}
 {% load hosts %}
 {% load django_bootstrap5 %}
 
-{% block sub_content %}
+{% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
-        <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
-        <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
-        <h1>Your Clubs Maps</h1>
         {% if not maps %}
             <p>You haven't created any map yet.</p>
+            <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
+            <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
+            <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
         {% else %}
+        <div style="margin-bottom:15px">
+          <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
+          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
+          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
+        </div>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
-        <table class="table table-striped">
-            <tr><th>Name</th><th>Club</th><th>Download</th></tr>
+        <table class="table table-striped" style="margin-top:15px">
+            <tr><th>Name</th><th>Download</th></tr>
             {% for map in maps %}
             <tr>
                 <td><a href="{% url 'dashboard:map_edit_view' id=map.aid %}">{{ map.name }}</a></td>
-                <td>{{ map.club }}</td>
                 <td>
                     {% if map.image %}<a class="btn btn-sm btn-primary" href="{{map.image.url}}"><i class="fa fa-download"></i> Image</a>{% endif %}
                     <a class="btn btn-sm btn-primary" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa fa-download"></i> KMZ</a>

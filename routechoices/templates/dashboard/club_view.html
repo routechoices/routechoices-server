@@ -1,0 +1,45 @@
+{% extends "dashboard/home.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% load hosts %}
+{% load compress %}
+{%  block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+{%  endblock %}
+
+{% block sub_content %}
+
+<div class="row">
+    <div class="col-12">
+        <h1>{{ club.name }}</h1>
+    </div>
+</div>
+<ul class="nav nav-tabs" style="margin-bottom:1em;">
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_view' %}active{% endif %}" href="{% url 'dashboard:club_view' %}">Club</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}">Devices</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}" href="{% url 'dashboard:map_list_view' %}">Maps</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}">Events</a></li>
+</ul>
+{% block sub_sub_content %}
+<p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a></p>
+<p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view'%}">{% if club.domain %}Edit your{% else %}Use a{% endif %} custom domain</a></p>
+<form action="" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <input type="submit" value="Save" class="btn btn-primary">
+  <a href="{% url 'dashboard:club_delete_view' %}" class="btn btn-danger">Delete</a>
+</form>
+{% endblock %}
+{% endblock %}
+
+{% block extra_body %}
+{% if request.resolver_match.view_name == 'dashboard:club_view' %}
+<script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+{% compress js %}
+<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
+<script src="{% static '/scripts/dashboard/club_edit.js' %}?_=2022031600"></script>
+{% endcompress %}
+{% endif %}
+{% endblock %}

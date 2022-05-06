@@ -5,18 +5,33 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
-        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary">Create new club</a>
-        <h1>Your Clubs</h1>
+
         {% if not clubs %}
-            <p>You haven't created any club yet.</p>
+        <div class="jumbotron">
+          <h3>Welcome to your dashboard.</h3>
+          <p>It seems you don't have a club yet! No worries...</p>
+          <p>
+            You can: <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary">Create a new club</a>
+          </p>
+          <p>Or request another user to add your username "{{request.user.username }}" to the list of admins of theirs.</p>
+        </div>
         {% else %}
+        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary">Create new club</a>
+        <h1>Select one of your club</h3>
         {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
-        <table class="table table-striped">
-            <tr><th>Name</th></tr>
-            {% for club in clubs %}
-            <tr><td><a href="{% url 'dashboard:club_edit_view' id=club.aid %}">{{ club.name }}</a></td></tr>
-            {% endfor %}
-        </table>
+          {% for club in clubs %}
+            <div class="card" style="margin-bottom: 15px;">
+              <div class="card-body">
+                <div class="d-flex flex-row bd-highlight justify-content-between">
+                    <div class="p-2 bd-highlight">
+                        <div>
+                          <a class="link-primary" href="{% url 'dashboard:club_set_view' id=club.aid %}"><b style="font-size: 1.3em;">{{ club.name }}</b></a>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
         {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
         {% endif %}
     </div>

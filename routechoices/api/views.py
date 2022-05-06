@@ -42,6 +42,7 @@ from routechoices.core.models import (
     Club,
     Competitor,
     Device,
+    DeviceClubOwnership,
     Event,
     ImeiDevice,
     Map,
@@ -1142,6 +1143,29 @@ def device_registrations(request, device_id):
 
 
 @swagger_auto_schema(
+    methods=["patch", "delete"],
+    auto_schema=None,
+)
+@api_view(["PATCH", "DELETE"])
+@login_required
+def device_api_view(request, club_id, device_id):
+    club = get_object_or_404(Club, admins=request.user, aid=club_id)
+    device = get_object_or_404(Device, aid=device_id, is_gpx=False)
+    ownership = get_object_or_404(DeviceClubOwnership, device=device, club=club)
+    if request.method == "PATCH":
+        nick = request.data.get("nickname", "")
+        if nick and len(nick) > 8:
+            raise ValidationError("Can not be more than 8 characters")
+
+        ownership.nickname = nick
+        ownership.save()
+        return Response({"nickname": nick})
+    elif request.method == "DELETE":
+        ownership.delete()
+        return HttpResponse(status=204)
+
+
+@swagger_auto_schema(
     method="get",
     auto_schema=None,
 )
@@ -1259,8 +1283,8 @@ def event_kmz_download(request, event_id, map_index="0"):
     method="get",
     auto_schema=None,
 )
-@login_required
 @api_view(["GET"])
+@login_required
 def map_kmz_download(request, map_id, *args, **kwargs):
     if request.user.is_superuser:
         raster_map = get_object_or_404(

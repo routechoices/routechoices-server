@@ -100,12 +100,13 @@ class DeviceForm(Form):
         help_text="Enter the device ID of the tracker",
         queryset=Device.objects.all(),
     )
+    nickname = CharField(max_length=8)
 
 
 class MapForm(ModelForm):
     class Meta:
         model = Map
-        fields = ["club", "name", "image", "corners_coordinates"]
+        fields = ["name", "image", "corners_coordinates"]
 
     def clean_image(self):
         f_orig = self.cleaned_data["image"]
@@ -142,7 +143,6 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = [
-            "club",
             "name",
             "slug",
             "privacy",
@@ -244,14 +244,12 @@ class UploadGPXForm(Form):
 
 
 class UploadMapGPXForm(Form):
-    club = ModelChoiceField(queryset=Club.objects.all())
     gpx_file = FileField(
         max_length=255, validators=[FileExtensionValidator(allowed_extensions=["gpx"])]
     )
 
 
 class UploadKmzForm(Form):
-    club = ModelChoiceField(queryset=Club.objects.all())
     file = FileField(
         label="KML/KMZ file",
         max_length=255,

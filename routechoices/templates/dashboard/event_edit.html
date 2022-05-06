@@ -1,4 +1,4 @@
-{% extends "dashboard/home.html" %}
+{% extends "dashboard/club_view.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
 {% load hosts %}
@@ -13,7 +13,7 @@
 {% endcompress %}
 {%  endblock %}
 
-{% block sub_content %}
+{% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
         {% if event %}<h1>{{event.name}}</h1>

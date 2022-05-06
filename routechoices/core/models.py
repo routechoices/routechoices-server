@@ -925,10 +925,10 @@ class Device(models.Model):
     user_agent = models.CharField(max_length=200, blank=True)
     is_gpx = models.BooleanField(default=False)
     owners = models.ManyToManyField(
-        User,
-        through="DeviceOwnership",
+        Club,
+        through="DeviceClubOwnership",
         related_name="devices",
-        through_fields=("device", "user"),
+        through_fields=("device", "club"),
     )
     locations_raw = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
@@ -943,12 +943,14 @@ class Device(models.Model):
     def __str__(self):
         return self.aid
 
-    @property
-    def display_str(self):
+    def get_display_str(self, club=None):
         original_device = self.get_original_device()
         if original_device:
-            return f"{original_device.aid}*"
-        return self.aid
+            device = original_device
+        else:
+            device = self
+        owner = device.club_ownerships.filter(club=club).first()
+        return f"{device.aid} {f' ({owner.nickname})' if owner and owner.nickname else ''}{'*' if original_device else ''}"
 
     @property
     def battery_level_0_4(self):
@@ -1182,15 +1184,18 @@ class ImeiDevice(models.Model):
         return self.imei
 
 
-class DeviceOwnership(models.Model):
+class DeviceClubOwnership(models.Model):
     device = models.ForeignKey(
-        Device, related_name="ownerships", on_delete=models.CASCADE
+        Device, related_name="club_ownerships", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(User, related_name="ownerships", on_delete=models.CASCADE)
+    club = models.ForeignKey(
+        Club, related_name="device_ownerships", on_delete=models.CASCADE
+    )
     creation_date = models.DateTimeField(auto_now_add=True)
+    nickname = models.CharField(max_length=8, default="")
 
     class Meta:
-        unique_together = (("device", "user"),)
+        unique_together = (("device", "club"),)
 
 
 class Competitor(models.Model):

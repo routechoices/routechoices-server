@@ -1,12 +1,12 @@
-{% extends "dashboard/home.html" %}
+{% extends "dashboard/club_view.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
 {% load compress %}
 
-{% block sub_content %}
+{% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        <h1>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h1>
+        <h3>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h3>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form form %}

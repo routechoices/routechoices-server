@@ -17,23 +17,19 @@ urlpatterns = [
     ),
     re_path(r"^devices/?$", views.device_list_view, name="device_list_view"),
     re_path(r"^devices/add/?$", views.device_add_view, name="device_add_view"),
+    re_path(r"^select-club/?$", views.club_select_view, name="club_select_view"),
+    re_path(r"^new-club?$", views.club_create_view, name="club_create_view"),
     re_path(
-        r"^devices/(?P<id>[A-Za-z0-9_-]+)/remove/?$",
-        views.device_remove_view,
-        name="device_remove_view",
+        r"^club/set/(?P<id>[A-Za-z0-9_-]+)/$", views.club_set_view, name="club_set_view"
     ),
-    re_path(r"^clubs/?$", views.club_list_view, name="club_list_view"),
-    re_path(r"^clubs/new/?$", views.club_create_view, name="club_create_view"),
+    re_path(r"^club/$", views.club_view, name="club_view"),
     re_path(
-        r"^clubs/(?P<id>[A-Za-z0-9_-]+)/$", views.club_edit_view, name="club_edit_view"
-    ),
-    re_path(
-        r"^clubs/(?P<id>[A-Za-z0-9_-]+)/custom-domain/?$",
+        r"^club/custom-domain/?$",
         views.club_custom_domain_view,
         name="club_custom_domain_view",
     ),
     re_path(
-        r"^clubs/(?P<id>[A-Za-z0-9_-]+)/delete/?$",
+        r"^club/delete/?$",
         views.club_delete_view,
         name="club_delete_view",
     ),

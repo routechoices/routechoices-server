@@ -11,15 +11,13 @@
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
-        <h1>{% if context == 'edit' %}Edit Club{% else %}New Club{% endif %}</h1>
-        {% if context == 'edit' %}<p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a></p>
-        <p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view' id=club.aid %}">{% if club.domain %}Edit your{% else %}Use a{% endif %} custom domain</a></p>{% endif %}
+        <h1>New Club</h1>
         <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <input type="submit" value="Save" class="btn btn-primary">
-            {% if context == 'edit' %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
-        </form>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <input type="submit" value="Save" class="btn btn-primary">
+          {% if context == 'edit' %}<a href="{% url 'dashboard:club_delete_view' id=club.aid %}" class="btn btn-danger">Delete</a>{% endif %}
+      </form>
     </div>
 </div>
 {% endblock %}

@@ -15,4 +15,72 @@
     }, 500);
     navigator.clipboard.writeText($el.data("value"));
   });
+  u(".edit-nick-btn").on("click", function (ev) {
+    var nick = u(ev.target).attr("data-nick");
+    var devId = u(ev.target).attr("data-dev-id");
+    swal(
+      {
+        title: "New nickname",
+        text: "Enter new nickname for device (max 8 characters):",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+        inputPlaceholder: nick ? nick : "Nickname",
+        inputValue: nick ? nick : null,
+      },
+      function (inputValue) {
+        if (inputValue === null || inputValue === false) return false;
+        if (inputValue.length > 8) {
+          swal({
+            title: "Error",
+            text: "Name too long!",
+            type: "error",
+          });
+        }
+        reqwest({
+          url: "/api/clubs/" + clubId + "/devices/" + devId,
+          data: { nickname: inputValue },
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+          crossOrigin: true,
+          withCredentials: true,
+          method: "patch",
+          type: "json",
+          success: function (response) {
+            window.location.reload();
+          },
+        });
+      }
+    );
+  });
+  u(".remove-btn").on("click", function (ev) {
+    var devId = u(ev.target).attr("data-dev-id");
+    swal(
+      {
+        title: "Confirm removal",
+        text: "Are you sure you want to remove this device?",
+        type: "warning",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+      },
+      function () {
+        reqwest({
+          url: "/api/clubs/" + clubId + "/devices/" + devId,
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+          crossOrigin: true,
+          withCredentials: true,
+          method: "delete",
+          type: "json",
+          success: function (response) {
+            window.location.reload();
+          },
+        });
+      }
+    );
+  });
 })();

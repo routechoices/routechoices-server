@@ -8,28 +8,14 @@
 {% block content %}
   <div class="row" style="margin-top:15px">
     <ul class="nav nav-tabs" style="margin-bottom:1em;">
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}">Account</a>
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}">Devices</a>
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_list_view' %}active{% endif %}" href="{% url 'dashboard:club_list_view' %}">Clubs</a>
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}" href="{% url 'dashboard:map_list_view' %}">Maps</a>
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}">Events</a>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}">Account</a></li>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_select_view' %}active{% endif %}" href="{% url 'dashboard:club_select_view' %}"> Switch Club</a></li>
     </ul>
     <div class="col-12">
       <div class="row">
         <div class="col-12">
           {% block sub_content %}
-          <div class="jumbotron">
-            <h3>Welcome to your dashboard.</h3>
-            <p>
-              Now that you have created an account you can:
-            </p>
-            <ul>
-              <li>Create a club</li>
-              <li>Upload your maps</li>
-              <li>Create and manage your events</li>
-            </ul>
-          </div>
-        {% endblock %}
+          {% endblock %}
         </div>
       </div><!--/.col-12.col-sm-9-->
     </div>

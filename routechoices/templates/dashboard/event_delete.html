@@ -3,12 +3,14 @@
 
 {% block sub_content %}
 <div class="row">
-    <div class="col">
-        <h1>Delete Event {{ event.name }}?</h1>
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Delete" class="btn btn-danger">
-        </form>
-    </div>
+  <div class="col-12">
+      <h1><i class="fa fa-warning"></i> Delete event {{ event.name }}?</h1>
+      <p>This will delete all data under this event.</p>
+      <p>There is no way to recover your data if you confirm this step.</p>
+      <form action="" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> I understand the risk and I want to delete all this event data!</button>
+      </form>
+  </div>
 </div>
 {% endblock %}
