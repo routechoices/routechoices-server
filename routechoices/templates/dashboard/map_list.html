@@ -8,12 +8,12 @@
     <div class="col-12">
         {% if not maps %}
             <p>You haven't created any map yet.</p>
-            <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
+            <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
             <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
             <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
         {% else %}
         <div style="margin-bottom:15px">
-          <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary">Create new map</a>
+          <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
           <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
           <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
         </div>
