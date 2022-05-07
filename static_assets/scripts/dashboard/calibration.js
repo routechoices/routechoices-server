@@ -281,6 +281,19 @@ function project(m, x, y) {
     map_b.on("click", function (e) {
       set_ref_pts_b(e.latlng);
     });
+
+    fetch("https://api.routechoices.com/check-latlon")
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        if (data.status === "success") {
+          map_b.setView([data.lat, data.lon], 10, {
+            duration: 0,
+          });
+        }
+      })
+      .catch();
   }
   function display_preview_map() {
     var bounds = corners_latlng;
