@@ -282,7 +282,7 @@ def club_create_view(request):
             messages.success(request, "Club created successfully")
             return redirect("dashboard:club_select_view")
     else:
-        form = ClubForm()
+        form = ClubForm(initial={"admins": request.user})
     form.fields["admins"].queryset = User.objects.filter(id=request.user.id)
     return render(
         request,

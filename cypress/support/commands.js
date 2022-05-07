@@ -39,7 +39,6 @@ Cypress.Commands.add("createClub", () => {
   cy.visit("/dashboard/new-club");
   cy.get("#id_name").type("Halden SK");
   cy.get("#id_slug").type("halden-sk");
-  cy.get("#id_admins").next("").type("admin{enter}");
   cy.get("input[value='Save']").click();
   cy.contains("successfully");
 });
