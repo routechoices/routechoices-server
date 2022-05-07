@@ -952,7 +952,13 @@ class Device(models.Model):
             device = original_device
         else:
             device = self
-        owner = device.club_ownerships.filter(club=club).first()
+
+        owner = None
+        # Use this instead of .filter(club=club).first() as club_ownership are already loaded, hence avoiding n+1 query
+        for ownership in device.club_ownerships.all():
+            if ownership.club_id == club.id:
+                owner = ownership
+                break
         return f"{device.aid} {f' ({owner.nickname})' if owner and owner.nickname else ''}{'*' if original_device else ''}"
 
     @property

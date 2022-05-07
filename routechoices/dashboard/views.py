@@ -775,7 +775,9 @@ def event_create_view(request):
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
                     all_devices.add(cform.cleaned_data.get("device").id)
-            dev_qs = Device.objects.filter(id__in=all_devices)
+            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
+                "club_ownerships"
+            )
             dev_qs |= club.devices.all()
             c = [
                 ["", "---------"],
@@ -791,8 +793,7 @@ def event_create_view(request):
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
         notice_form = NoticeForm()
-        dev_qs = Device.objects.none()
-        dev_qs = club.devices.all()
+        dev_qs = club.devices.all().prefetch_related("club_ownerships")
         c = [
             ["", "---------"],
         ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
@@ -879,7 +880,9 @@ def event_edit_view(request, id):
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
                     all_devices.add(cform.cleaned_data.get("device").id)
-            dev_qs = Device.objects.filter(id__in=all_devices)
+            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
+                "club_ownerships"
+            )
             c = [
                 ["", "---------"],
             ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
@@ -897,7 +900,9 @@ def event_edit_view(request, id):
         if event.has_notice:
             args = {"instance": event.notice}
         notice_form = NoticeForm(**args)
-        dev_qs = Device.objects.filter(id__in=all_devices)
+        dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
+            "club_ownerships"
+        )
         c = [
             ["", "---------"],
         ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
