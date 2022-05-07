@@ -26,18 +26,11 @@
         showCancelButton: true,
         closeOnConfirm: false,
         animation: "slide-from-top",
-        inputPlaceholder: nick ? nick : "Nickname",
+        inputPlaceholder: "Nickname",
         inputValue: nick ? nick : null,
       },
       function (inputValue) {
         if (inputValue === null || inputValue === false) return false;
-        if (inputValue.length > 8) {
-          swal({
-            title: "Error",
-            text: "Name too long!",
-            type: "error",
-          });
-        }
         reqwest({
           url: "/api/clubs/" + clubId + "/devices/" + devId,
           data: { nickname: inputValue },
@@ -54,6 +47,7 @@
         });
       }
     );
+    u('input[placeholder="Nickname"]').attr("maxlength", 8);
   });
   u(".remove-btn").on("click", function (ev) {
     var devId = u(ev.target).attr("data-dev-id");
