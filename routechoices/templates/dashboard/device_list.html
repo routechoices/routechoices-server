@@ -9,9 +9,9 @@
     <div class="col">
         {% if not devices %}
             <p>You haven't added any devices yet.</p>
-            <a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary">Add new device</a>
+            <a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Add new device</a>
         {% else %}
-        <div style="margin-bottom:15px"><a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary">Add new device</a></div>
+        <div style="margin-bottom:15px"><a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Add new device</a></div>
         {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
             <tr><th>Device ID</th><th>Nickname</th><th>Last Date Seen</th><th>Position</th><th>Battery %</th><th>Last Used By</th><th>Action</th></tr>
