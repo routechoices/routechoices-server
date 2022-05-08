@@ -437,11 +437,11 @@ def map_edit_view(request, map_id):
     else:
         return bypass
 
-    rmap = get_object_or_404(Map, aid=map_id, club=club)
+    raster_map = get_object_or_404(Map, aid=map_id, club=club)
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = MapForm(request.POST, request.FILES, instance=rmap)
+        form = MapForm(request.POST, request.FILES, instance=raster_map)
         form.instance.club = club
         # check whether it's valid:
         if form.is_valid():
@@ -449,14 +449,14 @@ def map_edit_view(request, map_id):
             messages.success(request, "Changes saved successfully")
             return redirect("dashboard:map_list_view")
     else:
-        form = MapForm(instance=rmap)
+        form = MapForm(instance=raster_map)
     return render(
         request,
         "dashboard/map_edit.html",
         {
             "club": club,
             "context": "edit",
-            "map": rmap,
+            "map": raster_map,
             "form": form,
         },
     )
@@ -470,9 +470,9 @@ def map_delete_view(request, map_id):
     else:
         return bypass
 
-    rmap = get_object_or_404(Map, aid=map_id, club=club)
+    raster_map = get_object_or_404(Map, aid=map_id, club=club)
     if request.method == "POST":
-        rmap.delete()
+        raster_map.delete()
         messages.success(request, "Map deleted")
         return redirect("dashboard:map_list_view")
     return render(
@@ -480,7 +480,7 @@ def map_delete_view(request, map_id):
         "dashboard/map_delete.html",
         {
             "club": club,
-            "map": rmap,
+            "map": raster_map,
         },
     )
 

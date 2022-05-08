@@ -177,11 +177,11 @@ class EventForm(ModelForm):
             raise ValidationError("Start Date must be before End Date")
 
     def clean_map(self):
-        rmap = self.cleaned_data.get("map")
+        raster_map = self.cleaned_data.get("map")
         club = self.data.get("club")
-        if rmap and club and int(club) != rmap.club_id:
+        if raster_map and club and int(club) != raster_map.club_id:
             raise ValidationError("Map must be from the organizing club")
-        return rmap
+        return raster_map
 
 
 class NoticeForm(ModelForm):
@@ -196,15 +196,15 @@ class ExtraMapForm(ModelForm):
         fields = ("event", "map", "title")
 
     def clean_map(self):
-        rmap = self.cleaned_data.get("map")
+        raster_map = self.cleaned_data.get("map")
         club = self.data.get("club")
-        if club and int(club) != rmap.club_id:
+        if club and int(club) != raster_map.club_id:
             raise ValidationError("Map must be from the organizing club")
         if not self.data.get("map"):
             raise ValidationError(
                 "Extra maps can be set only if the main map field is set first"
             )
-        return rmap
+        return raster_map
 
     def clean_title(self):
         map_title = self.cleaned_data.get("title")
