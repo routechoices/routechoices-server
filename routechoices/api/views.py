@@ -1154,8 +1154,8 @@ def device_api_view(request, club_id, device_id):
     ownership = get_object_or_404(DeviceClubOwnership, device=device, club=club)
     if request.method == "PATCH":
         nick = request.data.get("nickname", "")
-        if nick and len(nick) > 8:
-            raise ValidationError("Can not be more than 8 characters")
+        if nick and len(nick) > 12:
+            raise ValidationError("Can not be more than 12 characters")
 
         ownership.nickname = nick
         ownership.save()

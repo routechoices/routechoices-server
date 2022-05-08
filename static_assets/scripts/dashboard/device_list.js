@@ -21,7 +21,7 @@
     swal(
       {
         title: "New nickname",
-        text: "Enter new nickname for device (max 8 characters):",
+        text: "Enter new nickname for device (max 12 characters):",
         type: "input",
         showCancelButton: true,
         closeOnConfirm: false,
@@ -47,7 +47,7 @@
         });
       }
     );
-    u('input[placeholder="Nickname"]').attr("maxlength", 8);
+    u('input[placeholder="Nickname"]').attr("maxlength", 12);
   });
   u(".remove-btn").on("click", function (ev) {
     var devId = u(ev.target).attr("data-dev-id");

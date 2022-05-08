@@ -1201,7 +1201,7 @@ class DeviceClubOwnership(models.Model):
         Club, related_name="device_ownerships", on_delete=models.CASCADE
     )
     creation_date = models.DateTimeField(auto_now_add=True)
-    nickname = models.CharField(max_length=8, default="")
+    nickname = models.CharField(max_length=12, default="")
 
     class Meta:
         unique_together = (("device", "club"),)
