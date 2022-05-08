@@ -430,14 +430,14 @@ def map_create_view(request):
 
 
 @login_required
-def map_edit_view(request, id):
+def map_edit_view(request, map_id):
     is_club, bypass = handle_session_club(request)
     if is_club:
         club = bypass
     else:
         return bypass
 
-    rmap = get_object_or_404(Map, aid=id, club=club)
+    rmap = get_object_or_404(Map, aid=map_id, club=club)
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -463,14 +463,14 @@ def map_edit_view(request, id):
 
 
 @login_required
-def map_delete_view(request, id):
+def map_delete_view(request, map_id):
     is_club, bypass = handle_session_club(request)
     if is_club:
         club = bypass
     else:
         return bypass
 
-    rmap = get_object_or_404(Map, aid=id, club=club)
+    rmap = get_object_or_404(Map, aid=map_id, club=club)
     if request.method == "POST":
         rmap.delete()
         messages.success(request, "Map deleted")
@@ -767,10 +767,9 @@ def event_create_view(request):
             notice.save()
             messages.success(request, "Event created successfully")
             if request.POST.get("save_continue"):
-                return redirect("dashboard:event_edit_view", id=event.aid)
+                return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
-            formset.is_valid()
             all_devices = set()
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
@@ -815,7 +814,7 @@ def event_create_view(request):
 
 
 @login_required
-def event_edit_view(request, id):
+def event_edit_view(request, event_id):
     is_club, bypass = handle_session_club(request)
     if is_club:
         club = bypass
@@ -825,7 +824,7 @@ def event_edit_view(request, id):
     map_list = Map.objects.filter(club=club).select_related("club")
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
-        aid=id,
+        aid=event_id,
         club=club,
     )
     comp_devices_id = event.competitors.all().values_list("device", flat=True)
@@ -848,11 +847,13 @@ def event_edit_view(request, id):
             args = {"instance": event.notice}
         notice_form = NoticeForm(request.POST, **args)
         # check whether it's valid:
-        if (
-            form.is_valid()
-            and formset.is_valid()
-            and notice_form.is_valid()
-            and extra_map_formset.is_valid()
+        if all(
+            [
+                form.is_valid(),
+                formset.is_valid(),
+                notice_form.is_valid(),
+                extra_map_formset.is_valid(),
+            ]
         ):
             form.save()
             formset.instance = event
@@ -873,10 +874,9 @@ def event_edit_view(request, id):
                 notice.save()
             messages.success(request, "Changes saved successfully")
             if request.POST.get("save_continue"):
-                return redirect("dashboard:event_edit_view", id=event.aid)
+                return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
-            formset.is_valid()
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
                     all_devices.add(cform.cleaned_data.get("device").id)
@@ -926,14 +926,14 @@ def event_edit_view(request, id):
 
 
 @login_required
-def event_delete_view(request, id):
+def event_delete_view(request, event_id):
     is_club, bypass = handle_session_club(request)
     if is_club:
         club = bypass
     else:
         return bypass
 
-    event = get_object_or_404(Event, aid=id, club=club)
+    event = get_object_or_404(Event, aid=event_id, club=club)
     if request.method == "POST":
         event.delete()
         messages.success(request, "Event deleted")
@@ -948,23 +948,19 @@ def event_delete_view(request, id):
 
 
 @login_required
-def event_chat_moderation_view(request, id):
-    if request.user.is_superuser:
-        event = get_object_or_404(
-            Event,
-            aid=id,
-            allow_live_chat=True,
-            start_date__lte=now(),
-        )
+def event_chat_moderation_view(request, event_id):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
     else:
-        club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(
-            Event,
-            aid=id,
-            club__in=club_list,
-            allow_live_chat=True,
-            start_date__lte=now(),
-        )
+        return bypass
+    event = get_object_or_404(
+        Event,
+        aid=event_id,
+        club=club,
+        allow_live_chat=True,
+        start_date__lte=now(),
+    )
     return render(
         request,
         "dashboard/event_chat_moderation.html",
@@ -973,11 +969,11 @@ def event_chat_moderation_view(request, id):
 
 
 @login_required
-def event_view_live(request, id):
+def event_view_live(request, event_id):
     if request.user.is_superuser:
         event = get_object_or_404(
             Event,
-            aid=id,
+            aid=event_id,
             start_date__lte=now(),
             end_date__gte=now(),
         )
@@ -985,7 +981,7 @@ def event_view_live(request, id):
         club_list = Club.objects.filter(admins=request.user)
         event = get_object_or_404(
             Event,
-            aid=id,
+            aid=event_id,
             club__in=club_list,
             start_date__lte=now(),
             end_date__gte=now(),
@@ -1001,15 +997,15 @@ def event_view_live(request, id):
 
 
 @login_required
-def dashboard_map_download(request, id, *args, **kwargs):
+def dashboard_map_download(request, map_id, *args, **kwargs):
     if request.user.is_superuser:
         raster_map = get_object_or_404(
             Map,
-            aid=id,
+            aid=map_id,
         )
     else:
         club_list = Club.objects.filter(admins=request.user)
-        raster_map = get_object_or_404(Map, aid=id, club__in=club_list)
+        raster_map = get_object_or_404(Map, aid=map_id, club__in=club_list)
     file_path = raster_map.path
     mime_type = raster_map.mime_type
     return serve_from_s3(
@@ -1022,11 +1018,13 @@ def dashboard_map_download(request, id, *args, **kwargs):
 
 
 @login_required
-def dashboard_logo_download(request, id, *args, **kwargs):
+def dashboard_logo_download(request, club_id, *args, **kwargs):
     if request.user.is_superuser:
-        club = get_object_or_404(Club, aid=id, logo__isnull=False)
+        club = get_object_or_404(Club, aid=club_id, logo__isnull=False)
     else:
-        club = Club.objects.filter(admins=request.user, aid=id, logo__isnull=False)
+        club = Club.objects.filter(
+            admins=request.user, aid=club_id, logo__isnull=False
+        ).first()
     if not club:
         raise Http404()
     file_path = club.logo.name
@@ -1040,15 +1038,15 @@ def dashboard_logo_download(request, id, *args, **kwargs):
 
 
 @login_required
-def event_route_upload_view(request, id):
+def event_route_upload_view(request, event_id):
     if request.user.is_superuser:
         event = get_object_or_404(
             Event,
-            aid=id,
+            aid=event_id,
         )
     else:
         club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(Event, aid=id, club__in=club_list)
+        event = get_object_or_404(Event, aid=event_id, club__in=club_list)
     competitors = event.competitors.all()
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -1097,7 +1095,7 @@ def event_route_upload_view(request, id):
                 messages.error(request, error)
             else:
                 messages.success(request, "The upload of the GPX file was successful")
-                return redirect("dashboard:event_edit_view", id=event.aid)
+                return redirect("dashboard:event_edit_view", event_id=event.aid)
 
     else:
         form = UploadGPXForm()

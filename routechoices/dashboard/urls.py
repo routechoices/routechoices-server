@@ -44,38 +44,40 @@ urlpatterns = [
         r"^maps/upload-gpx/?$", views.map_gpx_upload_view, name="map_upload_gpx_view"
     ),
     re_path(
-        r"^maps/(?P<id>[A-Za-z0-9_-]+)/?$", views.map_edit_view, name="map_edit_view"
+        r"^maps/(?P<map_id>[A-Za-z0-9_-]+)/?$",
+        views.map_edit_view,
+        name="map_edit_view",
     ),
     re_path(
-        r"^maps/(?P<id>[A-Za-z0-9_-]+)/delete/?$",
+        r"^maps/(?P<map_id>[A-Za-z0-9_-]+)/delete/?$",
         views.map_delete_view,
         name="map_delete_view",
     ),
     re_path(r"^events/?$", views.event_list_view, name="event_list_view"),
     re_path(r"^events/new/?$", views.event_create_view, name="event_create_view"),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/?$",
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/?$",
         views.event_edit_view,
         name="event_edit_view",
     ),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/delete/?$",
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/delete/?$",
         views.event_delete_view,
         name="event_delete_view",
     ),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/chat-moderation/?$",
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/chat-moderation/?$",
         views.event_chat_moderation_view,
         name="event_chat_moderation_view",
     ),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/live/?$",
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/live/?$",
         views.event_view_live,
         name="event_view_live",
     ),
     re_path(
-        r"^events/(?P<id>[A-Za-z0-9_-]+)/route-upload/?$",
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/route-upload/?$",
         views.event_route_upload_view,
-        name="event_gpx_upload_view",
+        name="event_route_upload_view",
     ),
 ]

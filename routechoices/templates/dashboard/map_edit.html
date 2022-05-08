@@ -16,7 +16,7 @@
             </p>
             <p>To convert a PDF map in a image file <a target="_blank" rel="opener" href="{% url 'dashboard:pdf_to_jpg' %}">Click here</a></p>
             <input type="submit" value="Save" class="btn btn-primary">
-            {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' id=map.aid %}" class="btn btn-danger">Delete</a>{% endif %}
+            {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
     </div>
 </div>
