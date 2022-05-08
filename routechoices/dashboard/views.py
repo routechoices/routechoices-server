@@ -294,14 +294,14 @@ def club_create_view(request):
 
 
 @login_required
-def club_set_view(request, id):
+def club_set_view(request, club_id):
     if request.user.is_superuser:
         club = get_object_or_404(
             Club,
-            aid=id,
+            aid=club_id,
         )
     else:
-        club = get_object_or_404(Club, aid=id, admins=request.user)
+        club = get_object_or_404(Club, aid=club_id, admins=request.user)
     request.session["dashboard_club"] = club.aid
     return redirect("dashboard:club_view")
 

@@ -20,7 +20,9 @@ urlpatterns = [
     re_path(r"^select-club/?$", views.club_select_view, name="club_select_view"),
     re_path(r"^new-club/?$", views.club_create_view, name="club_create_view"),
     re_path(
-        r"^club/set/(?P<id>[A-Za-z0-9_-]+)/$", views.club_set_view, name="club_set_view"
+        r"^club/set/(?P<club_id>[A-Za-z0-9_-]+)/$",
+        views.club_set_view,
+        name="club_set_view",
     ),
     re_path(r"^club/$", views.club_view, name="club_view"),
     re_path(
