@@ -859,7 +859,7 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
         headers=livelox_headers,
     )
     if r_info.status_code != 200:
-        raise EventImportError("Can not fetch class info data")
+        raise EventImportError(f"Can not fetch class info data {r_info.status_code}")
     event_data = r_info.json().get("general", {})
     blob_url = event_data.get("classBlobUrl")
     if not blob_url or not blob_url.startswith("https://livelox.blob.core.windows.net"):
@@ -886,17 +886,16 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
 
     participant_data = [d for d in data["participants"] if d.get("routeData")]
     time_offset = 22089888e5
-
-    event_name = (
-        f"{event_data['class']['event']['name']} - {event_data['class']['name']}"
-    )
+    relay_name = "-".join(map(str, relay_legs))
+    event_name = f"{event_data['class']['event']['name']} - {event_data['class']['name']}{(' ' + relay_name) if relay_legs else ''}"
     event_start = arrow.get(
         event_data["class"]["event"]["timeInterval"]["start"]
     ).datetime
     event_end = arrow.get(event_data["class"]["event"]["timeInterval"]["end"]).datetime
+
     event, created = Event.objects.get_or_create(
         club=club,
-        slug=f"{class_id}",
+        slug=f"{class_id}{('-' + relay_name) if relay_legs else ''}",
         defaults={
             "name": event_name,
             "start_date": event_start,

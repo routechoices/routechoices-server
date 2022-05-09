@@ -32,11 +32,12 @@ class Command(BaseCommand):
                             pass
                 elif "," in event_id:
                     event_id, leg = event_id.split(",", 1)
+                    leg = int(leg)
                 self.stdout.write(f"Importing event {event_id}")
                 if options["task"]:
-                    import_single_event_from_livelox(event_id, leg)
+                    import_single_event_from_livelox(event_id, [leg])
                 else:
-                    import_single_event_from_livelox.now(event_id, leg)
+                    import_single_event_from_livelox.now(event_id, [leg])
             except EventImportError as e:
                 self.stderr.write(f"Could not import event {event_id}: {e}")
                 continue
