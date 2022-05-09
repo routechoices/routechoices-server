@@ -30,6 +30,8 @@ class Command(BaseCommand):
                             leg = parse_qs(parsed_url.query).get("relayLeg")[0]
                         except Exception:
                             pass
+                elif "," in event_id:
+                    event_id, leg = event_id.split(",", 1)
                 self.stdout.write(f"Importing event {event_id}")
                 if options["task"]:
                     import_single_event_from_livelox(event_id, leg)
