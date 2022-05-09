@@ -838,7 +838,9 @@ def draw_livelox_route(name, club, url, bound, routes, res):
 
 
 @background(schedule=0)
-def import_single_event_from_livelox(class_id):
+def import_single_event_from_livelox(class_id, relay_legs=None):
+    if relay_legs is None:
+        relay_legs = []
     livelox_headers = {
         "content-type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
@@ -850,21 +852,21 @@ def import_single_event_from_livelox(class_id):
             {
                 "classIds": [class_id],
                 "courseIds": [],
-                "relayLegs": [],
+                "relayLegs": relay_legs,
                 "relayLegGroupIds": [],
             }
         ),
         headers=livelox_headers,
     )
     if r_info.status_code != 200:
-        raise EventImportError("Can not fetch data")
+        raise EventImportError("Can not fetch class info data")
     event_data = r_info.json().get("general", {})
     blob_url = event_data.get("classBlobUrl")
     if not blob_url or not blob_url.startswith("https://livelox.blob.core.windows.net"):
-        raise EventImportError("Can not fetch data")
+        raise EventImportError(f"Can not fetch data: bad url ({blob_url})")
     r = requests.get(blob_url, headers=livelox_headers)
     if r.status_code != 200:
-        raise EventImportError("Can not fetch data")
+        raise EventImportError("Can not fetch class blob data")
     data = r.json()
     map_model = None
     map_projection = None

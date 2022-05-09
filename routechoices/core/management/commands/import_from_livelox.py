@@ -17,6 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for event_id in options["event_ids"]:
+            leg = None
             try:
                 if event_id.startswith("https://www.livelox.com/"):
                     try:
@@ -24,11 +25,16 @@ class Command(BaseCommand):
                         event_id = parse_qs(parsed_url.query).get("classId")[0]
                     except Exception:
                         self.stderr.write("Could not parse url")
+                    else:
+                        try:
+                            leg = parse_qs(parsed_url.query).get("relayLeg")[0]
+                        except Exception:
+                            pass
                 self.stdout.write(f"Importing event {event_id}")
                 if options["task"]:
-                    import_single_event_from_livelox(event_id)
+                    import_single_event_from_livelox(event_id, leg)
                 else:
-                    import_single_event_from_livelox.now(event_id)
-            except EventImportError:
-                self.stderr.write(f"Could not import event {event_id}")
+                    import_single_event_from_livelox.now(event_id, leg)
+            except EventImportError as e:
+                self.stderr.write(f"Could not import event {event_id}: {e}")
                 continue
