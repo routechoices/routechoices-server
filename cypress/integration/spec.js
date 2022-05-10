@@ -34,7 +34,7 @@ context("Cypress tests", () => {
     cy.get("#id_slug").clear().type("Jukola-2019-1st-leg");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-16 10:00:00");
-    cy.get("#id_map").select("Jukola 2019 - 1st Leg (Halden SK)");
+    cy.get("#id_map").select("Jukola 2019 - 1st Leg");
 
     cy.get("input[value='Save']").click();
     cy.url().should("match", /\/dashboard\/events$/);
@@ -68,7 +68,7 @@ context("Cypress tests", () => {
     cy.get("#id_slug").clear().type("Jukola-2019-1st-leg-2");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-16 00:00:00");
-    cy.get("#id_map").select("Jukola 2019 - 1st Leg (Halden SK)");
+    cy.get("#id_map").select("Jukola 2019 - 1st Leg");
     cy.get("#id_competitors-0-device-ts-control").type(this.devId).wait(1000);
     cy.get("#id_competitors-0-name").type("Mats Haldin");
     cy.get("#id_competitors-0-short_name").type("Halden");
@@ -96,7 +96,7 @@ context("Cypress tests", () => {
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-14 00:00:00");
     cy.get("#id_map_assignations-0-map").select(
-      "Jukola 2019 - 1st Leg (Halden SK)"
+      "Jukola 2019 - 1st Leg"
     );
     cy.get("#id_competitors-0-device-ts-control").type(this.devId).wait(1000);
     cy.get("#id_competitors-0-start_time")
