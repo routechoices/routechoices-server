@@ -271,7 +271,7 @@ class Map(models.Model):
         verbose_name_plural = "maps"
 
     def __str__(self):
-        return f"{self.name} ({self.club})"
+        return f"{self.name}"
 
     @property
     def path(self):
