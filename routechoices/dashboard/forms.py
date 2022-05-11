@@ -9,7 +9,6 @@ from django.forms import (
     DateTimeInput,
     FileField,
     Form,
-    HiddenInput,
     ModelChoiceField,
     ModelForm,
     inlineformset_factory,
@@ -136,15 +135,16 @@ class MapForm(ModelForm):
 
 class EventForm(ModelForm):
     def __init__(self, *args, **kwargs):
+        self.club = kwargs.pop("club")
         super().__init__(*args, **kwargs)
         self.fields["start_date"].help_text = '<span class="local_time"></span>'
         self.fields["end_date"].help_text = '<span class="local_time"></span>'
         self.fields["send_interval"].widget.attrs["min"] = 1
+        self.instance.club = self.club
 
     class Meta:
         model = Event
         fields = [
-            "club",
             "name",
             "slug",
             "privacy",
@@ -160,7 +160,6 @@ class EventForm(ModelForm):
             "map_title",
         ]
         widgets = {
-            "club": HiddenInput(),
             "start_date": DateTimeInput(
                 attrs={"class": "datetimepicker", "autocomplete": "off"}
             ),
@@ -168,6 +167,14 @@ class EventForm(ModelForm):
                 attrs={"class": "datetimepicker", "autocomplete": "off"}
             ),
         }
+
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
+        exclude.remove("club")
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)
 
     def clean(self):
         super().clean()
@@ -178,8 +185,8 @@ class EventForm(ModelForm):
 
     def clean_map(self):
         raster_map = self.cleaned_data.get("map")
-        club = self.data.get("club")
-        if raster_map and club and int(club) != raster_map.club_id:
+        club = self.club
+        if raster_map and club.id != raster_map.club_id:
             raise ValidationError("Map must be from the organizing club")
         return raster_map
 
