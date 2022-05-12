@@ -17,7 +17,7 @@
 </div>
 <ul class="nav nav-tabs" style="margin-bottom:1em;">
 <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_view' %}active{% endif %}" href="{% url 'dashboard:club_view' %}"><i class="fa fa-group"></i> Club</a></li>
-<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}"><i class="fa fa-mobile" style="font-size: 1.5em;vertical-align: bottom;"></i> Devices</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:device_list_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}"><i class="fa fa-mobile"></i> Devices</a></li>
 <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:map_list_view' %}active{% endif %}" href="{% url 'dashboard:map_list_view' %}"><i class="fa fa-map-o"></i>  Maps</a></li>
 <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}"><i class="fa fa-trophy"></i> Events</a></li>
 </ul>
