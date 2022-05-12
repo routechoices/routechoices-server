@@ -472,16 +472,14 @@ def event_chat(request, event_id):
 @api_view(["POST"])
 def event_register(request, event_id):
     event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
-
-    if not event.open_registration or event.end_date < now():
-        raise PermissionDenied()
-
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        is_user_event_admin = (
-            request.user.is_authenticated
-            and event.club.admins.filter(id=request.user.id).exists()
-        )
-        if not is_user_event_admin:
+    is_user_event_admin = (
+        request.user.is_authenticated
+        and event.club.admins.filter(id=request.user.id).exists()
+    )
+    if is_user_event_admin or request.user.is_superuser:
+        if not event.open_registration or event.end_date < now():
+            raise PermissionDenied()
+        elif event.privacy == PRIVACY_PRIVATE:
             raise PermissionDenied()
 
     device_id = request.data.get("device_id")

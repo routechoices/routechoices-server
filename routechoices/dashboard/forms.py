@@ -237,8 +237,15 @@ class CompetitorForm(ModelForm):
 
     def clean_start_time(self):
         start = self.cleaned_data.get("start_time")
-        event_start = get_aware_datetime(self.data.get("start_date"))
-        event_end = get_aware_datetime(self.data.get("end_date"))
+        orig_event = self.cleaned_data.get("event")
+        if self.data.get("start_date"):
+            event_start = get_aware_datetime(self.data.get("start_date"))
+        else:
+            event_start = orig_event.start_date
+        if self.data.get("end_date"):
+            event_end = get_aware_datetime(self.data.get("end_date"))
+        else:
+            event_end = orig_event.end_date
         if start and (event_start > start or start > event_end):
             raise ValidationError(
                 "Competitor start time should be during the event time"

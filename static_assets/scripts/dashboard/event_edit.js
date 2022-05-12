@@ -86,20 +86,7 @@ function onCsvParsed(result) {
     });
     return;
   }
-  // clear empty lines
-  u(".formset_row").each(function (e) {
-    if (
-      u(e)
-        .find("input")
-        .filter(function (el) {
-          return u(el).attr("type") != "hidden" && el.value != "";
-        }).length == 0
-    ) {
-      u(e).find(".delete-row").first().click();
-    }
-  });
-  result.data.forEach(function (l) {
-    u(".add-competitor-btn").first().click();
+  result.data.map(function (l, idx) {
     if (l.length != 1) {
       var inputs = u(u(".formset_row").last()).find("input").nodes;
       if (l.length > 3) {
@@ -110,13 +97,15 @@ function onCsvParsed(result) {
           type: "json",
           withCredentials: true,
           crossOrigin: true,
-          success: function (res) {
-            if (res.results.length == 1) {
-              var r = res.results[0];
-              myDeviceSelectInput.addOption(r);
-              myDeviceSelectInput.setValue(r[seletizeOptions.valueField]);
-            }
-          },
+          success: (function (line) {
+            return function (res) {
+              if (res.results.length == 1) {
+                var r = res.results[0];
+                myDeviceSelectInput.addOption(r);
+                myDeviceSelectInput.setValue(r[seletizeOptions.valueField]);
+              }
+            };
+          })(),
         });
       }
       if (l[2]) {
@@ -180,14 +169,14 @@ function showLocalTime(el) {
   });
 
   // next line must come after formset initialization
-  var hasArchivedDeivices = false;
+  var hasArchivedDevices = false;
   u('select[name$="-device"]').each(function (el) {
     if (el.options[el.selectedIndex].text.endsWith("*")) {
-      hasArchivedDeivices = true;
+      hasArchivedDevices = true;
     }
     new TomSelect(el, seletizeOptions);
   });
-  if (hasArchivedDeivices) {
+  if (hasArchivedDevices) {
     u(".add-competitor-btn")
       .parent()
       .append(

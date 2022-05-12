@@ -827,10 +827,16 @@ def event_edit_view(request, event_id):
         aid=event_id,
         club=club,
     )
-    comp_devices_id = event.competitors.all().values_list("device", flat=True)
+    use_competitor_formset = event.competitors.count() < 100
+    if use_competitor_formset:
+        comp_devices_id = event.competitors.all().values_list("device", flat=True)
+    else:
+        comp_devices_id = []
+
     own_devices = club.devices.all()
     own_devices_id = own_devices.values_list("id", flat=True)
     all_devices = set(list(comp_devices_id) + list(own_devices_id))
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, instance=event, club=club)
@@ -856,7 +862,6 @@ def event_edit_view(request, event_id):
             ]
         ):
             form.save()
-            formset.instance = event
             formset.save()
             extra_map_formset.instance = event
             extra_map_formset.save()
@@ -892,7 +897,11 @@ def event_edit_view(request, event_id):
     else:
         form = EventForm(instance=event, club=club)
         form.fields["map"].queryset = map_list
-        formset = CompetitorFormSet(instance=event)
+        formset_qs = Competitor.objects.none() if not use_competitor_formset else None
+        formset_args = {}
+        if not use_competitor_formset:
+            formset_args = {"queryset": formset_qs}
+        formset = CompetitorFormSet(instance=event, **formset_args)
         extra_map_formset = ExtraMapFormSet(instance=event)
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
@@ -921,7 +930,80 @@ def event_edit_view(request, event_id):
             "formset": formset,
             "extra_map_formset": extra_map_formset,
             "notice_form": notice_form,
+            "use_competitor_formset": use_competitor_formset,
         },
+    )
+
+
+@login_required
+def event_competitors_view(request, event_id):
+    is_club, bypass = handle_session_club(request)
+    if is_club:
+        club = bypass
+    else:
+        return bypass
+    event = get_object_or_404(
+        Event.objects.all().prefetch_related("notice", "competitors"),
+        aid=event_id,
+        club=club,
+    )
+    if event.competitors.count() < 50:
+        raise Http404()
+    page = request.GET.get("page", 1)
+    competitor_paginator = Paginator(event.competitors.all(), 50)
+    try:
+        competitors = competitor_paginator.page(page)
+    except Exception:
+        raise Http404()
+    comps = Competitor.objects.filter(id__in=[c.id for c in competitors.object_list])
+    comp_devices_id = [c.device_id for c in competitors.object_list]
+    own_devices = club.devices.all()
+    own_devices_id = own_devices.values_list("id", flat=True)
+    all_devices = set(list(comp_devices_id) + list(own_devices_id))
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        formset = CompetitorFormSet(
+            request.POST,
+            instance=event,
+        )
+        # check whether it's valid:
+        if formset.is_valid():
+            formset.save()
+            messages.success(request, "Changes saved successfully")
+            return redirect("dashboard:event_edit_view", event_id=event.aid)
+        else:
+            for cform in formset.forms:
+                if cform.cleaned_data.get("device"):
+                    all_devices.add(cform.cleaned_data.get("device").id)
+            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
+                "club_ownerships"
+            )
+            c = [
+                ["", "---------"],
+            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+            for cform in formset.forms:
+                cform.fields["device"].queryset = dev_qs
+                cform.fields["device"].choices = c
+    else:
+        formset = CompetitorFormSet(
+            instance=event,
+            queryset=comps,
+        )
+        formset.extra = 0
+        dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
+            "club_ownerships"
+        )
+        c = [
+            ["", "---------"],
+        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+        for cform in formset.forms:
+            cform.fields["device"].queryset = dev_qs
+            cform.fields["device"].choices = c
+
+    return render(
+        request,
+        "dashboard/event_competitors.html",
+        {"club": club, "event": event, "formset": formset, "competitors": competitors},
     )
 
 
