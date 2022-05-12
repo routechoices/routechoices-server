@@ -505,7 +505,7 @@ var selectReplayMode = function (e) {
     prevShownTime = currentTime;
     prevDisplayRefresh = performance.now();
     if (!isLiveMode) {
-      setTimeout(whileReplay, 101);
+      setTimeout(whileReplay, 300);
     }
   })();
 };
