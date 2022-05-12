@@ -644,6 +644,7 @@ var displayCompetitorList = function (force) {
   optionDisplayed = false;
   chatDisplayed = false;
   var listDiv = u('<div id="listCompetitor"/>');
+  nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
 
