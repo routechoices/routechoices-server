@@ -85,8 +85,20 @@ function onCsvParsed(result) {
       confirmButtonText: "OK",
     });
     return;
-  }
-  result.data.map(function (l, idx) {
+  } // clear empty lines
+  u(".formset_row").each(function (e) {
+    if (
+      u(e)
+        .find("input")
+        .filter(function (el) {
+          return u(el).attr("type") != "hidden" && el.value != "";
+        }).length == 0
+    ) {
+      u(e).find(".delete-row").first().click();
+    }
+  });
+  result.data.forEach(function (l) {
+    u(".add-competitor-btn").first().click();
     if (l.length != 1) {
       var inputs = u(u(".formset_row").last()).find("input").nodes;
       if (l.length > 3) {
