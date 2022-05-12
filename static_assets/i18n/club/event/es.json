@@ -38,5 +38,7 @@
   "error-sending-msg": "¡No se pudo enviar el mensaje!",
   "sending": "Enviando",
   "message-removed": "Mensaje eliminado por el moderador",
-  "chat-closed": "El chat está cerrado"
+  "chat-closed": "El chat está cerrado",
+  "error-max-runners": "Cannot display more than 75 competitors at the same time",
+  "reached-max-runners": "Se ha alcanzado el límite de 75 competidores mostrados"
 }

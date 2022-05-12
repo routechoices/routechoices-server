@@ -38,5 +38,6 @@
     "error-sending-msg": "Le message n'a pas pu être envoyé!",
     "sending": "Envoi en cours...",
     "message-removed": "Message supprimé par un modérateur",
-    "chat-closed": "Le chat est fermé"
+    "chat-closed": "Le chat est fermé",
+    "reached-max-runners": "La limite de 75 concurrents affichés a été atteinte"
 }

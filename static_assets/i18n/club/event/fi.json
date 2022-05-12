@@ -38,5 +38,6 @@
     "error-sending-msg": "Viestiä ei voitu lähettää!",
     "sending": "Lähetetään...",
     "message-removed": "Moderaattori poisti viestin",
-    "chat-closed": "Chat on suljettu"
+    "chat-closed": "Chat on suljettu",
+    "reached-max-runners": "75 kilpailijan raja on saavutettu"
 }

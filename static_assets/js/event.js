@@ -236,7 +236,8 @@ var sendInterval = 0;
 var endEvent = null;
 var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
-
+var maxParticipantsDisplayed = 75;
+var nbShown = 0;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -381,7 +382,7 @@ var onStart = function () {
     u("#live_button").remove();
     selectReplayMode();
   }
-  fetchCompetitorRoutes();
+  fetchCompetitorRoutes(null, true);
 };
 
 var selectLiveMode = function (e) {
@@ -525,7 +526,7 @@ var fetchCompetitorRoutes = function (url) {
     type: "json",
     success: function (response) {
       var runnerPoints = [];
-      response.competitors.forEach(function (competitor) {
+      response.competitors.forEach(function (competitor, idx) {
         if (competitor.encoded_data) {
           var route = PositionArchive.fromEncoded(competitor.encoded_data);
           competitorRoutes[competitor.id] = route;
@@ -645,9 +646,12 @@ var displayCompetitorList = function (force) {
   var listDiv = u('<div id="listCompetitor"/>');
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
-    competitor.isShown =
-      typeof competitor.isShown === "undefined" ? true : competitor.isShown;
 
+    competitor.isShown =
+      typeof competitor.isShown === "undefined"
+        ? nbShown < maxParticipantsDisplayed
+        : competitor.isShown;
+    nbShown += competitor.isShown ? 1 : 0;
     var div = u('<div class="card-body" style="padding:5px 10px 2px 10px;"/>');
     div.html(
       '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' +
@@ -728,10 +732,20 @@ var displayCompetitorList = function (force) {
           competitor.nameMarker = null;
           competitor.tail = null;
           updateCompetitor(competitor);
+          nbShown -= 1;
         } else {
+          if (nbShown >= maxParticipantsDisplayed) {
+            swal({
+              title: banana.i18n("reached-max-runners"),
+              type: "error",
+              confirmButtonText: "OK",
+            });
+            return;
+          }
           icon.removeClass("fa-toggle-off").addClass("fa-toggle-on");
           competitor.isShown = true;
           updateCompetitor(competitor);
+          nbShown += 1;
         }
       });
     u(div)
@@ -799,17 +813,34 @@ var displayCompetitorList = function (force) {
           competitor.nameMarker = null;
           competitor.tail = null;
           updateCompetitor(competitor);
+          nbShown = 0;
         });
         displayCompetitorList();
       });
     u(mainDiv)
       .find("#showAllCompetitorBtn")
       .on("click", function () {
-        competitorList.forEach(function (competitor) {
-          competitor.isShown = true;
+        nbShown = competitorList.reduce(function (a, v) {
+          return v.isShown ? a + 1 : a;
+        }, 0);
+        var didNotShowAll = false;
+        competitorList.forEach(function (competitor, idx) {
+          if (nbShown >= maxParticipantsDisplayed && !competitor.isShown) {
+            didNotShowAll = true;
+          } else if (!competitor.isShown) {
+            nbShown += 1;
+            competitor.isShown = true;
+          }
           updateCompetitor(competitor);
-          displayCompetitorList();
         });
+        if (didNotShowAll) {
+          swal({
+            title: banana.i18n("reached-max-runners"),
+            type: "warning",
+            confirmButtonText: "OK",
+          });
+        }
+        displayCompetitorList();
       });
     if (competitorList.length > 10) {
       mainDiv.append(
@@ -827,7 +858,6 @@ var displayCompetitorList = function (force) {
     mainDiv.append(listDiv);
   }
 };
-
 var filterCompetitorList = function (e) {
   var inputVal = u(e.target).val();
   searchText = inputVal.toLowerCase();
@@ -2136,7 +2166,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?2022032000`)
+  return fetch(`${langFile}?2022051200`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

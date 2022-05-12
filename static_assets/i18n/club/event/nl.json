@@ -38,5 +38,6 @@
     "error-sending-msg": "Bericht kon niet worden verstuurd!",
     "sending": "Sturen...",
     "message-removed": "Bericht verwijderd door een moderator",
-    "chat-closed": "Chatten is gesloten"
+    "chat-closed": "Chatten is gesloten",
+    "reached-max-runners": "De limiet van 75 deelnemers is bereikt"
 }
