@@ -37,7 +37,7 @@
           <div class="d-flex flex-row bd-highlight justify-content-between">
               <div class="p-2 bd-highlight">
                   <div>
-                    <a class="link-primary" href="{{ event.get_absolute_url }}"><b style="font-size: 1.3em;">{{ event.name }}</b></a>{% if event.is_live %}<span style="margin-left: 5px" class="badge bg-danger pull-right">LIVE</span>{% endif %}
+                    <a class="link-primary" href="{{ event.get_absolute_url }}"><b style="font-size: 1.3em;">{{ event.name }}</b></a>{% if event.is_live %}<span style="margin-left: 5px" class="badge bg-danger float-end">LIVE</span>{% endif %}
                   </div>
                   <div>
                     Starts <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
@@ -84,7 +84,7 @@
             <div class="d-flex flex-row bd-highlight justify-content-between">
                 <div class="p-2 bd-highlight">
                     <div>
-                      <a class="link-primary" href="{{ event.get_absolute_url }}"><b style="font-size: 1.3em;">{{ event.name }}</b></a>{% if event.is_live %}<span style="margin-left: 5px" class="badge bg-danger pull-right">LIVE</span>{% endif %}
+                      <a class="link-primary" href="{{ event.get_absolute_url }}"><b style="font-size: 1.3em;">{{ event.name }}</b></a>{% if event.is_live %}<span style="margin-left: 5px" class="badge bg-danger float-end">LIVE</span>{% endif %}
                     </div>
                     <div>
                       Starts <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>

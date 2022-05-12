@@ -871,7 +871,7 @@ var displayChat = function (ev) {
             banana.i18n("message") +
             "</label>" +
             '<input class="form-control" name="message" id="chatMessage" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>' +
-            '<input class="btn btn-primary pull-right" id="chatSubmitBtn" type="submit" value="Send" />'
+            '<input class="btn btn-primary float-end" id="chatSubmitBtn" type="submit" value="Send" />'
         )
         .on("submit", function (ev) {
           ev.preventDefault();
