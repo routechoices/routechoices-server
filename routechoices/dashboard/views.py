@@ -1154,7 +1154,7 @@ def event_route_upload_view(request, event_id):
     else:
         club_list = Club.objects.filter(admins=request.user)
         event = get_object_or_404(Event, aid=event_id, club__in=club_list)
-    competitors = event.competitors.all()
+    competitors = event.competitors.all().order_by("name")
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = UploadGPXForm(request.POST, request.FILES)
