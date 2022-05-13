@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files import File
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -813,6 +814,9 @@ def event_create_view(request):
     )
 
 
+MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
+
+
 @login_required
 def event_edit_view(request, event_id):
     is_club, bypass = handle_session_club(request)
@@ -827,7 +831,9 @@ def event_edit_view(request, event_id):
         aid=event_id,
         club=club,
     )
-    use_competitor_formset = event.competitors.count() < 100
+    use_competitor_formset = (
+        event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT
+    )
     if use_competitor_formset:
         comp_devices_id = event.competitors.all().values_list("device", flat=True)
     else:
@@ -935,6 +941,9 @@ def event_edit_view(request, event_id):
     )
 
 
+COMPETITORS_PAGE_SIZE = 50
+
+
 @login_required
 def event_competitors_view(request, event_id):
     is_club, bypass = handle_session_club(request)
@@ -947,10 +956,20 @@ def event_competitors_view(request, event_id):
         aid=event_id,
         club=club,
     )
-    if event.competitors.count() < 50:
+    if event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT:
         raise Http404()
     page = request.GET.get("page", 1)
-    competitor_paginator = Paginator(event.competitors.all(), 50)
+    search_query = request.GET.get("q", "")
+
+    qs = event.competitors.all()
+    if search_query:
+        qs = qs.filter(
+            Q(device__aid__icontains=search_query)
+            | Q(name__icontains=search_query)
+            | Q(short_name__icontains=search_query)
+        )
+
+    competitor_paginator = Paginator(qs, COMPETITORS_PAGE_SIZE)
     try:
         competitors = competitor_paginator.page(page)
     except Exception:
@@ -1003,7 +1022,13 @@ def event_competitors_view(request, event_id):
     return render(
         request,
         "dashboard/event_competitors.html",
-        {"club": club, "event": event, "formset": formset, "competitors": competitors},
+        {
+            "club": club,
+            "event": event,
+            "formset": formset,
+            "competitors": competitors,
+            "search_query": search_query,
+        },
     )
 
 

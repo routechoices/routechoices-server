@@ -16,10 +16,21 @@
 <div class="row">
     <div class="col-12">
         <h1>Edit {{event.name}} competitors <small><span class="utc-offset"></span></small></h1>
+        <div style="margin-bottom: 15px;">
+        <form method="GET" class="row">
+          <div class="col-auto">
+            <input class="form-control" type="search" value="{{search_query}}" name="q" placeholder="Search term"/>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> Search</button>
+          </div>
+        </form>
+        </div>
         {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
         <form action="" method="post">
             {% csrf_token %}
             <h3>Competitors</h3>
+            {% if not competitors.object_list and search_query %}<h4>No competitors matches this search</h4>{% endif %}
             {% bootstrap_formset_errors formset %}
             <table class="table competitor_table">
             {{ formset.management_form }}
