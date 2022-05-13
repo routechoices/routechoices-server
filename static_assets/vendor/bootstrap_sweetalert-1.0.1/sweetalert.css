@@ -227,7 +227,7 @@
     top: 0;
     bottom: 0;
     display: none;
-    z-index: 1040;
+    z-index: 10040;
   }
   .sweet-alert {
     background-color: #ffffff;
@@ -242,7 +242,7 @@
     margin-top: -200px;
     overflow: hidden;
     display: none;
-    z-index: 2000;
+    z-index: 20000;
   }
   @media all and (max-width: 767px) {
     .sweet-alert {
