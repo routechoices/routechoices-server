@@ -323,16 +323,12 @@ def event_registration_view(request, slug, **kwargs):
             return redirect(target_url)
         else:
             devices = Device.objects.none()
-            if request.user.is_authenticated:
-                devices = request.user.devices.all()
             form.fields["device"].queryset = devices
     else:
         if event.club.domain and not request.use_cname:
             return redirect(f"{event.club.nice_url}{event.slug}/registration")
         form = CompetitorForm(initial={"event": event})
         devices = Device.objects.none()
-        if request.user.is_authenticated:
-            devices = request.user.devices.all()
         form.fields["device"].queryset = devices
     form.fields["device"].label = "Device ID"
     return render(
