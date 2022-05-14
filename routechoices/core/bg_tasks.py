@@ -852,7 +852,7 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
             {
                 "classIds": [class_id],
                 "courseIds": [],
-                "relayLegs": relay_legs,
+                "relayLegs": [relay_legs],
                 "relayLegGroupIds": [],
             }
         ),
