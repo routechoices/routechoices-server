@@ -90,4 +90,33 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-3/route-upload")
         self.assertEqual(response.status_code, 200)
 
-    # TODO: Test private events visibility
+    def test_private_event_page_load(self):
+        Event.objects.create(
+            name="Kiila Cup 4",
+            slug="kiila-cup-4",
+            club=self.club,
+            start_date=arrow.now().shift(hours=-1).datetime,
+            end_date=arrow.now().shift(hours=1).datetime,
+            privacy="private",
+            open_registration=True,
+            allow_route_upload=True,
+        )
+
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4")
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/export")
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/registration")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/route-upload")
+        self.assertEqual(response.status_code, 200)
+
+        self.client.login(username="alice", password="pa$$word123")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/export")
+        self.assertEqual(response.status_code, 200)
