@@ -19,6 +19,7 @@ from routechoices.core.models import (
     Competitor,
     Device,
     DeviceArchiveReference,
+    DeviceClubOwnership,
     Event,
     ImeiDevice,
     Map,
@@ -358,6 +359,19 @@ class ChatMessageAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("event")
 
 
+class DeviceClubOwnershipAdmin(admin.ModelAdmin):
+    list_display = ("device", "club", "nickname")
+    list_filter = ("club",)
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("club", "device")
+            .order_by("club", "device__aid")
+        )
+
+
 admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
@@ -367,6 +381,7 @@ admin.site.register(Event, EventAdmin)
 admin.site.register(Map, MapAdmin)
 admin.site.register(SpotDevice, SpotDeviceAdmin)
 admin.site.register(SpotFeed, SpotFeedAdmin)
+admin.site.register(DeviceClubOwnership, DeviceClubOwnershipAdmin)
 
 
 class MyUserAdmin(UserAdmin):
