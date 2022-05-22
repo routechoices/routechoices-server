@@ -5,7 +5,6 @@ from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractMonth, ExtractYear
-from django.forms import HiddenInput
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
@@ -157,10 +156,10 @@ def backers(request):
 
 
 def contact(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.user.is_authenticated:
         form = ContactForm(request.POST)
         if form.is_valid():
-            from_email = form.cleaned_data["from_email"]
+            from_email = EmailAddress.objects.get_primary(request.user)
             subject = f'Routechoices.com contact form - {form.cleaned_data["subject"]} [{from_email}]'
             message = form.cleaned_data["message"]
             msg = EmailMessage(
@@ -175,9 +174,4 @@ def contact(request):
             return redirect("site:contact_view")
     else:
         form = ContactForm()
-    if request.user.is_authenticated:
-        primary_email = EmailAddress.objects.get_primary(request.user)
-        if primary_email:
-            form.fields["from_email"].initial = primary_email.email
-            form.fields["from_email"].widget = HiddenInput()
     return render(request, "site/contact.html", {"form": form})

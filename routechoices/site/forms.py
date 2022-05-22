@@ -1,13 +1,11 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
 from allauth.account.utils import filter_users_by_email
-from captcha.fields import CaptchaField
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.forms import (
     CharField,
-    EmailField,
     FileField,
     Form,
     HiddenInput,
@@ -92,9 +90,5 @@ class CompetitorForm(ModelForm):
 
 
 class ContactForm(Form):
-    from_email = EmailField(label="Your email address", required=True)
     subject = CharField(required=True, max_length=128)
     message = CharField(widget=Textarea, required=True)
-    captcha = CaptchaField(
-        help_text="To verify that you are not a robot, please enter the letters in the picture."
-    )
