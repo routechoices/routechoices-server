@@ -57,24 +57,28 @@ from routechoices.lib.kmz import extract_ground_overlay_info
 DEFAULT_PAGE_SIZE = 25
 
 
-def handle_session_club(request):
-    if "dashboard_club" not in request.session:
-        return False, redirect("dashboard:club_select_view")
-    session_club = request.session["dashboard_club"]
-    if request.user.is_superuser:
-        club = Club.objects.filter(aid=session_club).first()
-    else:
-        club = Club.objects.filter(admins=request.user, aid=session_club).first()
-    if not club:
-        return False, redirect("dashboard:club_select_view")
-    return True, club
+def requires_club_in_session(function):
+    def wrap(request, *args, **kwargs):
+        if "dashboard_club" not in request.session:
+            return redirect("dashboard:club_select_view")
+        session_club = request.session["dashboard_club"]
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=session_club).first()
+        else:
+            club = Club.objects.filter(aid=session_club).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        return function(request, *args, **kwargs)
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
 
 @login_required
+@requires_club_in_session
 def home_view(request):
-    is_club, bypass = handle_session_club(request)
-    if not is_club:
-        return bypass
     return redirect("dashboard:club_view")
 
 
@@ -189,12 +193,9 @@ def account_delete_view(request):
 
 
 @login_required
+@requires_club_in_session
 def device_list_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
@@ -233,12 +234,9 @@ def device_list_view(request):
 
 
 @login_required
+@requires_club_in_session
 def device_add_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -308,12 +306,9 @@ def club_set_view(request, club_id):
 
 
 @login_required
+@requires_club_in_session
 def club_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = ClubForm(request.POST, request.FILES, instance=club)
@@ -336,12 +331,9 @@ def club_view(request):
 
 
 @login_required
+@requires_club_in_session
 def club_custom_domain_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -364,12 +356,9 @@ def club_custom_domain_view(request):
 
 
 @login_required
+@requires_club_in_session
 def club_delete_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -386,12 +375,9 @@ def club_delete_view(request):
 
 
 @login_required
+@requires_club_in_session
 def map_list_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     map_list = Map.objects.filter(club=club).select_related("club")
     paginator = Paginator(map_list, DEFAULT_PAGE_SIZE)
@@ -401,12 +387,9 @@ def map_list_view(request):
 
 
 @login_required
+@requires_club_in_session
 def map_create_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -431,12 +414,9 @@ def map_create_view(request):
 
 
 @login_required
+@requires_club_in_session
 def map_edit_view(request, map_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     raster_map = get_object_or_404(Map, aid=map_id, club=club)
 
@@ -464,12 +444,9 @@ def map_edit_view(request, map_id):
 
 
 @login_required
+@requires_club_in_session
 def map_delete_view(request, map_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     raster_map = get_object_or_404(Map, aid=map_id, club=club)
     if request.method == "POST":
@@ -487,12 +464,9 @@ def map_delete_view(request, map_id):
 
 
 @login_required
+@requires_club_in_session
 def map_gpx_upload_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -589,12 +563,9 @@ def map_gpx_upload_view(request):
 
 
 @login_required
+@requires_club_in_session
 def map_kmz_upload_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -712,12 +683,9 @@ def map_kmz_upload_view(request):
 
 
 @login_required
+@requires_club_in_session
 def event_list_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     event_list = Event.objects.filter(club=club).select_related("club")
 
@@ -731,12 +699,9 @@ def event_list_view(request):
 
 
 @login_required
+@requires_club_in_session
 def event_create_view(request):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     map_list = Map.objects.filter(club=club).select_related("club")
 
@@ -818,12 +783,9 @@ MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
 
 
 @login_required
+@requires_club_in_session
 def event_edit_view(request, event_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     map_list = Map.objects.filter(club=club).select_related("club")
     event = get_object_or_404(
@@ -945,12 +907,10 @@ COMPETITORS_PAGE_SIZE = 50
 
 
 @login_required
+@requires_club_in_session
 def event_competitors_view(request, event_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
+
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
@@ -1033,12 +993,9 @@ def event_competitors_view(request, event_id):
 
 
 @login_required
+@requires_club_in_session
 def event_delete_view(request, event_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
 
     event = get_object_or_404(Event, aid=event_id, club=club)
     if request.method == "POST":
@@ -1055,12 +1012,10 @@ def event_delete_view(request, event_id):
 
 
 @login_required
+@requires_club_in_session
 def event_chat_moderation_view(request, event_id):
-    is_club, bypass = handle_session_club(request)
-    if is_club:
-        club = bypass
-    else:
-        return bypass
+    club = request.club
+
     event = get_object_or_404(
         Event,
         aid=event_id,
