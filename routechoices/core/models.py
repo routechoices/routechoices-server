@@ -963,7 +963,12 @@ class Device(models.Model):
 
     @property
     def battery_level_0_4(self):
-        return round(self.battery_level / 25)
+        # 0: 0-15
+        # 1: 15-35
+        # 2: 35-55
+        # 3: 55-75
+        # 4: 75-100
+        return min(4, round((self.battery_level - 5) / 20))
 
     @property
     def locations(self):
