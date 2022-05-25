@@ -31,6 +31,11 @@ urlpatterns = [
     re_path(r"^search/device/?$", views.device_search, name="device_search_api"),
     re_path(r"^search/user/?$", views.user_search, name="user_search_api"),
     re_path(
+        r"^device/(?P<device_id>[^/]+)/?$",
+        views.device_info,
+        name="device_info_api",
+    ),
+    re_path(
         r"^device/(?P<device_id>[^/]+)/registrations/?$",
         views.device_registrations,
         name="device_registrations_api",

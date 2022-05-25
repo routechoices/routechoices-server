@@ -1136,6 +1136,29 @@ def device_search(request):
     auto_schema=None,
 )
 @api_view(["GET"])
+def device_info(request, device_id):
+    device = get_object_or_404(Device, aid=device_id, is_gpx=False)
+    return Response(
+        {
+            "id": device.aid,
+            "last_position": {
+                "timestamp": device.last_date_viewed,
+                "coordinates": {
+                    "latitude": device.last_position[0],
+                    "longitude": device.last_position[1],
+                },
+            }
+            if device.last_location
+            else None,
+        }
+    )
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_view(["GET"])
 def device_registrations(request, device_id):
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
     competitors = device.competitor_set.filter(event__end_date__gte=now())
