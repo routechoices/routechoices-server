@@ -204,7 +204,7 @@ def decode_track_line(device, data, min_date=None, max_date=None):
     o_pt = data[0].split("_")
     if o_pt[0] == "*" or o_pt[1] == "*" or o_pt[2] == "*":
         return min_date, max_date
-    t = int(o_pt[0] + 1136073600)
+    t = int(o_pt[0]) + 1136073600
     prev_loc = {
         "lat": int(o_pt[2]) * 1.0 / 1e5,
         "lon": int(o_pt[1]) * 2.0 / 1e5,
