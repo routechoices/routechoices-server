@@ -19,7 +19,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files import File
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Case, Q, Value, When
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -197,10 +197,12 @@ def account_delete_view(request):
 def device_list_view(request):
     club = request.club
 
+    ordering_blank_last = Case(When(nickname="", then=Value(1)), default=Value(0))
+
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
         .select_related("club", "device")
-        .order_by("nickname", "device__aid")
+        .order_by(ordering_blank_last, "nickname", "device__aid")
     )
     paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
