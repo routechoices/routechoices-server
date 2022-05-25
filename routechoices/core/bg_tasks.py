@@ -304,8 +304,8 @@ def import_single_event_from_gps_seuranta(event_id):
         slug=event_id,
         defaults={
             "name": event_data["RACENAME"],
-            "start_date": event_start_date,
-            "end_date": event_end_date,
+            "start_date": arrow.get(event_start_date).datetime,
+            "end_date": arrow.get(event_end_date).datetime,
         },
     )
     if not created:
