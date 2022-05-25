@@ -200,7 +200,7 @@ def device_list_view(request):
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
         .select_related("club", "device")
-        .order_by("device__aid")
+        .order_by("nickname", "device__aid")
     )
     paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
@@ -744,9 +744,17 @@ def event_create_view(request):
                 "club_ownerships"
             )
             dev_qs |= club.devices.all()
+            cd = [
+                {
+                    "full": (d.id, d.get_display_str(club)),
+                    "key": (d.get_nickname(club), d.get_display_str(club)),
+                }
+                for d in dev_qs
+            ]
+            cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+            ] + [d["full"] for d in cd]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
@@ -759,9 +767,17 @@ def event_create_view(request):
             mform.fields["map"].queryset = map_list
         notice_form = NoticeForm()
         dev_qs = club.devices.all().prefetch_related("club_ownerships")
+        cd = [
+            {
+                "full": (d.id, d.get_display_str(club)),
+                "key": (d.get_nickname(club), d.get_display_str(club)),
+            }
+            for d in dev_qs
+        ]
+        cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
         c = [
             ["", "---------"],
-        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+        ] + [d["full"] for d in cd]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c
@@ -856,9 +872,17 @@ def event_edit_view(request, event_id):
             dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
                 "club_ownerships"
             )
+            cd = [
+                {
+                    "full": (d.id, d.get_display_str(club)),
+                    "key": (d.get_nickname(club), d.get_display_str(club)),
+                }
+                for d in dev_qs
+            ]
+            cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
             c = [
                 ["", "---------"],
-            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+            ] + [d["full"] for d in cd]
             for cform in formset.forms:
                 cform.fields["device"].queryset = dev_qs
                 cform.fields["device"].choices = c
@@ -880,9 +904,17 @@ def event_edit_view(request, event_id):
         dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
             "club_ownerships"
         )
+        cd = [
+            {
+                "full": (d.id, d.get_display_str(club)),
+                "key": (d.get_nickname(club), d.get_display_str(club)),
+            }
+            for d in dev_qs
+        ]
+        cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
         c = [
             ["", "---------"],
-        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+        ] + [d["full"] for d in cd]
         for cform in formset.forms:
             cform.fields["device"].queryset = dev_qs
             cform.fields["device"].choices = c

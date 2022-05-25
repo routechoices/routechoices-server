@@ -961,6 +961,22 @@ class Device(models.Model):
                 break
         return f"{device.aid} {f' ({owner.nickname})' if owner and owner.nickname else ''}{'*' if original_device else ''}"
 
+    def get_nickname(self, club):
+        original_device = self.get_original_device()
+        if original_device:
+            device = original_device
+        else:
+            device = self
+        owner = None
+        # Use this instead of .filter(club=club).first() as club_ownership are already loaded, hence avoiding n+1 query
+        for ownership in device.club_ownerships.all():
+            if ownership.club_id == club.id:
+                owner = ownership
+                break
+        if owner and owner.nickname:
+            return owner.nickname
+        return ""
+
     @property
     def battery_level_0_4(self):
         # 0: 0-15

@@ -42,8 +42,8 @@ urlpatterns = [
     ),
     re_path(
         r"^clubs/(?P<club_id>[0-9a-zA-Z_-]+)/devices/(?P<device_id>[^/]+)/?$",
-        views.device_api_view,
-        name="device_api_view",
+        views.device_ownership_api_view,
+        name="device_ownership_api_view",
     ),
     re_path(r"^events/?$", views.event_list, name="event_list"),
     re_path(

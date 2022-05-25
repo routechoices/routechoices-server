@@ -1171,8 +1171,11 @@ def device_registrations(request, device_id):
 )
 @api_view(["PATCH", "DELETE"])
 @login_required
-def device_api_view(request, club_id, device_id):
-    club = get_object_or_404(Club, admins=request.user, aid=club_id)
+def device_ownership_api_view(request, club_id, device_id):
+    if not request.user.is_superuser:
+        club = get_object_or_404(Club, admins=request.user, aid=club_id)
+    else:
+        club = get_object_or_404(Club, aid=club_id)
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
     ownership = get_object_or_404(DeviceClubOwnership, device=device, club=club)
     if request.method == "PATCH":
