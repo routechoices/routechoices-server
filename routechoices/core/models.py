@@ -996,7 +996,7 @@ class Device(models.Model):
     def locations(self, locs):
         self.locations_raw = str(json.dumps(locs), "utf-8")
 
-    def get_locations_between_dates(self, from_date, end_date, encoded=False):
+    def get_locations_between_dates(self, from_date, end_date, *, encoded=False):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
