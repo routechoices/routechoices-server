@@ -996,7 +996,7 @@ class Device(models.Model):
     def locations(self, locs):
         self.locations_raw = str(json.dumps(locs), "utf-8")
 
-    def get_locations_between_dates(self, from_date, end_date, *, encoded=False):
+    def get_locations_between_dates(self, from_date, end_date, /, *, encoded=False):
         qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
@@ -1010,7 +1010,7 @@ class Device(models.Model):
         result = gps_encoding.encode_data(locs)
         return len(locs), result
 
-    def add_locations(self, loc_array, *, save=True, push_forward=True):
+    def add_locations(self, loc_array, /, *, save=True, push_forward=True):
         new_ts = []
         new_lat = []
         new_lon = []
@@ -1063,7 +1063,7 @@ class Device(models.Model):
             except Exception:
                 pass
 
-    def add_location(self, timestamp, lat, lon, save=True, push_forward=True):
+    def add_location(self, timestamp, lat, lon, /, *, save=True, push_forward=True):
         self.add_locations(
             [
                 (timestamp, lat, lon),
