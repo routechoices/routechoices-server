@@ -582,18 +582,18 @@ def import_single_event_from_sportrec(event_id):
             break
         lf.write(block)
     lf.flush()
-    try:
-        with open(lf.name, "r") as f:
-            device_map = {}
+    device_map = {}
+    with open(lf.name, "r") as f:
+        try:
             device_data = json.load(f)
-            for d in device_data["locations"]:
-                device_map[d["device_id"]] = [
-                    int((float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
-                    for x in d["locations"]
-                ]
-    except Exception:
-        event.delete()
-        raise EventImportError("Could not decode data")
+        except Exception:
+            event.delete()
+            raise EventImportError("Invalid JSON")
+        for d in device_data["locations"]:
+            device_map[d["device_id"]] = [
+                (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
+                for x in d["locations"]
+            ]
     lf.close()
 
     for c_data in event_data["participants"]:

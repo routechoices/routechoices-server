@@ -24,6 +24,6 @@ class Command(BaseCommand):
                     import_single_event_from_sportrec(event_id)
                 else:
                     import_single_event_from_sportrec.now(event_id)
-            except EventImportError:
-                self.stderr.write(f"Could not import event {event_id}")
+            except EventImportError as e:
+                self.stderr.write(f"Could not import event {event_id}: {str(e)}")
                 continue
