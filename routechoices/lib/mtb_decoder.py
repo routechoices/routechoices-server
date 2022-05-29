@@ -3,9 +3,9 @@ from uuid import UUID
 
 
 class MtbDecoder:
-    def __init__(self, filename):
+    def __init__(self, file_pointer):
         self.device_map = {}
-        self.filename = filename
+        self.fp = file_pointer
 
     def get_float(self):
         d = self.fp.read(4)

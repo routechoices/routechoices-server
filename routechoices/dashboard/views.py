@@ -588,25 +588,25 @@ def map_kmz_upload_view(request):
                     ) and not image_path.startswith("https://"):
                         raise Exception("Fishy KML")
 
-                    dest = tempfile.NamedTemporaryFile(delete=False)
-                    headers = requests.utils.default_headers()
-                    headers.update(
-                        {
-                            "User-Agent": "Python3/Requests/Routechoices.com",
-                        }
-                    )
-                    r = requests.get(image_path, headers=headers)
-                    if r.status_code != 200:
-                        raise Exception("Could not reach image source")
-                    dest.write(r.content)
-                    new_map = Map(
-                        club=club,
-                        name=name,
-                        corners_coordinates=corners_coords,
-                    )
-                    image_file = File(open(dest.name, "rb"))
-                    new_map.image.save("file", image_file, save=False)
-                    dest.close()
+                    with tempfile.NamedTemporaryFile() as dest:
+                        headers = requests.utils.default_headers()
+                        headers.update(
+                            {
+                                "User-Agent": "Python3/Requests/Routechoices.com",
+                            }
+                        )
+                        r = requests.get(image_path, headers=headers)
+                        if r.status_code != 200:
+                            raise Exception("Could not reach image source")
+                        dest.write(r.content)
+                        dest.flush()
+                        new_map = Map(
+                            club=club,
+                            name=name,
+                            corners_coordinates=corners_coords,
+                        )
+                        image_file = File(open(dest.name, "rb"))
+                        new_map.image.save("file", image_file, save=False)
                 except Exception:
                     error = "An error occured while extracting the map from your file."
             elif file.name.lower().endswith(".kmz"):
@@ -628,7 +628,7 @@ def map_kmz_upload_view(request):
                     if image_path.startswith("http://") or image_path.startswith(
                         "https://"
                     ):
-                        dest = tempfile.NamedTemporaryFile(delete=False)
+                        dest = tempfile.TemporaryFile()
                         headers = requests.utils.default_headers()
                         headers.update(
                             {
