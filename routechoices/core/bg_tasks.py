@@ -576,25 +576,28 @@ def import_single_event_from_sportrec(event_id):
     if response.status_code != 200:
         event.delete()
         raise EventImportError("API returned error code")
-    lf = tempfile.NamedTemporaryFile()
-    for block in response.iter_content(1024 * 8):
-        if not block:
-            break
-        lf.write(block)
-    lf.flush()
-    device_map = {}
-    with open(lf.name, "r") as f:
+    with tempfile.TemporaryFile() as lf:
+        for block in response.iter_content(1024 * 8):
+            if not block:
+                break
+            lf.write(block)
+        lf.flush()
+        lf.seek(0)
+        device_map = {}
         try:
-            device_data = json.load(f)
+            device_data = json.load(lf)
         except Exception:
             event.delete()
             raise EventImportError("Invalid JSON")
-        for d in device_data["locations"]:
-            device_map[d["device_id"]] = [
-                (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
-                for x in d["locations"]
-            ]
-    lf.close()
+        try:
+            for d in device_data["locations"]:
+                device_map[d["device_id"]] = [
+                    (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
+                    for x in d["locations"]
+                ]
+        except Exception:
+            event.delete()
+            raise EventImportError("Unexpected data structure")
 
     for c_data in event_data["participants"]:
         st = c_data.get("time_start")
