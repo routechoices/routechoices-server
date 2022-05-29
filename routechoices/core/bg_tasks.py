@@ -486,20 +486,19 @@ def import_single_event_from_tractrac(event_id):
             data_url = f"http:{data_url}"
         response = requests.get(data_url, stream=True)
         if response.status_code == 200:
-            lf = tempfile.NamedTemporaryFile()
-            for block in response.iter_content(1024 * 8):
-                if not block:
-                    break
-                lf.write(block)
-            lf.flush()
-            try:
-                device_map = MtbDecoder(lf.name).decode()
-            except Exception:
-                if not event_data["parameters"].get("ws-uri"):
-                    event.delete()
-                    raise EventImportError("Could not decode mtb")
-            finally:
-                lf.close()
+            with tempfile.TemporaryFile() as lf:
+                for block in response.iter_content(1024 * 8):
+                    if not block:
+                        break
+                    lf.write(block)
+                lf.flush()
+                lf.seek(0)
+                try:
+                    device_map = MtbDecoder(lf).decode()
+                except Exception:
+                    if not event_data["parameters"].get("ws-uri"):
+                        event.delete()
+                        raise EventImportError("Could not decode mtb")
 
     if event_data["parameters"].get("ws-uri") and not device_map:
         try:
@@ -662,25 +661,28 @@ def import_single_event_from_otracker(event_id):
     if response.status_code != 200:
         event.delete()
         raise EventImportError("API returned error code")
-    lf = tempfile.NamedTemporaryFile()
-    for block in response.iter_content(1024 * 8):
-        if not block:
-            break
-        lf.write(block)
-    lf.flush()
-    try:
-        with open(lf.name, "r") as f:
-            orig_device_map = json.load(f)
-            device_map = {}
+    with tempfile.TemporaryFile() as lf:
+        for block in response.iter_content(1024 * 8):
+            if not block:
+                break
+            lf.write(block)
+        lf.flush()
+        lf.seek(0)
+        device_map = {}
+        try:
+            orig_device_map = json.load(lf)
+        except Exception:
+            event.delete()
+            raise EventImportError("Invalid JSON")
+        try:
             for d in orig_device_map:
                 device_map[d] = [
                     (int(x["fix_time"] + ft), x["lat"], x["lon"])
                     for x in orig_device_map[d]
                 ]
-    except Exception:
-        event.delete()
-        raise EventImportError("Could not decode data")
-    lf.close()
+        except Exception:
+            event.delete()
+            raise EventImportError("Unexpected data structure")
 
     for c_data in event_data["competitors"].values():
         st = c_data.get("sync_offset") + ft

@@ -58,24 +58,22 @@ class MtbDecoder:
         self.fp.read(n)
 
     def decode(self):
-        with open(self.filename, "rb") as fp:
-            self.fp = fp
-            while True:
-                self.current_size = self.get_int32()
-                t = self.get_int32()
-                if t == 1:
-                    self.read_event_latest_type()
-                elif t == 2:
-                    self.read_event_sequence_type()
-                elif t == 5:
-                    self.read_race_latest_type()
-                elif t == 6:
-                    self.read_race_sequence_type()
-                elif not t:
-                    print("done")
-                    break
-                else:
-                    raise Exception("Bad Format")
+        while True:
+            self.current_size = self.get_int32()
+            t = self.get_int32()
+            if t == 1:
+                self.read_event_latest_type()
+            elif t == 2:
+                self.read_event_sequence_type()
+            elif t == 5:
+                self.read_race_latest_type()
+            elif t == 6:
+                self.read_race_sequence_type()
+            elif not t:
+                print("done")
+                break
+            else:
+                raise Exception("Bad Format")
         return self.device_map
 
     def read_event_latest_type(self):
