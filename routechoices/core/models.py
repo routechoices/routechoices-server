@@ -372,7 +372,9 @@ class Map(models.Model):
         orig = self.image.open("rb").read()
         img = Image.open(BytesIO(orig))
         if img.mode != "RGB":
-            img = img.convert("RGB")
+            white_bg_img = Image.new("RGBA", img.size, "WHITE")
+            white_bg_img.paste(img, (0, 0), img)
+            img = white_bg_img.convert("RGB")
         img = img.transform(
             (1200, 630),
             Image.QUAD,
