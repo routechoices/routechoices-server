@@ -342,7 +342,7 @@ class Map(models.Model):
         if not value:
             raise ValueError("Value can not be null")
         data_matched = re.match(
-            r"^data:image/(?P<format>jpeg|png|gif);base64,"
+            r"^data:image/(?P<format>jpeg|png|gif|webp);base64,"
             r"(?P<data_b64>(?:[A-Za-z0-9+/]{4})*"
             r"(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$",
             value,
@@ -475,9 +475,9 @@ class Map(models.Model):
         return math.ceil(math.log2(r)) + 18
 
     def create_tile(
-        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, format
+        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
     ):
-        cache_key = f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{format}"
+        cache_key = f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
 
         use_cache = getattr(settings, "CACHE_TILES", False)
         cached = None
@@ -495,10 +495,10 @@ class Map(models.Model):
                 (output_height, output_width, n_channels), dtype=np.uint8
             )
             extra_args = []
-            if format == "image/webp":
+            if img_mime == "image/webp":
                 extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
             _, buffer = cv2.imencode(
-                ".png" if format == "image/png" else ".webp",
+                ".png" if img_mime == "image/png" else ".webp",
                 transparent_img,
                 extra_args,
             )
@@ -544,18 +544,18 @@ class Map(models.Model):
             borderValue=(255, 255, 255, 0),
         )
         extra_args = []
-        if format == "image/webp":
+        if img_mime == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
 
-        if format == "image/avif":
+        if img_mime == "image/avif":
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_RGBA2BGRA)
             pil_image = Image.fromarray(color_coverted)
             buffer = BytesIO()
-            pil_image.save(buffer, "AVIF", quality=20)
+            pil_image.save(buffer, "AVIF", quality=80)
             data_out = buffer.getvalue()
         else:
             _, buffer = cv2.imencode(
-                ".png" if format == "image/png" else ".webp", tile_img, extra_args
+                ".png" if img_mime == "image/png" else ".webp", tile_img, extra_args
             )
             data_out = BytesIO(buffer).getvalue()
         if use_cache:
@@ -598,16 +598,16 @@ class Map(models.Model):
                 new_w = image.size[0] * scale
                 new_h = image.size[1] * scale
                 rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
-            format = "WEBP"
+            img_ext = "WEBP"
             if rgba_img.size[0] > WEBP_MAX_SIZE or rgba_img.size[1] > WEBP_MAX_SIZE:
-                format = "PNG"
+                img_ext = "PNG"
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),
             }
-            if format == "WEBP":
-                params["quality"] = 60
-            rgba_img.save(out_buffer, format, **params)
+            if img_ext == "WEBP":
+                params["quality"] = 80
+            rgba_img.save(out_buffer, img_ext, **params)
             f_new = File(out_buffer, name=self.image.name)
             self.image.save(
                 "filename",

@@ -1598,17 +1598,17 @@ def wms_service(request):
 
         http_accept = request.META.get("HTTP_ACCEPT", "")
         if "image/avif" in http_accept.split(","):
-            format = "image/avif"
+            img_mime = "image/avif"
         elif "image/webp" in http_accept.split(","):
-            format = "image/webp"
+            img_mime = "image/webp"
         else:
-            format = "image/png"
+            img_mime = "image/png"
 
-        asked_format = request.GET.get("format", request.GET.get("FORMAT", format))
-        if asked_format in ("image/png", "image/webp", "image/avif"):
-            format = asked_format
+        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
+        if asked_mime in ("image/png", "image/webp", "image/avif"):
+            img_mime = asked_mime
 
-        if format not in ("image/png", "image/webp", "image/avif"):
+        if img_mime not in ("image/png", "image/webp", "image/avif"):
             return HttpResponseBadRequest("invalid format")
 
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
@@ -1662,14 +1662,14 @@ def wms_service(request):
 
         try:
             data_out = raster_map.create_tile(
-                out_w, out_h, min_lat, max_lat, min_lon, max_lon, format
+                out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime
             )
         except Exception as e:
             raise e
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}
-        return HttpResponse(data_out, content_type=format, headers=headers)
+        return HttpResponse(data_out, content_type=img_mime, headers=headers)
     elif "GetCapabilities" in [request.GET.get("request"), request.GET.get("REQUEST")]:
         """max_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': 89.9, 'lon': 180})
                 min_xy = GLOBAL_MERCATOR.latlon_to_meters({'lat': -89.9, 'lon': -180})
