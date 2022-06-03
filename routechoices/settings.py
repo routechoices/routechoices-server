@@ -77,10 +77,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "routechoices.core.middleware.SessionMiddleware",
     "routechoices.core.middleware.HostsRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "routechoices.core.middleware.XForwardedForMiddleware",
-    "routechoices.core.middleware.SessionMiddleware",
     "routechoices.core.middleware.BanRussiaMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
