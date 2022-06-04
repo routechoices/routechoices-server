@@ -1931,12 +1931,12 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(bounds, src, fit) {
+function addRasterMap(bounds, hash, fit) {
   if (fit === undefined) {
     fit = false;
   }
   rasterMap = L.tileLayer
-    .wms(wmsServiceUrl + "?", {
+    .wms(wmsServiceUrl + "?hash=" + hash, {
       layers: eventId,
       bounds: bounds,
       tileSize: 512,

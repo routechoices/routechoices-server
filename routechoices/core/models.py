@@ -476,11 +476,17 @@ class Map(models.Model):
         r = self.resolution / 1.193
         return math.ceil(math.log2(r)) + 18
 
+    def tile_cache_key(
+        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
+    ):
+        return f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
+
     def create_tile(
         self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
     ):
-        cache_key = f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
-
+        cache_key = self.tile_cache_key(
+            output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
+        )
         use_cache = getattr(settings, "CACHE_TILES", False)
         cached = None
         if use_cache:

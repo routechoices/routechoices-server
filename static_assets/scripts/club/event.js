@@ -201,8 +201,6 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                 m.title = m.title
                   ? u("<span/>").text(m.title).html()
                   : '<i class="fa fa-star"></i> Main Map';
-                mapHash = m.hash;
-                mapUrl = m.url + "?map_hash=" + mapHash;
                 var bounds = [
                   [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
                   [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
@@ -212,7 +210,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                addRasterMap(bounds, mapUrl, true);
+                addRasterMap(bounds, m.hash, true);
                 MapLayers[m.title] = rasterMap;
               } else {
                 var bounds = [
@@ -224,12 +222,15 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                MapLayers[m.title] = L.tileLayer.wms(wmsServiceUrl + "?", {
-                  layers: eventId + "/" + i,
-                  bounds: bounds,
-                  tileSize: 512,
-                  noWrap: true,
-                });
+                MapLayers[m.title] = L.tileLayer.wms(
+                  wmsServiceUrl + "?hash=" + m.hash,
+                  {
+                    layers: eventId + "/" + i,
+                    bounds: bounds,
+                    tileSize: 512,
+                    noWrap: true,
+                  }
+                );
               }
             }
             if (response.maps.length > 1) {

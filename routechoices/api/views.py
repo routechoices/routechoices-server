@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import re
 import time
@@ -20,13 +21,13 @@ from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.views.decorators.http import last_modified
+from django.views.decorators.http import etag, last_modified
 from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import renderers, status
 from rest_framework.decorators import api_view, throttle_classes
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
@@ -54,6 +55,7 @@ from routechoices.lib.helpers import (
     initial_of_name,
     random_device_id,
     safe64decode,
+    safe64encode,
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.validators import (
@@ -1203,9 +1205,9 @@ def event_map_download(request, event_id, map_index="0"):
         start_date__lt=now(),
     )
     if map_index == "0" and not event.map:
-        raise NotFound()
+        raise Http404
     elif event.extra_maps.all().count() < int(map_index):
-        raise NotFound()
+        raise Http404
 
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if (
@@ -1247,7 +1249,7 @@ def event_map_thumb_download(request, event_id):
         start_date__lt=now(),
     )
     if not event.map:
-        raise NotFound()
+        raise Http404
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if (
             not request.user.is_authenticated
@@ -1275,9 +1277,9 @@ def event_kmz_download(request, event_id, map_index="0"):
         start_date__lt=now(),
     )
     if map_index == "0" and not event.map:
-        raise NotFound()
+        raise Http404
     elif event.extra_maps.all().count() < int(map_index):
-        raise NotFound()
+        raise Http404
 
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if (
@@ -1547,6 +1549,85 @@ def two_d_rerun_race_data(request):
     )
 
 
+def tile_etag(request):
+    if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
+        layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
+        bbox_raw = request.GET.get("bbox", request.GET.get("BBOX"))
+        width_raw = request.GET.get("width", request.GET.get("WIDTH"))
+        heigth_raw = request.GET.get("height", request.GET.get("HEIGHT"))
+
+        http_accept = request.META.get("HTTP_ACCEPT", "")
+        if "image/avif" in http_accept.split(","):
+            img_mime = "image/avif"
+        elif "image/webp" in http_accept.split(","):
+            img_mime = "image/webp"
+        else:
+            img_mime = "image/png"
+
+        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
+        if asked_mime in ("image/png", "image/webp", "image/avif"):
+            img_mime = asked_mime
+
+        if img_mime not in ("image/png", "image/webp", "image/avif"):
+            return None
+
+        if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
+            return None
+        try:
+            min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(","))
+            if request.GET.get("SRS", request.GET.get("crs")) == "CRS:84":
+                min_lon, min_lat, max_lon, max_lat = (
+                    float(x) for x in bbox_raw.split(",")
+                )
+                min_xy = GLOBAL_MERCATOR.latlon_to_meters(
+                    {"lat": min_lat, "lon": min_lon}
+                )
+                max_xy = GLOBAL_MERCATOR.latlon_to_meters(
+                    {"lat": max_lat, "lon": max_lon}
+                )
+                min_lat = min_xy["y"]
+                min_lon = min_xy["x"]
+                max_lat = max_xy["y"]
+                max_lon = max_xy["x"]
+            out_w, out_h = int(width_raw), int(heigth_raw)
+            if "/" in layers_raw:
+                layer_id, map_index = layers_raw.split("/")
+                map_index = int(map_index)
+            else:
+                layer_id = layers_raw
+                map_index = 0
+        except Exception:
+            return None
+
+        event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
+        if map_index == 0 and not event.map:
+            return None
+        elif map_index > event.extra_maps.all().count():
+            return None
+
+        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+            if (
+                not request.user.is_authenticated
+                or not event.club.admins.filter(id=request.user.id).exists()
+            ):
+                raise None
+        if map_index == 0:
+            raster_map = event.map
+        else:
+            raster_map = (
+                event.map_assignations.select_related("map")
+                .all()[int(map_index) - 1]
+                .map
+            )
+        etag = raster_map.tile_cache_key(
+            out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime
+        )
+        h = hashlib.sha256()
+        h.update(etag.encode("utf-8"))
+        return safe64encode(h.digest())
+    return None
+
+
 def tile_latest_modification(request):
     if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
         layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
@@ -1565,7 +1646,7 @@ def tile_latest_modification(request):
         event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
         if map_index == 0 and not event.map:
             return None
-        elif event.extra_maps.all().count() < int(map_index):
+        elif map_index > event.extra_maps.all().count():
             return None
 
         if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
@@ -1586,6 +1667,7 @@ def tile_latest_modification(request):
     return None
 
 
+@etag(tile_etag)
 @last_modified(tile_latest_modification)
 def wms_service(request):
     if "WMS" not in [request.GET.get("service"), request.GET.get("SERVICE")]:
@@ -1641,9 +1723,9 @@ def wms_service(request):
 
         event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
         if map_index == 0 and not event.map:
-            raise NotFound()
-        elif event.extra_maps.all().count() < int(map_index):
-            raise NotFound()
+            raise Http404
+        elif map_index > event.extra_maps.all().count():
+            raise Http404
 
         if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
             if (
