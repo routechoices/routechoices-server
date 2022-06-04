@@ -1690,9 +1690,6 @@ def wms_service(request):
         if asked_mime in ("image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
 
-        if img_mime not in ("image/png", "image/webp", "image/avif"):
-            return HttpResponseBadRequest("invalid format")
-
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
             return HttpResponseBadRequest("missing mandatory parameters")
         try:
