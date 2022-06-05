@@ -183,10 +183,13 @@ class EventAdmin(admin.ModelAdmin):
         "privacy",
         "club",
         "start_date",
-        "shortcut",
+        "shortcut_link",
     )
     list_filter = ("club", "privacy")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
+
+    def shortcut_link(self, obj):
+        return mark_safe(f'<a href="{obj.shortcut}">Open</a>')
 
 
 class DeviceCompetitorInline(admin.TabularInline):
