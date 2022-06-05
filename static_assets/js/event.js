@@ -236,7 +236,7 @@ var sendInterval = 0;
 var endEvent = null;
 var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
-var maxParticipantsDisplayed = 75;
+var maxParticipantsDisplayed = 100;
 var nbShown = 0;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
@@ -737,7 +737,10 @@ var displayCompetitorList = function (force) {
         } else {
           if (nbShown >= maxParticipantsDisplayed) {
             swal({
-              title: banana.i18n("reached-max-runners"),
+              title: banana.i18n(
+                "reached-max-runners",
+                maxParticipantsDisplayed
+              ),
               type: "error",
               confirmButtonText: "OK",
             });
@@ -836,7 +839,7 @@ var displayCompetitorList = function (force) {
         });
         if (didNotShowAll) {
           swal({
-            title: banana.i18n("reached-max-runners"),
+            title: banana.i18n("reached-max-runners", maxParticipantsDisplayed),
             type: "warning",
             confirmButtonText: "OK",
           });
@@ -2167,7 +2170,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?2022051200`)
+  return fetch(`${langFile}?2022060500`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);
