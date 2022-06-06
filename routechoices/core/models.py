@@ -367,8 +367,9 @@ class Map(models.Model):
                 cached = cache.get(cache_key)
             except Exception:
                 pass
-        if use_cache and cached:
-            return cached
+            else:
+                if cached:
+                    return cached
         orig = self.image.open("rb").read()
         img = Image.open(BytesIO(orig))
         if img.mode != "RGB":
@@ -494,23 +495,50 @@ class Map(models.Model):
                 cached = cache.get(cache_key)
             except Exception:
                 pass
-        if use_cache and cached:
-            return cached
+            else:
+                if cached:
+                    return cached
 
         if not self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
+            blank_cache_key = f"blank_tile_{output_width}_{output_height}_{img_mime}"
+            if use_cache:
+                try:
+                    cached = cache.get(blank_cache_key)
+                except Exception:
+                    pass
+                else:
+                    if cached:
+                        try:
+                            cache.set(cache_key, cached, 3600 * 24 * 30)
+                        except Exception:
+                            pass
+                        return cached
             n_channels = 4
             transparent_img = np.zeros(
                 (output_height, output_width, n_channels), dtype=np.uint8
             )
             extra_args = []
             if img_mime == "image/webp":
-                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 20]
-            _, buffer = cv2.imencode(
-                ".png" if img_mime == "image/png" else ".webp",
-                transparent_img,
-                extra_args,
-            )
-            data_out = BytesIO(buffer).getvalue()
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 10]
+            if img_mime == "image/avif":
+                color_coverted = cv2.cvtColor(transparent_img, cv2.COLOR_RGBA2BGRA)
+                pil_image = Image.fromarray(color_coverted)
+                buffer = BytesIO()
+                pil_image.save(buffer, "AVIF", quality=10)
+                data_out = buffer.getvalue()
+            else:
+                _, buffer = cv2.imencode(
+                    ".png" if img_mime == "image/png" else ".webp",
+                    transparent_img,
+                    extra_args,
+                )
+                data_out = BytesIO(buffer).getvalue()
+            if use_cache:
+                try:
+                    cache.set(cache_key, data_out, 3600 * 24 * 30)
+                    cache.set(blank_cache_key, data_out, 3600 * 24 * 30)
+                except Exception:
+                    pass
             return data_out
 
         r_w = (max_lon - min_lon) / output_width

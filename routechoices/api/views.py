@@ -840,8 +840,9 @@ def event_data(request, event_id):
             cached_res = cache.get(cache_key)
         except Exception:
             pass
-    if cached_res:
-        return Response(cached_res)
+        else:
+            if cached_res:
+                return Response(cached_res)
     # If we dont have cache check if we are currently generating cache
     # if so return previous cache data if available
     elif use_cache and cache.get(f"{cache_key}:processing"):
@@ -849,8 +850,9 @@ def event_data(request, event_id):
             cached_res = cache.get(prev_cache_key)
         except Exception:
             pass
-        if cached_res:
-            return Response(cached_res)
+        else:
+            if cached_res:
+                return Response(cached_res)
     # else generate data and set that we are generating cache
     if use_cache:
         try:
