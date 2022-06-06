@@ -134,8 +134,8 @@
         data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}"false"{% endif %}
 ></script>
 {% compress js %}
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
 <script src="{% static '/js/server_clock.js' %}?2022012700"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrcode-generator-1.4.4/qrcode.min.js' %}"></script>
@@ -150,7 +150,7 @@
 <script src="{% static '/js/positioning-2021082902.js' %}"></script>
 <script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
-<script src="{% static '/js/event.js' %}?_=2022022600"></script>
-<script src="{% static '/scripts/club/event.js' %}?_=2022031600"></script>
+<script src="{% static '/js/event.js' %}"></script>
+<script src="{% static '/scripts/club/event.js' %}"></script>
 {% endcompress %}{% if event.allow_live_chat %}<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>{% endif %}
 {% endblock %}
