@@ -178,9 +178,9 @@ class EventForm(ModelForm):
 
     def clean(self):
         super().clean()
-        start_date = self.cleaned_data["start_date"]
-        end_date = self.cleaned_data["end_date"]
-        if end_date < start_date:
+        start_date = self.cleaned_data.get("start_date")
+        end_date = self.cleaned_data.get("end_date")
+        if start_date and end_date and end_date < start_date:
             raise ValidationError("Start Date must be before End Date")
 
     def clean_map(self):

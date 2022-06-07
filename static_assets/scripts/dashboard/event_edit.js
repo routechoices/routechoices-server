@@ -156,11 +156,17 @@ function showLocalTime(el) {
       },
     };
     var val = u(el).val();
-    if (val) {
+    if (
+      val &&
+      /^\d{4}-\d{2}-\d{2}/.test(val) &&
+      /\d{2}:\d{2}:\d{2}$/.test(val)
+    ) {
       val = val.substring(0, 10) + "T" + val.substring(11, 19) + "Z";
       options.defaultDate = new Date(
         new Date(val).toLocaleString("en-US", { timeZone: "UTC" })
       );
+    } else {
+      u(el).val("");
     }
     new tempusDominus.TempusDominus(el, options);
   });
