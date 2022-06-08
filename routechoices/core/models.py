@@ -390,6 +390,8 @@ class Map(models.Model):
                 int(self.height) / 2 - 158,
             ),
         )
+        wm = Image.open("routechoices/watermark.png")
+        img.paste(wm, (0, 0), wm)
         buffer = BytesIO()
         img.save(buffer, "JPEG", quality=80)
         data_out = buffer.getvalue()
