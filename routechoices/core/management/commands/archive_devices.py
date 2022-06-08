@@ -27,7 +27,7 @@ class Command(BaseCommand):
                     (),
                 ),
             )
-        ).filter(location_count_sql__gt=3600 * 24)
+        ).filter(location_count_sql__gt=3600 * 24, is_gpx=False)
         n_device_archived = 0
         two_weeks_ago = now() - timedelta(days=14)
         for device in devices:
@@ -82,7 +82,7 @@ class Command(BaseCommand):
                 archive_dev.locations = archived_locs
                 archive_dev.save()
                 DeviceArchiveReference.objects.create(
-                    original_device=device, achive=archive
+                    original=device, archive=archive_dev
                 )
                 for competitor in competitors:
                     if competitor.start_time < last_start:
