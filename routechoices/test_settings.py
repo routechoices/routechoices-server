@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 from .settings import *  # noqa
 
 DEBUG = False
-
 SITE_ID = 1
 
 SHORTCUT_BASE_URL = "http://www.routechoices.dev:8081/r/"

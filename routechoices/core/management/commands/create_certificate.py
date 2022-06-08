@@ -11,9 +11,11 @@ from routechoices.core.models import Club
 
 def write_nginf_conf(domain):
     with open(
-        os.path.join(settings.BASE_DIR, "nginx", "custom_domains", f"{domain}"), "w"
-    ) as f:
-        f.write(
+        os.path.join(settings.BASE_DIR, "nginx", "custom_domains", f"{domain}"),
+        "w",
+        encoding="utf_8",
+    ) as fp:
+        fp.write(
             f"""server {{
     server_name {domain};
     if ($host = {domain}) {{
@@ -119,9 +121,11 @@ class Command(BaseCommand):
             cert_key = client.cert_key
 
             with open(
-                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"), "w"
-            ) as f:
-                f.write(certificate)
+                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"),
+                "w",
+                encoding="utf_8",
+            ) as fp:
+                fp.write(certificate)
             cert_key.write_pem(
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
             )

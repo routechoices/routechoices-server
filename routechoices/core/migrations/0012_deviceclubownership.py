@@ -62,5 +62,5 @@ class Migration(migrations.Migration):
                 "unique_together": {("device", "club")},
             },
         ),
-        migrations.RunPython(transfer_ownership),
+        migrations.RunPython(transfer_ownership, migrations.RunPython.noop),
     ]

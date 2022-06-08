@@ -255,7 +255,7 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Invalid data format" in errors[0])
+        self.assertIn("Invalid data format", errors[0])
 
     def test_locations_api_gw_invalid_lon(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
@@ -275,7 +275,7 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Invalid longitude value" in errors[0])
+        self.assertIn("Invalid longitude value", errors[0])
 
     def test_locations_api_gw_invalid_lat(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
@@ -295,7 +295,7 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Invalid latitude value" in errors[0])
+        self.assertIn("Invalid latitude value", errors[0])
 
     def test_locations_api_gw_invalid_length(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
@@ -315,9 +315,9 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue(
-            "Latitudes, longitudes, and timestamps, should have same amount of points"
-            in errors[0]
+        self.assertIn(
+            "Latitudes, longitudes, and timestamps, should have same amount of points",
+            errors[0],
         )
 
     def test_locations_api_gw_bad_secret(self):
@@ -371,7 +371,7 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("No such device ID" in errors[0])
+        self.assertIn("No such device ID", errors[0])
 
 
 @override_settings(PARENT_HOST="localhost:8000")
@@ -414,7 +414,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Competitor with same name already registered" in errors[0])
+        self.assertIn("Competitor with same name already registered", errors[0])
         # short_name exists
         res = self.client.post(
             url,
@@ -429,9 +429,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue(
-            "Competitor with same short name already registered" in errors[0]
-        )
+        self.assertIn("Competitor with same short name already registered", errors[0])
         # bad start_time
         res = self.client.post(
             url,
@@ -447,8 +445,8 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue(
-            "Competitor start time should be during the event time" in errors[0]
+        self.assertIn(
+            "Competitor start time should be during the event time", errors[0]
         )
         # invalid start_time
         res = self.client.post(
@@ -464,7 +462,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         )
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Start time could not be parsed" in errors[0])
+        self.assertIn("Start time could not be parsed", errors[0])
         # no name
         res = self.client.post(
             url,
@@ -478,7 +476,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         )
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Name is missing" in errors[0])
+        self.assertIn("Name is missing", errors[0])
         # no device
         res = self.client.post(
             url,
@@ -493,7 +491,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertTrue("Device ID not found" in errors[0])
+        self.assertIn("Device ID not found", errors[0])
         # ok
         res = self.client.post(
             url,

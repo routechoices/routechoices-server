@@ -147,9 +147,11 @@ class Command(BaseCommand):
             cert_key = client.cert_key
 
             with open(
-                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"), "w"
-            ) as f:
-                f.write(certificate)
+                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"),
+                "w",
+                encoding="utf_8",
+            ) as fp:
+                fp.write(certificate)
             cert_key.write_pem(
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
             )

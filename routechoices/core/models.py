@@ -170,6 +170,16 @@ Browse our events here.""",
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            if self.domain:
+                self.domain = self.domain.lower()
+            old_domain = Club.objects.get(pk=self.pk).domain
+            if old_domain and old_domain != self.domain:
+                delete_domain(old_domain)
+        self.slug = self.slug.lower()
+        return super().save(*args, **kwargs)
+
     def get_absolute_url(self):
         return self.nice_url
 
@@ -203,16 +213,6 @@ Browse our events here.""",
             qs = qs.exclude(id=self.id)
         if qs.exists():
             raise ValidationError("Club with this slug already exists.")
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            if self.domain:
-                self.domain = self.domain.lower()
-            old_domain = Club.objects.get(pk=self.pk).domain
-            if old_domain and old_domain != self.domain:
-                delete_domain(old_domain)
-        self.slug = self.slug.lower()
-        return super().save(*args, **kwargs)
 
 
 @receiver(pre_delete, sender=Club, dispatch_uid="club_delete_signal")
@@ -863,12 +863,12 @@ class Event(models.Model):
         verbose_name = "event"
         verbose_name_plural = "events"
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         self.invalidate_cache()
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"
@@ -973,7 +973,7 @@ class Device(models.Model):
     )
     locations_raw = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
-        null=True, default=None, validators=[MaxValueValidator(100)]
+        null=True, default=None, validators=[MaxValueValidator(100)], blank=True
     )
 
     class Meta:
