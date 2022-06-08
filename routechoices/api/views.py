@@ -1248,22 +1248,23 @@ def event_map_thumb_download(request, event_id):
     event = get_object_or_404(
         Event.objects.all().select_related("club", "map"),
         aid=event_id,
-        start_date__lt=now(),
     )
-    if not event.map:
-        raise Http404
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if (
             not request.user.is_authenticated
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
-    raster_map = event.map
+    if event.start_date > now() or not event.map:
+        data_out = Event.default_thumbnail()
+    else:
+        raster_map = event.map
+        data_out = raster_map.thumbnail
 
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
-    data_out = raster_map.thumbnail
+
     return HttpResponse(data_out, content_type="image/jpeg", headers=headers)
 
 

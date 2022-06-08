@@ -870,6 +870,32 @@ class Event(models.Model):
         self.invalidate_cache()
         super().save(*args, **kwargs)
 
+    @classmethod
+    def default_thumbnail(cls):
+        cache_key = "default_thumb"
+        use_cache = getattr(settings, "CACHE_THUMBS", False)
+        cached = None
+        if use_cache:
+            try:
+                cached = cache.get(cache_key)
+            except Exception:
+                pass
+            else:
+                if cached:
+                    return cached
+        img = Image.new("RGB", (1200, 630), "WHITE")
+        wm = Image.open("routechoices/watermark.png")
+        img.paste(wm, (0, 0), wm)
+        buffer = BytesIO()
+        img.save(buffer, "JPEG", quality=80)
+        data_out = buffer.getvalue()
+        if use_cache:
+            try:
+                cache.set(cache_key, data_out, 3600 * 24 * 30)
+            except Exception:
+                pass
+        return data_out
+
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"
 

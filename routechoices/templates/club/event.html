@@ -15,17 +15,10 @@
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }}" />
 <meta property="og:url" content="{{ event.get_absolute_url }}" />
 <meta name="twitter:card" content="summary_large_image">
-{% if event.started and event.map %}
 <meta property="og:image" content="https:{% host_url 'event_map_thumb_download' event_id=event.aid host 'api' %}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 {% if request.is_secure %}<meta property="og:image:secure_url" content="https:{% host_url 'event_map_thumb_download' event_id=event.aid host 'api' %}" />{% endif %}
-{% else %}
-<meta property="og:image" content="{% static 'android-chrome-512x512.png' %}" />
-{% if request.is_secure %}<meta property="og:image:secure_url" content="{% static 'android-chrome-512x512.png' %}" />{% endif %}
-<meta property="og:image:width" content="512" />
-<meta property="og:image:height" content="512" />
-{% endif %}
 <link rel="canonical" href="{{ event.get_absolute_url }}">
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
