@@ -15,108 +15,50 @@
             <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/gl320mg.png' %}"/></div>
             <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
-          <p>You can upload your location to provide live GPS tracking in two different way. Using our smartphone application or using one of the supported dedicated GPS trackers.</p>
-          <p>For each method, we assign devices a unique "device ID" that can be used on this website.</p>
-          <p>If you are interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
-          <p>Select below your desired option for more detail instructions:</p>
+          <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
+          <p>For each method, devices are assigned a unique "device ID" that can be used on this website.</p>
+          <p>If interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
+          <p>See below more detailed instructions:</p>
           <p style="margin-top:2em; text-align:center">
-            <a role="button" class="btn btn-info" id="android-btn" data-bs-toggle="modal" data-bs-target="#android-modal" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
-            <a role="button" class="btn btn-primary" id="ios-btn" data-bs-toggle="modal" data-bs-target="#ios-modal" style="margin-bottom: 5px"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
+            <a role="button" class="btn btn-info" id="android-btn"  href="#android" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
+            <a role="button" class="btn btn-primary" id="ios-btn" href="#ios" style="margin-bottom: 5px"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
             <!--<a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a IPhone</a> -->
-            <a role="button" class="btn btn-danger" id="tmt250-btn" data-bs-toggle="modal" data-bs-target="#tmt250-modal" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
+            <a role="button" class="btn btn-danger" id="tmt250-btn" href="#hardware" style="margin-bottom: 5px"><i class="fa fa-globe"></i> Tracking with a dedicated GPS tracker</a>
             <!--<a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>-->
           </p>
         </div>
       </div>
-      <div class="modal fade" id="garmin-modal" tabindex="-1" role="dialog" aria-labelledby="garmin-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="garmin-modal-label">Garmin Tracking App</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>
-                Download the {{ site.name }} Tracker app from the Connect IQ store.
-              </p>
-              <p>
-                 <a href="https://apps.garmin.com/en-US/apps/50396179-a687-4720-a0d9-c5f1e9b2485b" target="_blank" rel="noopener noreferrer"><i class="fa fa-external-link"></i> Connect IQ store</a>
-              </p>
-              <p>
-                Once installed, run the app on your watch to start streaming your location, a new device ID will be displayed on the main screen.
+      <div id="android" >
+        <h4 class="modal-title" id="android-modal-label">Android Tracking App</h4>
+        <div>
+             <p>
+              Download the Routechoices Tracker app for Android.
              </p>
              <p>
-               Note that if your watch does not support 4G LTE network, you have to carry a phone with the Garmin connect app connected to the watch via Bluetooth in order to provide an internet connection.
+              <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker'><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
              </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal fade" id="traccar-modal" tabindex="-1" role="dialog" aria-labelledby="traccar-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="traccar-modal-label">Traccar Tracking App</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>
-                Download the Traccar Client for IPhone or Android.
-              </p>
-              <p>
-                <a href="https://play.google.com/store/apps/details?id=org.traccar.client" style="margin-right: 16px"><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a><a href="https://itunes.apple.com/us/app/traccar-client/id843156974"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
-              </p>
-              <p>
-                On the first time you use the app, enter the following settings: (Those are personal and won't change)
-                <ul class="well">
-                    <li>Device identifier: <code class="devId roboto"></code> <i class="fa fa-warning"></i> Uniquely generated for you</li>
-                    <li>Server URL: <code>https://www.routechoices.com/api/traccar</code></li>
-                    <li>Location Accuracy: <code>High</code></li>
-                    <li>Frequency: <code>1</code></li>
-                    <li>Distance: <code>0</code></li>
-                    <li>Angle: <code>0</code></li>
-                    <li>Offline buffering: <code>on</code></li>
-                    <li>Wake lock: <code>on</code></li>
-                </ul>
-            </p>
-             <p>Before you start your race, switch on the service from within the app to start sharing your position with us. And when your race is over, you can switch off the service from within the app.</p>
-             <p>Ensure that GPS location provider with high accuracy is enabled in the system settings of your phone.</p>
-             <p>Note: Both Apple and Google are trying to restrict background processes to give user better battery life, but it affects application like Traccar Client which require persistent background execution. Common issues to check for:
+             <p>
+              Upon opening the app, it will display a device ID.
+             </p>
+             <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
+             <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
+             <p><i class="fa fa-warning" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
+             <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
                 <li>
-                  On iOS if you swipe app off the screen, operating system actually kills the process and app will no longer be able to report.
-                </li>
-                <li>
-                  Make sure that in iOS settings background execution is allowed and Traccar Client has permission to always access location services.
-                </li>
-                <li>
-                  On recent versions of Android make sure that you have added Traccar Client to battery optimization exceptions.
+                  On recent versions of Android make sure that Routechoices Tracker has been added to battery optimization exceptions.
                 </li>
                 <li>
                   Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
                 </li>
               </ul>
-            </p>
-             <p>For more troubleshooting see <a href="https://www.traccar.org/client-troubleshooting/">Traccar troubleshooting page</a></p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
+             </p>
         </div>
       </div>
-
-      <div class="modal fade" id="ios-modal" tabindex="-1" role="dialog" aria-labelledby="traccar-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="ios-modal-label">iOS Tracking App</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+      <hr/>
+      <div id="ios">
+            <h4>iOS Tracking App</h4>
+            <div>
               <p>
                 Download the Routechoices Tracker app for iOS device.
               </p>
@@ -124,11 +66,11 @@
                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
               </p>
               <p>
-                When you'll open the app, it will display your device ID.
+                Upon opening the app, it will display a device ID.
                </p>
-               <p>Before you start your race, toggle the button to start sharing your position with us. And when your race is over, you can turn off the service from within the app.</p>
-               <p>Once you have good GPS signal, the device ID should turn green and the app starts streaming your position.</p>
-               <p><i class="fa fa-warning" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If you do not do it uploading GPS data will stop when screen go to sleep.</b></p>
+               <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
+               <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
+               <p><i class="fa fa-warning" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
              <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
                 <li>
@@ -140,118 +82,50 @@
               </ul>
             </p>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
       </div>
-
-      <div class="modal fade" id="android-modal" tabindex="-1" role="dialog" aria-labelledby="android-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="android-modal-label">Android Tracking App</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-             <p>
-              Download the Routechoices Tracker app for Android.
-             </p>
-             <p>
-              <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker'><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
-             </p>
-             <p>
-              When you'll open the app, it will display your device ID.
-             </p>
-             <p>Before you start your race, toggle the button to start sharing your position with us. And when your race is over, you can turn off the service from within the app.</p>
-             <p>Once you have good GPS signal, the device ID should turn green and the app starts streaming your position.</p>
-             <p><i class="fa fa-warning" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If you do not do it uploading GPS data will stop when screen go to sleep.</b></p>
-             <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
-              <ul>
-                <li>
-                  On recent versions of Android make sure that you have added Routechoices Tracker to battery optimization exceptions.
-                </li>
-                <li>
-                  Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
-                </li>
-              </ul>
-             </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="modal fade" id="tmt250-modal" tabindex="-1" role="dialog" aria-labelledby="tmt250-modal-label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="tmt250-modal-label">GPS Trackers</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>
-                The dedicated GPS trackers supported are:
-                <ul>
-                  <li>Teltonika TMT250</li>
-                  <li>Queclink GL200</li>
-                  <li>Queclink GL3XX series</li>
-                  <li>Queclink GL5XX series</li>
-                </ul>
-              </p>
-              <p>
-                Configure your device to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
-                <ul>
-                  <li>Teltonika devices: <code>port 2000</code></li>
-                  <li>Queclink devices: <code>port 2002</code></li>
-                </ul>
-                Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on your usage as this settings can affect battery life.<br/>
-                For more detailed configurations contact us.
-              </p>
-              <h3>Device ID</h3>
-              <p>You must register your device with us by geting a device ID for your tracker (see below) that you can use on this website.</p>
-              <p>Once done you can simply turn on your tracker during your races and its positions will be saved to the server.</p>
-              <h4>Get a device ID for your Tracker</h4>
-              <form id="imeiForm">
-                <div class="form-group" id=IMEIDiv>
-                  <label for="IMEI">IMEI</label>
-                  <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
-                  <small id="IMEIHelp" class="form-text text-muted">This is used to link your physical device with our system.</small>
-                  <div id="imeiErrorMsg" class="invalid-feedback d-none">
-                    <i class="fa fa-warning"></i> Invalid IMEI
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
-              <br/>
-              <ul id="imeiDevId" class="well d-none" >
-                <li>IMEI <code id="imeiRes"></code></li>
-                <li>Device ID: <code class="imeiDevId roboto"></code> <button class="btn btn-small" id="copyDevIdBtn"><i class="fa fa-copy fa-fw"></i></button></li>
-              </ul>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal fade" id="error-modal" tabindex="-1" role="dialog" aria-hidden="true">
-          <div class="modal-dialog">
-              <div class="modal-content">
-                   <div class="modal-header">
-                      <h4 class="modal-title" id="error-modal-label">Error</h4>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                      <div id="error-modal-msg"></div>
-                  </div>
+      <hr/>
+      <div id="hardware">
+        <h4>Dedicated GPS Trackers</h4>
+        <div>
+          <p>
+            The dedicated GPS trackers supported are:
+            <ul>
+              <li>Teltonika TMT250</li>
+              <li>Queclink GL200</li>
+              <li>Queclink GL3XX series</li>
+              <li>Queclink GL5XX series</li>
+            </ul>
+          </p>
+          <p>
+            Configure the devices to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
+            <ul>
+              <li>Teltonika devices: <code>port 2000</code></li>
+              <li>Queclink devices: <code>port 2002</code></li>
+            </ul>
+            Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on usage as this settings can affect battery life.<br/>
+            For more detailed configurations contact us.
+          </p>
+          <h5>Device ID</h5>
+          <p>Devices must be registered by acquiring a device ID (see below) that can be used on this website.</p>
+          <p>Once done simply turn on the tracker during events and its locations will be saved to the server.</p>
+          <h6>Get a device ID for a tracker</h6>
+          <form id="imeiForm">
+            <div class="form-group" id=IMEIDiv>
+              <label for="IMEI">IMEI</label>
+              <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
+              <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the Routechoices.com platform.</small>
+              <div id="imeiErrorMsg" class="invalid-feedback d-none">
+                <i class="fa fa-warning"></i> Invalid IMEI
               </div>
-          </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+          <br/>
+          <ul id="imeiDevId" class="well d-none" >
+            <li>IMEI <code id="imeiRes"></code></li>
+            <li>Device ID: <code class="imeiDevId roboto"></code> <button class="btn btn-small" id="copyDevIdBtn"><i class="fa fa-copy fa-fw"></i></button></li>
+          </ul>
+        </div>
       </div>
 {% endblock %}
 

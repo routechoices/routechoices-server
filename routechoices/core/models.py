@@ -142,7 +142,7 @@ class Club(models.Model):
         default="""# GPS tracking powered by routechoices.com
 
 Browse our events here.""",
-        help_text="This text will be displayed on your site frontpage, use markdown formatting",
+        help_text="This text will be displayed on the club site frontpage, use markdown formatting",
     )
     domain = models.CharField(
         max_length=128,
@@ -822,7 +822,7 @@ class Event(models.Model):
         max_length=255,
         blank=True,
         default="",
-        help_text="Leave blank if you are not using extra maps",
+        help_text="Leave blank if not using extra maps",
     )
     extra_maps = models.ManyToManyField(
         Map,
@@ -845,7 +845,7 @@ class Event(models.Model):
     send_interval = models.PositiveIntegerField(
         "Send interval (seconds)",
         default=5,
-        help_text="If you use dedicated trackers, enter here the sending interval you set your devices to, if you use the official smartphone app leave the value at 5 seconds",
+        help_text="If using dedicated trackers, enter here the sending interval set for the devices to, if using the official smartphone app leave the value at 5 seconds",
         validators=[MinValueValidator(1)],
     )
     tail_length = models.PositiveIntegerField(
