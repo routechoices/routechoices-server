@@ -20,8 +20,16 @@
         u(".imeiDevId").text(response.device_id);
         u("#imeiErrorMsg").addClass("d-none");
         u("#copyDevIdBtn").off("click");
-        u("#copyDevIdBtn").on("click", function () {
+        u("#copyDevIdBtn").on("click", function (ev) {
+          var tooltip = new bootstrap.Tooltip(ev.currentTarget, {
+            placement: "right",
+            title: "copied",
+          });
+          tooltip.show();
           navigator.clipboard.writeText(response.device_id);
+          setTimeout(function () {
+            tooltip.dispose();
+          }, 750);
         });
       },
       error: function (req) {
