@@ -1255,12 +1255,7 @@ def event_map_thumb_download(request, event_id):
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
-    if event.start_date > now() or not event.map:
-        data_out = Event.default_thumbnail()
-    else:
-        raster_map = event.map
-        data_out = raster_map.thumbnail
-
+    data_out = event.thumbnail()
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}

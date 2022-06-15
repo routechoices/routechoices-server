@@ -33,7 +33,7 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from pillow_avif import AvifImagePlugin  # noqa: F401
 
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -356,51 +356,6 @@ class Map(models.Model):
             self.image.close()
         else:
             raise ValueError("Not a base 64 encoded data URI of an image")
-
-    @property
-    def thumbnail(self):
-        cache_key = f"thumb_{self.aid}_{self.hash}"
-        use_cache = getattr(settings, "CACHE_THUMBS", False)
-        cached = None
-        if use_cache:
-            try:
-                cached = cache.get(cache_key)
-            except Exception:
-                pass
-            else:
-                if cached:
-                    return cached
-        orig = self.image.open("rb").read()
-        img = Image.open(BytesIO(orig))
-        if img.mode != "RGB":
-            white_bg_img = Image.new("RGBA", img.size, "WHITE")
-            white_bg_img.paste(img, (0, 0), img)
-            img = white_bg_img.convert("RGB")
-        img = img.transform(
-            (1200, 630),
-            Image.QUAD,
-            (
-                int(self.width) / 2 - 300,
-                int(self.height) / 2 - 158,
-                int(self.width) / 2 - 300,
-                int(self.height) / 2 + 157,
-                int(self.width) / 2 + 300,
-                int(self.height) / 2 + 157,
-                int(self.width) / 2 + 300,
-                int(self.height) / 2 - 158,
-            ),
-        )
-        wm = Image.open("routechoices/watermark.png")
-        img.paste(wm, (0, 0), wm)
-        buffer = BytesIO()
-        img.save(buffer, "JPEG", quality=80)
-        data_out = buffer.getvalue()
-        if use_cache:
-            try:
-                cache.set(cache_key, data_out, 3600 * 24 * 30)
-            except Exception:
-                pass
-        return data_out
 
     @property
     def size(self):
@@ -870,32 +825,6 @@ class Event(models.Model):
         self.invalidate_cache()
         super().save(*args, **kwargs)
 
-    @classmethod
-    def default_thumbnail(cls):
-        cache_key = "default_thumb"
-        use_cache = getattr(settings, "CACHE_THUMBS", False)
-        cached = None
-        if use_cache:
-            try:
-                cached = cache.get(cache_key)
-            except Exception:
-                pass
-            else:
-                if cached:
-                    return cached
-        img = Image.new("RGB", (1200, 630), "WHITE")
-        wm = Image.open("routechoices/watermark.png")
-        img.paste(wm, (0, 0), wm)
-        buffer = BytesIO()
-        img.save(buffer, "JPEG", quality=80)
-        data_out = buffer.getvalue()
-        if use_cache:
-            try:
-                cache.set(cache_key, data_out, 3600 * 24 * 30)
-            except Exception:
-                pass
-        return data_out
-
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"
 
@@ -949,6 +878,60 @@ class Event(models.Model):
     @property
     def has_notice(self):
         return hasattr(self, "notice")
+
+    def thumbnail(self, msg=""):
+        if self.start_date > now() or not self.map:
+            img = Image.new("RGB", (1200, 630), "WHITE")
+        else:
+            raster_map = self.map
+            orig = raster_map.image.open("rb").read()
+            img = Image.open(BytesIO(orig))
+            if img.mode != "RGB":
+                white_bg_img = Image.new("RGBA", img.size, "WHITE")
+                white_bg_img.paste(img, (0, 0), img)
+                img = white_bg_img.convert("RGB")
+            img = img.transform(
+                (1200, 630),
+                Image.QUAD,
+                (
+                    int(raster_map.width) / 2 - 300,
+                    int(raster_map.height) / 2 - 158,
+                    int(raster_map.width) / 2 - 300,
+                    int(raster_map.height) / 2 + 157,
+                    int(raster_map.width) / 2 + 300,
+                    int(raster_map.height) / 2 + 157,
+                    int(raster_map.width) / 2 + 300,
+                    int(raster_map.height) / 2 - 158,
+                ),
+            )
+        font = ImageFont.truetype("routechoices/AtkinsonHyperlegible-Bold.ttf", 60)
+        draw = ImageDraw.Draw(img)
+        w, h = draw.textsize(msg, font=font)
+        x = int((1200 - w) / 2)
+        if self.club.logo:
+            logo_b = self.club.logo.open("rb").read()
+            logo = Image.open(BytesIO(logo_b))
+            logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+            img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
+            y = 480
+        elif not self.club.domain:
+            wm = Image.open("routechoices/watermark.png")
+            img.paste(wm, (0, 0), wm)
+            y = 520
+        else:
+            y = int((630 - h) / 2)
+        color = "black"
+        shadow = "white"
+        if msg:
+            draw.text((x - 1, y - 1), msg, font=font, fill=shadow)
+            draw.text((x + 1, y - 1), msg, font=font, fill=shadow)
+            draw.text((x - 1, y + 1), msg, font=font, fill=shadow)
+            draw.text((x + 1, y + 1), msg, font=font, fill=shadow)
+            draw.text((x, y), msg, font=font, fill=color)
+        buffer = BytesIO()
+        img.save(buffer, "JPEG", quality=80)
+        data_out = buffer.getvalue()
+        return data_out
 
 
 class Notice(models.Model):
