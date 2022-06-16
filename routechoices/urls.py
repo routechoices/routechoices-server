@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from allauth.account import views as account_views
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path
@@ -39,6 +40,9 @@ urlpatterns = [
     ),
     path("accounts/", include("allauth_2fa.urls")),
     path("accounts/", include("allauth.urls")),
+    path("signup/", account_views.signup, name="root_account_signup"),
+    path("login/", account_views.login, name="root_account_login"),
+    path("logout/", account_views.logout, name="root_account_logout"),
     path("admin/", admin.site.urls),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
     path("captcha/", include("captcha.urls")),

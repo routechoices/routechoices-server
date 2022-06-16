@@ -3,14 +3,14 @@
 {% load i18n %}
 {% load django_bootstrap5 %}
 
-{% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block head_title %}{% trans "Sign Up" %}{% endblock %}
 
 {% block content %}
 <h1>{% trans "Sign Up" %}</h1>
 
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 
-<form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+<form class="signup" id="signup_form" method="post" action="{% url 'root_account_signup' %}">
   {% csrf_token %}
   {%  bootstrap_form form %}
   {% if redirect_field_value %}
