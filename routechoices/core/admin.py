@@ -32,7 +32,7 @@ from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
-    title = "when was it wodified"
+    title = "when was it modified"
     parameter_name = "modified"
 
     def lookups(self, request, model_admin):
