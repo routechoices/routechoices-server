@@ -26,6 +26,9 @@ urlpatterns = [
     ),
     re_path(r"^club/$", views.club_view, name="club_view"),
     re_path(
+        r"^club/send-invite/$", views.club_invite_add_view, name="club_invite_add_view"
+    ),
+    re_path(
         r"^club/custom-domain/?$",
         views.club_custom_domain_view,
         name="club_custom_domain_view",

@@ -44,6 +44,7 @@ urlpatterns = [
     path("login/", account_views.login, name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
     path("admin/", admin.site.urls),
+    path("invitations/", include("invitations.urls", namespace="invitations")),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
     path("captcha/", include("captcha.urls")),
     path(

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "invitations",
     "background_task",
     "django_bootstrap5",
     "admincommand",

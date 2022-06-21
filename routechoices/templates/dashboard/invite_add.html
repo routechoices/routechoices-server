@@ -1,0 +1,16 @@
+{% extends "dashboard/club_view.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block sub_sub_content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Send invite to manage club</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <input type="submit" value="Send" class="btn btn-primary">
+        </form>
+    </div>
+</div>
+{% endblock %}

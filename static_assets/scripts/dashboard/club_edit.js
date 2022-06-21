@@ -22,4 +22,10 @@
       });
     },
   });
+
+  var inviteBtn = u("#invite-btn").clone();
+  u("#invite-btn").remove();
+  if (inviteBtn) {
+    u("#id_admins-ts-label").parent().after(inviteBtn);
+  }
 })();

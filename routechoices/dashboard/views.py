@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from PIL import Image
 
+from invitations.forms import InviteForm
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
     IS_DB_SQLITE,
@@ -80,6 +81,25 @@ def requires_club_in_session(function):
 @requires_club_in_session
 def home_view(request):
     return redirect("dashboard:club_view")
+
+
+@login_required
+@requires_club_in_session
+def club_invite_add_view(request):
+    club = request.club
+    if request.method == "POST":
+        form = InviteForm(request.POST, club=club)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            invite = form.save(email, club)
+            invite.inviter = request.user
+            invite.save()
+            invite.send_invitation(request)
+            messages.success(request, "Invite sent successfully")
+            return redirect("dashboard:club_view")
+    else:
+        form = InviteForm()
+    return render(request, "dashboard/invite_add.html", {"club": club, "form": form})
 
 
 @login_required

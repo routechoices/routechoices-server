@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load django_bootstrap5 %}
+
+{% block content %}
+{% if not invitation %}
+<h1>Invite cannot be found</h1>
+<p>No invite with such key exists in the database.</p>
+<p>Please verify the link in the address bar match the one the content of the invite email.</p>
+{% elif invitation.accepted %}
+<h1>Invite already accepted</h1>
+<p>You were invited to manage club {{invitation.club}}, however you already accepted the invitation.</p>
+<p>You should now be club administrator.</p>
+{% elif invitation.key_expired %}
+<h1>Key expired</h1>
+<p>You were invited to manage club {{invitation.club}}, however the invitation has expired.</p>
+<p>Please ask for a new invite by a existing club administrator.</p>
+{%else%}
+<h1>Reply to invitation</h1>
+  <p>You have been invited to manage club {{invitation.club}}, please confirm to continue</p>
+  <p>
+    <form action="" method="post">
+      {% csrf_token %}
+      <input type="submit" value="Confirm" class="btn btn-primary">
+    </form>
+  </p>
+  {% endif %}
+  {% endblock %}

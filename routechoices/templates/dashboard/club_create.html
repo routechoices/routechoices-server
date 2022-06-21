@@ -25,8 +25,9 @@
 {% block extra_body %}
 <script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/dashboard/club_edit.js' %}?_=2022031600"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/scripts/dashboard/club_edit.js' %}"></script>
 {% endcompress %}
 {%  endblock %}
