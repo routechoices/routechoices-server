@@ -24,7 +24,19 @@ class AcceptInvite(SingleObjectMixin, View):
 
     def get(self, *args, **kwargs):
         self.object = invitation = self.get_object()
-        return render(self.request, "site/invitation.html", {"invitation": invitation})
+        target_user = True
+        if (
+            self.request.user.is_authenticated
+            and not EmailAddress.objects.filter(
+                user=self.request.user, email=invitation.email
+            ).exists()
+        ):
+            target_user = False
+        return render(
+            self.request,
+            "site/invitation.html",
+            {"invitation": invitation, "target_user": target_user},
+        )
 
     def post(self, *args, **kwargs):
         self.object = invitation = self.get_object()
@@ -63,10 +75,9 @@ class AcceptInvite(SingleObjectMixin, View):
             return redirect(self.get_signup_redirect())
 
         if self.request.user.is_authenticated:
-            user_emails = EmailAddress.objects.filter(
-                user=self.request.user
-            ).values_list("email", flat=True)
-            if invitation.email in user_emails:
+            if EmailAddress.objects.filter(
+                user=self.request.user, email=invitation.email
+            ).exists():
                 accept_invitation(
                     invitation=invitation,
                     request=self.request,

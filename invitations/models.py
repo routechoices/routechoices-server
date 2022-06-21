@@ -28,9 +28,6 @@ class Invitation(AbstractBaseInvitation):
     )
     created = models.DateTimeField(verbose_name=_("created"), default=timezone.now)
 
-    class Meta:
-        unique_together = (("email", "club", "accepted"),)
-
     @classmethod
     def create(cls, email, club, inviter=None, **kwargs):
         key = get_random_string(64).lower()

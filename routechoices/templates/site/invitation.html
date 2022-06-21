@@ -4,18 +4,22 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-{% if not invitation %}
+{% if not target_user %}
+<h1>Invite is targeted to different email address than yours</h1>
+<p>You were invited to manage club {{invitation.club}}, however the email provided for the invite is not listed in your account email addresses.</p>
+<p>To continue you can either add that email address to your account <a href={% url 'account_email' %}>here</a>, or create a new account in which case you need to <a href={% url 'root_account_logout' %}>logout</a> first.</p>
+{% elif not invitation %}
 <h1>Invite cannot be found</h1>
 <p>No invite with such key exists in the database.</p>
 <p>Please verify the link in the address bar match the one the content of the invite email.</p>
 {% elif invitation.accepted %}
 <h1>Invite already accepted</h1>
 <p>You were invited to manage club {{invitation.club}}, however you already accepted the invitation.</p>
-<p>You should now be club administrator.</p>
+<p>You should now be club administrator unless you were dismissed of your role since then.</p>
 {% elif invitation.key_expired %}
 <h1>Key expired</h1>
 <p>You were invited to manage club {{invitation.club}}, however the invitation has expired.</p>
-<p>Please ask for a new invite by a existing club administrator.</p>
+<p>Please ask for a new invite by an existing club administrator.</p>
 {%else%}
 <h1>Reply to invitation</h1>
   <p>You have been invited to manage club {{invitation.club}}, please confirm to continue</p>

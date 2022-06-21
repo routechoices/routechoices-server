@@ -21,13 +21,6 @@ class CleanEmailMixin:
             email__iexact=email, club=club, accepted=False
         ):
             raise AlreadyInvited
-
-        similar_accepted_invites = Invitation.objects.filter(
-            email__iexact=email, club=club, accepted=True
-        )
-        if similar_accepted_invites:
-            similar_accepted_invites.delete()
-
         return True
 
     def clean_email(self):
