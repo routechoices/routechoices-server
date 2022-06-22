@@ -1052,7 +1052,7 @@ var displayOptions = function (ev) {
       foreground: "black",
       level: "L",
       value: qrUrl,
-      size: 148,
+      size: 138,
     });
     qrDataUrl = qr.toDataURL();
   }
@@ -1114,7 +1114,7 @@ var displayOptions = function (ev) {
         (qrUrl
           ? "<h4>" +
             banana.i18n("qr-link") +
-            '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' +
+            '</h4><p style="text-align:center"><img style="padding:10px" src="' +
             qrDataUrl +
             '" alt="qr"><br/><a class="small" style="font-weight: bold" href="' +
             qrUrl +
