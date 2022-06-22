@@ -21,7 +21,7 @@
 {% if request.is_secure %}<meta property="og:image:secure_url" content="https:{% host_url 'event_map_thumb_download' event_id=event.aid host 'api' %}" />{% endif %}
 <link rel="canonical" href="{{ event.get_absolute_url }}">
 {% compress css %}
-<link rel="stylesheet" href="{% static '/vendor/leaflet-1.7.1/leaflet.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-1.8.0/leaflet.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.css' %}"/>
 <link rel="stylesheet" href="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.css' %}"/>
 <link rel="stylesheet" href="{% static 'styles/club/event.css' %}?_=2022020800" />
@@ -132,7 +132,7 @@
 <script src="{% static '/js/server_clock.js' %}?2022012700"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrious-4.0.2/qrious.min.js' %}"></script>
-<script src="{% static '/vendor/leaflet-1.7.1/leaflet.js' %}"></script>
+<script src="{% static '/vendor/leaflet-1.8.0/leaflet.js' %}"></script>
 <script src="{% static '/vendor/iro-5/iro.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
 <script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
