@@ -1046,7 +1046,7 @@ var displayOptions = function (ev) {
   if (qrUrl) {
     var qr = qrcode(0, "L");
     qr.addData(qrUrl);
-    qr.make();
+    qr.make({ colorLight: "#ccc" });
     qrDataUrl = qr.createDataURL(4);
   }
   mainDiv.append(
@@ -1109,7 +1109,7 @@ var displayOptions = function (ev) {
             banana.i18n("qr-link") +
             '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' +
             qrDataUrl +
-            '" alt="qr"><br/><a class="small" href="' +
+            '" alt="qr"><br/><a class="small" style="font-weight: bold" href="' +
             qrUrl +
             '">' +
             qrUrl.replace(/^https?:\/\//, "") +

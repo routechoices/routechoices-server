@@ -842,6 +842,13 @@ class Event(models.Model):
         return None
 
     @property
+    def shortcut_text(self):
+        shortcut_url = self.shortcut
+        if shortcut_url:
+            return shortcut_url.partition("://")[2]
+        return None
+
+    @property
     def hidden(self):
         return self.start_date > now()
 
