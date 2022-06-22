@@ -100,10 +100,16 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
     panControl = L.control.pan();
     zoomControl = L.control.zoom();
     rotateControl = L.control.rotate({ closeOnZeroBearing: false });
+    scaleControl = L.control.scale({
+      imperial: false,
+      updateWhenIdle: true,
+      position: "bottomleft",
+    });
 
     panControl.addTo(map);
     zoomControl.addTo(map);
     rotateControl.addTo(map);
+    scaleControl.addTo(map);
 
     map.doubleClickZoom.disable();
     map.on("dblclick", onPressCustomMassStart);

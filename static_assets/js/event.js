@@ -221,6 +221,7 @@ var groupControl = null;
 var panControl = null;
 var zoomControl = null;
 var rotateControl = null;
+var scaleControl = null;
 var showClusters = false;
 var showControls = true;
 var backdropMaps = {};
