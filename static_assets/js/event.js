@@ -237,8 +237,10 @@ var sendInterval = 0;
 var endEvent = null;
 var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
-var maxParticipantsDisplayed = 100;
+var maxParticipantsDisplayed = 300;
 var nbShown = 0;
+var refreshInterval = 100;
+var smoothFactor = 1;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -435,7 +437,7 @@ var selectLiveMode = function (e) {
       selectReplayMode();
     }
     if (isLiveMode) {
-      setTimeout(whileLive, 101);
+      setTimeout(whileLive, refreshInterval);
     }
   })();
 };
@@ -507,7 +509,7 @@ var selectReplayMode = function (e) {
     prevShownTime = currentTime;
     prevDisplayRefresh = performance.now();
     if (!isLiveMode) {
-      setTimeout(whileReplay, 105);
+      setTimeout(whileReplay, refreshInterval);
     }
   })();
 };
@@ -1507,6 +1509,9 @@ var drawCompetitors = function () {
         });
       }
 
+      var idleColor = tinycolor(competitor.color).setAlpha(0.4);
+      var liveColor = tinycolor(competitor.color).setAlpha(0.75);
+      var isDark = getContrastYIQ(competitor.color) === "dark";
       if (viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec) {
         if (!competitor.idle) {
           ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
@@ -1518,12 +1523,8 @@ var drawCompetitors = function () {
           competitor.idle = true;
         }
         if (loc && !isNaN(loc.coords.latitude)) {
-          var ccolor = tinycolor(competitor.color).setAlpha(0.4);
           if (competitor.mapMarker == undefined) {
-            var svgRect =
-              '<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="' +
-              ccolor.toRgbString() +
-              '" cx="4" cy="4" r="3"/></svg>';
+            var svgRect = `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="${idleColor.toRgbString()}" cx="4" cy="4" r="3"/></svg>`;
             var pulseIcon = L.icon({
               iconUrl: encodeURI("data:image/svg+xml," + svgRect),
               iconSize: [8, 8],
@@ -1614,6 +1615,7 @@ var drawCompetitors = function () {
 
       if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
         if (!competitor.mapMarker) {
+          /* // Animated icon uses too much resources
           var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${competitor.color}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
           var svgRectURI = encodeURI(`data:image/svg+xml,${svgRect}`);
           var pulseIcon = L.icon({
@@ -1621,6 +1623,19 @@ var drawCompetitors = function () {
             iconSize: [40, 40],
             shadowSize: [40, 40],
             iconAnchor: [20, 20],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0],
+          });
+          */
+
+          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+            isDark ? "white" : "black"
+          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+          var pulseIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+            iconSize: [16, 16],
+            shadowSize: [16, 16],
+            iconAnchor: [8, 8],
             shadowAnchor: [0, 0],
             popupAnchor: [0, 0],
           });
@@ -1716,6 +1731,7 @@ var drawCompetitors = function () {
             color: competitor.color,
             opacity: 0.75,
             weight: 5,
+            smoothFactor: smoothFactor,
           });
           competitor.tail.addTo(map);
         } else {
@@ -1810,11 +1826,12 @@ var drawCompetitors = function () {
             clusterCenter.location.longitude,
           ]);
         } else {
-          var svgRect =
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="' +
-            cluster.color +
-            '"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>';
-          var pulseIcon = L.icon({
+          /*
+            var svgRect =
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="' +
+              cluster.color +
+              '"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>';
+            var pulseIcon = L.icon({
             iconUrl: encodeURI("data:image/svg+xml," + svgRect).replace(
               "#",
               "%23"
@@ -1822,6 +1839,20 @@ var drawCompetitors = function () {
             iconSize: [40, 40],
             shadowSize: [40, 40],
             iconAnchor: [20, 20],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0],
+          });
+          */
+          var liveColor = tinycolor(cluster.color).setAlpha(0.75);
+          var isDark = getContrastYIQ(cluster.color) === "dark";
+          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+            isDark ? "white" : "black"
+          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+          var pulseIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+            iconSize: [16, 16],
+            shadowSize: [16, 16],
+            iconAnchor: [8, 8],
             shadowAnchor: [0, 0],
             popupAnchor: [0, 0],
           });

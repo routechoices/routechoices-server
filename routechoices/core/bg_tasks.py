@@ -851,18 +851,20 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
         "X-Requested-With": "XMLHttpRequest",
     }
     club = get_livelox_club()
+    post_data = json.dumps(
+        {
+            "classIds": [int(class_id)],
+            "courseIds": [],
+            "relayLegs": relay_legs,
+            "relayLegGroupIds": [],
+        }
+    )
     r_info = requests.post(
         "https://www.livelox.com/Data/ClassInfo",
-        data=json.dumps(
-            {
-                "classIds": [class_id],
-                "courseIds": [],
-                "relayLegs": [relay_legs],
-                "relayLegGroupIds": [],
-            }
-        ),
+        data=post_data,
         headers=livelox_headers,
     )
+
     if r_info.status_code != 200:
         raise EventImportError(f"Can not fetch class info data {r_info.status_code}")
     event_data = r_info.json().get("general", {})
