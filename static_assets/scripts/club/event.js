@@ -105,10 +105,11 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       updateWhenIdle: true,
       position: "bottomleft",
     });
-
-    panControl.addTo(map);
-    zoomControl.addTo(map);
-    rotateControl.addTo(map);
+    if (showControls) {
+      panControl.addTo(map);
+      zoomControl.addTo(map);
+      rotateControl.addTo(map);
+    }
     scaleControl.addTo(map);
 
     map.doubleClickZoom.disable();
