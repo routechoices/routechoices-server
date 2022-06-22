@@ -1046,10 +1046,15 @@ var displayOptions = function (ev) {
   );
   var qrDataUrl = null;
   if (qrUrl) {
-    var qr = qrcode(0, "L");
-    qr.addData(qrUrl);
-    qr.make({ colorLight: "#ccc" });
-    qrDataUrl = qr.createDataURL(4);
+    var qr = new QRious();
+    qr.set({
+      background: "#f5f5f5",
+      foreground: "black",
+      level: "L",
+      value: qrUrl,
+      size: 148,
+    });
+    qrDataUrl = qr.toDataURL();
   }
   mainDiv.append(
     u("<div/>").html(

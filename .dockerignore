@@ -15,3 +15,6 @@ package.json
 README.md
 yarn.lock
 requirements.txt
+*.json.gz
+*.sqlite3
+yarn.lock
