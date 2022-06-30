@@ -450,7 +450,7 @@ def import_single_event_from_loggator(event_id):
 @background(schedule=0)
 def import_single_event_from_tractrac(event_id):
     club = get_tractrac_club()
-    r = requests.get(event_id)
+    r = requests.get(event_id, verify=False)
     if r.status_code != 200:
         raise EventImportError("API returned error code")
     event_data = r.json()
@@ -484,7 +484,7 @@ def import_single_event_from_tractrac(event_id):
         data_url = mtb_url
         if not data_url.startswith("http"):
             data_url = f"http:{data_url}"
-        response = requests.get(data_url, stream=True)
+        response = requests.get(data_url, stream=True, verify=False)
         if response.status_code == 200:
             with tempfile.TemporaryFile() as lf:
                 for block in response.iter_content(1024 * 8):
