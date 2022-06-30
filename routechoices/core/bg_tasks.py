@@ -154,7 +154,7 @@ def import_map_from_sportrec(club, event_id, map_data, name):
 
 def import_map_from_tractrac(club, map_info, name):
     map_url = map_info.get("location")
-    r = requests.get(map_url)
+    r = requests.get(map_url, verify=False)
 
     if r.status_code != 200:
         raise MapImportError("API returned error code")
