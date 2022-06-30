@@ -486,6 +486,7 @@ def import_single_event_from_tractrac(event_id):
             data_url = f"http:{data_url}"
         response = requests.get(data_url, stream=True, verify=False)
         if response.status_code == 200:
+            print(f"mtb {data_url}")
             with tempfile.TemporaryFile() as lf:
                 for block in response.iter_content(1024 * 8):
                     if not block:
@@ -508,6 +509,7 @@ def import_single_event_from_tractrac(event_id):
                 + event_data["eventType"]
                 + "?snapping=false"
             )
+            print("ws")
             device_map = TracTracWSReader().read_data(url)
         except Exception:
             event.delete()
@@ -516,7 +518,6 @@ def import_single_event_from_tractrac(event_id):
     if not device_map:
         event.delete()
         raise EventImportError("Did not figure out how to get data")
-
     for c_data in event_data["competitors"].values():
         st = c_data.get("startTime")
         if not st:
@@ -536,6 +537,7 @@ def import_single_event_from_tractrac(event_id):
             device=dev_model,
             event=event,
         )
+        print(c_data["name"])
 
 
 @background(schedule=0)
