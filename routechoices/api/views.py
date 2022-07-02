@@ -98,7 +98,7 @@ def serve_from_s3(
     response["Content-Type"] = mime
     response[
         "Content-Disposition"
-    ] = f'attachment; filename="{escape_filename(filename)}"'.encode("utf-8")
+    ] = f'attachment; filename="{escape_filename(filename)}"'
     return response
 
 
