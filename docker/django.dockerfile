@@ -6,14 +6,14 @@ ADD requirements.in /requirements.in
 RUN mkdir /app/
 
 RUN set -ex \
-    && apt update && apt install -y libgdal-dev g++ git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
+    && apt-get update && apt-get install -y libgdal-dev g++ git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install pip-tools \
     && /venv/bin/pip-compile /requirements.in --no-header --no-annotate --output-file /app/requirements.txt \
     && /venv/bin/pip install -r /app/requirements.txt \
-    && apt autoremove -y \
-    && apt clean -y && rm -rf /var/lib/apt/lists/*
+    && apt-get autoremove -y \
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 
