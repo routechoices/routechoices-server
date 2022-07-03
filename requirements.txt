@@ -44,7 +44,7 @@ frozenlist==1.3.0
 geoip2==4.6.0
 gitdb==4.0.9
 gitpython==3.1.27
-gps-encoding @ git+https://github.com/rphlo/gps_encoding.git
+gps-encoding==1.3.2
 gpxpy==1.5.0
 idna==3.3
 inflection==0.5.1
