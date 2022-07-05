@@ -10,7 +10,7 @@ RUN set -ex \
     && apt-get update && apt-get install -y libgdal-dev g++ git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /app/requirements.txt \
+    && /venv/bin/pip --no-cache-dir install -r /app/requirements.txt \
     && apt-get autoremove -y \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
