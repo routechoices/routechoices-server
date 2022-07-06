@@ -1,5 +1,6 @@
 # coding=utf-8
 import json
+import math
 from struct import pack, unpack
 
 import arrow
@@ -242,21 +243,31 @@ class GL200Connection:
         if parts[0][8:] != "INF":
             try:
                 nb_pts = int(parts[6])
+                print(f"contains {nb_pts} pts")
+                if 12 * nb_pts + 10 == len(parts):
+                    len_points = 12
+                elif 11 * nb_pts + 11 == len(parts):
+                    len_points = 11
+                else:
+                    len_points = math.floor((len(parts) - 10) / nb_pts)
+                print(f"each point has {len_points} data")
                 pts = []
                 for i in range(nb_pts):
                     try:
-                        lon = float(parts[11 + i * 12])
-                        lat = float(parts[12 + i * 12])
+                        lon = float(parts[11 + i * len_points])
+                        lat = float(parts[12 + i * len_points])
                         tim = arrow.get(
-                            parts[13 + i * 12], "YYYYMMDDHHmmss"
+                            parts[13 + i * len_points], "YYYYMMDDHHmmss"
                         ).int_timestamp
-                    except Exception:
+                    except Exception as e:
+                        print(str(e))
                         continue
                     else:
                         pts.append((tim, lat, lon))
-                batt = int(parts[nb_pts * 12 + 7])
+                batt = int(parts[-3])
                 await self._on_data(pts, batt)
-            except Exception:
+            except Exception as e:
+                print(str(e))
                 self.stream.close()
                 return
         while await self._read_line():
@@ -284,23 +295,33 @@ class GL200Connection:
                 if imei != self.imei:
                     raise Exception("Cannot change IMEI while connected")
                 nb_pts = int(parts[6])
+                print(f"contains {nb_pts} pts")
+                if 12 * nb_pts + 10 == len(parts):
+                    len_points = 12
+                elif 11 * nb_pts + 11 == len(parts):
+                    len_points = 11
+                else:
+                    len_points = math.floor((len(parts) - 10) / nb_pts)
+                print(f"each point has {len_points} data")
                 pts = []
                 for i in range(nb_pts):
                     try:
-                        lon = float(parts[11 + i * 12])
-                        lat = float(parts[12 + i * 12])
+                        lon = float(parts[11 + i * len_points])
+                        lat = float(parts[12 + i * len_points])
                         tim = arrow.get(
-                            parts[13 + i * 12], "YYYYMMDDHHmmss"
+                            parts[13 + i * len_points], "YYYYMMDDHHmmss"
                         ).int_timestamp
-                    except Exception:
+                    except Exception as e:
+                        print(str(e))
                         continue
                     else:
                         pts.append((tim, lat, lon))
-                batt = int(parts[nb_pts * 12 + 7])
+                batt = int(parts[-3])
                 await self._on_data(pts, batt)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
-        except Exception:
+        except Exception as e:
+            print(str(e))
             self.stream.close()
             return False
         return True
@@ -316,7 +337,7 @@ class GL200Connection:
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             loc_array
         )
-        print("data wrote to db")
+        print("data wrote", flush=True)
 
 
 class GL200Server(TCPServer):
