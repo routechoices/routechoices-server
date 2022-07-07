@@ -111,6 +111,25 @@ def logo_upload_path(instance=None, file_name=None):
     return os.path.join(*tmp_path)
 
 
+class SoftChoiceMixin(object):
+    soft_default = True
+
+    def __init__(self, **kwargs):
+        self.soft_default = bool(kwargs.pop("soft_default", self.soft_default))
+        if callable(kwargs.get("choices")):
+            self.construct_choices = kwargs["choices"]
+        kwargs["choices"] = list(self.construct_choices())
+        super().__init__(**kwargs)
+
+    def deconstruct(self):  # pragma: no cover
+        # only run when creating migrations, so no-cover
+        name, path, args, kwargs = super(SoftChoiceMixin, self).deconstruct()
+        kwargs.pop("choices", None)
+        if self.soft_default:
+            kwargs.pop("default", None)
+        return (name, path, args, kwargs)
+
+
 class Club(models.Model):
     aid = models.CharField(
         default=random_key,
@@ -702,6 +721,7 @@ PRIVACY_CHOICES = (
     (PRIVACY_PRIVATE, "Private"),
 )
 
+
 MAP_BLANK = "blank"
 MAP_OSM = "osm"
 MAP_GOOGLE_STREET = "gmap-street"
@@ -727,6 +747,20 @@ MAP_CHOICES = (
     (MAP_TOPO_WRLD, "Topo World (OpenTopo)"),
     (MAP_TOPO_WRLD_ALT, "Topo World (ArcGIS)"),
 )
+
+
+class BackroundMapChoicesField(models.CharField):
+    def __init__(self, **kwargs):
+        kwargs["max_length"] = 16
+        kwargs["choices"] = MAP_CHOICES
+        kwargs["default"] = MAP_BLANK
+        super().__init__(**kwargs)
+
+    def deconstruct(self):  # pragma: no cover
+        # only run when creating migrations, so no-cover
+        name, path, args, kwargs = super().deconstruct()
+        kwargs.pop("choices", None)
+        return (name, path, args, kwargs)
 
 
 class Event(models.Model):
@@ -761,11 +795,7 @@ class Event(models.Model):
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
     )
-    backdrop_map = models.CharField(
-        max_length=16,
-        choices=MAP_CHOICES,
-        default=MAP_BLANK,
-    )
+    backdrop_map = BackroundMapChoicesField()
     map = models.ForeignKey(
         Map,
         related_name="+",
