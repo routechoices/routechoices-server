@@ -1302,7 +1302,14 @@ var getProgressBarText = function (currentTime) {
     if (viewedTime === 0) {
       return "00:00:00";
     }
-    result = dayjs(viewedTime).format("HH:mm:ss");
+    if (
+      dayjs(getCompetitionStartDate()).format("YYYY-MM-DD") !==
+      dayjs(getCompetitionEndDate()).format("YYYY-MM-DD")
+    ) {
+      result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
+    } else {
+      result = dayjs(viewedTime).format("HH:mm:ss");
+    }
   }
   return result;
 };
