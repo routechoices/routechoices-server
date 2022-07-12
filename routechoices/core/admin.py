@@ -107,7 +107,7 @@ class IsGPXFilter(admin.SimpleListFilter):
         return [
             ("all", "All"),
             (None, "Real Devices"),
-            ("fake", "Fake Devices"),
+            ("virtual", "Virtual Devices"),
         ]
 
     def choices(self, cl):
@@ -124,7 +124,7 @@ class IsGPXFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() == "fake":
+        if self.value() == "virtual":
             return queryset.filter(is_gpx=True)
         elif self.value():
             return queryset.all()
