@@ -22,7 +22,7 @@ services:
       - "1025"
   nginx:
     container_name: rc_nginx
-    image: nginx:latest
+    image: fholzer/nginx-brotli:v1.18.0
     ports:
       - "8081:443"
     volumes:
