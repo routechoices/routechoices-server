@@ -786,6 +786,7 @@ AWS_SECRET_ACCESS_KEY = "minio123"
 # The optional AWS session token to use.
 AWS_SESSION_TOKEN = ""
 AWS_S3_ENDPOINT_URL = "http://minio:9000"
+AWS_S3_BUCKET = "routechoices"
 
 GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
 

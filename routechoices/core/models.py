@@ -178,7 +178,7 @@ Browse our events here.""",
         null=True,
         blank=True,
         help_text="Square image of width greater or equal to 128px",
-        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
+        storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
 
     class Meta:
@@ -268,7 +268,7 @@ class Map(models.Model):
         max_length=255,
         height_field="height",
         width_field="width",
-        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
+        storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
     height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     width = models.PositiveIntegerField(

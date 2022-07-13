@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from routechoices.core.models import Map
@@ -16,7 +17,7 @@ class Command(BaseCommand):
         # paginator = s3.get_paginator('list_objects_v2')
         paginator = self.s3.get_paginator("list_objects")
         kwargs = {
-            "Bucket": "routechoices-maps",
+            "Bucket": settings.AWS_S3_BUCKET,
             "Prefix": "maps",
         }
         for page in paginator.paginate(**kwargs):
@@ -33,7 +34,7 @@ class Command(BaseCommand):
             self.n_image_removed += 1
             self.stdout.write(f"File {image_name} is unused")
             if not dry_run:
-                s3_delete_key(image_name, "routechoices-maps")
+                s3_delete_key(image_name, settings.AWS_S3_BUCKET)
         else:
             self.n_image_keeped += 1
             self.keeped.add(image_name)

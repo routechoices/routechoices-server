@@ -1230,7 +1230,7 @@ def event_map_download(request, event_id, map_index="0"):
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
     return serve_from_s3(
-        "routechoices-maps",
+        settings.AWS_S3_BUCKET,
         request,
         "/internal/" + file_path,
         filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
