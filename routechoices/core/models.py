@@ -298,8 +298,13 @@ class Map(models.Model):
 
     @property
     def data(self):
+        cache_key = f"img_data_{self.image.name}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
         with self.image.open("rb") as fp:
             data = fp.read()
+        cache.set(cache_key, data)
         return data
 
     @property
@@ -346,9 +351,15 @@ class Map(models.Model):
 
     @property
     def mime_type(self):
+        cache_key = f"img_mime_{self.image.name}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
         with self.image.storage.open(self.image.name, mode="rb", nbytes=2048) as fp:
             data = fp.read()
-            return magic.from_buffer(data, mime=True)
+        mime = magic.from_buffer(data, mime=True)
+        cache.set(cache_key, mime)
+        return mime
 
     @property
     def data_uri(self):
@@ -542,8 +553,7 @@ class Map(models.Model):
             ]
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
-        orig = self.image.open("rb").read()
-        self.image.close()
+        orig = self.data
         img = Image.open(BytesIO(orig)).convert("RGBA")
         img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
 

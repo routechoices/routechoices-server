@@ -49,7 +49,7 @@ jobs:
     - run:
         name: Deploy
         command: |
-          ssh root@routechoices.com 'sudo -u apps /apps/routechoices.com/bin/deploy'
+          ssh root@routechoices.com 'sudo -u apps /apps/routechoices-server/bin/deploy'
 
 workflows:
   build_test_and_deploy:
