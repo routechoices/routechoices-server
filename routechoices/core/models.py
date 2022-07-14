@@ -253,7 +253,6 @@ Browse our events here.""",
 
     def create_analytics_site(self):
         if not self.create_analytics_domain():
-            raise Exception("can not create analytic site")
             return False
         if self.analytics_site:
             return self.analytics_site
