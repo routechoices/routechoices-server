@@ -181,6 +181,7 @@ Browse our events here.""",
         help_text="Square image of width greater or equal to 128px",
         storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
+    analytics_site = models.URLField(max_length=256, blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -194,11 +195,18 @@ Browse our events here.""",
         if self.pk:
             if self.domain:
                 self.domain = self.domain.lower()
-            old_domain = Club.objects.get(pk=self.pk).domain
+            old_data = Club.objects.get(pk=self.pk)
+            old_domain = old_data.domain
             if old_domain and old_domain != self.domain:
                 delete_domain(old_domain)
+            if self.analytics_site:
+                old_slug = old_data.slug
+                if old_slug != self.slug:
+                    self.delete_analytics_domain(old_slug)
+                    self.create_analytics_domain()
         self.slug = self.slug.lower()
-        return super().save(*args, **kwargs)
+        self.create_analytics_site()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return self.nice_url
@@ -225,6 +233,55 @@ Browse our events here.""",
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
         )
         return f"{self.url_protocol}:{path}"
+
+    def create_analytics_domain(self):
+        r = requests.get(
+            f"{settings.ANALYTICS_API_URL}/sites/{self.slug}",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            timeout=5,
+        )
+        if r.status_code != 200:
+            r = requests.post(
+                f"{settings.ANALYTICS_API_URL}/sites",
+                headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+                data={"domain": self.slug},
+                timeout=5,
+            )
+            if r.status_code != 200:
+                return False
+        return True
+
+    def create_analytics_site(self):
+        if not self.create_analytics_domain():
+            raise Exception("can not create analytic site")
+            return False
+        if self.analytics_site:
+            return self.analytics_site
+        r = requests.put(
+            f"{settings.ANALYTICS_API_URL}/sites/shared-links",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            data={
+                "name": self.name,
+                "site_id": self.slug,
+            },
+            timeout=5,
+        )
+        data = r.json()
+        return data["url"]
+
+    def delete_analytics_domain(self, slug=None):
+        if not slug:
+            slug = self.slug
+        r = requests.delete(
+            f"{settings.ANALYTICS_API_URL}/sites/{slug}",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            timeout=5,
+        )
+        if r.status_code != 200:
+            return False
+        self.analytics_site = ""
+        self.save()
+        return True
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
