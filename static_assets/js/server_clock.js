@@ -38,7 +38,7 @@ var ServerClock = function (opts) {
       drifts = [];
       (function fetchServerTime() {
         if (drifts.length < 3) {
-          setTimeout(fetchServerTime, 500); // Every 0.5 seconds
+          setTimeout(fetchServerTime, 50); // Every 0.05 seconds
           var clientRequestTime = +new Date();
           fetch(options.url, {
             method: "GET",

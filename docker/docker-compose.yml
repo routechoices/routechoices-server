@@ -2,11 +2,13 @@ version: '3.7'
 services:
   minio:
     container_name: rc_minio
-    image: minio/minio:edge
+    image: minio/minio:latest
     volumes:
       - ../media:/data
     expose:
       - "9000"
+    ports:
+      - "9000:9000"
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
