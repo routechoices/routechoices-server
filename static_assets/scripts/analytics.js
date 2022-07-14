@@ -1,16 +1,57 @@
-var _paq = (window._paq = window._paq || []);
-/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-_paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
-_paq.push(["trackPageView"]);
-_paq.push(["enableLinkTracking"]);
-(function () {
-  var u = "https://stats.io.rphlo.com/";
-  _paq.push(["setTrackerUrl", u + "matomo.php"]);
-  _paq.push(["setSiteId", "2"]);
-  var d = document,
-    g = d.createElement("script"),
-    s = d.getElementsByTagName("script")[0];
-  g.async = true;
-  g.src = u + "matomo.js";
-  s.parentNode.insertBefore(g, s);
+!(function () {
+  "use strict";
+  var r = window.location,
+    a = window.document,
+    t = window.localStorage,
+    o = a.currentScript,
+    l = o.getAttribute("data-api") || new URL(o.src).origin + "/api/event",
+    w = t && t.plausible_ignore;
+  function s(t) {
+    console.warn("Ignoring Event: " + t);
+  }
+  function e(t, e) {
+    if (
+      /^localhost$|^127(\.[0-9]+){0,2}\.[0-9]+$|^\[::1?\]$/.test(r.hostname) ||
+      "file:" === r.protocol
+    )
+      return s("localhost");
+    if (
+      !(
+        window._phantom ||
+        window.__nightmare ||
+        window.navigator.webdriver ||
+        window.Cypress
+      )
+    ) {
+      if ("true" == w) return s("localStorage flag");
+      var n = {};
+      (n.n = t),
+        (n.u = e.u || r.href),
+        (n.d = o.getAttribute("data-domain")),
+        (n.r = a.referrer || null),
+        (n.w = window.innerWidth),
+        e && e.meta && (n.m = JSON.stringify(e.meta)),
+        e && e.props && (n.p = JSON.stringify(e.props));
+      var i = new XMLHttpRequest();
+      i.open("POST", l, !0),
+        i.setRequestHeader("Content-Type", "text/plain"),
+        i.send(JSON.stringify(n)),
+        (i.onreadystatechange = function () {
+          4 == i.readyState && e && e.callback && e.callback();
+        });
+    }
+  }
+  var n = (window.plausible && window.plausible.q) || [];
+  window.plausible = e;
+  for (var i = 0; i < n.length; i++) e.apply(this, n[i]);
 })();
+window.plausible =
+  window.plausible ||
+  function () {
+    (window.plausible.q = window.plausible.q || []).push(arguments);
+  };
+var clubSlug = window.document.currentScript.dataset.clubSlug;
+analyticsUrl = window.clubSlug
+  ? `https://www.routechoices.com/${window.clubSlug}${window.location.pathname}`
+  : window.location.href;
+window.plausible("pageview", { u: analyticsUrl });
