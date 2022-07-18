@@ -138,7 +138,7 @@ function project(m, x, y) {
     },
   });
   L.TileLayer["osm"] = L.TileLayer.Common.extend({
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     options: { attribution: "&copy; OpenStreetMap contributors" },
   });
   L.TileLayer["gmap-street"] = L.TileLayer.Common.extend({
