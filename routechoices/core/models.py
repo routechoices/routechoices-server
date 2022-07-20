@@ -304,7 +304,10 @@ class Map(models.Model):
             return cached
         with self.image.open("rb") as fp:
             data = fp.read()
-        cache.set(cache_key, data, 3600)
+        try:
+            cache.set(cache_key, data, 3600)
+        except Exception:
+            pass
         return data
 
     @property
@@ -358,7 +361,10 @@ class Map(models.Model):
         with self.image.storage.open(self.image.name, mode="rb", nbytes=2048) as fp:
             data = fp.read()
         mime = magic.from_buffer(data, mime=True)
-        cache.set(cache_key, mime, 3600)
+        try:
+            cache.set(cache_key, mime, 3600)
+        except Exception:
+            pass
         return mime
 
     @property
