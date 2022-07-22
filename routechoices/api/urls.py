@@ -116,6 +116,5 @@ urlpatterns = [
         views.two_d_rerun_race_data,
         name="2d_rerun_race_data",
     ),
-    re_path(r"^wms/?$", views.wms_service, name="wms_service"),
     re_path(r"^check-latlon/?$", views.ip_latlon, name="ip_latlon"),
 ]

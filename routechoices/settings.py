@@ -727,6 +727,7 @@ SLUG_BLACKLIST = [
     "widget",
     "widgets",
     "wiki",
+    "wms",
     "wpad",
     "write",
     "www",

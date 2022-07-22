@@ -116,7 +116,7 @@
 <script src="{% static '/scripts/load_variables.js' %}?_=2022031600"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
-        data-wms-service-url="{% host_url 'wms_service' host 'api' %}"{% if event.allow_live_chat %}
+        data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"{% if event.allow_live_chat %}
         data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
         data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
         data-server-clock-url="{% host_url 'time_api' host 'api' %}"
