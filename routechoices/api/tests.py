@@ -179,7 +179,15 @@ class MapApiTestCase(EssentialApiBase):
             SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res["content-type"], "image/png")
+        self.assertEqual(res["content-type"], "image/jpeg")
+
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            SERVER_NAME="wms.localhost:8000",
+            HTTP_ACCEPT="image/avif",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res["content-type"], "image/avif")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
@@ -212,8 +220,7 @@ class MapApiTestCase(EssentialApiBase):
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fgif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
             SERVER_NAME="wms.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res["content-type"], "image/png")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 @override_settings(PARENT_HOST="localhost:8000")
