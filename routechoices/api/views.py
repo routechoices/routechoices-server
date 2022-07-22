@@ -1562,11 +1562,22 @@ def tile_etag(request):
         else:
             img_mime = "image/png"
 
-        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
-        if asked_mime in ("image/png", "image/webp", "image/avif"):
-            img_mime = asked_mime
+        best_mime = None
+        if "image/avif" in http_accept.split(","):
+            best_mime = "image/avif"
+        elif "image/webp" in http_accept.split(","):
+            best_mime = "image/webp"
 
-        if img_mime not in ("image/png", "image/webp", "image/avif"):
+        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
+        if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
+            img_mime = asked_mime
+            if img_mime == "image/apng":
+                img_mime = "image/png"
+        elif asked_mime == "image/jpeg" and not best_mime:
+            img_mime = "image/jpeg"
+        elif best_mime:
+            img_mime = best_mime
+        else:
             return None
 
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
@@ -1684,16 +1695,23 @@ def wms_service(request):
         heigth_raw = request.GET.get("height", request.GET.get("HEIGHT"))
 
         http_accept = request.META.get("HTTP_ACCEPT", "")
+        best_mime = None
         if "image/avif" in http_accept.split(","):
-            img_mime = "image/avif"
+            best_mime = "image/avif"
         elif "image/webp" in http_accept.split(","):
-            img_mime = "image/webp"
-        else:
-            img_mime = "image/png"
+            best_mime = "image/webp"
 
-        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
-        if asked_mime in ("image/png", "image/webp", "image/avif"):
+        asked_mime = request.GET.get("format", request.GET.get("FORMAT"))
+        if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
+            if img_mime == "image/apng":
+                img_mime = "image/png"
+        elif asked_mime == "image/jpeg" and not best_mime:
+            img_mime = "image/jpeg"
+        elif best_mime:
+            img_mime = best_mime
+        else:
+            return HttpResponseBadRequest("invalid format")
 
         if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
             return HttpResponseBadRequest("missing mandatory parameters")
