@@ -1586,11 +1586,11 @@ def tile_etag(request):
             min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(","))
             srs = request.GET.get("SRS", request.GET.get("srs"))
             if srs in ("CRS:84", "EPSG:4326"):
-                min_lon, min_lat, max_lon, max_lat = (
+                min_lat, min_lon, max_lat, max_lon = (
                     float(x) for x in bbox_raw.split(",")
                 )
                 if srs == "EPSG:4326":
-                    min_lat, min_lon, max_lat, max_lon = (
+                    min_lon, min_lat, max_lon, max_lat = (
                         float(x) for x in bbox_raw.split(",")
                     )
                 min_xy = GLOBAL_MERCATOR.latlon_to_meters(
@@ -1719,11 +1719,11 @@ def wms_service(request):
             min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(","))
             srs = request.GET.get("SRS", request.GET.get("srs"))
             if srs in ("CRS:84", "EPSG:4326"):
-                min_lon, min_lat, max_lon, max_lat = (
+                min_lat, min_lon, max_lat, max_lon = (
                     float(x) for x in bbox_raw.split(",")
                 )
                 if srs == "EPSG:4326":
-                    min_lat, min_lon, max_lat, max_lon = (
+                    min_lon, min_lat, max_lon, max_lat = (
                         float(x) for x in bbox_raw.split(",")
                     )
                 min_xy = GLOBAL_MERCATOR.latlon_to_meters(
