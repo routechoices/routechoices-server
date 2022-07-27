@@ -1,6 +1,5 @@
-all: build-and-push
-	make build
-	make push
+all: build
+	 push
 	@echo "All done!"
 
 build:
