@@ -1,8 +1,7 @@
 all: build-and-push
+	make build
+	make push
 	@echo "All done!"
-
-build-and-push:
-	docker build build --push -t rphl/routechoices-dev-server:latest -f docker/django.dockerfile .
 
 build:
 	docker build -t rphl/routechoices-dev-server:latest -f docker/django.dockerfile .
