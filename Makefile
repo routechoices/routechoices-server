@@ -1,5 +1,4 @@
-all: build
-	 push
+all: build push
 	@echo "All done!"
 
 build:
