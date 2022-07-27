@@ -39,5 +39,6 @@
     "sending": "Envoi en cours...",
     "message-removed": "Message supprimé par un modérateur",
     "chat-closed": "Le chat est fermé",
-    "reached-max-runners": "La limite de $1 concurrents affichés a été atteinte"
+    "reached-max-runners": "La limite de $1 concurrents affichés a été atteinte",
+    "export": "Exporter"
 }

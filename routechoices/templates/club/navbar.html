@@ -26,8 +26,11 @@
       </ul>
       <ul class="nav navbar-nav d-flex">
         <li class="nav-item">
-          <a class="nav-link" href="{{ club.get_absolute_url }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer" id="club-events-link-text">Events by {{ club.name }}</a>
-        </li>
+          <a class="nav-link" href="{{ club.get_absolute_url }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-compass"></i> <span id="club-events-link-text">Events by {{ club.name }}</span></a>
+        </li>{% if is_event_page %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ club.get_absolute_url }}{{event.slug}}/export" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="export-text">Export</span></a>
+        </li>{% endif %}
       </ul>
     </div>
     {% endif %}

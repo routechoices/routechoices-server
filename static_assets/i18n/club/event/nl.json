@@ -39,5 +39,6 @@
     "sending": "Sturen...",
     "message-removed": "Bericht verwijderd door een moderator",
     "chat-closed": "Chatten is gesloten",
-    "reached-max-runners": "De limiet van $1 deelnemers is bereikt"
+    "reached-max-runners": "De limiet van $1 deelnemers is bereikt",
+    "export": "exporteren"
 }

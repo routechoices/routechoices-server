@@ -30,6 +30,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
   banana = new Banana();
   updateText().then(function () {
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
+    u("#export-text").text(banana.i18n("export"));
     u("#chat-btn-text").text(banana.i18n("chat"));
     u("#loading-text").text(banana.i18n("loading-text"));
     u("#event-not-started-text").text(banana.i18n("event-not-started-text"));

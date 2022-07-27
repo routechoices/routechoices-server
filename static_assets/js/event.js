@@ -2241,7 +2241,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?2022060500`)
+  return fetch(`${langFile}?2022072700`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);
