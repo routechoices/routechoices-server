@@ -27,7 +27,7 @@
       var n = {};
       (n.n = t),
         (n.u = e.u || r.href),
-        (n.d = o.getAttribute("data-domain")),
+        (n.d = e.d || o.getAttribute("data-domain")),
         (n.r = a.referrer || null),
         (n.w = window.innerWidth),
         e && e.meta && (n.m = JSON.stringify(e.meta)),
@@ -54,4 +54,7 @@ var clubSlug_ = window.document.currentScript.dataset.clubSlug;
 var analyticsUrl = clubSlug_
   ? "https://www.routechoices.com/" + clubSlug_ + window.location.pathname
   : window.location.href;
-window.plausible("pageview", { u: analyticsUrl });
+window.plausible("pageview", { u: analyticsUrl }); // global stats
+if (clubSlug_) {
+  window.plausible("pageview", { d: clubSlug_ + ".routechoices.com" }); // site stats
+}
