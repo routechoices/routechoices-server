@@ -29,27 +29,29 @@
     u("#id_admins-ts-label").parent().after(inviteBtn);
   }
   var submitForm = document.getElementById("change_form");
-  submitForm.addEventListener("submit", function confirmResetStats(e) {
-    if (clubSlug && u("#id_slug").val() !== clubSlug) {
-      e.preventDefault();
-      swal(
-        {
-          title: "Confirm",
-          text: "If you proceed to change your club slug, you will loose your pages visits statistics history",
-          type: "warning",
-          confirmButtonText: "Continue",
-          showCancelButton: true,
-          confirmButtonClass: "btn-danger",
-        },
-        function (isConfirmed) {
-          if (isConfirmed) {
-            submitForm.removeEventListener("submit", confirmResetStats);
-            submitForm.submit();
-          } else {
-            u("#id_slug").val(clubSlug);
+  if (submitForm) {
+    submitForm.addEventListener("submit", function confirmResetStats(e) {
+      if (clubSlug && u("#id_slug").val() !== clubSlug) {
+        e.preventDefault();
+        swal(
+          {
+            title: "Confirm",
+            text: "If you proceed to change your club slug, you will loose your pages visits statistics history",
+            type: "warning",
+            confirmButtonText: "Continue",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+          },
+          function (isConfirmed) {
+            if (isConfirmed) {
+              submitForm.removeEventListener("submit", confirmResetStats);
+              submitForm.submit();
+            } else {
+              u("#id_slug").val(clubSlug);
+            }
           }
-        }
-      );
-    }
-  });
+        );
+      }
+    });
+  }
 })();
