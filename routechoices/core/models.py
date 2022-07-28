@@ -236,7 +236,7 @@ Browse our events here.""",
 
     def create_analytics_domain(self):
         r = requests.get(
-            f"{settings.ANALYTICS_API_URL}/sites/{self.slug}",
+            f"{settings.ANALYTICS_API_URL}/sites/{self.slug}.routechoices.com",
             headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
             timeout=5,
         )
@@ -244,7 +244,7 @@ Browse our events here.""",
             r = requests.post(
                 f"{settings.ANALYTICS_API_URL}/sites",
                 headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
-                data={"domain": self.slug},
+                data={"domain": f"{self.slug}.routechoices.com"},
                 timeout=5,
             )
             if r.status_code != 200:
@@ -252,27 +252,28 @@ Browse our events here.""",
         return True
 
     def create_analytics_site(self):
-        if not self.create_analytics_domain():
-            return False
         if self.analytics_site:
             return self.analytics_site
+        if not self.create_analytics_domain():
+            return False
         r = requests.put(
             f"{settings.ANALYTICS_API_URL}/sites/shared-links",
             headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
             data={
                 "name": self.name,
-                "site_id": self.slug,
+                "site_id": f"{self.slug}.routechoices.com",
             },
             timeout=5,
         )
         data = r.json()
-        return data["url"]
+        self.analytics_site = data["url"]
+        return True
 
     def delete_analytics_domain(self, slug=None):
         if not slug:
             slug = self.slug
         r = requests.delete(
-            f"{settings.ANALYTICS_API_URL}/sites/{slug}",
+            f"{settings.ANALYTICS_API_URL}/sites/{slug}.routechoices.com",
             headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
             timeout=5,
         )
