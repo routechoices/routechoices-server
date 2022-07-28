@@ -28,6 +28,7 @@
 {% endblock %}
 
 {% block extra_body %}
+{{ block.super }}
 <script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {% compress js %}
 <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>

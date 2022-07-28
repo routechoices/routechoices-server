@@ -113,6 +113,7 @@
 
 {% endblock %}
 {% block extra_body %}
+{{ block.super }}
 <script src="{% static '/scripts/load_variables.js' %}?_=2022031600"
         data-event-id="{{event.aid}}"
         data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
