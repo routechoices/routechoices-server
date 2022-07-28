@@ -9,6 +9,9 @@
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 {%  endblock %}
 
+{% block head_title %}{{ event.name }} registration | Powered by {{ site.name }}{% endblock %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} registration page{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">
