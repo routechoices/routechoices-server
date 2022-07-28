@@ -897,6 +897,10 @@ CSRF_COOKIE_HTTPONLY = False
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 ALLAUTH_2FA_ALWAYS_REVEAL_BACKUP_TOKENS = False
+
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
+
 try:
     from .local_settings import *  # noqa: F403, F401
 except ImportError:
