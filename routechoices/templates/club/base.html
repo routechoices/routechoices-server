@@ -11,5 +11,5 @@
 <link rel="shortcut icon" href="{% static 'favicon.ico' %}">{% endif %}{% endblock %}
 
 {% block extra_body %}
-{% if request.club_slug %}<script defer data-domain="{{request.club_slug}}.routechoices.com" data-api="https://analytics.routechoices.dev:8081/api/event" src="{% static '/scripts/analytics.js' %}?v=20220722"></script>{% endif %}
+{% if request.club_slug and enable_analytics %}<script defer data-domain="{{request.club_slug}}.routechoices.com" data-api="https://analytics.routechoices.dev:8081/api/event" src="{% static '/scripts/analytics.js' %}?v=20220722"></script>{% endif %}
 {% endblock%}
