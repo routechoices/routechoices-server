@@ -29,7 +29,7 @@
     u("#id_admins-ts-label").parent().after(inviteBtn);
   }
   var submitForm = document.getElementById("change_form");
-  if (submitForm) {
+  if (submitForm && window.clubHasAnalytics) {
     submitForm.addEventListener("submit", function confirmResetStats(e) {
       if (clubSlug && u("#id_slug").val() !== clubSlug) {
         e.preventDefault();
