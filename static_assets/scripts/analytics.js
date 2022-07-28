@@ -50,8 +50,8 @@ window.plausible =
   function () {
     (window.plausible.q = window.plausible.q || []).push(arguments);
   };
-var clubSlug = window.document.currentScript.dataset.clubSlug;
-var analyticsUrl = window.clubSlug
-  ? "https://www.routechoices.com/" + window.clubSlug + window.location.pathname
+var clubSlug_ = window.document.currentScript.dataset.clubSlug;
+var analyticsUrl = clubSlug_
+  ? "https://www.routechoices.com/" + clubSlug_ + window.location.pathname
   : window.location.href;
 window.plausible("pageview", { u: analyticsUrl });
