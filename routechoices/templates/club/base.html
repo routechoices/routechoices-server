@@ -9,3 +9,10 @@
 <link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}" color="#5bbad5">
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <link rel="shortcut icon" href="{% static 'favicon.ico' %}">{% endif %}{% endblock %}
+
+{% block extra_body %}
+{% if enable_analytics %}
+<script defer data-domain="routechoices.com" src="https://analytics.routechoices.com/js/plausible.js"></script>
+{% endif %}
+{{ block.super }}
+{% endblock%}
