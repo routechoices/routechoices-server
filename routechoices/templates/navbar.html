@@ -3,7 +3,7 @@
 {% load hosts %}
 <header class="navbar navbar-expand-md navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand site-name" href="{% host_url 'site:events_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25" style="vertical-align: text-bottom;"></span> {{site.name}}</a>
+    <a class="navbar-brand site-name" href="{% host_url 'site:home_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25" style="vertical-align: text-bottom;"></span> {{site.name}}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -11,7 +11,7 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
       </ul>
       <ul class="navbar-nav d-flex">
-        {% if user.is_authenticated %}<li><a class="nav-link" href="{% host_url 'site:home_view'%}">Dashboard</a></li>{% endif %}
+        {% if user.is_authenticated %}<li><a class="nav-link" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>{% endif %}
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:trackers_view' host 'www'%}">Trackers</a></li>
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
