@@ -84,6 +84,14 @@ body {
 .video_text_overlay {
   color: #eee;
 }
+
+.frontpage_text {
+  font-family: "Atkinson-Hyperlegible-Regular-102", sans-serif;
+}
+.frontpage_text_bold {
+  font-family: "Atkinson-Hyperlegible-Bold-102", sans-serif;
+}
+
 #myFooter {
   background-color: #3a3f46;
   color: white;
