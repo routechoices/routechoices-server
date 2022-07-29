@@ -36,14 +36,14 @@
 {% endblock %}
 
 {% block extra_body %}
-<script src="{% static '/scripts/load_variables.js' %}?_=2022031600"
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
     data-csrf-token="{{ csrf_token }}"
     data-club-id="{{ club.aid }}"
 ></script>
 {% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/device_list.js' %}?_=2022011801"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
+<script src="{% static '/scripts/dashboard/device_list.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
 {% endcompress %}
 {% endblock %}

@@ -12,7 +12,10 @@
         return callback();
       }
       reqwest({
-        url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
+        url:
+          window.local.apiBaseUrl +
+          "search/device?q=" +
+          encodeURIComponent(query),
         method: "get",
         type: "json",
         withCredentials: true,

@@ -415,7 +415,7 @@ var selectLiveMode = function (e) {
       performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!noDelay) {
+      if (!window.local.noDelay) {
         fetchCompetitorRoutes();
       }
     }
@@ -427,7 +427,7 @@ var selectLiveMode = function (e) {
     }
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
-    if (noDelay) {
+    if (window.local.noDelay) {
       currentTime = +clock.now();
     }
     drawCompetitors();
@@ -473,7 +473,7 @@ var selectReplayMode = function (e) {
       performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!noDelay) {
+      if (!window.local.noDelay) {
         fetchCompetitorRoutes();
       }
     }
@@ -546,7 +546,7 @@ var fetchCompetitorRoutes = function (url) {
       });
 
       updateCompetitorList(response.competitors);
-      if (!initialCompetitorDataLoaded && noDelay) {
+      if (!initialCompetitorDataLoaded && window.local.qnoDelay) {
         initialCompetitorDataLoaded = true;
         connectToGpsEvents();
       }
@@ -569,7 +569,7 @@ var fetchCompetitorRoutes = function (url) {
 var fetchNotice = function () {
   isCurrentlyFetchingNotice = true;
   reqwest({
-    url: eventUrl,
+    url: window.local.eventUrl,
     withCredentials: true,
     crossOrigin: true,
     type: "json",
@@ -936,14 +936,14 @@ var displayChat = function (ev) {
           }
           u("#chatSubmitBtn").val(banana.i18n("sending"));
           reqwest({
-            url: "https:" + chatMessagesEndpoint,
+            url: "https:" + window.local.chatMessagesEndpoint,
             data: {
               nickname: u("#chatNick").val(),
               message: u("#chatMessage").val(),
-              csrfmiddlewaretoken: csrfToken,
+              csrfmiddlewaretoken: window.local.csrfToken,
             },
             headers: {
-              "X-CSRFToken": csrfToken,
+              "X-CSRFToken": window.local.csrfToken,
             },
             crossOrigin: true,
             withCredentials: true,
@@ -2010,8 +2010,8 @@ function addRasterMap(bounds, hash, fit) {
     fit = false;
   }
   rasterMap = L.tileLayer
-    .wms(wmsServiceUrl + "?hash=" + hash, {
-      layers: eventId,
+    .wms(window.local.wmsServiceUrl + "?v=" + hash, {
+      layers: window.local.eventId,
       bounds: bounds,
       tileSize: 512,
       noWrap: true,
@@ -2135,7 +2135,9 @@ function bumpChatConnectTimeout() {
 }
 
 function connectToChatEvents() {
-  chatEventSource = new EventSource(chatStreamUrl, { withCredentials: true });
+  chatEventSource = new EventSource(window.local.chatStreamUrl, {
+    withCredentials: true,
+  });
   // Listen for messages
   chatEventSource.addEventListener("open", function () {
     chatMessages = [];
@@ -2196,7 +2198,9 @@ function bumpGpsConnectTimeout() {
 }
 
 function connectToGpsEvents() {
-  gpsEventSource = new EventSource(gpsStreamUrl, { withCredentials: true });
+  gpsEventSource = new EventSource(window.local.gpsStreamUrl, {
+    withCredentials: true,
+  });
   // Listen for messages
   gpsEventSource.addEventListener("open", function () {});
   gpsEventSource.addEventListener("message", function (event) {
@@ -2240,7 +2244,7 @@ function shareUrl(e) {
 
 function updateText() {
   banana.setLocale(locale);
-  var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
+  var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
   return fetch(`${langFile}?2022072801`)
     .then((response) => response.json())
     .then((messages) => {

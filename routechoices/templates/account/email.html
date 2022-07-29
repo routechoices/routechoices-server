@@ -58,5 +58,7 @@
 {% endblock %}
 
 {% block extra_body %}
+{% compress js %}
 <script type="text/javascript" src="{% static '/scripts/account/email.js' %}?_=2022011800"></script>
+{% endcompress %}
 {% endblock %}

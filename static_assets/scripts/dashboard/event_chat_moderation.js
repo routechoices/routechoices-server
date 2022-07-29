@@ -30,7 +30,9 @@ function bumpChatConnectTimeout() {
 }
 
 function connectToChatEvents() {
-  chatEventSource = new EventSource(chatStreamUrl, { withCredentials: true });
+  chatEventSource = new EventSource(window.local.chatStreamUrl, {
+    withCredentials: true,
+  });
   // Listen for messages
   chatEventSource.addEventListener("open", function () {
     chatMessages = [];
@@ -98,15 +100,15 @@ function refreshMessageList() {
         function (isConfirmed) {
           if (isConfirmed) {
             reqwest({
-              url: "https:" + chatMessagesEndpoint,
+              url: "https:" + window.local.chatMessagesEndpoint,
               method: "delete",
               data: {
                 uuid: uuid,
-                csrfmiddlewaretoken: csrfToken,
+                csrfmiddlewaretoken: window.local.csrfToken,
               },
               type: "json",
               headers: {
-                "X-CSRFToken": csrfToken,
+                "X-CSRFToken": window.local.csrfToken,
               },
               withCredentials: true,
               crossOrigin: true,

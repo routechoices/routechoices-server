@@ -11,7 +11,10 @@ var seletizeOptions = {
       return callback();
     }
     reqwest({
-      url: apiBaseUrl + "search/device?q=" + encodeURIComponent(query),
+      url:
+        window.local.apiBaseUrl +
+        "search/device?q=" +
+        encodeURIComponent(query),
       method: "get",
       type: "json",
       withCredentials: true,
@@ -104,7 +107,7 @@ function onCsvParsed(result) {
       if (l.length > 3) {
         var myDeviceSelectInput = lastDeviceSelectInput;
         reqwest({
-          url: apiBaseUrl + "search/device?q=" + l[3],
+          url: window.local.apiBaseUrl + "search/device?q=" + l[3],
           method: "get",
           type: "json",
           withCredentials: true,

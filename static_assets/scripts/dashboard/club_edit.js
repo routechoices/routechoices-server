@@ -8,7 +8,10 @@
     load: function (query, callback) {
       if (!query.length || query.length < 2) return callback();
       reqwest({
-        url: apiBaseUrl + "search/user?q=" + encodeURIComponent(query),
+        url:
+          window.local.apiBaseUrl +
+          "search/user?q=" +
+          encodeURIComponent(query),
         method: "get",
         type: "json",
         withCredentials: true,
@@ -29,9 +32,12 @@
     u("#id_admins-ts-label").parent().after(inviteBtn);
   }
   var submitForm = document.getElementById("change_form");
-  if (submitForm && window.clubHasAnalytics) {
+  if (submitForm && window.local.clubHasAnalytics) {
     submitForm.addEventListener("submit", function confirmResetStats(e) {
-      if (clubSlug && u("#id_slug").val() !== clubSlug) {
+      if (
+        window.local.clubSlug &&
+        u("#id_slug").val() !== window.local.clubSlug
+      ) {
         e.preventDefault();
         swal(
           {
@@ -47,7 +53,7 @@
               submitForm.removeEventListener("submit", confirmResetStats);
               submitForm.submit();
             } else {
-              u("#id_slug").val(clubSlug);
+              u("#id_slug").val(window.local.clubSlug);
             }
           }
         );

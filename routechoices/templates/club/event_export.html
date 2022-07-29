@@ -57,9 +57,9 @@
 
 {% block extra_body %}
 {{ block.super }}
-{% compress js%}
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/club/event_export.js' %}?_=2022011801"></script>
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/scripts/club/event_export.js' %}"></script>
 {% endcompress %}
 {% endblock %}

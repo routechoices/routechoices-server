@@ -1,8 +1,4 @@
-{% extends "club/base.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-{% load hosts %}
-{% load compress %}
+{% extends "club/base.html" %}{% load static %}{% load django_bootstrap5 %}{% load hosts %}{% load compress %}
 
 {% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
 {% block head_description %}GPS Tracking of {{ event.name }} by {{ event.club.name }}{% endblock %}
@@ -34,7 +30,6 @@
 {% with is_event_page=True %}
 {% include "club/navbar.html" %}
 {% endwith %}
-
 <div class="container-fluid">
   <div class="row">
     <div id="sidebar" class="d-none d-sm-block col-sm-4 col-lg-3 col-xxl-2 sidebar"></div>
@@ -65,9 +60,7 @@
     </div>
   </div>
 </div>
-{% with is_event_page=True %}
-{% include "club/footer.html" %}
-{% endwith %}
+{% with is_event_page=True %}{% include "club/footer.html" %}{% endwith %}
 <div class="modal" tabindex="-1" role="dialog" id="eventLoadingModal" style="display: block; z-index: 10002">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -75,8 +68,8 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
         <h1 id="loading-text">Loading...</h1>
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal" style="z-index: 10002">
@@ -88,8 +81,8 @@
       <div class="modal-body" style="text-align: center">
         <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="colorModal" tabindex="-1" role="dialog"
@@ -110,27 +103,25 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
-{% block extra_body %}
-{{ block.super }}
-<script src="{% static '/scripts/load_variables.js' %}?_=2022031600"
-        data-event-id="{{event.aid}}"
-        data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
-        data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"{% if event.allow_live_chat %}
-        data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
-        data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
-        data-server-clock-url="{% host_url 'time_api' host 'api' %}"
-        data-club-name="{{ event.club.name }}"
-        data-static-root="{% static '' %}"
-        data-csrf-token="{{ csrf_token }}"
-        data-no-delay={% if no_delay %}"true"
-        data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}"false"{% endif %}
+{% block extra_body %}{{ block.super }}
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
+  data-event-id="{{event.aid}}"
+  data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
+  data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"{% if event.allow_live_chat %}
+  data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
+  data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
+  data-server-clock-url="{% host_url 'time_api' host 'api' %}"
+  data-club-name="{{ event.club.name }}"
+  data-static-root="{% static '' %}"
+  data-csrf-token="{{ csrf_token }}"
+  data-no-delay={% if no_delay %}"1"
+  data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}""{% endif %}
 ></script>
 {% compress js %}
 <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
-<script src="{% static '/js/server_clock.js' %}?2022012700"></script>
+<script src="{% static '/js/server_clock.js' %}"></script>
 <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
 <script src="{% static '/vendor/qrious-4.0.2/qrious.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.8.0/leaflet.js' %}"></script>

@@ -9,7 +9,7 @@
       method: "post",
       data: {
         imei: u("#IMEI").val(),
-        csrfmiddlewaretoken: csrfToken,
+        csrfmiddlewaretoken: window.local.csrfToken,
       },
       type: "json",
       withCredentials: true,

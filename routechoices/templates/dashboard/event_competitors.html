@@ -70,17 +70,17 @@
 {% endblock %}
 
 {%  block extra_body %}
-<script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {% compress js %}
 <script src="{% static '/vendor/jquery-3.6.0/jquery.min.js' %}"></script>
 <script src="{% static '/vendor/jquery-formset-1.3.2/jquery.formset.js' %}"></script>
 <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
 <script src="{% static '/vendor/popper-2.11.4/popper.min.js' %}"></script>
-<script src="{% static '/vendor/tempus-dominus-6-custom-2/js/tempus-dominus.js' %}?2021090900"></script>
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
+<script src="{% static '/vendor/tempus-dominus-6-custom-2/js/tempus-dominus.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/papaparse-5.0.0-beta/papaparse.min.js' %}"></script>
-<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/dashboard/event_competitors.js' %}?_=2022031600"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/scripts/dashboard/event_competitors.js' %}"></script>
 {% endcompress %}
 {%  endblock %}

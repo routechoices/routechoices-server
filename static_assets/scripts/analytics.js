@@ -50,11 +50,11 @@ window.plausible =
   function () {
     (window.plausible.q = window.plausible.q || []).push(arguments);
   };
-var clubSlug_ = window.document.currentScript.dataset.clubSlug;
-var analyticsUrl = clubSlug_
-  ? "https://www.routechoices.com/" + clubSlug_ + window.location.pathname
+var clubSlug = window.document.currentScript.dataset.clubSlug;
+var analyticsUrl = clubSlug
+  ? "https://www.routechoices.com/" + clubSlug + window.location.pathname
   : window.location.href;
 window.plausible("pageview", { u: analyticsUrl }); // global stats
-if (clubSlug_) {
-  window.plausible("pageview", { d: clubSlug_ + ".routechoices.com" }); // site stats
+if (clubSlug) {
+  window.plausible("pageview", { d: clubSlug + ".routechoices.com" }); // site stats
 }

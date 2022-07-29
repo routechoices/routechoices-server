@@ -32,10 +32,10 @@
       function (inputValue) {
         if (inputValue === null || inputValue === false) return false;
         reqwest({
-          url: "/api/clubs/" + clubId + "/devices/" + devId,
+          url: "/api/clubs/" + window.local.clubId + "/devices/" + devId,
           data: { nickname: inputValue },
           headers: {
-            "X-CSRFToken": csrfToken,
+            "X-CSRFToken": window.local.csrfToken,
           },
           crossOrigin: true,
           withCredentials: true,
@@ -62,9 +62,9 @@
       },
       function () {
         reqwest({
-          url: "/api/clubs/" + clubId + "/devices/" + devId,
+          url: "/api/clubs/" + window.local.clubId + "/devices/" + devId,
           headers: {
-            "X-CSRFToken": csrfToken,
+            "X-CSRFToken": window.local.csrfToken,
           },
           crossOrigin: true,
           withCredentials: true,
