@@ -158,6 +158,7 @@ def account_delete_view(request):
         if conf_key:
             if token_generator.check_token(user, conf_key):
                 request.user.delete()
+                request.session.user_id = None
                 messages.success(request, "Account deleted.")
                 return redirect("site:home_view")
             return render(

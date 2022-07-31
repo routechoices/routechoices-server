@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block head_title %}{% trans "Account" %}{% endblock %}
 
@@ -59,6 +60,6 @@
 
 {% block extra_body %}
 {% compress js %}
-<script type="text/javascript" src="{% static '/scripts/account/email.js' %}?_=2022011800"></script>
+<script type="text/javascript" src="{% static '/scripts/account/email.js' %}""></script>
 {% endcompress %}
 {% endblock %}
