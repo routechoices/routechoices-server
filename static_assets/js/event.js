@@ -221,8 +221,9 @@ var groupControl = null;
 var panControl = null;
 var zoomControl = null;
 var rotateControl = null;
+var scaleControl = null;
 var showClusters = false;
-var showControls = true;
+var showControls = !(L.Browser.touch && L.Browser.mobile);
 var backdropMaps = {};
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
 var chatDisplayed = false;
@@ -236,8 +237,10 @@ var sendInterval = 0;
 var endEvent = null;
 var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
-var maxParticipantsDisplayed = 100;
+var maxParticipantsDisplayed = 300;
 var nbShown = 0;
+var refreshInterval = 100;
+var smoothFactor = 1;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -246,7 +249,7 @@ backdropMaps["blank"] = L.tileLayer(
   }
 );
 backdropMaps["osm"] = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
     attribution:
       'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -412,7 +415,7 @@ var selectLiveMode = function (e) {
       performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!noDelay) {
+      if (!window.local.noDelay) {
         fetchCompetitorRoutes();
       }
     }
@@ -424,7 +427,7 @@ var selectLiveMode = function (e) {
     }
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
-    if (noDelay) {
+    if (window.local.noDelay) {
       currentTime = +clock.now();
     }
     drawCompetitors();
@@ -434,7 +437,7 @@ var selectLiveMode = function (e) {
       selectReplayMode();
     }
     if (isLiveMode) {
-      setTimeout(whileLive, 101);
+      setTimeout(whileLive, refreshInterval);
     }
   })();
 };
@@ -470,7 +473,7 @@ var selectReplayMode = function (e) {
       performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!noDelay) {
+      if (!window.local.noDelay) {
         fetchCompetitorRoutes();
       }
     }
@@ -506,7 +509,7 @@ var selectReplayMode = function (e) {
     prevShownTime = currentTime;
     prevDisplayRefresh = performance.now();
     if (!isLiveMode) {
-      setTimeout(whileReplay, 105);
+      setTimeout(whileReplay, refreshInterval);
     }
   })();
 };
@@ -543,7 +546,7 @@ var fetchCompetitorRoutes = function (url) {
       });
 
       updateCompetitorList(response.competitors);
-      if (!initialCompetitorDataLoaded && noDelay) {
+      if (!initialCompetitorDataLoaded && window.local.qnoDelay) {
         initialCompetitorDataLoaded = true;
         connectToGpsEvents();
       }
@@ -566,7 +569,7 @@ var fetchCompetitorRoutes = function (url) {
 var fetchNotice = function () {
   isCurrentlyFetchingNotice = true;
   reqwest({
-    url: eventUrl,
+    url: window.local.eventUrl,
     withCredentials: true,
     crossOrigin: true,
     type: "json",
@@ -933,14 +936,14 @@ var displayChat = function (ev) {
           }
           u("#chatSubmitBtn").val(banana.i18n("sending"));
           reqwest({
-            url: "https:" + chatMessagesEndpoint,
+            url: "https:" + window.local.chatMessagesEndpoint,
             data: {
               nickname: u("#chatNick").val(),
               message: u("#chatMessage").val(),
-              csrfmiddlewaretoken: csrfToken,
+              csrfmiddlewaretoken: window.local.csrfToken,
             },
             headers: {
-              "X-CSRFToken": csrfToken,
+              "X-CSRFToken": window.local.csrfToken,
             },
             crossOrigin: true,
             withCredentials: true,
@@ -1043,10 +1046,15 @@ var displayOptions = function (ev) {
   );
   var qrDataUrl = null;
   if (qrUrl) {
-    var qr = qrcode(0, "L");
-    qr.addData(qrUrl);
-    qr.make();
-    qrDataUrl = qr.createDataURL(4);
+    var qr = new QRious();
+    qr.set({
+      background: "#f5f5f5",
+      foreground: "black",
+      level: "L",
+      value: qrUrl,
+      size: 138,
+    });
+    qrDataUrl = qr.toDataURL();
   }
   mainDiv.append(
     u("<div/>").html(
@@ -1104,15 +1112,14 @@ var displayOptions = function (ev) {
           .join("") +
         "</select>" +
         (qrUrl
-          ? "<h4>" +
-            banana.i18n("qr-link") +
-            '</h4><p style="text-align:center"><img style="margin-bottom:15px" src="' +
-            qrDataUrl +
-            '" alt="qr"><br/><a class="small" href="' +
-            qrUrl +
-            '">' +
-            qrUrl.replace(/^https?:\/\//, "") +
-            "</a></p>"
+          ? `<h4>${banana.i18n("qr-link")}</h4>
+<p style="text-align:center">
+<img style="padding:10px" src="${qrDataUrl}" alt="qr"><br/>
+<a class="small" style="font-weight: bold" href="${qrUrl}">${qrUrl.replace(
+              /^https?:\/\//,
+              ""
+            )}</a>
+</p>`
           : "")
     )
   );
@@ -1295,7 +1302,14 @@ var getProgressBarText = function (currentTime) {
     if (viewedTime === 0) {
       return "00:00:00";
     }
-    result = dayjs(viewedTime).format("HH:mm:ss");
+    if (
+      dayjs(getCompetitionStartDate()).format("YYYY-MM-DD") !==
+      dayjs(getCompetitionEndDate()).format("YYYY-MM-DD")
+    ) {
+      result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
+    } else {
+      result = dayjs(viewedTime).format("HH:mm:ss");
+    }
   }
   return result;
 };
@@ -1517,12 +1531,9 @@ var drawCompetitors = function () {
           competitor.idle = true;
         }
         if (loc && !isNaN(loc.coords.latitude)) {
-          var ccolor = tinycolor(competitor.color).setAlpha(0.4);
           if (competitor.mapMarker == undefined) {
-            var svgRect =
-              '<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="' +
-              ccolor.toRgbString() +
-              '" cx="4" cy="4" r="3"/></svg>';
+            var idleColor = tinycolor(competitor.color).setAlpha(0.4);
+            var svgRect = `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="${idleColor.toRgbString()}" cx="4" cy="4" r="3"/></svg>`;
             var pulseIcon = L.icon({
               iconUrl: encodeURI("data:image/svg+xml," + svgRect),
               iconSize: [8, 8],
@@ -1611,18 +1622,48 @@ var drawCompetitors = function () {
         competitor.idle = false;
       }
 
+      if (
+        competitor.mapMarker &&
+        ((competitor.hasLiveMarker && !isLiveMode) ||
+          (!competitor.hasLiveMarker && isLiveMode))
+      ) {
+        if (competitor.mapMarker) {
+          map.removeLayer(competitor.mapMarker);
+        }
+        competitor.mapMarker = null;
+        competitor.hasLiveMarker = false;
+      }
+
       if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
         if (!competitor.mapMarker) {
-          var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${competitor.color}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
-          var svgRectURI = encodeURI(`data:image/svg+xml,${svgRect}`);
-          var pulseIcon = L.icon({
-            iconUrl: svgRectURI.replace("#", "%23"),
-            iconSize: [40, 40],
-            shadowSize: [40, 40],
-            iconAnchor: [20, 20],
-            shadowAnchor: [0, 0],
-            popupAnchor: [0, 0],
-          });
+          var pulseIcon = null;
+          if (isLiveMode) {
+            var liveColor = tinycolor(competitor.color);
+            var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${liveColor.toRgbString()}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
+            pulseIcon = L.icon({
+              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+              iconSize: [40, 40],
+              shadowSize: [40, 40],
+              iconAnchor: [20, 20],
+              shadowAnchor: [0, 0],
+              popupAnchor: [0, 0],
+            });
+            competitor.hasLiveMarker = true;
+          } else {
+            var liveColor = tinycolor(competitor.color).setAlpha(0.75);
+            var isDark = getContrastYIQ(competitor.color) === "dark";
+            var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+              isDark ? "white" : "black"
+            }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+            pulseIcon = L.icon({
+              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+              iconSize: [16, 16],
+              shadowSize: [16, 16],
+              iconAnchor: [8, 8],
+              shadowAnchor: [0, 0],
+              popupAnchor: [0, 0],
+            });
+          }
           competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             { icon: pulseIcon }
@@ -1660,24 +1701,29 @@ var drawCompetitors = function () {
           )
             .text(competitor.short_name)
             .html()}</span>`;
-          var iconClass = `runner-icon runner-icon-${getContrastYIQ(
+          var iconCSSClasses = `runner-icon runner-icon-${getContrastYIQ(
             competitor.color
-          )}`;
-          var ic2 = `${iconClass} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
+          )} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
+
           var nameTagEl = document.createElement("div");
-          nameTagEl.className = ic2;
+          nameTagEl.className = iconCSSClasses;
           nameTagEl.innerHTML = iconHtml;
+
           var mapEl = document.getElementById("map");
           mapEl.appendChild(nameTagEl);
+
           var nameTagWidth =
             nameTagEl.childNodes[0].getBoundingClientRect().width;
           mapEl.removeChild(nameTagEl);
+
           competitor.isNameOnRight = pointX > mapMiddleX;
+
           var runnerIcon = L.divIcon({
-            className: iconClass,
+            className: iconCSSClasses,
             html: iconHtml,
             iconAnchor: [competitor.isNameOnRight ? nameTagWidth : 0, 0],
           });
+
           competitor.nameMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             { icon: runnerIcon }
@@ -1715,6 +1761,7 @@ var drawCompetitors = function () {
             color: competitor.color,
             opacity: 0.75,
             weight: 5,
+            smoothFactor: smoothFactor,
           });
           competitor.tail.addTo(map);
         } else {
@@ -1794,36 +1841,60 @@ var drawCompetitors = function () {
         if (!cluster.color) {
           cluster.color = getColor(i);
         }
-        var c = listCompWithMarker[i];
-        if (c.mapMarker) {
-          map.removeLayer(c.mapMarker);
-          c.mapMarker = null;
+        var competitorInCluster = listCompWithMarker[i];
+        ["mapMarker", "nameMarker"].forEach(function (layerName) {
+          if (competitorInCluster[layerName]) {
+            map.removeLayer(competitorInCluster[layerName]);
+          }
+          competitorInCluster[layerName] = null;
+        });
+
+        if (
+          cluster.mapMarker &&
+          ((cluster.hasLiveMarker && !isLiveMode) ||
+            (!cluster.hasLiveMarker && isLiveMode))
+        ) {
+          if (cluster.mapMarker) {
+            map.removeLayer(cluster.mapMarker);
+          }
+          cluster.mapMarker = null;
+          cluster.hasLiveMarker = false;
         }
-        if (c.nameMarker) {
-          map.removeLayer(c.nameMarker);
-          c.nameMarker = null;
-        }
+
         if (cluster.mapMarker) {
           cluster.mapMarker.setLatLng([
             clusterCenter.location.latitude,
             clusterCenter.location.longitude,
           ]);
         } else {
-          var svgRect =
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="' +
-            cluster.color +
-            '"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>';
-          var pulseIcon = L.icon({
-            iconUrl: encodeURI("data:image/svg+xml," + svgRect).replace(
-              "#",
-              "%23"
-            ),
-            iconSize: [40, 40],
-            shadowSize: [40, 40],
-            iconAnchor: [20, 20],
-            shadowAnchor: [0, 0],
-            popupAnchor: [0, 0],
-          });
+          var pulseIcon = null;
+          if (isLiveMode) {
+            var liveColor = tinycolor(cluster.color);
+            var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${liveColor.toRgbString()}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
+            pulseIcon = L.icon({
+              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+              iconSize: [40, 40],
+              shadowSize: [40, 40],
+              iconAnchor: [20, 20],
+              shadowAnchor: [0, 0],
+              popupAnchor: [0, 0],
+            });
+            cluster.hasLiveMarker = true;
+          } else {
+            var liveColor = tinycolor(cluster.color).setAlpha(0.75);
+            var isDark = getContrastYIQ(cluster.color) === "dark";
+            var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+              isDark ? "white" : "black"
+            }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+            pulseIcon = L.icon({
+              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+              iconSize: [16, 16],
+              shadowSize: [16, 16],
+              iconAnchor: [8, 8],
+              shadowAnchor: [0, 0],
+              popupAnchor: [0, 0],
+            });
+          }
           cluster.mapMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
             { icon: pulseIcon }
@@ -1939,8 +2010,8 @@ function addRasterMap(bounds, hash, fit) {
     fit = false;
   }
   rasterMap = L.tileLayer
-    .wms(wmsServiceUrl + "?hash=" + hash, {
-      layers: eventId,
+    .wms(window.local.wmsServiceUrl + "?v=" + hash, {
+      layers: window.local.eventId,
       bounds: bounds,
       tileSize: 512,
       noWrap: true,
@@ -2064,7 +2135,9 @@ function bumpChatConnectTimeout() {
 }
 
 function connectToChatEvents() {
-  chatEventSource = new EventSource(chatStreamUrl, { withCredentials: true });
+  chatEventSource = new EventSource(window.local.chatStreamUrl, {
+    withCredentials: true,
+  });
   // Listen for messages
   chatEventSource.addEventListener("open", function () {
     chatMessages = [];
@@ -2125,7 +2198,9 @@ function bumpGpsConnectTimeout() {
 }
 
 function connectToGpsEvents() {
-  gpsEventSource = new EventSource(gpsStreamUrl, { withCredentials: true });
+  gpsEventSource = new EventSource(window.local.gpsStreamUrl, {
+    withCredentials: true,
+  });
   // Listen for messages
   gpsEventSource.addEventListener("open", function () {});
   gpsEventSource.addEventListener("message", function (event) {
@@ -2169,8 +2244,8 @@ function shareUrl(e) {
 
 function updateText() {
   banana.setLocale(locale);
-  var langFile = `${staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?2022060500`)
+  var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
+  return fetch(`${langFile}?2022072801`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

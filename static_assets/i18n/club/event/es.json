@@ -39,5 +39,6 @@
   "sending": "Enviando",
   "message-removed": "Mensaje eliminado por el moderador",
   "chat-closed": "El chat está cerrado",
-  "reached-max-runners": "Se ha alcanzado el límite de $1 competidores mostrados"
+  "reached-max-runners": "Se ha alcanzado el límite de $1 competidores mostrados",
+  "export": "Exportar"
 }

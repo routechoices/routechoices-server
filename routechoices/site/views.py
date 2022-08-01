@@ -15,8 +15,6 @@ from routechoices.site.forms import ContactForm
 
 
 def home_view(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard:home_view")
     return render(
         request,
         "site/home.html",

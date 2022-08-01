@@ -32,7 +32,7 @@ from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
-    title = "when was it wodified"
+    title = "when was it modified"
     parameter_name = "modified"
 
     def lookups(self, request, model_admin):
@@ -107,7 +107,7 @@ class IsGPXFilter(admin.SimpleListFilter):
         return [
             ("all", "All"),
             (None, "Real Devices"),
-            ("fake", "Fake Devices"),
+            ("virtual", "Virtual Devices"),
         ]
 
     def choices(self, cl):
@@ -124,7 +124,7 @@ class IsGPXFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        if self.value() == "fake":
+        if self.value() == "virtual":
             return queryset.filter(is_gpx=True)
         elif self.value():
             return queryset.all()

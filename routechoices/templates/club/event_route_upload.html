@@ -3,6 +3,9 @@
 {% load django_bootstrap5 %}
 {% load compress %}
 
+{% block head_title %}{{ event.name }} route upload | Powered by {{ site.name }}{% endblock %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} route upload page{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">
@@ -17,8 +20,9 @@
 {% endblock %}
 
 {% block extra_body %}
+{{ block.super }}
 {% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/club/event_route_upload.js' %}?_=2022022600"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/club/event_route_upload.js' %}"></script>
 {% endcompress %}
 {% endblock %}

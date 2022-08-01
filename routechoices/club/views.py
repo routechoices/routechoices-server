@@ -135,7 +135,7 @@ def club_logo(request, **kwargs):
     club = get_object_or_404(Club, slug__iexact=club_slug, logo__isnull=False)
     file_path = club.logo.name
     return serve_from_s3(
-        "routechoices-maps",
+        settings.AWS_S3_BUCKET,
         request,
         "/internal/" + file_path,
         filename=f"{club.name}.png",

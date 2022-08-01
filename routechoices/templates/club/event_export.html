@@ -3,6 +3,9 @@
 {% load hosts %}
 {% load compress %}
 
+{% block head_title %}{{ event.name }} data export | Powered by {{ site.name }}{% endblock %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} data export page{% endblock %}
+
 {% block content %}
 <div class="row">
   <div>
@@ -53,9 +56,10 @@
 {% endblock %}
 
 {% block extra_body %}
-{% compress js%}
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/club/event_export.js' %}?_=2022011801"></script>
+{{ block.super }}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/scripts/club/event_export.js' %}"></script>
 {% endcompress %}
 {% endblock %}

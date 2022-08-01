@@ -39,5 +39,6 @@
     "sending": "Lähetetään...",
     "message-removed": "Moderaattori poisti viestin",
     "chat-closed": "Chat on suljettu",
-    "reached-max-runners": "$1 kilpailijan raja on saavutettu"
+    "reached-max-runners": "$1 kilpailijan raja on saavutettu",
+    "export": "Viedä"
 }

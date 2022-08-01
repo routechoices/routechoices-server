@@ -1,5 +1,3 @@
-var noDelay = noDelay === "true";
-
 if (!navigator.canShare) {
   document.getElementById("share_buttons").remove();
 }
@@ -26,15 +24,16 @@ var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
 var locale = urlLanguage || storedLanguage || browserLanguage || "en";
 
 (function () {
-  clock = ServerClock({ url: serverClockUrl });
+  clock = ServerClock({ url: window.local.serverClockUrl });
   banana = new Banana();
   updateText().then(function () {
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
+    u("#export-text").text(banana.i18n("export"));
     u("#chat-btn-text").text(banana.i18n("chat"));
     u("#loading-text").text(banana.i18n("loading-text"));
     u("#event-not-started-text").text(banana.i18n("event-not-started-text"));
     u("#club-events-link-text").text(
-      banana.i18n("club-events-link-text", clubName)
+      banana.i18n("club-events-link-text", window.local.clubName)
     );
 
     u(".page-alerts").hide();
@@ -100,10 +99,17 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
     panControl = L.control.pan();
     zoomControl = L.control.zoom();
     rotateControl = L.control.rotate({ closeOnZeroBearing: false });
-
-    panControl.addTo(map);
-    zoomControl.addTo(map);
-    rotateControl.addTo(map);
+    scaleControl = L.control.scale({
+      imperial: false,
+      updateWhenIdle: true,
+      position: "bottomleft",
+    });
+    if (showControls) {
+      panControl.addTo(map);
+      zoomControl.addTo(map);
+      rotateControl.addTo(map);
+    }
+    scaleControl.addTo(map);
 
     map.doubleClickZoom.disable();
     map.on("dblclick", onPressCustomMassStart);
@@ -112,7 +118,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
     });
 
     reqwest({
-      url: eventUrl,
+      url: window.local.eventUrl,
       withCredentials: true,
       crossOrigin: true,
       type: "json",
@@ -223,9 +229,9 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
                 MapLayers[m.title] = L.tileLayer.wms(
-                  wmsServiceUrl + "?hash=" + m.hash,
+                  window.local.wmsServiceUrl + "?v=" + m.hash,
                   {
-                    layers: eventId + "/" + i,
+                    layers: window.local.eventId + "/" + i,
                     bounds: bounds,
                     tileSize: 512,
                     noWrap: true,

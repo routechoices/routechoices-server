@@ -9,10 +9,10 @@
       <div class="container">
         <div class="row">
           <h1>GPS Trackers</h1>
-          <div class="row" style="margin-bottom: 15px">
-            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/iphone_tracker.png' %}"/></div>
-            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/TMT250.png' %}"/></div>
-            <div class="col col-md-4 col-6" style="text-align:center"><img style="height: 150px" src="{% static '/img/gl320mg.png' %}"/></div>
+          <div class="row justify-content-between" style="margin-bottom: 15px">
+            <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}"/></div>
+            <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
+            <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
             <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
           <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
@@ -130,10 +130,10 @@
 {% endblock %}
 
 {% block extra_body %}
-<script src="{% static '/scripts/load_variables.js' %}?_=2022031600" data-csrf-token="{{ csrf_token }}"></script>
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900" data-csrf-token="{{ csrf_token }}"></script>
 {% compress js %}
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}?_=2022011800"></script>
-<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}?_=2022011800"></script>
-<script src="{% static '/scripts/site/tracker.js' %}?_=2022031600"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/site/tracker.js' %}"></script>
 {% endcompress %}
 {% endblock %}

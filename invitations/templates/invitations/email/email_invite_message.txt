@@ -1,0 +1,12 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}
+
+Hello,
+
+You ({{ email }}) have been invited to manage club {{ club }} on {{ site_name }}
+
+If you'd like so, please go to {{ invite_url }}
+
+{% endblocktrans %}
+{% endautoescape %}

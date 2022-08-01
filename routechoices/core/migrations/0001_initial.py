@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
                         help_text="Square image of width greater or equal to 128px",
                         null=True,
                         storage=routechoices.lib.storages.OverwriteImageStorage(
-                            aws_s3_bucket_name="routechoices-maps"
+                            aws_s3_bucket_name=settings.AWS_S3_BUCKET
                         ),
                         upload_to=routechoices.core.models.logo_upload_path,
                     ),
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                         height_field="height",
                         max_length=255,
                         storage=routechoices.lib.storages.OverwriteImageStorage(
-                            aws_s3_bucket_name="routechoices-maps"
+                            aws_s3_bucket_name=settings.AWS_S3_BUCKET
                         ),
                         upload_to=routechoices.core.models.map_upload_path,
                         width_field="width",

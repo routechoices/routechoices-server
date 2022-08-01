@@ -54,7 +54,7 @@ class ClubForm(ModelForm):
             rgba_img = image.convert("RGBA")
             target = 256
             if image.size[0] > target:
-                scale = target / min(image.size[0], image.size[1])
+                scale = target / image.size[0]
                 new_w = image.size[0] * scale
                 rgba_img.thumbnail((new_w, new_w), Image.ANTIALIAS)
             out_buffer = BytesIO()

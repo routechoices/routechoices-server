@@ -20,7 +20,7 @@ django-simple-captcha
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 drf-yasg
 geoip2
-gps-encoding @ git+https://github.com/rphlo/gps_encoding.git
+gps-encoding
 gpxpy
 numpy
 opencv-python

@@ -1,5 +1,8 @@
 {% extends "club/base.html" %}
 
+{% block head_title %}{{ event.name }} registration | Powered by {{ site.name }}{% endblock %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} registration page{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-12">

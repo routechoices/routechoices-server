@@ -23,6 +23,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
@@ -33,7 +34,7 @@ from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from pillow_avif import AvifImagePlugin  # noqa: F401
 
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -111,6 +112,25 @@ def logo_upload_path(instance=None, file_name=None):
     return os.path.join(*tmp_path)
 
 
+class SoftChoiceMixin(object):
+    soft_default = True
+
+    def __init__(self, **kwargs):
+        self.soft_default = bool(kwargs.pop("soft_default", self.soft_default))
+        if callable(kwargs.get("choices")):
+            self.construct_choices = kwargs["choices"]
+        kwargs["choices"] = list(self.construct_choices())
+        super().__init__(**kwargs)
+
+    def deconstruct(self):  # pragma: no cover
+        # only run when creating migrations, so no-cover
+        name, path, args, kwargs = super(SoftChoiceMixin, self).deconstruct()
+        kwargs.pop("choices", None)
+        if self.soft_default:
+            kwargs.pop("default", None)
+        return (name, path, args, kwargs)
+
+
 class Club(models.Model):
     aid = models.CharField(
         default=random_key,
@@ -159,8 +179,9 @@ Browse our events here.""",
         null=True,
         blank=True,
         help_text="Square image of width greater or equal to 128px",
-        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
+        storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
+    analytics_site = models.URLField(max_length=256, blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -174,11 +195,18 @@ Browse our events here.""",
         if self.pk:
             if self.domain:
                 self.domain = self.domain.lower()
-            old_domain = Club.objects.get(pk=self.pk).domain
+            old_data = Club.objects.get(pk=self.pk)
+            old_domain = old_data.domain
             if old_domain and old_domain != self.domain:
                 delete_domain(old_domain)
+            if self.analytics_site:
+                old_slug = old_data.slug
+                if old_slug != self.slug:
+                    self.delete_analytics_domain(old_slug)
+                    self.create_analytics_domain()
         self.slug = self.slug.lower()
-        return super().save(*args, **kwargs)
+        self.create_analytics_site()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return self.nice_url
@@ -205,6 +233,55 @@ Browse our events here.""",
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
         )
         return f"{self.url_protocol}:{path}"
+
+    def create_analytics_domain(self):
+        r = requests.get(
+            f"{settings.ANALYTICS_API_URL}/sites/{self.slug}.routechoices.com",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            timeout=5,
+        )
+        if r.status_code != 200:
+            r = requests.post(
+                f"{settings.ANALYTICS_API_URL}/sites",
+                headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+                data={"domain": f"{self.slug}.routechoices.com"},
+                timeout=5,
+            )
+            if r.status_code != 200:
+                return False
+        return True
+
+    def create_analytics_site(self):
+        if self.analytics_site:
+            return self.analytics_site
+        if not self.create_analytics_domain():
+            return False
+        r = requests.put(
+            f"{settings.ANALYTICS_API_URL}/sites/shared-links",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            data={
+                "name": self.name,
+                "site_id": f"{self.slug}.routechoices.com",
+            },
+            timeout=5,
+        )
+        data = r.json()
+        self.analytics_site = data["url"]
+        return True
+
+    def delete_analytics_domain(self, slug=None):
+        if not slug:
+            slug = self.slug
+        r = requests.delete(
+            f"{settings.ANALYTICS_API_URL}/sites/{slug}.routechoices.com",
+            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            timeout=5,
+        )
+        if r.status_code != 200:
+            return False
+        self.analytics_site = ""
+        self.save()
+        return True
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
@@ -249,7 +326,7 @@ class Map(models.Model):
         max_length=255,
         height_field="height",
         width_field="width",
-        storage=OverwriteImageStorage(aws_s3_bucket_name="routechoices-maps"),
+        storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
     height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     width = models.PositiveIntegerField(
@@ -279,8 +356,16 @@ class Map(models.Model):
 
     @property
     def data(self):
+        cache_key = f"img_data_{self.image.name}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
         with self.image.open("rb") as fp:
             data = fp.read()
+        try:
+            cache.set(cache_key, data, 3600)
+        except Exception:
+            pass
         return data
 
     @property
@@ -327,9 +412,18 @@ class Map(models.Model):
 
     @property
     def mime_type(self):
+        cache_key = f"img_mime_{self.image.name}"
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
         with self.image.storage.open(self.image.name, mode="rb", nbytes=2048) as fp:
             data = fp.read()
-            return magic.from_buffer(data, mime=True)
+        mime = magic.from_buffer(data, mime=True)
+        try:
+            cache.set(cache_key, mime, 3600)
+        except Exception:
+            pass
+        return mime
 
     @property
     def data_uri(self):
@@ -356,51 +450,6 @@ class Map(models.Model):
             self.image.close()
         else:
             raise ValueError("Not a base 64 encoded data URI of an image")
-
-    @property
-    def thumbnail(self):
-        cache_key = f"thumb_{self.aid}_{self.hash}"
-        use_cache = getattr(settings, "CACHE_THUMBS", False)
-        cached = None
-        if use_cache:
-            try:
-                cached = cache.get(cache_key)
-            except Exception:
-                pass
-            else:
-                if cached:
-                    return cached
-        orig = self.image.open("rb").read()
-        img = Image.open(BytesIO(orig))
-        if img.mode != "RGB":
-            white_bg_img = Image.new("RGBA", img.size, "WHITE")
-            white_bg_img.paste(img, (0, 0), img)
-            img = white_bg_img.convert("RGB")
-        img = img.transform(
-            (1200, 630),
-            Image.QUAD,
-            (
-                int(self.width) / 2 - 300,
-                int(self.height) / 2 - 158,
-                int(self.width) / 2 - 300,
-                int(self.height) / 2 + 157,
-                int(self.width) / 2 + 300,
-                int(self.height) / 2 + 157,
-                int(self.width) / 2 + 300,
-                int(self.height) / 2 - 158,
-            ),
-        )
-        wm = Image.open("routechoices/watermark.png")
-        img.paste(wm, (0, 0), wm)
-        buffer = BytesIO()
-        img.save(buffer, "JPEG", quality=80)
-        data_out = buffer.getvalue()
-        if use_cache:
-            try:
-                cache.set(cache_key, data_out, 3600 * 24 * 30)
-            except Exception:
-                pass
-        return data_out
 
     @property
     def size(self):
@@ -522,6 +571,8 @@ class Map(models.Model):
             extra_args = []
             if img_mime == "image/webp":
                 extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 10]
+            elif img_mime == "image/jpeg":
+                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
             if img_mime == "image/avif":
                 color_coverted = cv2.cvtColor(transparent_img, cv2.COLOR_RGBA2BGRA)
                 pil_image = Image.fromarray(color_coverted)
@@ -530,7 +581,7 @@ class Map(models.Model):
                 data_out = buffer.getvalue()
             else:
                 _, buffer = cv2.imencode(
-                    ".png" if img_mime == "image/png" else ".webp",
+                    f".{img_mime[6:]}",
                     transparent_img,
                     extra_args,
                 )
@@ -568,8 +619,7 @@ class Map(models.Model):
             ]
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
-        orig = self.image.open("rb").read()
-        self.image.close()
+        orig = self.data
         img = Image.open(BytesIO(orig)).convert("RGBA")
         img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
 
@@ -584,7 +634,8 @@ class Map(models.Model):
         extra_args = []
         if img_mime == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
-
+        elif img_mime == "image/jpeg":
+            extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
         if img_mime == "image/avif":
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_RGBA2BGRA)
             pil_image = Image.fromarray(color_coverted)
@@ -592,9 +643,7 @@ class Map(models.Model):
             pil_image.save(buffer, "AVIF", quality=80)
             data_out = buffer.getvalue()
         else:
-            _, buffer = cv2.imencode(
-                ".png" if img_mime == "image/png" else ".webp", tile_img, extra_args
-            )
+            _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
             data_out = BytesIO(buffer).getvalue()
         if use_cache:
             try:
@@ -747,6 +796,7 @@ PRIVACY_CHOICES = (
     (PRIVACY_PRIVATE, "Private"),
 )
 
+
 MAP_BLANK = "blank"
 MAP_OSM = "osm"
 MAP_GOOGLE_STREET = "gmap-street"
@@ -772,6 +822,20 @@ MAP_CHOICES = (
     (MAP_TOPO_WRLD, "Topo World (OpenTopo)"),
     (MAP_TOPO_WRLD_ALT, "Topo World (ArcGIS)"),
 )
+
+
+class BackroundMapChoicesField(models.CharField):
+    def __init__(self, **kwargs):
+        kwargs["max_length"] = 16
+        kwargs["choices"] = MAP_CHOICES
+        kwargs["default"] = MAP_BLANK
+        super().__init__(**kwargs)
+
+    def deconstruct(self):  # pragma: no cover
+        # only run when creating migrations, so no-cover
+        name, path, args, kwargs = super().deconstruct()
+        kwargs.pop("choices", None)
+        return (name, path, args, kwargs)
 
 
 class Event(models.Model):
@@ -806,11 +870,7 @@ class Event(models.Model):
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
     )
-    backdrop_map = models.CharField(
-        max_length=16,
-        choices=MAP_CHOICES,
-        default=MAP_BLANK,
-    )
+    backdrop_map = BackroundMapChoicesField()
     map = models.ForeignKey(
         Map,
         related_name="+",
@@ -870,32 +930,6 @@ class Event(models.Model):
         self.invalidate_cache()
         super().save(*args, **kwargs)
 
-    @classmethod
-    def default_thumbnail(cls):
-        cache_key = "default_thumb"
-        use_cache = getattr(settings, "CACHE_THUMBS", False)
-        cached = None
-        if use_cache:
-            try:
-                cached = cache.get(cache_key)
-            except Exception:
-                pass
-            else:
-                if cached:
-                    return cached
-        img = Image.new("RGB", (1200, 630), "WHITE")
-        wm = Image.open("routechoices/watermark.png")
-        img.paste(wm, (0, 0), wm)
-        buffer = BytesIO()
-        img.save(buffer, "JPEG", quality=80)
-        data_out = buffer.getvalue()
-        if use_cache:
-            try:
-                cache.set(cache_key, data_out, 3600 * 24 * 30)
-            except Exception:
-                pass
-        return data_out
-
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"
 
@@ -910,6 +944,13 @@ class Event(models.Model):
         shortcut_url = getattr(settings, "SHORTCUT_BASE_URL", None)
         if shortcut_url:
             return f"{shortcut_url}{self.aid}"
+        return None
+
+    @property
+    def shortcut_text(self):
+        shortcut_url = self.shortcut
+        if shortcut_url:
+            return shortcut_url.partition("://")[2]
         return None
 
     @property
@@ -949,6 +990,60 @@ class Event(models.Model):
     @property
     def has_notice(self):
         return hasattr(self, "notice")
+
+    def thumbnail(self, msg=""):
+        if self.start_date > now() or not self.map:
+            img = Image.new("RGB", (1200, 630), "WHITE")
+        else:
+            raster_map = self.map
+            orig = raster_map.image.open("rb").read()
+            img = Image.open(BytesIO(orig))
+            if img.mode != "RGB":
+                white_bg_img = Image.new("RGBA", img.size, "WHITE")
+                white_bg_img.paste(img, (0, 0), img)
+                img = white_bg_img.convert("RGB")
+            img = img.transform(
+                (1200, 630),
+                Image.QUAD,
+                (
+                    int(raster_map.width) / 2 - 300,
+                    int(raster_map.height) / 2 - 158,
+                    int(raster_map.width) / 2 - 300,
+                    int(raster_map.height) / 2 + 157,
+                    int(raster_map.width) / 2 + 300,
+                    int(raster_map.height) / 2 + 157,
+                    int(raster_map.width) / 2 + 300,
+                    int(raster_map.height) / 2 - 158,
+                ),
+            )
+        font = ImageFont.truetype("routechoices/AtkinsonHyperlegible-Bold.ttf", 60)
+        draw = ImageDraw.Draw(img)
+        w, h = draw.textsize(msg, font=font)
+        x = int((1200 - w) / 2)
+        if self.club.logo:
+            logo_b = self.club.logo.open("rb").read()
+            logo = Image.open(BytesIO(logo_b))
+            logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+            img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
+            y = 480
+        elif not self.club.domain:
+            wm = Image.open("routechoices/watermark.png")
+            img.paste(wm, (0, 0), wm)
+            y = 520
+        else:
+            y = int((630 - h) / 2)
+        color = "black"
+        shadow = "white"
+        if msg:
+            draw.text((x - 1, y - 1), msg, font=font, fill=shadow)
+            draw.text((x + 1, y - 1), msg, font=font, fill=shadow)
+            draw.text((x - 1, y + 1), msg, font=font, fill=shadow)
+            draw.text((x + 1, y + 1), msg, font=font, fill=shadow)
+            draw.text((x, y), msg, font=font, fill=color)
+        buffer = BytesIO()
+        img.save(buffer, "JPEG", quality=80)
+        data_out = buffer.getvalue()
+        return data_out
 
 
 class Notice(models.Model):
@@ -1365,7 +1460,9 @@ class Competitor(models.Model):
 
     @property
     def gpx(self):
+        current_site = get_current_site(None)
         gpx = gpxpy.gpx.GPX()
+        gpx.creator = current_site.name
         gpx_track = gpxpy.gpx.GPXTrack()
         gpx.tracks.append(gpx_track)
 

@@ -1,3 +1,4 @@
+from allauth.account.signals import user_logged_in, user_signed_up
 from allauth_2fa.adapter import OTPAdapter
 from django.conf import settings
 
@@ -12,3 +13,9 @@ class SiteAccountAdapter(OTPAdapter):
         return url_has_allowed_host_and_scheme(
             url, allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS
         )
+
+    def get_user_signed_up_signal(self):
+        return user_signed_up
+
+    def get_user_logged_in_signal(self):
+        return user_logged_in

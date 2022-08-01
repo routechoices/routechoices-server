@@ -25,9 +25,9 @@ class EssentialApiBase(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def reverse_and_check(self, path, expected):
-        url = reverse(path, host="api")
-        self.assertEqual(url, "//api.localhost:8000" + expected)
+    def reverse_and_check(self, path, expected, host="api"):
+        url = reverse(path, host=host)
+        self.assertEqual(url, f"//{host}.localhost:8000{expected}")
         return url
 
     def get_device_id(self):
@@ -132,7 +132,7 @@ class ImeiApiTestCase(EssentialApiBase):
 @override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()), PARENT_HOST="localhost:8000")
 class MapApiTestCase(EssentialApiBase):
     def test_get_tile(self):
-        url = self.reverse_and_check("wms_service", "/wms")
+        url = self.reverse_and_check("wms_service", "/", "wms")
         club = Club.objects.create(name="Test club", slug="club")
         raster_map = Map.objects.create(
             club=club,
@@ -153,13 +153,13 @@ class MapApiTestCase(EssentialApiBase):
         )
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -176,44 +176,51 @@ class MapApiTestCase(EssentialApiBase):
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res["content-type"], "image/png")
+        self.assertEqual(res["content-type"], "image/jpeg")
+
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            SERVER_NAME="wms.localhost:8000",
+            HTTP_ACCEPT="image/avif",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res["content-type"], "image/avif")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fpng&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/png")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fwebp&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/webp")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Favif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/avif")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fgif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="wms.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res["content-type"], "image/png")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 @override_settings(PARENT_HOST="localhost:8000")

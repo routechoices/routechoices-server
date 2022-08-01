@@ -154,7 +154,7 @@ def import_map_from_sportrec(club, event_id, map_data, name):
 
 def import_map_from_tractrac(club, map_info, name):
     map_url = map_info.get("location")
-    r = requests.get(map_url)
+    r = requests.get(map_url, verify=False)
 
     if r.status_code != 200:
         raise MapImportError("API returned error code")
@@ -450,7 +450,7 @@ def import_single_event_from_loggator(event_id):
 @background(schedule=0)
 def import_single_event_from_tractrac(event_id):
     club = get_tractrac_club()
-    r = requests.get(event_id)
+    r = requests.get(event_id, verify=False)
     if r.status_code != 200:
         raise EventImportError("API returned error code")
     event_data = r.json()
@@ -484,8 +484,9 @@ def import_single_event_from_tractrac(event_id):
         data_url = mtb_url
         if not data_url.startswith("http"):
             data_url = f"http:{data_url}"
-        response = requests.get(data_url, stream=True)
+        response = requests.get(data_url, stream=True, verify=False)
         if response.status_code == 200:
+            print(f"mtb {data_url}")
             with tempfile.TemporaryFile() as lf:
                 for block in response.iter_content(1024 * 8):
                     if not block:
@@ -508,6 +509,7 @@ def import_single_event_from_tractrac(event_id):
                 + event_data["eventType"]
                 + "?snapping=false"
             )
+            print("ws")
             device_map = TracTracWSReader().read_data(url)
         except Exception:
             event.delete()
@@ -516,7 +518,6 @@ def import_single_event_from_tractrac(event_id):
     if not device_map:
         event.delete()
         raise EventImportError("Did not figure out how to get data")
-
     for c_data in event_data["competitors"].values():
         st = c_data.get("startTime")
         if not st:
@@ -536,6 +537,7 @@ def import_single_event_from_tractrac(event_id):
             device=dev_model,
             event=event,
         )
+        print(c_data["name"])
 
 
 @background(schedule=0)
@@ -851,18 +853,20 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
         "X-Requested-With": "XMLHttpRequest",
     }
     club = get_livelox_club()
+    post_data = json.dumps(
+        {
+            "classIds": [int(class_id)],
+            "courseIds": [],
+            "relayLegs": relay_legs,
+            "relayLegGroupIds": [],
+        }
+    )
     r_info = requests.post(
         "https://www.livelox.com/Data/ClassInfo",
-        data=json.dumps(
-            {
-                "classIds": [class_id],
-                "courseIds": [],
-                "relayLegs": [relay_legs],
-                "relayLegGroupIds": [],
-            }
-        ),
+        data=post_data,
         headers=livelox_headers,
     )
+
     if r_info.status_code != 200:
         raise EventImportError(f"Can not fetch class info data {r_info.status_code}")
     event_data = r_info.json().get("general", {})

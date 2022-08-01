@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from PIL import Image
 
+from invitations.forms import InviteForm
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
     IS_DB_SQLITE,
@@ -80,6 +81,25 @@ def requires_club_in_session(function):
 @requires_club_in_session
 def home_view(request):
     return redirect("dashboard:club_view")
+
+
+@login_required
+@requires_club_in_session
+def club_invite_add_view(request):
+    club = request.club
+    if request.method == "POST":
+        form = InviteForm(request.POST, club=club)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            invite = form.save(email, club)
+            invite.inviter = request.user
+            invite.save()
+            invite.send_invitation(request)
+            messages.success(request, "Invite sent successfully")
+            return redirect("dashboard:club_view")
+    else:
+        form = InviteForm()
+    return render(request, "dashboard/invite_add.html", {"club": club, "form": form})
 
 
 @login_required
@@ -138,6 +158,7 @@ def account_delete_view(request):
         if conf_key:
             if token_generator.check_token(user, conf_key):
                 request.user.delete()
+                request.session.user_id = None
                 messages.success(request, "Account deleted.")
                 return redirect("site:home_view")
             return render(
@@ -1107,7 +1128,7 @@ def dashboard_map_download(request, map_id, *args, **kwargs):
     file_path = raster_map.path
     mime_type = raster_map.mime_type
     return serve_from_s3(
-        "routechoices-maps",
+        settings.AWS_S3_BUCKET,
         request,
         "/internal/" + file_path,
         filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
@@ -1127,7 +1148,7 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
         raise Http404()
     file_path = club.logo.name
     return serve_from_s3(
-        "routechoices-maps",
+        settings.AWS_S3_BUCKET,
         request,
         "/internal/" + file_path,
         filename=f"{club.name}.png",

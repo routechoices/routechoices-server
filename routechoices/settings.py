@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "invitations",
     "background_task",
     "django_bootstrap5",
     "admincommand",
@@ -186,7 +187,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 LOGIN_URL = "//www.routechoices.dev:8081/accounts/login/"
 REDIRECT_ALLOWED_DOMAINS = ["api.routechoices.dev", "www.routechoices.dev"]
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = "/"
 
 SESSION_COOKIE_DOMAIN = ".routechoices.dev"
@@ -726,6 +727,7 @@ SLUG_BLACKLIST = [
     "widget",
     "widgets",
     "wiki",
+    "wms",
     "wpad",
     "write",
     "www",
@@ -785,6 +787,7 @@ AWS_SECRET_ACCESS_KEY = "minio123"
 # The optional AWS session token to use.
 AWS_SESSION_TOKEN = ""
 AWS_S3_ENDPOINT_URL = "http://minio:9000"
+AWS_S3_BUCKET = "routechoices"
 
 GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
 
@@ -894,6 +897,10 @@ CSRF_COOKIE_HTTPONLY = False
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 ALLAUTH_2FA_ALWAYS_REVEAL_BACKUP_TOKENS = False
+
+ANALYTICS_API_KEY = ""
+ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
+
 try:
     from .local_settings import *  # noqa: F403, F401
 except ImportError:
