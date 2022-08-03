@@ -37,7 +37,6 @@ uwsgi
 GitPython
 websocket-client
 django-read-only
-tblib
-django_compressor
+django_compressor @ git+https://github.com/django-compressor/django-compressor.git@develop
 django-allauth-2fa @ git+https://github.com/valohai/django-allauth-2fa.git
 pillow-avif-plugin
