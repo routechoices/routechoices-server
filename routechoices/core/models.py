@@ -235,20 +235,12 @@ Browse our events here.""",
         return f"{self.url_protocol}:{path}"
 
     def create_analytics_domain(self):
-        r = requests.get(
-            f"{settings.ANALYTICS_API_URL}/sites/{self.slug}.routechoices.com",
+        requests.post(
+            f"{settings.ANALYTICS_API_URL}/sites",
             headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+            data={"domain": f"{self.slug}.routechoices.com"},
             timeout=5,
         )
-        if r.status_code != 200:
-            r = requests.post(
-                f"{settings.ANALYTICS_API_URL}/sites",
-                headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
-                data={"domain": f"{self.slug}.routechoices.com"},
-                timeout=5,
-            )
-            if r.status_code != 200:
-                return False
         return True
 
     def create_analytics_site(self):
@@ -266,12 +258,13 @@ Browse our events here.""",
             timeout=5,
         )
         data = r.json()
-        self.analytics_site = data["url"]
+        self.analytics_site = data.get("url", "")
         return True
 
     def delete_analytics_domain(self, slug=None):
         if not slug:
             slug = self.slug
+        self.analytics_site = ""
         r = requests.delete(
             f"{settings.ANALYTICS_API_URL}/sites/{slug}.routechoices.com",
             headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
@@ -279,8 +272,6 @@ Browse our events here.""",
         )
         if r.status_code != 200:
             return False
-        self.analytics_site = ""
-        self.save()
         return True
 
     def validate_unique(self, exclude=None):
