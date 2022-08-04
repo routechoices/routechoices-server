@@ -1092,7 +1092,6 @@ class Device(models.Model):
         related_name="devices",
         through_fields=("device", "club"),
     )
-    locations_raw = models.TextField(blank=True, default="")
     locations_encoded = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
