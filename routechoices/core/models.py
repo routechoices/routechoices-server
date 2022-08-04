@@ -1152,9 +1152,9 @@ class Device(models.Model):
         locs = gps_encoding.decode_data(self.locations_encoded)
         data = list(zip(*locs))
         return {
-            "timestamps": data[LOCATION_TIMESTAMP_INDEX],
-            "latitudes": data[LOCATION_LATITUDE_INDEX],
-            "longitudes": [LOCATION_LONGITUDE_INDEX],
+            "timestamps": list(data[LOCATION_TIMESTAMP_INDEX]),
+            "latitudes": list(data[LOCATION_LATITUDE_INDEX]),
+            "longitudes": list(data[LOCATION_LONGITUDE_INDEX]),
         }
 
     @property
@@ -1224,6 +1224,7 @@ class Device(models.Model):
         locs["latitudes"] += new_lat
         locs["longitudes"] += new_lon
         self.locations = locs
+
         if save:
             self.save()
         if push_forward:
