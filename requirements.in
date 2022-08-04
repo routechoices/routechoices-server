@@ -18,6 +18,7 @@ django-qr-code
 django-s3-storage
 django-simple-captcha
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
+drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
 drf-yasg
 geoip2
 gps-encoding
@@ -37,6 +38,6 @@ uwsgi
 GitPython
 websocket-client
 django-read-only
-django_compressor @ git+https://github.com/django-compressor/django-compressor.git@develop
+django_compressor
 django-allauth-2fa @ git+https://github.com/valohai/django-allauth-2fa.git
 pillow-avif-plugin
