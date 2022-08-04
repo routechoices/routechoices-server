@@ -17,3 +17,4 @@ yarn.lock
 *.json.gz
 *.sqlite3
 yarn.lock
+.git/*
