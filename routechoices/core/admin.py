@@ -5,15 +5,11 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.core.paginator import Paginator
-from django.db.models import Case, Count, Value, When
-from django.db.models.expressions import RawSQL
-from django.utils.functional import cached_property
+from django.db.models import Count
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
 from routechoices.core.models import (
-    IS_DB_SQLITE,
     ChatMessage,
     Club,
     Competitor,
@@ -28,7 +24,7 @@ from routechoices.core.models import (
     SpotDevice,
     SpotFeed,
 )
-from routechoices.lib.helpers import epoch_to_datetime, get_device_name
+from routechoices.lib.helpers import get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
@@ -77,9 +73,9 @@ class HasLocationFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "false":
-            return queryset.filter(location_count_sql=0)
+            return queryset.filter(_locations_count=0)
         elif self.value():
-            return queryset.filter(location_count_sql__gt=0)
+            return queryset.filter(_locations_count__gt=0)
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
@@ -202,25 +198,6 @@ class DeviceCompetitorInline(admin.TabularInline):
         return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
 
 
-class DevicePaginator(Paginator):
-    @cached_property
-    def count(self):
-        qs = self.object_list.all()
-        qs.query.annotations.clear()
-        qs = qs.annotate(competitor_count=Count("competitor_set")).annotate(
-            location_count_sql=Case(
-                When(locations_raw="", then=Value(0)),
-                default=RawSQL(
-                    'json_array_length(locations_raw, "$.timestamps")'
-                    if IS_DB_SQLITE
-                    else "json_array_length(locations_raw::json->'timestamps')",
-                    (),
-                ),
-            )
-        )
-        return qs.count()
-
-
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         "aid",
@@ -254,50 +231,21 @@ class DeviceAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .annotate(competitor_count=Count("competitor_set"))
-            .annotate(
-                last_position_at=Case(
-                    When(locations_raw="", then=Value("")),
-                    default=RawSQL(
-                        'json_extract(locations_raw, "$.timestamps[#-1]")'
-                        if IS_DB_SQLITE
-                        else "locations_raw::json->'timestamps'->>-1",
-                        (),
-                    ),
-                )
-            )
-            .annotate(
-                location_count_sql=Case(
-                    When(locations_raw="", then=Value(0)),
-                    default=RawSQL(
-                        'json_array_length(json_extract(locations_raw, "$.timestamps"))'
-                        if IS_DB_SQLITE
-                        else "json_array_length(locations_raw::json->'timestamps')",
-                        (),
-                    ),
-                )
-            )
         )
         return qs
 
-    def get_paginator(
-        self, request, queryset, per_page, orphans=0, allow_empty_first_page=True
-    ):
-        return DevicePaginator(queryset, per_page, orphans, allow_empty_first_page)
-
     def location_count(self, obj):
-        return obj.location_count_sql
+        return obj._locations_count
 
     def competitor_count(self, obj):
         return obj.competitor_count
 
     def last_position_at(self, obj):
-        if not obj.last_position_at:
-            return None
-        return epoch_to_datetime(obj.last_position_at)
+        return obj._last_location_datetime
 
-    location_count.admin_order_field = "location_count_sql"
+    location_count.admin_order_field = "_locations_count"
     competitor_count.admin_order_field = "competitor_count"
-    last_position_at.admin_order_field = "last_position_at"
+    last_position_at.admin_order_field = "_last_location_datetime"
 
     def clean_positions(self, request, queryset):
         for obj in queryset:

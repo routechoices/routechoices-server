@@ -1093,9 +1093,19 @@ class Device(models.Model):
         through_fields=("device", "club"),
     )
     locations_raw = models.TextField(blank=True, default="")
+    locations_encoded = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
     )
+
+    _last_location_datetime = models.DateTimeField(null=True, editable=False)
+    _last_location_latitude = models.DecimalField(
+        null=True, editable=False, max_digits=10, decimal_places=5
+    )
+    _last_location_longitude = models.DecimalField(
+        null=True, editable=False, max_digits=10, decimal_places=5
+    )
+    _locations_count = models.PositiveIntegerField(editable=False, default=0)
 
     class Meta:
         ordering = ["aid"]
@@ -1147,20 +1157,46 @@ class Device(models.Model):
 
     @property
     def locations(self):
-        if not self.locations_raw:
+        if not self.locations_encoded:
             return {"timestamps": [], "latitudes": [], "longitudes": []}
-        return json.loads(self.locations_raw)
+        locs = gps_encoding.decode_data(self.locations_encoded)
+        data = list(zip(*locs))
+        return {
+            "timestamps": data[LOCATION_TIMESTAMP_INDEX],
+            "latitudes": data[LOCATION_LATITUDE_INDEX],
+            "longitudes": [LOCATION_LONGITUDE_INDEX],
+        }
+
+    @property
+    def locations_series(self):
+        if not self.locations_encoded:
+            return []
+        return gps_encoding.decode_data(self.locations_encoded)
 
     @locations.setter
-    def locations(self, locs):
-        self.locations_raw = str(json.dumps(locs), "utf-8")
+    def locations(self, locs_dict):
+        locs = zip(
+            locs_dict["timestamps"], locs_dict["latitudes"], locs_dict["longitudes"]
+        )
+        locs = list(sorted(locs, key=itemgetter(0)))
+        self._locations_count = len(locs_dict["timestamps"])
+        if self._locations_count > 0:
+            last_loc = locs[-1]
+            self._last_location_datetime = epoch_to_datetime(
+                last_loc[LOCATION_TIMESTAMP_INDEX]
+            )
+            self._last_location_latitude = last_loc[LOCATION_LATITUDE_INDEX]
+            self._last_location_longitude = last_loc[LOCATION_LONGITUDE_INDEX]
+        else:
+            self._last_location_datetime = None
+            self._last_location_latitude = None
+            self._last_location_longitude = None
+        self.locations_encoded = gps_encoding.encode_data(locs)
 
     def get_locations_between_dates(self, from_date, end_date, /, *, encoded=False):
-        qs = self.locations
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
-        locs = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
-        locs = list(sorted(locs, key=itemgetter(0)))
+        locs = self.locations_series
         from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
         end_idx = bisect.bisect_right(locs, end_ts, key=itemgetter(0))
         locs = locs[from_idx:end_idx]
@@ -1233,16 +1269,12 @@ class Device(models.Model):
 
     @property
     def location_count(self):
-        try:
-            return len(self.locations["timestamps"])
-        except Exception:
-            return 0
+        return len(self.locations_series)
 
     def remove_duplicates(self, save=True):
         if self.location_count == 0:
             return
-        qs = self.locations
-        d = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
+        d = self.locations_series
         sorted_locs = sorted(d, key=itemgetter(0))
         loc_list = []
         prev_t = None
@@ -1251,14 +1283,13 @@ class Device(models.Model):
             if t != prev_t:
                 prev_t = t
                 loc_list.append([t, round(loc[1], 5), round(loc[2], 5)])
-        if len(loc_list) == 0:
-            tims, lats, lons = [], [], []
-        else:
+        new_encoded = ""
+        if len(loc_list) > 0:
+            new_encoded = gps_encoding.encode_data(loc_list)
+        if self.locations_encoded != new_encoded:
             tims, lats, lons = zip(*loc_list)
-        new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
-        new_raw = str(json.dumps(new_locs), "utf-8")
-        if self.locations_raw != new_raw:
-            self.locations_raw = new_raw
+            new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
+            self.locations = new_locs
             if save:
                 self.save()
 
@@ -1266,31 +1297,28 @@ class Device(models.Model):
     def last_location(self):
         if self.location_count == 0:
             return None
-        qs = self.locations
-        locs = zip(qs["timestamps"], qs["latitudes"], qs["longitudes"])
-        locs = list(sorted(locs, key=itemgetter(0)))
-        return locs[-1]
+        return self.locations_series[-1]
 
     @property
-    def last_timestamp(self):
-        loc = self.last_location
-        if not loc:
+    def last_position_timestamp(self):
+        if self.location_count == 0:
             return None
-        return loc[LOCATION_TIMESTAMP_INDEX]
+        return self.last_location[LOCATION_TIMESTAMP_INDEX]
 
     @property
-    def last_date_viewed(self):
-        t = self.last_timestamp
-        if not t:
+    def last_position_date(self):
+        if self.location_count == 0:
             return None
-        return epoch_to_datetime(t)
+        return epoch_to_datetime(self.last_location[LOCATION_TIMESTAMP_INDEX])
 
     @cached_property
     def last_position(self):
-        loc = self.last_location
-        if not loc:
+        if self.location_count == 0:
             return None
-        return loc[LOCATION_LATITUDE_INDEX], loc[LOCATION_LONGITUDE_INDEX]
+        return (
+            self.last_location[LOCATION_LATITUDE_INDEX],
+            self.last_location[LOCATION_LONGITUDE_INDEX],
+        )
 
     def get_competitor(self, at=None, load_event=False):
         if not at:
@@ -1336,7 +1364,7 @@ class Device(models.Model):
 
 @receiver(post_save, sender=Device)
 def invalidate_ended_event_using_device_cache(sender, instance, **kwargs):
-    event = instance.get_event(at=instance.last_date_viewed)
+    event = instance.get_event(at=instance.last_position_date)
     if event and event.ended:
         event.invalidate_cache()
 

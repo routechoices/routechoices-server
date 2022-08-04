@@ -1146,7 +1146,7 @@ def device_info(request, device_id):
         {
             "id": device.aid,
             "last_position": {
-                "timestamp": device.last_date_viewed,
+                "timestamp": device.last_position_timestamp,
                 "coordinates": {
                     "latitude": device.last_position[0],
                     "longitude": device.last_position[1],
