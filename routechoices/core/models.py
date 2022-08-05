@@ -1273,7 +1273,7 @@ class Device(models.Model):
             t = int(loc[0])
             if t != prev_t:
                 prev_t = t
-                loc_list.append([t, round(loc[1], 5), round(loc[2], 5)])
+                loc_list.append((t, round(loc[1], 5), round(loc[2], 5)))
         new_encoded = ""
         if len(loc_list) > 0:
             new_encoded = gps_encoding.encode_data(loc_list)
