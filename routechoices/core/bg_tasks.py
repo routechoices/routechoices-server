@@ -328,11 +328,11 @@ def import_single_event_from_gps_seuranta(event_id):
 
     for c_raw in event_data["COMPETITOR"]:
         c_data = c_raw.strip().split("|")
-        start_time_raw = c_data[1] + c_data[2]
+        start_time_raw = f"{c_data[1]}{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
         if len(start_time_raw) == 12:
-            start_time = arrow.get(c_data[1] + c_data[2], "YYYYMMDDHHmm")
+            start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
         else:
-            start_time = arrow.get(c_data[1] + c_data[2], "YYYYMMDDHHmmss")
+            start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
         start_time = start_time.shift(
             minutes=-int(event_data.get("TIMEZONE", 0))
         ).datetime
