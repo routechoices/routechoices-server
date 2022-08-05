@@ -257,6 +257,25 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 4)
+        res = self.client.post(
+            url,
+            {
+                "device_id": dev_id,
+                "latitudes": "1.3,1.4",
+                "longitudes": "3.3,3.4",
+                "timestamps": f"{t+2},{t+3}",
+                "secret": settings.POST_LOCATION_SECRETS[0],
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
+        self.assertEqual(nb_points, 4)
+        dev = Device.objects.get(aid=dev_id)
+        dev.remove_duplicates()
+        dev.save()
+        nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
+        self.assertEqual(nb_points, 4)
 
     def test_locations_api_gw_invalid_cast(self):
         url = self.reverse_and_check("locations_api_gw", "/locations")
