@@ -1011,18 +1011,17 @@ class Event(models.Model):
         draw = ImageDraw.Draw(img)
         w, h = draw.textsize(msg, font=font)
         x = int((1200 - w) / 2)
+        logo = None
+        y = int((630 - h) / 2)
         if self.club.logo:
             logo_b = self.club.logo.open("rb").read()
             logo = Image.open(BytesIO(logo_b))
+        elif not self.club.domain:
+            logo = Image.open("routechoices/watermark.png")
+        if logo:
             logo_f = logo.resize((250, 250), Image.ANTIALIAS)
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
             y = 480
-        elif not self.club.domain:
-            wm = Image.open("routechoices/watermark.png")
-            img.paste(wm, (0, 0), wm)
-            y = 520
-        else:
-            y = int((630 - h) / 2)
         color = "black"
         shadow = "white"
         if msg:
