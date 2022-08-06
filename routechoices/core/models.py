@@ -1257,9 +1257,23 @@ class Device(models.Model):
             push_forward=push_forward,
         )
 
+    # @property
+    # def location_count(self):
+    #    return len(self.locations_series)
+
     @property
     def location_count(self):
-        return len(self.locations_series)
+        # This use a property of the GPS encoding format
+        return (
+            len(
+                [
+                    x
+                    for x in self.locations_encoded
+                    if x in "?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^"
+                ]
+            )
+            // 3
+        )
 
     def remove_duplicates(self, save=True):
         if self.location_count == 0:
