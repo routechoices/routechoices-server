@@ -1094,7 +1094,7 @@ class Device(models.Model):
     _last_location_longitude = models.DecimalField(
         null=True, editable=False, max_digits=10, decimal_places=5
     )
-    _locations_count = models.PositiveIntegerField(editable=False, default=0)
+    _location_count = models.PositiveIntegerField(editable=False, default=0)
 
     class Meta:
         ordering = ["aid"]
@@ -1168,8 +1168,8 @@ class Device(models.Model):
             locs_dict["timestamps"], locs_dict["latitudes"], locs_dict["longitudes"]
         )
         locs = list(sorted(locs, key=itemgetter(0)))
-        self._locations_count = len(locs_dict["timestamps"])
-        if self._locations_count > 0:
+        self._location_count = len(locs_dict["timestamps"])
+        if self._location_count > 0:
             last_loc = locs[-1]
             self._last_location_datetime = epoch_to_datetime(
                 last_loc[LOCATION_TIMESTAMP_INDEX]

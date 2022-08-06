@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         force = options["force"]
-        devices = Device.objects.filter(_locations_count__gt=3600 * 24, is_gpx=False)
+        devices = Device.objects.filter(_location_count__gt=3600 * 24, is_gpx=False)
         n_device_archived = 0
         two_weeks_ago = now() - timedelta(days=14)
         for device in devices:

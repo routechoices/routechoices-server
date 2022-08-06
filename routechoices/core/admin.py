@@ -73,9 +73,9 @@ class HasLocationFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "false":
-            return queryset.filter(_locations_count=0)
+            return queryset.filter(_location_count=0)
         elif self.value():
-            return queryset.filter(_locations_count__gt=0)
+            return queryset.filter(_location_count__gt=0)
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
@@ -235,7 +235,7 @@ class DeviceAdmin(admin.ModelAdmin):
         return qs
 
     def location_count(self, obj):
-        return obj._locations_count
+        return obj._location_count
 
     def competitor_count(self, obj):
         return obj.competitor_count
@@ -243,7 +243,7 @@ class DeviceAdmin(admin.ModelAdmin):
     def last_position_at(self, obj):
         return obj._last_location_datetime
 
-    location_count.admin_order_field = "_locations_count"
+    location_count.admin_order_field = "_location_count"
     competitor_count.admin_order_field = "competitor_count"
     last_position_at.admin_order_field = "_last_location_datetime"
 
