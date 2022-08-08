@@ -311,7 +311,7 @@ class GL200Connection:
             return
         access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
         for command in commands:
-            self.stream.write(command)
+            self.stream.write(command.encode())
         await sync_to_async(_mark_pending_commands_sent, thread_sensitive=True)(
             self.imei, access_date
         )
