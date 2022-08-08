@@ -27,9 +27,11 @@ def _get_device(imei):
 
 def _get_pending_commands(imei):
     try:
-        commands = QueclinkCommand.objects.filter(
-            target__imei=imei, sent=False
-        ).values_list("command", flat=True)
+        commands = list(
+            QueclinkCommand.objects.filter(target__imei=imei, sent=False).values_list(
+                "command", flat=True
+            )
+        )
         t = arrow.now().datetime
         return t, commands
     except Exception:
