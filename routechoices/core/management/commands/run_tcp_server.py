@@ -44,8 +44,8 @@ def _mark_pending_commands_sent(imei, max_date):
             target__imei=imei, sent=False, creation_date__lte=max_date
         ).update(send=True, modification_date=arrow.now().datetime)
         return count
-    except Exception:
-        return None
+    except Exception as e:
+        return str(e)
 
 
 class TMT250Decoder:
