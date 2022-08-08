@@ -12,8 +12,10 @@ from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
-from routechoices.core.models import Device
+from routechoices.core.models import Device, QueclinkCommand
 from routechoices.lib.validators import validate_imei
+
+mat_updated = False
 
 
 def _get_device(imei):
@@ -21,6 +23,28 @@ def _get_device(imei):
         return Device.objects.get(physical_device__imei=imei)
     except Exception:
         return None
+
+
+def _get_pending_commands(imei):
+    try:
+        commands = list(
+            QueclinkCommand.objects.filter(target__imei=imei, sent=False).values_list(
+                "command", flat=True
+            )
+        )
+        t = arrow.now().datetime
+        return t, commands
+    except Exception:
+        return None
+
+
+def _mark_pending_commands_sent(imei, max_date):
+    try:
+        return QueclinkCommand.objects.filter(
+            target__imei=imei, sent=False, creation_date__lte=max_date
+        ).update(sent=True, modification_date=arrow.now().datetime)
+    except Exception:
+        return 0
 
 
 class TMT250Decoder:
@@ -199,18 +223,23 @@ class GL200Connection:
             data = data_bin.decode("ascii")
             print(f"received data ({data})", flush=True)
             parts = data.split(",")
-            if parts[0][:8] in ("+RESP:GT", "+BUFF:GT") and parts[0][8:] in (
-                "FRI",
-                "GEO",
-                "SPD",
-                "SOS",
-                "RTL",
-                "PNL",
-                "NMR",
-                "DIS",
-                "DOG",
-                "IGL",
-                "INF",
+            if parts[0][:7] == "+ACK:GT" or (
+                parts[0][:8] in ("+RESP:GT", "+BUFF:GT")
+                and parts[0][8:]
+                in (
+                    "FRI",
+                    "GEO",
+                    "SPD",
+                    "SOS",
+                    "STT",
+                    "RTL",
+                    "PNL",
+                    "NMR",
+                    "DIS",
+                    "DOG",
+                    "IGL",
+                    "INF",
+                )
             ):
                 imei = parts[2]
             elif parts[0] == "+ACK:GTHBD":
@@ -240,7 +269,10 @@ class GL200Connection:
             return
         self.imei = imei
         print(f"{self.imei} is connected")
-        if parts[0][8:] != "INF":
+
+        await self.send_pending_commands()
+
+        if parts[0][:7] != "+ACK:GT" and parts[0][8:] != "INF":
             try:
                 nb_pts = int(parts[6])
                 print(f"contains {nb_pts} pts")
@@ -273,6 +305,18 @@ class GL200Connection:
         while await self._read_line():
             pass
 
+    async def send_pending_commands(self):
+        if not self.imei:
+            return
+        access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
+        for command in commands:
+            self.stream.write(command.encode())
+        count_sent_in_db = await sync_to_async(
+            _mark_pending_commands_sent, thread_sensitive=True
+        )(self.imei, access_date)
+        print(f"{len(commands)} commands sent")
+        print(f"{count_sent_in_db} commands marked sent", flush=True)
+
     async def _read_line(self):
         try:
             data_bin = await self.stream.read_until(b"$")
@@ -288,6 +332,7 @@ class GL200Connection:
                 "PNL",
                 "NMR",
                 "DIS",
+                "STT",
                 "DOG",
                 "IGL",
             ):
