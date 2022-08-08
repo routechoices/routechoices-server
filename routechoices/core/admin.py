@@ -21,6 +21,7 @@ from routechoices.core.models import (
     Map,
     MapAssignation,
     Notice,
+    QueclinkCommand,
     SpotDevice,
     SpotFeed,
 )
@@ -323,6 +324,10 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
         )
 
 
+class QueclinkCommandAdmin(admin.ModelAdmin):
+    list_display = ("target", "creation_date", "modification_date", "sent")
+
+
 admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
@@ -333,6 +338,7 @@ admin.site.register(Map, MapAdmin)
 admin.site.register(SpotDevice, SpotDeviceAdmin)
 admin.site.register(SpotFeed, SpotFeedAdmin)
 admin.site.register(DeviceClubOwnership, DeviceClubOwnershipAdmin)
+admin.site.register(QueclinkCommand, QueclinkCommandAdmin)
 
 
 class MyUserAdmin(UserAdmin):

@@ -1587,3 +1587,21 @@ class ChatMessage(models.Model):
             "timestamp": self.creation_date.timestamp(),
             "user_hash": self.user_hash(),
         }
+
+
+class QueclinkCommand(models.Model):
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
+    target = models.ForeignKey(
+        ImeiDevice, related_name="commands", on_delete=models.CASCADE
+    )
+    sent = models.BooleanField(default=False)
+    command = models.TextField()
+
+    class Meta:
+        ordering = ["-modification_date"]
+        verbose_name = "Queclink command"
+        verbose_name_plural = "Queclink commands"
+
+    def __str__(self):
+        return f"Command for imei {self.target}"
