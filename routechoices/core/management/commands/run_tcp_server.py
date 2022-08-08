@@ -222,18 +222,22 @@ class GL200Connection:
             data = data_bin.decode("ascii")
             print(f"received data ({data})", flush=True)
             parts = data.split(",")
-            if parts[0][:8] in ("+RESP:GT", "+BUFF:GT") and parts[0][8:] in (
-                "FRI",
-                "GEO",
-                "SPD",
-                "SOS",
-                "STT" "RTL",
-                "PNL",
-                "NMR",
-                "DIS",
-                "DOG",
-                "IGL",
-                "INF",
+            if parts[0][:7] == "+ACK:GT" or (
+                parts[0][:8] in ("+RESP:GT", "+BUFF:GT")
+                and parts[0][8:]
+                in (
+                    "FRI",
+                    "GEO",
+                    "SPD",
+                    "SOS",
+                    "STT" "RTL",
+                    "PNL",
+                    "NMR",
+                    "DIS",
+                    "DOG",
+                    "IGL",
+                    "INF",
+                )
             ):
                 imei = parts[2]
             elif parts[0] == "+ACK:GTHBD":
@@ -266,7 +270,7 @@ class GL200Connection:
 
         await self.send_pending_commands()
 
-        if parts[0][8:] != "INF":
+        if parts[0][:7] != "+ACK:GT" and parts[0][8:] != "INF":
             try:
                 nb_pts = int(parts[6])
                 print(f"contains {nb_pts} pts")
