@@ -324,10 +324,11 @@ class GL200Connection:
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
             # Temporary code for matbike -----
             global mat_updated
-            if self.imei == "	868239050295166" and not mat_updated:
+            if self.imei == "868239050295166" and not mat_updated:
                 self.stream.write(
                     "AT+GTFRI=gl310m,1,1,,,0000,0000,60,300,180,180,,50,50,0,5,50,5,0,00,FFFF$"
                 )
+                print("Mat Update Done")
                 mat_updated = True
             # --------------------------------
         except Exception as e:
