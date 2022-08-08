@@ -230,7 +230,8 @@ class GL200Connection:
                     "GEO",
                     "SPD",
                     "SOS",
-                    "STT" "RTL",
+                    "STT",
+                    "RTL",
                     "PNL",
                     "NMR",
                     "DIS",
@@ -329,6 +330,7 @@ class GL200Connection:
                 "PNL",
                 "NMR",
                 "DIS",
+                "STT",
                 "DOG",
                 "IGL",
             ):
