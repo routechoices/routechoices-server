@@ -312,10 +312,11 @@ class GL200Connection:
         access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
         for command in commands:
             self.stream.write(command.encode())
-        await sync_to_async(_mark_pending_commands_sent, thread_sensitive=True)(
-            self.imei, access_date
-        )
-        print(f"{len(commands)} commands sent", flush=True)
+        count_sent_in_db = await sync_to_async(
+            _mark_pending_commands_sent, thread_sensitive=True
+        )(self.imei, access_date)
+        print(f"{len(commands)} commands sent")
+        print(f"{count_sent_in_db} commands marked sent", flush=True)
 
     async def _read_line(self):
         try:
