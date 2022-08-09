@@ -272,6 +272,7 @@ class ImeiDeviceAdmin(admin.ModelAdmin):
         "device",
         "creation_date",
     )
+    search_fields = ("imei", "device__aid")
 
 
 class SpotDeviceAdmin(admin.ModelAdmin):
@@ -326,6 +327,7 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
 
 class TcpDeviceCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
+    autocomplete_fields = ("target",)
 
 
 admin.site.register(ChatMessage, ChatMessageAdmin)
