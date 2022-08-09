@@ -1570,30 +1570,9 @@ class ChatMessage(models.Model):
         }
 
 
-DEVICE_QUECLINK = "queclink"
-
-DEVICCE_TYPES = ((DEVICE_QUECLINK, "Queclink"),)
-
-
-class DeviceTypeChoicesField(models.CharField):
-    def __init__(self, **kwargs):
-        kwargs["max_length"] = 16
-        kwargs["choices"] = DEVICCE_TYPES
-        kwargs["default"] = DEVICE_QUECLINK
-        super().__init__(**kwargs)
-
-    def deconstruct(self):  # pragma: no cover
-        # only run when creating migrations, so no-cover
-        name, path, args, kwargs = super().deconstruct()
-        kwargs.pop("choices", None)
-        kwargs.pop("default", None)
-        return (name, path, args, kwargs)
-
-
 class TcpDeviceCommand(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
-    device_type = DeviceTypeChoicesField()
     target = models.ForeignKey(
         ImeiDevice, related_name="commands", on_delete=models.CASCADE
     )
