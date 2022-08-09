@@ -19,8 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tcpdevicecommand",
             name="device_type",
-            field=routechoices.core.models.DeviceTypeChoicesField(
-                default=False, max_length=16
-            ),
+            field=routechoices.core.models.DeviceTypeChoicesField(max_length=16),
         ),
     ]
