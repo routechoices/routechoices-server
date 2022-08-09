@@ -21,9 +21,9 @@ from routechoices.core.models import (
     Map,
     MapAssignation,
     Notice,
-    QueclinkCommand,
     SpotDevice,
     SpotFeed,
+    TcpDeviceCommand,
 )
 from routechoices.lib.helpers import get_device_name
 
@@ -324,7 +324,7 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
         )
 
 
-class QueclinkCommandAdmin(admin.ModelAdmin):
+class TcpDeviceCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
 
 
@@ -338,7 +338,7 @@ admin.site.register(Map, MapAdmin)
 admin.site.register(SpotDevice, SpotDeviceAdmin)
 admin.site.register(SpotFeed, SpotFeedAdmin)
 admin.site.register(DeviceClubOwnership, DeviceClubOwnershipAdmin)
-admin.site.register(QueclinkCommand, QueclinkCommandAdmin)
+admin.site.register(TcpDeviceCommand, TcpDeviceCommandAdmin)
 
 
 class MyUserAdmin(UserAdmin):

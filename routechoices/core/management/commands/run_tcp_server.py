@@ -12,7 +12,7 @@ from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
-from routechoices.core.models import Device, QueclinkCommand
+from routechoices.core.models import DEVICE_QUECLINK, Device, TcpDeviceCommand
 from routechoices.lib.validators import validate_imei
 
 mat_updated = False
@@ -25,12 +25,12 @@ def _get_device(imei):
         return None
 
 
-def _get_pending_commands(imei):
+def _get_pending_commands(device_type, imei):
     try:
         commands = list(
-            QueclinkCommand.objects.filter(target__imei=imei, sent=False).values_list(
-                "command", flat=True
-            )
+            TcpDeviceCommand.objects.filter(
+                device_type=device_type, target__imei=imei, sent=False
+            ).values_list("command", flat=True)
         )
         t = arrow.now().datetime
         return t, commands
@@ -38,10 +38,13 @@ def _get_pending_commands(imei):
         return None
 
 
-def _mark_pending_commands_sent(imei, max_date):
+def _mark_pending_commands_sent(device_type, imei, max_date):
     try:
-        return QueclinkCommand.objects.filter(
-            target__imei=imei, sent=False, creation_date__lte=max_date
+        return TcpDeviceCommand.objects.filter(
+            device_type=device_type,
+            target__imei=imei,
+            sent=False,
+            creation_date__lte=max_date,
         ).update(sent=True, modification_date=arrow.now().datetime)
     except Exception:
         return 0
@@ -308,12 +311,14 @@ class GL200Connection:
     async def send_pending_commands(self):
         if not self.imei:
             return
-        access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
+        access_date, commands = await sync_to_async(_get_pending_commands)(
+            DEVICE_QUECLINK, self.imei
+        )
         for command in commands:
             self.stream.write(command.encode())
         count_sent_in_db = await sync_to_async(
             _mark_pending_commands_sent, thread_sensitive=True
-        )(self.imei, access_date)
+        )(DEVICE_QUECLINK, self.imei, access_date)
         print(f"{len(commands)} commands sent")
         print(f"{count_sent_in_db} commands marked sent", flush=True)
 
