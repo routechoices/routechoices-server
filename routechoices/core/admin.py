@@ -324,6 +324,8 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
             .order_by("club", "device__aid")
         )
 
+    search_fields = ("device__aid", "nickname")
+
 
 class TcpDeviceCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
