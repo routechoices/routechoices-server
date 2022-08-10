@@ -200,3 +200,9 @@ body {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+.navbar-brand.navbarchimey {
+  color: #18bc98;
+}
+.navbar-brand.navbarchimey:hover {
+  color: #13967d;
+}
