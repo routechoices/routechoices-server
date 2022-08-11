@@ -130,8 +130,12 @@ WSGI_APPLICATION = "routechoices.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "app_db",
+        "USER": "app_user",
+        "PASSWORD": "changeme",
+        "HOST": "db",
+        "PORT": "",
     }
 }
 
