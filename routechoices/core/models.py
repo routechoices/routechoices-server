@@ -112,25 +112,6 @@ def logo_upload_path(instance=None, file_name=None):
     return os.path.join(*tmp_path)
 
 
-class SoftChoiceMixin(object):
-    soft_default = True
-
-    def __init__(self, **kwargs):
-        self.soft_default = bool(kwargs.pop("soft_default", self.soft_default))
-        if callable(kwargs.get("choices")):
-            self.construct_choices = kwargs["choices"]
-        kwargs["choices"] = list(self.construct_choices())
-        super().__init__(**kwargs)
-
-    def deconstruct(self):  # pragma: no cover
-        # only run when creating migrations, so no-cover
-        name, path, args, kwargs = super(SoftChoiceMixin, self).deconstruct()
-        kwargs.pop("choices", None)
-        if self.soft_default:
-            kwargs.pop("default", None)
-        return (name, path, args, kwargs)
-
-
 class Club(models.Model):
     aid = models.CharField(
         default=random_key,
@@ -1589,7 +1570,8 @@ class ChatMessage(models.Model):
         }
 
 
-class QueclinkCommand(models.Model):
+
+class TcpDeviceCommand(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     target = models.ForeignKey(
@@ -1600,8 +1582,8 @@ class QueclinkCommand(models.Model):
 
     class Meta:
         ordering = ["-modification_date"]
-        verbose_name = "Queclink command"
-        verbose_name_plural = "Queclink commands"
+        verbose_name = "TCP Device command"
+        verbose_name_plural = "TCP Devices commands"
 
     def __str__(self):
         return f"Command for imei {self.target}"

@@ -9,22 +9,23 @@
 <header class="navbar navbar-expand-md navbar-light bg-light" style="z-index: 110001">
   <div class="container">
     {% if club.logo and club.website %}
-    <a href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span></a>
+    <a class="navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span></a>
     {% elif club.logo %}
-    <span style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span>
+    <span class="navbar-brand site-name" style="display:inline-block;"><img src="{{club.nice_url}}logo" alt="_" height="40"></span>
     {% elif club.website %}
-    <a href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa fa-house-chimney fa-2x"></i></a></span>
+    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa fa-house-chimney fa-2x"></i></a></span>
     {% else %}
     <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span></a>
     {% endif %}
     {% if club %}
+    <span style="display:inline-block;max-width: calc(100% - 120px);overflow: hidden; white-space: nowrap;text-overflow: ellipsis;" title="{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}">{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}</span>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="nav navbar-nav me-auto mb-2 mb-lg-0">
       </ul>
-      <ul class="nav navbar-nav d-flex">
+      <ul class="nav navbar-nav d-flex flex-nowrap">
         <li class="nav-item">
           <a class="nav-link" href="{{ club.get_absolute_url }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-compass"></i> <span id="club-events-link-text">Events by {{ club.name }}</span></a>
         </li>{% if is_event_page %}

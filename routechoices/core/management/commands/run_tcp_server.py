@@ -12,7 +12,7 @@ from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
-from routechoices.core.models import Device, QueclinkCommand
+from routechoices.core.models import Device, TcpDeviceCommand
 from routechoices.lib.validators import validate_imei
 
 mat_updated = False
@@ -28,7 +28,7 @@ def _get_device(imei):
 def _get_pending_commands(imei):
     try:
         commands = list(
-            QueclinkCommand.objects.filter(target__imei=imei, sent=False).values_list(
+            TcpDeviceCommand.objects.filter(target__imei=imei, sent=False).values_list(
                 "command", flat=True
             )
         )
@@ -40,8 +40,10 @@ def _get_pending_commands(imei):
 
 def _mark_pending_commands_sent(imei, max_date):
     try:
-        return QueclinkCommand.objects.filter(
-            target__imei=imei, sent=False, creation_date__lte=max_date
+        return TcpDeviceCommand.objects.filter(
+            target__imei=imei,
+            sent=False,
+            creation_date__lte=max_date,
         ).update(sent=True, modification_date=arrow.now().datetime)
     except Exception:
         return 0

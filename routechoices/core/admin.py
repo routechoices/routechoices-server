@@ -24,6 +24,7 @@ from routechoices.core.models import (
     QueclinkCommand,
     SpotDevice,
     SpotFeed,
+    TcpDeviceCommand,
 )
 from routechoices.lib.helpers import get_device_name
 
@@ -272,6 +273,7 @@ class ImeiDeviceAdmin(admin.ModelAdmin):
         "device",
         "creation_date",
     )
+    search_fields = ("imei", "device__aid")
 
 
 class SpotDeviceAdmin(admin.ModelAdmin):
@@ -323,6 +325,13 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
             .order_by("club", "device__aid")
         )
 
+    search_fields = ("device__aid", "nickname")
+
+
+class TcpDeviceCommandAdmin(admin.ModelAdmin):
+    list_display = ("target", "creation_date", "modification_date", "sent")
+    autocomplete_fields = ("target",)
+
 
 class QueclinkCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
@@ -338,7 +347,7 @@ admin.site.register(Map, MapAdmin)
 admin.site.register(SpotDevice, SpotDeviceAdmin)
 admin.site.register(SpotFeed, SpotFeedAdmin)
 admin.site.register(DeviceClubOwnership, DeviceClubOwnershipAdmin)
-admin.site.register(QueclinkCommand, QueclinkCommandAdmin)
+admin.site.register(TcpDeviceCommand, TcpDeviceCommandAdmin)
 
 
 class MyUserAdmin(UserAdmin):
