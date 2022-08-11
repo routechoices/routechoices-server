@@ -8,7 +8,7 @@ from .managers import BaseInvitationManager
 class AbstractBaseInvitation(models.Model):
     accepted = models.BooleanField(verbose_name=_("accepted"), default=False)
     key = models.CharField(verbose_name=_("key"), max_length=64, unique=True)
-    sent = models.DateTimeField(verbose_name=_("sent"), null=True)
+    sent = models.DateTimeField(verbose_name=_("sent"), null=True, blank=True)
     inviter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

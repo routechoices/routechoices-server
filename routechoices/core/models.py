@@ -1068,12 +1068,14 @@ class Device(models.Model):
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
     )
 
-    _last_location_datetime = models.DateTimeField(null=True, editable=False)
+    _last_location_datetime = models.DateTimeField(
+        null=True, blank=True, editable=False
+    )
     _last_location_latitude = models.DecimalField(
-        null=True, editable=False, max_digits=10, decimal_places=5
+        null=True, blank=True, editable=False, max_digits=10, decimal_places=5
     )
     _last_location_longitude = models.DecimalField(
-        null=True, editable=False, max_digits=10, decimal_places=5
+        null=True, blank=True, editable=False, max_digits=10, decimal_places=5
     )
     _location_count = models.PositiveIntegerField(editable=False, default=0)
 
