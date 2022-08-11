@@ -11,6 +11,11 @@ var extractCornersCoordsFromFilename = function (filename) {
   }
 };
 (function () {
+  u("#id_image").attr("capture", "filesystem");
+  u("#id_image").attr(
+    "accept",
+    "image/png,image/jpeg,image/gif,image/webp,image/avif"
+  );
   u("#id_image").on("change", function () {
     if (this.files.length > 0 && this.files[0].size > 1e7) {
       swal({
