@@ -642,7 +642,7 @@ def map_kmz_upload_view(request):
                         doc_file = "doc.kml"
                     else:
                         raise Exception("No valid doc.kml file")
-                    with open(os.path.join(dest, doc_file), "r") as f:
+                    with open(os.path.join(dest, doc_file), "r", encoding="utf-8") as f:
                         kml = f.read().encode("utf8")
                     name, image_path, corners_coords = extract_ground_overlay_info(kml)
                     if not name:
