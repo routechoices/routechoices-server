@@ -21,7 +21,7 @@ django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
 drf-yasg
 geoip2
-gps-encoding
+gps-encoding @ git+https://github.com/rphlo/gps_encoding
 gpxpy
 numpy
 opencv-python
@@ -34,7 +34,7 @@ raven
 requests
 sewer==0.8.4
 tornado
-uwsgi
+uwsgi @ git+https://github.com/unbit/uwsgi@uwsgi-2.0
 GitPython
 websocket-client
 django-read-only

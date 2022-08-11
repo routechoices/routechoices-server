@@ -1,4 +1,26 @@
 version: 2.1
+commands:
+  setup-docker:
+    steps:
+      - run:
+          name: Setup buildx and qemu
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y qemu-user-static
+            sudo apt-get install -y binfmt-support
+      - run:
+          name: Check versions
+          command: |
+            qemu-aarch64-static --version
+            update-binfmts --version
+      - run:
+          name: Create builder
+          command: |
+            export DOCKER_CLI_EXPERIMENTAL=enabled
+            docker buildx create --name arm-builder
+            docker buildx use arm-builder
+            docker buildx inspect --bootstrap
+
 jobs:
   build-and-test:
     # to speed up Dockers builds turn on layer caching
@@ -51,11 +73,34 @@ jobs:
         command: |
           ssh root@routechoices.com 'sudo -u apps /apps/routechoices-server/bin/deploy'
 
+  build-docker:
+    machine:
+      image: 'ubuntu-2004:202107-02'
+    resource_class: large
+    steps:
+      - checkout
+      - setup-docker
+      - run:
+          name: Connect account
+          command: |
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+      - run:
+          name: Build docker images
+          command: |
+            DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/arm64,linux/amd64 --push -t rphlo/routechoices-dev-server:latest -f docker/django.dockerfile .
+
 workflows:
   build_test_and_deploy:
     jobs:
       - build-and-test
       - deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - master
+      - build-docker:
           requires:
             - build-and-test
           filters:
