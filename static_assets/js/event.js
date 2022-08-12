@@ -1343,16 +1343,12 @@ var drawCompetitors = function () {
           getCompetitorsMaxDuration(true)) *
         100;
     } else {
-      perc = max(
-        0,
-        min(
-          ((currentTime - getCompetitionStartDate()) /
-            getCompetitorsMaxDuration()) *
-            100,
-          100
-        )
-      );
+      perc =
+        ((currentTime - getCompetitionStartDate()) /
+          getCompetitorsMaxDuration()) *
+        100;
     }
+    perc = Math.max(0, Math.min(100, perc));
   }
   u("#progress_bar")
     .css({ width: perc + "%" })
