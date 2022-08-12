@@ -1343,10 +1343,15 @@ var drawCompetitors = function () {
           getCompetitorsMaxDuration(true)) *
         100;
     } else {
-      perc =
-        ((currentTime - getCompetitionStartDate()) /
-          getCompetitorsMaxDuration()) *
-        100;
+      perc = max(
+        0,
+        min(
+          ((currentTime - getCompetitionStartDate()) /
+            getCompetitorsMaxDuration()) *
+            100,
+          100
+        )
+      );
     }
   }
   u("#progress_bar")
