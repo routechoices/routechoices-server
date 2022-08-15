@@ -131,6 +131,7 @@ class IsGPXFilter(admin.SimpleListFilter):
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "slug",
         "domain",
         "creation_date",
         "event_count",
