@@ -211,6 +211,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "battery_level",
         "competitor_count",
     )
+    readonly_fields = ("locations_series",)
     actions = ["clean_positions"]
     search_fields = ("aid",)
     inlines = [
