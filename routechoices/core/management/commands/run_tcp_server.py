@@ -274,7 +274,7 @@ class GL200Connection:
 
         await self.send_pending_commands()
 
-        if parts[0][:7] != "+ACK:GT" and parts[0][8:] != "INF":
+        if parts[0][:7] != "+ACK:GT" and (parts[0][8:] not in ("INF", "STT")):
             try:
                 nb_pts = int(parts[6])
                 print(f"contains {nb_pts} pts")
@@ -334,7 +334,6 @@ class GL200Connection:
                 "PNL",
                 "NMR",
                 "DIS",
-                "STT",
                 "DOG",
                 "IGL",
             ):
@@ -376,10 +375,11 @@ class GL200Connection:
     def _on_close(self):
         print("client quit", self.address)
 
-    async def _on_data(self, pts, batt):
+    async def _on_data(self, pts, batt=None):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
-        self.db_device.battery_level = batt
+        if batt:
+            self.db_device.battery_level = batt
         loc_array = pts
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             loc_array
