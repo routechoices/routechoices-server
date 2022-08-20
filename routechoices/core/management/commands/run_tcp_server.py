@@ -329,7 +329,6 @@ class GL200Connection:
         print(f"Received data ({data})")
         return await self.process_line(data)
 
-
     async def on_data(self, pts, batt=None):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Queclink"
@@ -364,18 +363,22 @@ class TrackTapeConnection:
         self.db_device = None
 
     async def start_listening(self):
-        print(f"start listening from {self.address}")
+        print(f"Start listening from {self.address}")
         imei = None
         try:
             data_raw = ""
             while not data_raw:
                 data_bin = await self.stream.read_until(b"\n")
                 data_raw = data_bin.decode("ascii").strip()
-            print(f"received data ({data_raw})", flush=True)
+            print(f"Received data ({data_raw})", flush=True)
             data = json.loads(data_raw)
             imei = data.get("id")
         except Exception as e:
             print(e, flush=True)
+            self.stream.close()
+            return
+        if not imei:
+            print("No imei", flush=True)
             self.stream.close()
             return
         is_valid_imei = True
@@ -383,24 +386,29 @@ class TrackTapeConnection:
             validate_imei(imei)
         except ValidationError:
             is_valid_imei = False
-        if not imei:
-            print("no imei")
-            self.stream.close()
-            return
-        elif not is_valid_imei:
-            print("invalid imei")
+        if not is_valid_imei:
+            print("Invalid imei", flush=True)
             self.stream.close()
             return
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
-            print(f"imei not registered {self.address}, {imei}")
+            print(f"Imei not registered {self.address}, {imei}", flush=True)
             self.stream.close()
             return
         self.imei = imei
         print(f"{self.imei} is connected")
+
+        self._process_data(data)
+
+        while await self._read_line():
+            pass
+
+    async def _process_data(self, data):
+        imei = data.get("id")
+        if imei != self.imei:
+            return False
         locs = data.get("positions", [])
         loc_array = []
-        # TODO: Read battery level
         for loc in locs:
             try:
                 tim = arrow.get(loc.get("timestamp")).int_timestamp
@@ -409,14 +417,11 @@ class TrackTapeConnection:
                 loc_array.append((tim, lat, lon))
             except Exception:
                 continue
-        if not self.db_device.user_agent:
-            self.db_device.user_agent = "TrackTape"
         if loc_array:
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
-        while await self._read_line():
-            pass
+            print(f"{len(loc_array)} locations wrote to DB", flush=True)
 
     async def _read_line(self):
         try:
@@ -424,32 +429,17 @@ class TrackTapeConnection:
             while not data_raw:
                 data_bin = await self.stream.read_until(b"\n")
                 data_raw = data_bin.decode("ascii").strip()
-            print(f"received data ({data_raw})")
+            print(f"Received data ({data_raw})")
             data = json.loads(data_raw)
-            imei = data.get("id")
-            if imei != self.imei:
-                return False
-            locs = data.get("positions", [])
-            loc_array = []
-            for loc in locs:
-                try:
-                    tim = arrow.get(loc.get("timestamp")).int_timestamp
-                    lon = float(loc.get("lon"))
-                    lat = float(loc.get("lat"))
-                    loc_array.append((tim, lat, lon))
-                except Exception:
-                    continue
-            if loc_array:
-                await sync_to_async(
-                    self.db_device.add_locations, thread_sensitive=True
-                )(loc_array)
-        except Exception:
+            self._process_data(data)
+        except Exception as e:
+            print(f"Error parsing data: {str(e)}")
             self.stream.close()
             return False
         return True
 
     def _on_close(self):
-        print("client quit", self.address)
+        print("client quit", flush=True)
 
 
 class TrackTapeServer(TCPServer):
@@ -462,7 +452,7 @@ class TrackTapeServer(TCPServer):
 
 
 class Command(BaseCommand):
-    help = "Run a tcp server for GPS trackers."
+    help = "Run a TCP server for GPS trackers."
 
     def handle(self, *args, **options):
         tmt250_server = TMT250Server()
