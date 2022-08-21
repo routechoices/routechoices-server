@@ -223,7 +223,7 @@ class CsrfViewMiddleware(OrigCsrfViewMiddleware):
         return allowed
 
 
-class BanRussiaMiddleware:
+class FilterCountriesIPsMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -239,10 +239,8 @@ class BanRussiaMiddleware:
             country = g.country_code(request.META["REMOTE_ADDR"])
         except (GeoIP2Exception, GeoIP2Error):
             country = None
-        if country in ("BY", "RU"):
-            return HttpResponse(
-                "Sorry, we block IP addresses from Russia and Belarus following actions in Ukraine."
-            )
+        if country in getattr(settings, "BANNED_COUNTRIES", []):
+            return HttpResponse("Sorry, we block IP addresses from your country.")
         return None
 
 

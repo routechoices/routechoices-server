@@ -82,7 +82,7 @@ MIDDLEWARE = [
     "routechoices.core.middleware.HostsRequestMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "routechoices.core.middleware.XForwardedForMiddleware",
-    "routechoices.core.middleware.BanRussiaMiddleware",
+    "routechoices.core.middleware.FilterCountriesIPsMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
     "django.middleware.common.CommonMiddleware",
