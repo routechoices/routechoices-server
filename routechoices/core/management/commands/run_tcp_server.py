@@ -327,6 +327,7 @@ class GL200Connection:
         data_bin = await self.stream.read_until(b"$")
         data = data_bin.decode("ascii")
         print(f"Received data ({data})")
+        await self.send_pending_commands()
         return await self.process_line(data)
 
     async def on_data(self, pts, batt=None):
