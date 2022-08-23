@@ -81,9 +81,8 @@ class PostDataThrottle(AnonRateThrottle):
 def serve_from_s3(
     bucket, request, path, filename="", mime="application/force-download", headers=None
 ):
-    path = re.sub(r"^/internal/", "", path)
     url = s3_object_url(path, bucket)
-    url = f"/s3{url[len(settings.AWS_S3_ENDPOINT_URL):]}"
+    url = url[len(settings.AWS_S3_ENDPOINT_URL) :]
 
     response_status = status.HTTP_200_OK
     if request.method == "GET":
@@ -92,7 +91,7 @@ def serve_from_s3(
     response = HttpResponse("", status=response_status, headers=headers)
 
     if request.method == "GET":
-        response["X-Accel-Redirect"] = urllib.parse.quote(url.encode("utf-8"))
+        response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
         response["X-Accel-Buffering"] = "no"
     response["Accept-Ranges"] = "bytes"
     response["Content-Type"] = mime
@@ -1232,7 +1231,7 @@ def event_map_download(request, event_id, map_index="0"):
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
         request,
-        "/internal/" + file_path,
+        file_path,
         filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
         mime=mime_type,
         headers=headers,

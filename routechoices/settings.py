@@ -783,8 +783,6 @@ GL200_PORT = 2002
 TRACKTAPE_PORT = 2004
 
 
-# The AWS region to connect to.
-AWS_REGION = "us-east-1"
 # The AWS access key to use.
 AWS_ACCESS_KEY_ID = "minio"
 # The AWS secret access key to use.

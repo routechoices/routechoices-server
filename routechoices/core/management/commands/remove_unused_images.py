@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "Remove old images files from db"
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", action="store_true", default=False)
+        parser.add_argument("--force", action="store_true", default=False)
 
     def scan_map_directory(self):
 
@@ -29,27 +29,27 @@ class Command(BaseCommand):
                 key = obj["Key"]
                 yield key
 
-    def process_image_file(self, image_name, dry_run):
+    def process_image_file(self, image_name, force):
         if image_name not in self.maps_image_paths:
             self.n_image_removed += 1
             self.stdout.write(f"File {image_name} is unused")
-            if not dry_run:
+            if force:
                 s3_delete_key(image_name, settings.AWS_S3_BUCKET)
         else:
             self.n_image_keeped += 1
             self.keeped.add(image_name)
 
     def handle(self, *args, **options):
-        dry_run = options["dry_run"]
+        force = options["force"]
         self.maps_image_paths = set(Map.objects.all().values_list("image", flat=True))
         self.n_image_removed = 0
         self.keeped = set()
         self.n_image_keeped = 0
         self.s3 = get_s3_client()
         for filename in self.scan_map_directory():
-            self.process_image_file(filename, dry_run)
+            self.process_image_file(filename, force)
 
-        if not dry_run:
+        if force:
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Successfully removed {self.n_image_removed} files, keeping {self.n_image_keeped}"

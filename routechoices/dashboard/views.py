@@ -1134,7 +1134,7 @@ def dashboard_map_download(request, map_id, *args, **kwargs):
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
         request,
-        "/internal/" + file_path,
+        file_path,
         filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
         mime=mime_type,
     )
@@ -1154,7 +1154,7 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
         request,
-        "/internal/" + file_path,
+        file_path,
         filename=f"{club.name}.png",
         mime="image/png",
     )

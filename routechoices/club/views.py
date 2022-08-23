@@ -137,7 +137,7 @@ def club_logo(request, **kwargs):
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
         request,
-        "/internal/" + file_path,
+        file_path,
         filename=f"{club.name}.png",
         mime="image/png",
     )
