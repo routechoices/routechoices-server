@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Build docker images
           command: |
-            DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64 --push -t rphl/routechoices-dev-server:latest -f docker/django.dockerfile .
+            DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform linux/amd64 --push -t rphlo/routechoices-dev-server:latest -f docker/django.dockerfile .
 
 workflows:
   build_test_and_deploy:

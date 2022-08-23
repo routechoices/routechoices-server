@@ -46,7 +46,7 @@ services:
       - django
   django:
     container_name: rc_django
-    image: rphl/routechoices-dev-server
+    image: rphlo/routechoices-dev-server
     stop_signal: SIGINT
     volumes:
       - ../:/app/:rw
