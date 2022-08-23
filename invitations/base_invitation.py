@@ -21,6 +21,9 @@ class AbstractBaseInvitation(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        raise NotImplementedError("You should implement the __str__ method")
+
     @classmethod
     def create(cls, email, inviter=None, **kwargs):
         raise NotImplementedError("You should implement the create method class")
@@ -30,6 +33,3 @@ class AbstractBaseInvitation(models.Model):
 
     def send_invitation(self, request, **kwargs):
         raise NotImplementedError("You should implement the send_invitation method")
-
-    def __str__(self):
-        raise NotImplementedError("You should implement the __str__ method")

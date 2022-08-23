@@ -28,6 +28,9 @@ class Invitation(AbstractBaseInvitation):
     )
     created = models.DateTimeField(verbose_name=_("created"), default=timezone.now)
 
+    def __str__(self):
+        return f"Invite to club {self.club}: {self.email}"
+
     @classmethod
     def create(cls, email, club, inviter=None, **kwargs):
         key = get_random_string(64).lower()
@@ -70,6 +73,3 @@ class Invitation(AbstractBaseInvitation):
             invite_url_sent=invite_url,
             inviter=self.inviter,
         )
-
-    def __str__(self):
-        return f"Invite to club {self.club}: {self.email}"
