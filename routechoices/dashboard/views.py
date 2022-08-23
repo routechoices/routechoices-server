@@ -385,7 +385,11 @@ def club_delete_view(request):
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        club.delete()
+        password = request.POST.get("password")
+        if not request.user.check_password(password):
+            messages.error(request, "Invalid password")
+            return redirect("dashboard:club_delete_view")
+        # club.delete()
         messages.success(request, "Club deleted")
         return redirect("dashboard:club_select_view")
     return render(
