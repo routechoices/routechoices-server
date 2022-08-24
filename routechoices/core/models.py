@@ -216,6 +216,10 @@ Follow our events live or replay them later.
         )
         return f"{self.url_protocol}:{path}"
 
+    @property
+    def logo_url(self):
+        return f"{self.nice_url}logo?v={int(self.modification_date.timestamp())}"
+
     def create_analytics_domain(self):
         requests.post(
             f"{settings.ANALYTICS_API_URL}/sites",
