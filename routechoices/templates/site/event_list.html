@@ -65,6 +65,7 @@
   {% endfor %}
   </div>
   {% endif%}
+  {% if events %}
   <div style="margin-bottom: 15px;">
     {% if club %}
     <h2>All Events by {{ club.name }} <a href="{{club.nice_url}}feed"><i class="fa fa-rss"></i></a></h2>
@@ -84,7 +85,7 @@
       {% endif %}
     {% endif %}
   </div>
-
+  {% endif %}
   <div>
   {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
   {% for event in events %}
@@ -112,7 +113,7 @@
   {% empty %}
     <div class="card">
       <div class="card-body">
-        <h2>No public events yet...</h2>
+        <h2 style="color: #888">No public events yet...</h2>
       </div>
     </div>
   {% endfor %}
