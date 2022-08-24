@@ -23,10 +23,6 @@
     "group": "Group",
     "no-group": "No groups",
     "search-competitors": "Search competitors",
-    "chat": "Chat",
-    "message": "Message",
-    "nickname": "Nickname",
-    "send": "Send",
     "tails": "Tails",
     "length-in-seconds": "Length (Hours, Minutes, Seconds)",
     "map-controls": "Map controls",
@@ -35,10 +31,6 @@
     "show-groupings": "Show groupings",
     "qr-link": "QR Link",
     "language": "Language",
-    "error-sending-msg": "Message could not be sent!",
-    "sending": "Sending...",
-    "message-removed": "Message removed by a moderator",
-    "chat-closed": "Chat is closed",
     "reached-max-runners": "The limit of $1 competitors displayed has been reached",
     "export": "Export"
 }

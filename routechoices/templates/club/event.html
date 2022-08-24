@@ -50,7 +50,6 @@
         <div class="btn-group" role="group" id="replay_control_buttons" style="margin-bottom: 2px"><a href="#" role="button" class="btn btn-sm btn-secondary" id="prev_button"  aria-label="slower"><i class="fa fa-backward"></i></a><a href="#" role="button" class="btn btn-sm btn-secondary" id="play_pause_button"  aria-label="play/pause"><i class="fa fa-play"></i></a><a href="#" role="button" class="btn btn-sm btn-secondary" id="next_button" aria-label="faster"><i class="fa fa-forward"></i></a></div>
         <div class="btn-group float-end" role="group" id="share_buttons" style="margin: 0 0 2px 5px"><a href="#" role="button" class="btn btn-sm btn-secondary" id="share_button" aria-label="share"><i class="fa fa-share-alt"></i></a></div>
         <div class="btn-group float-end" role="group" id="options_buttons" style="margin: 0 0 2px 5px"><a href="#" role="button" class="btn btn-sm btn-secondary" id="options_show_button" aria-label="options"><i class="fa fa-cog"></i></a></div>
-        <div class="btn-group float-end d-none" style="margin: 0 0 2px 5px" id="chat_button_group"><a href="#" role="button" class="btn btn-sm btn-secondary" id="chat_show_button" aria-label="chat"><i class="fa fa fa-comments"></i> <span id="chat-btn-text">Chat</span></a></div>
       </div>
       <div style="padding-top:5px;" class="event-tool">
         <div id="full_progress_bar" class="progress" style="cursor: pointer">
@@ -108,9 +107,7 @@
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
   data-event-id="{{event.aid}}"
   data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
-  data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"{% if event.allow_live_chat %}
-  data-chat-stream-url="https://{{chat_server}}/sse/{{event.aid}}"
-  data-chat-messages-endpoint = "{% host_url 'event_chat' event_id=event.aid host 'api' %}"{% endif %}
+  data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"
   data-server-clock-url="{% host_url 'time_api' host 'api' %}"
   data-club-name="{{ event.club.name }}"
   data-static-root="{% static '' %}"
@@ -137,5 +134,5 @@
 <script src="{% static '/js/hash-avatar-2021100701.js' %}?1"></script>
 <script src="{% static '/js/event.js' %}"></script>
 <script src="{% static '/scripts/club/event.js' %}"></script>
-{% endcompress %}{% if event.allow_live_chat %}<script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>{% endif %}
+{% endcompress %}
 {% endblock %}

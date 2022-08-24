@@ -23,10 +23,6 @@
     "group": "Ryhmä",
     "no-group": "Ei ryhmiä",
     "search-competitors": "Etsi kilpailijoita",
-    "chat": "Chat",
-    "message": "Viesti",
-    "nickname": "Nimi",
-    "send": "Lähettää",
     "tails": "Hännät",
     "length-in-seconds": "Pituus (Tuntia, Minuuttia, Sekuntia)",
     "map-controls": "Kartan hallintalaitteet",
@@ -35,10 +31,6 @@
     "show-groupings": "Näytä ryhmittymiä",
     "qr-link": "QR-linkki",
     "language": "Kieli",
-    "error-sending-msg": "Viestiä ei voitu lähettää!",
-    "sending": "Lähetetään...",
-    "message-removed": "Moderaattori poisti viestin",
-    "chat-closed": "Chat on suljettu",
     "reached-max-runners": "$1 kilpailijan raja on saavutettu",
     "export": "Viedä"
 }

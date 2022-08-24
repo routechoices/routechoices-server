@@ -23,10 +23,6 @@
     "group": "Groeperen",
     "no-group": "Geen groepen",
     "search-competitors": "Zoek concurrenten",
-    "chat": "Chat",
-    "message": "Stuur bericht",
-    "nickname": "Bijnaam",
-    "send": "Verstuur",
     "tails": "Staarten",
     "length-in-seconds": "Lengte (Uren, Minuten, Seconden)",
     "map-controls": "Kaart controles",
@@ -35,10 +31,6 @@
     "show-groupings": "Toon groeperingen",
     "qr-link": "Qr link",
     "language": "Taal",
-    "error-sending-msg": "Bericht kon niet worden verstuurd!",
-    "sending": "Sturen...",
-    "message-removed": "Bericht verwijderd door een moderator",
-    "chat-closed": "Chatten is gesloten",
     "reached-max-runners": "De limiet van $1 deelnemers is bereikt",
     "export": "Exporteren"
 }

@@ -226,10 +226,6 @@ var showClusters = false;
 var showControls = !(L.Browser.touch && L.Browser.mobile);
 var backdropMaps = {};
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
-var chatDisplayed = false;
-var chatMessages = [];
-var chatEventSource = null;
-var chatNick = "";
 var zoomOnRunners = false;
 var clock = null;
 var banana = null;
@@ -632,7 +628,7 @@ function toggleCompetitorList(e) {
   if (u("#sidebar").hasClass("d-none")) {
     u("#sidebar").removeClass("d-none").addClass("col-12");
     u("#map").addClass("d-none").removeClass("col-12");
-  } else if (!(chatDisplayed || optionDisplayed)) {
+  } else if (!optionDisplayed) {
     u("#sidebar").addClass("d-none").removeClass("col-12");
     u("#map").removeClass("d-none").addClass("col-12");
     map.invalidateSize();
@@ -641,11 +637,10 @@ function toggleCompetitorList(e) {
 }
 
 var displayCompetitorList = function (force) {
-  if (!force && (optionDisplayed || chatDisplayed)) {
+  if (!force && optionDisplayed) {
     return;
   }
   optionDisplayed = false;
-  chatDisplayed = false;
   var listDiv = u('<div id="listCompetitor"/>');
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
@@ -871,157 +866,8 @@ var filterCompetitorList = function (e) {
   displayCompetitorList();
 };
 
-var displayChat = function (ev) {
-  ev.preventDefault();
-  optionDisplayed = false;
-  if (chatDisplayed) {
-    chatDisplayed = false;
-    u("#sidebar").addClass("d-none").removeClass("col-12");
-    u("#map").removeClass("d-none").addClass("col-12");
-    map.invalidateSize();
-    displayCompetitorList();
-    return;
-  }
-  if (u("#sidebar").hasClass("d-none")) {
-    u("#sidebar").removeClass("d-none").addClass("col-12");
-    u("#map").addClass("d-none").removeClass("col-12");
-  }
-  chatDisplayed = true;
-  var mainDiv = u("<div/>");
-  mainDiv.append(
-    u('<div style="text-align:right;margin-bottom:-27px"/>').append(
-      u('<button class="btn btn-default btn-sm"/>')
-        .html('<i class="fa fa-times"></i>')
-        .on("click", displayChat)
-    )
-  );
-  mainDiv.append(u("<div/>").html("<h4>" + banana.i18n("chat") + "</h4>"));
-  if (endEvent > new Date()) {
-    mainDiv.append(
-      u('<form id="chatForm"/>')
-        .html(
-          '<label class="form-label" for="nickname">' +
-            banana.i18n("nickname") +
-            "</label>" +
-            '<input class="form-control" name="nickname" id="chatNick" maxlength="20" />' +
-            '<label class="form-label" for="message">' +
-            banana.i18n("message") +
-            "</label>" +
-            '<input class="form-control" name="message" id="chatMessage" maxlength="100" autocomplete="off" style="margin-bottom: 3px"/>' +
-            '<input class="btn btn-primary float-end" id="chatSubmitBtn" type="submit" value="Send" />'
-        )
-        .on("submit", function (ev) {
-          ev.preventDefault();
-          if (
-            u("#chatMessage").val() === "" ||
-            u("#chatNick").val() === "" ||
-            u("chatSubmitBtn").val() === banana.i18n("sending")
-          ) {
-            return;
-          }
-          if (+endEvent <= +clock.now()) {
-            swal({
-              title: banana.i18n("chat-closed"),
-              text: "",
-              type: "error",
-              confirmButtonText: "OK",
-            });
-            u("#chatForm").after(
-              u("<div/>").html(
-                "<h4><i>" + banana.i18n("chat-closed") + "</i></h4>"
-              )
-            );
-            u("#chatForm").remove();
-            return;
-          }
-          u("#chatSubmitBtn").val(banana.i18n("sending"));
-          reqwest({
-            url: "https:" + window.local.chatMessagesEndpoint,
-            data: {
-              nickname: u("#chatNick").val(),
-              message: u("#chatMessage").val(),
-              csrfmiddlewaretoken: window.local.csrfToken,
-            },
-            headers: {
-              "X-CSRFToken": window.local.csrfToken,
-            },
-            crossOrigin: true,
-            withCredentials: true,
-            method: "post",
-            type: "json",
-            success: function () {
-              u("#chatMessage").val("");
-              document.getElementById("chatMessage").focus();
-            },
-            fail: function () {
-              swal({
-                title: banana.i18n("error-sending-msg"),
-                text: "",
-                type: "error",
-                confirmButtonText: "OK",
-              });
-            },
-            complete: function () {
-              u("#chatSubmitBtn").val(banana.i18n("send"));
-            },
-          });
-        })
-    );
-  } else {
-    mainDiv.append(
-      u("<div/>").html("<h4><i>" + banana.i18n("chat-closed") + "</i></h4>")
-    );
-  }
-  mainDiv.append(u('<div style="clear: both"/>').attr("id", "messageList"));
-  u("#sidebar").html("");
-  u("#sidebar").append(mainDiv);
-  u("#chatNick").attr("placeholder", banana.i18n("nickname"));
-  u("#chatMessage").attr("placeholder", banana.i18n("message"));
-  u("#chatSubmitBtn").attr("value", banana.i18n("send"));
-  refreshMessageList();
-  u("#chatNick").val(chatNick);
-  u("#chatNick").on("change", function (ev) {
-    chatNick = ev.target.value;
-  });
-};
-
-var refreshMessageList = function () {
-  var out = "";
-  if (!chatEventSource) {
-    out = '<div><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
-    u("#messageList").html(out);
-    return;
-  }
-  chatMessages.sort((a, b) => b.timestamp - a.timestamp);
-  chatMessages.forEach(function (msg) {
-    if (msg.removed) {
-      out +=
-        "<div><span>" +
-        hashAvatar(msg.user_hash, 20) +
-        " <i>" +
-        banana.i18n("message-removed") +
-        "</i></div>";
-    } else {
-      var div = document.createElement("div");
-      var innerHTML =
-        "<div><span>" +
-        hashAvatar(msg.user_hash, 20) +
-        " <b>" +
-        u("<span/>").text(msg.nickname).html() +
-        "</b></span>: " +
-        u("<span/>").text(msg.message).html() +
-        "</div>";
-      div.innerHTML = innerHTML;
-      twemoji.parse(div, { folder: "svg", ext: ".svg" });
-      out += div.innerHTML;
-    }
-  });
-  u("#messageList").html(out);
-};
-
 var displayOptions = function (ev) {
   ev.preventDefault();
-  chatDisplayed = false;
   if (optionDisplayed) {
     optionDisplayed = false;
     u("#sidebar").addClass("d-none").removeClass("col-12");
@@ -2106,69 +1952,6 @@ function pressProgressBar(e) {
   prevShownTime = currentTime;
 }
 
-var connectChatAttempts;
-var connectChatTimeoutMs;
-
-function resetChatConnectTimeout() {
-  connectChatAttempts = 0;
-  connectChatTimeoutMs = 100;
-}
-resetChatConnectTimeout();
-
-function bumpChatConnectTimeout() {
-  connectChatAttempts++;
-
-  if (connectChatTimeoutMs === 100 && connectChatAttempts === 20) {
-    connectChatAttempts = 0;
-    connectChatTimeoutMs = 300;
-  } else if (connectChatTimeoutMs === 300 && connectChatAttempts === 20) {
-    connectChatAttempts = 0;
-    connectChatTimeoutMs = 1000;
-  } else if (connectChatTimeoutMs === 1000 && connectChatAttempts === 20) {
-    connectChatAttempts = 0;
-    connectChatTimeoutMs = 3000;
-  }
-  if (connectChatAttempts === 0) {
-    console.debug(
-      "😅 chat connection error, retrying every " + connectChatTimeoutMs + "ms"
-    );
-  }
-}
-
-function connectToChatEvents() {
-  chatEventSource = new EventSource(window.local.chatStreamUrl, {
-    withCredentials: true,
-  });
-  // Listen for messages
-  chatEventSource.addEventListener("open", function () {
-    chatMessages = [];
-  });
-  chatEventSource.addEventListener("message", function (event) {
-    resetChatConnectTimeout();
-    const message = JSON.parse(event.data);
-    if (message.type === "ping") {
-      // pass
-    } else if (message.type === "message") {
-      chatMessages.push(message);
-      refreshMessageList();
-    } else if (message.type === "delete") {
-      chatMessages = chatMessages.map(function (msg) {
-        if (msg.uuid === message.uuid) {
-          msg.removed = true;
-        }
-        return msg;
-      });
-      refreshMessageList();
-    }
-  });
-  chatEventSource.addEventListener("error", function () {
-    chatEventSource.close();
-    chatEventSource = null;
-    bumpChatConnectTimeout();
-    setTimeout(connectToChatEvents, connectChatTimeoutMs);
-  });
-}
-
 var connectGpsAttempts;
 var connectGpsTimeoutMs;
 
@@ -2193,7 +1976,9 @@ function bumpGpsConnectTimeout() {
   }
   if (connectGpsAttempts === 0) {
     console.debug(
-      "😅 chat connection error, retrying every " + connectGpsTimeoutMs + "ms"
+      "Live GPS data stream connection error, retrying every " +
+        connectGpsTimeoutMs +
+        "ms"
     );
   }
 }

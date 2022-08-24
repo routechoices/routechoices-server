@@ -3,12 +3,10 @@ import logging
 import re
 import time
 import urllib.parse
-import uuid
 from datetime import timedelta
 
 import arrow
 import orjson as json
-import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -39,7 +37,6 @@ from routechoices.core.models import (
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
-    ChatMessage,
     Club,
     Competitor,
     Device,
@@ -54,7 +51,6 @@ from routechoices.lib.helpers import (
     escape_filename,
     initial_of_name,
     random_device_id,
-    safe64decode,
     safe64encode,
 )
 from routechoices.lib.s3 import s3_object_url
@@ -279,7 +275,6 @@ def event_detail(request, event_id):
             "club_slug": event.club.slug.lower(),
             "open_registration": event.open_registration,
             "open_route_upload": event.allow_route_upload,
-            "chat_enabled": event.allow_live_chat,
             "url": request.build_absolute_uri(event.get_absolute_url()),
             "shortcut": event.shortcut,
             "backdrop": event.backdrop_map,
@@ -342,86 +337,6 @@ def event_detail(request, event_id):
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
     return Response(output, headers=headers)
-
-
-@swagger_auto_schema(
-    method="post",
-    auto_schema=None,
-)
-@swagger_auto_schema(
-    method="delete",
-    auto_schema=None,
-)
-@api_view(["POST", "DELETE"])
-@throttle_classes(
-    [
-        PostDataThrottle,
-    ]
-)
-def event_chat(request, event_id):
-    event = get_object_or_404(
-        Event,
-        aid=event_id,
-        start_date__lte=now(),
-        allow_live_chat=True,
-    )
-
-    if request.method == "DELETE":
-        if not request.user.is_superuser:
-            if (
-                not request.user.is_authenticated
-                or not event.club.admins.filter(id=request.user.id).exists()
-            ):
-                raise PermissionDenied()
-        msg_uuid = request.data.get("uuid")
-        if not msg_uuid:
-            raise ValidationError("Missing parameter")
-        msg = ChatMessage.objects.get(
-            uuid=uuid.UUID(bytes=safe64decode(request.data.get("uuid")))
-        )
-        if msg:
-            msg.delete()
-            try:
-                requests.delete(
-                    f"http://127.0.0.1:8009/{event_id}",
-                    data=json.dumps(msg.serialize()),
-                    headers={
-                        "Authorization": f"Bearer {settings.CHAT_INTERNAL_SECRET}"
-                    },
-                )
-            except Exception:
-                pass
-        return Response({"status": "deleted"}, status=201)
-
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
-
-    if event.end_date <= now():
-        raise Http404()
-
-    nickname = request.data.get("nickname")
-    message = request.data.get("message")
-    if not nickname or not message:
-        raise ValidationError("Missing parameter")
-
-    remote_ip = request.META["REMOTE_ADDR"]
-
-    msg = ChatMessage.objects.create(
-        nickname=nickname, message=message, ip_address=remote_ip, event=event
-    )
-    try:
-        requests.post(
-            f"http://127.0.0.1:8009/{event_id}",
-            data=json.dumps(msg.serialize()),
-            headers={"Authorization": f"Bearer {settings.CHAT_INTERNAL_SECRET}"},
-        )
-    except Exception:
-        pass
-    return Response({"status": "sent"}, status=201)
 
 
 @swagger_auto_schema(

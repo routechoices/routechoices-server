@@ -74,11 +74,6 @@ urlpatterns = [
         name="event_delete_view",
     ),
     re_path(
-        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/chat-moderation/?$",
-        views.event_chat_moderation_view,
-        name="event_chat_moderation_view",
-    ),
-    re_path(
         r"^events/(?P<event_id>[A-Za-z0-9_-]+)/live/?$",
         views.event_view_live,
         name="event_view_live",

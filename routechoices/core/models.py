@@ -6,7 +6,6 @@ import math
 import os.path
 import re
 import time
-import uuid
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
@@ -874,10 +873,6 @@ class Event(models.Model):
         default=False,
         help_text="Participants can upload their routes after the event.",
     )
-    allow_live_chat = models.BooleanField(
-        default=False,
-        help_text="Spectator will have a chat enabled during the live.",
-    )
     send_interval = models.PositiveIntegerField(
         "Send interval (seconds)",
         default=5,
@@ -1540,40 +1535,6 @@ class SpotDevice(models.Model):
 
     def __str__(self):
         return self.messenger_id
-
-
-class ChatMessage(models.Model):
-    creation_date = models.DateTimeField(auto_now_add=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    ip_address = models.GenericIPAddressField()
-    event = models.ForeignKey(
-        Event, related_name="chat_messages", on_delete=models.CASCADE
-    )
-    nickname = models.CharField(max_length=20)
-    message = models.CharField(max_length=100)
-
-    class Meta:
-        ordering = ["-creation_date"]
-        verbose_name = "chat message"
-        verbose_name_plural = "chat messages"
-
-    def __str__(self):
-        return f"<{self.nickname}> in {self.event.name}: {self.message}"
-
-    def user_hash(self):
-        hash_user = hashlib.sha256()
-        hash_user.update(self.nickname.encode("utf-8"))
-        hash_user.update(self.ip_address.encode("utf-8"))
-        return safe64encode(hash_user.digest())
-
-    def serialize(self):
-        return {
-            "uuid": safe64encode(self.uuid.bytes),
-            "nickname": self.nickname,
-            "message": self.message,
-            "timestamp": self.creation_date.timestamp(),
-            "user_hash": self.user_hash(),
-        }
 
 
 class TcpDeviceCommand(models.Model):

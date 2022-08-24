@@ -29,7 +29,6 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
   updateText().then(function () {
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
     u("#export-text").text(banana.i18n("export"));
-    u("#chat-btn-text").text(banana.i18n("chat"));
     u("#loading-text").text(banana.i18n("loading-text"));
     u("#event-not-started-text").text(banana.i18n("event-not-started-text"));
     u("#club-events-link-text").text(
@@ -182,14 +181,9 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
               onPressResetMassStart();
             })
             .text(banana.i18n("mass-start"));
-          u("#chat_show_button").on("click", displayChat);
           u("#options_show_button").on("click", displayOptions);
           u("#full_progress_bar").on("click", pressProgressBar);
           u("#share_button").on("click", shareUrl);
-          if (response.event.chat_enabled) {
-            u("#chat_button_group").removeClass("d-none");
-            connectToChatEvents();
-          }
           if (endEvent > now) {
             isLiveEvent = true;
           } else {

@@ -191,8 +191,6 @@ def event_view(request, slug, **kwargs):
     resp_args = {
         "event": event,
     }
-    if event.allow_live_chat:
-        resp_args["chat_server"] = getattr(settings, "CHAT_SERVER", None)
     response = render(request, "club/event.html", resp_args)
     if event.privacy == PRIVACY_PRIVATE:
         response["Cache-Control"] = "private"

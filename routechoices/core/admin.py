@@ -10,7 +10,6 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
 from routechoices.core.models import (
-    ChatMessage,
     Club,
     Competitor,
     Device,
@@ -300,20 +299,6 @@ class MapAdmin(admin.ModelAdmin):
     list_filter = ("club",)
 
 
-class ChatMessageAdmin(admin.ModelAdmin):
-    list_display = (
-        "creation_date",
-        "event",
-        "ip_address",
-        "nickname",
-        "message",
-    )
-    list_filter = ("event",)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("event")
-
-
 class DeviceClubOwnershipAdmin(admin.ModelAdmin):
     list_display = ("device", "club", "nickname")
     list_filter = ("club",)
@@ -334,7 +319,6 @@ class TcpDeviceCommandAdmin(admin.ModelAdmin):
     autocomplete_fields = ("target",)
 
 
-admin.site.register(ChatMessage, ChatMessageAdmin)
 admin.site.register(Club, ClubAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(DeviceArchiveReference, DeviceArchiveReferenceAdmin)

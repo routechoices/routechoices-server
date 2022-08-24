@@ -23,10 +23,6 @@
     "group": "Groupe",
     "no-group": "Pas de groupes",
     "search-competitors": "Chercher les participants",
-    "chat": "Chat",
-    "message": "Message",
-    "nickname": "Nom",
-    "send": "Envoyer",
     "tails": "Trainées",
     "length-in-seconds": "Durée (Heures, Minutes, Secondes)",
     "map-controls": "Contrôles de la carte",
@@ -35,10 +31,6 @@
     "show-groupings": "Afficher les regroupments",
     "qr-link": "Lien QR code",
     "language": "Langue",
-    "error-sending-msg": "Le message n'a pas pu être envoyé!",
-    "sending": "Envoi en cours...",
-    "message-removed": "Message supprimé par un modérateur",
-    "chat-closed": "Le chat est fermé",
     "reached-max-runners": "La limite de $1 concurrents affichés a été atteinte",
     "export": "Exporter"
 }

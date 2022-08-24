@@ -23,10 +23,6 @@
   "group": "Grupo",
   "no-group": "Sin grupo",
   "search-competitors": "Buscar competidor",
-  "chat": "Chat",
-  "message": "Mensaje",
-  "nickname": "Sobrenombre",
-  "send": "Enviar",
   "tails": "Cola",
   "length-in-seconds": "Duración (Horas, Minutos, Segundos)",
   "map-controls": "Controles del mapa",
@@ -35,10 +31,6 @@
   "show-groupings": "Ver agrupaciones",
   "qr-link": "QR Link",
   "language": "Lenguaje",
-  "error-sending-msg": "¡No se pudo enviar el mensaje!",
-  "sending": "Enviando",
-  "message-removed": "Mensaje eliminado por el moderador",
-  "chat-closed": "El chat está cerrado",
   "reached-max-runners": "Se ha alcanzado el límite de $1 competidores mostrados",
   "export": "Exportar"
 }

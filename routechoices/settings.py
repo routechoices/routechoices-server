@@ -859,9 +859,6 @@ SWAGGER_SETTINGS = {
 
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
-CHAT_SERVER = "chat.routechoices.dev:8081"
-CHAT_INTERNAL_SECRET = "<change-me>"
-
 GPS_SSE_SERVER = "data.routechoices.dev:8081"
 LIVESTREAM_INTERNAL_SECRET = "<change-me>"
 
@@ -873,11 +870,9 @@ CSP_DEFAULT_SRC = (
     "'self'",
     "www.routechoices.dev:8081",
     "api.routechoices.dev:8081",
-    "chat.routechoices.dev:8081",
     "data.routechoices.dev:8081",
     "www.routechoices.com",
     "api.routechoices.com",
-    "twemoji.maxcdn.com",
     "nominatim.openstreetmap.org",
     "data:",
 )

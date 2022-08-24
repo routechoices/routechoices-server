@@ -19,10 +19,7 @@ import routechoices.lib.validators
 
 
 def create_uuid(apps, schema_editor):
-    MyModel = apps.get_model("core", "ChatMessage")
-    for row in MyModel.objects.all():
-        row.uuid = uuid.uuid4()
-        row.save(update_fields=["uuid"])
+    pass
 
 
 # Functions from the following migrations need manual copying.
