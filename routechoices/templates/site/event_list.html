@@ -38,7 +38,7 @@
 {% endif %}
 <div class="row">
   {% if live_events %}
-  <div><h2>Live</h2></div>
+  <div><h2>Live Events</h2></div>
   <div>
   {% for event in live_events %}
     <div class="card" style="margin-bottom: 15px;">
@@ -67,10 +67,7 @@
   {% endif%}
   {% if events %}
   <div style="margin-bottom: 15px;">
-    {% if club %}
-    <h2>All Events by {{ club.name }} <a href="{{club.nice_url}}feed"><i class="fa fa-rss"></i></a></h2>
-    {% else %}<h2>All Events <a href="{% url 'site:events_feed' %}"><i class="fa fa-rss"></i></a></h2>
-    {% endif %}
+    <h2>Archived Events</h2>
     {% if years %}
       {% if club %}
         {% if years %}
@@ -110,15 +107,16 @@
             </div>
         </div>
     </div>
-  {% empty %}
+  {% endfor %}
+  {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
+  </div>
+  {% if not live_events and not events %}
     <div class="card">
       <div class="card-body">
         <h2 style="color: #888">No public events yet...</h2>
       </div>
     </div>
-  {% endfor %}
-  </div>
-  {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
+  {% endif %}
 </div>
 {% endblock %}
 

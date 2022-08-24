@@ -57,6 +57,7 @@ def club_view(request, **kwargs):
         "club"
     )
     live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
+    event_list = event_list.filter(end_date__lt=now())
     years = list(
         event_list.annotate(year=ExtractYear("start_date"))
         .values_list("year", flat=True)
