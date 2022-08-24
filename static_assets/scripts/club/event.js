@@ -193,8 +193,9 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
           liveUrl = response.data;
           sendInterval = response.event.send_interval;
           tailLength = response.event.tail_length;
+          prevMapsJSONData = JSON.stringify(response.maps);
           if (response.maps.length) {
-            var MapLayers = {};
+            var mapChoices = {};
             for (var i = 0; i < response.maps.length; i++) {
               var m = response.maps[i];
               if (m.default) {
@@ -210,8 +211,8 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                addRasterMap(bounds, m.hash, true);
-                MapLayers[m.title] = rasterMap;
+                rasterMap = addRasterMap(bounds, m.hash, true, 0, m);
+                mapChoices[m.title] = rasterMap;
               } else {
                 var bounds = [
                   [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
@@ -222,24 +223,26 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                MapLayers[m.title] = L.tileLayer.wms(
+                mapChoices[m.title] = L.tileLayer.wms(
                   window.local.wmsServiceUrl + "?v=" + m.hash,
                   {
                     layers: window.local.eventId + "/" + i,
                     bounds: bounds,
                     tileSize: 512,
                     noWrap: true,
+                    data: m,
                   }
                 );
               }
             }
             if (response.maps.length > 1) {
-              L.control
-                .layers(MapLayers, null, { collapsed: false })
-                .addTo(map);
+              mapSelectorLayer = L.control.layers(mapChoices, null, {
+                collapsed: false,
+              });
+              mapSelectorLayer.addTo(map);
               map.on("baselayerchange", function (e) {
-                console.log(e);
                 map.fitBounds(e.layer.options.bounds);
+                rasterMap = e.layer;
               });
             }
           } else {

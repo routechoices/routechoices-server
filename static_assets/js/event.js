@@ -188,14 +188,14 @@ var isCustomStart = false;
 var competitorList = [];
 var competitorRoutes = {};
 var routesLastFetched = -Infinity;
-var noticeLastFetched = -Infinity;
+var eventDataLastFetch = -Infinity;
 var fetchPositionInterval = 10;
 var playbackRate = 16;
 var playbackPaused = true;
 var prevDisplayRefresh = 0;
 var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
-var isCurrentlyFetchingNotice = false;
+var isFetchingEventData = false;
 var currentTime = 0;
 var lastDataTs = 0;
 var lastNbPoints = 0;
@@ -204,7 +204,6 @@ var mapHash = "";
 var mapUrl = null;
 var rasterMap = null;
 var searchText = null;
-var noticeUrl = null;
 var prevNotice = new Date(0);
 var resetMassStartContextMenuItem = null;
 var setMassStartContextMenuItem = null;
@@ -237,6 +236,8 @@ var maxParticipantsDisplayed = 300;
 var nbShown = 0;
 var refreshInterval = 100;
 var smoothFactor = 1;
+var prevMapsJSONData = null;
+var mapSelectorLayer = null;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -416,10 +417,10 @@ var selectLiveMode = function (e) {
       }
     }
     if (
-      performance.now() - noticeLastFetched > 30 * 1e3 &&
-      !isCurrentlyFetchingNotice
+      performance.now() - eventDataLastFetch > 30 * 1e3 &&
+      !isFetchingEventData
     ) {
-      fetchNotice();
+      refreshEventData();
     }
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
@@ -475,10 +476,10 @@ var selectReplayMode = function (e) {
     }
     if (
       isLiveEvent &&
-      performance.now() - noticeLastFetched > 30 * 1e3 &&
-      !isCurrentlyFetchingNotice
+      performance.now() - eventDataLastFetch > 30 * 1e3 &&
+      !isFetchingEventData
     ) {
-      fetchNotice();
+      refreshEventData();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
 
@@ -562,22 +563,92 @@ var fetchCompetitorRoutes = function (url) {
   });
 };
 
-var fetchNotice = function () {
-  isCurrentlyFetchingNotice = true;
+var refreshEventData = function () {
+  isFetchingEventData = true;
   reqwest({
     url: window.local.eventUrl,
     withCredentials: true,
     crossOrigin: true,
     type: "json",
     success: function (response) {
-      noticeLastFetched = performance.now();
-      isCurrentlyFetchingNotice = false;
+      eventDataLastFetch = performance.now();
+      isFetchingEventData = false;
       if (response.announcement && response.announcement != prevNotice) {
         prevNotice = response.announcement;
         u("#alert-text").text(prevNotice);
         u(".page-alert").show();
-      } else {
-        isCurrentlyFetchingNotice = false;
+      }
+      if (JSON.stringify(response.maps) !== prevMapsJSONData) {
+        prevMapsJSONData = JSON.stringify(response.maps);
+        var currentMapNewData = response.maps.find(function (m) {
+          return (
+            m.id === rasterMap.options.data.id &&
+            m.modification_date !== rasterMap.options.data.modification_date
+          );
+        });
+        var currentMapStillExists = response.maps.find(function (m) {
+          return m.id === rasterMap.options.data.id;
+        });
+        if (currentMapNewData) {
+          rasterMap.remove();
+        }
+        mapSelectorLayer.remove();
+        if (response.maps.length) {
+          var mapChoices = {};
+          for (var i = 0; i < response.maps.length; i++) {
+            var m = response.maps[i];
+            if (
+              (currentMapStillExists && m.id === currentMapStillExists.id) ||
+              (!currentMapStillExists && m.default)
+            ) {
+              m.title =
+                !m.title && m.default
+                  ? '<i class="fa fa-star"></i> Main Map'
+                  : u("<span/>").text(m.title).html();
+              var bounds = [
+                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
+                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
+                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
+                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
+              ];
+              rasterMap = addRasterMap(
+                bounds,
+                m.hash,
+                !currentMapNewData,
+                i,
+                m
+              );
+              mapChoices[m.title] = rasterMap;
+            } else {
+              m.title =
+                !m.title && m.default
+                  ? '<i class="fa fa-star"></i> Main Map'
+                  : u("<span/>").text(m.title).html();
+              var bounds = [
+                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
+                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
+                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
+                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
+              ];
+              mapChoices[m.title] = L.tileLayer.wms(
+                window.local.wmsServiceUrl + "?v=" + m.hash,
+                {
+                  layers: window.local.eventId + "/" + i,
+                  bounds: bounds,
+                  tileSize: 512,
+                  noWrap: true,
+                  data: m,
+                }
+              );
+            }
+          }
+          if (response.maps.length > 1) {
+            mapSelectorLayer = L.control.layers(mapChoices, null, {
+              collapsed: false,
+            });
+            mapSelectorLayer.addTo(map);
+          }
+        }
       }
     },
   });
@@ -1852,21 +1923,22 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(bounds, hash, fit) {
+function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
   if (fit === undefined) {
     fit = false;
   }
-  rasterMap = L.tileLayer
-    .wms(window.local.wmsServiceUrl + "?v=" + hash, {
-      layers: window.local.eventId,
-      bounds: bounds,
-      tileSize: 512,
-      noWrap: true,
-    })
-    .addTo(map);
+  var _rasterMap = L.tileLayer.wms(window.local.wmsServiceUrl + "?v=" + hash, {
+    layers: window.local.eventId + (idx ? "/" + idx : ""),
+    bounds: bounds,
+    tileSize: 512,
+    noWrap: true,
+    data: data,
+  });
+  _rasterMap.addTo(map);
   if (fit) {
     map.fitBounds(bounds);
   }
+  return _rasterMap;
 }
 
 function centerMap(e) {

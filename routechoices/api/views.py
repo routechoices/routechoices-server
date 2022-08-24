@@ -241,8 +241,9 @@ def event_list(request):
                             "url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
                             "title": "",
                             "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
-                            "last_mod": "2019-06-10T17:21:52.417000Z",
+                            "modification_date": "2019-06-10T17:21:52.417000Z",
                             "default": True,
+                            "id": "or6tmT19cfk",
                         }
                     ],
                 }
@@ -312,8 +313,9 @@ def event_detail(request, event_id):
                         )
                     ),
                     "hash": event.map.hash,
-                    "last_mod": event.map.modification_date,
+                    "modification_date": event.map.modification_date,
                     "default": True,
+                    "id": event.map.aid,
                 }
             )
         for i, m in enumerate(event.map_assignations.all().select_related("map")):
@@ -329,8 +331,9 @@ def event_detail(request, event_id):
                         )
                     ),
                     "hash": m.map.hash,
-                    "last_mod": m.map.modification_date,
+                    "modification_date": m.map.modification_date,
                     "default": False,
+                    "id": m.map.aid,
                 }
             )
     headers = None

@@ -2,7 +2,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   "//www.routechoices.com/static/vendor/pdfjs-2.7.570/pdf.worker.min.js";
 
 var onPDF = function (ev, filename) {
-  console.log(ev.target.result);
   var loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(ev.target.result),
   });
