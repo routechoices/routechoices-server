@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="description",
             field=models.TextField(
                 blank=True,
-                default="## Live GPS Tracking \n\nFollow our events live or replay them later.\n\n*This website is powered by Routechoices.com*",
+                default="## Live GPS Tracking\n\nFollow our events live or replay them later.\n\n*This website is powered by Routechoices.com*",
                 help_text="This text will be displayed on the club site frontpage, use markdown formatting",
             ),
         ),
