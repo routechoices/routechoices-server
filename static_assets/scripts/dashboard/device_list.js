@@ -16,8 +16,8 @@
     navigator.clipboard.writeText($el.data("value"));
   });
   u(".edit-nick-btn").on("click", function (ev) {
-    var nick = u(ev.target).attr("data-nick");
-    var devId = u(ev.target).attr("data-dev-id");
+    var nick = u(this).attr("data-nick");
+    var devId = u(this).attr("data-dev-id");
     swal(
       {
         title: "New nickname",

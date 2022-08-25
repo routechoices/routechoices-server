@@ -13,18 +13,17 @@
         {% else %}
         <div style="margin-bottom:15px"><a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Add new device</a></div>
         {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
-        <table class="table table-striped">
-            <tr><th>Device ID</th><th>Nickname</th><th>Last Date Seen</th><th>Position</th><th>Battery %</th><th>Last Used By</th><th>Action</th></tr>
+        <table class="table table-striped" style="vertical-align: middle;">
+            <tr><th>Device ID</th><th>Nickname</th><th>Last Seen</th><th>Battery %</th><th>Last Used By</th><th></th></tr>
             {% for device_ownership in devices %}
             {% with device=device_ownership.device %}
             <tr>
-              <td><button class="btn btn-sm copy-btn btn-dark" data-value="{{ device.aid }}">{{ device.aid }} <i class="fa fa-copy"></i></button></td>
-              <td>{% if device_ownership.nickname %}{{ device_ownership.nickname }}{% else %}-{% endif %}</td>
-              <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_position_date|date:"c"}}">{{device.last_position_date|date:'Y-m-d H:i:s'}} UTC</span>{% else %}-{% endif %}</td>
-              <td>{% if device.last_location %}{{ device.last_position.0 }}, {{ device.last_position.1 }} <a class="btn btn-sm" target="_blank" rel="noopener noreferrer" href="http://www.openstreetmap.org/?mlat={{ device.last_position.0 }}&mlon={{ device.last_position.1 }}"><i class="fa fa-external-link"></i></a>{% else %}-{% endif %}</td>
+              <td><button class="btn btn-sm copy-btn btn-dark" data-value="{{ device.aid }}" style="white-space: nowrap;">{{ device.aid }} <i class="fa fa-copy"></i></button></td>
+              <td><button class="btn btn-sm edit-nick-btn float-end" data-nick="{{ device_ownership.nickname }}" data-dev-id="{{ device.aid }}"><i class="fa fa-edit"></i></button>{% if device_ownership.nickname %}{{ device_ownership.nickname }}{% else %}-{% endif %}</td>
+              <td>{% if device.last_location %}<span class="date-utc" data-date="{{device.last_position_date|date:"c"}}" style="white-space: nowrap;">{{device.last_position_date|date:'Y-m-d H:i:s'}} UTC</span><br/><a class="btn btn-sm btn-success" target="_blank" rel="noopener noreferrer" href="http://www.openstreetmap.org/?mlat={{ device.last_position.0 }}&mlon={{ device.last_position.1 }}" style="white-space: nowrap;">{{ device.last_position.0 }}, {{ device.last_position.1 }} <i class="fa-solid fa-map-location-dot"></i></a>{% else %}-{% endif %}</td>
               <td>{% if device.battery_level %}{{ device.battery_level }}% <i class="fa fa-battery-{{ device.battery_level_0_4 }}" style="color: {% if device.battery_level_0_4 == 0 %}red{% elif device.battery_level_0_4 == 1 %}orange{% elif device.battery_level_0_4 == 2 %}#EFCC00{% else %}green{% endif%}"></i>{% else %}-{% endif %}</td>
               <td>{% if last_usage|hash:device.id %}{{ last_usage|hash:device.id }}{% else %}-{% endif %}</td>
-              <td><button class="btn-primary btn edit-nick-btn" data-nick="{{ device_ownership.nickname }}" data-dev-id="{{ device.aid }}"><i class="fa fa-edit"></i> Edit Nickname</button> <button class="btn btn-danger remove-btn" data-dev-id="{{ device.aid }}"><i class="fa fa-times"></i> Remove</button></td>
+              <td><button class="btn btn-danger remove-btn" data-dev-id="{{ device.aid }}"><i class="fa fa-trash"></i></button></td>
             </tr>
             {% endwith %}
             {% endfor %}
