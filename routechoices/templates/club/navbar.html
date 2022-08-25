@@ -14,7 +14,7 @@
     <span class="navbar-brand site-name" style="display:inline-block;"><img src="{{club.logo_url}}" alt="club logo" height="40"></span>
     {% elif club.website %}
     <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa fa-house-chimney fa-2x"></i></a></span>
-    {% elif club %}
+    {% else %}
     <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{% static 'img/logo.png' %}" alt="logo" height="40"></span></a>
     {% endif %}
     {% if club %}
