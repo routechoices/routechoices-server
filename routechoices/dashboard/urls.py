@@ -15,18 +15,14 @@ urlpatterns = [
         views.check_calibration_view,
         name="check_calibration_view",
     ),
-    re_path(r"^devices/?$", views.device_list_view, name="device_list_view"),
-    re_path(r"^devices/add/?$", views.device_add_view, name="device_add_view"),
-    re_path(r"^select-club/?$", views.club_select_view, name="club_select_view"),
-    re_path(r"^new-club/?$", views.club_create_view, name="club_create_view"),
+    re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(
-        r"^club/set/(?P<club_id>[A-Za-z0-9_-]+)/$",
+        r"^club/(?P<club_id>[A-Za-z0-9_-]+)/$",
         views.club_set_view,
         name="club_set_view",
     ),
-    re_path(r"^club/$", views.club_view, name="club_view"),
     re_path(
-        r"^club/send-invite/$", views.club_invite_add_view, name="club_invite_add_view"
+        r"^club/send-invite/?$", views.club_invite_add_view, name="club_invite_add_view"
     ),
     re_path(
         r"^club/custom-domain/?$",
@@ -38,6 +34,10 @@ urlpatterns = [
         views.club_delete_view,
         name="club_delete_view",
     ),
+    re_path(r"^clubs/?$", views.club_select_view, name="club_select_view"),
+    re_path(r"^clubs/new/?$", views.club_create_view, name="club_create_view"),
+    re_path(r"^devices/?$", views.device_list_view, name="device_list_view"),
+    re_path(r"^devices/new/?$", views.device_add_view, name="device_add_view"),
     re_path(r"^maps/?$", views.map_list_view, name="map_list_view"),
     re_path(r"^maps/new/?$", views.map_create_view, name="map_create_view"),
     re_path(

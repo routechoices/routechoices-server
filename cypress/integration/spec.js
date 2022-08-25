@@ -14,7 +14,7 @@ context("Cypress tests", () => {
 
   it("Create an Event", function () {
     cy.login();
-    cy.url().should("match", /\/dashboard\/select-club$/);
+    cy.url().should("match", /\/dashboard\/clubs$/);
 
     // Create club
     cy.createClub();
