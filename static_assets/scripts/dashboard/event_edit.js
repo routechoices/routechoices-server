@@ -277,4 +277,19 @@ function showLocalTime(el) {
       u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
     });
+
+  u('[for="id_start_date"]').after(
+    '<button id="set_start_date_now_btn" class="btn btn-success btn-small" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
+  );
+  u('[for="id_end_date"]').after(
+    '<button id="set_end_date_now_btn" class="btn btn-success btn-small" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
+  );
+  u("#set_start_date_now_btn").on("click", function (e) {
+    e.preventDefault();
+    u("#id_start_date").val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+  });
+  u("#set_end_date_now_btn").on("click", function (e) {
+    e.preventDefault();
+    u("#id_end_date").val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+  });
 })();
