@@ -389,7 +389,7 @@ def club_delete_view(request):
         if not request.user.check_password(password):
             messages.error(request, "Invalid password")
             return redirect("dashboard:club_delete_view")
-        # club.delete()
+        club.delete()
         messages.success(request, "Club deleted")
         return redirect("dashboard:club_select_view")
     return render(

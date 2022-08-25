@@ -271,6 +271,7 @@ Follow our events live or replay them later.
 
 @receiver(pre_delete, sender=Club, dispatch_uid="club_delete_signal")
 def delete_club_receiver(sender, instance, using, **kwargs):
+    instance.delete_analytics_domain()
     if instance.domain:
         delete_domain(instance.domain)
 
