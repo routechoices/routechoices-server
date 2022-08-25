@@ -165,11 +165,19 @@ def event_view(request, slug, **kwargs):
     club_slug = request.club_slug
     if not club_slug:
         club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club").prefetch_related("competitors"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .prefetch_related("competitors")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
     # If event is private, page needs to send ajax with cookies to prove identity, cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
@@ -205,12 +213,27 @@ def event_export_view(request, slug, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club").prefetch_related("competitors"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
-        start_date__lt=now(),
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .prefetch_related("competitors")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
+    if event.start_date > now():
+        return render(
+            request,
+            "club/event_export_closed.html",
+            {
+                "event": event,
+            },
+        )
     # If event is private, page needs to be sent with cookies to prove identity, cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
@@ -250,11 +273,18 @@ def event_map_view(request, slug, index="0", **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/map/{index}")
     return redirect(
@@ -273,11 +303,18 @@ def event_kmz_view(request, slug, index="0", **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/kmz/{index}")
     return redirect(
@@ -296,13 +333,19 @@ def event_registration_view(request, slug, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
-        open_registration=True,
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
-    if event.end_date < now():
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
+    if event.end_date < now() or not event.open_registration:
         return render(
             request,
             "club/event_registration_closed.html",
@@ -347,13 +390,26 @@ def event_route_upload_view(request, slug, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    event = get_object_or_404(
-        Event.objects.all().select_related("club"),
-        club__slug__iexact=club_slug,
-        slug__iexact=slug,
-        allow_route_upload=True,
-        start_date__lte=now(),
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
     )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event.html", {"club": club}, status=404)
+    if event.start_date > now() or not event.allow_route_upload:
+        return render(
+            request,
+            "club/event_route_upload_closed.html",
+            {
+                "event": event,
+            },
+        )
     if request.method == "POST":
         form = UploadGPXForm(request.POST, request.FILES, event=event)
         # check whether it's valid:

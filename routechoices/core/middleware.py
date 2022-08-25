@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import get_urlconf, set_urlconf
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
@@ -143,17 +143,26 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if ":" in raw_host:
             raw_host = raw_host[: raw_host.rfind(":")]
         request.use_cname = False
+        if raw_host == default_domain:
+            return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
         if not raw_host.endswith(default_domain) and raw_host not in (
             "localhost",
             "127.0.0.1",
         ):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
-                return HttpResponse(status=204)
+                return HttpResponse(status=444)
             raw_host = f"{club.slug.lower()}.{default_domain}"
             request.use_cname = True
-        if raw_host == default_domain:
-            return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
+        elif raw_host.endswith(f".{default_domain}"):
+            slug = raw_host[: -(len(default_domain) + 1)]
+            if slug not in ("www", "api", "wms"):
+                club_exists = Club.objects.filter(slug=slug).exists()
+                if not club_exists:
+                    request.club_slug = True
+                    if request.path != "/":
+                        return render(request, "404.html", status=404)
+                    return render(request, "club/404.html", status=404)
         host, kwargs = self.get_host(raw_host)
         # This is the main part of this middleware
         request.urlconf = host.urlconf
@@ -191,7 +200,7 @@ class HostsResponseMiddleware(HostsBaseMiddleware):
         ):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
-                return HttpResponse(status=204)
+                return HttpResponse(status=444)
             raw_host = f"{club.slug.lower()}.{default_domain}"
             request.use_cname = True
         host, kwargs = self.get_host(raw_host)

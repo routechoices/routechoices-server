@@ -1,0 +1,10 @@
+{% extends "club/base.html" %}
+{% load hosts %}
+
+{% block content %}
+    <div style="text-align: center">
+        <h3>Club not found...</h3>
+        <p>Join {{ site.name }} and start using this domain for the GPS tracking events of your club.</p>
+        <a href="{% host_url 'root_account_signup' host 'www'%}" class="btn btn-success">Join</a> or <a href="{% host_url 'root_account_login' host 'www' %}">Login</a>
+    </div>
+{% endblock %}

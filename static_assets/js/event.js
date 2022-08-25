@@ -985,13 +985,13 @@ var displayOptions = function (ev) {
         '<div class="row g-3">' +
         '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
         Math.floor(tailLength / 3600) +
-        '"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
+        '" style="width:100px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
         '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
         (Math.floor(tailLength / 60) % 60) +
-        '"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
+        '" style="width:70px"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
         '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
         (tailLength % 60) +
-        '"/></div>' +
+        '"style="width:70px" /></div>' +
         "</div>" +
         "</div>" +
         "<h4>" +
