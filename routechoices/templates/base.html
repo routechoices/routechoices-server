@@ -62,7 +62,7 @@
     {% endblock %}
     <script src='https://js.sentry-cdn.com/90a1a7dd37134928b5a981eeb3a20293.min.js' crossorigin="anonymous" data-lazy="no"></script>
     {% if enable_analytics %}
-    <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://analytics.routechoices.com/api/event" src="{% static '/scripts/analytics.js' %}?v=2022072800"></script>
+    <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/analytics.js' %}?v=20220825"></script>
     {% endif %}
     {% compress js %}
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
