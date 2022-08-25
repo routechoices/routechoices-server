@@ -279,10 +279,10 @@ function showLocalTime(el) {
     });
 
   u('[for="id_start_date"]').after(
-    '<button id="set_start_date_now_btn" class="btn btn-success btn-small" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
+    '<button id="set_start_date_now_btn" class="btn btn-success btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
   );
   u('[for="id_end_date"]').after(
-    '<button id="set_end_date_now_btn" class="btn btn-success btn-small" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
+    '<button id="set_end_date_now_btn" class="btn btn-success btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
   );
   u("#set_start_date_now_btn").on("click", function (e) {
     e.preventDefault();
