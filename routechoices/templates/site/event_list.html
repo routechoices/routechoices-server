@@ -13,12 +13,12 @@
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <link rel="shortcut icon" href="{% static 'favicon.ico' %}">{% endif %}{% endblock %}
 
-{% block head_title %}Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
+{% block head_title %}GPS Tracking of Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
 {% block head_description %}List of public events{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}{% endblock %}
 
 {% block extra_head %}
-<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} Event Feed{% else %}Event Feed{% endif%}" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
-<meta property="og:title" content="Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}" />
+<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} {% else %}{% endif%}GPS Tracking Event Feed" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
+<meta property="og:title" content="GPS Tracking of Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}" />
 <meta property="og:description" content="List of public events{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
