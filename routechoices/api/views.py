@@ -897,18 +897,23 @@ def ip_latlon(request):
             ),
             "latitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations latitudes (in degrees) separated by commas",
+                description="List of locations latitudes (in degrees) separated by commas",
                 example="60.12345,60.12346,60.12347",
             ),
             "longitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations longitudes (in degrees) separated by commas",
+                description="List of locations longitudes (in degrees) separated by commas",
                 example="20.12345,20.12346,20.12347",
             ),
             "timestamps": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations timestamps (UNIX epoch in seconds) separated by commas",
+                description="List of locations timestamps (UNIX epoch in seconds) separated by commas",
                 example="1661489045,1661489046,1661489047",
+            ),
+            "battery": openapi.Schema(
+                type=openapi.TYPE_INTEGER,
+                description="Battery load percentage value",
+                example="85",
             ),
         },
         required=["device_id", "latitudes", "longitudes", "timestamps"],
@@ -934,7 +939,7 @@ def ip_latlon(request):
 @throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
     secret_provided = request.data.get("secret")
-    battery_level = request.data.get("battery")
+    battery_level_posted = request.data.get("battery")
     device_id = request.data.get("device_id")
     if not device_id:
         raise ValidationError("Missing device_id parameter")
@@ -977,22 +982,26 @@ def locations_api_gw(request):
             except DjangoValidationError:
                 raise ValidationError("Invalid latitude value")
             loc_array.append((tim, lat, lon))
-    if battery_level:
+
+    if battery_level_posted:
         try:
-            battery_level = int(battery_level)
+            battery_level = int(battery_level_posted)
         except Exception:
-            battery_level = None
+            pass
+            # raise ValidationError("Invalid battery_level value type")
         else:
             if battery_level < 0 or battery_level > 100:
-                battery_level = None
-    else:
-        battery_level = None
-    device.battery_level = battery_level
+                # raise ValidationError("battery_level value not in 0-100 range")
+                pass
+            else:
+                device.battery_level = battery_level
+
     if len(loc_array) > 0:
         device.add_locations(loc_array, save=False)
     device.save()
     return Response(
-        {"status": "ok", "locations_count": len(loc_array), "device_id": device.aid}
+        {"status": "ok", "locations_count": len(loc_array), "device_id": device.aid},
+        status=status.HTTP_201_CREATED,
     )
 
 
