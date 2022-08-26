@@ -265,7 +265,7 @@ class LocationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 2)
         # Add more location
@@ -280,7 +280,7 @@ class LocationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 4)
         # post same location again
@@ -295,7 +295,7 @@ class LocationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 4)
         dev = Device.objects.get(aid=dev_id)
@@ -413,7 +413,7 @@ class LocationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data.get("device_id"), dev_id)
         self.assertEqual(res.data.get("locations_count"), 2)
 
@@ -433,7 +433,7 @@ class LocationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_locations_api_gw_no_device(self):
         t = time.time()
