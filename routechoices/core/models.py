@@ -160,7 +160,7 @@ Follow our events live or replay them later.
         upload_to=logo_upload_path,
         null=True,
         blank=True,
-        help_text="Square image of width greater or equal to 128px",
+        help_text="Image of size greater or equal than 128x128 pixels",
         storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
     analytics_site = models.URLField(max_length=256, blank=True)
@@ -878,7 +878,7 @@ class Event(models.Model):
     )
     allow_route_upload = models.BooleanField(
         default=False,
-        help_text="Participants can upload their routes after the event.",
+        help_text="Participants can add their GPS trace from a file after the event.",
     )
     send_interval = models.PositiveIntegerField(
         "Send interval (seconds)",

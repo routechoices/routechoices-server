@@ -582,12 +582,12 @@ var refreshEventData = function () {
         prevMapsJSONData = JSON.stringify(response.maps);
         var currentMapNewData = response.maps.find(function (m) {
           return (
-            m.id === rasterMap.options.data.id &&
-            m.modification_date !== rasterMap.options.data.modification_date
+            m.id === rasterMap.data.id &&
+            m.modification_date !== rasterMap.data.modification_date
           );
         });
         var currentMapStillExists = response.maps.find(function (m) {
-          return m.id === rasterMap.options.data.id;
+          return m.id === rasterMap.data.id;
         });
         if (currentMapNewData) {
           rasterMap.remove();
@@ -637,9 +637,9 @@ var refreshEventData = function () {
                   bounds: bounds,
                   tileSize: 512,
                   noWrap: true,
-                  data: m,
                 }
               );
+              mapChoices[m.title].data = m;
             }
           }
           if (response.maps.length > 1) {
@@ -1932,8 +1932,8 @@ function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
     bounds: bounds,
     tileSize: 512,
     noWrap: true,
-    data: data,
   });
+  _rasterMap.data = data;
   _rasterMap.addTo(map);
   if (fit) {
     map.fitBounds(bounds);
@@ -2103,7 +2103,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?2022072801`)
+  return fetch(`${langFile}?v=2022082600`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

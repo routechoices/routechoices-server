@@ -839,7 +839,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 OAUTH2_PROVIDER = {
     # this is the list of available scopes
-    "SCOPES": {"full": "Read and Write data"}
+    "SCOPES": {"all": "Read and Write data"}
 }
 
 SWAGGER_SETTINGS = {

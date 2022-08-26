@@ -104,6 +104,7 @@ workflows:
           requires:
             - build-and-test
           filters:
+            tags:
+              only: /v.*/
             branches:
-              only:
-                - master
+              ignore: /.*/

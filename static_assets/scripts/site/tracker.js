@@ -5,7 +5,7 @@
     e.preventDefault();
     u("#imeiRes").text(u("#IMEI").val());
     reqwest({
-      url: "/api/imei/",
+      url: "/api/device/",
       method: "post",
       data: {
         imei: u("#IMEI").val(),

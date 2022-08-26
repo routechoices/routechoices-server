@@ -24,8 +24,8 @@ schema_view = get_schema_view(
 urlpatterns = [
     re_path(r"^oauth2/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     re_path(r"^$", schema_view.with_ui("redoc", cache_timeout=0), name="api_doc"),
-    re_path(r"^device_id/?$", views.get_device_id, name="device_id_api"),
-    re_path(r"^imei/?$", views.get_device_for_imei, name="device_imei_api"),
+    re_path(r"^device_id/?$", views.get_device_id, name="device_id_api"),  # deprecated
+    re_path(r"^device/?$", views.create_device_id, name="device_api"),
     re_path(r"^locations/?$", views.locations_api_gw, name="locations_api_gw"),
     re_path(r"^time/?$", views.get_time, name="time_api"),
     re_path(r"^search/device/?$", views.device_search, name="device_search_api"),
@@ -62,14 +62,14 @@ urlpatterns = [
         name="event_register",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/upload-route/?$",
-        views.event_upload_route,
-        name="event_upload_route",
+        r"^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$",
+        views.competitor_api,
+        name="competitor_api",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$",
-        views.event_delete_competitor,
-        name="event_delete_competitor",
+        r"competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/route/?$",
+        views.competitor_route_upload,
+        name="competitor_route_upload",
     ),
     re_path(
         r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$",

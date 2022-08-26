@@ -24,6 +24,9 @@ from routechoices.core.models import (
 class EssentialApiBase(APITestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(
+            "alice", "alice@example.com", "pa$$word123"
+        )
 
     def reverse_and_check(self, path, expected, host="api"):
         url = reverse(path, host=host)
@@ -50,45 +53,64 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(t1 < res.data.get("time") < t2)
 
-    def test_get_device_id(self):
+    def test_get_device_id_legacy(self):
         url = self.reverse_and_check("device_id_api", "/device_id")
         res = self.client.post(url, SERVER_NAME="api.localhost:8000")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data.get("device_id")) == 8)
         self.assertTrue(res.data.get("device_id") != self.get_device_id())
 
+    def test_create_device_id(self):
+        url = self.reverse_and_check("device_api", "/device")
+        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_login(self.user)
+        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        dev_id = res.data.get("device_id")
+        self.assertTrue(dev_id.isdigit())
+        self.assertEqual(len(dev_id), 8)
+        self.assertTrue(dev_id != self.get_device_id())
+
 
 @override_settings(PARENT_HOST="localhost:8000")
 class ImeiApiTestCase(EssentialApiBase):
-    def test_get_imei_no_data(self):
-        url = self.reverse_and_check("device_imei_api", "/imei")
-        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+    def setUp(self):
+        super().setUp()
+        self.url = self.reverse_and_check("device_api", "/device")
 
     def test_get_imei_invalid(self):
-        url = self.reverse_and_check("device_imei_api", "/imei")
-        res = self.client.post(url, {"imei": "abcd"}, SERVER_NAME="api.localhost:8000")
+        res = self.client.post(
+            self.url, {"imei": "abcd"}, SERVER_NAME="api.localhost:8000"
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_imei_valid(self):
-        url = self.reverse_and_check("device_imei_api", "/imei")
         res = self.client.post(
-            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         dev_id = res.data.get("device_id")
         self.assertTrue(dev_id.isdigit())
         self.assertEqual(len(dev_id), 8)
         self.assertNotEqual(dev_id, self.get_device_id())
+
+        # request with same imei
+        res = self.client.post(
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(dev_id, res.data.get("device_id"))
 
         # test device with alpha character get new id with only digits
         device = Device.objects.get(aid=dev_id)
         device.aid = "1234abcd"
         device.save()
         res = self.client.post(
-            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         new_dev_id = res.data.get("device_id")
         self.assertNotEqual(new_dev_id, "1234abcd")
         self.assertTrue(dev_id.isdigit())
@@ -110,7 +132,7 @@ class ImeiApiTestCase(EssentialApiBase):
         device.aid = "1234abcd"
         device.save()
         res = self.client.post(
-            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         new_dev_id = res.data.get("device_id")
@@ -120,9 +142,9 @@ class ImeiApiTestCase(EssentialApiBase):
         event.end_date = arrow.get().shift(seconds=-1).datetime
         event.save()
         res = self.client.post(
-            url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
         )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         new_dev_id = res.data.get("device_id")
         self.assertNotEqual(new_dev_id, "1234abcd")
         self.assertTrue(dev_id.isdigit())
@@ -225,12 +247,15 @@ class MapApiTestCase(EssentialApiBase):
 
 @override_settings(PARENT_HOST="localhost:8000")
 class LocationApiTestCase(EssentialApiBase):
+    def setUp(self):
+        super().setUp()
+        self.url = self.reverse_and_check("locations_api_gw", "/locations")
+
     def test_locations_api_gw_valid(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
@@ -243,8 +268,9 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 2)
+        # Add more location
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.3,1.4",
@@ -257,8 +283,9 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
         self.assertEqual(nb_points, 4)
+        # post same location again
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.3,1.4",
@@ -278,11 +305,10 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(nb_points, 4)
 
     def test_locations_api_gw_invalid_cast(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
@@ -298,11 +324,10 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertIn("Invalid data format", errors[0])
 
     def test_locations_api_gw_invalid_lon(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
@@ -318,11 +343,10 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertIn("Invalid longitude value", errors[0])
 
     def test_locations_api_gw_invalid_lat(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,100",
@@ -338,11 +362,10 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertIn("Invalid latitude value", errors[0])
 
     def test_locations_api_gw_invalid_length(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
@@ -361,11 +384,10 @@ class LocationApiTestCase(EssentialApiBase):
         )
 
     def test_locations_api_gw_bad_secret(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         dev_id = self.get_device_id()
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": dev_id,
                 "latitudes": "1.1,1.2",
@@ -377,12 +399,31 @@ class LocationApiTestCase(EssentialApiBase):
         )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_locations_api_gw_no_secret_but_logged_in(self):
+        self.client.force_login(self.user)
+        dev_id = self.get_device_id()
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "device_id": dev_id,
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data.get("device_id"), dev_id)
+        self.assertEqual(res.data.get("locations_count"), 2)
+
     def test_locations_api_gw_old_dev_id_valid(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
+        # Original app didnt require any authentication to post location
+        # The device id included alphabetical characters
         d = Device.objects.create(aid="abcd1234")
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": d.aid,
                 "latitudes": "1.1,1.2",
@@ -395,10 +436,9 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_locations_api_gw_no_device(self):
-        url = self.reverse_and_check("locations_api_gw", "/locations")
         t = time.time()
         res = self.client.post(
-            url,
+            self.url,
             {
                 "device_id": "doesnotexist",
                 "latitudes": "1.1,1.2",
@@ -418,9 +458,8 @@ class LocationApiTestCase(EssentialApiBase):
 class RegistrationApiTestCase(EssentialApiBase):
     def test_registration(self):
         device_id = self.get_device_id()
-        user = User.objects.create_user("alice", "alice@example.com", "pa$$word123")
         club = Club.objects.create(name="Test club", slug="club")
-        club.admins.set([user])
+        club.admins.set([self.user])
         event = Event.objects.create(
             club=club,
             name="Test event",
@@ -454,7 +493,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertIn("Competitor with same name already registered", errors[0])
+        self.assertIn("Name already in use in this event", errors[0])
         # short_name exists
         res = self.client.post(
             url,
@@ -469,7 +508,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertIn("Competitor with same short name already registered", errors[0])
+        self.assertIn("Shortname already in use in this event", errors[0])
         # bad start_time
         res = self.client.post(
             url,
@@ -557,16 +596,35 @@ class RegistrationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-        # ok event
-        event.end_date = arrow.get().shift(minutes=1).datetime
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Registration is closed", errors[0])
+        # ended event but allow route upload
+        event.start_date = arrow.get().shift(hours=-1).datetime
+        event.end_date = arrow.get().shift(minutes=-1).datetime
+        event.allow_route_upload = True
         event.save()
         res = self.client.post(
             url,
             {
                 "device_id": device_id,
-                "name": "Charles",
-                "short_name": "🇺🇸 C",
+                "name": "Dick",
+                "short_name": "🇺🇸 D",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # ok event
+        event.end_date = arrow.get().shift(minutes=1).datetime
+        event.allow_route_upload = False
+        event.save()
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+                "name": "Elsa",
+                "short_name": "🇺🇸 E",
             },
             SERVER_NAME="api.localhost:8000",
         )
@@ -579,12 +637,12 @@ class RegistrationApiTestCase(EssentialApiBase):
             url,
             {
                 "device_id": device_id,
-                "name": "Dylan",
-                "short_name": "🇺🇸 D",
+                "name": "Frank",
+                "short_name": "🇺🇸 F",
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # private event logged in as not admin
         user_not_admin = User.objects.create_user(
             "bob", "bob@example.com", "pa$$word123"
@@ -594,20 +652,20 @@ class RegistrationApiTestCase(EssentialApiBase):
             url,
             {
                 "device_id": device_id,
-                "name": "Dylan",
-                "short_name": "🇺🇸 D",
+                "name": "George",
+                "short_name": "🇺🇸 G",
             },
             SERVER_NAME="api.localhost:8000",
         )
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # private event logged in as admin ok
-        self.client.force_login(user)
+        self.client.force_login(self.user)
         res = self.client.post(
             url,
             {
                 "device_id": device_id,
-                "name": "Dylan",
-                "short_name": "🇺🇸 D",
+                "name": "Hugh",
+                "short_name": "🇺🇸 H",
             },
             SERVER_NAME="api.localhost:8000",
         )

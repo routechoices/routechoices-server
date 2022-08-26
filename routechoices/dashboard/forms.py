@@ -45,23 +45,46 @@ class ClubForm(ModelForm):
         if not logo:
             return logo
         w, h = get_image_dimensions(logo)
-        if w != h:
-            raise ValidationError("The image should be square")
-        if w < 128:
-            raise ValidationError("The image is too small, < 128px width")
+        minimum = 128
+        if w < minimum or h < minimum:
+            raise ValidationError(
+                "The image is too small, minimum {minimum}x{minimum} pixels"
+            )
         fn = logo.name
         with Image.open(logo.file) as image:
             rgba_img = image.convert("RGBA")
-            target = 256
-            if image.size[0] > target:
-                scale = target / image.size[0]
-                new_w = image.size[0] * scale
-                rgba_img.thumbnail((new_w, new_w), Image.ANTIALIAS)
+            target = min([256, w, h])
+            if w < h:
+                resized_image = rgba_img.resize(
+                    (target, int(image.size[1] * (target / image.size[0])))
+                )
+                required_loss = resized_image.size[1] - target
+                sqare_image = resized_image.crop(
+                    box=(
+                        0,
+                        required_loss / 2,
+                        target,
+                        resized_image.size[1] - required_loss / 2,
+                    )
+                )
+            else:
+                resized_image = rgba_img.resize(
+                    (int(image.size[0] * (target / image.size[1])), target)
+                )
+                required_loss = resized_image.size[0] - target
+                sqare_image = resized_image.crop(
+                    box=(
+                        required_loss / 2,
+                        0,
+                        resized_image.size[0] - required_loss / 2,
+                        target,
+                    )
+                )
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),
             }
-            rgba_img.save(out_buffer, "PNG", **params)
+            sqare_image.save(out_buffer, "PNG", **params)
             f_new = File(out_buffer, name=fn)
             return f_new
 

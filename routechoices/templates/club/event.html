@@ -106,6 +106,8 @@
 {% block extra_body %}{{ block.super }}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
   data-event-id="{{event.aid}}"
+  {% if event.privacy == "public" %}data-show-qr="1"{% endif%}
+  data-data-url="{% host_url 'event_data' event_id=event.aid host 'api' %}"
   data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
   data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"
   data-server-clock-url="{% host_url 'time_api' host 'api' %}"

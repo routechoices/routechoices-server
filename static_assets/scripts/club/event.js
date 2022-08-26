@@ -122,7 +122,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       crossOrigin: true,
       type: "json",
       success: function (response) {
-        backdropMaps[response.event.backdrop].addTo(map);
+        backdropMaps[response.event.backdrop || "blank"].addTo(map);
         var now = new Date();
         var startEvent = new Date(response.event.start_date);
         endEvent = new Date(response.event.end_date);
@@ -190,7 +190,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
             clock.stopRefreshes();
           }
           qrUrl = response.event.shortcut;
-          liveUrl = response.data;
+          liveUrl = window.local.dataUrl;
           sendInterval = response.event.send_interval;
           tailLength = response.event.tail_length;
           prevMapsJSONData = JSON.stringify(response.maps);
@@ -230,9 +230,9 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                     bounds: bounds,
                     tileSize: 512,
                     noWrap: true,
-                    data: m,
                   }
                 );
+                mapChoices[m.title].data = m;
               }
             }
             if (response.maps.length > 1) {

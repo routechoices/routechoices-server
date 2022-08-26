@@ -100,13 +100,13 @@ def serve_from_s3(
 club_param = openapi.Parameter(
     "club",
     openapi.IN_QUERY,
-    description="filter with this club slug",
+    description="Filter by this club slug",
     type=openapi.TYPE_STRING,
 )
 event_param = openapi.Parameter(
     "event",
     openapi.IN_QUERY,
-    description="filter with this event slug",
+    description="Filter by this event slug",
     type=openapi.TYPE_STRING,
 )
 
@@ -114,8 +114,8 @@ event_param = openapi.Parameter(
 @swagger_auto_schema(
     method="get",
     operation_id="events_list",
-    operation_description="list events",
-    tags=["events"],
+    operation_description="List events",
+    tags=["Events"],
     manual_parameters=[club_param, event_param],
     responses={
         "200": openapi.Response(
@@ -156,6 +156,7 @@ event_param = openapi.Parameter(
 def event_list(request):
     club_slug = request.GET.get("club")
     event_slug = request.GET.get("event")
+
     if event_slug and club_slug:
         privacy_arg = {"privacy__in": [PRIVACY_PUBLIC, PRIVACY_SECRET]}
     else:
@@ -196,8 +197,8 @@ def event_list(request):
 @swagger_auto_schema(
     method="get",
     operation_id="event_detail",
-    operation_description="read an event detail",
-    tags=["events"],
+    operation_description="Read an event detail",
+    tags=["Events"],
     responses={
         "200": openapi.Response(
             description="Success response",
@@ -218,6 +219,7 @@ def event_list(request):
                         "backdrop": "osm",
                         "send_interval": 5,
                         "tail_length": 60,
+                        "privacy": "public",
                     },
                     "competitors": [
                         {
@@ -228,7 +230,7 @@ def event_list(request):
                         },
                         "...",
                     ],
-                    "data": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
+                    "data_url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
                     "announcement": "",
                     "maps": [
                         {
@@ -253,18 +255,26 @@ def event_list(request):
 )
 @api_view(["GET"])
 def event_detail(request, event_id):
-    event = get_object_or_404(
-        Event.objects.select_related("club", "notice").prefetch_related(
+    event = (
+        Event.objects.select_related("club", "notice")
+        .prefetch_related(
             "competitors",
-        ),
-        aid=event_id,
+        )
+        .filter(aid=event_id)
+        .first()
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
+    if not event:
+        res = {"error": "No event match this id"}
+        return Response(res)
+
+    is_user_club_admin = (
+        request.user.is_superuser
+        or event.club.admins.filter(id=request.user.id).exists()
+    )
+
+    if event.privacy == PRIVACY_PRIVATE and not is_user_club_admin:
+        raise PermissionDenied()
+
     output = {
         "event": {
             "id": event.aid,
@@ -281,16 +291,19 @@ def event_detail(request, event_id):
             "backdrop": event.backdrop_map,
             "send_interval": event.send_interval,
             "tail_length": event.tail_length,
+            "privacy": event.privacy,
         },
         "competitors": [],
-        "data": request.build_absolute_uri(
+        "data_url": request.build_absolute_uri(
             reverse("event_data", host="api", kwargs={"event_id": event.aid})
         ),
         "announcement": "",
         "maps": [],
     }
+
     if event.start_date < now():
         output["announcement"] = event.notice.text if event.has_notice else ""
+
         for c in event.competitors.all():
             output["competitors"].append(
                 {
@@ -300,42 +313,42 @@ def event_detail(request, event_id):
                     "start_time": c.start_time,
                 }
             )
+
         if event.map:
-            output["maps"].append(
-                {
-                    "title": event.map_title,
-                    "coordinates": event.map.bound,
-                    "url": request.build_absolute_uri(
-                        reverse(
-                            "event_map_download",
-                            host="api",
-                            kwargs={"event_id": event.aid},
-                        )
-                    ),
-                    "hash": event.map.hash,
-                    "modification_date": event.map.modification_date,
-                    "default": True,
-                    "id": event.map.aid,
-                }
-            )
+            map_data = {
+                "title": event.map_title,
+                "coordinates": event.map.bound,
+                "hash": event.map.hash,
+                "modification_date": event.map.modification_date,
+                "default": True,
+                "id": event.map.aid,
+                "url": request.build_absolute_uri(
+                    reverse(
+                        "event_map_download",
+                        host="api",
+                        kwargs={"event_id": event.aid},
+                    )
+                ),
+            }
+            output["maps"].append(map_data)
         for i, m in enumerate(event.map_assignations.all().select_related("map")):
-            output["maps"].append(
-                {
-                    "title": m.title,
-                    "coordinates": m.map.bound,
-                    "url": request.build_absolute_uri(
-                        reverse(
-                            "event_map_download",
-                            host="api",
-                            kwargs={"event_id": event.aid, "map_index": (i + 1)},
-                        )
-                    ),
-                    "hash": m.map.hash,
-                    "modification_date": m.map.modification_date,
-                    "default": False,
-                    "id": m.map.aid,
-                }
-            )
+            map_data = {
+                "title": m.title,
+                "coordinates": m.map.bound,
+                "hash": m.map.hash,
+                "modification_date": m.map.modification_date,
+                "default": False,
+                "id": m.map.aid,
+                "url": request.build_absolute_uri(
+                    reverse(
+                        "event_map_download",
+                        host="api",
+                        kwargs={"event_id": event.aid, "map_index": (i + 1)},
+                    )
+                ),
+            }
+            output["maps"].append(map_data)
+
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
@@ -344,30 +357,30 @@ def event_detail(request, event_id):
 
 @swagger_auto_schema(
     method="post",
-    operation_id="event_register",
-    operation_description="register a competitor to a given event",
-    tags=["events"],
+    operation_id="register_competitor",
+    operation_description="Register a competitor to a given event",
+    tags=["Events"],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
             "device_id": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="device id",
+                description="Device id",
             ),
             "name": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="full name",
+                description="Full name",
             ),
             "short_name": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="short version of the name displayed on the map",
+                description="Short version of the name",
             ),
             "start_time": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)",
+                description="Start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)",
             ),
         },
-        required=["device_id", "name"],
+        required=["name"],
     ),
     responses={
         "201": openapi.Response(
@@ -375,10 +388,10 @@ def event_detail(request, event_id):
             examples={
                 "application/json": {
                     "id": "<id>",
-                    "device_id": "<device_id>",
                     "name": "<name>",
                     "short_name": "<short_name>",
                     "start_time": "<start_time>",
+                    "device_id": "<device_id>",
                 }
             },
         ),
@@ -390,21 +403,13 @@ def event_detail(request, event_id):
 )
 @api_view(["POST"])
 def event_register(request, event_id):
-    event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
+    event = Event.objects.select_related("club").filter(aid=event_id).first()
+    if not event:
+        res = {"error": "No event match this id"}
+        return Response(res)
 
-    if not event.open_registration or event.end_date < now():
+    if not event.open_registration:
         raise PermissionDenied()
-
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        is_user_event_admin = (
-            request.user.is_authenticated
-            and event.club.admins.filter(id=request.user.id).exists()
-        )
-        if not is_user_event_admin:
-            raise PermissionDenied()
-
-    device_id = request.data.get("device_id")
-    device = Device.objects.filter(aid=device_id).first()
 
     lang = request.GET.get("lang", "en")
     if lang not in ("en", "es", "fi", "fr", "nl", "sv"):
@@ -416,55 +421,61 @@ def event_register(request, event_id):
             "no-name": "Name is missing",
             "invalid-start-time": "Start time could not be parsed",
             "bad-start-time": "Competitor start time should be during the event time",
-            "bad-name": "Competitor with same name already registered",
-            "bad-sname": "Competitor with same short name already registered",
+            "bad-name": "Name already in use in this event",
+            "bad-sname": "Shortname already in use in this event",
+            "registration-closed": "Registration is closed",
         },
         "es": {
             "no-device-id": "ID del dispositivo no encontrado",
             "no-name": "Falta el nombre",
             "invalid-start-time": "La hora de inicio no pudo ser analizada",
             "bad-start-time": "La hora de inicio del competidor debe ser durante la hora del evento.",
-            "bad-name": "Competidor con el mismo nombre ya registrado",
-            "bad-sname": "Competidor con el mismo nombre corto ya registrado",
+            "bad-name": "Nombre corto ya en uso en este evento",
+            "bad-sname": "Nombre ya en uso en este evento",
+            "registration-closed": "Las inscripciones están cerradas",
         },
         "fr": {
             "no-device-id": "Identifiant de l'appareil introuvable",
             "no-name": "Nom est manquant",
             "invalid-start-time": "Impossible d'extraire l'heure de début",
             "bad-start-time": "L'heure de départ du concurrent doit être durant l'événement",
-            "bad-name": "Participant avec le même nom déjà inscrit",
-            "bad-sname": "Participant avec le même nom court déjà inscrit",
+            "bad-name": "Nom déjà utilisé dans cet événement",
+            "bad-sname": "Nom abrégé déjà utilisé dans cet événement",
+            "registration-closed": "Les inscriptions sont closes",
         },
         "fi": {
             "no-device-id": "Laitetunnusta ei löydy",
             "no-name": "Nimi puuttuu",
             "invalid-start-time": "Aloitusaikaa ei voitu jäsentää",
             "bad-start-time": "Kilpailijan aloitusajan tulee olla tapahtuman aikana",
-            "bad-name": "Kilpailija samalla nimellä jo rekisteröitynyt",
-            "bad-sname": "Kilpailija samalla lyhyellä nyhyelläimellä jo rekisteröitynyt",
+            "bad-name": "Nimi on jo käytössä tässä tapahtumassa",
+            "bad-sname": "Lyhyt nimi jo käytössä tässä tapahtumassa",
+            "registration-closed": "Ilmoittautumiset on suljettu",
         },
         "nl": {
             "no-device-id": "Toestel ID niet gevonden",
             "no-name": "Naam ontbreekt",
             "invalid-start-time": "Start tijd kan niet worden ontleed",
             "bad-start-time": "Starttijd van de atleet is tijdens de event tijd",
-            "bad-name": "Atleet met zelfde naam bestaat al",
-            "bad-sname": "Atleet met zelfde korte naam bestaat al",
+            "bad-name": "Naam al in gebruik in dit evenement",
+            "bad-sname": "Korte naam al in gebruik in dit evenement",
+            "registration-closed": "Inschrijvingen zijn gesloten",
         },
         "sv": {
             "no-device-id": "Enhets-ID hittades inte",
             "no-name": "Namn saknas",
             "invalid-start-time": "Starttiden kunde inte hittas",
             "bad-start-time": "Tävlandes starttid bör vara under evenemangstiden",
-            "bad-name": "Tävlande med samma namn är redan registrerad",
-            "bad-sname": "Tävlande med samma förkortning är redan registrerad",
+            "bad-name": "Namnet används redan i det här evenemanget",
+            "bad-sname": "Kortnamn används redan i det här evenemanget",
+            "registration-closed": "Anmälningarna är stängda",
         },
     }
 
-    errs = []
+    if event.end_date < now() and not event.allow_route_upload:
+        raise ValidationError(err_messages[lang]["registration-closed"])
 
-    if not device:
-        errs.append(err_messages[lang]["no-device-id"])
+    errs = []
 
     name = request.data.get("name")
 
@@ -473,14 +484,14 @@ def event_register(request, event_id):
     short_name = request.data.get("short_name")
     if not short_name:
         short_name = initial_of_name(name)
-    start_time = request.data.get("start_time")
-    if start_time:
+    start_time_query = request.data.get("start_time")
+    if start_time_query:
         try:
-            start_time = arrow.get(start_time).datetime
+            start_time = arrow.get(start_time_query).datetime
         except Exception:
             start_time = None
             errs.append(err_messages[lang]["invalid-start-time"])
-    elif event.start_date < now():
+    elif event.start_date < now() < event.end_date:
         start_time = now()
     else:
         start_time = event.start_date
@@ -496,6 +507,12 @@ def event_register(request, event_id):
     if event.competitors.filter(short_name=short_name).exists():
         errs.append(err_messages[lang]["bad-sname"])
 
+    device_id = request.data.get("device_id")
+    device = Device.objects.filter(aid=device_id).first()
+
+    if not device and device_id:
+        errs.append(err_messages[lang]["no-device-id"])
+
     if errs:
         raise ValidationError(errs)
 
@@ -507,23 +524,26 @@ def event_register(request, event_id):
         device=device,
     )
 
+    output = {
+        "id": comp.aid,
+        "name": name,
+        "short_name": short_name,
+        "start_time": start_time,
+    }
+    if device:
+        output["device_id"] = device.aid
+
     return Response(
-        {
-            "id": comp.aid,
-            "device_id": device.aid,
-            "name": name,
-            "short_name": short_name,
-            "start_time": start_time,
-        },
+        output,
         status=status.HTTP_201_CREATED,
     )
 
 
 @swagger_auto_schema(
     method="delete",
-    operation_id="event_delete_competitor",
-    operation_description="delete a competitor from a given event",
-    tags=["events"],
+    operation_id="delete_competitor",
+    operation_description="Delete a competitor",
+    tags=["Competitors"],
     responses={
         "204": openapi.Response(
             description="Success response", examples={"application/json": ""}
@@ -536,68 +556,59 @@ def event_register(request, event_id):
 )
 @api_view(["DELETE"])
 @login_required
-def event_delete_competitor(request, event_id, competitor_id):
-    event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
-    is_user_event_admin = request.user.is_superuser or (
-        request.user.is_authenticated
-        and event.club.admins.filter(id=request.user.id).exists()
+def competitor_api(request, competitor_id):
+    competitor = (
+        Competitor.objects.select_related("event", "event__club")
+        .filter(aid=competitor_id)
+        .first()
+    )
+    if not competitor:
+        res = {"error": "No competitor match this id"}
+        return Response(res)
+
+    event = competitor.event
+
+    is_user_event_admin = (
+        request.user.is_superuser
+        or event.club.admins.filter(id=request.user.id).exists()
     )
     if not is_user_event_admin:
         raise PermissionDenied()
-    c = event.competitors.filter(aid=competitor_id).first()
-    if not c:
-        raise ValidationError("no such competitor in this event")
-    c.delete()
+
+    competitor.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @swagger_auto_schema(
     method="post",
-    operation_id="event_upload_route",
-    operation_description="register a competitor to a given event and upload its positions",
-    tags=["events"],
+    operation_id="competitor_route_upload",
+    operation_description="Upload route for an existing competitor (Delete existing data)",
+    tags=["Competitors"],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description="full name",
-            ),
-            "short_name": openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description="short version of the name displayed on the map",
-            ),
-            "start_time": openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description="start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)",
-            ),
             "latitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="a list of locations latitudes (in degrees) separated by commas",
+                description="A list of locations latitudes (in degrees) separated by commas",
+                example="60.12345,60.12346,60.12347",
             ),
             "longitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="a list of locations longitudes (in degrees) separated by commas",
+                description="A list of locations longitudes (in degrees) separated by commas",
+                example="20.12345,20.12346,20.12347",
             ),
             "timestamps": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="a list of locations timestamps (UNIX epoch in seconds) separated by commas",
+                description="A list of locations timestamps (UNIX epoch in seconds) separated by commas",
+                example="1661489045,1661489046,1661489047",
             ),
         },
-        required=["name"],
+        required=["latitudes", "longitudes", "timestamps"],
     ),
     responses={
         "201": openapi.Response(
             description="Success response",
-            examples={
-                "application/json": {
-                    "id": "<id>",
-                    "device_id": "<device_id>",
-                    "name": "<name>",
-                    "short_name": "<short_name>",
-                    "start_time": "<start_time>",
-                }
-            },
+            examples={"application/json": {"status": "ok", "locations_count": "3"}},
         ),
         "400": openapi.Response(
             description="Validation Error",
@@ -606,40 +617,54 @@ def event_delete_competitor(request, event_id, competitor_id):
     },
 )
 @api_view(["POST"])
-def event_upload_route(request, event_id):
-    event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
+def competitor_route_upload(request, competitor_id):
+    competitor = (
+        Competitor.objects.select_related("event", "event__club", "device")
+        .filter(aid=competitor_id)
+        .first()
+    )
+    if not competitor:
+        res = {"error": "No competitor match this id"}
+        return Response(res)
+    event = competitor.event
+
     is_user_event_admin = (
         request.user.is_authenticated
         and event.club.admins.filter(id=request.user.id).exists()
-    )
-    if not is_user_event_admin:
-        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-            raise PermissionDenied()
-        if not event.allow_route_upload or event.start_date > now():
-            raise PermissionDenied()
+    ) or request.user.is_superuser
+
+    if not event.allow_route_upload:
+        raise PermissionDenied()
+
+    if (
+        not is_user_event_admin
+        and not event.open_registration
+        and competitor.device
+        and competitor.device.location_count != 0
+    ):
+        raise PermissionDenied()
+
     errs = []
 
-    name = request.data.get("name")
-
-    if not name:
-        errs.append("Property name is missing")
-    short_name = request.data.get("short_name")
-    if not short_name:
-        short_name = initial_of_name(name)
-
-    if event.competitors.filter(name=name).exists():
-        errs.append("Competitor with same name already registered")
-
-    if event.competitors.filter(short_name=short_name).exists():
-        errs.append("Competitor with same short name already registered")
+    if event.start_date > now():
+        errs.append(ValidationError("Event not yet started"))
 
     lats = request.data.get("latitudes", "").split(",")
     lons = request.data.get("longitudes", "").split(",")
     times = request.data.get("timestamps", "").split(",")
+
     if len(lats) != len(lons) != len(times):
-        raise ValidationError(
-            "latitudes, longitudes, and timestamps, should have same ammount of points"
+        errs.append(
+            ValidationError(
+                "Latitudes, longitudes, and timestamps, should have same amount of points"
+            )
         )
+        raise ValidationError("\r\n".join(errs))
+
+    if len(lats) < 2:
+        errs.append(ValidationError("Minimum amount of locations is 2"))
+        raise ValidationError("\r\n".join(errs))
+
     loc_array = []
     start_pt_ts = (event.end_date + timedelta(seconds=1)).timestamp()
     for i in range(len(times)):
@@ -680,22 +705,12 @@ def event_upload_route(request, event_id):
             user_agent=request.session.user_agent[:200], is_gpx=True
         )
         device.add_locations(loc_array, push_forward=False)
-
-    comp = Competitor.objects.create(
-        name=name,
-        event=event,
-        short_name=short_name,
-        start_time=start_time,
-        device=device,
-    )
+        competitor.device = device
 
     return Response(
         {
-            "id": comp.aid,
-            "device_id": device.aid if device else "",
-            "name": name,
-            "short_name": short_name,
-            "start_time": start_time,
+            "id": competitor.aid,
+            "locations_count": len(loc_array),
         },
         status=status.HTTP_201_CREATED,
     )
@@ -704,8 +719,8 @@ def event_upload_route(request, event_id):
 @swagger_auto_schema(
     method="get",
     operation_id="event_data",
-    operation_description="read competitor data associated to an event",
-    tags=["events"],
+    operation_description="Read competitors data from an event",
+    tags=["Events"],
     responses={
         "200": openapi.Response(
             description="Success response",
@@ -741,9 +756,14 @@ def event_data(request, event_id):
     if use_cache and live_cached_res:
         return Response(live_cached_res)
 
-    event = get_object_or_404(
-        Event.objects.select_related("club"), aid=event_id, start_date__lt=now()
+    event = (
+        Event.objects.select_related("club")
+        .filter(aid=event_id, start_date__lt=now())
+        .first()
     )
+    if not event:
+        res = {"error": "No event match this id"}
+        return Response(res)
 
     cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
     cache_prefix = "live" if event.is_live else "archived"
@@ -865,7 +885,50 @@ def ip_latlon(request):
 
 @swagger_auto_schema(
     method="post",
-    auto_schema=None,
+    operation_id="upload_device_locations",
+    operation_description="Upload a list of device location",
+    tags=["Devices"],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "device_id": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="<device id>",
+            ),
+            "latitudes": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="A list of locations latitudes (in degrees) separated by commas",
+                example="60.12345,60.12346,60.12347",
+            ),
+            "longitudes": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="A list of locations longitudes (in degrees) separated by commas",
+                example="20.12345,20.12346,20.12347",
+            ),
+            "timestamps": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="A list of locations timestamps (UNIX epoch in seconds) separated by commas",
+                example="1661489045,1661489046,1661489047",
+            ),
+        },
+        required=["device_id", "latitudes", "longitudes", "timestamps"],
+    ),
+    responses={
+        "201": openapi.Response(
+            description="Success response",
+            examples={
+                "application/json": {
+                    "status": "ok",
+                    "device_id": "<device id>",
+                    "locations_count": "3",
+                }
+            },
+        ),
+        "400": openapi.Response(
+            description="Validation Error",
+            examples={"application/json": ["<error message>"]},
+        ),
+    },
 )
 @api_view(["POST"])
 @throttle_classes([PostDataThrottle])
@@ -876,10 +939,11 @@ def locations_api_gw(request):
     if not device_id:
         raise ValidationError("Missing device_id parameter")
     if (
-        re.match(r"^[0-9]+$", device_id)
+        not request.user.is_authenticated
+        and re.match(r"^[0-9]+$", device_id)
         and secret_provided not in settings.POST_LOCATION_SECRETS
     ):
-        raise PermissionDenied("Invalid secret")
+        raise PermissionDenied("Authentication Failed")
     devices = Device.objects.filter(aid=device_id)
     if not devices.exists():
         raise ValidationError("No such device ID")
@@ -927,7 +991,9 @@ def locations_api_gw(request):
     if len(loc_array) > 0:
         device.add_locations(loc_array, save=False)
     device.save()
-    return Response({"status": "ok", "n": len(loc_array)})
+    return Response(
+        {"status": "ok", "locations_count": len(loc_array), "device_id": device.aid}
+    )
 
 
 class DataRenderer(renderers.BaseRenderer):
@@ -952,18 +1018,19 @@ def get_device_id(request):
 
 @swagger_auto_schema(
     method="post",
-    operation_id="create_imei_device_id",
-    operation_description="create a device id for a specific imei",
-    tags=["device"],
+    operation_id="create_device_id",
+    operation_description="Create a device id",
+    tags=["Devices"],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
             "imei": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="your gps tracking device IMEI",
+                example="<IMEI>",
+                description="Hardware GPS tracking device IMEI (Optional)",
             ),
         },
-        required=["imei"],
+        required=[],
     ),
     responses={
         "200": openapi.Response(
@@ -981,6 +1048,44 @@ def get_device_id(request):
             examples={"application/json": ["<error message>"]},
         ),
     },
+)
+@api_view(["POST"])
+def create_device_id(request):
+    imei = request.data.get("imei")
+    if imei:
+        try:
+            validate_imei(imei)
+        except Exception as e:
+            raise ValidationError(str(e.message))
+        status_code = status.HTTP_200_OK
+        try:
+            idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
+        except ImeiDevice.DoesNotExist:
+            device = Device.objects.create()
+            idevice = ImeiDevice.objects.create(imei=imei, device=device)
+            status_code = status.HTTP_201_CREATED
+        else:
+            device = idevice.device
+            if re.search(r"[^0-9]", device.aid):
+                if not device.competitor_set.filter(
+                    event__end_date__gte=now()
+                ).exists():
+                    device.aid = random_device_id()
+                    status_code = status.HTTP_201_CREATED
+        return Response(
+            {"status": "ok", "device_id": device.aid, "imei": imei}, status=status_code
+        )
+    if not request.user.is_authenticated:
+        raise PermissionDenied("Authentication Failed")
+    device = Device.objects.create(user_agent=request.session.user_agent[:200])
+    return Response(
+        {"status": "ok", "device_id": device.aid}, status=status.HTTP_201_CREATED
+    )
+
+
+@swagger_auto_schema(
+    method="post",
+    auto_schema=None,
 )
 @api_view(["POST"])
 def get_device_for_imei(request):
@@ -1007,8 +1112,8 @@ def get_device_for_imei(request):
 @swagger_auto_schema(
     method="get",
     operation_id="server_time",
-    operation_description="read the server time",
-    tags=[],
+    operation_description="Return the server epoch time",
+    tags=["Miscellaneous"],
     responses={
         "200": openapi.Response(
             description="Success response",
@@ -1058,7 +1163,11 @@ def device_search(request):
 )
 @api_view(["GET"])
 def device_info(request, device_id):
-    device = get_object_or_404(Device, aid=device_id, is_gpx=False)
+    device = Device.objects.filter(aid=device_id, is_gpx=False).first()
+    if not device:
+        res = {"error": "No device match this id"}
+        return Response(res)
+
     return Response(
         {
             "id": device.aid,
@@ -1109,7 +1218,7 @@ def device_ownership_api_view(request, club_id, device_id):
         return Response({"nickname": nick})
     elif request.method == "DELETE":
         ownership.delete()
-        return HttpResponse(status=204)
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 @swagger_auto_schema(
@@ -1532,7 +1641,9 @@ def tile_etag(request):
         except Exception:
             return None
 
-        event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
+        event = Event.objects.select_related("club").filter(aid=layer_id).first()
+        if not event:
+            return None
         if map_index == 0 and not event.map:
             return None
         elif map_index > event.extra_maps.all().count():
@@ -1576,7 +1687,9 @@ def tile_latest_modification(request):
         except Exception:
             return None
 
-        event = get_object_or_404(Event.objects.select_related("club"), aid=layer_id)
+        event = Event.objects.select_related("club").filter(aid=layer_id).first()
+        if not event:
+            return None
         if map_index == 0 and not event.map:
             return None
         elif map_index > event.extra_maps.all().count():
