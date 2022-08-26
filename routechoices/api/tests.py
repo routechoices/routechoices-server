@@ -1,4 +1,5 @@
 import json
+import random
 import tempfile
 import time
 from pathlib import Path
@@ -25,7 +26,7 @@ class EssentialApiBase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            "alice", "alice@example.com", "pa$$word123"
+            "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
         )
 
     def reverse_and_check(self, path, expected, host="api"):
