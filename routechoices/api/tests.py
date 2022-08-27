@@ -416,7 +416,7 @@ class LocationApiTestCase(EssentialApiBase):
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data.get("device_id"), dev_id)
-        self.assertEqual(res.data.get("locations_count"), 2)
+        self.assertEqual(res.data.get("location_count"), 2)
 
     def test_locations_api_gw_old_dev_id_valid(self):
         # Original app didnt require any authentication to post location

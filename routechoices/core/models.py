@@ -1157,9 +1157,13 @@ class Device(models.Model):
             locs_dict["timestamps"], locs_dict["latitudes"], locs_dict["longitudes"]
         )
         locs = list(sorted(locs, key=itemgetter(0)))
-        self._location_count = len(locs_dict["timestamps"])
+        self.locations_encoded = gps_encoding.encode_data(locs)
+        self.update_cached_data()
+
+    def update_cached_data(self):
+        self._location_count = self.location_count
         if self._location_count > 0:
-            last_loc = locs[-1]
+            last_loc = self.locations_series[-1]
             self._last_location_datetime = epoch_to_datetime(
                 last_loc[LOCATION_TIMESTAMP_INDEX]
             )
@@ -1169,7 +1173,6 @@ class Device(models.Model):
             self._last_location_datetime = None
             self._last_location_latitude = None
             self._last_location_longitude = None
-        self.locations_encoded = gps_encoding.encode_data(locs)
 
     def get_locations_between_dates(self, from_date, end_date, /, *, encoded=False):
         from_ts = from_date.timestamp()
@@ -1245,10 +1248,6 @@ class Device(models.Model):
             save=save,
             push_forward=push_forward,
         )
-
-    # @property
-    # def location_count(self):
-    #    return len(self.locations_series)
 
     @property
     def location_count(self):

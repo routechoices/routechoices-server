@@ -608,7 +608,7 @@ def competitor_api(request, competitor_id):
     responses={
         "201": openapi.Response(
             description="Success response",
-            examples={"application/json": {"status": "ok", "locations_count": "3"}},
+            examples={"application/json": {"status": "ok", "location_count": "3"}},
         ),
         "400": openapi.Response(
             description="Validation Error",
@@ -710,7 +710,7 @@ def competitor_route_upload(request, competitor_id):
     return Response(
         {
             "id": competitor.aid,
-            "locations_count": len(loc_array),
+            "location_count": len(loc_array),
         },
         status=status.HTTP_201_CREATED,
     )
@@ -925,7 +925,7 @@ def ip_latlon(request):
                 "application/json": {
                     "status": "ok",
                     "device_id": "<device id>",
-                    "locations_count": "3",
+                    "location_count": "3",
                 }
             },
         ),
@@ -1000,7 +1000,7 @@ def locations_api_gw(request):
         device.add_locations(loc_array, save=False)
     device.save()
     return Response(
-        {"status": "ok", "locations_count": len(loc_array), "device_id": device.aid},
+        {"status": "ok", "location_count": len(loc_array), "device_id": device.aid},
         status=status.HTTP_201_CREATED,
     )
 
