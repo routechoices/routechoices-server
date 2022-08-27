@@ -159,19 +159,19 @@ function showLocalTime(el) {
       },
     };
     var val = u(el).val();
+    new tempusDominus.TempusDominus(el, options);
     if (
       val &&
       /^\d{4}-\d{2}-\d{2}/.test(val) &&
       /\d{2}:\d{2}:\d{2}$/.test(val)
     ) {
-      val = val.substring(0, 10) + "T" + val.substring(11, 19) + "Z";
-      options.defaultDate = new Date(
-        new Date(val).toLocaleString("en-US", { timeZone: "UTC" })
-      );
+      val = val.substring(0, 10) + " " + val.substring(11, 19);
+      u(el).val(val);
+      u(el).trigger("change");
     } else {
       u(el).val("");
     }
-    new tempusDominus.TempusDominus(el, options);
+    
   });
   u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
@@ -286,10 +286,14 @@ function showLocalTime(el) {
   );
   u("#set_start_date_now_btn").on("click", function (e) {
     e.preventDefault();
-    u("#id_start_date").val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+    var el = "#id_start_date";
+    u(el).val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+    u(el).trigger("change");
   });
   u("#set_end_date_now_btn").on("click", function (e) {
     e.preventDefault();
-    u("#id_end_date").val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+    var el = "#id_end_date";
+    u(el).val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+    u(el).trigger("change");
   });
 })();
