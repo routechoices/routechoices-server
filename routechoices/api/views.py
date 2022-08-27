@@ -129,6 +129,7 @@ event_param = openapi.Parameter(
                         "slug": "Jukola-2019-1st-leg",
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
+                        "privacy": "public",
                         "open_registration": False,
                         "open_route_upload": False,
                         "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg",
@@ -141,6 +142,7 @@ event_param = openapi.Parameter(
                         "slug": "Jukola-2019-2nd-leg",
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
+                        "privacy": "public",
                         "open_registration": False,
                         "open_route_upload": False,
                         "url": "http://www.routechoices.com/ksk/Jukola-2019-2nd-leg",
@@ -162,7 +164,10 @@ def event_list(request):
         privacy_arg = {"privacy": PRIVACY_PUBLIC}
 
     if request.user.is_authenticated:
-        clubs = Club.objects.filter(admins=request.user)
+        if request.user.is_superuser:
+            clubs = Club.objects.all()
+        else:
+            clubs = Club.objects.filter(admins=request.user)
         events = Event.objects.filter(
             Q(**privacy_arg) | Q(club__in=clubs)
         ).select_related("club")
@@ -185,6 +190,7 @@ def event_list(request):
                 "slug": event.slug,
                 "club": event.club.name,
                 "club_slug": event.club.slug.lower(),
+                "privacy": event.privacy,
                 "open_registration": event.open_registration,
                 "open_route_upload": event.allow_route_upload,
                 "url": request.build_absolute_uri(event.get_absolute_url()),
@@ -211,6 +217,7 @@ def event_list(request):
                         "slug": "Jukola-2019-1st-leg",
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
+                        "privacy": "public",
                         "open_registration": False,
                         "open_route_upload": False,
                         "url": "https://www.routechoices.com/ksk/Jukola-2019-1st-leg",
@@ -218,7 +225,6 @@ def event_list(request):
                         "backdrop": "osm",
                         "send_interval": 5,
                         "tail_length": 60,
-                        "privacy": "public",
                     },
                     "competitors": [
                         {
@@ -283,6 +289,7 @@ def event_detail(request, event_id):
             "slug": event.slug,
             "club": event.club.name,
             "club_slug": event.club.slug.lower(),
+            "privacy": event.privacy,
             "open_registration": event.open_registration,
             "open_route_upload": event.allow_route_upload,
             "url": request.build_absolute_uri(event.get_absolute_url()),
@@ -290,7 +297,6 @@ def event_detail(request, event_id):
             "backdrop": event.backdrop_map,
             "send_interval": event.send_interval,
             "tail_length": event.tail_length,
-            "privacy": event.privacy,
         },
         "competitors": [],
         "data_url": request.build_absolute_uri(
