@@ -392,6 +392,7 @@ var selectLiveMode = function (e) {
   if (isLiveMode) {
     return;
   }
+  eventStateControl.setLive();
   if (setMassStartContextMenuItem) {
     map.contextmenu.removeItem(setMassStartContextMenuItem);
     setMassStartContextMenuItem = null;
@@ -446,6 +447,7 @@ var selectReplayMode = function (e) {
   if (!isLiveMode && u("#replay_button").hasClass("active")) {
     return;
   }
+  eventStateControl.setReplay();
   u("#live_button").removeClass("active");
   u("#replay_button").addClass("active");
   u("#replay_mode_buttons").css({ display: "inline-block" });
@@ -2109,3 +2111,59 @@ function updateText() {
       banana.load(messages, banana.locale);
     });
 }
+
+L.Control.EventState = L.Control.extend({
+  options: {
+    position: "topleft",
+  },
+  onAdd: function (map) {
+    var div = L.DomUtil.create("div");
+    div.style.userSelect = "none";
+    div.style["-webkit-user-select"] = "none";
+    this._div = div;
+    return div;
+  },
+  hide() {
+    this._div.style.display = "none";
+    console.log("hide");
+  },
+  setLive() {
+    console.log("live");
+    this._div.innerHTML =
+      '<svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      banana.i18n("live-mode");
+    u(this._div).css({
+      display: "block",
+      fontSize: "20px",
+      color: "#fff",
+      backgroundColor: "red",
+      borderRadius: "15px",
+      padding: "3px 20px",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+    });
+  },
+  setReplay() {
+    console.log("live");
+    this._div.innerHTML = banana.i18n("replay-mode");
+    u(this._div).css({
+      display: "block",
+      fontSize: "20px",
+      color: "#fff",
+      backgroundColor: "#666",
+      borderRadius: "15px",
+      padding: "3px 20px",
+      fontStyle: "normal",
+      fontWeight: "bold",
+      textTransform: "none",
+    });
+  },
+  onRemove: function (map) {
+    // Nothing to do here
+  },
+});
+
+L.control.eventState = function (opts) {
+  return new L.Control.EventState(opts);
+};

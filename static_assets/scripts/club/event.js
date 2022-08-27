@@ -95,6 +95,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
         },
       ],
     });
+    eventStateControl = L.control.eventState();
     panControl = L.control.pan();
     zoomControl = L.control.zoom();
     rotateControl = L.control.rotate({ closeOnZeroBearing: false });
@@ -103,6 +104,8 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       updateWhenIdle: true,
       position: "bottomleft",
     });
+    eventStateControl.addTo(map);
+    eventStateControl.hide();
     if (showControls) {
       panControl.addTo(map);
       zoomControl.addTo(map);
@@ -186,8 +189,10 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
           u("#share_button").on("click", shareUrl);
           if (endEvent > now) {
             isLiveEvent = true;
+            eventStateControl.setLive();
           } else {
             clock.stopRefreshes();
+            eventStateControl.setReplay();
           }
           qrUrl = response.event.shortcut;
           liveUrl = window.local.dataUrl;
