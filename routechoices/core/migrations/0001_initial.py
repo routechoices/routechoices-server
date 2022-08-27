@@ -301,6 +301,7 @@ class Migration(migrations.Migration):
                         ],
                         default="public",
                         max_length=8,
+                        help_text="Public > Listed on the front page | Secret > Can be opened with a link, however not listed on frontpage | Secret > Only a logged in admin of the club can access the page",
                     ),
                 ),
                 (

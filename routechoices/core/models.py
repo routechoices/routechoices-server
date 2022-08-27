@@ -851,6 +851,7 @@ class Event(models.Model):
         max_length=8,
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
+        help_text="Public > Listed on the front page | Secret > Can be opened with a link, however not listed on frontpage | Secret > Only a logged in admin of the club can access the page",
     )
     backdrop_map = BackroundMapChoicesField()
     map = models.ForeignKey(
