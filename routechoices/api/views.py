@@ -938,7 +938,9 @@ def ip_latlon(request):
 @api_view(["POST"])
 @throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
-    secret_provided = request.data.get("secret")
+    secret_provided = request.data.get(
+        "secret"
+    )  # secret was used in legacy apps before v1.6.0
     battery_level_posted = request.data.get("battery")
     device_id = request.data.get("device_id")
     if not device_id:
@@ -949,12 +951,15 @@ def locations_api_gw(request):
         and secret_provided not in settings.POST_LOCATION_SECRETS
     ):
         raise PermissionDenied("Authentication Failed")
-    devices = Device.objects.filter(aid=device_id)
-    if not devices.exists():
+
+    device = Device.objects.filter(aid=device_id).first()
+    if not device:
         raise ValidationError("No such device ID")
-    device = devices.first()
-    if not device.user_agent:
-        device.user_agent = request.session.user_agent[:200]
+
+    device_user_agent = request.session.user_agent[:200]
+    if not device.user_agent or device_user_agent != device.user_agent:
+        device.user_agent = device_user_agent
+
     try:
         lats = [float(x) for x in request.data.get("latitudes", "").split(",") if x]
         lons = [float(x) for x in request.data.get("longitudes", "").split(",") if x]
@@ -989,9 +994,11 @@ def locations_api_gw(request):
         except Exception:
             pass
             # raise ValidationError("Invalid battery_level value type")
+            # Do not raise exception to stay compatible with legacy apps
         else:
             if battery_level < 0 or battery_level > 100:
                 # raise ValidationError("battery_level value not in 0-100 range")
+                # Do not raise exception to stay compatible with legacy apps
                 pass
             else:
                 device.battery_level = battery_level
