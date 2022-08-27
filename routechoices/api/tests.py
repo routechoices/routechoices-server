@@ -456,6 +456,200 @@ class LocationApiTestCase(EssentialApiBase):
 
 
 @override_settings(PARENT_HOST="localhost:8000")
+class RouteUploadApiTestCase(EssentialApiBase):
+    def setUp(self):
+        super().setUp()
+        self.club = Club.objects.create(name="Test club", slug="club")
+        self.event = Event.objects.create(
+            club=self.club,
+            name="Test event",
+            open_registration=True,
+            allow_route_upload=True,
+            start_date=arrow.get().datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        self.club.admins.set([self.user])
+        self.competitor = Competitor.objects.create(
+            name="Alice", short_name="A", event=self.event
+        )
+        self.url = reverse(
+            "competitor_route_upload",
+            host="api",
+            kwargs={"competitor_id": self.competitor.aid},
+        )
+        self.assertEqual(
+            self.url, f"//api.localhost:8000/competitor/{self.competitor.aid}/route"
+        )
+
+    def test_route_upload_api_valid(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            Competitor.objects.get(aid=self.competitor.aid).device.location_count, 2
+        )
+        # Upload again on same competitor without being an admin
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.3,1.4",
+                "longitudes": "3.3,3.4",
+                "timestamps": f"{t+2},{t+3}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Competitor already assigned a route", errors[0])
+        # Upload again on same competitor while being an admin
+        self.client.force_login(self.user)
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.3,1.4,1.5",
+                "longitudes": "3.3,3.4,3.5",
+                "timestamps": f"{t+2},{t+3},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            Competitor.objects.get(aid=self.competitor.aid).device.location_count, 3
+        )
+
+    def test_route_upload_api_invalid_cast(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},NaN",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Invalid data format", errors[0])
+
+    def test_route_upload_api_invalid_lon(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,182",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Invalid longitude value", errors[0])
+
+    def test_route_upload_api_invalid_lat(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,100",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Invalid latitude value", errors[0])
+
+    def test_route_upload_api_invalid_length(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn(
+            "Latitudes, longitudes, and timestamps, should have same amount of points",
+            errors[0],
+        )
+
+    def test_route_upload_api_not_enough_points(self):
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1",
+                "longitudes": "3.1",
+                "timestamps": f"{t}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn(
+            "Minimum amount of locations is 2",
+            errors[0],
+        )
+
+    def test_route_upload_api_not_allowed(self):
+        self.event.allow_route_upload = False
+        self.event.save()
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_route_upload_api_not_started(self):
+        self.event.start_date = arrow.get().shift(minutes=1).datetime
+        self.event.save()
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn(
+            "Event not yet started",
+            errors[0],
+        )
+
+
+@override_settings(PARENT_HOST="localhost:8000")
 class RegistrationApiTestCase(EssentialApiBase):
     def test_registration(self):
         device_id = self.get_device_id()

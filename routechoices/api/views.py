@@ -3,7 +3,6 @@ import logging
 import re
 import time
 import urllib.parse
-from datetime import timedelta
 
 import arrow
 import orjson as json
@@ -638,66 +637,46 @@ def competitor_route_upload(request, competitor_id):
 
     if (
         not is_user_event_admin
-        and not event.open_registration
         and competitor.device
         and competitor.device.location_count != 0
     ):
-        raise PermissionDenied()
-
-    errs = []
+        raise ValidationError("Competitor already assigned a route")
 
     if event.start_date > now():
-        errs.append(ValidationError("Event not yet started"))
+        raise ValidationError("Event not yet started")
 
-    lats = request.data.get("latitudes", "").split(",")
-    lons = request.data.get("longitudes", "").split(",")
-    times = request.data.get("timestamps", "").split(",")
+    try:
+        lats = [float(x) for x in request.data.get("latitudes", "").split(",") if x]
+        lons = [float(x) for x in request.data.get("longitudes", "").split(",") if x]
+        times = [
+            int(float(x)) for x in request.data.get("timestamps", "").split(",") if x
+        ]
+    except ValueError:
+        raise ValidationError("Invalid data format")
 
-    if len(lats) != len(lons) != len(times):
-        errs.append(
-            ValidationError(
-                "Latitudes, longitudes, and timestamps, should have same amount of points"
-            )
+    if not (len(lats) == len(lons) == len(times)):
+        raise ValidationError(
+            "Latitudes, longitudes, and timestamps, should have same amount of points"
         )
-        raise ValidationError("\r\n".join(errs))
 
     if len(lats) < 2:
-        errs.append(ValidationError("Minimum amount of locations is 2"))
-        raise ValidationError("\r\n".join(errs))
+        raise ValidationError("Minimum amount of locations is 2")
 
     loc_array = []
-    start_pt_ts = (event.end_date + timedelta(seconds=1)).timestamp()
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
+            lat = lats[i]
+            lon = lons[i]
+            tim = times[i]
             try:
-                lat = float(lats[i])
-                lon = float(lons[i])
-                tim = int(float(times[i]))
-                start_pt_ts = min(tim, start_pt_ts)
-            except ValueError:
-                continue
+                validate_longitude(lon)
+            except DjangoValidationError:
+                raise ValidationError("Invalid longitude value")
+            try:
+                validate_latitude(lat)
+            except DjangoValidationError:
+                raise ValidationError("Invalid latitude value")
             loc_array.append((tim, lat, lon))
-
-    start_pt_dt = epoch_to_datetime(start_pt_ts)
-    if event.start_date > start_pt_dt or start_pt_dt > event.end_date:
-        start_pt_dt = event.start_date
-    start_time = request.data.get("start_time")
-    if start_time:
-        try:
-            start_time = arrow.get(start_time).datetime
-        except Exception:
-            errs.append("Start time could not be parsed")
-    else:
-        start_time = start_pt_dt
-
-    event_start = event.start_date
-    event_end = event.end_date
-
-    if start_time and (event_start > start_time or start_time > event_end):
-        errs.append("Competitor start time should be during the event time")
-
-    if errs:
-        raise ValidationError("\r\n".join(errs))
 
     device = None
     if len(loc_array) > 0:
@@ -706,6 +685,7 @@ def competitor_route_upload(request, competitor_id):
         )
         device.add_locations(loc_array, push_forward=False)
         competitor.device = device
+        competitor.save()
 
     return Response(
         {
@@ -968,7 +948,7 @@ def locations_api_gw(request):
         ]
     except ValueError:
         raise ValidationError("Invalid data format")
-    if len(lats) != len(lons) != len(times):
+    if not (len(lats) == len(lons) == len(times)):
         raise ValidationError(
             "Latitudes, longitudes, and timestamps, should have same amount of points"
         )
