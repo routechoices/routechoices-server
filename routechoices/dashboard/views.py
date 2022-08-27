@@ -445,7 +445,17 @@ def map_create_view(request):
 def map_edit_view(request, map_id):
     club = request.club
 
-    raster_map = get_object_or_404(Map, aid=map_id, club=club)
+    raster_map = get_object_or_404(Map, aid=map_id)
+    if raster_map.club != club:
+        club = raster_map.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -476,6 +486,17 @@ def map_delete_view(request, map_id):
     club = request.club
 
     raster_map = get_object_or_404(Map, aid=map_id, club=club)
+    if raster_map.club != club:
+        club = raster_map.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
+
     if request.method == "POST":
         raster_map.delete()
         messages.success(request, "Map deleted")
@@ -836,8 +857,17 @@ def event_edit_view(request, event_id):
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
-        club=club,
     )
+    if event.club != club:
+        club = event.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
     use_competitor_formset = (
         event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT
     )
@@ -975,8 +1005,17 @@ def event_competitors_view(request, event_id):
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
-        club=club,
     )
+    if event.club != club:
+        club = event.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
     if event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT:
         raise Http404()
     page = request.GET.get("page", 1)
@@ -1058,7 +1097,17 @@ def event_competitors_view(request, event_id):
 def event_delete_view(request, event_id):
     club = request.club
 
-    event = get_object_or_404(Event, aid=event_id, club=club)
+    event = get_object_or_404(Event, aid=event_id)
+    if event.club != club:
+        club = event.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
     if request.method == "POST":
         event.delete()
         messages.success(request, "Event deleted")
