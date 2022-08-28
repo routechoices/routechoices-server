@@ -3,9 +3,9 @@
 {% load define_action %}
 
 {% block favicon %}{% if event.club %}{% define event.club as club %}{% endif %}
-{% if club.logo %}<link rel="icon" type="image/png" href="{{club.logo_url}}">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-<link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}" color="#5bbad5">
-<link rel="manifest" href="{% static 'manifest.json' %}">
-<link rel="shortcut icon" href="{% static 'favicon.ico' %}">{% endif %}{% endblock %}
+{% if club.logo %}<link rel="icon" type="image/png" href="{{club.logo_url}}">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}?v=20220828">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}?v=20220828">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}?v=20220828">
+<link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}?v=20220828" color="#5bbad5">
+<link rel="manifest" href="{% static 'manifest.json' %}?v=20220828">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}?v=20220828">{% endif %}{% endblock %}
