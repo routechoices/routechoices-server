@@ -435,8 +435,8 @@ def event_register(request, event_id):
             "no-name": "Falta el nombre",
             "invalid-start-time": "La hora de inicio no pudo ser analizada",
             "bad-start-time": "La hora de inicio del competidor debe ser durante la hora del evento.",
-            "bad-name": "Nombre corto ya en uso en este evento",
-            "bad-sname": "Nombre ya en uso en este evento",
+            "bad-name": "Nombre ya en uso en este evento",
+            "bad-sname": "Nombre corto ya en uso en este evento",
             "registration-closed": "Las inscripciones están cerradas",
         },
         "fr": {
