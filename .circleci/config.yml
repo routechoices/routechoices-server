@@ -71,7 +71,7 @@ jobs:
     - run:
         name: Deploy
         command: |
-          ssh root@routechoices.com 'sudo -u apps /apps/routechoices-server/bin/deploy'
+          ssh rphlo@routechoices.com 'sudo -u apps /apps/routechoices-server/bin/deploy'
 
   build-docker:
     machine:
