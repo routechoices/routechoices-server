@@ -8,6 +8,7 @@ var supportedLanguages = {
   fr: "Français",
   nl: "Nederlands",
   fi: "Suomi",
+  sv: "Svenska",
 };
 
 function getLangIfSupported(code) {
@@ -30,6 +31,8 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
     u("#export-text").text(banana.i18n("export"));
     u("#loading-text").text(banana.i18n("loading-text"));
+    u(".cancel-text").text(banana.i18n("cancel"));
+    u(".save-text").text(banana.i18n("save"));
     u("#event-not-started-text").text(banana.i18n("event-not-started-text"));
     u("#club-events-link-text").text(
       banana.i18n("club-events-link-text", window.local.clubName)

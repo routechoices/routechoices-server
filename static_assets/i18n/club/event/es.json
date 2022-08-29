@@ -32,5 +32,7 @@
   "qr-link": "QR Link",
   "language": "Lenguaje",
   "reached-max-runners": "Se ha alcanzado el límite de $1 competidores mostrados",
-  "export": "Exportar"
+  "export": "Exportar",
+  "save": "Guardar",
+  "cancel": "Cancelar"
 }

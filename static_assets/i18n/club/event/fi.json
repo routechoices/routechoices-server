@@ -32,5 +32,7 @@
     "qr-link": "QR-linkki",
     "language": "Kieli",
     "reached-max-runners": "$1 kilpailijan raja on saavutettu",
-    "export": "Vie"
+    "export": "Vie",
+    "save": "Tallenna",
+    "cancel": "Peruuttaa"
 }

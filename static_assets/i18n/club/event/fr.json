@@ -32,5 +32,7 @@
     "qr-link": "Lien QR code",
     "language": "Langue",
     "reached-max-runners": "La limite de $1 concurrents affichés a été atteinte",
-    "export": "Exporter"
+    "export": "Exporter",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
 }
