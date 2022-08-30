@@ -504,6 +504,12 @@ var selectReplayMode = function (e) {
           getCompetitionStartDate());
     }
     currentTime = Math.min(+clock.now(), currentTime, maxCTime);
+    var liveTime =
+      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3;
+    if (currentTime > liveTime) {
+      selectLiveMode();
+      return;
+    }
     drawCompetitors();
     prevShownTime = currentTime;
     prevDisplayRefresh = performance.now();
