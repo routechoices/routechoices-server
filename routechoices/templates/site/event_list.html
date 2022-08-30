@@ -54,11 +54,11 @@
                   {% if not club %}<div>By <a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
               </div>
               <div class="p-2 bd-highlight" style="border-left: 1px solid rgba(0,0,0,.125); width:320px">
-                {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
-                {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
-                {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
-                    <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
+                {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a><br/>{% endif %}
+                 {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
+                    <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a><br/>
                 {% endif %}
+                {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
               </div>
           </div>
       </div>
@@ -100,9 +100,9 @@
                     {% if not club %}<div>By <a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
                 </div>
                 <div class="p-2 bd-highlight" style="border-left: 1px solid rgba(0,0,0,.125); width:320px">
-                  {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a>{% endif %}
+                  {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a><br/>{% endif %}
                   {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
-                      <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
+                      <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a><br/>
                   {% endif %}
                 {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
                 </div>
