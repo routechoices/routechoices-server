@@ -32,14 +32,9 @@ urlpatterns = [
         name="event_kmz_view",
     ),
     re_path(
-        r"(?P<slug>[0-9a-zA-Z_-]+)/registration/?$",
-        views.event_registration_view,
-        name="event_registration_view",
-    ),
-    re_path(
-        r"(?P<slug>[0-9a-zA-Z_-]+)/route-upload/?$",
-        views.event_route_upload_view,
-        name="event_route_upload_view",
+        r"(?P<slug>[0-9a-zA-Z_-]+)/contribute/?$",
+        views.event_contribute_view,
+        name="event_contribute_view",
     ),
     re_path(r"(?P<slug>[0-9a-zA-Z_-]+)/?$", views.event_view, name="event_view"),
 ]

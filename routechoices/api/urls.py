@@ -62,14 +62,19 @@ urlpatterns = [
         name="event_register",
     ),
     re_path(
-        r"^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$",
+        r"^competitors/(?P<competitor_id>[0-9a-zA-Z_-]+)/?$",
         views.competitor_api,
         name="competitor_api",
     ),
     re_path(
-        r"competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/route/?$",
+        r"competitors/(?P<competitor_id>[0-9a-zA-Z_-]+)/route/?$",
         views.competitor_route_upload,
         name="competitor_route_upload",
+    ),
+    re_path(
+        r"^competitors/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx/?$",
+        views.competitor_gpx_download,
+        name="competitor_gpx_download",
     ),
     re_path(
         r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$",
@@ -95,11 +100,6 @@ urlpatterns = [
         r"^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$",
         views.map_kmz_download,
         name="map_kmz_download",
-    ),
-    re_path(
-        r"^competitor/(?P<competitor_id>[0-9a-zA-Z_-]+)/gpx/?$",
-        views.competitor_gpx_download,
-        name="competitor_gpx_download",
     ),
     re_path(
         r"^woo/race_status/get_info.json$",

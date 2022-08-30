@@ -1,5 +1,3 @@
-import gpxpy
-from defusedxml import minidom
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import BadRequest, PermissionDenied
@@ -13,16 +11,8 @@ from django_hosts.resolvers import reverse
 
 from routechoices.api.views import serve_from_s3
 from routechoices.club import feeds
-from routechoices.core.models import (
-    PRIVACY_PRIVATE,
-    PRIVACY_PUBLIC,
-    Club,
-    Competitor,
-    Device,
-    Event,
-)
-from routechoices.lib.helpers import initial_of_name, short_random_key
-from routechoices.site.forms import CompetitorForm, UploadGPXForm
+from routechoices.core.models import PRIVACY_PRIVATE, PRIVACY_PUBLIC, Club, Event
+from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
 def handle_legacy_request(view_name, club_slug=None, **kwargs):
@@ -326,7 +316,7 @@ def event_kmz_view(request, slug, index="0", **kwargs):
     )
 
 
-def event_registration_view(request, slug, **kwargs):
+def event_contribute_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
         "event_registration_view", kwargs.get("club_slug"), slug=slug
     )
@@ -345,133 +335,47 @@ def event_registration_view(request, slug, **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         return render(request, "club/404_event.html", {"club": club}, status=404)
-    if event.end_date < now() or not event.open_registration:
-        return render(
-            request,
-            "club/event_registration_closed.html",
-            {
-                "event": event,
-            },
+
+    if request.GET.get("competitor-added", None):
+        messages.success(request, "Competitor Added!")
+        return redirect(
+            reverse(
+                "event_contribute_view",
+                host="clubs",
+                host_kwargs={"club_slug": club_slug},
+                kwargs={"slug": slug},
+            )
         )
-    if request.method == "POST":
-        form = CompetitorForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            competitor = form.save()
-            competitor.short_name = initial_of_name(competitor.name)
-            competitor.save()
-            messages.success(request, "Successfully registered for this event.")
-            target_url = f"{event.club.nice_url}{event.slug}/registration"
-            return redirect(target_url)
-        else:
-            devices = Device.objects.none()
-            form.fields["device"].queryset = devices
-    else:
-        if event.club.domain and not request.use_cname:
-            return redirect(f"{event.club.nice_url}{event.slug}/registration")
-        form = CompetitorForm(initial={"event": event})
-        devices = Device.objects.none()
-        form.fields["device"].queryset = devices
-    form.fields["device"].label = "Device ID"
+    if request.GET.get("route-uploaded", None):
+        messages.success(request, "Data uploaded!")
+        return redirect(
+            reverse(
+                "event_contribute_view",
+                host="clubs",
+                host_kwargs={"club_slug": club_slug},
+                kwargs={"slug": slug},
+            )
+        )
+
+    can_upload = event.allow_route_upload and (event.start_date <= now())
+    can_register = event.open_registration and (event.end_date >= now() or can_upload)
+
+    register_form = None
+    if can_register:
+        register_form = RegisterForm(event=event)
+
+    upload_form = None
+    if can_upload:
+        upload_form = CompetitorUploadGPXForm(event=event)
+
     return render(
         request,
-        "club/event_registration.html",
+        "club/event_contribute.html",
         {
             "event": event,
-            "form": form,
-        },
-    )
-
-
-def event_route_upload_view(request, slug, **kwargs):
-    bypass_resp = handle_legacy_request(
-        "event_route_upload_view", kwargs.get("club_slug"), slug=slug
-    )
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    event = (
-        Event.objects.all()
-        .select_related("club")
-        .filter(
-            club__slug__iexact=club_slug,
-            slug__iexact=slug,
-        )
-        .first()
-    )
-    if not event:
-        club = get_object_or_404(Club, slug__iexact=club_slug)
-        return render(request, "club/404_event.html", {"club": club}, status=404)
-    if event.start_date > now() or not event.allow_route_upload:
-        return render(
-            request,
-            "club/event_route_upload_closed.html",
-            {
-                "event": event,
-            },
-        )
-    if request.method == "POST":
-        form = UploadGPXForm(request.POST, request.FILES, event=event)
-        # check whether it's valid:
-        if form.is_valid():
-            error = None
-            try:
-                gpx_file = form.cleaned_data["gpx_file"].read()
-                data = minidom.parseString(gpx_file)
-                gpx_file = data.toxml(encoding="utf-8")
-            except Exception:
-                error = "Couldn't decode file"
-            if not error:
-                try:
-                    gpx = gpxpy.parse(gpx_file)
-                except Exception:
-                    error = "Couldn't parse file"
-            if not error:
-                device = Device.objects.create(
-                    aid=f"{short_random_key()}_GPX", is_gpx=True
-                )
-                points = []
-                start_time = None
-                for track in gpx.tracks:
-                    for segment in track.segments:
-                        for point in segment.points:
-                            if point.time and point.latitude and point.longitude:
-                                points.append(
-                                    (
-                                        int(point.time.timestamp()),
-                                        round(point.latitude, 5),
-                                        round(point.longitude, 5),
-                                    )
-                                )
-                                if not start_time:
-                                    start_time = point.time
-                device.add_locations(points, push_forward=False)
-                competitor_name = form.cleaned_data["name"]
-                competitor = Competitor.objects.create(
-                    event=event,
-                    name=competitor_name,
-                    short_name=initial_of_name(competitor_name),
-                    device=device,
-                )
-                if start_time and event.start_date <= start_time <= event.end_date:
-                    competitor.start_time = start_time
-                competitor.save()
-                target_url = f"{event.club.nice_url}{event.slug}/route-upload"
-            if not error:
-                messages.success(request, "The upload of the GPX file was successful")
-                return redirect(target_url)
-            else:
-                messages.error(request, error)
-    else:
-        if event.club.domain and not request.use_cname:
-            return redirect(f"{event.club.nice_url}{event.slug}/route-upload")
-        form = UploadGPXForm()
-    return render(
-        request,
-        "club/event_route_upload.html",
-        {
-            "event": event,
-            "form": form,
+            "register_form": register_form,
+            "upload_form": upload_form,
+            "event_ended": event.end_date < now(),
         },
     )
 

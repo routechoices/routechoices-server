@@ -2,19 +2,16 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
 from allauth.account.utils import filter_users_by_email
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from django.db.models import Q
 from django.forms import (
     CharField,
+    ChoiceField,
     FileField,
     Form,
-    HiddenInput,
     ModelChoiceField,
-    ModelForm,
     Textarea,
 )
-from django.utils.timezone import now
-from django_hosts.resolvers import reverse
 
 from routechoices.core.models import Competitor, Device
 
@@ -40,53 +37,35 @@ class ResetPasswordForm(OrigResetPasswordForm):
         return self.cleaned_data["email"]
 
 
-class UploadGPXForm(Form):
+class RegisterForm(Form):
     name = CharField(max_length=64, required=True)
-    gpx_file = FileField(
-        max_length=255, validators=[FileExtensionValidator(allowed_extensions=["gpx"])]
+    short_name = CharField(max_length=64, required=False)
+    device_id = ModelChoiceField(
+        required=False, queryset=Device.objects.none(), label="Device ID"
     )
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
 
-    def clean_name(self):
-        name = self.cleaned_data["name"]
-        if self.event and self.event.competitors.filter(name=name).exists():
-            raise ValidationError("Name already taken")
-        return name
 
-
-class CompetitorForm(ModelForm):
-    device = ModelChoiceField(required=True, queryset=Device.objects.all())
+class CompetitorUploadGPXForm(Form):
+    competitor_aid = ChoiceField(required=True, choices=[], label="Competitor")
+    gpx_file = FileField(
+        max_length=255,
+        validators=[FileExtensionValidator(allowed_extensions=["gpx"])],
+        label="GPX File",
+    )
 
     def __init__(self, *args, **kwargs):
+        event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
-        self.fields[
-            "device"
-        ].help_text = f"find out how to get a device ID from the <a href=\"{reverse('site:trackers_view')}\">trackers page</a>"
-
-    class Meta:
-        model = Competitor
-        fields = ("event", "device", "name")
-        widgets = {
-            "event": HiddenInput(),
-        }
-
-    def clean_name(self):
-        event = self.cleaned_data.get("event")
-        name = self.cleaned_data["name"]
-        if event and event.competitors.filter(name=name).exists():
-            raise ValidationError("Name already taken")
-        return name
-
-    def clean(self):
-        super().clean()
-        event = self.cleaned_data.get("event")
-        if event.end_date < now():
-            raise ValidationError(
-                "Competition ended, registration is not possible anymore"
-            )
+        competitors = list(
+            Competitor.objects.select_related("device")
+            .filter(event=event)
+            .filter(Q(device__locations_encoded="") | Q(device__isnull=True))
+        )
+        self.fields["competitor_aid"].choices = [(c.aid, c.name) for c in competitors]
 
 
 class ContactForm(Form):

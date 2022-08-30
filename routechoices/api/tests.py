@@ -465,7 +465,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
             name="Test event",
             open_registration=True,
             allow_route_upload=True,
-            start_date=arrow.get().datetime,
+            start_date=arrow.get().shift(seconds=-1).datetime,
             end_date=arrow.get().shift(hours=1).datetime,
         )
         self.club.admins.set([self.user])
@@ -478,7 +478,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
             kwargs={"competitor_id": self.competitor.aid},
         )
         self.assertEqual(
-            self.url, f"//api.localhost:8000/competitor/{self.competitor.aid}/route"
+            self.url, f"//api.localhost:8000/competitors/{self.competitor.aid}/route"
         )
 
     def test_route_upload_api_valid(self):
@@ -488,7 +488,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
             {
                 "latitudes": "1.1,1.2",
                 "longitudes": "3.1,3.2",
-                "timestamps": f"{t},{t+1}",
+                "timestamps": f"{ t },{t + 1}",
             },
             SERVER_NAME="api.localhost:8000",
         )
@@ -540,7 +540,37 @@ class RouteUploadApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
+        self.assertIn("Invalid time value", errors[0])
+
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,3.2",
+                "timestamps": f"{t},Nope",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
         self.assertIn("Invalid data format", errors[0])
+
+        t = time.time()
+        res = self.client.post(
+            self.url,
+            {
+                "latitudes": "1.1,1.2",
+                "longitudes": "3.1,NaN",
+                "timestamps": f"{t},{t+1}",
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Invalid longitude value", errors[0])
 
     def test_route_upload_api_invalid_lon(self):
         t = time.time()
@@ -703,7 +733,7 @@ class RegistrationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
-        self.assertIn("Shortname already in use in this event", errors[0])
+        self.assertIn("Short name already in use in this event", errors[0])
         # bad start_time
         res = self.client.post(
             url,

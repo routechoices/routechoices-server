@@ -36,25 +36,22 @@ class ClubViewsTestCase(LiveServerTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Export data of")
 
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/registration")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/contribute")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Registration is closed")
+        self.assertContains(response, "Registration and route upload closed.")
 
         e.open_registration = True
         e.save()
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/registration")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/contribute")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Register for event")
-
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/route-upload")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Route upload is closed")
+        self.assertContains(response, "Add competitor")
 
         e.allow_route_upload = True
         e.save()
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/route-upload")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-1/contribute")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Upload a route on event")
+        self.assertContains(response, "Add competitor")
+        self.assertContains(response, "Upload route for existing competitor")
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/does-not-exist")
         self.assertEqual(response.status_code, 404)
@@ -67,10 +64,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-69/export")
         self.assertEqual(response.status_code, 404)
         self.assertTrue("Event not found" in response.content.decode())
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-69/registration")
-        self.assertEqual(response.status_code, 404)
-        self.assertTrue("Event not found" in response.content.decode())
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-69/route-upload")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-69/contribute")
         self.assertEqual(response.status_code, 404)
         self.assertTrue("Event not found" in response.content.decode())
         response = self.client.get(
@@ -117,13 +111,10 @@ class ClubViewsTestCase(LiveServerTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Export is not available yet")
 
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-2/registration")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-2/contribute")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Register for event")
-
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-2/route-upload")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Route upload is closed")
+        self.assertContains(response, "Add competitor")
+        self.assertNotContains(response, "Upload route for existing competitor")
 
     def test_past_event_pages_loads(self):
         Event.objects.create(
@@ -143,13 +134,10 @@ class ClubViewsTestCase(LiveServerTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Export data of")
 
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-3/registration")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-3/contribute")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Registration is closed")
-
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-3/route-upload")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Upload a route on event")
+        self.assertContains(response, "Add competitor")
+        self.assertContains(response, "Upload route for existing competitor")
 
     def test_private_event_page_load(self):
         Event.objects.create(
@@ -169,10 +157,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-4/export")
         self.assertEqual(response.status_code, 403)
 
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/registration")
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/route-upload")
+        response = self.client.get(f"{self.live_server_url}/kiila-cup-4/contribute")
         self.assertEqual(response.status_code, 200)
 
         self.client.login(username="alice", password="pa$$word123")

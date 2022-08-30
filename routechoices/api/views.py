@@ -427,7 +427,7 @@ def event_register(request, event_id):
             "invalid-start-time": "Start time could not be parsed",
             "bad-start-time": "Competitor start time should be during the event time",
             "bad-name": "Name already in use in this event",
-            "bad-sname": "Shortname already in use in this event",
+            "bad-sname": "Short name already in use in this event",
             "registration-closed": "Registration is closed",
         },
         "es": {
@@ -509,7 +509,9 @@ def event_register(request, event_id):
     if event.competitors.filter(name=name).exists():
         errs.append(err_messages[lang]["bad-name"])
 
-    if event.competitors.filter(short_name=short_name).exists():
+    if event.competitors.filter(short_name=short_name).exists() and request.data.get(
+        "short_name"
+    ):
         errs.append(err_messages[lang]["bad-sname"])
 
     device_id = request.data.get("device_id")
@@ -654,9 +656,7 @@ def competitor_route_upload(request, competitor_id):
     try:
         lats = [float(x) for x in request.data.get("latitudes", "").split(",") if x]
         lons = [float(x) for x in request.data.get("longitudes", "").split(",") if x]
-        times = [
-            int(float(x)) for x in request.data.get("timestamps", "").split(",") if x
-        ]
+        times = [float(x) for x in request.data.get("timestamps", "").split(",") if x]
     except ValueError:
         raise ValidationError("Invalid data format")
 
@@ -676,13 +676,18 @@ def competitor_route_upload(request, competitor_id):
             tim = times[i]
             try:
                 validate_longitude(lon)
-            except DjangoValidationError:
+            except Exception:
                 raise ValidationError("Invalid longitude value")
             try:
                 validate_latitude(lat)
-            except DjangoValidationError:
+            except Exception:
                 raise ValidationError("Invalid latitude value")
-            loc_array.append((tim, lat, lon))
+            try:
+                int(tim)
+            except Exception:
+                raise ValidationError("Invalid time value")
+            if event.start_date.timestamp() <= tim <= event.end_date.timestamp():
+                loc_array.append((int(tim), lat, lon))
 
     device = None
     if len(loc_array) > 0:
@@ -692,6 +697,9 @@ def competitor_route_upload(request, competitor_id):
         device.add_locations(loc_array, push_forward=False)
         competitor.device = device
         competitor.save()
+
+    if len(loc_array) == 0:
+        raise ValidationError("No locations within event schedule were detected")
 
     return Response(
         {

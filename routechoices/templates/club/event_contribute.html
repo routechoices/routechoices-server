@@ -1,0 +1,67 @@
+{% extends "club/base.html" %}
+{% load static %}
+{% load hosts %}
+{% load django_bootstrap5 %}
+{% load compress %}
+
+{%  block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+{%  endblock %}
+
+{% block head_title %}{{ event.name }} contribution page | Powered by {{ site.name }}{% endblock %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} contribution page{% endblock %}
+
+{% block content %}
+<div class="row">
+    <h1>Contribute to {{ event.name }} by {{ event.club.name }}</h1>
+    {% if register_form %}
+    <div class="col-12">
+        <h2>Add competitor</h2>
+        <p>Event {% if not event.hidden %}started {{event.start_date|timesince}} ago{% else %}starts on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+        <form action="" method="post" id="registration-form" style="margin-bottom: 15px">
+            {% csrf_token %}
+            {% bootstrap_form register_form %}
+            <p id="warning-if-device-id" class="d-none"><i class="fa fa-warning"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+            <input type="submit" value="Add competitor" class="btn btn-primary">
+        </form>
+    </div>
+    {% endif %}
+    {% if upload_form and register_form %}
+    <hr/>
+    {% endif %}
+    {% if upload_form %}
+    <div class="col-12">
+        <h2>Upload route for existing competitor</h2>
+        <form action="" method="post" id="upload-form" style="margin-bottom: 15px">
+            {% csrf_token %}
+            {% bootstrap_form upload_form %}
+            <p id="warning-if-open-registration" class="d-none"><i class="fa fa-warning"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
+            <input type="submit" value="Upload Route" class="btn btn-primary">
+        </form>
+    </div>
+    {% endif %}
+    {% if not register_form and not upload_form %}
+    <div class="col-12">
+        <h2>Registration and route upload closed.</h2>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+<script src="{% static '/scripts/load-local-variables.js' %}"
+    data-api-base-url="{% host_url 'api_doc' host 'api' %}"
+    data-event-id="{{ event.aid }}"
+    data-csrf-token="{{ csrf_token }}"
+    {% if event_ended %}data-event-ended="1"{% endif %}>
+</script>
+{% compress js %}
+<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/scripts/club/event_contribute.js' %}" ></script>
+{% endcompress %}
+{% endblock %}
