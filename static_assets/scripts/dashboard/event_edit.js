@@ -171,7 +171,6 @@ function showLocalTime(el) {
     } else {
       u(el).val("");
     }
-    
   });
   u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
