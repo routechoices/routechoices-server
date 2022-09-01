@@ -39,9 +39,10 @@ def _get_device(imei):
     try:
         return Device.objects.get(physical_device__imei=imei)
     except DatabaseError:
-        from django import db
+        from django.db import connections
 
-        db.close_connection()
+        for conn in connections.all():
+            conn.close_if_unusable_or_obsolete()
         time.sleep(5)
         return _get_device(imei)
     except Exception:
@@ -58,9 +59,10 @@ def _get_pending_commands(imei):
         t = arrow.now().datetime
         return t, commands
     except DatabaseError:
-        from django import db
+        from django.db import connections
 
-        db.close_connection()
+        for conn in connections.all():
+            conn.close_if_unusable_or_obsolete()
         return None
     except Exception:
         return None
@@ -74,9 +76,10 @@ def _mark_pending_commands_sent(imei, max_date):
             creation_date__lte=max_date,
         ).update(sent=True, modification_date=arrow.now().datetime)
     except DatabaseError:
-        from django import db
+        from django.db import connections
 
-        db.close_connection()
+        for conn in connections.all():
+            conn.close_if_unusable_or_obsolete()
         return 0
     except Exception:
         return 0
