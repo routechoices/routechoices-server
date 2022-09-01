@@ -1,41 +1,38 @@
 # coding=utf-8
 import json
+import logging
 import math
 import os.path
-from struct import pack, unpack
+import signal
+import sys
 import time
+from struct import pack, unpack
+
 import arrow
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import DatabaseError
 from django.core.management.base import BaseCommand
+from django.db import DatabaseError
 from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
-import signal
-import sys
+from routechoices.core.models import Device, TcpDeviceCommand
+from routechoices.lib.helpers import random_key, safe64encode
+from routechoices.lib.validators import validate_imei
+
+logger = logging.getLogger("TCP Rotating Log")
+logger.setLevel(logging.INFO)
+handler = logging.handlers.RotatingFileHandler(
+    os.path.join(settings.BASE_DIR, "logs", "tcp.log"), maxBytes=10000000, backupCount=5
+)
+logger.addHandler(handler)
 
 
 def sigterm_handler(_signo, _stack_frame):
     # Raises SystemExit(0):
     sys.exit(0)
-
-from routechoices.core.models import Device, TcpDeviceCommand
-from routechoices.lib.validators import validate_imei
-from routechoices.lib.helpers import safe64encode, random_key
-
-import logging
-
-logger = logging.getLogger("TCP Rotating Log")
-logger.setLevel(logging.INFO)
-handler = logging.handlers.RotatingFileHandler(
-    os.path.join(settings.BASE_DIR, 'logs', 'tcp.log'),
-    maxBytes=10000000,
-    backupCount=5
-)
-logger.addHandler(handler)
 
 
 def _get_device(imei):
@@ -43,6 +40,7 @@ def _get_device(imei):
         return Device.objects.get(physical_device__imei=imei)
     except DatabaseError:
         from django import db
+
         db.close_connection()
         time.sleep(5)
         return _get_device(imei)
@@ -61,6 +59,7 @@ def _get_pending_commands(imei):
         return t, commands
     except DatabaseError:
         from django import db
+
         db.close_connection()
         return None
     except Exception:
@@ -76,6 +75,7 @@ def _mark_pending_commands_sent(imei, max_date):
         ).update(sent=True, modification_date=arrow.now().datetime)
     except DatabaseError:
         from django import db
+
         db.close_connection()
         return 0
     except Exception:
@@ -176,7 +176,9 @@ class TMT250Connection:
             await self.stream.write(pack("b", 0))
             self.stream.close()
             return
-        logger.info(f'{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}')
+        logger.info(
+            f"{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
+        )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
             print(f"imei not registered {self.address}, {imei}", flush=True)
@@ -204,7 +206,9 @@ class TMT250Connection:
             try:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
-                logger.info(f'{time.time()}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}')
+                logger.info(
+                    f"{time.time()}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}"
+                )
                 await self._on_read_line(data[:data_len])
             except Exception as e:
                 print("exception reading data " + str(e))
@@ -260,7 +264,9 @@ class GL200Connection:
         try:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
-            logger.info(f'{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}')
+            logger.info(
+                f"{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}"
+            )
             print(f"Received data ({data})", flush=True)
             parts = data.split(",")
             if parts[0][:7] == "+ACK:GT" or parts[0][:8] in ("+RESP:GT", "+BUFF:GT"):
@@ -364,7 +370,7 @@ class GL200Connection:
     async def read_line(self):
         data_bin = await self.stream.read_until(b"$")
         data = data_bin.decode("ascii")
-        logger.info(f'{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}')
+        logger.info(f"{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}")
         print(f"Received data ({data})")
         await self.send_pending_commands()
         return await self.process_line(data)
@@ -504,7 +510,7 @@ class Command(BaseCommand):
         tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
             print("Start listening TCP data...", flush=True)
-            logger.info(f'{time.time()}, UP')
+            logger.info(f"{time.time()}, UP")
             IOLoop.current().start()
         except (KeyboardInterrupt, SystemExit):
             tmt250_server.stop()
@@ -513,5 +519,5 @@ class Command(BaseCommand):
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)
-            logger.info(f'{time.time()}, DOWN')
+            logger.info(f"{time.time()}, DOWN")
             logging.shutdown()
