@@ -161,7 +161,6 @@ class TMT250Connection:
             validate_imei(imei)
         except Exception:
             is_valid_imei = False
-        logger.info(f'{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}')
         if imei_len != len(imei) or not is_valid_imei:
             print(
                 f"invalid identification {self.address}, {imei}, {imei_len}", flush=True
@@ -169,6 +168,7 @@ class TMT250Connection:
             await self.stream.write(pack("b", 0))
             self.stream.close()
             return
+        logger.info(f'{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}')
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
             print(f"imei not registered {self.address}, {imei}", flush=True)
