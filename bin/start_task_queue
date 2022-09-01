@@ -12,11 +12,11 @@ then
   echo "already running"
  else
   echo "starting"
-  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py process_tasks > ${BASEDIR}/log/tasks.log 2> ${BASEDIR}/log/tasks.error.log &
+  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py process_tasks > ${BASEDIR}/logs/tasks.log 2> ${BASEDIR}/logs/tasks.error.log &
   echo $! > $PID_FILE
  fi
 else
  echo "starting"
- nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py process_tasks > ${BASEDIR}/log/tasks.log 2> ${BASEDIR}/log/tasks.error.log &
+ nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py process_tasks > ${BASEDIR}/logs/tasks.log 2> ${BASEDIR}/logs/tasks.error.log &
  echo $! > $PID_FILE
 fi

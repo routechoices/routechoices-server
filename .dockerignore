@@ -5,6 +5,7 @@ static/*
 .github/*
 cypress/*
 log/*
+logs/*
 .gitignore
 cypress.json
 da
