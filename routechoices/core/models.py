@@ -1237,7 +1237,7 @@ class Device(models.Model):
                             headers={
                                 "Authorization": f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
                             },
-                            timeout=1
+                            timeout=1,
                         )
             except Exception:
                 pass
