@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(r"^time/?$", views.get_time, name="time_api"),
     re_path(r"^search/device/?$", views.device_search, name="device_search_api"),
     re_path(r"^search/user/?$", views.user_search, name="user_search_api"),
+    re_path(r"^user/?$", views.user_view, name="user_view_api"),
     re_path(
         r"^device/(?P<device_id>[^/]+)/?$",
         views.device_info,

@@ -1157,6 +1157,26 @@ def user_search(request):
     auto_schema=None,
 )
 @api_view(["GET"])
+@login_required
+def user_view(request):
+    user = request.user
+    if user.is_superuser:
+        clubs = Club.objects.all()
+    else:
+        clubs = Club.objects.filter(admins=user)
+
+    output = {
+        "username": user.username,
+        "clubs": [{"name": c.name, "slug": c.slug} for c in clubs],
+    }
+    return Response(output)
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_view(["GET"])
 def device_search(request):
     devices = []
     q = request.GET.get("q")
