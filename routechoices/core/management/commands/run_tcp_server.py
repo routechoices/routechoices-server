@@ -2,11 +2,12 @@
 import json
 import math
 from struct import pack, unpack
-
+import time
 import arrow
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import DatabaseError
 from django.core.management.base import BaseCommand
 from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
@@ -21,6 +22,11 @@ mat_updated = False
 def _get_device(imei):
     try:
         return Device.objects.get(physical_device__imei=imei)
+    except DatabaseError:
+        from django import db
+        db.close_connection()
+        time.sleep(5)
+        return _get_device(imei)
     except Exception:
         return None
 
@@ -34,6 +40,10 @@ def _get_pending_commands(imei):
         )
         t = arrow.now().datetime
         return t, commands
+    except DatabaseError:
+        from django import db
+        db.close_connection()
+        return None
     except Exception:
         return None
 
@@ -45,6 +55,10 @@ def _mark_pending_commands_sent(imei, max_date):
             sent=False,
             creation_date__lte=max_date,
         ).update(sent=True, modification_date=arrow.now().datetime)
+    except DatabaseError:
+        from django import db
+        db.close_connection()
+        return 0
     except Exception:
         return 0
 
@@ -463,9 +477,11 @@ class Command(BaseCommand):
         gl200_server.listen(settings.GL200_PORT)
         tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
+            print("Listening TCP data...", flush=True)
             IOLoop.current().start()
         except KeyboardInterrupt:
             tmt250_server.stop()
             gl200_server.stop()
             tracktape_server.stop()
             IOLoop.current().stop()
+        print("Stopped listening TCP data...", flush=True)
