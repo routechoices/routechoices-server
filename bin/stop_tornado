@@ -6,7 +6,7 @@ PID_FILE=${BASEDIR}/var/tornado.pid
 if [[ -e $PID_FILE ]];
 then
   echo 'stopping'
-  kill -9 `cat $PID_FILE`
+  kill -s SIGTERM `cat $PID_FILE`
   rm $PID_FILE
 else
   echo 'proccess not running'
