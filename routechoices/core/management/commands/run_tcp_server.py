@@ -1,6 +1,7 @@
 # coding=utf-8
 import json
 import math
+import os.path
 from struct import pack, unpack
 import time
 import arrow
@@ -15,8 +16,18 @@ from tornado.tcpserver import TCPServer
 
 from routechoices.core.models import Device, TcpDeviceCommand
 from routechoices.lib.validators import validate_imei
+from routechoices.lib.helpers import safe64encode, random_key
 
-mat_updated = False
+import logging
+
+logger = logging.getLogger("TCP Rotating Log")
+logger.setLevel(logging.INFO)
+handler = logging.handlers.RotatingFileHandler(
+    os.path.join(settings.BASE_DIR, 'logs', 'tcp.log'),
+    maxBytes=10000000,
+    backupCount=5
+)
+logger.addHandler(handler)
 
 
 def _get_device(imei):
@@ -122,6 +133,7 @@ class TMT250Decoder:
 class TMT250Connection:
     def __init__(self, stream, address):
         print(f"received a new connection from {address} on port 2000")
+        self.aid = random_key()
         self.imei = None
         self.address = address
         self.stream = stream
@@ -149,6 +161,7 @@ class TMT250Connection:
             validate_imei(imei)
         except Exception:
             is_valid_imei = False
+        logger.info(f'{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}')
         if imei_len != len(imei) or not is_valid_imei:
             print(
                 f"invalid identification {self.address}, {imei}, {imei_len}", flush=True
@@ -183,6 +196,7 @@ class TMT250Connection:
             try:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
+                logger.info(f'{time.time()}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}')
                 await self._on_read_line(data[:data_len])
             except Exception as e:
                 print("exception reading data " + str(e))
@@ -225,6 +239,7 @@ class TMT250Server(TCPServer):
 class GL200Connection:
     def __init__(self, stream, address):
         print(f"Received a new connection from {address} on port 2002")
+        self.aid = random_key()
         self.imei = None
         self.address = address
         self.stream = stream
@@ -237,6 +252,7 @@ class GL200Connection:
         try:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
+            logger.info(f'{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}')
             print(f"Received data ({data})", flush=True)
             parts = data.split(",")
             if parts[0][:7] == "+ACK:GT" or parts[0][:8] in ("+RESP:GT", "+BUFF:GT"):
@@ -340,6 +356,7 @@ class GL200Connection:
     async def read_line(self):
         data_bin = await self.stream.read_until(b"$")
         data = data_bin.decode("ascii")
+        logger.info(f'{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}')
         print(f"Received data ({data})")
         await self.send_pending_commands()
         return await self.process_line(data)
@@ -477,7 +494,8 @@ class Command(BaseCommand):
         gl200_server.listen(settings.GL200_PORT)
         tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
-            print("Listening TCP data...", flush=True)
+            print("Start listening TCP data...", flush=True)
+            logger.info(f'{time.time()}, UP')
             IOLoop.current().start()
         except KeyboardInterrupt:
             tmt250_server.stop()
@@ -485,3 +503,4 @@ class Command(BaseCommand):
             tracktape_server.stop()
             IOLoop.current().stop()
         print("Stopped listening TCP data...", flush=True)
+        logger.info(f'{time.time()}, DOWN')
