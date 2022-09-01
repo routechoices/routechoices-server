@@ -502,5 +502,8 @@ class Command(BaseCommand):
             gl200_server.stop()
             tracktape_server.stop()
             IOLoop.current().stop()
+        except Exception:
+            pass
         print("Stopped listening TCP data...", flush=True)
         logger.info(f'{time.time()}, DOWN')
+        logging.shutdown()
