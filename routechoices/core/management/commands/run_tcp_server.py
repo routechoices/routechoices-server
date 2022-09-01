@@ -14,6 +14,14 @@ from tornado.ioloop import IOLoop
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
+import signal
+import sys
+
+
+def sigterm_handler(_signo, _stack_frame):
+    # Raises SystemExit(0):
+    sys.exit(0)
+
 from routechoices.core.models import Device, TcpDeviceCommand
 from routechoices.lib.validators import validate_imei
 from routechoices.lib.helpers import safe64encode, random_key
@@ -487,6 +495,7 @@ class Command(BaseCommand):
     help = "Run a TCP server for GPS trackers."
 
     def handle(self, *args, **options):
+        signal.signal(signal.SIGTERM, sigterm_handler)
         tmt250_server = TMT250Server()
         gl200_server = GL200Server()
         tracktape_server = TrackTapeServer()
@@ -497,13 +506,12 @@ class Command(BaseCommand):
             print("Start listening TCP data...", flush=True)
             logger.info(f'{time.time()}, UP')
             IOLoop.current().start()
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, SystemExit):
             tmt250_server.stop()
             gl200_server.stop()
             tracktape_server.stop()
             IOLoop.current().stop()
-        except Exception:
-            pass
-        print("Stopped listening TCP data...", flush=True)
-        logger.info(f'{time.time()}, DOWN')
-        logging.shutdown()
+        finally:
+            print("Stopped listening TCP data...", flush=True)
+            logger.info(f'{time.time()}, DOWN')
+            logging.shutdown()
