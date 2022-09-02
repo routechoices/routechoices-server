@@ -363,7 +363,7 @@ class GL200Connection:
                 batt = int(parts[-3])
                 await self.on_data(pts, batt)
             elif parts[0] == "+ACK:GTHBD":
-                self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}$".encode("ascii"))
+                self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii"))
         except Exception as e:
             print(f"Error processing line: {str(e)}", flush=True)
             self.stream.close()
