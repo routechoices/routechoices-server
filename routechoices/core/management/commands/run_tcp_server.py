@@ -447,7 +447,7 @@ class TrackTapeConnection:
         self.imei = imei
         print(f"{self.imei} is connected")
 
-        self._process_data(data)
+        await self._process_data(data)
 
         while await self._read_line():
             pass
@@ -480,7 +480,7 @@ class TrackTapeConnection:
                 data_raw = data_bin.decode("ascii").strip()
             print(f"Received data ({data_raw})")
             data = json.loads(data_raw)
-            self._process_data(data)
+            await self._process_data(data)
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
             self.stream.close()
@@ -500,6 +500,129 @@ class TrackTapeServer(TCPServer):
             pass
 
 
+class MicTrackConnection:
+    def __init__(self, stream, address):
+        print(f"Received a new connection from {address} on port 2001")
+        self.aid = random_key()
+        self.imei = None
+        self.address = address
+        self.stream = stream
+        self.stream.set_close_callback(self._on_close)
+        self.db_device = None
+
+    async def start_listening(self):
+        print(f"Start listening from {self.address}")
+        imei = None
+        try:
+            data_raw = ""
+            while not data_raw:
+                data_bin = await self.stream.read_until(b"\r\n##")
+                data_raw = data_bin.decode("ascii").strip()
+            print(f"Received data ({data_raw})", flush=True)
+            data = data_raw.split("#")
+            imei = data[1]
+        except Exception as e:
+            print(e, flush=True)
+            self.stream.close()
+            return
+        if not imei:
+            print("No imei", flush=True)
+            self.stream.close()
+            return
+        is_valid_imei = True
+        try:
+            validate_imei(imei)
+        except ValidationError:
+            is_valid_imei = False
+        if not is_valid_imei:
+            print("Invalid imei", flush=True)
+            self.stream.close()
+            return
+        logger.info(
+            f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+        )
+        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        if not self.db_device:
+            print(f"Imei not registered {self.address}, {imei}", flush=True)
+            self.stream.close()
+            return
+        self.imei = imei
+        print(f"{self.imei} is connected")
+        await self._process_data(data)
+        while await self._read_line():
+            pass
+
+    async def _process_data(self, data):
+        imei = data[1]
+        if imei != self.imei:
+            return False
+        gps_data = data[6].split(",")
+        try:
+            batt_volt, msg_type = gps_data[0].split("$")
+        except Exception:
+            print("Invalid format", flush=True)
+            return False
+        if msg_type != "GPRMC" or gps_data[2] not in ("A", "L"):
+            print("Not GPS data or invalid data", flush=True)
+            return False
+        try:
+            tim = arrow.get(
+                f"{gps_data[9]} {gps_data[1]}", "DDMMYY HHmmss.S"
+            ).int_timestamp
+            lat_minute = float(gps_data[3])
+            lat = lat_minute // 100 + (lat_minute % 100) / 60
+            if gps_data[4] == "S":
+                lat *= -1
+            lon_minute = float(gps_data[5])
+            lon = lon_minute // 100 + (lon_minute % 100) / 60
+            if gps_data[6] == "W":
+                lon *= -1
+        except Exception:
+            print("Could not parse GPS data", flush=True)
+            return False
+        try:
+            self.db_device.battery_level = max(
+                [0, min([100, int(int(batt_volt) / 50 * 100)])]
+            )
+        except Exception:
+            print("Invalid battery level value", flush=True)
+            pass
+        await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+            [(tim, lat, lon)]
+        )
+        print("1 location wrote to DB", flush=True)
+
+    async def _read_line(self):
+        try:
+            data_raw = ""
+            while not data_raw:
+                data_bin = await self.stream.read_until(b"\r\n##")
+                data_raw = data_bin.decode("ascii").strip()
+            print(f"Received data ({data_raw})")
+            logger.info(
+                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+            )
+            data = data_raw.split("#")
+            await self._process_data(data)
+        except Exception as e:
+            print(f"Error parsing data: {str(e)}")
+            self.stream.close()
+            return False
+        return True
+
+    def _on_close(self):
+        print("client quit", flush=True)
+
+
+class MicTrackServer(TCPServer):
+    async def handle_stream(self, stream, address):
+        c = MicTrackConnection(stream, address)
+        try:
+            await c.start_listening()
+        except StreamClosedError:
+            pass
+
+
 class Command(BaseCommand):
     help = "Run a TCP server for GPS trackers."
 
@@ -507,10 +630,12 @@ class Command(BaseCommand):
         signal.signal(signal.SIGTERM, sigterm_handler)
         tmt250_server = TMT250Server()
         gl200_server = GL200Server()
-        tracktape_server = TrackTapeServer()
+        mictrack_server = MicTrackServer()
+        # tracktape_server = TrackTapeServer()
         tmt250_server.listen(settings.TMT250_PORT)
         gl200_server.listen(settings.GL200_PORT)
-        tracktape_server.listen(settings.TRACKTAPE_PORT)
+        mictrack_server.listen(settings.MICTRACK_PORT)
+        # tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
             print("Start listening TCP data...", flush=True)
             logger.info(f"{time.time()}, UP")
@@ -518,7 +643,8 @@ class Command(BaseCommand):
         except (KeyboardInterrupt, SystemExit):
             tmt250_server.stop()
             gl200_server.stop()
-            tracktape_server.stop()
+            mictrack_server.stop()
+            # tracktape_server.stop()
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)

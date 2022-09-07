@@ -54,6 +54,7 @@ services:
       DJANGO_WATCHMAN_TIMEOUT: 20
     ports:
       - "2000:2000"
+      - "2001:2001"
       - "2002:2002"
     expose:
       - "2000"
