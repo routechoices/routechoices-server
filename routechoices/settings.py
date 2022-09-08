@@ -1050,6 +1050,7 @@ SLUG_BLACKLIST = [
     "you",
     "yourname",
     "yourusername",
+    "youtube",
     "zlib",
 ]
 ACCOUNT_ADAPTER = "routechoices.lib.account_adapters.SiteAccountAdapter"
