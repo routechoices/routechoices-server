@@ -48,7 +48,7 @@ class ClubForm(ModelForm):
         minimum = 128
         if w < minimum or h < minimum:
             raise ValidationError(
-                "The image is too small, minimum {minimum}x{minimum} pixels"
+                f"The image is too small, minimum {minimum}x{minimum} pixels"
             )
         fn = logo.name
         with Image.open(logo.file) as image:
