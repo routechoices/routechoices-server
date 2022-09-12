@@ -7,6 +7,7 @@ from re import compile
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+from django.core.exceptions import DisallowedHost
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect, render
@@ -139,7 +140,10 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         default_domain = settings.PARENT_HOST
         if ":" in settings.PARENT_HOST:
             default_domain = settings.PARENT_HOST[: settings.PARENT_HOST.rfind(":")]
-        raw_host = request.get_host()
+        try:
+            raw_host = request.get_host()
+        except DisallowedHost:
+            return HttpResponse(status=444)
         if ":" in raw_host:
             raw_host = raw_host[: raw_host.rfind(":")]
         request.use_cname = False
