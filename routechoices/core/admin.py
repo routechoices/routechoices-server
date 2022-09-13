@@ -24,7 +24,7 @@ from routechoices.core.models import (
     SpotFeed,
     TcpDeviceCommand,
 )
-from routechoices.lib.helpers import get_device_name
+from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
@@ -211,7 +211,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "battery_level",
         "competitor_count",
     )
-    readonly_fields = ("locations_series",)
+    readonly_fields = ("last_hundred_locations",)
     actions = ["clean_positions"]
     search_fields = ("aid",)
     inlines = [
@@ -224,6 +224,14 @@ class DeviceAdmin(admin.ModelAdmin):
         HasLocationFilter,
     )
     show_full_result_count = False
+
+    def last_hundred_locations(self, obj):
+        return "\n".join(
+            [
+                f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
+                for x in obj.locations_series[-100:]
+            ]
+        )
 
     def get_ordering(self, request):
         return ["-modification_date", "aid"]
