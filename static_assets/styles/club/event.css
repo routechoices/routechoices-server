@@ -186,3 +186,9 @@ img.emoji {
   background-color: #e50000;
   border-color: #e50000;
 }
+
+.leaflet-control-zoom-out,
+.leaflet-control-zoom-in {
+  user-select: none;
+  -webkit-user-select: none;
+}
