@@ -486,9 +486,12 @@ class Map(models.Model):
     def spherical_mercator_to_map_xy(self):
         return lambda x, y: project(self.matrix_3d_inverse, x, y)
 
-    def wsg84_to_map_xy(self, lat, lon):
-        xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": lat, "lon": lon})
-        return self.spherical_mercator_to_map_xy(xy["x"], xy["y"])
+    def wsg84_to_map_xy(self, lat, lon, round_values=False):
+        world_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": lat, "lon": lon})
+        map_xy = self.spherical_mercator_to_map_xy(world_xy["x"], world_xy["y"])
+        if round_values:
+            return round(map_xy[0]), round(map_xy[1])
+        return map_xy
 
     def map_xy_to_wsg84(self, x, y):
         mx, my = self.map_xy_to_spherical_mercator(x, y)
@@ -748,7 +751,9 @@ class Map(models.Model):
         new_map.height = int(height / scale)
         draw = ImageDraw.Draw(im)
         for pts in seg:
-            map_pts = [new_map.wsg84_to_map_xy(pt[0], pt[1]) for pt in pts]
+            map_pts = [
+                new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True) for pt in pts
+            ]
             draw.line(map_pts, (255, 0, 0, 160), 15, joint="curve")
             draw.line(map_pts, (255, 255, 255, 100), 10, joint="curve")
 
