@@ -1,27 +1,27 @@
 aiohttp==3.8.1
 aiosignal==1.2.0
-arrow==1.2.2
+arrow==1.2.3
 asgiref==3.5.2
 async-timeout==4.0.2
 attrs==22.1.0
 beautifulsoup4==4.11.1
 bleach[css]==5.0.1
-boto3==1.24.50
-botocore==1.27.50
+boto3==1.24.71
+botocore==1.27.71
 bs4==0.0.1
-certifi==2022.6.15
+certifi==2022.6.15.1
 cffi==1.15.1
-charset-normalizer==2.1.0
+charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography==37.0.4
+cryptography==38.0.1
 defusedxml==0.7.1
 deprecated==1.2.13
 diskcache==5.4.0
-django==4.1
+django==4.1.1
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.51.0
-django-allauth-2fa @ git+https://github.com/valohai/django-allauth-2fa.git
+django-allauth-2fa==0.10.0
 django-appconf==1.0.5
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
@@ -30,13 +30,11 @@ django-cors-headers==3.13.0
 django-csp==3.7
 django-hosts==5.1
 django-markdownify==0.9.2
-django-oauth-toolkit==2.1.0
+django-oauth-toolkit @ git+https://github.com/jazzband/django-oauth-toolkit.git#235e3f84c3ad86c05f22c15dfaac202ad06d7654
 django-otp==1.1.3
 django-qr-code==3.1.1
-django-ranged-response==0.2.0
 django-read-only==1.10.0
-django-s3-storage==0.13.8
-django-simple-captcha==0.5.17
+django-s3-storage==0.13.9
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 djangorestframework==3.13.1
 drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
@@ -45,7 +43,7 @@ frozenlist==1.3.1
 geoip2==4.6.0
 gitdb==4.0.9
 gitpython==3.1.27
-gps-encoding @ git+https://github.com/rphlo/gps_encoding
+gps-encoding==1.4.1
 gpxpy==1.5.0
 idna==3.3
 inflection==0.5.1
@@ -57,22 +55,22 @@ markdown==3.4.1
 markupsafe==2.1.1
 maxminddb==2.2.0
 multidict==6.0.2
-numpy==1.23.1
-oauthlib==3.2.0
+numpy==1.23.3
+oauthlib==3.2.1
 opencv-python==4.6.0.66
-orjson==3.7.11
+orjson==3.8.0
 packaging==21.3
 pillow==9.2.0
 pillow-avif-plugin==1.2.2
 psycopg2==2.9.3
 pycparser==2.21
-pydantic==1.9.2
+pydantic==1.10.2
 pyjwt[crypto]==2.4.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
 python-magic==0.4.27
 python3-openid==3.2.0
-pytz==2022.2
+pytz==2022.2.1
 pywatchman==1.4.1
 qrcode==7.3.1
 raven==6.10.0
@@ -93,9 +91,9 @@ tinycss2==1.1.1
 tornado==6.2
 typing-extensions==4.3.0
 uritemplate==4.1.1
-urllib3==1.26.11
+urllib3==1.26.12
 uwsgi @ git+https://github.com/unbit/uwsgi@uwsgi-2.0
 webencodings==0.5.1
-websocket-client==1.3.3
+websocket-client==1.4.1
 wrapt==1.14.1
 yarl==1.8.1

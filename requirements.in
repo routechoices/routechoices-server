@@ -13,15 +13,14 @@ django-cors-headers
 django-csp
 django-hosts
 django-markdownify
-django-oauth-toolkit
+django-oauth-toolkit @ git+https://github.com/jazzband/django-oauth-toolkit.git#235e3f84c3ad86c05f22c15dfaac202ad06d7654
 django-qr-code
 django-s3-storage
-django-simple-captcha
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
 drf-yasg
 geoip2
-gps-encoding @ git+https://github.com/rphlo/gps_encoding
+gps-encoding
 gpxpy
 numpy
 opencv-python
@@ -39,5 +38,5 @@ GitPython
 websocket-client
 django-read-only
 django_compressor
-django-allauth-2fa @ git+https://github.com/valohai/django-allauth-2fa.git
+django-allauth-2fa
 pillow-avif-plugin

@@ -46,7 +46,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("invitations/", include("invitations.urls", namespace="invitations")),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
-    path("captcha/", include("captcha.urls")),
     path(
         "dashboard/",
         include(("routechoices.dashboard.urls", "dashboard"), namespace="dashboard"),

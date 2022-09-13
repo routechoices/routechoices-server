@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "django_s3_storage",
     "raven.contrib.django.raven_compat",
     "qr_code",
-    "captcha",
     "django_read_only",
     "compressor",
     "django_otp",
