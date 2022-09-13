@@ -551,7 +551,7 @@ var fetchCompetitorRoutes = function (url) {
       });
 
       updateCompetitorList(response.competitors);
-      if (!initialCompetitorDataLoaded && window.local.qnoDelay) {
+      if (!initialCompetitorDataLoaded && window.local.noDelay) {
         initialCompetitorDataLoaded = true;
         connectToGpsEvents();
       }
