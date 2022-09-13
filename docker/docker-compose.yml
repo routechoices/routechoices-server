@@ -44,6 +44,9 @@ services:
     links:
       - minio
       - django
+  redis:
+    container_name: rc_redis
+    image: redis:7.0.4
   django:
     container_name: rc_django
     image: rphlo/routechoices-dev-server
@@ -63,4 +66,5 @@ services:
       - db
       - minio
       - smtp
+      - redis
     command: ['/venv/bin/python3.10', './manage.py', 'runserver', '0.0.0.0:8000']

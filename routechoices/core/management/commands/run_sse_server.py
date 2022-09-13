@@ -1,7 +1,9 @@
 import asyncio
 from importlib import import_module
 
+import async_timeout
 import orjson as json
+import redis.asyncio as redis
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -14,30 +16,10 @@ from tornado.iostream import StreamClosedError
 
 from routechoices.core.models import Event
 
-EVENT_LIVE_DATA_STREAMS = {}
-
 
 class HealthCheckHandler(tornado.web.RequestHandler):
     def get(self):
         self.write(tornado.escape.json_encode({"status": "ok"}))
-
-
-class LiveEventDataHandler(tornado.web.RequestHandler):
-    async def post(self, event_id):
-        if (
-            self.request.headers.get("Authorization")
-            != f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
-        ):
-            raise tornado.web.HTTPError(403)
-        try:
-            data = json.loads(self.request.body)
-        except Exception:
-            raise tornado.web.HTTPError(400)
-        ongoing_streams = EVENT_LIVE_DATA_STREAMS.get(event_id)
-        if ongoing_streams:
-            await asyncio.gather(
-                *[stream.publish("locations", **data) for stream in ongoing_streams]
-            )
 
 
 class LiveEventDataStream(tornado.web.RequestHandler):
@@ -45,7 +27,9 @@ class LiveEventDataStream(tornado.web.RequestHandler):
         self.listening = False
         return super().__init__(*args, **kwargs)
 
-    def initialize(self):
+    def initialize(self, manager):
+        self.queue = asyncio.Queue()
+        self.manager = manager
         self.set_header(
             "Access-Control-Allow-Origin", self.request.headers.get("Origin", "*")
         )
@@ -71,18 +55,16 @@ class LiveEventDataStream(tornado.web.RequestHandler):
     async def publish(self, type_, **kwargs):
         if not self.listening:
             return
+        jsonified = str(json.dumps({"type": type_, **kwargs}), "utf-8")
         try:
-            jsonified = str(json.dumps({"type": type_, **kwargs}), "utf-8")
             self.write(f"data: {jsonified}\n\n".encode())
             await self.flush()
         except StreamClosedError:
             self.listening = False
-            EVENT_LIVE_DATA_STREAMS[self.event_id].remove(self)
-            if len(EVENT_LIVE_DATA_STREAMS[self.event_id]) == 0:
-                EVENT_LIVE_DATA_STREAMS.pop(self.event_id, None)
 
     async def get(self, event_id):
         self.event_id = event_id
+
         event = await sync_to_async(
             Event.objects.select_related("club")
             .filter(
@@ -107,26 +89,105 @@ class LiveEventDataStream(tornado.web.RequestHandler):
             )()
             if not is_admin:
                 raise tornado.web.HTTPError(403)
-        EVENT_LIVE_DATA_STREAMS.setdefault(event_id, [])
-        EVENT_LIVE_DATA_STREAMS[event_id].append(self)
+        await self.manager.subscribe(self, f"routechoices_event_data:{event_id}")
         self.listening = True
         while self.listening:
-            await asyncio.sleep(5.0)
-            await self.publish("ping")
+            try:
+                async with async_timeout.timeout(5):
+                    message_raw = await self.queue.get()
+                    try:
+                        data = json.loads(message_raw.get("data").decode())
+                    except Exception:
+                        pass
+                    await self.publish("locations", **data)
+            except asyncio.TimeoutError:
+                await self.publish("ping")
+
+
+class Subscription:
+    """Handles subscriptions to Redis PUB/SUB channels."""
+
+    def __init__(self, redis, channel):
+        self._redis = redis
+        self._pubsub = self._redis.pubsub()
+        self.name = channel
+        self.listeners = set()
+        self.listening = False
+
+    async def subscribe(self):
+        await self._pubsub.subscribe(self.name)
+
+    def __str__(self):
+        return self.name
+
+    def add_listener(self, listener):
+        self.listeners.add(listener)
+
+    async def broadcast(self):
+        """Listen for new messages on Redis and broadcast to all
+        HTTP listeners.
+        """
+        while len(self.listeners) > 0:
+            self.listening = True
+            closed = []
+            message = await self._pubsub.get_message(ignore_subscribe_messages=True)
+            if message is not None:
+                for listener in self.listeners:
+                    try:
+                        listener.queue.put_nowait(message)
+                    except Exception:
+                        closed.append(listener)
+                if len(closed) > 0:
+                    [self.listeners.remove(listener) for listener in closed]
+        self.listening = False
+
+
+class SubscriptionManager:
+    """Manages all subscriptions."""
+
+    def __init__(self, loop=None):
+        self.redis = None
+        self.subscriptions = dict()
+        self.loop = loop or asyncio.get_event_loop()
+
+    async def connect(self):
+        self.redis = await redis.from_url(settings.REDIS_URL)
+
+    async def subscribe(self, listener, channel: str):
+        """Subscribe to a new channel."""
+        if channel in self.subscriptions:
+            subscription = self.subscriptions[channel]
+        else:
+            subscription = Subscription(self.redis, channel)
+            await subscription.subscribe()
+            self.subscriptions[channel] = subscription
+        subscription.add_listener(listener)
+        if not subscription.listening:
+            self.loop.call_soon(lambda: asyncio.Task(subscription.broadcast()))
 
 
 class Command(BaseCommand):
     help = "Run SSE servers."
 
     def handle(self, *args, **options):
+
+        loop = asyncio.get_event_loop()
+
+        manager = SubscriptionManager()
+        loop.run_until_complete(manager.connect())
+
         live_data_tornado_app = tornado.web.Application(
             [
                 (r"/health", HealthCheckHandler),
-                (r"/([a-zA-Z0-9_-]{11})", LiveEventDataHandler),
-                (r"/sse/([a-zA-Z0-9_-]{11})", LiveEventDataStream),
+                (
+                    r"/sse/([a-zA-Z0-9_-]{11})",
+                    LiveEventDataStream,
+                    dict(manager=manager),
+                ),
             ]
         )
         live_data_tornado_app.listen(8010)
+
         try:
             tornado.ioloop.IOLoop.instance().start()
         except KeyboardInterrupt:

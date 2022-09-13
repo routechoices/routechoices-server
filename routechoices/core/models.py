@@ -18,6 +18,7 @@ import gpxpy.gpx
 import magic
 import numpy as np
 import orjson as json
+import redis
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -1228,15 +1229,12 @@ class Device(models.Model):
                         new_locs = list(zip(new_ts, new_lat, new_lon))
                         new_locs = list(sorted(new_locs, key=itemgetter(0)))
                         new_data = gps_encoding.encode_data(new_locs)
-                        requests.post(
-                            f"http://127.0.0.1:8010/{event_id}",
-                            data=json.dumps(
+                        client = redis.from_url(settings.REDIS_URL)
+                        client.publish(
+                            f"routechoices_event_data:{event_id}",
+                            json.dumps(
                                 {"competitor": competitor.aid, "data": new_data}
                             ),
-                            headers={
-                                "Authorization": f"Bearer {settings.LIVESTREAM_INTERNAL_SECRET}"
-                            },
-                            timeout=1,
                         )
             except Exception:
                 pass
