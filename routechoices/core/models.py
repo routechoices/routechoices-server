@@ -661,12 +661,6 @@ class Map(models.Model):
             self.image.open()
         with Image.open(self.image.file) as image:
             rgba_img = image.convert("RGBA")
-            MAX = 4000
-            if image.size[0] > MAX and image.size[1] > MAX:
-                scale = MAX / min(image.size[0], image.size[1])
-                new_w = image.size[0] * scale
-                new_h = image.size[1] * scale
-                rgba_img.thumbnail((new_w, new_h), Image.ANTIALIAS)
             img_ext = "WEBP"
             if rgba_img.size[0] > WEBP_MAX_SIZE or rgba_img.size[1] > WEBP_MAX_SIZE:
                 img_ext = "PNG"
@@ -724,14 +718,14 @@ class Map(models.Model):
         br_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": max_lon})
         bl_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": min_lon})
 
-        MAX = 2000
+        MAX_SIZE = 4000
         offset = 30
         width = tr_xy["x"] - tl_xy["x"] + offset * 2
         height = tr_xy["y"] - br_xy["y"] + offset * 2
 
         scale = 1
-        if width > MAX or height > MAX:
-            scale = max(width, height) / MAX
+        if width > MAX_SIZE or height > MAX_SIZE:
+            scale = max(width, height) / MAX_SIZE
 
         tl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
             {"x": tl_xy["x"] - offset * scale, "y": tl_xy["y"] + offset * scale}
@@ -759,7 +753,7 @@ class Map(models.Model):
             draw.line(map_pts, (255, 255, 255, 100), 10, joint="curve")
 
         out_buffer = BytesIO()
-        im.save(out_buffer, "PNG", dpi=(300, 300))
+        im.save(out_buffer, "WEBP", dpi=(72, 72), quality=80)
         f_new = File(out_buffer)
         new_map.image.save(
             "filename",
