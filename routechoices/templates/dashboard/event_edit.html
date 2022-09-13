@@ -23,12 +23,12 @@
         </div>
         {% endif%}
         <div>
-            <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> Open</a>
+            <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 2px"><i class="fa fa-sign-in"></i> View</a>
             {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export Page</a>{% endif %}
-            {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary " style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
             {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
                 <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
             {% endif %}
+            {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary " style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
             {% if event.is_live %} <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 2px"><i class="fa fa-bolt"></i> No Delay Live (Admin Only)</a>{% endif %}
         </div>
         {% endif%}
