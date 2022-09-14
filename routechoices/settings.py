@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "drf_yasg",
     "markdownify.apps.MarkdownifyConfig",
     "django_s3_storage",
-    "raven.contrib.django.raven_compat",
     "qr_code",
     "django_read_only",
     "compressor",

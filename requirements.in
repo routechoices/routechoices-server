@@ -33,7 +33,6 @@ pillow-avif-plugin
 psycopg2
 python-magic
 pywatchman
-raven
 redis
 requests
 sewer==0.8.4
