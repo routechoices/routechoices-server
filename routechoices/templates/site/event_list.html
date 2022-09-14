@@ -35,6 +35,11 @@
   {{club.description|markdownify }}
 </div>
 <hr/>
+{% else %}
+<div class="row d-none d-sm-block" style="aspect-ratio: 2047 / 768;margin-top:-55px;margin-bottom:20px">
+  <h1 style="font-family: Atkinson-Hyperlegible-Regular-102;color: white;z-index: 2;margin-left:20px;text-shadow: rgb(0, 0, 0) -1px -1px 0px, rgb(0, 0, 0) 1px -1px 0px, rgb(0, 0, 0) -1px 1px 0px, rgb(0, 0, 0) 1px 1px 0px;font-size: 1.8em;position: relative;top: 55px">{{site.name}}</h1>
+  <img src="{% static 'img/banner.jpg'%}" alt="banner" width="100%" style="border-radius:2em / 1em"></img>
+</div>
 {% endif %}
 <div class="row">
   {% if live_events %}
