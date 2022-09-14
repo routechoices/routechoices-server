@@ -22,7 +22,7 @@
           {% for club in clubs %}
             <div class="card flex-row flex-no-wrap" style="margin-bottom: 15px;">
               <div class="border-0">
-                <a class="link-primary" href="{% url 'dashboard:club_set_view' club_id=club.aid %}"><img class="card-img-left" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" alt="Club {{ club.name }} Logo"></a>
+                <a class="link-primary" href="{% url 'dashboard:club_set_view' club_id=club.aid %}"><img class="card-img-left" style="border-radius: 3px 0 0 3px;" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" alt="Club {{ club.name }} Logo"></a>
               </div>
               <div class="card-body px-2">
                 <div class="d-flex flex-row bd-highlight justify-content-between">
