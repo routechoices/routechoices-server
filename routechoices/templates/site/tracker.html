@@ -13,6 +13,7 @@
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}"/></div>
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
+            <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Mictrack MT710" src="{% static '/img/mictrack.png' %}"/></div>
             <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
           <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
@@ -92,6 +93,9 @@
             <ul>
               <li>Teltonika TMT250</li>
               <li>Queclink GL200</li>
+              <li>Mictrack MT700</li>
+              <li>Mictrack MT710</li>
+              <li>Mictrack MT825</li>
               <li>Queclink GL3XX series</li>
               <li>Queclink GL5XX series</li>
             </ul>
@@ -100,6 +104,7 @@
             Configure the devices to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
             <ul>
               <li>Teltonika devices: <code>port 2000</code></li>
+              <li>Mictrack devices: <code>port 2001</code></li>
               <li>Queclink devices: <code>port 2002</code></li>
             </ul>
             Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on usage as this settings can affect battery life.<br/>
@@ -110,7 +115,7 @@
           <p>Once done simply turn on the tracker during events and its locations will be saved to the server.</p>
           <h6>Get a device ID for a tracker</h6>
           <form id="imeiForm">
-            <div class="form-group" id=IMEIDiv>
+            <div class="form-group">
               <label for="IMEI">IMEI</label>
               <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
               <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{site.name}} platform.</small>
