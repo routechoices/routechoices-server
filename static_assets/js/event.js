@@ -20,16 +20,16 @@ L.Control.Ranking = L.Control.extend({
     back.style.width = "205px";
     back.style.background = "white";
     back.style.padding = "5px";
-    back.style.top = (showClusters ? 200 : 0) + 62 + "px";
-    back.style.right = "10px";
-    back.style.position = "absolute";
+    back.style.top = "0px";
+    back.style.right = "0px";
     back.style["max-height"] = "195px";
     back.style["overflow-y"] = "auto";
     back.style["overflow-x"] = "hidden";
     back.style["z-index"] = 10000;
     back.style["font-size"] = "12px";
-    document.body.prepend(back);
-    return L.DomUtil.create("div", "tmp");
+    L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
+    L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
+    return back;
   },
 
   setValues: function (ranking) {
@@ -77,16 +77,16 @@ L.Control.Grouping = L.Control.extend({
     back.style.width = "205px";
     back.style.background = "white";
     back.style.padding = "5px";
-    back.style.top = "62px";
-    back.style.right = "10px";
-    back.style.position = "absolute";
+    back.style.top = "0px";
+    back.style.right = "0px";
     back.style["max-height"] = "195px";
     back.style["overflow-y"] = "auto";
     back.style["overflow-x"] = "hidden";
     back.style["z-index"] = 10000;
     back.style["font-size"] = "12px";
-    document.body.prepend(back);
-    return L.DomUtil.create("div", "tmp2");
+    L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
+    L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
+    return back;
   },
 
   setValues: function (c, cl) {
@@ -238,6 +238,7 @@ var refreshInterval = 100;
 var smoothFactor = 1;
 var prevMapsJSONData = null;
 var mapSelectorLayer = null;
+var sidebarShown = true;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -702,17 +703,61 @@ var updateCompetitor = function (newData) {
   }
 };
 
+function getViewport() {
+  // https://stackoverflow.com/a/8876069
+
+  if (width <= 576) return "xs";
+  if (width <= 768) return "sm";
+  if (width <= 992) return "md";
+  if (width <= 1200) return "lg";
+  return "xl";
+}
+
+function hideSidebar() {
+  u("#map")
+    .addClass("col-12")
+    .removeClass("col-sm-8")
+    .removeClass("col-lg-9")
+    .removeClass("col-xxl-10");
+  u("#sidebar")
+    .addClass("d-none")
+    .removeClass("col-12")
+    .addClass("d-sm-none")
+    .removeClass("d-sm-block")
+    .removeClass("col-sm-4")
+    .removeClass("col-lg-3")
+    .removeClass("col-xxl-2");
+  sidebarShown = false;
+}
+
+function showSidebar() {
+  u("#map")
+    .removeClass("col-12")
+    .addClass("col-sm-8")
+    .addClass("col-lg-9")
+    .addClass("col-xxl-10");
+  u("#sidebar")
+    .removeClass("d-none")
+    .addClass("col-12")
+    .removeClass("d-sm-none")
+    .addClass("d-sm-block")
+    .addClass("col-sm-4")
+    .addClass("col-lg-3")
+    .addClass("col-xxl-2");
+  sidebarShown = true;
+}
+
 function toggleCompetitorList(e) {
   e.preventDefault();
-  if (u("#sidebar").hasClass("d-none")) {
-    u("#sidebar").removeClass("d-none").addClass("col-12");
-    u("#map").addClass("d-none").removeClass("col-12");
-  } else if (!optionDisplayed) {
-    u("#sidebar").addClass("d-none").removeClass("col-12");
-    u("#map").removeClass("d-none").addClass("col-12");
-    map.invalidateSize();
+  if (sidebarShown && !optionDisplayed) {
+    // we remove the competitor list
+    hideSidebar();
+  } else {
+    // we add the side bar
+    showSidebar();
+    displayCompetitorList(true);
   }
-  displayCompetitorList(true);
+  map.invalidateSize();
 }
 
 var displayCompetitorList = function (force) {
@@ -854,9 +899,7 @@ var displayCompetitorList = function (force) {
   if (searchText === null) {
     var mainDiv = u('<div id="competitorSidebar"/>');
     mainDiv.append(
-      u(
-        '<div style="text-align:right;margin-bottom:-27px" class="d-block d-sm-none"/>'
-      ).append(
+      u('<div style="text-align:right;margin-bottom:-27px"/>').append(
         u('<button class="btn btn-default btn-sm"/>')
           .html('<i class="fa fa-times"></i>')
           .on("click", toggleCompetitorList)
@@ -948,16 +991,16 @@ var filterCompetitorList = function (e) {
 var displayOptions = function (ev) {
   ev.preventDefault();
   if (optionDisplayed) {
+    // hide sidebar
     optionDisplayed = false;
-    u("#sidebar").addClass("d-none").removeClass("col-12");
-    u("#map").removeClass("d-none").addClass("col-12");
+    hideSidebar();
     map.invalidateSize();
     displayCompetitorList();
     return;
   }
-  if (u("#sidebar").hasClass("d-none")) {
-    u("#sidebar").removeClass("d-none").addClass("col-12");
-    u("#map").addClass("d-none").removeClass("col-12");
+  // show sidebar
+  if (!sidebarShown) {
+    showSidebar();
   }
   optionDisplayed = true;
   searchText = null;
@@ -1084,7 +1127,6 @@ var displayOptions = function (ev) {
           map.removeLayer(c.nameMarker);
         });
         clusters = {};
-        u(".leaflet-control-ranking").css({ top: "62px" });
       } else {
         u(".toggle_cluster_btn")
           .find(".fa-toggle-off")
@@ -1093,7 +1135,6 @@ var displayOptions = function (ev) {
         groupControl = L.control.grouping({ position: "topright" });
         map.addControl(groupControl);
         showClusters = true;
-        u(".leaflet-control-ranking").css({ top: "262px" });
       }
     });
   u(mainDiv)
