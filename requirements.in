@@ -1,14 +1,15 @@
 arrow
-bs4
+beautifulsoup4
 cryptography
 defusedxml
 diskcache
 django
-djangorestframework
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth
+django-allauth-2fa
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
+django-compressor
 django-cors-headers
 django-csp
 django-hosts
@@ -17,27 +18,25 @@ django-oauth-toolkit @ git+https://github.com/jazzband/django-oauth-toolkit.git#
 django-qr-code
 django-s3-storage
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
+djangorestframework
 drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
 drf-yasg
 geoip2
+gitpython
 gps-encoding
 gpxpy
 numpy
 opencv-python
 orjson
 pillow
+pillow-avif-plugin
 psycopg2
 python-magic
 pywatchman
 raven
+redis
 requests
 sewer==0.8.4
 tornado
 uwsgi @ git+https://github.com/unbit/uwsgi@uwsgi-2.0
-GitPython
 websocket-client
-django-read-only
-django_compressor
-django-allauth-2fa
-pillow-avif-plugin
-redis
