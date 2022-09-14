@@ -115,6 +115,7 @@ class Subscription:
         self.listening = False
 
     async def subscribe(self):
+        print(f"Started listening for {self.name}")
         await self._pubsub.subscribe(self.name)
 
     def __str__(self):
@@ -130,16 +131,26 @@ class Subscription:
         while len(self.listeners) > 0:
             self.listening = True
             closed = []
-            message = await self._pubsub.get_message(ignore_subscribe_messages=True)
-            if message is not None:
+            try:
+                async with async_timeout.timeout(10):
+                    message = await self._pubsub.get_message(
+                        ignore_subscribe_messages=True
+                    )
+            except asyncio.TimeoutError:
+                message = None
+            finally:
                 for listener in self.listeners:
-                    try:
-                        listener.queue.put_nowait(message)
-                    except Exception:
+                    if not listener.listening:
                         closed.append(listener)
+                    elif message is not None:
+                        listener.queue.put_nowait(message)
+
                 if len(closed) > 0:
                     [self.listeners.remove(listener) for listener in closed]
+
         self.listening = False
+        await self._pubsub.unsubscribe()
+        print(f"Stopped listening for {self.name}")
 
 
 class SubscriptionManager:
@@ -159,10 +170,10 @@ class SubscriptionManager:
             subscription = self.subscriptions[channel]
         else:
             subscription = Subscription(self.redis, channel)
-            await subscription.subscribe()
             self.subscriptions[channel] = subscription
         subscription.add_listener(listener)
         if not subscription.listening:
+            await subscription.subscribe()
             self.loop.call_soon(lambda: asyncio.Task(subscription.broadcast()))
 
 
