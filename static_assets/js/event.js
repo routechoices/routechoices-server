@@ -866,12 +866,12 @@ var displayCompetitorList = function (force) {
       var hideAllTxt = banana.i18n("hide-all");
       var showAllTxt = banana.i18n("show-all");
       mainDiv.append(
-        "<div>" +
-          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> ' +
-          hideAllTxt +
-          "</button>" +
+        '<div style="text-align: center">' +
           '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> ' +
           showAllTxt +
+          "</button>" +
+          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> ' +
+          hideAllTxt +
           "</button>" +
           "</div>"
       );
