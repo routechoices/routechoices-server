@@ -239,6 +239,7 @@ var smoothFactor = 1;
 var prevMapsJSONData = null;
 var mapSelectorLayer = null;
 var sidebarShown = true;
+var sidebarHidden = false;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -749,7 +750,12 @@ function showSidebar() {
 
 function toggleCompetitorList(e) {
   e.preventDefault();
-  if (sidebarShown && !optionDisplayed) {
+  var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+  if (
+    sidebarShown &&
+    !optionDisplayed &&
+    !(u("#sidebar").hasClass("d-none") && width <= 576)
+  ) {
     // we remove the competitor list
     hideSidebar();
   } else {
@@ -998,9 +1004,11 @@ var displayOptions = function (ev) {
     displayCompetitorList();
     return;
   }
+  var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
   // show sidebar
-  if (!sidebarShown) {
+  if (!sidebarShown || (u("#sidebar").hasClass("d-none") && width <= 576)) {
     showSidebar();
+    map.invalidateSize();
   }
   optionDisplayed = true;
   searchText = null;
