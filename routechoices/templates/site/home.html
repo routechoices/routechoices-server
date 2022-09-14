@@ -12,14 +12,14 @@
     <h1 class="video_text_overlay frontpage_text_bold" style="margin-top: 40px">{{site.name}}</h1>
     <h1 class="video_text_overlay frontpage_text" style="margin-bottom: -20px">Live GPS tracking solution for orienteering events</h1>
     <p><img src="{% static 'img/iphone.png'%}?v=2022072900" style="max-width:100%;max-height:600px;width: auto;height: auto;" alt="app on phone"/></p>
-    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: 0.2em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'site:events_view' %}"><i class="fa-solid fa-person-running"></i> Event List</a></h3>
+    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'site:events_view' %}"><i class="fa-solid fa-person-running"></i> Event list</a></h3>
     <hr style="color:#fff"/>
     {% if user.is_authenticated %}
     <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.</h3>
-    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: 0.2em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
+    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
     {% else %}
     <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.</h3>
-    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: 0.2em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% host_url 'root_account_signup' host 'www'%}"><i class="fa-solid fa-compass"></i> Join now</a></h3>
+    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% host_url 'root_account_signup' host 'www'%}"><i class="fa-solid fa-compass"></i> Join now</a></h3>
     {% endif %}
   </div>
 {% endblock %}
