@@ -120,7 +120,7 @@ function project(m, x, y) {
   var raster_map_image;
   var corners_latlng = [];
   var calib_string = null;
-  var icon_scale = browser.mobile ? 2 : 1;
+  var icon_scale = L.Browser.touch && L.Browser.mobile ? 2 : 1;
   var icons = [
     color_icon("blue"),
     color_icon("red"),
