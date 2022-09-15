@@ -4,7 +4,7 @@
 routechoices-server
 ==================
 
-![screenshot](https://cdn.rphlo.com/routechoices-screenshot.png)
+![screenshot](https://cdn.rphlo.com/routechoices-screenshot.png?t=20220915)
 
 Server solution for live GPS tracking of orienteering events.
 
