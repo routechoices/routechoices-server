@@ -384,6 +384,9 @@ var onStart = function () {
     u("#live_button").remove();
     selectReplayMode();
   }
+  u(".main").removeClass("loading");
+  u(".sidebar").removeClass("loading");
+  u(".time_bar").removeClass("loading");
   fetchCompetitorRoutes(null, true);
 };
 
