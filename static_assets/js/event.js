@@ -920,7 +920,7 @@ var displayCompetitorList = function (force) {
     var mainDiv = u('<div id="competitorSidebar"/>');
     mainDiv.append(
       u('<div style="text-align:right;margin-bottom:-27px"/>').append(
-        u('<button class="btn btn-default btn-sm"/>')
+        u('<button class="btn btn-default btn-sm" aria-label="close"/>')
           .html('<i class="fa fa-times"></i>')
           .on("click", toggleCompetitorList)
       )
@@ -1029,7 +1029,7 @@ var displayOptions = function (ev) {
   var mainDiv = u("<div/>");
   mainDiv.append(
     u('<div style="text-align:right;margin-bottom:-27px"/>').append(
-      u('<button class="btn btn-default btn-sm"/>')
+      u('<button class="btn btn-default btn-sm" aria-label="close"/>')
         .html('<i class="fa fa-times"></i>')
         .on("click", displayOptions)
     )
