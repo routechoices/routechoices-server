@@ -471,7 +471,8 @@ def map_edit_view(request, map_id):
 
     used_in = Event.objects.filter(
         Q(map_id=raster_map.id) | Q(map_assignations__map_id=raster_map.id)
-    )
+    ).distinct()
+
     return render(
         request,
         "dashboard/map_edit.html",
