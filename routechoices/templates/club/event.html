@@ -42,15 +42,24 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12 time_bar" style="z-index: 110001">
+    <div class="col-12 time_bar replay_mode" style="z-index: 110001">
       <div class="event-tool">
-        <div class="btn-group" role="group" id="view_mods_buttons" style="margin-bottom: 2px"><button class="btn btn-sm btn-secondary" id="live_button">Live</button><button class="btn btn-sm btn-secondary" id="replay_button">Replay</button></div>
-        <div class="btn-group" role="group" id="replay_mode_buttons" style="margin-bottom: 2px"><button class="btn btn-sm btn-secondary active" id="real_time_button">Real Time</button><button class="btn btn-sm btn-secondary" id="mass_start_button">Mass start</button></div>
-        <div class="btn-group" role="group" id="replay_control_buttons" style="margin-bottom: 2px"><button class="btn btn-sm btn-secondary" id="prev_button"  aria-label="slower"><i class="fa fa-backward"></i></button><button class="btn btn-sm btn-secondary" id="play_pause_button" aria-label="play/pause"><i class="fa fa-play"></i></button><button class="btn btn-sm btn-secondary" id="next_button" aria-label="faster"><i class="fa fa-forward"></i></button></div>
-
-        <div class="btn-group float-end" role="group" id="share_buttons" style="margin: 0 0 2px 5px"><button class="btn btn-sm btn-secondary" id="share_button" aria-label="share"><i class="fa fa-share-alt"></i></button></div>
-        <div class="btn-group float-end" role="group" id="options_buttons" style="margin: 0 0 2px 5px"><button class="btn btn-sm btn-secondary" id="options_show_button" aria-label="options"><i class="fa fa-cog"></i></button></div>
-        <div class="btn-group float-end" role="group" style="margin: 0 0 2px 5px"><button class="btn btn-sm btn-secondary" id="runners_show_button"><i class="fa fa-users"></i></button></div>
+        <div class="d-flex flex-wrap">
+          <div class="d-inline-flex flex-row flex-nowrap">
+            <div class="btn-group" role="group" id="view_mods_buttons" style="margin-bottom: 2px"><button class="btn btn-sm btn-secondary" id="live_button" style="white-space: nowrap;">Live</button><button class="btn btn-sm btn-secondary" id="replay_button" style="white-space: nowrap;">Replay</button></div>
+            <div class="btn-group" role="group" id="replay_mode_buttons" style="margin-bottom: 2px;margin-left:2px;white-space: nowrap;"><button class="btn btn-sm btn-secondary active" id="real_time_button" style="white-space: nowrap;">Real Time</button><button class="btn btn-sm btn-secondary" id="mass_start_button" style="white-space: nowrap;">Mass start</button></div>
+          </div>
+          <div class="d-inline-flex flex-row justify-content-between flex-nowrap" style="margin-left:2px;flex-grow: 1;">
+            <div>
+              <div class="btn-group" role="group" id="replay_control_buttons" style="margin-bottom: 2px;white-space: nowrap;"><button class="btn btn-sm btn-secondary" id="prev_button"  aria-label="slower"><i class="fa fa-backward"></i></button><button class="btn btn-sm btn-secondary" id="play_pause_button" aria-label="play/pause"><i class="fa fa-play"></i></button><button class="btn btn-sm btn-secondary" id="next_button" aria-label="faster"><i class="fa fa-forward"></i></button></div>
+            </div>
+            <div style="white-space: nowrap;margin-left:2px">
+              <div class="btn-group" role="group" style="margin: 0 0 2px 0px"><button class="btn btn-sm btn-secondary" id="runners_show_button"><i class="fa fa-users"></i></button></div>
+              <div class="btn-group" role="group" id="options_buttons" style="margin: 0 0 2px 0px"><button class="btn btn-sm btn-secondary" id="options_show_button" aria-label="options"><i class="fa fa-cog"></i></button></div>
+              <div class="btn-group" role="group" id="share_buttons" style="margin: 0 0 2px 0px"><button class="btn btn-sm btn-secondary" id="share_button" aria-label="share"><i class="fa fa-share-alt"></i></button></div>
+            </div>
+          </div>
+        </div>
       </div>
       <div style="padding-top:5px;" class="event-tool">
         <div id="full_progress_bar" class="progress" style="cursor: pointer">
