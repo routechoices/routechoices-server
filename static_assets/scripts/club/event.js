@@ -147,7 +147,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
               e.preventDefault();
             });
           hideSidebar();
-          map.invalidateSize();
+          map.remove();
           preRaceModal.show();
           window.setInterval(function () {
             if (new Date() > startEvent) {
