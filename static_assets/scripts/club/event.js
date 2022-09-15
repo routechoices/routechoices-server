@@ -146,6 +146,8 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
             .addEventListener("hide.bs.modal", function (e) {
               e.preventDefault();
             });
+          hideSidebar();
+          map.invalidateSize();
           preRaceModal.show();
           window.setInterval(function () {
             if (new Date() > startEvent) {
