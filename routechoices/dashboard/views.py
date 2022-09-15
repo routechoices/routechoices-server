@@ -468,6 +468,10 @@ def map_edit_view(request, map_id):
             return redirect("dashboard:map_list_view")
     else:
         form = MapForm(instance=raster_map)
+
+    used_in = Event.objects.filter(
+        Q(map_id=raster_map.id) | Q(map_assignations__map_id=raster_map.id)
+    )
     return render(
         request,
         "dashboard/map_edit.html",
@@ -476,6 +480,7 @@ def map_edit_view(request, map_id):
             "context": "edit",
             "map": raster_map,
             "form": form,
+            "used_in": used_in,
         },
     )
 

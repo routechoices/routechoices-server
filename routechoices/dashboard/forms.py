@@ -204,7 +204,29 @@ class EventForm(ModelForm):
         club = self.club
         if raster_map and club.id != raster_map.club_id:
             raise ValidationError("Map must be from the organizing club")
+
+        num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
+        start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
+        for i in range(start_count_maps, start_count_maps + num_maps):
+            if (
+                self.data.get(f"map_assignations-{i}-map")
+                and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
+            ):
+                raise ValidationError("Map assigned more than once in this event")
+
         return raster_map
+
+    def clean_map_title(self):
+        map_title = self.cleaned_data.get("map_title")
+        num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
+        start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
+        for i in range(start_count_maps, start_count_maps + num_maps):
+            if (
+                self.data.get(f"map_assignations-{i}-title")
+                and self.data.get(f"map_assignations-{i}-title") == map_title
+            ):
+                raise ValidationError("Map title given more than once in this event")
+        return map_title
 
 
 class NoticeForm(ModelForm):
@@ -227,13 +249,42 @@ class ExtraMapForm(ModelForm):
             raise ValidationError(
                 "Extra maps can be set only if the main map field is set first"
             )
+        if int(self.data.get("map")) == self.cleaned_data.get("map").id:
+            raise ValidationError("Map assigned more than once in this event")
+
+        num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
+        start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
+        map_with_same_id = 0
+        for i in range(start_count_maps, start_count_maps + num_maps):
+            if (
+                self.data.get(f"map_assignations-{i}-map")
+                and int(self.data.get(f"map_assignations-{i}-map"))
+                == self.cleaned_data.get("map").id
+            ):
+                map_with_same_id += 1
+                if map_with_same_id > 1:
+                    raise ValidationError("Map assigned more than once in this event")
         return raster_map
 
     def clean_title(self):
         map_title = self.cleaned_data.get("title")
         main_map_title = self.data.get("map_title")
         if main_map_title and main_map_title == map_title:
-            raise ValidationError("Extra maps title can not be same as main map title")
+            raise ValidationError("Map title given more than once in this event")
+
+        num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
+        start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
+        map_with_same_title = 0
+        for i in range(start_count_maps, start_count_maps + num_maps):
+            if (
+                self.data.get(f"map_assignations-{i}-title")
+                and self.data.get(f"map_assignations-{i}-title") == map_title
+            ):
+                map_with_same_title += 1
+                if map_with_same_title > 1:
+                    raise ValidationError(
+                        "Map title given more than once in this event"
+                    )
         return map_title
 
 

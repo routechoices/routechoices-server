@@ -56,7 +56,6 @@
                         <td>
                             {# Include the hidden fields in the form #}
                             {% if forloop.first %}
-                                {% bootstrap_form_errors form layout='inline' %}
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
