@@ -205,14 +205,15 @@ class EventForm(ModelForm):
         if raster_map and club.id != raster_map.club_id:
             raise ValidationError("Map must be from the organizing club")
 
-        num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
-        start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
-        for i in range(start_count_maps, start_count_maps + num_maps):
-            if (
-                self.data.get(f"map_assignations-{i}-map")
-                and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
-            ):
-                raise ValidationError("Map assigned more than once in this event")
+        if raster_map:
+            num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
+            start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
+            for i in range(start_count_maps, start_count_maps + num_maps):
+                if (
+                    self.data.get(f"map_assignations-{i}-map")
+                    and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
+                ):
+                    raise ValidationError("Map assigned more than once in this event")
 
         return raster_map
 
