@@ -731,7 +731,7 @@ function getViewport() {
 function hideSidebar() {
   u("#map")
     .addClass("col-12")
-    .removeClass("col-sm-8")
+    .removeClass("col-sm-7")
     .removeClass("col-lg-9")
     .removeClass("col-xxl-10");
   u("#sidebar")
@@ -739,7 +739,7 @@ function hideSidebar() {
     .removeClass("col-12")
     .addClass("d-sm-none")
     .removeClass("d-sm-block")
-    .removeClass("col-sm-4")
+    .removeClass("col-sm-5")
     .removeClass("col-lg-3")
     .removeClass("col-xxl-2");
   sidebarShown = false;
@@ -748,7 +748,7 @@ function hideSidebar() {
 function showSidebar() {
   u("#map")
     .removeClass("col-12")
-    .addClass("col-sm-8")
+    .addClass("col-sm-7")
     .addClass("col-lg-9")
     .addClass("col-xxl-10");
   u("#sidebar")
@@ -756,7 +756,7 @@ function showSidebar() {
     .addClass("col-12")
     .removeClass("d-sm-none")
     .addClass("d-sm-block")
-    .addClass("col-sm-4")
+    .addClass("col-sm-5")
     .addClass("col-lg-3")
     .addClass("col-xxl-2");
   sidebarShown = true;
@@ -785,7 +785,7 @@ var displayCompetitorList = function (force) {
     return;
   }
   optionDisplayed = false;
-  var listDiv = u('<div id="listCompetitor"/>');
+  var listDiv = u('<div id="listCompetitor" style="overflow: scroll;"/>');
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
@@ -797,7 +797,7 @@ var displayCompetitorList = function (force) {
     nbShown += competitor.isShown ? 1 : 0;
     var div = u('<div class="card-body" style="padding:5px 10px 2px 10px;"/>');
     div.html(
-      '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x" style="color:' +
+      '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>' +
@@ -917,9 +917,12 @@ var displayCompetitorList = function (force) {
     listDiv.append(div);
   }
   if (searchText === null) {
-    var mainDiv = u('<div id="competitorSidebar"/>');
-    mainDiv.append(
-      u('<div style="text-align:right;margin-bottom:-27px"/>').append(
+    var mainDiv = u(
+      '<div id="competitorSidebar" style="display: flex;flex-direction: column"/>'
+    );
+    var topDiv = u("<div/>");
+    topDiv.append(
+      u('<div style="text-align:right;margin-bottom:-15px"/>').append(
         u('<button class="btn btn-default btn-sm" aria-label="close"/>')
           .html('<i class="fa fa-times"></i>')
           .on("click", toggleCompetitorList)
@@ -928,8 +931,8 @@ var displayCompetitorList = function (force) {
     if (competitorList.length) {
       var hideAllTxt = banana.i18n("hide-all");
       var showAllTxt = banana.i18n("show-all");
-      mainDiv.append(
-        '<div style="text-align: center">' +
+      topDiv.append(
+        '<div style="text-align: center;white-space: nowrap">' +
           '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> ' +
           showAllTxt +
           "</button>" +
@@ -939,7 +942,7 @@ var displayCompetitorList = function (force) {
           "</div>"
       );
     }
-    u(mainDiv)
+    u(topDiv)
       .find("#hideAllCompetitorBtn")
       .on("click", function () {
         competitorList.forEach(function (competitor) {
@@ -961,7 +964,7 @@ var displayCompetitorList = function (force) {
         });
         displayCompetitorList();
       });
-    u(mainDiv)
+    u(topDiv)
       .find("#showAllCompetitorBtn")
       .on("click", function () {
         nbShown = competitorList.reduce(function (a, v) {
@@ -987,12 +990,14 @@ var displayCompetitorList = function (force) {
         displayCompetitorList();
       });
     if (competitorList.length > 10) {
-      mainDiv.append(
+      topDiv.append(
         u('<input class="form-control" type="search" val=""/>')
           .on("input", filterCompetitorList)
           .attr("placeholder", banana.i18n("search-competitors"))
       );
+      listDiv.addClass("with_search_bar");
     }
+    mainDiv.append(topDiv);
     mainDiv.append(listDiv);
     u("#sidebar").html("");
     u("#sidebar").append(mainDiv);

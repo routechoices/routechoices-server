@@ -16,9 +16,25 @@
   display: block;
   padding: 5px;
   overflow-x: hidden;
-  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  overflow-y: hidden; /* Scrollable contents if viewport is shorter than content. */
   background-color: #f5f5f5;
-  border-left: 1px solid #eee;
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.sidebar #listCompetitor {
+  max-height: calc(100vh - 223px);
+}
+
+.sidebar #listCompetitor.with_search_bar {
+  max-height: calc(100vh - 261px);
+}
+
+.sidebar.replay_mode #listCompetitor {
+  max-height: calc(100vh - 248px);
+}
+
+.sidebar.replay_mode #listCompetitor.with_search_bar {
+  max-height: calc(100vh - 286px);
 }
 
 .time_bar {
@@ -99,6 +115,11 @@
     1px 1px 0 #000;
 }
 
+.fa-circle.fa-3x.icon-sidebar {
+  text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.125), 1px -1px 0 rgba(0, 0, 0, 0.125),
+    -1px 1px 0 rgba(0, 0, 0, 0.125), 1px 1px 0 rgba(0, 0, 0, 0.125);
+}
+
 .runner-icon span {
   font-family: "Atkinson-Hyperlegible-Bold-102", sans-serif;
   font-size: 1.5em;
@@ -114,6 +135,12 @@
   .main.replay_mode,
   .sidebar.replay_mode {
     bottom: 160px;
+  }
+  .sidebar.replay_mode #listCompetitor {
+    max-height: calc(100vh - 278px);
+  }
+  .sidebar.replay_mode #listCompetitor.with_search_bar {
+    max-height: calc(100vh - 316px);
   }
 }
 
