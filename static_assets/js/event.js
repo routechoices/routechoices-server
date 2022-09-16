@@ -785,7 +785,9 @@ var displayCompetitorList = function (force) {
     return;
   }
   optionDisplayed = false;
-  var listDiv = u('<div id="listCompetitor" style="overflow: scroll;"/>');
+  var listDiv = u(
+    '<div id="listCompetitor" style="overflow-y: auto;margin-top:3px;"/>'
+  );
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
@@ -918,7 +920,7 @@ var displayCompetitorList = function (force) {
   }
   if (searchText === null) {
     var mainDiv = u(
-      '<div id="competitorSidebar" style="display: flex;flex-direction: column"/>'
+      '<div id="competitorSidebar" style="display: flex;flex-direction: column;"/>'
     );
     var topDiv = u("<div/>");
     topDiv.append(
