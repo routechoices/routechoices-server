@@ -128,14 +128,14 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       crossOrigin: true,
       type: "json",
       success: function (response) {
-        backdropMaps[response.event.backdrop || "blank"].addTo(map);
+        try {
+          map.remove();
+        } catch {}
         var now = new Date();
         var startEvent = new Date(response.event.start_date);
         endEvent = new Date(response.event.end_date);
         if (startEvent > now) {
           u(".event-tool").hide();
-
-          map.fitWorld({ animate: false }).zoomIn(null, { animate: false });
           u("#eventLoadingModal").remove();
           var preRaceModal = new bootstrap.Modal(
             document.getElementById("eventNotStartedModal"),
@@ -147,7 +147,6 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
               e.preventDefault();
             });
           hideSidebar();
-          map.remove();
           preRaceModal.show();
           window.setInterval(function () {
             if (new Date() > startEvent) {
