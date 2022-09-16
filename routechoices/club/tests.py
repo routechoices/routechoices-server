@@ -76,7 +76,8 @@ class ClubViewsTestCase(LiveServerTestCase):
     def test_custom_domain_loads(self):
         client = Client(HTTP_HOST="gpstracking.kiilat.com")
         response = client.get(f"{self.live_server_url}")
-        self.assertEqual(response.status_code, 444)
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue("Page does not exist" in response.content.decode())
 
         self.club.domain = "gpstracking.kiilat.com"
         self.club.save()

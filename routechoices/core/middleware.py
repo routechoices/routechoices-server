@@ -155,7 +155,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         ):
             club = Club.objects.filter(domain=raw_host).first()
             if not club:
-                return HttpResponse(status=444)
+                return render(request, "404.html", status=404)
             raw_host = f"{club.slug.lower()}.{default_domain}"
             request.use_cname = True
         elif raw_host.endswith(f".{default_domain}"):
