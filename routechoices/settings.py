@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     "markdownify.apps.MarkdownifyConfig",
     "django_s3_storage",
     "qr_code",
-    "django_read_only",
     "compressor",
     "django_otp",
     "django_otp.plugins.otp_static",
