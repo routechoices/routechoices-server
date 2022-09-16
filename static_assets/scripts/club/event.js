@@ -128,13 +128,14 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       crossOrigin: true,
       type: "json",
       success: function (response) {
-        try {
-          map.remove();
-        } catch {}
+        backdropMaps[response.event.backdrop || "blank"].addTo(map);
         var now = new Date();
         var startEvent = new Date(response.event.start_date);
         endEvent = new Date(response.event.end_date);
         if (startEvent > now) {
+          try {
+            map.remove();
+          } catch {}
           u(".event-tool").hide();
           u("#eventLoadingModal").remove();
           var preRaceModal = new bootstrap.Modal(
