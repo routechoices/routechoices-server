@@ -1,3 +1,7 @@
+:root {
+  —-app-height: 100%;
+}
+
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
@@ -23,18 +27,22 @@
 
 .sidebar #listCompetitor {
   max-height: calc(100vh - 223px);
+  max-height: calc(var(--app-height) - 223px);
 }
 
 .sidebar #listCompetitor.with_search_bar {
   max-height: calc(100vh - 261px);
+  max-height: calc(var(--app-height) - 261px);
 }
 
 .sidebar.replay_mode #listCompetitor {
   max-height: calc(100vh - 248px);
+  max-height: calc(var(--app-height) - 248px);
 }
 
 .sidebar.replay_mode #listCompetitor.with_search_bar {
   max-height: calc(100vh - 286px);
+  max-height: calc(var(--app-height) - 286px);
 }
 
 .time_bar {
@@ -138,10 +146,11 @@
   }
   .sidebar.replay_mode #listCompetitor {
     max-height: calc(100vh - 278px);
+    max-height: calc(var(--app-height) - 278px);
   }
   .sidebar.replay_mode #listCompetitor.with_search_bar {
-    background-color: #8e1600;
     max-height: calc(100vh - 316px);
+    max-height: calc(var(--app-height) - 316px);
   }
 }
 

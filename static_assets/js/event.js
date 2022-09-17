@@ -10,6 +10,12 @@ var alphabetizeNumber = function (integer) {
     )
     .join("");
 };
+const appHeight = () => {
+  const doc = document.documentElement;
+  doc.style.setProperty("--app-height", `${window.innerHeight}px`);
+};
+window.addEventListener("resize", appHeight);
+appHeight();
 
 L.Control.Ranking = L.Control.extend({
   onAdd: function (map) {
