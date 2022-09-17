@@ -101,12 +101,6 @@ workflows:
             branches:
               only:
                 - master
-      - build-docker:
-          requires:
-            - build-and-test
-          filters:
-            tags:
-              only: /v.*/
   build_image:
     jobs:
       - build-and-test
@@ -117,8 +111,7 @@ workflows:
             tags:
               only: /v.*/
             branches:
-              only:
-                - master
+              ignore: /.*/
       - build-docker:
           requires:
             - build-and-test
@@ -126,5 +119,4 @@ workflows:
             tags:
               only: /v.*/
             branches:
-              only:
-                - master
+              ignore: /.*/
