@@ -364,6 +364,17 @@ class GL200Connection:
                 await self.on_data(pts, batt)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii"))
+            elif parts[0][:8] == "+RESP:GT" and parts[0][8:] == "INF":
+                imei = parts[2]
+                if imei != self.imei:
+                    raise Exception("Cannot change IMEI while connected")
+                try:
+                    print(f"Battery level at {parts[18]}%", flush=True)
+                    batt = int(parts[18])
+                except Exception as e:
+                    print(f"Error parsing battery level: {str(e)}", flush=True)
+                self.db_device.battery_level = batt
+                await sync_to_async(self.db_device.save, thread_sensitive=True)()
         except Exception as e:
             print(f"Error processing line: {str(e)}", flush=True)
             self.stream.close()
