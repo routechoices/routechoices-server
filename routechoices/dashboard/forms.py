@@ -171,9 +171,9 @@ class EventForm(ModelForm):
             "end_date",
             "send_interval",
             "tail_length",
-            "backdrop_map",
             "map",
             "map_title",
+            "backdrop_map",
         ]
         widgets = {
             "start_date": DateTimeInput(
