@@ -9,9 +9,11 @@ class BadKMLException(Exception):
 
 def extract_ground_overlay_info(kml):
     doc = minidom.parseString(kml)
+    out = []
+    main_name = doc.getElementsByTagName("name")[0].firstChild.nodeValue
     for go in doc.getElementsByTagName("GroundOverlay"):
         try:
-            name = doc.getElementsByTagName("name")[0].firstChild.nodeValue
+            name = go.getElementsByTagName("name")[0].firstChild.nodeValue
             icon = go.getElementsByTagName("Icon")[0]
             href = icon.getElementsByTagName("href")[0].firstChild.nodeValue
             latlon_box_nodes = go.getElementsByTagName("LatLonBox")
@@ -57,4 +59,5 @@ def extract_ground_overlay_info(kml):
                 raise Exception("Invalid GroundOverlay")
         except Exception:
             raise BadKMLException("Could not find proper GroundOverlay.")
-        return name, href, corners_coords
+        out.append((f"{main_name} - {name}", href, corners_coords))
+    return out

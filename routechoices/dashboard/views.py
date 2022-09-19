@@ -632,34 +632,36 @@ def map_kmz_upload_view(request):
             if file.name.lower().endswith(".kml"):
                 try:
                     kml = file.read()
-                    name, image_path, corners_coords = extract_ground_overlay_info(kml)
-                    if not name:
-                        name = "Untitled"
-                    if not image_path.startswith(
-                        "http://"
-                    ) and not image_path.startswith("https://"):
-                        raise Exception("Fishy KML")
+                    overlays = extract_ground_overlay_info(kml)
+                    for data in overlays:
+                        name, image_path, corners_coords = data
+                        if not name:
+                            name = "Untitled"
+                        if not image_path.startswith(
+                            "http://"
+                        ) and not image_path.startswith("https://"):
+                            raise Exception("Fishy KML")
 
-                    with tempfile.TemporaryFile() as dest:
-                        headers = requests.utils.default_headers()
-                        headers.update(
-                            {
-                                "User-Agent": "Python3/Requests/Routechoices.com",
-                            }
-                        )
-                        r = requests.get(image_path, headers=headers)
-                        if r.status_code != 200:
-                            raise Exception("Could not reach image source")
-                        dest.write(r.content)
-                        dest.flush()
-                        dest.seek(0)
-                        new_map = Map(
-                            club=club,
-                            name=name,
-                            corners_coordinates=corners_coords,
-                        )
-                        image_file = File(dest)
-                        new_map.image.save("file", image_file, save=False)
+                        with tempfile.TemporaryFile() as dest:
+                            headers = requests.utils.default_headers()
+                            headers.update(
+                                {
+                                    "User-Agent": "Python3/Requests/Routechoices.com",
+                                }
+                            )
+                            r = requests.get(image_path, headers=headers)
+                            if r.status_code != 200:
+                                raise Exception("Could not reach image source")
+                            dest.write(r.content)
+                            dest.flush()
+                            dest.seek(0)
+                            new_map = Map(
+                                club=club,
+                                name=name,
+                                corners_coordinates=corners_coords,
+                            )
+                            image_file = File(dest)
+                            new_map.image.save("file", image_file, save=False)
                 except Exception:
                     error = "An error occured while extracting the map from your file."
             elif file.name.lower().endswith(".kmz"):
@@ -675,43 +677,45 @@ def map_kmz_upload_view(request):
                         raise Exception("No valid doc.kml file")
                     with open(os.path.join(dest, doc_file), "r", encoding="utf-8") as f:
                         kml = f.read().encode("utf8")
-                    name, image_path, corners_coords = extract_ground_overlay_info(kml)
-                    if not name:
-                        name = "Untitled"
-                    if image_path.startswith("http://") or image_path.startswith(
-                        "https://"
-                    ):
-                        with tempfile.TemporaryFile() as dest:
-                            headers = requests.utils.default_headers()
-                            headers.update(
-                                {
-                                    "User-Agent": "Python3/Requests/Routechoices.com",
-                                }
-                            )
-                            r = requests.get(image_path, headers=headers)
-                            if r.status_code != 200:
-                                raise Exception("Could not reach image source")
-                            dest.write(r.content)
-                            dest.flush()
-                            dest.seek(0)
-                            image_file = File(dest)
+                    overlays = extract_ground_overlay_info(kml)
+                    for data in overlays:
+                        name, image_path, corners_coords = data
+                        if not name:
+                            name = "Untitled"
+                        if image_path.startswith("http://") or image_path.startswith(
+                            "https://"
+                        ):
+                            with tempfile.TemporaryFile() as dest:
+                                headers = requests.utils.default_headers()
+                                headers.update(
+                                    {
+                                        "User-Agent": "Python3/Requests/Routechoices.com",
+                                    }
+                                )
+                                r = requests.get(image_path, headers=headers)
+                                if r.status_code != 200:
+                                    raise Exception("Could not reach image source")
+                                dest.write(r.content)
+                                dest.flush()
+                                dest.seek(0)
+                                image_file = File(dest)
+                                new_map = Map(
+                                    name=name,
+                                    club=club,
+                                    corners_coordinates=corners_coords,
+                                )
+                                new_map.image.save("file", image_file, save=True)
+                        else:
+                            image_path = os.path.abspath(os.path.join(dest, image_path))
+                            if not image_path.startswith(dest):
+                                raise Exception("Fishy KMZ")
+                            image_file = File(open(image_path, "rb"))
                             new_map = Map(
                                 name=name,
                                 club=club,
                                 corners_coordinates=corners_coords,
                             )
-                            new_map.image.save("file", image_file, save=True)
-                    else:
-                        image_path = os.path.abspath(os.path.join(dest, image_path))
-                        if not image_path.startswith(dest):
-                            raise Exception("Fishy KMZ")
-                        image_file = File(open(image_path, "rb"))
-                        new_map = Map(
-                            name=name,
-                            club=club,
-                            corners_coordinates=corners_coords,
-                        )
-                        new_map.image.save("file", image_file, save=False)
+                            new_map.image.save("file", image_file, save=False)
                 except Exception:
                     error = "An error occured while extracting the map from your file."
             if new_map:
