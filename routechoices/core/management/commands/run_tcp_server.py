@@ -525,13 +525,34 @@ class MicTrackConnection:
         print(f"Start listening from {self.address}")
         imei = None
         try:
-            data_raw = ""
-            while not data_raw:
-                data_bin = await self.stream.read_until(b"\r\n##")
-                data_raw = data_bin.decode("ascii").strip()
+            data_bin = await self.stream.read_bytes(2)
+            data_raw = data_bin.decode("ascii")
+            if data_raw == "MT":
+                self.protocol_version = 2
+            elif data_raw.startswith("#"):
+                self.protocol_version = 1
+            else:
+                print("Unknown protocol", flush=True)
+                self.stream.close()
+                return
+            if self.protocol_version == 1:
+                data_bin = await self.stream.read_until(b"\r\n##", 1000)
+                data_raw += data_bin.decode("ascii").strip()
+            else:
+                data_bin = await self.stream.read_bytes(22)
+                data_raw += data_bin.decode("ascii")
+            if self.protocol_version == 1:
+                data = data_raw.split("#")
+                imei = data[1]
+            else:
+                data = data_raw.split(";")
+                imei = data[2]
+                if data[3] == "R0":
+                    while len(data_raw.split("+")) != 9:
+                        data_bin = await self.stream.read_bytes(90, partial=True)
+                        data_raw += data_bin.decode("ascii")
+                    data = data_raw.split(";")
             print(f"Received data ({data_raw})", flush=True)
-            data = data_raw.split("#")
-            imei = data[1]
         except Exception as e:
             print(e, flush=True)
             self.stream.close()
@@ -549,9 +570,14 @@ class MicTrackConnection:
             print("Invalid imei", flush=True)
             self.stream.close()
             return
-        logger.info(
-            f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
-        )
+        if self.protocol_version == 1:
+            logger.info(
+                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+            )
+        else:
+            logger.info(
+                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {data_bin}"
+            )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
             print(f"Imei not registered {self.address}, {imei}", flush=True)
@@ -559,9 +585,14 @@ class MicTrackConnection:
             return
         self.imei = imei
         print(f"{self.imei} is connected")
-        await self._process_data(data)
-        while await self._read_line():
-            pass
+        if self.protocol_version == 1:
+            await self._process_data(data)
+            while await self._read_line():
+                pass
+        else:
+            await self._process_data2(data)
+            while await self._read_line2():
+                pass
 
     async def _process_data(self, data):
         imei = data[1]
@@ -603,6 +634,35 @@ class MicTrackConnection:
         )
         print("1 location wrote to DB", flush=True)
 
+    async def _process_data2(self, data):
+        imei = data[2]
+        if imei != self.imei:
+            return False
+        msg_type = data[3]
+        if msg_type != "R0":
+            print("Not GPS data", flush=True)
+            return False
+        gps_data = data[4].split("+")
+        batt_volt = gps_data[7]
+        try:
+            tim = arrow.get(gps_data[1], "YYMMDDHHmmss").int_timestamp
+            lat = float(gps_data[2])
+            lon = float(gps_data[3])
+        except Exception:
+            print("Could not parse GPS data", flush=True)
+            return False
+        try:
+            self.db_device.battery_level = max(
+                [0, min([100, int(int(batt_volt) / 5000 * 100)])]
+            )
+        except Exception:
+            print("Invalid battery level value", flush=True)
+            pass
+        await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
+            [(tim, lat, lon)]
+        )
+        print("1 location wrote to DB", flush=True)
+
     async def _read_line(self):
         try:
             data_raw = ""
@@ -615,6 +675,29 @@ class MicTrackConnection:
             )
             data = data_raw.split("#")
             await self._process_data(data)
+        except Exception as e:
+            print(f"Error parsing data: {str(e)}")
+            self.stream.close()
+            return False
+        return True
+
+    async def _read_line2(self):
+        try:
+            data_raw = ""
+            while not data_raw:
+                data_bin = await self.stream.read_bytes(24)
+                data_raw = data_bin.decode("ascii")
+            print(f"Received data ({data_raw})")
+            logger.info(
+                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+            )
+            data = data_raw.split(";")
+            if data[3] == "R0":
+                while len(data_raw.split("+")) != 9:
+                    data_bin = await self.stream.read_bytes(90, partial=True)
+                    data_raw += data_bin.decode("ascii")
+                data = data_raw.split(";")
+            await self._process_data2(data)
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
             self.stream.close()
