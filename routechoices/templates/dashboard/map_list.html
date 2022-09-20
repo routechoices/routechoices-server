@@ -11,12 +11,14 @@
             <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
             <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
             <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
+            <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</button></p>
         {% else %}
         <div style="margin-bottom:15px">
           <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
           <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
           <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
         </div>
+        <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</button></p>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped" style="margin-top:15px">
             <tr><th>Name</th><th>Download</th></tr>
@@ -32,6 +34,22 @@
         </table>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
         {% endif %}
+    </div>
+</div>
+<div class="modal fade" id="howToKMZModal" tabindex="-1" role="dialog" aria-labelledby="howToKMZModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="howToKMZModalLabel">How To Export KMZ from OCAD</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <img src="{% static "img/export_kmz.gif"%}" width="100%" alt="how to export kmz from ocad gif"/>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+        </div>
     </div>
 </div>
 {% endblock %}
