@@ -548,10 +548,13 @@ class MicTrackConnection:
                 data = data_raw.split(";")
                 imei = data[2]
                 if data[3] == "R0":
-                    while len(data_raw.split("+")) != 9:
+                    while len(data_raw.split("+")) < 9:
                         data_bin = await self.stream.read_bytes(90, partial=True)
                         data_raw += data_bin.decode("ascii")
                     data = data_raw.split(";")
+                else:
+                    data_bin = await self.stream.read_bytes(90, partial=True)
+                    data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})", flush=True)
         except Exception as e:
             print(e, flush=True)
@@ -669,6 +672,10 @@ class MicTrackConnection:
             while not data_raw:
                 data_bin = await self.stream.read_until(b"\r\n##")
                 data_raw = data_bin.decode("ascii").strip()
+            if not data_raw.startswith("#"):
+                print("Invalid protocol")
+                self.stream.close()
+                return False
             print(f"Received data ({data_raw})")
             logger.info(
                 f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
@@ -687,12 +694,19 @@ class MicTrackConnection:
             while not data_raw:
                 data_bin = await self.stream.read_bytes(24)
                 data_raw = data_bin.decode("ascii")
+            if not data_raw.startswith("MT;"):
+                print("Invalid protocol")
+                self.stream.close()
+                return False
             data = data_raw.split(";")
             if data[3] == "R0":
-                while len(data_raw.split("+")) != 9:
+                while len(data_raw.split("+")) < 9:
                     data_bin = await self.stream.read_bytes(90, partial=True)
                     data_raw += data_bin.decode("ascii")
                 data = data_raw.split(";")
+            else:
+                data_bin = await self.stream.read_bytes(90, partial=True)
+                data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})")
             logger.info(
                 f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_bin)}"
