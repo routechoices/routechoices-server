@@ -687,16 +687,16 @@ class MicTrackConnection:
             while not data_raw:
                 data_bin = await self.stream.read_bytes(24)
                 data_raw = data_bin.decode("ascii")
-            print(f"Received data ({data_raw})")
-            logger.info(
-                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_bin)}"
-            )
             data = data_raw.split(";")
             if data[3] == "R0":
                 while len(data_raw.split("+")) != 9:
                     data_bin = await self.stream.read_bytes(90, partial=True)
                     data_raw += data_bin.decode("ascii")
                 data = data_raw.split(";")
+            print(f"Received data ({data_raw})")
+            logger.info(
+                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+            )
             await self._process_data2(data)
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
