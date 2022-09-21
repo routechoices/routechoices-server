@@ -296,5 +296,5 @@ function showLocalTime(el) {
     u(el).trigger("change");
   });
 
-  u("#id_map").parent().before("<hr/><h3>Maps</h3>");
+  u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
 })();
