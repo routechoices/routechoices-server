@@ -295,4 +295,6 @@ function showLocalTime(el) {
     u(el).val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
     u(el).trigger("change");
   });
+
+  u("#id_map").parent().before("<hr/><h3>Maps</h3>");
 })();
