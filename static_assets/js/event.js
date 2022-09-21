@@ -245,7 +245,7 @@ var smoothFactor = 1;
 var prevMapsJSONData = null;
 var mapSelectorLayer = null;
 var sidebarShown = true;
-var sidebarHidden = false;
+
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -393,6 +393,7 @@ var onStart = function () {
   u(".main").removeClass("loading");
   u(".sidebar").removeClass("loading");
   u(".time_bar").removeClass("loading");
+  map.invalidateSize();
   fetchCompetitorRoutes(null, true);
 };
 
