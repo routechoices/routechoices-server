@@ -118,9 +118,12 @@
 }
 
 .runner-icon-light {
-  color: #000;
+  color: #fff;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+#progress_bar {
+  overflow: initial;
 }
 
 .fa-circle.fa-3x.icon-sidebar {
