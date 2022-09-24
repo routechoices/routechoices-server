@@ -11,14 +11,14 @@
             <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
             <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
             <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
-            <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</button></p>
+            <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</a></p>
         {% else %}
         <div style="margin-bottom:15px">
           <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
           <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
           <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
         </div>
-        <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</button></p>
+        <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</a></p>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped" style="margin-top:15px">
             <tr><th>Name</th><th>Download</th></tr>
