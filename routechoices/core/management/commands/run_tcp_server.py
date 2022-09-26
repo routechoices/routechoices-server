@@ -737,7 +737,7 @@ class Command(BaseCommand):
             tmt250_server.listen(settings.TMT250_PORT)
         if settings.QUECLINK_PORT:
             queclink_server = QueclinkServer()
-            queclink_server.listen()
+            queclink_server.listen(settings.QUECLINK_PORT)
         if settings.MICTRACK_PORT:
             mictrack_server = MicTrackServer()
             mictrack_server.listen(settings.MICTRACK_PORT)
