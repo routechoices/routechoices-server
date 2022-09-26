@@ -2,6 +2,7 @@
 import json
 import logging
 import math
+from multiprocessing import connection
 import os.path
 import signal
 import sys
@@ -242,16 +243,7 @@ class TMT250Connection:
             await self.stream.write(self.decoder.generate_response())
 
 
-class TMT250Server(TCPServer):
-    async def handle_stream(self, stream, address):
-        c = TMT250Connection(stream, address)
-        try:
-            await c.start_listening()
-        except StreamClosedError:
-            pass
-
-
-class GL200Connection:
+class QueclinkConnection:
     def __init__(self, stream, address):
         print(f"Received a new connection from {address} on port 2002")
         self.aid = random_key()
@@ -404,15 +396,6 @@ class GL200Connection:
         print("Client quit", flush=True)
 
 
-class GL200Server(TCPServer):
-    async def handle_stream(self, stream, address):
-        c = GL200Connection(stream, address)
-        try:
-            await c.start_listening()
-        except StreamClosedError:
-            pass
-
-
 class TrackTapeConnection:
     def __init__(self, stream, address):
         print(f"received a new connection from {address} on port 2004")
@@ -500,15 +483,6 @@ class TrackTapeConnection:
 
     def _on_close(self):
         print("client quit", flush=True)
-
-
-class TrackTapeServer(TCPServer):
-    async def handle_stream(self, stream, address):
-        c = TrackTapeConnection(stream, address)
-        try:
-            await c.start_listening()
-        except StreamClosedError:
-            pass
 
 
 class MicTrackConnection:
@@ -722,13 +696,35 @@ class MicTrackConnection:
         print("client quit", flush=True)
 
 
-class MicTrackServer(TCPServer):
+class GenericTCPServer(TCPServer):
+    connection_class = None
+
     async def handle_stream(self, stream, address):
-        c = MicTrackConnection(stream, address)
+        if not self.connection_class:
+            return
+        c = self.connection_class(stream, address)
         try:
             await c.start_listening()
         except StreamClosedError:
             pass
+
+
+class MicTrackServer(GenericTCPServer):
+    connection_class = MicTrackConnection
+
+
+class TMT250Server(GenericTCPServer):
+    connection_class = TMT250Connection
+
+
+class QueclinkServer(GenericTCPServer):
+    connection_class = QueclinkConnection
+
+
+class TrackTapeServer(GenericTCPServer):
+    connection_class = TrackTapeConnection
+
+
 
 
 class Command(BaseCommand):
@@ -736,23 +732,27 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         signal.signal(signal.SIGTERM, sigterm_handler)
-        tmt250_server = TMT250Server()
-        gl200_server = GL200Server()
-        mictrack_server = MicTrackServer()
-        # tracktape_server = TrackTapeServer()
-        tmt250_server.listen(settings.TMT250_PORT)
-        gl200_server.listen(settings.GL200_PORT)
-        mictrack_server.listen(settings.MICTRACK_PORT)
-        # tracktape_server.listen(settings.TRACKTAPE_PORT)
+        if settings.TMT250_PORT:
+            tmt250_server = TMT250Server()
+            tmt250_server.listen(settings.TMT250_PORT)
+        if settings.QUECLINK_PORT:
+            queclink_server = QueclinkServer()
+            queclink_server.listen()
+        if settings.MICTRACK_PORT:
+            mictrack_server = MicTrackServer()
+            mictrack_server.listen(settings.MICTRACK_PORT)
+        if settings.TRACKTAPE_PORT:
+            tracktape_server = TrackTapeServer()
+            tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
             print("Start listening TCP data...", flush=True)
             logger.info(f"{time.time()}, UP")
             IOLoop.current().start()
         except (KeyboardInterrupt, SystemExit):
             tmt250_server.stop()
-            gl200_server.stop()
+            queclink_server.stop()
             mictrack_server.stop()
-            # tracktape_server.stop()
+            tracktape_server.stop()
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)
