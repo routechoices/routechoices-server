@@ -74,7 +74,7 @@
     });
 
     L.TileLayer["osm"] = L.TileLayer.Common.extend({
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       options: { attribution: "&copy; OpenStreetMap contributors" },
     });
     L.TileLayer["gmap-street"] = L.TileLayer.Common.extend({
@@ -100,7 +100,7 @@
       options: { attribution: "" },
     });
     L.TileLayer["world-topo"] = L.TileLayer.Common.extend({
-      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
       options: { attribution: "&copy; OpenTopoMap (CC-BY-SA)" },
     });
     L.TileLayer["world-topo-alt"] = L.TileLayer.Common.extend({
