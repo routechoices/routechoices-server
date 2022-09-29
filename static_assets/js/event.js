@@ -825,9 +825,9 @@ var displayCompetitorList = function (force) {
         <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">\
           <button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
         (competitor.isShown ? "off" : "on") +
-        '"><i class="fa fa-toggle-' +
+        '" style="padding: 0"><i class="fa fa-toggle-' +
         (competitor.isShown ? "on" : "off") +
-        '" style="padding: 0"></i></button>\
+        '" ></i></button>\
           <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0"><i class="fa fa-map-marker"></i></button>\
           <button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0">' +
         '<i class="fa-solid fa-stairs fa-rotate-90" id="fullRouteIcon-' +
