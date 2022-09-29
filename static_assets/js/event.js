@@ -769,6 +769,16 @@ function showSidebar() {
   sidebarShown = true;
 }
 
+function toggleFullCompetitor(c) {
+  if (c.displayFullRoute) {
+    c.displayFullRoute = null;
+    u("#fullRouteIcon-" + c.id).css({ color: null });
+  } else {
+    c.displayFullRoute = true;
+    u("#fullRouteIcon-" + c.id).css({ color: "#18bc9c" });
+  }
+}
+
 function toggleCompetitorList(e) {
   e.preventDefault();
   var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
@@ -817,9 +827,15 @@ var displayCompetitorList = function (force) {
         (competitor.isShown ? "off" : "on") +
         '"><i class="fa fa-toggle-' +
         (competitor.isShown ? "on" : "off") +
-        '"></i></button>\
-          <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus"><i class="fa fa-map-marker"></i></button>\
-          <span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
+        '" style="padding: 0"></i></button>\
+          <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0"><i class="fa fa-map-marker"></i></button>\
+          <button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0">' +
+        '<i class="fa-solid fa-stairs fa-rotate-90" id="fullRouteIcon-' +
+        competitor.id +
+        '" ' +
+        (competitor.displayFullRoute ? 'style="color:#18bc9c"' : "") +
+        "></i></span></button>" +
+        '<span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
         </div>\
         </div>'
     );
@@ -907,6 +923,11 @@ var displayCompetitorList = function (force) {
       .find(".center_competitor_btn")
       .on("click", function () {
         zoomOnCompetitor(competitor);
+      });
+    u(div)
+      .find(".full_competitor_btn")
+      .on("click", function () {
+        toggleFullCompetitor(competitor);
       });
     if (
       searchText === null ||
@@ -1739,14 +1760,18 @@ var drawCompetitors = function () {
           ]);
         }
       }
-      var tail = route.extractInterval(
-        viewedTime - tailLength * 1e3,
-        viewedTime
-      );
-      var hasPointInTail = route.hasPointInInterval(
-        viewedTime - tailLength * 1e3,
-        viewedTime
-      );
+      var tail = null;
+      var hasPointInTail = false;
+      if (competitor.displayFullRoute) {
+        tail = route.extractInterval(-Infinity, viewedTime);
+        hasPointInTail = route.hasPointInInterval(-Infinity, viewedTime);
+      } else {
+        tail = route.extractInterval(viewedTime - tailLength * 1e3, viewedTime);
+        hasPointInTail = route.hasPointInInterval(
+          viewedTime - tailLength * 1e3,
+          viewedTime
+        );
+      }
       if (!hasPointInTail) {
         if (competitor.tail) {
           map.removeLayer(competitor.tail);
