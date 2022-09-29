@@ -43,6 +43,7 @@ JS Libraries:
     reqwest                     MIT https://github.com/neocotic/qrious
     tempus-dominus              MIT https://github.com/Eonasdan/tempus-dominus
     tom-select                  Apache-2.0 https://github.com/orchidjs/tom-select
+    tinycolor                   MIT https://github.com/bgrins/TinyColor
     umbrellajs                  MIT https://github.com/franciscop/umbrella
 
 

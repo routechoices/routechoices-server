@@ -252,6 +252,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
               mapSelectorLayer.addTo(map);
               map.on("baselayerchange", function (e) {
                 map.fitBounds(e.layer.options.bounds);
+                map.zoomIn(0.5, { animate: false });
                 rasterMap = e.layer;
               });
             }

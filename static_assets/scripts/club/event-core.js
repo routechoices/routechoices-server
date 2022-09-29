@@ -2047,6 +2047,7 @@ function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
   _rasterMap.addTo(map);
   if (fit) {
     map.fitBounds(bounds);
+    map.zoomIn(0.5, { animate: false });
   }
   return _rasterMap;
 }
