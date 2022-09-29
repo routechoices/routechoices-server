@@ -15,7 +15,6 @@ const appHeight = () => {
   doc.style.setProperty("--app-height", `${window.innerHeight}px`);
 };
 window.addEventListener("resize", appHeight);
-appHeight();
 
 L.Control.Ranking = L.Control.extend({
   onAdd: function (map) {
@@ -395,6 +394,7 @@ var onStart = function () {
   u(".time_bar").removeClass("loading");
   map.invalidateSize();
   fetchCompetitorRoutes(null, true);
+  appHeight();
 };
 
 var selectLiveMode = function (e) {
