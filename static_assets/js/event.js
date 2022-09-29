@@ -819,10 +819,10 @@ var displayCompetitorList = function (force) {
       '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
-        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 7px"><b>' +
+        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">\
+        <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px">\
           <button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
         (competitor.isShown ? "off" : "on") +
         '" style="padding: 0 3px 0 0"><i class="fa fa-toggle-' +
