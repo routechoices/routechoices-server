@@ -602,11 +602,12 @@ class Map(models.Model):
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
         orig = self.data
-        img_nparr = np.fromstring(orig, np.uint8)
-        if self.mime_type == "image/gif":
+        orig_mime_type = magic.from_buffer(orig, mime=True)
+        if orig_mime_type == "image/gif":
             img = Image.open(BytesIO(orig)).convert("RGBA")
             img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
         else:
+            img_nparr = np.fromstring(orig, np.uint8)
             img = cv2.imdecode(img_nparr, cv2.IMREAD_UNCHANGED)
             img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2BGRA)
         tile_img = cv2.warpPerspective(
