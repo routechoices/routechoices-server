@@ -2,7 +2,6 @@
 import json
 import logging
 import math
-from multiprocessing import connection
 import os.path
 import signal
 import sys
@@ -723,8 +722,6 @@ class QueclinkServer(GenericTCPServer):
 
 class TrackTapeServer(GenericTCPServer):
     connection_class = TrackTapeConnection
-
-
 
 
 class Command(BaseCommand):
