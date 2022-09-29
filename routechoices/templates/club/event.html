@@ -128,23 +128,24 @@
   data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}""{% endif %}
 ></script>
 {% compress js %}
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
+<script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
+<script src="{% static '/vendor/server-clock-2022.06.14/server-clock.min.js' %}"></script>
 <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
-<script src="{% static '/js/server_clock.js' %}"></script>
-<script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
+<script src="{% static '/vendor/tinycolor-1.4.2/tinycolor.min.js' %}"></script>
+<script src="{% static '/vendor/iro-5/iro.min.js' %}"></script>
 <script src="{% static '/vendor/qrious-4.0.2/qrious.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-1.9.1/leaflet.js' %}"></script>
 <script src="{% static '/vendor/leaflet-tilelayer-nogap-2020.02.07/L.TileLayer.NoGap.js' %}"></script>
-<script src="{% static '/vendor/iro-5/iro.min.js' %}"></script>
-<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
 <script src="{% static '/vendor/leaflet-pancontrol-1.0.0/L.Control.Pan.js' %}" ></script>
-<script src="{% static '/js/leaflet.lineUtils.js' %}"></script>
+<script src="{% static '/vendor/leaflet-line-utils-2022.09.29/leaflet.lineUtils.js' %}"></script>
 <script src="{% static '/vendor/leaflet-contextmenu-1.5.1/leaflet.contextmenu.min.js' %}"></script>
 <script src="{% static '/vendor/leaflet-rotate-0.1.3/leaflet-rotate.js' %}"></script>
-<script src="{% static '/vendor/bn-5.2.0/bn.js' %}"></script>
-<script src="{% static '/js/positioning-2021082902.js' %}"></script>
-<script src="{% static '/vendor/jdbscan-20210913/jDBScan.js' %}"></script>
-<script src="{% static '/js/event.js' %}"></script>
+<script src="{% static '/vendor/jdbscan-20210913/jdbscan.min.js' %}"></script>
+<script src="{% static '/vendor/bn-5.2.0/bn.min.js' %}"></script>
+<script src="{% static '/vendor/gps-encoding-2021.08.29/gps-encoding.min.js' %}"></script>
+<script src="{% static '/scripts/club/event-core.js' %}"></script>
 <script src="{% static '/scripts/club/event.js' %}"></script>
 {% endcompress %}
 {% endblock %}

@@ -1,4 +1,4 @@
-/* Positioning.js 2021-08-28 */
+/* gps-encoding.js 2021-08-28 */
 // Depends on BN.js, https://github.com/indutny/bn.js
 var intValCodec = (function () {
   var decodeUnsignedValueFromString = function (encoded, offset) {
