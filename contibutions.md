@@ -90,3 +90,8 @@ PyPi Packages:
     tornado                     Apache Software License
     uWSGI                       GNU General Public License v2 or later (GPLv2+)
     websocket-client            Apache Software License
+
+Fonts:
+------
+    Atkinson Hyperlegible
+    Roboto Mono
