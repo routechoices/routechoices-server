@@ -6,6 +6,7 @@ from django.db.models.functions import ExtractMonth, ExtractYear
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
+from django.views.decorators.cache import cache_page
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
 
@@ -146,6 +147,7 @@ def club_live_event_feed(request, **kwargs):
 
 
 @xframe_options_exempt
+@cache_page(5)
 def event_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
         "event_view", kwargs.get("club_slug"), slug=slug
@@ -158,7 +160,6 @@ def event_view(request, slug, **kwargs):
     event = (
         Event.objects.all()
         .select_related("club")
-        .prefetch_related("competitors")
         .filter(
             club__slug__iexact=club_slug,
             slug__iexact=slug,
