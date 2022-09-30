@@ -31,10 +31,32 @@ server {{
 
     ssl_certificate {os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')};
     ssl_certificate_key {os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')};
-    listen 443;
-    listen [::]:443;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
 
     location / {{
+       set $no_cache "";
+       if ($request_method !~ ^(GET|HEAD)$) {{
+           set $no_cache "1";
+       }}
+       if ($uri ~ ^(\\/dashboard|\\/admin)) {{
+           set $no_cache "1";
+       }}
+       if ($no_cache = "1") {{
+           add_header Set-Cookie "_mcnc=1; Max-Age=2; Path=/";
+           add_header X-Microcachable "0";
+       }}
+       if ($http_cookie ~* "_mcnc") {{
+           set $no_cache "1";
+       }}
+       uwsgi_cache microcache;
+       uwsgi_cache_key $scheme$host$request_method$request_uri;
+       uwsgi_cache_valid 200 1s;
+       uwsgi_cache_use_stale updating;
+       uwsgi_max_temp_file_size 10M;
+       uwsgi_no_cache $no_cache;
+       uwsgi_cache_bypass $no_cache;
+
        client_max_body_size    10M;
        proxy_set_header        Host $host;
        proxy_set_header        X-Real-IP $remote_addr;
