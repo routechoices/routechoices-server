@@ -94,7 +94,7 @@ def tile_etag(request):
                 not request.user.is_authenticated
                 or not event.club.admins.filter(id=request.user.id).exists()
             ):
-                raise None
+                return None
         if map_index == 0:
             raster_map = event.map
         else:
