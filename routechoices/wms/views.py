@@ -239,12 +239,9 @@ def wms_service(request):
                 .map
             )
 
-        try:
-            data_out = raster_map.create_tile(
-                out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime
-            )
-        except Exception as e:
-            raise e
+        data_out = raster_map.create_tile(
+            out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime
+        )
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}
