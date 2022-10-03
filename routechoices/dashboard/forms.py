@@ -25,7 +25,11 @@ from routechoices.core.models import (
     MapAssignation,
     Notice,
 )
-from routechoices.lib.helpers import check_records, get_aware_datetime
+from routechoices.lib.helpers import (
+    check_cname_record,
+    check_txt_record,
+    get_aware_datetime,
+)
 from routechoices.lib.validators import domain_validator
 
 
@@ -106,15 +110,20 @@ class ClubDomainForm(ModelForm):
         domain = self.cleaned_data["domain"]
         if domain == "":
             return domain
-        if not check_records(domain):
-            raise ValidationError(f"TXT record for '{domain}' has not been set.")
+        if not check_txt_record(domain):
+            raise ValidationError(
+                f"TXT record for '{domain}' has not been set properly."
+            )
+        if not check_cname_record(domain):
+            raise ValidationError(
+                f"CNAME record for '{domain}' has not been set properly."
+            )
         matching_clubs = Club.objects.filter(domain__iexact=domain)
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
         if matching_clubs.exists():
-            raise ValidationError(f"Domain '{domain}'  already exists.")
-        else:
-            return domain.lower()
+            raise ValidationError(f"Domain '{domain}' already exists.")
+        return domain.lower()
 
 
 class DeviceForm(Form):

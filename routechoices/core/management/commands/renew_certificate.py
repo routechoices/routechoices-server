@@ -12,6 +12,7 @@ from sewer.auth import ProviderBase
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
+from routechoices.lib.helpers import check_cname_record
 
 
 def is_expirying(domain):
@@ -94,6 +95,12 @@ class Command(BaseCommand):
             club = Club.objects.filter(domain=domain).first()
             if not club:
                 self.stderr.write("No club with this domain")
+                continue
+
+            if not check_cname_record(domain):
+                self.stderr.write("Domain is not pointing to routechoices.com anymore")
+                club.domain = ""
+                club.save()
                 continue
 
             if not os.path.exists(

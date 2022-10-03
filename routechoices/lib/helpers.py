@@ -294,7 +294,7 @@ def initial_of_name(name):
     return ".".join(initials + [parts[-1]])
 
 
-def check_records(domain):
+def check_txt_record(domain):
     if not domain:
         return
 
@@ -320,6 +320,37 @@ def check_records(domain):
     answer = data.get("Answer", [])
     for ans in answer:
         if ans.get("data") == '"full-speed-no-mistakes"' and ans.get("type") == 16:
+            return True
+
+    return False
+
+
+def check_cname_record(domain):
+    if not domain:
+        return
+
+    try:
+        resp = requests.get(
+            f"https://cloudflare-dns.com/dns-query?type=CNAME&name={requests.utils.quote(domain)}",
+            headers={"accept": "application/dns-json"},
+        )
+    except Exception:
+        return False
+
+    if resp.status_code != 200:
+        return False
+
+    try:
+        data = resp.json()
+    except Exception:
+        return False
+
+    if data.get("Status") != 0:
+        return False
+
+    answer = data.get("Answer", [])
+    for ans in answer:
+        if ans.get("data") == "cname.routechoices.com." and ans.get("type") == 5:
             return True
 
     return False
