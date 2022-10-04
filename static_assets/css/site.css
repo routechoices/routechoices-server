@@ -88,6 +88,7 @@ body {
 .frontpage_text {
   font-family: "Atkinson-Hyperlegible-Regular-102", sans-serif;
 }
+
 .frontpage_text_bold {
   font-family: "Atkinson-Hyperlegible-Bold-102", sans-serif;
 }
@@ -205,4 +206,16 @@ body {
 }
 .navbar-brand.navbarchimey:hover {
   color: #13967d;
+}
+
+.route-displayed .fa-bullseye {
+  color: black;
+}
+
+.route-not-displayed .fa-bullseye {
+  color: #aaa;
+}
+
+.route-displayed .fa-bullseye.route-focused {
+  color: #18bc9c;
 }

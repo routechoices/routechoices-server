@@ -778,6 +778,24 @@ function toggleFullCompetitor(c) {
     u("#fullRouteIcon-" + c.id).css({ color: "#18bc9c" });
   }
 }
+function toggleFocusCompetitor(c) {
+  const wasFocused = c.focused;
+  competitorList.map((comp) => {
+    comp.focused = false;
+    u("#focusedIcon-" + comp.id).removeClass("route-focused");
+  });
+  if (wasFocused) {
+    c.focused = false;
+    u("#focusedIcon-" + c.id).removeClass("route-focused");
+  } else {
+    if (!c.isShown) {
+      return;
+    }
+    c.focused = true;
+    u("#focusedIcon-" + c.id).addClass("route-focused");
+    zoomOnCompetitor(c);
+  }
+}
 
 function toggleCompetitorList(e) {
   e.preventDefault();
@@ -822,7 +840,9 @@ var displayCompetitorList = function (force) {
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px">\
+        <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px" class="' +
+        (competitor.isShown ? "route-displayed" : "route-not-displayed") +
+        '">\
           <button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
         (competitor.isShown ? "off" : "on") +
         '" style="padding: 0 3px 0 0"><i class="fa fa-toggle-' +
@@ -834,7 +854,13 @@ var displayCompetitorList = function (force) {
         competitor.id +
         '" ' +
         (competitor.displayFullRoute ? 'style="color:#18bc9c"' : "") +
-        "></i></span></button>" +
+        "></i></button>" +
+        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" style="padding: 0;margin-left:1px">' +
+        '<i class="fa-solid fa-bullseye" id="focusedIcon-' +
+        competitor.id +
+        '" ' +
+        (competitor.focused ? 'style="color:#18bc9c"' : "") +
+        "></i></button>" +
         '<span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
         </div>\
         </div>'
@@ -886,7 +912,16 @@ var displayCompetitorList = function (force) {
         var icon = u(this).find("i");
         if (icon.hasClass("fa-toggle-on")) {
           icon.removeClass("fa-toggle-on").addClass("fa-toggle-off");
+          icon
+            .parent()
+            .parent()
+            .removeClass("route-displayed")
+            .addClass("route-not-displayed");
           competitor.isShown = false;
+
+          competitor.focused = false;
+          u("#focusedIcon-" + competitor.id).removeClass("route-focused");
+
           if (competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker);
           }
@@ -914,6 +949,11 @@ var displayCompetitorList = function (force) {
             return;
           }
           icon.removeClass("fa-toggle-off").addClass("fa-toggle-on");
+          icon
+            .parent()
+            .parent()
+            .removeClass("route-not-displayed")
+            .addClass("route-displayed");
           competitor.isShown = true;
           updateCompetitor(competitor);
           nbShown += 1;
@@ -928,6 +968,11 @@ var displayCompetitorList = function (force) {
       .find(".full_competitor_btn")
       .on("click", function () {
         toggleFullCompetitor(competitor);
+      });
+    u(div)
+      .find(".focus_competitor_btn")
+      .on("click", function () {
+        toggleFocusCompetitor(competitor);
       });
     if (
       searchText === null ||
@@ -977,6 +1022,10 @@ var displayCompetitorList = function (force) {
       .on("click", function () {
         competitorList.forEach(function (competitor) {
           competitor.isShown = false;
+
+          competitor.focused = false;
+          u("#focusedIcon-" + competitor.id).removeClass("route-focused");
+
           if (competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker);
           }
@@ -1534,6 +1583,22 @@ var drawCompetitors = function () {
         viewedTime
       );
       var loc = route.getByTime(viewedTime);
+
+      if (competitor.focused) {
+        const mapSize = map.getSize();
+        const placeXY = map.latLngToContainerPoint([
+          loc.coords.latitude,
+          loc.coords.longitude,
+        ]);
+        if (
+          placeXY.x < mapSize.x / 4 ||
+          placeXY.x > (mapSize.x * 3) / 4 ||
+          placeXY.y < mapSize.y / 4 ||
+          placeXY.y > (mapSize.y * 3) / 4
+        ) {
+          zoomOnCompetitor(competitor);
+        }
+      }
 
       if (viewedTime < route.getByIndex(0).timestamp) {
         ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
