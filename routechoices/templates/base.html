@@ -65,6 +65,7 @@
     <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=20220825"></script>
     {% endif %}
     {% compress js %}
+    <script src="{% static '/vendor/popper-2.11.4/popper.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap-5.1.1/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
     {% endcompress %}

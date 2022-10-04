@@ -34,5 +34,9 @@
     "reached-max-runners": "$1 kilpailijan raja on saavutettu",
     "export": "Vie",
     "save": "Tallenna",
-    "cancel": "Peruuttaa"
+    "cancel": "Peruuttaa",
+    "toggle": "Piilota/Näytä",
+    "center": "Keskitä",
+    "full-route": "Koko reitti",
+    "follow": "Seuraa"
 }

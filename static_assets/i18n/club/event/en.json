@@ -34,5 +34,9 @@
     "reached-max-runners": "The limit of $1 competitors displayed has been reached",
     "export": "Export",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "toggle": "Hide/Show",
+    "center": "Center",
+    "full-route": "Full route",
+    "follow": "Follow"
 }

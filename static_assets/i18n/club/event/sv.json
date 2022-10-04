@@ -34,5 +34,9 @@
     "reached-max-runners": "Gränsen på $1-deltagare som visas har uppnåtts",
     "export": "Exportera",
     "save": "Spara",
-    "cancel": "Avbryt"
+    "cancel": "Avbryt",
+    "toggle": "Dölj/Visa",
+    "center": "Centrera",
+    "full-route": "Full väg",
+    "follow": "Följ"
 }

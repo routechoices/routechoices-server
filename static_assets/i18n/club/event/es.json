@@ -34,5 +34,9 @@
   "reached-max-runners": "Se ha alcanzado el límite de $1 competidores mostrados",
   "export": "Exportar",
   "save": "Guardar",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "toggle": "Ocultar/Ver",
+  "center": "Centrar",
+  "full-route": "Routa completa",
+  "follow": "Seguir"
 }

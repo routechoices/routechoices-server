@@ -6,7 +6,7 @@
     "event-not-started-text": "Événement pas encore débuté.",
     "event-start-date-text": "L'événement débute le $1",
     "hide-all": "Cacher tous",
-    "show-all": "Montrer tous",
+    "show-all": "Afficher tous",
     "select-color-for": "Sélectionnez une nouvelle couleur pour $1",
     "replay-mode": "Revoir",
     "live-mode": "Direct",
@@ -34,5 +34,9 @@
     "reached-max-runners": "La limite de $1 concurrents affichés a été atteinte",
     "export": "Exporter",
     "save": "Enregistrer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "toggle": "Cacher/Afficher",
+    "center": "Centrer",
+    "full-route": "Itinéraire complet",
+    "follow": "Suivre"
 }

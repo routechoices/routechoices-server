@@ -34,5 +34,9 @@
     "reached-max-runners": "De limiet van $1 deelnemers is bereikt",
     "export": "Exporteren",
     "save": "Opslaan",
-    "cancel": "Annuleren"
+    "cancel": "Annuleren",
+    "toggle": "Verberg/Toon",
+    "center": "Centreer",
+    "full-route": "Volledige route",
+    "follow": "Volgen"
 }

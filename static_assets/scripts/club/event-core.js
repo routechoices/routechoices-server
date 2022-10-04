@@ -845,21 +845,29 @@ var displayCompetitorList = function (force) {
         '">\
           <button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
         (competitor.isShown ? "off" : "on") +
-        '" style="padding: 0 3px 0 0"><i class="fa fa-toggle-' +
+        '" style="padding: 0 3px 0 0" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("toggle") +
+        '"><i class="fa fa-toggle-' +
         (competitor.isShown ? "on" : "off") +
         '" ></i></button>\
-          <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0"><i class="fa fa-map-marker"></i></button>\
-          <button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0">' +
+          <button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("center") +
+        '"><i class="fa fa-map-marker"></i></button>\
+          <button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("full-route") +
+        '">' +
         '<i class="fa-solid fa-stairs fa-rotate-90" id="fullRouteIcon-' +
         competitor.id +
         '" ' +
         (competitor.displayFullRoute ? 'style="color:#18bc9c"' : "") +
         "></i></button>" +
-        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" style="padding: 0;margin-left:1px">' +
+        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("follow") +
+        '" style="padding: 0;margin-left:1px">' +
         '<i class="fa-solid fa-bullseye" id="focusedIcon-' +
         competitor.id +
         '" ' +
-        (competitor.focused ? 'style="color:#18bc9c"' : "") +
+        (competitor.focused ? 'class="route-focused"' : "") +
         "></i></button>" +
         '<span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
         </div>\
@@ -1085,6 +1093,9 @@ var displayCompetitorList = function (force) {
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
   }
+  u(".tooltip").remove();
+  const tooltipEls = u("#competitorSidebar").find('[data-bs-toggle="tooltip"]');
+  tooltipEls.map((el) => new bootstrap.Tooltip(el, { trigger: "hover" }));
 };
 var filterCompetitorList = function (e) {
   var inputVal = u(e.target).val();
@@ -2279,7 +2290,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2022082900`)
+  return fetch(`${langFile}?v=2022090400`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);
