@@ -28,7 +28,7 @@ gpxpy
 numpy
 opencv-python
 orjson
-pillow
+pillow-simd
 pillow-avif-plugin
 psycopg2
 python-magic
