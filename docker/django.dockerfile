@@ -7,7 +7,7 @@ WORKDIR /app/
 ADD . /app/
 
 RUN set -ex \
-    && apt-get update && apt-get install -y libgdal-dev g++ git libmagic-dev libgl1 watchman libpq5 cargo --no-install-recommends \
+    && apt-get update && apt-get install -y libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 watchman libpq5 cargo --no-install-recommends \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install -r /app/requirements.txt \
