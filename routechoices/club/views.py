@@ -319,7 +319,7 @@ def event_kmz_view(request, slug, index="0", **kwargs):
 
 def event_contribute_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_registration_view", kwargs.get("club_slug"), slug=slug
+        "event_contribute_view", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
