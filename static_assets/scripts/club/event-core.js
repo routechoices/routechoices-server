@@ -754,7 +754,7 @@ function hideSidebar() {
 
 function showSidebar() {
   u("#map")
-    .removeClass("col-12")
+    .addClass("col-12")
     .addClass("col-sm-7")
     .addClass("col-lg-9")
     .addClass("col-xxl-10");
@@ -864,11 +864,11 @@ var displayCompetitorList = function (force) {
         '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("follow") +
         '" style="padding: 0;margin-left:1px">' +
-        '<i class="fa-solid fa-bullseye" id="focusedIcon-' +
+        '<i class="fa-solid fa-bullseye' +
+        (competitor.focused ? " route-focused" : "") +
+        '" id="focusedIcon-' +
         competitor.id +
-        '" ' +
-        (competitor.focused ? 'class="route-focused"' : "") +
-        "></i></button>" +
+        '"></i></button>' +
         '<span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
         </div>\
         </div>'
@@ -1352,7 +1352,9 @@ var zoomOnCompetitor = function (compr) {
     }
   }
   var loc = route.getByTime(timeT);
-  map.setView([loc.coords.latitude, loc.coords.longitude]);
+  map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
+    animate: false,
+  });
 };
 var getRelativeTime = function (currentTime) {
   var viewedTime = currentTime;
@@ -1602,10 +1604,12 @@ var drawCompetitors = function () {
           loc.coords.longitude,
         ]);
         if (
-          placeXY.x < mapSize.x / 4 ||
-          placeXY.x > (mapSize.x * 3) / 4 ||
-          placeXY.y < mapSize.y / 4 ||
-          placeXY.y > (mapSize.y * 3) / 4
+          (placeXY.x < mapSize.x / 4 ||
+            placeXY.x > (mapSize.x * 3) / 4 ||
+            placeXY.y < mapSize.y / 4 ||
+            placeXY.y > (mapSize.y * 3) / 4) &&
+          mapSize.x > 0 &&
+          mapSize.y > 0
         ) {
           zoomOnCompetitor(competitor);
         }
