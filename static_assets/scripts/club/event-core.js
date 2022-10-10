@@ -420,6 +420,8 @@ var selectLiveMode = function (e) {
   }
   u("#live_button").addClass("active");
   u("#replay_button").removeClass("active");
+  u("#real_time_button").removeClass("active");
+  u("#mass_start_button").removeClass("active");
   u("#replay_mode_buttons").hide();
   u("#replay_control_buttons").hide();
 
@@ -466,6 +468,8 @@ var selectReplayMode = function (e) {
   }
 
   u("#full_progress_bar").removeClass("d-none");
+  u("#real_time_button").addClass("active");
+  u("#mass_start_button").removeClass("active");
   u(".time_bar").addClass("replay_mode");
   u(".main").addClass("replay_mode");
   u(".sidebar").addClass("replay_mode");
