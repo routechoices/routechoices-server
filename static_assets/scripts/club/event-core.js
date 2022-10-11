@@ -1345,6 +1345,10 @@ var getCompetitorsMinCustomOffset = function () {
 };
 
 var zoomOnCompetitor = function (compr) {
+  if (compr.focusing) {
+    return;
+  }
+  compr.focusing = true;
   var route = competitorRoutes[compr.id];
   if (!route) return;
   var timeT = currentTime;
@@ -1359,6 +1363,7 @@ var zoomOnCompetitor = function (compr) {
   map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
     animate: false,
   });
+  compr.focusing = false;
 };
 var getRelativeTime = function (currentTime) {
   var viewedTime = currentTime;
