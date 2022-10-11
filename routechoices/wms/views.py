@@ -1,5 +1,6 @@
 import hashlib
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
@@ -355,7 +356,7 @@ def wms_service(request):
       <Format>application/vnd.ogc.wms_xml</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.routechoices.com/?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.{settings.PARENT_HOST}/?"/></Get>
         </HTTP>
       </DCPType>
     </GetCapabilities>
@@ -366,7 +367,7 @@ def wms_service(request):
       <Format>image/webp</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.routechoices.com/?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.{settings.PARENT_HOST}/?"/></Get>
         </HTTP>
       </DCPType>
     </GetMap>
