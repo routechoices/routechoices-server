@@ -1,11 +1,11 @@
 import hashlib
 
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import etag, last_modified
+from django_hosts.resolvers import reverse
 
 from routechoices.core.models import PRIVACY_PRIVATE, PRIVACY_PUBLIC, Event
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -356,7 +356,7 @@ def wms_service(request):
       <Format>application/vnd.ogc.wms_xml</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.{settings.PARENT_HOST}/?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{reverse('wms_service', host='wms', scheme=request.scheme)}?"/></Get>
         </HTTP>
       </DCPType>
     </GetCapabilities>
@@ -367,7 +367,7 @@ def wms_service(request):
       <Format>image/webp</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.{settings.PARENT_HOST}/?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{reverse('wms_service', host='wms', scheme=request.scheme)}?"/></Get>
         </HTTP>
       </DCPType>
     </GetMap>
