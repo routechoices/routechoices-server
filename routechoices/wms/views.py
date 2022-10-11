@@ -14,11 +14,15 @@ GLOBAL_MERCATOR = GlobalMercator()
 
 
 def tile_etag(request):
-    if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
-        layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
-        bbox_raw = request.GET.get("bbox", request.GET.get("BBOX"))
-        width_raw = request.GET.get("width", request.GET.get("WIDTH"))
-        heigth_raw = request.GET.get("height", request.GET.get("HEIGHT"))
+    get_params = {}
+    for key in request.GET.keys():
+        get_params[key.lower()] = request.GET[key]
+
+    if get_params.get("request") == "GetMap":
+        layers_raw = get_params.get("layers")
+        bbox_raw = get_params.get("bbox")
+        width_raw = get_params.get("width")
+        heigth_raw = get_params.get("height")
 
         http_accept = request.META.get("HTTP_ACCEPT", "")
         if "image/avif" in http_accept.split(","):
@@ -34,7 +38,7 @@ def tile_etag(request):
         elif "image/webp" in http_accept.split(","):
             best_mime = "image/webp"
 
-        asked_mime = request.GET.get("format", request.GET.get("FORMAT", img_mime))
+        asked_mime = get_params.get("format")
         if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
             if img_mime == "image/apng":
@@ -50,7 +54,7 @@ def tile_etag(request):
             return None
         try:
             min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(","))
-            srs = request.GET.get("SRS", request.GET.get("srs"))
+            srs = get_params.get("srs")
             if srs in ("CRS:84", "EPSG:4326"):
                 min_lat, min_lon, max_lat, max_lon = (
                     float(x) for x in bbox_raw.split(",")
@@ -113,8 +117,12 @@ def tile_etag(request):
 
 
 def tile_latest_modification(request):
-    if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
-        layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
+    get_params = {}
+    for key in request.GET.keys():
+        get_params[key.lower()] = request.GET[key]
+
+    if get_params.get("request") == "GetMap":
+        layers_raw = get_params.get("layers")
         if not layers_raw:
             return None
         try:
@@ -156,13 +164,18 @@ def tile_latest_modification(request):
 @etag(tile_etag)
 @last_modified(tile_latest_modification)
 def wms_service(request):
-    if "WMS" not in [request.GET.get("service"), request.GET.get("SERVICE")]:
+    get_params = {}
+    for key in request.GET.keys():
+        get_params[key.lower()] = request.GET[key]
+
+    if get_params.get("service") != "WMS":
         return HttpResponseBadRequest("Service must be WMS")
-    if "GetMap" in [request.GET.get("request"), request.GET.get("REQUEST")]:
-        layers_raw = request.GET.get("layers", request.GET.get("LAYERS"))
-        bbox_raw = request.GET.get("bbox", request.GET.get("BBOX"))
-        width_raw = request.GET.get("width", request.GET.get("WIDTH"))
-        heigth_raw = request.GET.get("height", request.GET.get("HEIGHT"))
+
+    if get_params.get("request") == "GetMap":
+        layers_raw = get_params.get("layers")
+        bbox_raw = get_params.get("bbox")
+        width_raw = get_params.get("width")
+        heigth_raw = get_params.get("height")
 
         http_accept = request.META.get("HTTP_ACCEPT", "")
         best_mime = None
@@ -171,7 +184,7 @@ def wms_service(request):
         elif "image/webp" in http_accept.split(","):
             best_mime = "image/webp"
 
-        asked_mime = request.GET.get("format", request.GET.get("FORMAT"))
+        asked_mime = get_params.get("format")
         if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
             if img_mime == "image/apng":
@@ -187,7 +200,7 @@ def wms_service(request):
             return HttpResponseBadRequest("missing mandatory parameters")
         try:
             min_lon, min_lat, max_lon, max_lat = (float(x) for x in bbox_raw.split(","))
-            srs = request.GET.get("SRS", request.GET.get("srs"))
+            srs = get_params.get("srs")
             if srs in ("CRS:84", "EPSG:4326"):
                 min_lat, min_lon, max_lat, max_lon = (
                     float(x) for x in bbox_raw.split(",")
@@ -246,7 +259,7 @@ def wms_service(request):
         if event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}
         return HttpResponse(data_out, content_type=img_mime, headers=headers)
-    elif "GetCapabilities" in [request.GET.get("request"), request.GET.get("REQUEST")]:
+    elif get_params.get("request") == "GetCapabilities":
         max_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": 89.9, "lon": 180})
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": -89.9, "lon": -180})
 
@@ -383,4 +396,4 @@ def wms_service(request):
 </WMT_MS_Capabilities>
 """
         return HttpResponse(data_xml, content_type="text/xml")
-    return HttpResponse(status_code=501)
+    return HttpResponse(status=501)
