@@ -626,7 +626,7 @@ def map_kmz_upload_view(request):
         form = UploadKmzForm(request.POST, request.FILES)
         # check whether it's valid:
         if form.is_valid():
-            new_map = None
+            new_maps = []
             file = form.cleaned_data["file"]
             error = None
             if file.name.lower().endswith(".kml"):
@@ -662,8 +662,9 @@ def map_kmz_upload_view(request):
                             )
                             image_file = File(dest)
                             new_map.image.save("file", image_file, save=False)
+                            new_maps.append(new_map)
                 except Exception:
-                    error = "An error occured while extracting the map from your file."
+                    error = "An error occured while extracting the map from this file."
             elif file.name.lower().endswith(".kmz"):
                 try:
                     dest = tempfile.mkdtemp("_kmz")
@@ -705,6 +706,7 @@ def map_kmz_upload_view(request):
                                     corners_coordinates=corners_coords,
                                 )
                                 new_map.image.save("file", image_file, save=True)
+                                new_maps.append(new_map)
                         else:
                             image_path = os.path.abspath(os.path.join(dest, image_path))
                             if not image_path.startswith(dest):
@@ -716,20 +718,26 @@ def map_kmz_upload_view(request):
                                 corners_coordinates=corners_coords,
                             )
                             new_map.image.save("file", image_file, save=False)
+                            new_maps.append(new_map)
                 except Exception:
-                    error = "An error occured while extracting the map from your file."
-            if new_map:
-                try:
-                    new_map.strip_exif()
-                except Image.DecompressionBombError:
-                    error = "Image is too large, try to use lower resolution."
-                else:
-                    new_map.save()
+                    error = "An error occured while extracting the map from this file."
             if error:
                 messages.error(request, error)
-            else:
-                messages.success(request, "The import of the map was successful")
+            elif new_maps:
+                for new_map in new_maps:
+                    try:
+                        new_map.strip_exif()
+                    except Image.DecompressionBombError:
+                        error = "Image is too large, try to use lower resolution."
+                    else:
+                        new_map.save()
+                messages.success(
+                    request,
+                    f"The import of the map{'s' if len(new_maps) > 1 else ''} was successful",
+                )
                 return redirect("dashboard:map_list_view")
+            else:
+                messages.error(request, "Could not find maps in this file")
     else:
         form = UploadKmzForm()
     return render(
