@@ -97,20 +97,22 @@ class Command(BaseCommand):
                 self.stderr.write("No club with this domain")
                 continue
 
-            if not check_cname_record(domain):
-                self.stderr.write("Domain is not pointing to routechoices.com anymore")
-                club.domain = ""
-                club.save()
-                continue
-
             if not os.path.exists(
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
             ):
-                self.stderr.write("No certificates found for this domain found")
+                self.stderr.write(
+                    "SSL not setup for this domain, no key/certificate found"
+                )
                 continue
 
             if not is_expirying(domain):
                 self.stderr.write("Domain is not yet expiring")
+                continue
+
+            if not check_cname_record(domain):
+                self.stderr.write("Domain is not pointing to routechoices.com anymore")
+                club.domain = ""
+                club.save()
                 continue
 
             account_exists = os.path.exists(
