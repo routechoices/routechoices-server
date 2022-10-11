@@ -355,7 +355,7 @@ def wms_service(request):
       <Format>application/vnd.ogc.wms_xml</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.routechoices.com/?"/></Get>
         </HTTP>
       </DCPType>
     </GetCapabilities>
@@ -366,7 +366,7 @@ def wms_service(request):
       <Format>image/webp</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://routechoices.com/api/wms?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://wms.routechoices.com/?"/></Get>
         </HTTP>
       </DCPType>
     </GetMap>
