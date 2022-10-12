@@ -185,10 +185,12 @@ Follow our events live or replay them later.
             if self.analytics_site:
                 if old_self.analytics_domain != self.analytics_domain:
                     plausible.delete_domain(old_self.analytics_domain)
+                    self.analytics_site = ""
         self.slug = self.slug.lower()
-        self.analytics_site = plausible.create_shared_link(
-            self.analytics_domain, self.name
-        )
+        if not self.analytics_site:
+            self.analytics_site = plausible.create_shared_link(
+                self.analytics_domain, self.name
+            )
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
