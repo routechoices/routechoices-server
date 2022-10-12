@@ -53,11 +53,11 @@ server {{
        uwsgi_cache_key $scheme$host$request_method$request_uri;
        uwsgi_cache_valid 200 1s;
        uwsgi_cache_use_stale updating;
-       uwsgi_max_temp_file_size 10M;
+       uwsgi_max_temp_file_size 5M;
        uwsgi_no_cache $no_cache;
        uwsgi_cache_bypass $no_cache;
 
-       client_max_body_size    10M;
+       client_max_body_size    20M;
        proxy_set_header        Host $host;
        proxy_set_header        X-Real-IP $remote_addr;
        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;

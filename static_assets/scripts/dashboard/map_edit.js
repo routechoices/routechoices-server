@@ -16,7 +16,7 @@ var extractCornersCoordsFromFilename = function (filename) {
     "image/png,image/jpeg,image/gif,image/webp,image/avif"
   );
   u("#id_image").on("change", function () {
-    if (this.files.length > 0 && this.files[0].size > 1e7) {
+    if (this.files.length > 0 && this.files[0].size > 2 * 1e7) {
       swal({
         title: "Error!",
         text: "File is too big!",
