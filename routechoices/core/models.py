@@ -19,7 +19,6 @@ import magic
 import numpy as np
 import orjson as json
 import redis
-import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
@@ -37,6 +36,7 @@ from django_hosts.resolvers import reverse
 from PIL import Image, ImageDraw, ImageFont
 from pillow_avif import AvifImagePlugin  # noqa: F401
 
+from routechoices.lib import plausible
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     adjugate_matrix,
@@ -178,21 +178,25 @@ Follow our events live or replay them later.
         if self.pk:
             if self.domain:
                 self.domain = self.domain.lower()
-            old_data = Club.objects.get(pk=self.pk)
-            old_domain = old_data.domain
+            old_self = Club.objects.get(pk=self.pk)
+            old_domain = old_self.domain
             if old_domain and old_domain != self.domain:
                 delete_domain(old_domain)
             if self.analytics_site:
-                old_slug = old_data.slug
-                if old_slug != self.slug:
-                    self.delete_analytics_domain(old_slug)
-                    self.create_analytics_domain()
+                if old_self.analytics_domain != self.analytics_domain:
+                    plausible.delete_domain(old_self.analytics_domain)
         self.slug = self.slug.lower()
-        self.create_analytics_site()
+        self.analytics_site = plausible.create_shared_link(
+            self.analytics_domain, self.name
+        )
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return self.nice_url
+
+    @property
+    def analytics_domain(self):
+        return f"{self.slug}.{settings.PARENT_HOST}"
 
     @property
     def use_https(self):
@@ -221,46 +225,6 @@ Follow our events live or replay them later.
     def logo_url(self):
         return f"{self.nice_url}logo?v={int(self.modification_date.timestamp())}"
 
-    def create_analytics_domain(self):
-        requests.post(
-            f"{settings.ANALYTICS_API_URL}/sites",
-            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
-            data={"domain": f"{self.slug}.routechoices.com"},
-            timeout=5,
-        )
-        return True
-
-    def create_analytics_site(self):
-        if self.analytics_site:
-            return self.analytics_site
-        if not self.create_analytics_domain():
-            return False
-        r = requests.put(
-            f"{settings.ANALYTICS_API_URL}/sites/shared-links",
-            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
-            data={
-                "name": self.name,
-                "site_id": f"{self.slug}.routechoices.com",
-            },
-            timeout=5,
-        )
-        data = r.json()
-        self.analytics_site = data.get("url", "")
-        return True
-
-    def delete_analytics_domain(self, slug=None):
-        if not slug:
-            slug = self.slug
-        self.analytics_site = ""
-        r = requests.delete(
-            f"{settings.ANALYTICS_API_URL}/sites/{slug}.routechoices.com",
-            headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
-            timeout=5,
-        )
-        if r.status_code != 200:
-            return False
-        return True
-
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Club.objects.filter(slug__iexact=self.slug)
@@ -272,7 +236,7 @@ Follow our events live or replay them later.
 
 @receiver(pre_delete, sender=Club, dispatch_uid="club_delete_signal")
 def delete_club_receiver(sender, instance, using, **kwargs):
-    instance.delete_analytics_domain()
+    plausible.delete_domain(instance.analytics_domain)
     if instance.domain:
         delete_domain(instance.domain)
 
