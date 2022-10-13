@@ -10,6 +10,7 @@ from django_hosts.resolvers import reverse
 from routechoices.core.models import PRIVACY_PRIVATE, PRIVACY_PUBLIC, Event
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import safe64encode
+from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
 GLOBAL_MERCATOR = GlobalMercator()
 
@@ -259,7 +260,9 @@ def wms_service(request):
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}
-        return HttpResponse(data_out, content_type=img_mime, headers=headers)
+        return StreamingHttpRangeResponse(
+            request, data_out, content_type=img_mime, headers=headers
+        )
     elif get_params.get("request") == "GetCapabilities":
         max_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": 89.9, "lon": 180})
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": -89.9, "lon": -180})
