@@ -6,7 +6,7 @@
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        <h3>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h3>
+        <h1>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h1>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form form %}

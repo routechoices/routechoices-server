@@ -9,7 +9,7 @@
   <div class="row" style="margin-top:15px">
     <ul class="nav nav-tabs" style="margin-bottom:1em;">
       <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}"><i class="fa fa-user-circle"></i> Account</a></li>
-      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_select_view' %}active{% endif %}" href="{% url 'dashboard:club_select_view' %}"><i class="fa fa-exchange"></i> Switch Club</a></li>
+      <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:club_view' %}active{% endif %}" href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club</a></li>
     </ul>
     <div class="col-12">
       <div class="row">

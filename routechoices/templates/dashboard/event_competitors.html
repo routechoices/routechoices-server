@@ -15,7 +15,9 @@
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        <h1>Edit {{event.name}} competitors <small><span class="utc-offset"></span></small></h1>
+        <h1>Edit competitors <small><span class="utc-offset"></span></small></h1>
+        <h3>{{event.name}}</h3>
+        <hr/>
         <div style="margin-bottom: 15px;">
         <form method="GET" class="row">
           <div class="col-auto">
@@ -60,7 +62,6 @@
                 </tr>
             {% endfor %}
             </table>
-            <hr class="table-bottom"/>
             {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
             <input type="submit" value="Save" class="btn btn-primary" id="submit-btn" style="margin-bottom: 3px"/>
             {% if context == 'edit' %}<a href="{% url 'dashboard:event_delete_view' event_id=event.aid %}" class="btn btn-danger" style="margin-bottom: 3px">Delete</a>{% endif %}

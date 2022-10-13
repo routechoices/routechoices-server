@@ -175,14 +175,14 @@ function showLocalTime(el) {
   u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
     addText: '<i class="fa fa-plus-circle"></i> Add Competitor',
-    addCssClass: "btn btn-primary add-competitor-btn",
+    addCssClass: "btn btn-info add-competitor-btn",
     deleteText: '<i class="fa fa-trash fa-2x"></i>',
     prefix: "competitors",
     added: onAddedCompetitorRow,
   });
   $(".extra_map_formset_row").formset({
     addText: '<i class="fa fa-plus-circle"></i> Add Map',
-    addCssClass: "btn btn-primary add-map-btn",
+    addCssClass: "btn btn-info add-map-btn",
     deleteText: '<i class="fa fa-trash fa-2x"></i>',
     prefix: "map_assignations",
     formCssClass: "extra_map_formset_row",
@@ -277,24 +277,18 @@ function showLocalTime(el) {
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
     });
 
-  u('[for="id_start_date"]').after(
-    '<button id="set_start_date_now_btn" class="btn btn-success btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
-  );
-  u('[for="id_end_date"]').after(
-    '<button id="set_end_date_now_btn" class="btn btn-success btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
-  );
-  u("#set_start_date_now_btn").on("click", function (e) {
-    e.preventDefault();
-    var el = "#id_start_date";
-    u(el).val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
-    u(el).trigger("change");
+  ["id_start_date", "id_end_date"].forEach((id) => {
+    u('[for="' + id + '"]').after(
+      '<button id="set_' +
+        id +
+        '_now_btn" class="btn btn-info btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
+    );
+    u("#set_" + id + "_now_btn").on("click", function (e) {
+      e.preventDefault();
+      var el = u("#" + id);
+      el.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+      el.trigger("change");
+    });
   });
-  u("#set_end_date_now_btn").on("click", function (e) {
-    e.preventDefault();
-    var el = "#id_end_date";
-    u(el).val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
-    u(el).trigger("change");
-  });
-
   u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
 })();
