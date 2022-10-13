@@ -1204,6 +1204,8 @@ ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
 
 REDIS_URL = "redis://redis"
 
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
 try:
     from .local_settings import *  # noqa: F403, F401
 except ImportError:

@@ -50,6 +50,7 @@ from routechoices.lib.helpers import (
     random_device_id,
 )
 from routechoices.lib.s3 import s3_object_url
+from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.lib.validators import (
     validate_imei,
     validate_latitude,
@@ -1312,7 +1313,7 @@ def event_map_thumb_download(request, event_id):
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
 
-    return HttpResponse(data_out, content_type="image/jpeg", headers=headers)
+    return StreamingHttpRangeResponse(request, data_out, headers=headers)
 
 
 @swagger_auto_schema(
@@ -1348,8 +1349,11 @@ def event_kmz_download(request, event_id, map_index="0"):
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
-    response = HttpResponse(
-        kmz_data, content_type="application/vnd.google-earth.kmz", headers=headers
+    response = StreamingHttpRangeResponse(
+        request,
+        kmz_data,
+        content_type="application/vnd.google-earth.kmz",
+        headers=headers,
     )
     response[
         "Content-Disposition"
@@ -1373,7 +1377,8 @@ def map_kmz_download(request, map_id, *args, **kwargs):
         club_list = Club.objects.filter(admins=request.user)
         raster_map = get_object_or_404(Map, aid=map_id, club__in=club_list)
     kmz_data = raster_map.kmz
-    response = HttpResponse(
+    response = StreamingHttpRangeResponse(
+        request,
         kmz_data,
         content_type="application/vnd.google-earth.kmz",
         headers={"Cache-Control": "Private"},
@@ -1406,8 +1411,9 @@ def competitor_gpx_download(request, competitor_id):
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
-    response = HttpResponse(
-        gpx_data,
+    response = StreamingHttpRangeResponse(
+        request,
+        gpx_data.encode(),
         content_type="application/gpx+xml",
         headers=headers,
     )
