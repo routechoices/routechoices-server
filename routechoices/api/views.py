@@ -48,6 +48,7 @@ from routechoices.lib.helpers import (
     escape_filename,
     initial_of_name,
     random_device_id,
+    short_random_key,
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
@@ -690,7 +691,9 @@ def competitor_route_upload(request, competitor_id):
     device = None
     if len(loc_array) > 0:
         device = Device.objects.create(
-            user_agent=request.session.user_agent[:200], is_gpx=True
+            aid=f"{short_random_key()}_GPX",
+            user_agent=request.session.user_agent[:200],
+            is_gpx=True,
         )
         device.add_locations(loc_array, push_forward=False)
         competitor.device = device

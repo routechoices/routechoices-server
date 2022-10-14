@@ -208,21 +208,31 @@ function selectizeDeviceInput() {
         },
       });
     });
-  }
-  if (window.local.eventEnded) {
-    u("#id_device_id").parent().remove();
-  } else {
-    selectizeDeviceInput();
-    u("select[name='device_id']").on("change", function (e) {
-      if (e.target.value) {
-        u("#warning-if-device-id").removeClass("d-none");
-      }
-    });
+    if (window.local.eventEnded) {
+      u("#id_device_id").parent().remove();
+    } else {
+      selectizeDeviceInput();
+      u("select[name='device_id']").on("change", function (e) {
+        if (e.target.value) {
+          u("#warning-if-device-id").removeClass("d-none");
+        }
+      });
+    }
   }
 
   if (u("#id_gpx_file").nodes.length) {
     u("#id_gpx_file").attr("accept", ".gpx");
     u("#id_gpx_file").on("change", function (e) {
+      if (this.files.length > 0 && this.files[0].size > 2 * 1e7) {
+        swal({
+          title: "Error!",
+          text: "File is too big!",
+          type: "error",
+          confirmButtonText: "OK",
+        });
+        this.value = "";
+        return;
+      }
       var reader = new FileReader();
       reader.onload = onGPXLoaded;
       reader.readAsText(this.files[0]);
