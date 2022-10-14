@@ -34,7 +34,7 @@ class ClubViewsTestCase(LiveServerTestCase):
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/export")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Export data of")
+        self.assertContains(response, "Export event data")
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/contribute")
         self.assertEqual(response.status_code, 200)
@@ -133,7 +133,7 @@ class ClubViewsTestCase(LiveServerTestCase):
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-3/export")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Export data of")
+        self.assertContains(response, "Export event data")
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-3/contribute")
         self.assertEqual(response.status_code, 200)
