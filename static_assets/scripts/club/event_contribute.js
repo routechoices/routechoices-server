@@ -233,9 +233,11 @@ function selectizeDeviceInput() {
         this.value = "";
         return;
       }
-      var reader = new FileReader();
-      reader.onload = onGPXLoaded;
-      reader.readAsText(this.files[0]);
+      if (this.files.length > 0) {
+        var reader = new FileReader();
+        reader.onload = onGPXLoaded;
+        reader.readAsText(this.files[0]);
+      }
     });
   }
 
