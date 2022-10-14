@@ -85,11 +85,12 @@ def serve_from_s3(
     if request.method == "GET":
         response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
         response["X-Accel-Buffering"] = "no"
-    response["Accept-Ranges"] = "bytes"
     response["Content-Type"] = mime
     response[
         "Content-Disposition"
-    ] = f'attachment; filename="{escape_filename(filename)}"'
+    ] = f'attachment; charset=utf-8; filename="{escape_filename(filename)}"'.encode(
+        "utf-8"
+    )
     return response
 
 
@@ -1357,7 +1358,9 @@ def event_kmz_download(request, event_id, map_index="0"):
     )
     response[
         "Content-Disposition"
-    ] = f'attachment; filename="{escape_filename(raster_map.name)}.kmz"'
+    ] = f'attachment; charset=utf-8; filename="{escape_filename(raster_map.name)}.kmz"'.encode(
+        "utf-8"
+    )
     return response
 
 
@@ -1385,7 +1388,9 @@ def map_kmz_download(request, map_id, *args, **kwargs):
     )
     response[
         "Content-Disposition"
-    ] = f'attachment; filename="{escape_filename(raster_map.name)}.kmz"'
+    ] = f'attachment; charset=utf-8; filename="{escape_filename(raster_map.name)}.kmz"'.encode(
+        "utf-8"
+    )
     return response
 
 
@@ -1419,7 +1424,9 @@ def competitor_gpx_download(request, competitor_id):
     )
     response[
         "Content-Disposition"
-    ] = f'attachment; filename="{escape_filename(competitor.event.name)} - {escape_filename(competitor.name)}.gpx"'
+    ] = f'attachment; charset=utf-8; filename="{escape_filename(competitor.event.name)} - {escape_filename(competitor.name)}.gpx"'.encode(
+        "utf-8"
+    )
     return response
 
 
