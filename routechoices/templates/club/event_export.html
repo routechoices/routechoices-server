@@ -9,7 +9,8 @@
 {% block content %}
 <div class="row">
   <div>
-      <h1>Export data of <a href="{{ event.get_absolute_url }}">{{ event.name }}</a></h1>
+      <h1>Export data of event<h1>
+      <h2><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></h2>
   </div>
 
   {% if event.map %}

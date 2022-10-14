@@ -276,5 +276,12 @@ function selectizeDeviceInput() {
         },
       });
     });
+    if (
+      u("#upload-form").find("#id_competitor_aid").nodes[0].options.length === 0
+    ) {
+      u("#upload-form").html(
+        "<h3 style='color:rgb(0,0,0,0.6)'>No competitors to upload data to.</h3>"
+      );
+    }
   }
 })();
