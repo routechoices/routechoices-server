@@ -1425,9 +1425,11 @@ def competitor_gpx_download(request, competitor_id):
         content_type="application/gpx+xml",
         headers=headers,
     )
+    out_filename = f"{competitor.event.name} - {competitor.name}.gpx"
+    import urllib
     response[
         "Content-Disposition"
-    ] = f'attachment; charset=utf-8; filename="{escape_filename(competitor.event.name)} - {escape_filename(competitor.name)}.gpx"'.encode(
+    ] = f"attachment; filename*=UTF-8''{urllib.parse.quote(out_filename, safe='')}".encode(
         "utf-8"
     )
     return response
