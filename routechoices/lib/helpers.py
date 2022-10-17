@@ -5,6 +5,7 @@ import os.path
 import secrets
 import struct
 import time
+import urllib
 import zoneinfo
 from datetime import datetime
 from math import cos, pi, sin
@@ -27,9 +28,10 @@ def epoch_to_datetime(t):
     return datetime.utcfromtimestamp(int(t)).replace(tzinfo=UTC_TZ)
 
 
-def escape_filename(f):
-    return f.replace("\\", "_").replace('"', '\\"')
-
+def set_content_disposition(filename):
+    f"attachment; filename*=UTF-8''{urllib.parse.quote(filename, safe='')}".encode(
+        "utf-8"
+    )
 
 def safe32encode(b):
     return base64.b32encode(b).decode().rstrip("=").lower()

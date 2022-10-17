@@ -1,3 +1,4 @@
+from fileinput import filename
 import logging
 import re
 import time
@@ -45,7 +46,7 @@ from routechoices.core.models import (
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     epoch_to_datetime,
-    escape_filename,
+    set_content_disposition,
     initial_of_name,
     random_device_id,
     short_random_key,
@@ -89,9 +90,7 @@ def serve_from_s3(
     response["Content-Type"] = mime
     response[
         "Content-Disposition"
-    ] = f'attachment; charset=utf-8; filename="{escape_filename(filename)}"'.encode(
-        "utf-8"
-    )
+    ] = set_content_disposition(filename)
     return response
 
 
@@ -1359,11 +1358,10 @@ def event_kmz_download(request, event_id, map_index="0"):
         content_type="application/vnd.google-earth.kmz",
         headers=headers,
     )
+    filename = f"{raster_map.name}.kmz"
     response[
         "Content-Disposition"
-    ] = f'attachment; charset=utf-8; filename="{escape_filename(raster_map.name)}.kmz"'.encode(
-        "utf-8"
-    )
+    ] = set_content_disposition(filename)
     return response
 
 
@@ -1389,11 +1387,10 @@ def map_kmz_download(request, map_id, *args, **kwargs):
         content_type="application/vnd.google-earth.kmz",
         headers={"Cache-Control": "Private"},
     )
+    filename = f"{raster_map.name}.kmz"
     response[
         "Content-Disposition"
-    ] = f'attachment; charset=utf-8; filename="{escape_filename(raster_map.name)}.kmz"'.encode(
-        "utf-8"
-    )
+    ] = set_content_disposition(filename)
     return response
 
 
@@ -1425,13 +1422,10 @@ def competitor_gpx_download(request, competitor_id):
         content_type="application/gpx+xml",
         headers=headers,
     )
-    out_filename = f"{competitor.event.name} - {competitor.name}.gpx"
-    import urllib
+    filename = f"{competitor.event.name} - {competitor.name}.gpx"
     response[
         "Content-Disposition"
-    ] = f"attachment; filename*=UTF-8''{urllib.parse.quote(out_filename, safe='')}".encode(
-        "utf-8"
-    )
+    ] = set_content_disposition(filename)
     return response
 
 
