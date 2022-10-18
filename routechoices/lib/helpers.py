@@ -29,11 +29,7 @@ def epoch_to_datetime(t):
 
 
 def set_content_disposition(filename):
-    return (
-        f"attachment; filename*=UTF-8''{urllib.parse.quote(filename, safe='')}".encode(
-            "utf-8"
-        )
-    )
+    return f"attachment; filename*=UTF-8''{urllib.parse.quote(filename, safe='')}"
 
 
 def safe32encode(b):
