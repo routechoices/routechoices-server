@@ -153,7 +153,7 @@ function selectizeDeviceInput() {
 }
 
 (function () {
-  u(".date-utc").each(function (i, el) {
+  u(".date-utc").each(function (el) {
     var _el = u(el);
     _el.text(
       dayjs(_el.data("date")).local().format("MMMM D, YYYY [at] HH:mm:ss")
