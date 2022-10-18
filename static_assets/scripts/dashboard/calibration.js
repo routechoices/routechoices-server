@@ -325,9 +325,16 @@ function project(m, x, y) {
     baseLayers["Topo World (ArcGIS)"] = new L.TileLayer["world-topo-alt"]();
 
     map_c.addLayer(defaultLayer);
-    map_c.addControl(
-      new L.Control.Layers(baseLayers, { Map: transformedImage })
-    );
+
+    var controlLayersPrev = new L.Control.Layers(baseLayers, {
+      Map: transformedImage,
+    });
+    map_c.addControl(controlLayers);
+    if (L.Browser.touch && L.Browser.mobile) {
+      map_c.on("baselayerchange", function (e) {
+        controlLayersPrev.collapse();
+      });
+    }
   }
 
   function set_ref_pts_a(xy) {
