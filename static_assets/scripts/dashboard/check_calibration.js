@@ -141,7 +141,16 @@
     });
     transformedImage.addTo(map);
 
-    map.addControl(new L.Control.Layers(baseLayers, { Map: transformedImage }));
+    var controlLayers = new L.Control.Layers(baseLayers, {
+      Map: transformedImage,
+    });
+    map.addControl(controlLayers);
+    if (L.Browser.touch && L.Browser.mobile) {
+      map.on("baselayerchange", function (e) {
+        controlLayers.collapse();
+      });
+    }
+
     map.fitBounds(bounds);
   }
 
