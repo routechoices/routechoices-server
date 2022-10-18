@@ -45,9 +45,9 @@ from routechoices.core.models import (
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     epoch_to_datetime,
-    set_content_disposition,
     initial_of_name,
     random_device_id,
+    set_content_disposition,
     short_random_key,
 )
 from routechoices.lib.s3 import s3_object_url
@@ -87,9 +87,7 @@ def serve_from_s3(
         response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
         response["X-Accel-Buffering"] = "no"
     response["Content-Type"] = mime
-    response[
-        "Content-Disposition"
-    ] = set_content_disposition(filename)
+    response["Content-Disposition"] = set_content_disposition(filename)
     return response
 
 
@@ -1358,9 +1356,7 @@ def event_kmz_download(request, event_id, map_index="0"):
         headers=headers,
     )
     filename = f"{raster_map.name}.kmz"
-    response[
-        "Content-Disposition"
-    ] = set_content_disposition(filename)
+    response["Content-Disposition"] = set_content_disposition(filename)
     return response
 
 
@@ -1387,9 +1383,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
         headers={"Cache-Control": "Private"},
     )
     filename = f"{raster_map.name}.kmz"
-    response[
-        "Content-Disposition"
-    ] = set_content_disposition(filename)
+    response["Content-Disposition"] = set_content_disposition(filename)
     return response
 
 
@@ -1422,9 +1416,7 @@ def competitor_gpx_download(request, competitor_id):
         headers=headers,
     )
     filename = f"{competitor.event.name} - {competitor.name}.gpx"
-    response[
-        "Content-Disposition"
-    ] = set_content_disposition(filename)
+    response["Content-Disposition"] = set_content_disposition(filename)
     return response
 
 
