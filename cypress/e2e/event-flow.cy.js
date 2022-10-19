@@ -2,7 +2,8 @@ context("Cypress tests", () => {
   beforeEach(() => {
     // https://on.cypress.io/visit
     cy.exec(
-      "docker exec rc_django /venv/bin/python3 /app/manage.py reset_db_for_tests"
+      "docker exec rc_django /venv/bin/python3 /app/manage.py reset_db_for_e2e_test --spec=" +
+        Cypress.spec.relative
     );
     cy.getDeviceId();
     cy.visit("/");
