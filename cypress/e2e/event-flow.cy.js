@@ -55,7 +55,7 @@ context("Cypress tests", () => {
     cy.contains("The upload of the GPX file was successful");
 
     cy.forceVisit("/halden-sk/Jukola-2019-1st-leg");
-    cy.contains("Olav Lundanes");
+    cy.contains("Olav Lundanes", { timeout: 20000 });
     cy.contains("KooVee");
 
     // Create Event with all fields info

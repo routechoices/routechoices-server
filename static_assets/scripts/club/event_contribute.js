@@ -153,6 +153,14 @@ function selectizeDeviceInput() {
 }
 
 (function () {
+  var thisUrl = window.location.href;
+  if (
+    thisUrl.includes("competitor-added=1") ||
+    thisUrl.includes("route-uploaded=1")
+  ) {
+    window.history.pushState("-", null, window.location.pathname);
+  }
+
   u(".date-utc").each(function (el) {
     var _el = u(el);
     _el.text(

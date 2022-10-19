@@ -339,24 +339,8 @@ def event_contribute_view(request, slug, **kwargs):
 
     if request.GET.get("competitor-added", None):
         messages.success(request, "Competitor Added!")
-        return redirect(
-            reverse(
-                "event_contribute_view",
-                host="clubs",
-                host_kwargs={"club_slug": club_slug},
-                kwargs={"slug": slug},
-            )
-        )
     if request.GET.get("route-uploaded", None):
         messages.success(request, "Data uploaded!")
-        return redirect(
-            reverse(
-                "event_contribute_view",
-                host="clubs",
-                host_kwargs={"club_slug": club_slug},
-                kwargs={"slug": slug},
-            )
-        )
 
     can_upload = event.allow_route_upload and (event.start_date <= now())
     can_register = event.open_registration and (event.end_date >= now() or can_upload)
