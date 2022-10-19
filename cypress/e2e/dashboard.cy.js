@@ -1,16 +1,12 @@
-context("Cypress tests", () => {
-  beforeEach(() => {
+context("Dashboard manipulations", () => {
+  before(() => {
     // https://on.cypress.io/visit
-    cy.exec(
-      "docker exec rc_django /venv/bin/python3 /app/manage.py reset_db_for_e2e_test --spec=" +
-        Cypress.spec.relative
-    );
     cy.getDeviceId();
     cy.visit("/");
   });
 
   after(() => {
-    cy.wait(1000);
+    cy.wait(100);
   });
 
   it("Create an Event", function () {
@@ -20,7 +16,7 @@ context("Cypress tests", () => {
     // Create club
     cy.createClub();
 
-    cy.contains("Halden SK").click();
+    cy.contains("KangasalaSK").click();
 
     // Create Map
     cy.createMap();
@@ -55,7 +51,7 @@ context("Cypress tests", () => {
 
     cy.contains("The upload of the GPX file was successful");
 
-    cy.forceVisit("/halden-sk/Jukola-2019-1st-leg");
+    cy.forceVisit("/kangasala-sk/Jukola-2019-1st-leg");
     cy.contains("Olav Lundanes", { timeout: 20000 });
     cy.contains("KooVee");
 
@@ -84,7 +80,7 @@ context("Cypress tests", () => {
       expect(request.body).to.contain("&competitors-0-device=2&");
     });
     cy.url().should("match", /\/dashboard\/events$/);
-    cy.forceVisit("/halden-sk/Jukola-2019-1st-leg-2");
+    cy.forceVisit("/kangasala-sk/Jukola-2019-1st-leg-2");
 
     // trigger as many errors has possible
     cy.visit("/dashboard/events");
