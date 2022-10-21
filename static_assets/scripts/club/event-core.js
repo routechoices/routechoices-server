@@ -617,17 +617,20 @@ var refreshEventData = function () {
         prevMapsJSONData = JSON.stringify(response.maps);
         var currentMapNewData = response.maps.find(function (m) {
           return (
+            rasterMap &&
             m.id === rasterMap.data.id &&
             m.modification_date !== rasterMap.data.modification_date
           );
         });
         var currentMapStillExists = response.maps.find(function (m) {
-          return m.id === rasterMap.data.id;
+          return rasterMap && m.id === rasterMap.data.id;
         });
         if (currentMapNewData) {
           rasterMap.remove();
         }
-        mapSelectorLayer.remove();
+        if (mapSelectorLayer) {
+          mapSelectorLayer.remove();
+        }
         if (response.maps.length) {
           var mapChoices = {};
           for (var i = 0; i < response.maps.length; i++) {
