@@ -625,7 +625,7 @@ var refreshEventData = function () {
         var currentMapStillExists = response.maps.find(function (m) {
           return rasterMap && m.id === rasterMap.data.id;
         });
-        if (currentMapNewData) {
+        if (currentMapNewData || response.maps.length === 0) {
           rasterMap.remove();
         }
         if (mapSelectorLayer) {
