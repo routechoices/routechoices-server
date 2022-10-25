@@ -2351,10 +2351,10 @@ L.Control.EventState = L.Control.extend({
       color: "#fff",
       backgroundColor: "#666",
       borderRadius: "15px",
-      padding: "3px 20px",
+      padding: "3px 15px",
       fontStyle: "normal",
       fontWeight: "bold",
-      textTransform: "none",
+      textTransform: "uppercase",
     });
   },
   onRemove: function (map) {
