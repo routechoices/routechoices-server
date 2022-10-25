@@ -68,4 +68,4 @@ services:
       - minio
       - smtp
       - redis
-    command: ['/venv/bin/python3.10', './manage.py', 'runserver', '0.0.0.0:8000']
+    command: ['/venv/bin/python3', './manage.py', 'runserver', '0.0.0.0:8000']
