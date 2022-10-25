@@ -8,10 +8,9 @@ urlpatterns = [
     re_path(
         r"^account/delete/?$", views.account_delete_view, name="account_delete_view"
     ),
-    re_path(r"^calibrate_map/?$", views.calibration_view, name="calibration_view"),
-    re_path(r"^pdf-to-jpg/?$", views.pdf_to_jpg, name="pdf_to_jpg"),
+    re_path(r"^calibrate-map/?$", views.calibration_view, name="calibration_view"),
     re_path(
-        r"^check_calibration/?$",
+        r"^check-calibration/?$",
         views.check_calibration_view,
         name="check_calibration_view",
     ),

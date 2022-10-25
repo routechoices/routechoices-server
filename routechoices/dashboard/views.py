@@ -125,14 +125,6 @@ def calibration_view(request):
 
 
 @login_required
-def pdf_to_jpg(request):
-    return render(
-        request,
-        "dashboard/pdf_to_jpg.html",
-    )
-
-
-@login_required
 def check_calibration_view(request):
     return render(
         request,

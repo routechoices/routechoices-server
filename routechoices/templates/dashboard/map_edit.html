@@ -10,12 +10,10 @@
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <p id="calibration_help" {% if context == 'create' %}class="hidden"{% endif %}>
+            <p id="calibration_help" {% if context == 'create' %}class="d-none"{% endif %}>
                 To help figuring out the corners coordinates of the map <a target="_blank" rel="opener" href="{% url 'dashboard:calibration_view' %}">Click Here</a><br/>
                 To check calibration <a target="_blank" rel="opener" href="{% url 'dashboard:check_calibration_view' %}">Click Here</a>
             </p>
-            <p>To convert a PDF map in a image file <a target="_blank" rel="opener" href="{% url 'dashboard:pdf_to_jpg' %}">Click here</a></p>
-
             <input type="submit" value="Save" class="btn btn-primary">
             {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger">Delete</a>{% endif %}
         </form>
@@ -37,6 +35,7 @@
 {{ block.super }}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/pdfjs-2.7.570/pdf.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/map_edit.js' %}"></script>
 {% endcompress %}
 {% endblock %}
