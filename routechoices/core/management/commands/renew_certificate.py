@@ -1,78 +1,20 @@
 import os
 import os.path
 import subprocess
-from typing import cast
 
-import arrow
 import sewer.client
-from cryptography import x509
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from sewer.auth import ProviderBase
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
 from routechoices.lib.helpers import check_cname_record
-
-
-def is_expirying(domain):
-    cert_path = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt")
-    if not os.path.exists(cert_path):
-        return True
-    with open(cert_path, "rb") as fp:
-        data = fp.read()
-    cert = x509.load_pem_x509_certificate(data)
-    return arrow.utcnow().shift(days=30) > arrow.get(cert.not_valid_after)
-
-
-def read_account_key(cls, filename: str):
-    with open(filename, "rb") as f:
-        data = f.read()
-    prefix = b""
-    n = data.find(b"-----BEGIN")
-    if 0 < n:
-        prefix = data[:n]
-        data = data[n:]
-    acct = cast("AcmeAccount", cls.from_pem(data))
-    if prefix:
-        parts = prefix.split(b"\n")
-        for p in parts:
-            if p.startswith(b"KID: "):
-                acct.__kid = p[5:].decode()
-            elif p.startswith(b"Timestamp: "):
-                acct._timestamp = float(p[11:])
-    return acct
-
-
-def write_account_key(self, filename):
-    with open(filename, "wb") as f:
-        if hasattr(self, "__kid") and self.__kid:
-            f.write(f"KID: {self.__kid}\n".encode())
-            if self._timestamp:
-                f.write(f"Timestamp: {self._timestamp}\n".encode())
-        f.write(self.to_pem())
-
-
-class ClubProvider(ProviderBase):
-    def __init__(self, club, **kwargs):
-        kwargs["chal_types"] = ["http-01"]
-        self.club = club
-        super().__init__(**kwargs)
-        self.chal_type = "http-01"
-
-    def setup(self, challenges):
-        self.club.acme_challenge = challenges[0]["key_auth"]
-        self.club.save()
-        return []
-
-    def unpropagated(self, challenges):
-        # could add confirmation here, but it's just a demo
-        return []
-
-    def clear(self, challenges):
-        self.club.acme_challenge = ""
-        self.club.save()
-        return []
+from routechoices.lib.ssl_certificates import (
+    ClubAcmeProvider,
+    is_account_ssl_expirying,
+    read_account_ssl_key,
+    write_account_ssl_key,
+)
 
 
 class Command(BaseCommand):
@@ -105,7 +47,7 @@ class Command(BaseCommand):
                 )
                 continue
 
-            if not is_expirying(domain):
+            if not is_account_ssl_expirying(domain):
                 self.stderr.write("Domain is not yet expiring")
                 continue
 
@@ -121,20 +63,10 @@ class Command(BaseCommand):
                 )
             )
             if account_exists:
-                acct_key = read_account_key(
-                    AcmeAccount,
-                    os.path.join(
-                        settings.BASE_DIR, "nginx", "certs", "accounts", f"{domain}.key"
-                    ),
-                )
+                acct_key = read_account_ssl_key(domain, AcmeAccount)
             else:
                 acct_key = AcmeAccount.create("secp256r1")
-                write_account_key(
-                    acct_key,
-                    os.path.join(
-                        settings.BASE_DIR, "nginx", "certs", "accounts", f"{domain}.key"
-                    ),
-                )
+                write_account_ssl_key(domain, acct_key)
 
             cert_key = AcmeKey.read_pem(
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
@@ -142,7 +74,7 @@ class Command(BaseCommand):
 
             client = sewer.client.Client(
                 domain_name=domain,
-                provider=ClubProvider(club),
+                provider=ClubAcmeProvider(club),
                 account=acct_key,
                 cert_key=cert_key,
                 is_new_acct=(not account_exists),

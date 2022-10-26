@@ -3,10 +3,11 @@ import os.path
 import sewer.client
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from sewer.auth import ProviderBase
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
+from routechoices.lib.helpers import check_cname_record
+from routechoices.lib.ssl_certificates import ClubAcmeProvider, write_account_ssl_key
 
 
 def write_nginf_conf(domain):
@@ -74,37 +75,6 @@ server {{
         )
 
 
-def write_account_key(self, filename):
-    with open(filename, "wb") as f:
-        if hasattr(self, "__kid") and self.__kid:
-            f.write(f"KID: {self.__kid}\n".encode())
-            if self._timestamp:
-                f.write(f"Timestamp: {self._timestamp}\n".encode())
-        f.write(self.to_pem())
-
-
-class ClubProvider(ProviderBase):
-    def __init__(self, club, **kwargs):
-        kwargs["chal_types"] = ["http-01"]
-        self.club = club
-        super().__init__(**kwargs)
-        self.chal_type = "http-01"
-
-    def setup(self, challenges):
-        self.club.acme_challenge = challenges[0]["key_auth"]
-        self.club.save()
-        return []
-
-    def unpropagated(self, challenges):
-        # could add confirmation here, but it's just a demo
-        return []
-
-    def clear(self, challenges):
-        self.club.acme_challenge = ""
-        self.club.save()
-        return []
-
-
 class Command(BaseCommand):
     help = "Create letsencrypt certificate for club custom domain"
 
@@ -125,11 +95,17 @@ class Command(BaseCommand):
                 self.stderr.write("Certificates for this domain already exists")
                 continue
 
+            if not check_cname_record(domain):
+                self.stderr.write("Domain is not pointing to routechoices.com anymore")
+                club.domain = ""
+                club.save()
+                continue
+
             acct_key = AcmeAccount.create("secp256r1")
 
             client = sewer.client.Client(
                 domain_name=domain,
-                provider=ClubProvider(club),
+                provider=ClubAcmeProvider(club),
                 account=acct_key,
                 cert_key=AcmeKey.create("secp256r1"),
                 is_new_acct=True,
@@ -151,12 +127,7 @@ class Command(BaseCommand):
             cert_key.write_pem(
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
             )
-            write_account_key(
-                acct_key,
-                os.path.join(
-                    settings.BASE_DIR, "nginx", "certs", "accounts", f"{domain}.key"
-                ),
-            )
+            write_account_ssl_key(domain, acct_key)
             write_nginf_conf(domain)
             nginx_need_restart = True
         if nginx_need_restart:
