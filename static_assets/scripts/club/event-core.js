@@ -295,16 +295,13 @@ backdropMaps["mapant-no"] = L.tileLayer(
     attribution: "&copy; MapAnt.no",
   }
 );
-backdropMaps["mapant-es"] = L.tileLayer.wms(
-  "https://mapant.es/mapserv?map=/mapas/geotiff.map",
-  {
-    layers: "geotiff",
-    format: "image/png",
-    version: "1.3.0",
-    transparent: true,
-    attribution: "&copy; MapAnt.es",
-  }
-);
+backdropMaps["mapant-es"] = L.tileLayer.wms("https://mapant.es/wms", {
+  layers: "mapant.es",
+  format: "image/png",
+  version: "1.3.0",
+  transparent: true,
+  attribution: "&copy; MapAnt.es",
+});
 backdropMaps["topo-world"] = L.tileLayer(
   "https://tile.opentopomap.org/{z}/{x}/{y}.png",
   {

@@ -111,15 +111,13 @@
       url: "https://mapant.no/osm-tiles/{z}/{x}/{y}.png",
       options: { attribution: "&copy; MapAnt.no" },
     });
-    L.TileLayer["mapant-es"] = L.tileLayer.wms(
-      "https://mapant.es/mapserv?map=/mapas/geotiff.map",
-      {
-        layers: "geotiff",
-        format: "image/png",
-        version: "1.3.0",
-        transparent: true,
-      }
-    );
+    L.TileLayer["mapant-es"] = L.tileLayer.wms("https://mapant.es/wms", {
+      layers: "mapant.es",
+      format: "image/png",
+      version: "1.3.0",
+      transparent: true,
+      attribution: "&copy; MapAnt.es",
+    });
 
     var defaultLayer = new L.TileLayer["osm"]();
     baseLayers["Open Street Map"] = defaultLayer;

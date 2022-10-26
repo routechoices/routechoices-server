@@ -175,15 +175,13 @@ function project(m, x, y) {
     url: "https://mapant.no/osm-tiles/{z}/{x}/{y}.png",
     options: { attribution: "&copy; MapAnt.no" },
   });
-  L.TileLayer["mapant-es"] = L.tileLayer.wms(
-    "https://mapant.es/mapserv?map=/mapas/geotiff.map",
-    {
-      layers: "geotiff",
-      format: "image/png",
-      version: "1.3.0",
-      transparent: true,
-    }
-  );
+  L.TileLayer["mapant-es"] = L.tileLayer.wms("https://mapant.es/wms", {
+    layers: "mapant.es",
+    format: "image/png",
+    version: "1.3.0",
+    transparent: true,
+    attribution: "&copy; MapAnt.es",
+  });
 
   function color_icon(color) {
     return new L.Icon({
