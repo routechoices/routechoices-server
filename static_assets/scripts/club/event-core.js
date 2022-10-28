@@ -1463,10 +1463,8 @@ var drawCompetitors = function () {
         !isCustomStart &&
         competitor.start_time
       ) {
-        viewedTime += Math.max(
-          0,
-          new Date(competitor.start_time) - getCompetitionStartDate()
-        );
+        viewedTime +=
+          new Date(competitor.start_time) - getCompetitionStartDate();
       }
       if (
         !isLiveMode &&
@@ -1515,10 +1513,8 @@ var drawCompetitors = function () {
                 !isCustomStart &&
                 competitor.start_time
               ) {
-                competitorTime -= Math.max(
-                  0,
-                  new Date(competitor.start_time) - getCompetitionStartDate()
-                );
+                competitorTime -=
+                  new Date(competitor.start_time) - getCompetitionStartDate();
               }
               if (
                 !isLiveMode &&
@@ -1572,10 +1568,8 @@ var drawCompetitors = function () {
                 !isCustomStart &&
                 competitor.start_time
               ) {
-                competitorTime -= Math.max(
-                  0,
-                  new Date(competitor.start_time) - getCompetitionStartDate()
-                );
+                competitorTime -=
+                  new Date(competitor.start_time) - getCompetitionStartDate();
               }
               if (
                 !isLiveMode &&
