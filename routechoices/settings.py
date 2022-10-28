@@ -693,6 +693,7 @@ SLUG_BLACKLIST = [
     "oauth",
     "oauth_clients",
     "oauth2",
+    "ocad-map",
     "offer",
     "offers",
     "official",
