@@ -2,7 +2,7 @@ version: '3.7'
 services:
   db:
     container_name: rc_postgres
-    image: postgres:13.7
+    image: postgres:13.8
     environment:
       POSTGRES_DB: app_db
       POSTGRES_USER: app_user
@@ -69,3 +69,4 @@ services:
       - smtp
       - redis
     command: ['/venv/bin/python3', './manage.py', 'runserver', '0.0.0.0:8000']
+    # command: ['/venv/bin/uwsgi', "--http",  "0.0.0.0:8000", "--wsgi-file", "/app/routechoices/wsgi.py", "--processes", "8"]

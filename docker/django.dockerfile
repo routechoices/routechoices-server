@@ -7,13 +7,18 @@ WORKDIR /app/
 ADD . /app/
 
 RUN set -ex \
-    && apt-get update && apt-get install -y libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 watchman libpq5 cargo --no-install-recommends \
-    && python -m venv /venv \
-    && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /app/requirements.txt \
+    && apt-get update && apt-get install -y libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
+
     && apt-get autoremove -y \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+
+ENV PATH="/root/.cargo/bin:$PATH"
+
+RUN python -m venv /venv \
+    && /venv/bin/pip install --upgrade pip \
+    && /venv/bin/pip install -r /app/requirements.txt
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 
 

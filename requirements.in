@@ -37,5 +37,5 @@ redis
 requests
 sewer==0.8.4
 tornado
-uwsgi @ git+https://github.com/unbit/uwsgi@uwsgi-2.0
+uwsgi
 websocket-client
