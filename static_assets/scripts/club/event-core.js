@@ -384,6 +384,7 @@ var onStart = function () {
     selectLiveMode();
   } else {
     u("#live_button").remove();
+    u("#replay_button").remove();
     selectReplayMode();
   }
   u(".main").removeClass("loading");
