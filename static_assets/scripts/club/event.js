@@ -118,10 +118,6 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
 
     map.doubleClickZoom.disable();
     map.on("dblclick", onPressCustomMassStart);
-    map.on("move", function () {
-      drawCompetitors();
-    });
-
     reqwest({
       url: window.local.eventUrl,
       withCredentials: true,
