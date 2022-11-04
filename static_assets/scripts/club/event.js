@@ -98,6 +98,20 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
         },
       ],
     });
+
+    map.on("movestart", function () {
+      isMapMoving = true;
+    });
+    map.on("moveend", function () {
+      isMapMoving = false;
+    });
+    map.on("zoomstart", function () {
+      isMapMoving = true;
+    });
+    map.on("zoomend", function () {
+      isMapMoving = false;
+    });
+
     eventStateControl = L.control.eventState();
     panControl = L.control.pan();
     zoomControl = L.control.zoom();
