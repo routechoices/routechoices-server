@@ -351,7 +351,7 @@ function drawFinishLineEnd(e) {
     map.removeLayer(finishLinePoly);
   }
   finishLinePoints.push(e.latlng);
-  finishLinePoly = L.polyline(finishLinePoints, { color: "purple", renderer: L.canvas() });
+  finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
   map.off("click", drawFinishLineEnd);
   map.off("mousemove", drawFinishLineTmp);
   rankControl = L.control.ranking({ position: "topright" });
@@ -372,7 +372,7 @@ function drawFinishLineEnd(e) {
 function drawFinishLineTmp(e) {
   finishLinePoints[1] = e.latlng;
   if (!finishLinePoly) {
-    finishLinePoly = L.polyline(finishLinePoints, { color: "purple", renderer: L.canvas() });
+    finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
     map.addLayer(finishLinePoly);
   } else {
     finishLinePoly.setLatLngs(finishLinePoints);
@@ -1877,7 +1877,6 @@ var drawCompetitors = function () {
             opacity: 0.75,
             weight: 5,
             smoothFactor: smoothFactor,
-            renderer: L.canvas()
           }).addTo(map);
         } else {
           competitor.tail.setLatLngs(tailLatLng);
