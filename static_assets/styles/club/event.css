@@ -136,9 +136,9 @@
 }
 
 .runner-icon span {
-  font-family: "Atkinson-Hyperlegible-Bold-102", sans-serif;
+  font-family: "Atkinson Hyperlegible", sans-serif;
   font-size: 1.5em;
-  font-weight: bold;
+  font-weight: 700;
   padding: 0 15px;
   white-space: nowrap;
 }

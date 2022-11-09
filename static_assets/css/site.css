@@ -86,11 +86,12 @@ body {
 }
 
 .frontpage_text {
-  font-family: "Atkinson-Hyperlegible-Regular-102", sans-serif;
+  font-family: "Atkinson Hyperlegible", sans-serif;
 }
 
 .frontpage_text_bold {
-  font-family: "Atkinson-Hyperlegible-Bold-102", sans-serif;
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-weight: 700;
 }
 
 #myFooter {
