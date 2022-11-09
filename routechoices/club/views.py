@@ -372,7 +372,7 @@ def acme_challenge(request, challenge):
     club = get_object_or_404(
         Club.objects.all().exclude(domain=""), slug__iexact=club_slug
     )
-    if challenge == club.acme_challenge.split(".")[0]:
+    if challenge == club.acme_challenge.partition(".")[0]:
         return HttpResponse(club.acme_challenge)
     else:
         raise Http404()

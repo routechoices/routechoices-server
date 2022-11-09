@@ -296,7 +296,7 @@ class SessionMiddleware(MiddlewareMixin):
                 # Skip session save for 500 responses, refs #3881.
                 if response.status_code != 500:
                     request.session.save()
-                    host = request.get_host().split(":")[0]
+                    host = request.get_host().partition(":")[0]
                     domain = settings.SESSION_COOKIE_DOMAIN
                     if Club.objects.filter(domain=host).exists():
                         domain = host
