@@ -148,6 +148,10 @@ function showLocalTime(el) {
 }
 
 (function () {
+  new TomSelect("#id_event_set", {
+    allowEmptyOption: true,
+  });
+
   u(".datetimepicker").map(function (el) {
     var options = {
       useCurrent: false,
