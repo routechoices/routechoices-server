@@ -197,9 +197,9 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = [
-            "event_set",
             "name",
             "slug",
+            "event_set",
             "start_date",
             "end_date",
             "open_registration",
