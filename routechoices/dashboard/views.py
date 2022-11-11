@@ -36,6 +36,7 @@ from routechoices.core.models import (
     Device,
     DeviceClubOwnership,
     Event,
+    EventSet,
     Map,
     Notice,
 )
@@ -45,6 +46,7 @@ from routechoices.dashboard.forms import (
     CompetitorFormSet,
     DeviceForm,
     EventForm,
+    EventSetForm,
     ExtraMapFormSet,
     MapForm,
     NoticeForm,
@@ -744,10 +746,124 @@ def map_kmz_upload_view(request):
 
 @login_required
 @requires_club_in_session
+def event_set_list_view(request):
+    club = request.club
+
+    event_set_list = (
+        EventSet.objects.filter(club=club)
+        .select_related("club")
+        .prefetch_related("events")
+    )
+
+    paginator = Paginator(event_set_list, DEFAULT_PAGE_SIZE)
+    page = request.GET.get("page")
+    event_sets = paginator.get_page(page)
+
+    return render(
+        request,
+        "dashboard/event_set_list.html",
+        {"club": club, "event_sets": event_sets},
+    )
+
+
+@login_required
+@requires_club_in_session
+def event_set_create_view(request):
+    club = request.club
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = EventSetForm(request.POST, request.FILES, club=club)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event set created successfully")
+            return redirect("dashboard:event_set_list_view")
+    else:
+        form = EventSetForm(club=club)
+    return render(
+        request,
+        "dashboard/event_set_edit.html",
+        {
+            "club": club,
+            "context": "create",
+            "form": form,
+        },
+    )
+
+
+@login_required
+@requires_club_in_session
+def event_set_edit_view(request, event_set_id):
+    club = request.club
+
+    event_set = get_object_or_404(
+        EventSet.objects.all().prefetch_related("events"),
+        aid=event_set_id,
+    )
+    if event_set.club != club:
+        club = event_set.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
+    if request.method == "POST":
+        form = EventSetForm(request.POST, instance=event_set, club=club)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Changes saved successfully")
+            return redirect("dashboard:event_set_list_view")
+    else:
+        form = EventSetForm(instance=event_set, club=club)
+    return render(
+        request,
+        "dashboard/event_set_edit.html",
+        {
+            "club": club,
+            "context": "edit",
+            "event_set": event_set,
+            "form": form,
+        },
+    )
+
+
+@login_required
+@requires_club_in_session
+def event_set_delete_view(request, event_set_id):
+    club = request.club
+
+    event_set = get_object_or_404(EventSet, aid=event_set_id)
+    if event_set.club != club:
+        club = event_set.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
+    if request.method == "POST":
+        event_set.delete()
+        messages.success(request, "Event set deleted")
+        return redirect("dashboard:event_list_view")
+    return render(
+        request,
+        "dashboard/event_set_delete.html",
+        {
+            "event_set": event_set,
+        },
+    )
+
+
+@login_required
+@requires_club_in_session
 def event_list_view(request):
     club = request.club
 
-    event_list = Event.objects.filter(club=club).select_related("club")
+    event_list = Event.objects.filter(club=club).select_related("club", "event_set")
 
     paginator = Paginator(event_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
@@ -763,12 +879,15 @@ def event_list_view(request):
 def event_create_view(request):
     club = request.club
 
-    map_list = Map.objects.filter(club=club).select_related("club")
+    map_list = Map.objects.filter(club=club)
+    event_set_list = EventSet.objects.filter(club=club)
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, club=club)
         form.fields["map"].queryset = map_list
+        form.fields["event_set"].queryset = event_set_list
+        form.fields["event_set"].required = False
         formset = CompetitorFormSet(request.POST)
         extra_map_formset = ExtraMapFormSet(request.POST)
         for mform in extra_map_formset.forms:
@@ -821,6 +940,8 @@ def event_create_view(request):
     else:
         form = EventForm(club=club)
         form.fields["map"].queryset = map_list
+        form.fields["event_set"].queryset = event_set_list
+        form.fields["event_set"].required = False
         formset = CompetitorFormSet()
         extra_map_formset = ExtraMapFormSet()
         for mform in extra_map_formset.forms:
@@ -863,7 +984,8 @@ MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
 def event_edit_view(request, event_id):
     club = request.club
 
-    map_list = Map.objects.filter(club=club).select_related("club")
+    map_list = Map.objects.filter(club=club)
+    event_set_list = EventSet.objects.filter(club=club)
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
@@ -894,6 +1016,8 @@ def event_edit_view(request, event_id):
         # create a form instance and populate it with data from the request:
         form = EventForm(request.POST, request.FILES, instance=event, club=club)
         form.fields["map"].queryset = map_list
+        form.fields["event_set"].queryset = event_set_list
+        form.fields["event_set"].required = False
         extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
@@ -958,6 +1082,8 @@ def event_edit_view(request, event_id):
     else:
         form = EventForm(instance=event, club=club)
         form.fields["map"].queryset = map_list
+        form.fields["event_set"].queryset = event_set_list
+        form.fields["event_set"].required = False
         formset_qs = Competitor.objects.none() if not use_competitor_formset else None
         formset_args = {}
         if not use_competitor_formset:

@@ -82,16 +82,60 @@ def club_view(request, **kwargs):
                 raise Http404()
         if selected_month:
             event_list = event_list.filter(start_date__month=selected_month)
-    paginator = Paginator(event_list, 25)
+
+    event_sets = []
+    event_sets_keys = {}
+    for event in event_list[::-1]:
+        key = event.event_set or f"{event.aid}_E"
+        name = event.event_set or event.name
+        if key not in event_sets_keys.keys():
+            event_sets_keys[key] = len(event_sets)
+            event_sets.append(
+                {
+                    "name": name,
+                    "events": [
+                        event,
+                    ],
+                    "fake": event.event_set is None,
+                }
+            )
+        else:
+            idx = event_sets_keys[key]
+            event_sets[idx]["events"].append(event)
+    event_sets = event_sets[::-1]
+
+    live_event_sets = []
+    live_event_sets_keys = {}
+    for event in live_events[::-1]:
+        key = event.event_set or f"{event.aid}_E"
+        name = event.event_set or event.name
+        if key not in live_event_sets_keys.keys():
+            live_event_sets_keys[key] = len(live_event_sets)
+            live_event_sets.append(
+                {
+                    "name": name,
+                    "events": [
+                        event,
+                    ],
+                    "fake": event.event_set is None,
+                }
+            )
+        else:
+            idx = live_event_sets_keys[key]
+            live_event_sets[idx]["events"].append(event)
+    live_event_sets = live_event_sets[::-1]
+
+    paginator = Paginator(event_sets, 25)
     page = request.GET.get("page")
-    events = paginator.get_page(page)
+    event_sets = paginator.get_page(page)
+
     return render(
         request,
         "site/event_list.html",
         {
             "club": club,
-            "events": events,
-            "live_events": live_events,
+            "event_sets": event_sets,
+            "live_event_sets": live_event_sets,
             "years": years,
             "months": months,
             "year": selected_year,

@@ -21,6 +21,7 @@ from routechoices.core.models import (
     Competitor,
     Device,
     Event,
+    EventSet,
     Map,
     MapAssignation,
     Notice,
@@ -165,6 +166,25 @@ class MapForm(ModelForm):
             return f_new
 
 
+class EventSetForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.club = kwargs.pop("club")
+        super().__init__(*args, **kwargs)
+        self.instance.club = self.club
+
+    class Meta:
+        model = EventSet
+        fields = ["name"]
+
+    def validate_unique(self):
+        exclude = self._get_validation_exclusions()
+        exclude.remove("club")
+        try:
+            self.instance.validate_unique(exclude=exclude)
+        except ValidationError as e:
+            self._update_errors(e)
+
+
 class EventForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.club = kwargs.pop("club")
@@ -177,6 +197,7 @@ class EventForm(ModelForm):
     class Meta:
         model = Event
         fields = [
+            "event_set",
             "name",
             "slug",
             "start_date",

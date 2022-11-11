@@ -9,7 +9,7 @@
     <div class="col-12">
 
         {% if not events %}
-            <p>You haven't created any event yet.</p>
+            <p>You haven't created any events yet.</p>
             <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event</a>
         {% else %}
         <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event</a></div>
@@ -17,6 +17,7 @@
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
+                <th>Set</th>
                 <th>Start Date</th>
                 <th>Privacy</th>
                 <th>Is Live</th>
@@ -25,6 +26,7 @@
             {% for event in events %}
             <tr>
                 <td><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></td>
+                <td>{% if event.event_set %}{{ event.event_set }}{% else %}-{% endif %}</td>
                 <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}" style="white-space: nowrap;font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
                 <td><span style="white-space: nowrap;"><i class="fa fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
                 <td>{% if event.is_live %}<i style="color:green" class="fa fa-check-circle"></i>{% else %}<i style="color:red" class="fa fa-times-circle"></i>{% endif %}</a></td>

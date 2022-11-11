@@ -1,0 +1,33 @@
+{% extends "dashboard/club_view.html" %}
+{% load static %}
+{% load hosts %}
+{% load django_bootstrap5 %}
+{% load compress %}
+
+{% block sub_sub_content %}
+<div class="row">
+    <div class="col-12">
+
+        {% if not event_sets %}
+            <p>You haven't created any event sets yet.</p>
+            <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event set</a>
+        {% else %}
+        <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event set</a></div>
+        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
+        <table class="table table-striped">
+            <tr>
+                <th>Name</th>
+                <th>Event Count</th>
+            </tr>
+            {% for event_set in event_sets %}
+            <tr>
+                <td><a href="{% url 'dashboard:event_set_edit_view' event_set_id=event_set.aid %}">{{ event_set.name }}</a></td>
+                <td>{{ event_set.events.all.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

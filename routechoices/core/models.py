@@ -787,6 +787,28 @@ class BackroundMapChoicesField(models.CharField):
         return (name, path, args, kwargs)
 
 
+class EventSet(models.Model):
+    aid = models.CharField(
+        default=random_key,
+        max_length=12,
+        editable=False,
+        unique=True,
+    )
+    creation_date = models.DateTimeField(auto_now_add=True)
+    modification_date = models.DateTimeField(auto_now=True)
+    club = models.ForeignKey(
+        Club, verbose_name="Club", related_name="event_sets", on_delete=models.CASCADE
+    )
+    name = models.CharField(verbose_name="Name", max_length=255)
+
+    class Meta:
+        ordering = ["-creation_date", "name"]
+        unique_together = (("club", "name"),)
+
+    def __str__(self):
+        return self.name
+
+
 class Event(models.Model):
     aid = models.CharField(
         default=random_key,
@@ -858,6 +880,13 @@ class Event(models.Model):
         "Tail length (seconds)",
         default=60,
         help_text="Default tail length when a user open the event. Can be overriden by the viewers in the event page settings tab.",
+    )
+    event_set = models.ForeignKey(
+        EventSet,
+        null=True,
+        verbose_name="Event Set",
+        related_name="events",
+        on_delete=models.CASCADE,
     )
 
     class Meta:

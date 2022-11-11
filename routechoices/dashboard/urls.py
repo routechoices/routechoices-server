@@ -82,4 +82,18 @@ urlpatterns = [
         views.event_route_upload_view,
         name="event_route_upload_view",
     ),
+    re_path(r"^event-sets/?$", views.event_set_list_view, name="event_set_list_view"),
+    re_path(
+        r"^event-sets/new/?$", views.event_set_create_view, name="event_set_create_view"
+    ),
+    re_path(
+        r"^event-sets/(?P<event_set_id>[A-Za-z0-9_-]+)/?$",
+        views.event_set_edit_view,
+        name="event_set_edit_view",
+    ),
+    re_path(
+        r"^event-sets/(?P<event_set_id>[A-Za-z0-9_-]+)/delete/?$",
+        views.event_set_delete_view,
+        name="event_set_delete_view",
+    ),
 ]

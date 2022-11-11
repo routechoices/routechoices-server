@@ -1,0 +1,15 @@
+{% extends "dashboard/home.html" %}
+{% load static %}
+
+{% block sub_content %}
+<div class="row">
+  <div class="col-12">
+      <h1><i class="fa fa-warning"></i> Delete event set {{ event_set.name }}?</h1>
+      <p>This will delete this event set, however the event within will not be deleted.</p>
+      <form action="" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> I understand the risk and I want to delete this event set!</button>
+      </form>
+  </div>
+</div>
+{% endblock %}
