@@ -45,20 +45,26 @@ Label the data
 */
   td:nth-of-type(1):before {
     content: "Device ID";
+    font-weight: bold;
   }
   td:nth-of-type(2):before {
     content: "Nickname";
+    font-weight: bold;
   }
   td:nth-of-type(3):before {
     content: "Last Seen";
+    font-weight: bold;
   }
   td:nth-of-type(4):before {
     content: "Battery";
+    font-weight: bold;
   }
   td:nth-of-type(5):before {
     content: "Last Used By";
+    font-weight: bold;
   }
   td:nth-of-type(6):before {
     content: "Delete";
+    font-weight: bold;
   }
 }
