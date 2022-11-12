@@ -127,8 +127,8 @@ function onCsvParsed(result) {
         inputs[5].value = dayjs(l[2]).utc().format("YYYY-MM-DD HH:mm:ss");
         u(inputs[5]).trigger("change");
       }
-      inputs[3].value = l[0];
-      inputs[4].value = l[1];
+      inputs[2].value = l[0];
+      inputs[3].value = l[1];
     }
   });
   u(".add-competitor-btn").first().click();
