@@ -332,7 +332,7 @@ class CompetitorForm(ModelForm):
 
     class Meta:
         model = Competitor
-        fields = ("event", "device", "name", "short_name", "start_time")
+        fields = ("event", "name", "short_name", "device", "start_time")
         widgets = {
             "start_time": DateTimeInput(
                 attrs={"class": "datetimepicker", "autocomplete": "off"}
