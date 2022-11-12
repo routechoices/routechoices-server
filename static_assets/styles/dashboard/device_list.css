@@ -58,7 +58,7 @@ Label the data
     font-weight: bold;
   }
   td:nth-of-type(4):before {
-    content: "Battery";
+    content: "Battery %";
     font-weight: bold;
   }
   td:nth-of-type(5):before {
