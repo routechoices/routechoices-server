@@ -4,6 +4,13 @@
 {% load django_bootstrap5 %}
 {% load compress %}
 
+{%  block extra_head %}
+{{ block.super }}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'styles/dashboard/event_list.css' %}"/>
+{% endcompress %}
+{%  endblock %}
+
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
@@ -15,6 +22,7 @@
         <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event</a></div>
         {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
+          <thead>
             <tr>
                 <th>Name</th>
                 <th>Set</th>
@@ -23,8 +31,10 @@
                 <th>Is Live</th>
                 <th>Actions</th>
             </tr>
+          </thead>
+          <tbody>
             {% for event in events %}
-            <tr>
+            <tr class="collapsable">
                 <td><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></td>
                 <td>{% if event.event_set %}{{ event.event_set }}{% else %}-{% endif %}</td>
                 <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}" style="white-space: nowrap;font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
@@ -41,6 +51,7 @@
                 </td>
             </tr>
             {% endfor %}
+          </tbody>
         </table>
         {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
         {% endif %}
