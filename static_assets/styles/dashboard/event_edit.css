@@ -58,9 +58,11 @@
   }
   .competitor_table td:nth-of-type(2):before {
     content: "Name";
+    font-weight: bold;
   }
   .competitor_table td:nth-of-type(3):before {
     content: "Short Name";
+    font-weight: bold;
   }
   .competitor_table td:nth-of-type(4):before {
     content: "Start time (UTC)";
