@@ -92,3 +92,7 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+body {
+  background-color: #f8f9fa;
+}

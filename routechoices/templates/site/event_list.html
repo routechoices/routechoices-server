@@ -32,9 +32,12 @@
 {% block content %}
 {% if club %}
 <div class="row">
-  {{club.description|markdownify }}
+  <div class="card" style="margin-bottom: 15px;">
+    <div class="card-body">
+    {{club.description|markdownify }}
+    </div>
+  </div>
 </div>
-<hr/>
 {% else %}
 <div class="row d-none d-sm-block" style="aspect-ratio: 2047 / 768;margin-top:-65px;margin-bottom:20px">
   <h1 style="font-weight: bold;color: white;z-index: 2;margin-left:20px;text-shadow: rgb(0, 0, 0) -1px -1px 0px, rgb(0, 0, 0) 1px -1px 0px, rgb(0, 0, 0) -1px 1px 0px, rgb(0, 0, 0) 1px 1px 0px;font-size: 1.8em;position: relative;top: 80px;line-height:.9em">{{site.name}}<br/><span style="font-size: .6em">Live GPS Tracking Solution</span></h1>
