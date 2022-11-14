@@ -2,6 +2,15 @@
 {% load i18n %}
 {% load django_bootstrap5 %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
+<style>
+.content {
+  background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <h1>
   {% trans "Two-Factor Authentication" %}
