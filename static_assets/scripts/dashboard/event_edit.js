@@ -150,6 +150,37 @@ function showLocalTime(el) {
 (function () {
   new TomSelect("#id_event_set", {
     allowEmptyOption: true,
+    render: {
+      option_create: function (data, escape) {
+        return (
+          '<div class="create">Create <strong>' +
+          escape(data.input) +
+          "</strong>&hellip;</div>"
+        );
+      },
+    },
+    create: function (input, callback) {
+      reqwest({
+        url: window.local.apiBaseUrl + "event-set",
+        method: "post",
+        data: {
+          club_id: window.local.clubId,
+          name: input,
+        },
+        type: "json",
+        withCredentials: true,
+        crossOrigin: true,
+        headers: {
+          "X-CSRFToken": window.local.csrfToken,
+        },
+        success: function (res) {
+          return callback(res);
+        },
+        error: function () {
+          return callback();
+        },
+      });
+    },
   });
 
   u(".datetimepicker").map(function (el) {

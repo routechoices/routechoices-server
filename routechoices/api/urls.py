@@ -46,6 +46,7 @@ urlpatterns = [
         views.device_ownership_api_view,
         name="device_ownership_api_view",
     ),
+    re_path(r"^event-set/?$", views.event_set_creation, name="event_set"),
     re_path(r"^events/?$", views.event_list, name="event_list"),
     re_path(
         r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/?$",

@@ -39,6 +39,7 @@ from routechoices.core.models import (
     Device,
     DeviceClubOwnership,
     Event,
+    EventSet,
     ImeiDevice,
     Map,
 )
@@ -103,6 +104,32 @@ event_param = openapi.Parameter(
     description="Filter by this event slug",
     type=openapi.TYPE_STRING,
 )
+
+
+@swagger_auto_schema(
+    method="post",
+    auto_schema=None,
+)
+@login_required
+@api_view(["POST"])
+def event_set_creation(request):
+    club_id = request.data.get("club_id")
+    club = Club.objects.filter(aid=club_id).first()
+    name = request.data.get("name")
+    if not name or not club:
+        raise ValidationError("Missing parameter")
+    is_user_event_admin = (
+        request.user.is_superuser or club.admins.filter(id=request.user.id).exists()
+    )
+    if not is_user_event_admin:
+        raise PermissionDenied("not club admin")
+    event_set, created = EventSet.objects.get_or_create(club=club, name=name)
+    return Response(
+        {
+            "value": event_set.id,
+            "text": name,
+        }
+    )
 
 
 @swagger_auto_schema(
