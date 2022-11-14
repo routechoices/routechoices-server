@@ -1,10 +1,13 @@
 {% extends "account/base.html" %}
 {% load static %}
 {% load i18n %}
+{% load compress %}
 {% load django_bootstrap5 %}
 
 {% block extra_head %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
+{% endcompress %}
 <style>
 .content {
   background-color: #f8f9fa;
