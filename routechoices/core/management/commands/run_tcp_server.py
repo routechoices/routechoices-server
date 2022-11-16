@@ -598,6 +598,8 @@ class MicTrackConnection:
         except Exception:
             print("Could not parse GPS data", flush=True)
             return False
+        if not self.db_device.user_agent:
+            self.db_device.user_agent = "MicTrack V1"
         try:
             self.db_device.battery_level = max(
                 [0, min([100, int(int(batt_volt) / 50 * 100)])]
@@ -627,6 +629,8 @@ class MicTrackConnection:
         except Exception:
             print("Could not parse GPS data", flush=True)
             return False
+        if not self.db_device.user_agent:
+            self.db_device.user_agent = "MicTrack V2"
         try:
             self.db_device.battery_level = max(
                 [0, min([100, int(int(batt_volt) / 5000 * 100)])]
