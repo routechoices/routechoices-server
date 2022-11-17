@@ -13,7 +13,7 @@ cffi==1.15.1
 charset-normalizer==2.1.1
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography==38.0.1
+cryptography==38.0.3
 defusedxml==0.7.1
 deprecated==1.2.13
 diskcache==5.4.0
