@@ -1262,11 +1262,11 @@ class Device(models.Model):
         if self.location_count == 0:
             return
         d = self.locations_series
-        sorted_locs = sorted(d, key=itemgetter(0))
+        sorted_locs = sorted(d, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
         loc_list = []
         prev_t = None
         for loc in sorted_locs:
-            t = int(loc[0])
+            t = loc[LOCATION_TIMESTAMP_INDEX]
             if t != prev_t:
                 prev_t = t
                 loc_list.append((t, round(loc[1], 5), round(loc[2], 5)))
