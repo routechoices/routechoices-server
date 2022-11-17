@@ -1131,10 +1131,24 @@ class Device(models.Model):
         return min(4, round((self.battery_level - 5) / 20))
 
     @property
+    def locations_series(self):
+        if not self.locations_encoded:
+            return []
+        return gps_encoding.decode_data(self.locations_encoded)
+
+    @locations_series.setter
+    def locations_series(self, locations_list):
+        sorted_locations = list(
+            sorted(locations_list, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
+        )
+        self.locations_encoded = gps_encoding.encode_data(sorted_locations)
+        self.update_cached_data()
+
+    @property
     def locations(self):
         if not self.locations_encoded:
             return {"timestamps": [], "latitudes": [], "longitudes": []}
-        locs = gps_encoding.decode_data(self.locations_encoded)
+        locs = self.locations_series()
         data = list(zip(*locs))
         return {
             "timestamps": list(data[LOCATION_TIMESTAMP_INDEX]),
@@ -1142,20 +1156,16 @@ class Device(models.Model):
             "longitudes": list(data[LOCATION_LONGITUDE_INDEX]),
         }
 
-    @property
-    def locations_series(self):
-        if not self.locations_encoded:
-            return []
-        return gps_encoding.decode_data(self.locations_encoded)
-
     @locations.setter
-    def locations(self, locs_dict):
-        locs = zip(
-            locs_dict["timestamps"], locs_dict["latitudes"], locs_dict["longitudes"]
+    def locations(self, locations_dict):
+        locations_list = list(
+            zip(
+                locations_dict["timestamps"],
+                locations_dict["latitudes"],
+                locations_dict["longitudes"],
+            )
         )
-        locs = list(sorted(locs, key=itemgetter(0)))
-        self.locations_encoded = gps_encoding.encode_data(locs)
-        self.update_cached_data()
+        self.locations_series = locations_list
 
     def update_cached_data(self):
         self._location_count = self.location_count
@@ -1261,22 +1271,22 @@ class Device(models.Model):
     def remove_duplicates(self, save=True):
         if self.location_count == 0:
             return
-        d = self.locations_series
-        sorted_locs = sorted(d, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
-        loc_list = []
+        ts = self.locations["timestamps"]
+        unique_ts = set(ts)
+        if len(ts) == len(unique_ts):
+            return
+        sorted_locs = self.locations_series  # This is always sorted
+        new_locations_list = []
         prev_t = None
         for loc in sorted_locs:
             t = loc[LOCATION_TIMESTAMP_INDEX]
-            if t != prev_t:
-                prev_t = t
-                loc_list.append((t, round(loc[1], 5), round(loc[2], 5)))
-        new_encoded = ""
-        if len(loc_list) > 0:
-            new_encoded = gps_encoding.encode_data(loc_list)
-        if self.locations_encoded != new_encoded:
-            tims, lats, lons = zip(*loc_list)
-            new_locs = {"timestamps": tims, "latitudes": lats, "longitudes": lons}
-            self.locations = new_locs
+            if t == prev_t:
+                continue
+            new_locations_list.append((t, round(loc[1], 5), round(loc[2], 5)))
+            prev_t = t
+        newly_encoded = gps_encoding.encode_data(new_locations_list)
+        if self.locations_encoded != newly_encoded:
+            self.locations_series = new_locations_list
             if save:
                 self.save()
 
