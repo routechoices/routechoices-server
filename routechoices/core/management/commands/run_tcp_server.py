@@ -601,9 +601,10 @@ class MicTrackConnection:
         if not self.db_device.user_agent:
             self.db_device.user_agent = "MicTrack V1"
         try:
-            # we assume 4.2V battery going empty at 3.6V
+            # https://help.mictrack.com/articles/how-to-calculate-battery-voltage-into-percentage-for-mictrack-devices/
+            # we assume 4.2V battery going empty at 3.3V
             self.db_device.battery_level = max(
-                [0, min([100, int((int(batt_volt) - 36) / 6 * 100)])]
+                [0, min([100, int((int(batt_volt) - 33) / 9 * 100)])]
             )
         except Exception:
             print("Invalid battery level value", flush=True)
@@ -633,9 +634,10 @@ class MicTrackConnection:
         if not self.db_device.user_agent:
             self.db_device.user_agent = "MicTrack V2"
         try:
-            # we assume 4.2V battery going empty at 3.6V
+            # https://help.mictrack.com/articles/how-to-calculate-battery-voltage-into-percentage-for-mictrack-devices/
+            # we assume 4.2V battery going empty at 3.5V
             self.db_device.battery_level = max(
-                [0, min([100, int((int(batt_volt) - 3600) / 600 * 100)])]
+                [0, min([100, int((int(batt_volt) - 3500) / 700 * 100)])]
             )
         except Exception:
             print("Invalid battery level value", flush=True)
