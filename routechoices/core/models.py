@@ -1197,7 +1197,12 @@ class Device(models.Model):
         if len(loc_array) == 0:
             return
         new_pts = []
-        all_ts = set(self.locations["timestamps"])
+        locations = self.locations_series
+        all_ts = set()
+        if locations:
+            all_ts = set(
+                list(zip(*locations))[LOCATION_TIMESTAMP_INDEX]
+            )
         for loc in loc_array:
             ts = int(loc[LOCATION_TIMESTAMP_INDEX])
             lat = loc[LOCATION_LATITUDE_INDEX]
@@ -1219,7 +1224,6 @@ class Device(models.Model):
         if len(new_pts) == 0:
             return
 
-        locations = self.locations_series
         locations += new_pts
         self.locations_series = locations
 
@@ -1259,25 +1263,23 @@ class Device(models.Model):
     @property
     def location_count(self):
         # This use a property of the GPS encoding format
-        return (
-            len(
-                [
-                    x
-                    for x in self.locations_encoded
-                    if x in "?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^"
-                ]
-            )
-            // 3
-        )
+        n = 0
+        for x in self.locations_encoded:
+            if ord(x) - 63 < 0x20:
+                n += 1
+        return n // 3
 
     def remove_duplicates(self, save=True):
-        if self.location_count == 0:
+        loc_count = self.location_count
+        if loc_count == 0:
             return
-        ts = self.locations["timestamps"]
-        unique_ts = set(ts)
-        if len(ts) == len(unique_ts):
+        sorted_locs = self.locations_series
+        unique_ts = set(
+            list(zip(*sorted_locs))[LOCATION_TIMESTAMP_INDEX]
+        )
+        if loc_count == len(unique_ts):
             return
-        sorted_locs = self.locations_series  # This is always sorted
+
         new_locations_list = []
         prev_t = None
         for loc in sorted_locs:
@@ -1292,7 +1294,7 @@ class Device(models.Model):
             if save:
                 self.save()
 
-    @cached_property
+    @property
     def last_location(self):
         if self.location_count == 0:
             return None
@@ -1310,7 +1312,7 @@ class Device(models.Model):
             return None
         return epoch_to_datetime(self.last_location[LOCATION_TIMESTAMP_INDEX])
 
-    @cached_property
+    @property
     def last_position(self):
         if self.location_count == 0:
             return None
