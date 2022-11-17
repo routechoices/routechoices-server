@@ -1298,7 +1298,12 @@ class Device(models.Model):
     def last_location(self):
         if self.location_count == 0:
             return None
-        return self.locations_series[-1]
+        return (
+            self._last_location_datetime.timestamp(),
+            self._last_location_latitude,
+            self._last_location_longitude,
+        )
+            
 
     @property
     def last_position_timestamp(self):
