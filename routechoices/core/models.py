@@ -1303,7 +1303,6 @@ class Device(models.Model):
             self._last_location_latitude,
             self._last_location_longitude,
         )
-            
 
     @property
     def last_position_timestamp(self):
