@@ -1148,7 +1148,7 @@ class Device(models.Model):
     def locations(self):
         if not self.locations_encoded:
             return {"timestamps": [], "latitudes": [], "longitudes": []}
-        locs = self.locations_series()
+        locs = self.locations_series
         data = list(zip(*locs))
         return {
             "timestamps": list(data[LOCATION_TIMESTAMP_INDEX]),
@@ -1194,11 +1194,10 @@ class Device(models.Model):
         return len(locs), result
 
     def add_locations(self, loc_array, /, *, save=True, push_forward=True):
-        new_ts = []
-        new_lat = []
-        new_lon = []
-        locs = self.locations
-        all_ts = set(locs["timestamps"])
+        if len(loc_array) == 0:
+            return
+        new_pts = []
+        all_ts = set(self.locations["timestamps"])
         for loc in loc_array:
             ts = int(loc[LOCATION_TIMESTAMP_INDEX])
             lat = loc[LOCATION_LATITUDE_INDEX]
@@ -1215,16 +1214,18 @@ class Device(models.Model):
             if isinstance(lon, Decimal):
                 lon = float(lon)
             all_ts.add(ts)
-            new_ts.append(ts)
-            new_lat.append(round(lat, 5))
-            new_lon.append(round(lon, 5))
-        locs["timestamps"] += new_ts
-        locs["latitudes"] += new_lat
-        locs["longitudes"] += new_lon
-        self.locations = locs
+            new_pts.append((ts, lat, lon))
+
+        if len(new_pts) == 0:
+            return
+
+        locations = self.locations_series
+        locations += new_pts
+        self.locations_series = locations
 
         if save:
             self.save()
+
         if push_forward:
             try:
                 competitor = self.get_competitor(load_event=True)
@@ -1232,9 +1233,10 @@ class Device(models.Model):
                     event = competitor.event
                     if event.is_live:
                         event_id = event.aid
-                        new_locs = list(zip(new_ts, new_lat, new_lon))
-                        new_locs = list(sorted(new_locs, key=itemgetter(0)))
-                        new_data = gps_encoding.encode_data(new_locs)
+                        new_pts = list(
+                            sorted(new_pts, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
+                        )
+                        new_data = gps_encoding.encode_data(new_pts)
                         client = redis.from_url(settings.REDIS_URL)
                         client.publish(
                             f"routechoices_event_data:{event_id}",
