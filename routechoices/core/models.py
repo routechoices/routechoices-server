@@ -1200,9 +1200,7 @@ class Device(models.Model):
         locations = self.locations_series
         all_ts = set()
         if locations:
-            all_ts = set(
-                list(zip(*locations))[LOCATION_TIMESTAMP_INDEX]
-            )
+            all_ts = set(list(zip(*locations))[LOCATION_TIMESTAMP_INDEX])
         for loc in loc_array:
             ts = int(loc[LOCATION_TIMESTAMP_INDEX])
             lat = loc[LOCATION_LATITUDE_INDEX]
@@ -1274,9 +1272,7 @@ class Device(models.Model):
         if loc_count == 0:
             return
         sorted_locs = self.locations_series
-        unique_ts = set(
-            list(zip(*sorted_locs))[LOCATION_TIMESTAMP_INDEX]
-        )
+        unique_ts = set(list(zip(*sorted_locs))[LOCATION_TIMESTAMP_INDEX])
         if loc_count == len(unique_ts):
             return
 
