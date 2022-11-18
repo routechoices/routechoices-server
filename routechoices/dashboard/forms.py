@@ -141,7 +141,7 @@ class MapForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields[
             "image"
-        ].help_text = "Image of map as a PNG, JPEG, GIF, BMP or PDF file"
+        ].help_text = "Image of map as a PNG, JPEG, GIF, WEBP, or PDF file"
 
     class Meta:
         model = Map

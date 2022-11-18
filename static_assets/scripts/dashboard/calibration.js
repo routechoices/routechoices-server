@@ -327,7 +327,7 @@ function project(m, x, y) {
     var controlLayersPrev = new L.Control.Layers(baseLayers, {
       Map: transformedImage,
     });
-    map_c.addControl(controlLayers);
+    map_c.addControl(controlLayersPrev);
     if (L.Browser.touch && L.Browser.mobile) {
       map_c.on("baselayerchange", function (e) {
         controlLayersPrev.collapse();
