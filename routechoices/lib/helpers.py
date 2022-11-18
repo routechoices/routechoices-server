@@ -99,16 +99,6 @@ def short_random_slug():
     return generate_random_string(alphabet, 6)
 
 
-def get_country_from_coords(lat, lon):
-    api_url = "http://api.geonames.org/countryCode"
-    values = {"type": "json", "lat": lat, "lng": lon, "username": "rphl", "radius": 1}
-    try:
-        response = requests.get(api_url, params=values)
-        return response.json().get("countryCode")
-    except Exception:
-        return None
-
-
 def solve_affine_matrix(r1, s1, t1, r2, s2, t2, r3, s3, t3):
     a = (((t2 - t3) * (s1 - s2)) - ((t1 - t2) * (s2 - s3))) / (
         ((r2 - r3) * (s1 - s2)) - ((r1 - r2) * (s2 - s3))
@@ -231,17 +221,15 @@ def multiply_matrix_vector(m, v):
     ]
 
 
-def basis_to_points(x1, y1, x2, y2, x3, y3, x4, y4):
-    m = [x1, x2, x3, y1, y2, y3, 1, 1, 1]
-    v = multiply_matrix_vector(adjugate_matrix(m), [x4, y4, 1])
+def basis_to_points(a, b, c, d):
+    m = [a.x, b.x, c.x, a.y, b.y, c.y, 1, 1, 1]
+    v = multiply_matrix_vector(adjugate_matrix(m), [d.x, d.y, 1])
     return multiply_matrices(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]])
 
 
-def general_2d_projection(
-    x1s, y1s, x1d, y1d, x2s, y2s, x2d, y2d, x3s, y3s, x3d, y3d, x4s, y4s, x4d, y4d
-):
-    s = basis_to_points(x1s, y1s, x2s, y2s, x3s, y3s, x4s, y4s)
-    d = basis_to_points(x1d, y1d, x2d, y2d, x3d, y3d, x4d, y4d)
+def general_2d_projection(a1, a2, a3, a4, b1, b2, b3, b4):
+    s = basis_to_points(a1, a2, a3, a4)
+    d = basis_to_points(b1, b2, b3, b4)
     return multiply_matrices(d, adjugate_matrix(s))
 
 
@@ -363,9 +351,9 @@ def find_coeffs(pa, pb):
     for p1, p2 in zip(pa, pb):
         matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0] * p1[0], -p2[0] * p1[1]])
         matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1] * p1[0], -p2[1] * p1[1]])
-    A = numpy.matrix(matrix, dtype=numpy.float)
-    B = numpy.array(pb).reshape(8)
-    res = numpy.dot(numpy.linalg.inv(A.T * A) * A.T, B)
+    a = numpy.matrix(matrix, dtype=numpy.float)
+    b = numpy.array(pb).reshape(8)
+    res = numpy.dot(numpy.linalg.inv(a.T * a) * a.T, b)
     return numpy.array(res).reshape(8)
 
 

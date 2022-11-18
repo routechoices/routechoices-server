@@ -402,37 +402,19 @@ class Map(models.Model):
 
     @property
     def alignment_points(self):
-        r1_a = Point(0, 0)
-        r1_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topLeft"]))
-        r2_a = Point(0, self.height)
-        r2_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomLeft"]))
-        r3_a = Point(self.width, 0)
-        r3_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topRight"]))
-        r4_a = Point(self.width, self.height)
-        r4_b = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomRight"]))
-        return r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b
+        a1 = Point(0, 0)
+        b1 = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topLeft"]))
+        a2 = Point(0, self.height)
+        b2 = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomLeft"]))
+        a3 = Point(self.width, 0)
+        b3 = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topRight"]))
+        a4 = Point(self.width, self.height)
+        b4 = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["bottomRight"]))
+        return a1, a2, a3, a4, b1, b2, b3, b4
 
     @property
     def matrix_3d(self):
-        r1_a, r1_b, r2_a, r2_b, r3_a, r3_b, r4_a, r4_b = self.alignment_points
-        m = general_2d_projection(
-            r1_a.x,
-            r1_a.y,
-            r1_b.x,
-            r1_b.y,
-            r2_a.x,
-            r2_a.y,
-            r2_b.x,
-            r2_b.y,
-            r3_a.x,
-            r3_a.y,
-            r3_b.x,
-            r3_b.y,
-            r4_a.x,
-            r4_a.y,
-            r4_b.x,
-            r4_b.y,
-        )
+        m = general_2d_projection(*self.alignment_points)
         if not m[8]:
             return
         for i in range(9):
@@ -1271,22 +1253,30 @@ class Device(models.Model):
         loc_count = self.location_count
         if loc_count == 0:
             return
-        sorted_locs = self.locations_series
-        unique_ts = set(list(zip(*sorted_locs))[LOCATION_TIMESTAMP_INDEX])
-        if loc_count == len(unique_ts):
+
+        orig_locations = self.locations_series
+        unique_ts = set(list(zip(*orig_locations))[LOCATION_TIMESTAMP_INDEX])
+        if len(unique_ts) == loc_count:
             return
 
-        new_locations_list = []
+        updated_locations_list = []
         prev_t = None
-        for loc in sorted_locs:
+        for loc in orig_locations:
             t = loc[LOCATION_TIMESTAMP_INDEX]
             if t == prev_t:
                 continue
-            new_locations_list.append((t, round(loc[1], 5), round(loc[2], 5)))
+            updated_locations_list.append(
+                (
+                    t,
+                    round(loc[LOCATION_LATITUDE_INDEX], 5),
+                    round(loc[LOCATION_LONGITUDE_INDEX], 5),
+                )
+            )
             prev_t = t
-        newly_encoded = gps_encoding.encode_data(new_locations_list)
-        if self.locations_encoded != newly_encoded:
-            self.locations_series = new_locations_list
+
+        updated_encoded = gps_encoding.encode_data(updated_locations_list)
+        if self.locations_encoded != updated_encoded:
+            self.locations_series = updated_locations_list
             if save:
                 self.save()
 
@@ -1301,25 +1291,14 @@ class Device(models.Model):
         )
 
     @property
-    def last_position_timestamp(self):
+    def last_location_timestamp(self):
         if self.location_count == 0:
             return None
         return self.last_location[LOCATION_TIMESTAMP_INDEX]
 
     @property
-    def last_position_date(self):
-        if self.location_count == 0:
-            return None
-        return epoch_to_datetime(self.last_location[LOCATION_TIMESTAMP_INDEX])
-
-    @property
-    def last_position(self):
-        if self.location_count == 0:
-            return None
-        return (
-            self.last_location[LOCATION_LATITUDE_INDEX],
-            self.last_location[LOCATION_LONGITUDE_INDEX],
-        )
+    def last_location_datetime(self):
+        return self._last_location_datetime
 
     def get_competitor(self, at=None, load_event=False):
         if not at:
@@ -1365,7 +1344,7 @@ class Device(models.Model):
 
 @receiver(post_save, sender=Device)
 def invalidate_ended_event_using_device_cache(sender, instance, **kwargs):
-    event = instance.get_event(at=instance.last_position_date)
+    event = instance.get_event(at=instance.last_location_datetime)
     if event and event.ended:
         event.invalidate_cache()
 

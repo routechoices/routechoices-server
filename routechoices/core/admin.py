@@ -205,8 +205,8 @@ class DeviceAdmin(admin.ModelAdmin):
         "device_name",
         "creation_date",
         "modification_date",
-        "last_position_at",
-        "last_position",
+        "last_location_datetime",
+        "last_coordinates",
         "location_count",
         "battery_level",
         "competitor_count",
@@ -250,12 +250,15 @@ class DeviceAdmin(admin.ModelAdmin):
     def competitor_count(self, obj):
         return obj.competitor_count
 
-    def last_position_at(self, obj):
+    def last_location_datetime(self, obj):
         return obj._last_location_datetime
+
+    def last_coordinates(self, obj):
+        return obj._last_location_latitude, obj._last_location_longitude
 
     location_count.admin_order_field = "_location_count"
     competitor_count.admin_order_field = "competitor_count"
-    last_position_at.admin_order_field = "_last_location_datetime"
+    last_location_datetime.admin_order_field = "_last_location_datetime"
 
     def clean_positions(self, request, queryset):
         for obj in queryset:

@@ -1226,10 +1226,10 @@ def device_info(request, device_id):
         {
             "id": device.aid,
             "last_position": {
-                "timestamp": device.last_position_timestamp,
+                "timestamp": device.last_location_timestamp,
                 "coordinates": {
-                    "latitude": device.last_position[0],
-                    "longitude": device.last_position[1],
+                    "latitude": device.last_location[LOCATION_LATITUDE_INDEX],
+                    "longitude": device.last_location[LOCATION_LONGITUDE_INDEX],
                 },
             }
             if device.last_location
