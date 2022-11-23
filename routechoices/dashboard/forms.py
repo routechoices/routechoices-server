@@ -379,9 +379,21 @@ class UploadKmzForm(Form):
 
 
 CompetitorFormSet = inlineformset_factory(
-    Event, Competitor, form=CompetitorForm, extra=1, min_num=0, max_num=None, validate_min=True
+    Event,
+    Competitor,
+    form=CompetitorForm,
+    extra=1,
+    min_num=0,
+    max_num=None,
+    validate_min=True,
 )
 
 ExtraMapFormSet = inlineformset_factory(
-    Event, MapAssignation, form=ExtraMapForm, extra=1, min_num=0, max_num=None, validate_min=True
+    Event,
+    MapAssignation,
+    form=ExtraMapForm,
+    extra=1,
+    min_num=0,
+    max_num=None,
+    validate_min=True,
 )
