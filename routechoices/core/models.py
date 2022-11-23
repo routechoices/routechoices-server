@@ -866,6 +866,7 @@ class Event(models.Model):
     event_set = models.ForeignKey(
         EventSet,
         null=True,
+        blank=True,
         verbose_name="Event Set",
         related_name="events",
         on_delete=models.CASCADE,
