@@ -291,6 +291,7 @@ def check_txt_record(domain):
         resp = requests.get(
             f"https://cloudflare-dns.com/dns-query?type=TXT&name={requests.utils.quote(domain)}",
             headers={"accept": "application/dns-json"},
+            timeout=10,
         )
     except Exception:
         return False
@@ -322,6 +323,7 @@ def check_cname_record(domain):
         resp = requests.get(
             f"https://cloudflare-dns.com/dns-query?type=CNAME&name={requests.utils.quote(domain)}",
             headers={"accept": "application/dns-json"},
+            timeout=10,
         )
     except Exception:
         return False

@@ -643,7 +643,7 @@ def map_kmz_upload_view(request):
                                     "User-Agent": "Python3/Requests/Routechoices.com",
                                 }
                             )
-                            r = requests.get(image_path, headers=headers)
+                            r = requests.get(image_path, headers=headers, timeout=10)
                             if r.status_code != 200:
                                 raise Exception("Could not reach image source")
                             dest.write(r.content)
@@ -687,7 +687,9 @@ def map_kmz_upload_view(request):
                                         "User-Agent": "Python3/Requests/Routechoices.com",
                                     }
                                 )
-                                r = requests.get(image_path, headers=headers)
+                                r = requests.get(
+                                    image_path, headers=headers, timeout=10
+                                )
                                 if r.status_code != 200:
                                     raise Exception("Could not reach image source")
                                 dest.write(r.content)
