@@ -296,7 +296,7 @@ def club_create_view(request):
             club.save()
             form.save_m2m()
             messages.success(request, "Club created successfully")
-            return redirect("dashboard:club_select_view")
+            return redirect("dashboard:club_set_view", club_id=club.aid)
     else:
         form = ClubForm(initial={"admins": request.user})
     form.fields["admins"].queryset = User.objects.filter(id=request.user.id)
