@@ -889,7 +889,6 @@ def event_create_view(request):
         form = EventForm(request.POST, request.FILES, club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        form.fields["event_set"].required = False
         formset = CompetitorFormSet(request.POST)
         extra_map_formset = ExtraMapFormSet(request.POST)
         for mform in extra_map_formset.forms:
@@ -943,7 +942,6 @@ def event_create_view(request):
         form = EventForm(club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        form.fields["event_set"].required = False
         formset = CompetitorFormSet()
         extra_map_formset = ExtraMapFormSet()
         for mform in extra_map_formset.forms:
@@ -1019,7 +1017,6 @@ def event_edit_view(request, event_id):
         form = EventForm(request.POST, request.FILES, instance=event, club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        form.fields["event_set"].required = False
         extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
@@ -1085,7 +1082,6 @@ def event_edit_view(request, event_id):
         form = EventForm(instance=event, club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        form.fields["event_set"].required = False
         formset_qs = Competitor.objects.none() if not use_competitor_formset else None
         formset_args = {}
         if not use_competitor_formset:
