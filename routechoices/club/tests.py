@@ -55,29 +55,29 @@ class ClubViewsTestCase(LiveServerTestCase):
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/does-not-exist")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Page does not exist" in response.content.decode())
+        self.assertIn("Page does not exist", response.content.decode())
 
     def test_no_event_pages_loads(self):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-69/")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Event not found" in response.content.decode())
+        self.assertIn("Event not found", response.content.decode())
         response = self.client.get(f"{self.live_server_url}/kiila-cup-69/export")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Event not found" in response.content.decode())
+        self.assertIn("Event not found", response.content.decode())
         response = self.client.get(f"{self.live_server_url}/kiila-cup-69/contribute")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Event not found" in response.content.decode())
+        self.assertIn("Event not found", response.content.decode())
         response = self.client.get(
             f"{self.live_server_url}/kiila-cup-69/does-not-exist"
         )
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Page does not exist" in response.content.decode())
+        self.assertIn("Page does not exist", response.content.decode())
 
     def test_custom_domain_loads(self):
         client = Client(HTTP_HOST="gpstracking.kiilat.com")
         response = client.get(f"{self.live_server_url}")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Page does not exist" in response.content.decode())
+        self.assertIn("Page does not exist", response.content.decode())
 
         self.club.domain = "gpstracking.kiilat.com"
         self.club.save()
@@ -88,11 +88,11 @@ class ClubViewsTestCase(LiveServerTestCase):
         client = Client(HTTP_HOST="haldensk.routechoices.dev:8081")
         response = client.get(f"{self.live_server_url}/kiila-cup-69/does-not-exist")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Page does not exist" in response.content.decode())
+        self.assertIn("Page does not exist", response.content.decode())
 
         response = client.get(f"{self.live_server_url}")
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("Club not found" in response.content.decode())
+        self.assertIn("Club not found", response.content.decode())
 
     def test_future_event_pages_loads(self):
         Event.objects.create(

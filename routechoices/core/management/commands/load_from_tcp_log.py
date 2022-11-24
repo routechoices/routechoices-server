@@ -15,7 +15,7 @@ def process_file(file_path):
     devices = {}
     new_locs = {}
     print(file_path)
-    with open(file_path, "r") as fp:
+    with open(file_path, "r", encoding="utf-8") as fp:
         while line := fp.readline():
             if ", " not in line:
                 continue
@@ -83,7 +83,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for i in range(5, 0, -1):
-            file_path = os.path.join(settings.BASE_DIR, "logs", "tcp.log.{i}")
+            file_path = os.path.join(settings.BASE_DIR, "logs", f"tcp.log.{i}")
             if os.path.exists(file_path):
                 process_file(file_path)
         file_path = os.path.join(settings.BASE_DIR, "logs", "tcp.log")

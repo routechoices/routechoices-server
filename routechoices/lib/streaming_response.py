@@ -9,7 +9,7 @@ from django.http import StreamingHttpResponse
 range_re = re.compile(r"bytes\s*=\s*(\d+)\s*-\s*(\d*)", re.I)
 
 
-class RangeFileWrapper(object):
+class RangeFileWrapper:
     def __init__(self, filelike, blksize=8192, offset=0, length=None):
         self.filelike = filelike
         self.filelike.seek(offset, os.SEEK_SET)
@@ -63,7 +63,7 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
             **kwargs,
         )
         resp["Content-Length"] = str(length)
-        resp["Content-Range"] = "bytes %s-%s/%s" % (first_byte, last_byte, size)
+        resp["Content-Range"] = f"bytes {first_byte}-{last_byte}/{size}"
     else:
         resp = StreamingHttpResponse(
             FileWrapper(fileIO), content_type=content_type, **kwargs

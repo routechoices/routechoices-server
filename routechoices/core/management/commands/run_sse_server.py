@@ -158,7 +158,7 @@ class SubscriptionManager:
 
     def __init__(self, loop=None):
         self.redis = None
-        self.subscriptions = dict()
+        self.subscriptions = {}
         self.loop = loop or asyncio.get_event_loop()
 
     async def connect(self):
