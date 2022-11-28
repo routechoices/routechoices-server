@@ -143,11 +143,11 @@ body {
 #myFooter .social-icons {
   float: right;
 }
-#myFooter .facebook:hover {
-  color: #0077e2;
+#myFooter .github:hover {
+  color: #ffffff;
 }
-#myFooter .google:hover {
-  color: #ef1a1a;
+#myFooter .instagram:hover {
+  color: #c226cd;
 }
 #myFooter .twitter:hover {
   color: #00aced;
