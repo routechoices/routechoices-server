@@ -133,7 +133,7 @@ class DeviceForm(Form):
         help_text="Enter the device ID of the tracker",
         queryset=Device.objects.all(),
     )
-    nickname = CharField(max_length=8)
+    nickname = CharField(max_length=12)
 
 
 class MapForm(ModelForm):
