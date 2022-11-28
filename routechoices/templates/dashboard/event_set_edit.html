@@ -22,7 +22,7 @@
 </div>
 {% if event_set %}
 <hr/>
-{% if event_set.events %}
+{% if event_set.events.all %}
 <h4>Contains following events</h4>
 <ul>
 {% for event in event_set.events.all %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{event.name}}</a></li>{% endfor %}
