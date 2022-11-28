@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 def domain_is_setup(domain):
-    if settings.ANALYTICS_API_KEY:
+    if not settings.ANALYTICS_API_KEY:
         return False
     r = requests.get(
         f"{settings.ANALYTICS_API_URL}/sites/{domain}",
@@ -14,7 +14,7 @@ def domain_is_setup(domain):
 
 
 def create_domain(domain):
-    if settings.ANALYTICS_API_KEY:
+    if not settings.ANALYTICS_API_KEY:
         return False
     r = requests.post(
         f"{settings.ANALYTICS_API_URL}/sites",
@@ -26,11 +26,11 @@ def create_domain(domain):
 
 
 def create_shared_link(domain, name):
-    if settings.ANALYTICS_API_KEY:
-        return False
+    if not settings.ANALYTICS_API_KEY:
+        return "", False
     if not domain_is_setup(domain):
         if not create_domain(domain):
-            return False
+            return "", False
     r = requests.put(
         f"{settings.ANALYTICS_API_URL}/sites/shared-links",
         headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
@@ -42,12 +42,12 @@ def create_shared_link(domain, name):
     )
     if r.status_code == 200:
         data = r.json()
-        return data.get("url", "")
-    return False
+        return data.get("url", ""), True
+    return "", False
 
 
 def delete_domain(domain):
-    if settings.ANALYTICS_API_KEY:
+    if not settings.ANALYTICS_API_KEY:
         return False
     r = requests.delete(
         f"{settings.ANALYTICS_API_URL}/sites/{domain}",

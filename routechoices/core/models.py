@@ -188,9 +188,11 @@ Follow our events live or replay them later.
                     self.analytics_site = ""
         self.slug = self.slug.lower()
         if not self.analytics_site:
-            self.analytics_site = plausible.create_shared_link(
+            analytics_site, created = plausible.create_shared_link(
                 self.analytics_domain, self.name
             )
+            if created:
+                self.analytics_site = analytics_site
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
