@@ -124,7 +124,7 @@ class TMT250Decoder:
                 if avl_id == 113:
                     self.battery_level = buffer[pointer + 1 + i * 2]
                 if avl_id == 236:
-                    self.alarm_triggered = True
+                    self.alarm_triggered = buffer[pointer + 1 + i * 2]
             pointer += n1 * 2
 
             n2 = buffer[pointer]
