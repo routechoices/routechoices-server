@@ -40,8 +40,6 @@ def events_view(request):
             selected_year = int(selected_year)
         except Exception:
             raise BadRequest("Invalid year")
-        if selected_year not in years:
-            raise Http404()
     if selected_year:
         event_list = event_list.filter(start_date__year=selected_year)
         months = list(

@@ -19,6 +19,7 @@ import magic
 import numpy as np
 import orjson as json
 import redis
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
@@ -26,6 +27,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile, File
+from django.core.mail import EmailMessage
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_delete
@@ -1343,6 +1345,26 @@ class Device(models.Model):
         ):
             return self.original_ref.original
         return None
+
+    def send_sos(self, lat, lon):
+        competitor = self.get_competitor(at=now(), load_event=True)
+        if not competitor:
+            return None
+        event = competitor.event
+        club = event.club
+        to_emails = []
+        for user in club.admins.all():
+            to_email = EmailAddress.objects.get_primary(user) or user.email
+            to_emails.append(to_email)
+        if to_emails:
+            msg = EmailMessage(
+                f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name}",
+                f"Competitor {competitor.name} has triggered the SOS button of his GPS tracker during event {event.name}\nHis location is Latitude, Longitude: {lat}, {lon}",
+                settings.DEFAULT_FROM_EMAIL,
+                to_emails,
+            )
+            msg.send()
+        return to_emails
 
 
 @receiver(post_save, sender=Device)

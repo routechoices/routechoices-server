@@ -89,6 +89,7 @@ class TMT250Decoder:
     def __init__(self):
         self.packet = {}
         self.battery_level = None
+        self.alarm_triggered = False
 
     def generate_response(self, success=True):
         s = self.packet["num_data"] if success else 0
@@ -110,6 +111,7 @@ class TMT250Decoder:
         remaining_data = self.packet["num_data"]
         self.packet["records"] = []
         pointer = 10
+        self.alarm_triggered = False
         while remaining_data > 0:
             timestamp = unpack(">Q", buffer[pointer : pointer + 8])[0] / 1e3
             lon = unpack(">i", buffer[pointer + 9 : pointer + 13])[0] / 1e7
@@ -121,6 +123,8 @@ class TMT250Decoder:
                 avl_id = buffer[pointer + i * 2]
                 if avl_id == 113:
                     self.battery_level = buffer[pointer + 1 + i * 2]
+                if avl_id == 236:
+                    self.alarm_triggered = True
             pointer += n1 * 2
 
             n2 = buffer[pointer]
@@ -235,6 +239,14 @@ class TMT250Connection:
                 self.db_device.user_agent = "Teltonika"
             if self.decoder.battery_level:
                 self.db_device.battery_level = self.decoder.battery_level
+            if self.alarm_triggered:
+                sent_to = await sync_to_async(
+                    self.db_device.send_sos, thread_sensitive=True
+                )(loc_array[0][1], loc_array[0][2])
+                print(
+                    f"Sending SOS {loc_array[0][1]}, {loc_array[0][2]} to {sent_to}",
+                    flush=True,
+                )
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
@@ -352,6 +364,13 @@ class QueclinkConnection:
                     else:
                         pts.append((tim, lat, lon))
                 batt = int(parts[-3])
+                if parts[0][8:] == "SOS":
+                    sent_to = await sync_to_async(
+                        self.db_device.send_sos, thread_sensitive=True
+                    )(pts[0][1], pts[0][2])
+                    print(
+                        f"Sending SOS {pts[0][1]}, {pts[0][2]} to {sent_to}", flush=True
+                    )
                 await self.on_data(pts, batt)
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii"))
@@ -572,6 +591,7 @@ class MicTrackConnection:
 
     async def _process_data(self, data):
         imei = data[1]
+        sos_triggered = data[4] == "SOS"
         if imei != self.imei:
             return False
         gps_data = data[6].split(",")
@@ -609,6 +629,11 @@ class MicTrackConnection:
         except Exception:
             print("Invalid battery level value", flush=True)
             pass
+        if sos_triggered:
+            sent_to = await sync_to_async(
+                self.db_device.send_sos, thread_sensitive=True
+            )(lat, lon)
+            print(f"Sending SOS {lat}, {lon} to {sent_to}", flush=True)
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             [(tim, lat, lon)]
         )
@@ -623,6 +648,7 @@ class MicTrackConnection:
             print("Not GPS data", flush=True)
             return False
         gps_data = data[4].split("+")
+        sos_triggered = gps_data[6] == "5"
         batt_volt = gps_data[7]
         try:
             tim = arrow.get(gps_data[1], "YYMMDDHHmmss").int_timestamp
@@ -642,6 +668,11 @@ class MicTrackConnection:
         except Exception:
             print("Invalid battery level value", flush=True)
             pass
+        if sos_triggered:
+            sent_to = await sync_to_async(
+                self.db_device.send_sos, thread_sensitive=True
+            )(lat, lon)
+            print(f"Sending SOS {lat}, {lon} to {sent_to}", flush=True)
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             [(tim, lat, lon)]
         )
