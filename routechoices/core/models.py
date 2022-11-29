@@ -1374,7 +1374,7 @@ class Device(models.Model):
                 list(to_emails),
             )
             msg.send()
-        return to_emails
+        return list(to_emails)
 
 
 @receiver(post_save, sender=Device)
