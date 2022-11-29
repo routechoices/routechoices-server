@@ -116,7 +116,7 @@ class TMT250Decoder:
             timestamp = unpack(">Q", buffer[pointer : pointer + 8])[0] / 1e3
             lon = unpack(">i", buffer[pointer + 9 : pointer + 13])[0] / 1e7
             lat = unpack(">i", buffer[pointer + 13 : pointer + 17])[0] / 1e7
-
+            print("😘", flush=True)
             n1 = buffer[pointer + 26]
             pointer += 27
             for i in range(n1):
@@ -124,6 +124,7 @@ class TMT250Decoder:
                 if avl_id == 113:
                     self.battery_level = buffer[pointer + 1 + i * 2]
                 if avl_id == 236:
+                    print("🥳", flush=True)
                     self.alarm_triggered = buffer[pointer + 1 + i * 2]
             pointer += n1 * 2
 
@@ -239,7 +240,7 @@ class TMT250Connection:
                 self.db_device.user_agent = "Teltonika"
             if self.decoder.battery_level:
                 self.db_device.battery_level = self.decoder.battery_level
-            if self.alarm_triggered:
+            if self.decoder.alarm_triggered:
                 sent_to = await sync_to_async(
                     self.db_device.send_sos, thread_sensitive=True
                 )(loc_array[0][1], loc_array[0][2])
