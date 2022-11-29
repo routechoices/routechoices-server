@@ -1357,21 +1357,21 @@ class Device(models.Model):
             return None
         event = competitor.event
         club = event.club
-        to_emails = []
 
+        to_emails = set()
         if event.emergency_contact:
-            to_emails.append(event.emergency_contact)
-
-        for user in club.admins.all():
-            to_email = EmailAddress.objects.get_primary(user) or user.email
-            to_emails.append(to_email)
+            to_emails.add(event.emergency_contact)
+        else:
+            for user in club.admins.all():
+                to_email = EmailAddress.objects.get_primary(user) or user.email
+                to_emails.add(to_email)
 
         if to_emails:
             msg = EmailMessage(
                 f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name}",
                 f"Competitor {competitor.name} has triggered the SOS button of his GPS tracker during event {event.name}\nHis location is Latitude, Longitude: {lat}, {lon}",
                 settings.DEFAULT_FROM_EMAIL,
-                to_emails,
+                list(to_emails),
             )
             msg.send()
         return to_emails
