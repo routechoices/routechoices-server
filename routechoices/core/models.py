@@ -1351,12 +1351,12 @@ class Device(models.Model):
             return self.original_ref.original
         return None
 
-    def send_sos(self, lat, lon):
+    def send_sos(self):
         competitor = self.get_competitor(at=now(), load_event=True)
+        _, lat, lon = self.last_location
         if not competitor:
-            return None
+            return self.aid, lat, lon, None
         event = competitor.event
-
         to_emails = set()
         if event.emergency_contact:
             to_emails.add(event.emergency_contact)
@@ -1368,12 +1368,14 @@ class Device(models.Model):
         if to_emails:
             msg = EmailMessage(
                 f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name} [{now().isoformat()}]",
-                f"Competitor {competitor.name} has triggered the SOS button of his GPS tracker during event {event.name}\nHis location is Latitude, Longitude: {lat}, {lon}",
+                f"""Competitor {competitor.name} has triggered the SOS button of his GPS tracker during event {event.name}
+
+His latest known location is latitude, longitude: {lat}, {lon}""",
                 settings.DEFAULT_FROM_EMAIL,
                 list(to_emails),
             )
             msg.send()
-        return list(to_emails)
+        return self.aid, lat, lon, list(to_emails)
 
 
 @receiver(post_save, sender=Device)

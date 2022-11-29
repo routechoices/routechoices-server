@@ -204,7 +204,7 @@ class TMT250Connection:
             raise Exception("zeroes should be 0")
         self.packet_length = unpack(">i", data[4:8])[0] + 4
         self.buffer = bytes(data)
-        await self._on_full_data(self.buffer)
+        await self._on_full_data()
 
     async def _on_write_complete(self):
         if not self.stream.reading():
@@ -224,7 +224,7 @@ class TMT250Connection:
     def _on_close(self):
         print("client quit", self.address)
 
-    async def _on_full_data(self, data):
+    async def _on_full_data(self):
         try:
             decoded = self.decoder.decode_alv(self.buffer)
         except Exception:
@@ -238,18 +238,19 @@ class TMT250Connection:
                 self.db_device.user_agent = "Teltonika"
             if self.decoder.battery_level:
                 self.db_device.battery_level = self.decoder.battery_level
-            if self.decoder.alarm_triggered:
-                sent_to = await sync_to_async(
-                    self.db_device.send_sos, thread_sensitive=True
-                )(loc_array[0][1], loc_array[0][2])
-                print(
-                    f"Sending SOS {loc_array[0][1]}, {loc_array[0][2]} to {sent_to}",
-                    flush=True,
-                )
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
+            print(f"{len(loc_array)} locations wrote to DB", flush=True)
             self.waiting_for_content = True
+            if self.decoder.alarm_triggered:
+                sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
+                    self.db_device.send_sos, thread_sensitive=True
+                )()
+                print(
+                    f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                    flush=True,
+                )
             await self.stream.write(self.decoder.generate_response())
 
 
@@ -363,14 +364,15 @@ class QueclinkConnection:
                     else:
                         pts.append((tim, lat, lon))
                 batt = int(parts[-3])
-                if parts[0][8:] == "SOS":
-                    sent_to = await sync_to_async(
-                        self.db_device.send_sos, thread_sensitive=True
-                    )(pts[0][1], pts[0][2])
-                    print(
-                        f"Sending SOS {pts[0][1]}, {pts[0][2]} to {sent_to}", flush=True
-                    )
                 await self.on_data(pts, batt)
+                if parts[0][8:] == "SOS":
+                    sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
+                        self.db_device.send_sos, thread_sensitive=True
+                    )()
+                    print(
+                        f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                        flush=True,
+                    )
             elif parts[0] == "+ACK:GTHBD":
                 self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii"))
             elif parts[0][:8] == "+RESP:GT" and parts[0][8:] == "INF":
@@ -628,15 +630,18 @@ class MicTrackConnection:
         except Exception:
             print("Invalid battery level value", flush=True)
             pass
-        if sos_triggered:
-            sent_to = await sync_to_async(
-                self.db_device.send_sos, thread_sensitive=True
-            )(lat, lon)
-            print(f"Sending SOS {lat}, {lon} to {sent_to}", flush=True)
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             [(tim, lat, lon)]
         )
         print("1 location wrote to DB", flush=True)
+        if sos_triggered:
+            sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
+                self.db_device.send_sos, thread_sensitive=True
+            )()
+            print(
+                f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                flush=True,
+            )
 
     async def _process_data2(self, data):
         imei = data[2]
@@ -667,15 +672,18 @@ class MicTrackConnection:
         except Exception:
             print("Invalid battery level value", flush=True)
             pass
-        if sos_triggered:
-            sent_to = await sync_to_async(
-                self.db_device.send_sos, thread_sensitive=True
-            )(lat, lon)
-            print(f"Sending SOS {lat}, {lon} to {sent_to}", flush=True)
         await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
             [(tim, lat, lon)]
         )
         print("1 location wrote to DB", flush=True)
+        if sos_triggered:
+            sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
+                self.db_device.send_sos, thread_sensitive=True
+            )()
+            print(
+                f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                flush=True,
+            )
 
     async def _read_line(self):
         try:
