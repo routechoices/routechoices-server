@@ -116,7 +116,6 @@ class TMT250Decoder:
             timestamp = unpack(">Q", buffer[pointer : pointer + 8])[0] / 1e3
             lon = unpack(">i", buffer[pointer + 9 : pointer + 13])[0] / 1e7
             lat = unpack(">i", buffer[pointer + 13 : pointer + 17])[0] / 1e7
-            print("😘", flush=True)
             n1 = buffer[pointer + 26]
             pointer += 27
             for i in range(n1):
@@ -124,7 +123,6 @@ class TMT250Decoder:
                 if avl_id == 113:
                     self.battery_level = buffer[pointer + 1 + i * 2]
                 if avl_id == 236:
-                    print("🥳", flush=True)
                     self.alarm_triggered = buffer[pointer + 1 + i * 2]
             pointer += n1 * 2
 
