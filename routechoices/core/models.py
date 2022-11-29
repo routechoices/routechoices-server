@@ -875,6 +875,11 @@ class Event(models.Model):
         related_name="events",
         on_delete=models.CASCADE,
     )
+    emergency_contact = models.EmailField(
+        null=True,
+        blank=True,
+        help_text="Email address of a person available to respond in the case a competitor carrying a GPS tracker with SOS feature enabled triggers the SOS button.",
+    )
 
     class Meta:
         ordering = ["-start_date", "name"]
@@ -1353,9 +1358,14 @@ class Device(models.Model):
         event = competitor.event
         club = event.club
         to_emails = []
+
+        if event.emergency_contact:
+            to_emails.append(event.emergency_contact)
+
         for user in club.admins.all():
             to_email = EmailAddress.objects.get_primary(user) or user.email
             to_emails.append(to_email)
+
         if to_emails:
             msg = EmailMessage(
                 f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name}",

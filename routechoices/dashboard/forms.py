@@ -207,6 +207,7 @@ class EventForm(ModelForm):
             "privacy",
             "send_interval",
             "tail_length",
+            "emergency_contact",
             "backdrop_map",
             "map",
             "map_title",
