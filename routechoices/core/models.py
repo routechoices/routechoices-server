@@ -1353,7 +1353,10 @@ class Device(models.Model):
 
     def send_sos(self):
         competitor = self.get_competitor(at=now(), load_event=True)
-        _, lat, lon = self.last_location
+        lat = None
+        lon = None
+        if self.last_location:
+            _, lat, lon = self.last_location
         if not competitor:
             return self.aid, lat, lon, None
         event = competitor.event
