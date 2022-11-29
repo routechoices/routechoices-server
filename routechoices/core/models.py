@@ -1352,13 +1352,17 @@ class Device(models.Model):
         return None
 
     def send_sos(self):
-        competitor = self.get_competitor(at=now(), load_event=True)
         lat = None
         lon = None
+
+        competitor = self.get_competitor(at=now(), load_event=True)
+
         if self.last_location:
             _, lat, lon = self.last_location
+
         if not competitor:
             return self.aid, lat, lon, None
+
         event = competitor.event
         to_emails = set()
         if event.emergency_contact:
@@ -1368,6 +1372,7 @@ class Device(models.Model):
             for user in club.admins.all():
                 to_email = EmailAddress.objects.get_primary(user) or user.email
                 to_emails.add(to_email)
+
         if to_emails:
             msg = EmailMessage(
                 f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name} [{now().isoformat()}]",
@@ -1378,6 +1383,7 @@ His latest known location is latitude, longitude: {lat}, {lon}""",
                 list(to_emails),
             )
             msg.send()
+
         return self.aid, lat, lon, list(to_emails)
 
 
