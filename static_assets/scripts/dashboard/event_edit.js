@@ -48,9 +48,33 @@ function onAddedCompetitorRow(row) {
       lastDeviceSelectInput = new TomSelect(el, seletizeOptions);
     });
 
+  u(row)
+    .find('input[id$="-start_time"]')
+    .each(function (el) {
+      var localTimeDisplay = u(el).parent().find(".local_time");
+      localTimeDisplay.before(
+        '<button class="set_time_now_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-clock"></i> Set Now</button>'
+      );
+      u(el)
+        .parent()
+        .find(".set_time_now_btn")
+        .on("click", function (e) {
+          e.preventDefault();
+          var target = u(e.target)
+            .parent()
+            .parent()
+            .find('input[id$="-start_time"]');
+          target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+          target.trigger("change");
+        });
+    });
+
   u(el).attr("autocomplete", "off");
   showLocalTime(el);
   el.addEventListener(tempusDominus.Namespace.events.change, function (e) {
+    showLocalTime(e.target);
+  });
+  u(el).on("change", function (e) {
     showLocalTime(e.target);
   });
 }
@@ -136,15 +160,13 @@ function onCsvParsed(result) {
 
 function showLocalTime(el) {
   var val = u(el).val();
+  var local = "";
   if (val) {
-    var local = dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss");
-    u(el)
-      .parent()
-      .find(".local_time")
-      .text(local + " Local time");
-  } else {
-    u(el).parent().find(".local_time").text("");
+    local =
+      dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss") +
+      " Local time";
   }
+  u(el).parent().find(".local_time").text(local);
 }
 
 (function () {
@@ -250,6 +272,21 @@ function showLocalTime(el) {
   });
   u(".datetimepicker").each(function (el) {
     u(el).attr("autocomplete", "off");
+
+    var localTimeDisplay = u(el).parent().find(".local_time");
+    localTimeDisplay.before(
+      '<button class="set_time_now_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-clock"></i> Set Now</button>'
+    );
+    u(el)
+      .parent()
+      .find(".set_time_now_btn")
+      .on("click", function (e) {
+        e.preventDefault();
+        var target = u(e.target).parent().parent().find(".datetimepicker");
+        target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
+        target.trigger("change");
+      });
+
     showLocalTime(el);
     el.addEventListener(tempusDominus.Namespace.events.change, function (e) {
       var elId = u(e.target).attr("id");
@@ -258,6 +295,9 @@ function showLocalTime(el) {
       ).filter(function (_e) {
         return u(_e).attr("id") != elId;
       }).nodes;
+      showLocalTime(e.target);
+    });
+    u(el).on("change", function (e) {
       showLocalTime(e.target);
     });
   });
@@ -312,18 +352,5 @@ function showLocalTime(el) {
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
     });
 
-  ["id_start_date", "id_end_date"].forEach((id) => {
-    u('[for="' + id + '"]').after(
-      '<button id="set_' +
-        id +
-        '_now_btn" class="btn btn-info btn-sm" style="padding: 3px 8px;margin-left: 15px;"><i class="fa-solid fa-clock"></i> Set Now</button>'
-    );
-    u("#set_" + id + "_now_btn").on("click", function (e) {
-      e.preventDefault();
-      var el = u("#" + id);
-      el.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
-      el.trigger("change");
-    });
-  });
   u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
 })();
