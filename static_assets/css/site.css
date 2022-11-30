@@ -79,7 +79,7 @@ body {
   width: auto;
   height: auto;
   z-index: -100;
-  background: rgb(20, 30, 50, 0.5);
+  background: rgb(20, 30, 50, 0.6);
 }
 .video_text_overlay {
   color: #eee;
