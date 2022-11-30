@@ -2,18 +2,47 @@
 {% load static %}{% load hosts %}
 
 {% block content %}
-<video poster="{% static 'background.jpg'%}" class="bg_video" playsinline autoplay muted loop>
-  <source src="{% static 'background.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
-  <source src="{% static 'background.mp4'%}" type="video/mp4">
-  <source src="{% static 'background.webm'%}" type="video/webm">
-</video>
-<div class="video_cover"></div>
-<div class="row" style="text-align: center">
+  <video poster="{% static 'background.jpg'%}" class="bg_video" playsinline autoplay muted loop>
+    <source src="{% static 'background.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
+    <source src="{% static 'background.mp4'%}" type="video/mp4">
+    <source src="{% static 'background.webm'%}" type="video/webm">
+  </video>
+  <div class="video_cover"></div>
+  <div class="row" style="text-align: center">
     <h1 class="video_text_overlay frontpage_text_bold" style="margin-top: 40px">{{site.name}}</h1>
-    <h1 class="video_text_overlay frontpage_text" style="margin-bottom: -20px">Live GPS tracking solution for orienteering events</h1>
+    <h1 class="video_text_overlay frontpage_text" style="margin-bottom: -20px">Live GPS tracking for orienteering events</h1>
     <p><img src="{% static 'img/iphone.png'%}?v=2022091500" style="max-width:100%;max-height:600px;width: auto;height: auto;" alt="app on phone"/></p>
     <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'site:events_view' %}"><i class="fa-solid fa-person-running"></i> Event list</a></h3>
-    <hr style="color:#fff"/>
+  </div>
+</div>
+<div class="container-fluid frontpage_text" style="background-color: #fff;padding: 20px 5px;margin-bottom:40px">
+  <div class="container">
+    <div class="text-center">
+      <h2 style="margin-bottom:15px"><b>They trust us</b></h2>
+      <div class="row justify-content-between">
+        <div class="col align-self-center text-center">
+          <img src="{% static 'img/kemion_kiilat.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+          <span style="font-weight: bold">Kemiön Kiilat</span>
+        </div>
+        <div class="col align-self-center text-center">
+          <img src="{% static 'img/across_norway.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+          <span style="font-weight: bold">Across Norway</span>
+        </div>
+        <div class="col align-self-center text-center">
+          <img src="{% static 'img/schoolofoutdoors.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+          <span style="font-weight: bold">School of Outdoors</span>
+        </div>
+        <div class="col align-self-center text-center">
+          <img src="{% static 'img/hyvinkaan_rasti.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+          <span style="font-weight: bold">Hyvinkään Rasti</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row" style="text-align: center">
+    <h1 class="video_text_overlay frontpage_text">For clubs</h1>
     {% if user.is_authenticated %}
     <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.</h3>
     <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
