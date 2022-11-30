@@ -158,6 +158,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
               e.preventDefault();
             });
           hideSidebar();
+          u("#export-nav-item").remove();
           preRaceModal.show();
           window.setInterval(function () {
             if (new Date() > startEvent) {
