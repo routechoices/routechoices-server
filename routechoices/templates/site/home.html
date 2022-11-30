@@ -45,9 +45,14 @@
     <h1 class="video_text_overlay frontpage_text">For clubs</h1>
     {% if user.is_authenticated %}
     <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.</h3>
-    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
     {% else %}
     <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.</h3>
+    {% endif %}
+    <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a smartphone with our app or one of the many supported dedicated trackers. Purpose being entertainement, fast analysis, or safety.</h3>
+    <h3 style="margin-bottom:1em; color:#fff" class="frontpage_text">After the event you can replay what happened as many time as you want for deeper analysis.</h3>
+    {% if user.is_authenticated %}
+    <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
+    {% else %}
     <h3 style="margin-bottom:1em" class="frontpage_text"><a style="font-size: 1em;padding: .3em .5em .15em .5em;text-decoration: none;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% host_url 'root_account_signup' host 'www'%}"><i class="fa-solid fa-compass"></i> Join now</a></h3>
     {% endif %}
   </div>
