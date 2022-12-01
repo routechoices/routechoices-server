@@ -56,6 +56,18 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
         e.preventDefault();
       });
     document
+      .querySelector("#sidebar")
+      .addEventListener("touchmove", function (e) {
+        var path = e.composedPath();
+        if (
+          !path.find(function (el) {
+            return el.matches && el.matches("#listCompetitor");
+          })
+        ) {
+          e.preventDefault();
+        }
+      });
+    document
       .querySelector("#myFooter")
       .addEventListener("touchmove", function (e) {
         e.preventDefault();
