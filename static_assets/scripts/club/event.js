@@ -44,6 +44,23 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       u(this).closest(".page-alert").hide();
     });
 
+    document
+      .querySelector(".navbar")
+      .addEventListener("touchmove", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    document
+      .querySelector("#bottom-div")
+      .addEventListener("touchmove", function (e) {
+        e.preventDefault();
+      });
+    document
+      .querySelector("#myFooter")
+      .addEventListener("touchmove", function (e) {
+        e.preventDefault();
+      });
+
     var thumb = document.querySelector("#full_progress_bar");
     thumb.onmousedown = function (event) {
       event.preventDefault();
