@@ -54,9 +54,11 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
       }
       document.addEventListener("mouseup", onMouseUp);
     };
-    thumb.ondragstart = function () {
+    thumb.ondragstart = function (e) {
+      e.preventDefault();
       return false;
     };
+    thumb.addEventListener("touchmove", touchProgressBar);
 
     u(".date-utc").each(function (el) {
       var _el = u(el);

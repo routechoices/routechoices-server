@@ -2203,10 +2203,7 @@ function pressPlayPauseButton(e) {
   playbackPaused = !playbackPaused;
 }
 
-function pressProgressBar(e) {
-  var perc =
-    (e.pageX - document.getElementById("full_progress_bar").offsetLeft) /
-    u("#full_progress_bar").size().width;
+function onMoveProgressBar(perc) {
   if (isRealTime) {
     currentTime =
       getCompetitionStartDate() +
@@ -2223,6 +2220,23 @@ function pressProgressBar(e) {
       getCompetitionStartDate() + getCompetitorsMaxDuration() * perc;
   }
   prevShownTime = currentTime;
+}
+
+function pressProgressBar(e) {
+  var perc =
+    (e.pageX - document.getElementById("full_progress_bar").offsetLeft) /
+    u("#full_progress_bar").size().width;
+  onMoveProgressBar(perc);
+}
+
+function touchProgressBar(e) {
+  var touchLocation = e.targetTouches[0];
+  var perc =
+    (touchLocation.pageX -
+      document.getElementById("full_progress_bar").offsetLeft) /
+    u("#full_progress_bar").size().width;
+  e.preventDefault();
+  onMoveProgressBar(perc);
 }
 
 var connectGpsAttempts;
