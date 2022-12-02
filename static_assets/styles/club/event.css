@@ -44,9 +44,14 @@
   max-height: calc(var(--app-height) - 248px);
 }
 
-.sidebar.replay_mode #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 286px);
-  max-height: calc(var(--app-height) - 286px);
+.sidebar #listOptions {
+  max-height: calc(100vh - 200px);
+  max-height: calc(var(--app-height) - 200px);
+}
+
+.sidebar.replay_mode #listOptions {
+  max-height: calc(100vh - 248px);
+  max-height: calc(var(--app-height) - 225px);
 }
 
 .time_bar {
@@ -158,6 +163,10 @@
   .sidebar.replay_mode #listCompetitor.with_search_bar {
     max-height: calc(100vh - 316px);
     max-height: calc(var(--app-height) - 316px);
+  }
+  .sidebar.replay_mode #listOptions {
+    max-height: calc(100vh - 258px);
+    max-height: calc(var(--app-height) - 258px);
   }
 }
 

@@ -1132,7 +1132,7 @@ var displayOptions = function (ev) {
   searchText = null;
   var mainDiv = u("<div/>");
   mainDiv.append(
-    u('<div style="text-align:right;margin-bottom:-27px"/>').append(
+    u('<div style="text-align:right;"/>').append(
       u('<button class="btn btn-default btn-sm" aria-label="close"/>')
         .html('<i class="fa fa-times"></i>')
         .on("click", displayOptions)
@@ -1151,7 +1151,7 @@ var displayOptions = function (ev) {
     qrDataUrl = qr.toDataURL();
   }
   mainDiv.append(
-    u("<div/>").html(
+    u('<div id="listOptions" style="overflow-y:auto" />').html(
       "<h4>" +
         banana.i18n("tails") +
         "</h4>" +

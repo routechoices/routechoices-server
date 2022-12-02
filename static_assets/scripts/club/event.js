@@ -61,7 +61,10 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
         var path = e.composedPath();
         if (
           !path.find(function (el) {
-            return el.matches && el.matches("#listCompetitor");
+            return (
+              el.matches &&
+              (el.matches("#listCompetitor") || el.matches("#listOptions"))
+            );
           })
         ) {
           e.preventDefault();
