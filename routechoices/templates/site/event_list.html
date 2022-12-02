@@ -52,7 +52,7 @@
   {% for event_set in live_event_sets %}
     <div class="card" style="margin-bottom: 15px;">
       <div class="card-body">
-          {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
+          {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
           {% for event in event_set.events %}
           <div class="d-flex flex-row bd-highlight justify-content-between">
               <div class="p-2 bd-highlight">
@@ -63,7 +63,7 @@
                   <div>
                     Started <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
                   </div>
-                  {% if not club and event_set.fake%}<div>By <a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
+                  {% if not club and event_set.fake%}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
               </div>
               <div class="p-2 bd-highlight" style="border-left: 1px solid rgba(0,0,0,.125); width:320px">
                 {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export</a><br/>{% endif %}
@@ -103,7 +103,7 @@
   {% for event_set in event_sets %}
     <div class="card" style="margin-bottom: 15px;">
         <div class="card-body">
-            {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
+            {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
             {% for event in event_set.events %}
             <div class="d-flex flex-row bd-highlight justify-content-between">
                 <div class="p-2 bd-highlight">
@@ -113,7 +113,7 @@
                     <div>
                       Started <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
                     </div>
-                    {% if not club and event_set.fake %}<div>By <a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
+                    {% if not club and event_set.fake %}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event.club.get_absolute_url }}">{{ event.club.name }}</a></div>{% endif%}
                 </div>
                 <div class="p-2 bd-highlight" style="border-left: 1px solid rgba(0,0,0,.125); width:320px">
                   {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
