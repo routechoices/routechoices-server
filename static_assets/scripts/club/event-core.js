@@ -1151,7 +1151,9 @@ var displayOptions = function (ev) {
     qrDataUrl = qr.toDataURL();
   }
   mainDiv.append(
-    u('<div id="listOptions" style="overflow-y:auto" />').html(
+    u(
+      '<div id="listOptions" style="overflow-y:auto;overflow-x: hidden;" />'
+    ).html(
       "<h4>" +
         banana.i18n("tails") +
         "</h4>" +
