@@ -52,7 +52,7 @@
   {% for event_set in live_event_sets %}
     <div class="card" style="margin-bottom: 15px;">
       <div class="card-body">
-          {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
+          {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event_set.club.logo %}<img src="{{event_set.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
           {% for event in event_set.events %}
           <div class="d-flex flex-row bd-highlight justify-content-between">
               <div class="p-2 bd-highlight">
@@ -103,7 +103,7 @@
   {% for event_set in event_sets %}
     <div class="card" style="margin-bottom: 15px;">
         <div class="card-body">
-            {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event.club.logo %}<img src="{{event.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
+            {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By {% if event_set.club.logo %}<img src="{{event_set.club.logo_url}}" width="25px" height="25px" alt="logo"/> {% endif %}<a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
             {% for event in event_set.events %}
             <div class="d-flex flex-row bd-highlight justify-content-between">
                 <div class="p-2 bd-highlight">
