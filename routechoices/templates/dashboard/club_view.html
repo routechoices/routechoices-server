@@ -24,7 +24,7 @@
 </ul>
 {% block sub_sub_content %}
 <p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
-<p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-at"></i> Custom Domain Management</a></p>
+<p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-link"></i> Custom Domain Management</a></p>
 {% if club.analytics_site %}<p><a href="{{ club.analytics_site }}" class="btn btn-info"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a></p>{% endif %}
 <hr/>
 <h3>Edit info</h3>
