@@ -1739,51 +1739,24 @@ var drawCompetitors = function () {
         competitor.idle = false;
       }
 
-      if (
-        competitor.mapMarker &&
-        ((competitor.hasLiveMarker && !isLiveMode) ||
-          (!competitor.hasLiveMarker && isLiveMode))
-      ) {
-        if (competitor.mapMarker) {
-          map.removeLayer(competitor.mapMarker);
-        }
-        competitor.mapMarker = null;
-        competitor.hasLiveMarker = false;
-      }
-
       if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
         if (!competitor.mapMarker) {
-          var pulseIcon = null;
-          if (isLiveMode) {
-            var liveColor = tinycolor(competitor.color);
-            var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${liveColor.toRgbString()}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
-            pulseIcon = L.icon({
-              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-              iconSize: [40, 40],
-              shadowSize: [40, 40],
-              iconAnchor: [20, 20],
-              shadowAnchor: [0, 0],
-              popupAnchor: [0, 0],
-            });
-            competitor.hasLiveMarker = true;
-          } else {
-            var liveColor = tinycolor(competitor.color).setAlpha(0.75);
-            var isDark = getContrastYIQ(competitor.color) === "dark";
-            var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
-              isDark ? "white" : "black"
-            }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
-            pulseIcon = L.icon({
-              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-              iconSize: [16, 16],
-              shadowSize: [16, 16],
-              iconAnchor: [8, 8],
-              shadowAnchor: [0, 0],
-              popupAnchor: [0, 0],
-            });
-          }
+          var liveColor = tinycolor(competitor.color).setAlpha(0.75);
+          var isDark = getContrastYIQ(competitor.color) === "dark";
+          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+            isDark ? "white" : "black"
+          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+          var runnerIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+            iconSize: [16, 16],
+            shadowSize: [16, 16],
+            iconAnchor: [8, 8],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0],
+          });
           competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
-            { icon: pulseIcon }
+            { icon: runnerIcon }
           );
           competitor.mapMarker.addTo(map);
         } else {
@@ -1968,56 +1941,28 @@ var drawCompetitors = function () {
           }
           competitorInCluster[layerName] = null;
         });
-
-        if (
-          cluster.mapMarker &&
-          ((cluster.hasLiveMarker && !isLiveMode) ||
-            (!cluster.hasLiveMarker && isLiveMode))
-        ) {
-          if (cluster.mapMarker) {
-            map.removeLayer(cluster.mapMarker);
-          }
-          cluster.mapMarker = null;
-          cluster.hasLiveMarker = false;
-        }
-
         if (cluster.mapMarker) {
           cluster.mapMarker.setLatLng([
             clusterCenter.location.latitude,
             clusterCenter.location.longitude,
           ]);
         } else {
-          var pulseIcon = null;
-          if (isLiveMode) {
-            var liveColor = tinycolor(cluster.color);
-            var svgRect = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="${liveColor.toRgbString()}"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>`;
-            pulseIcon = L.icon({
-              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-              iconSize: [40, 40],
-              shadowSize: [40, 40],
-              iconAnchor: [20, 20],
-              shadowAnchor: [0, 0],
-              popupAnchor: [0, 0],
-            });
-            cluster.hasLiveMarker = true;
-          } else {
-            var liveColor = tinycolor(cluster.color).setAlpha(0.75);
-            var isDark = getContrastYIQ(cluster.color) === "dark";
-            var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
-              isDark ? "white" : "black"
-            }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
-            pulseIcon = L.icon({
-              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-              iconSize: [16, 16],
-              shadowSize: [16, 16],
-              iconAnchor: [8, 8],
-              shadowAnchor: [0, 0],
-              popupAnchor: [0, 0],
-            });
-          }
+          var liveColor = tinycolor(cluster.color).setAlpha(0.75);
+          var isDark = getContrastYIQ(cluster.color) === "dark";
+          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+            isDark ? "white" : "black"
+          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+          var runnerIcon = L.icon({
+            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+            iconSize: [16, 16],
+            shadowSize: [16, 16],
+            iconAnchor: [8, 8],
+            shadowAnchor: [0, 0],
+            popupAnchor: [0, 0],
+          });
           cluster.mapMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
-            { icon: pulseIcon }
+            { icon: runnerIcon }
           );
           cluster.mapMarker.addTo(map);
         }
