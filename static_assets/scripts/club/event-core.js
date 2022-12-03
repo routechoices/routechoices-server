@@ -22,6 +22,7 @@ L.Control.Ranking = L.Control.extend({
       "div",
       "leaflet-bar leaflet-control leaflet-control-ranking"
     );
+    u(back).append('<div class="result-name-list"/>');
     back.style.width = "205px";
     back.style.background = "white";
     back.style.padding = "5px";
@@ -34,32 +35,51 @@ L.Control.Ranking = L.Control.extend({
     back.style["font-size"] = "12px";
     L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
     L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
+    L.DomEvent.on(back, "click", L.DomEvent.stopPropagation);
+    L.DomEvent.on(back, "dblclick", L.DomEvent.stopPropagation);
     return back;
   },
 
   setValues: function (ranking) {
-    var el = u(".leaflet-control-ranking");
-    var out = "<h6>" + banana.i18n("ranking") + "</h6>";
+    var el = u(".leaflet-control-ranking").find(".result-name-list");
+    if (
+      u(".leaflet-control-ranking").find(".result-list-title").nodes.length ===
+      0
+    ) {
+      u(".leaflet-control-ranking").prepend(
+        '<div class="result-list-title">' +
+          "<h6>" +
+          banana.i18n("ranking") +
+          "</h6><label>" +
+          banana.i18n("crossing-count") +
+          '</label><br/><input type="number" min="1" id="crossing-time" step="1" value="1" class="cross-count">' +
+          "</div>"
+      );
+    }
+    var innerOut = u('<div class="result-name-list"/>');
     ranking.sort(function (a, b) {
       return getRelativeTime(a.time) - getRelativeTime(b.time);
     });
     ranking.forEach(function (c, i) {
-      out +=
+      innerOut.append(
         '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' +
-        (i + 1) +
-        ' <span style="color: ' +
-        c.competitor.color +
-        '">⬤</span> ' +
-        u("<span/>").text(c.competitor.name).html() +
-        '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px">' +
-        getProgressBarText(c.time) +
-        "</span></div>";
+          (i + 1) +
+          ' <span style="color: ' +
+          c.competitor.color +
+          '">⬤</span> ' +
+          u("<span/>").text(c.competitor.name).html() +
+          '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px" title="' +
+          getProgressBarText(c.time) +
+          '">' +
+          getProgressBarText(c.time) +
+          "</span></div>"
+      );
     });
-    if (out === "<h6>" + banana.i18n("ranking") + "</h6>") {
-      out += "<p>-</p>";
+    if (innerOut.html() === "") {
+      innerOut.append("<div>-</div>");
     }
-    if (el.html() !== out) {
-      el.html(out);
+    if (el.html() !== innerOut.html()) {
+      el.html(innerOut.html());
     }
   },
 
@@ -245,6 +265,7 @@ var prevMapsJSONData = null;
 var mapSelectorLayer = null;
 var sidebarShown = true;
 var isMapMoving = false;
+var oldCrossingForNTimes = 1;
 backdropMaps["blank"] = L.tileLayer(
   'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
   {
@@ -1488,11 +1509,20 @@ var drawCompetitors = function () {
         );
       }
       if (finishLineSet) {
+        if (
+          u("#crossing-time").nodes.length &&
+          oldCrossingForNTimes !== u("#crossing-time").val()
+        ) {
+          oldCrossingForNTimes = u("#crossing-time").val() || 1;
+          oldFinishCrosses = [];
+          finishLineCrosses = [];
+        }
         var allPoints = route.getArray();
         var oldCrossing = oldFinishCrosses.find(function (el) {
           return el.competitor.id === competitor.id;
         });
         var useOldCrossing = false;
+        var crossCount = 0;
         if (oldCrossing) {
           var oldTs = allPoints[oldCrossing.idx].timestamp;
           if (viewedTime >= oldTs) {
@@ -1516,39 +1546,44 @@ var drawCompetitors = function () {
                 )
               )
             ) {
-              var competitorTime = allPoints[oldCrossing.idx].timestamp;
-              if (
-                !isLiveMode &&
-                !isRealTime &&
-                !isCustomStart &&
-                competitor.start_time
-              ) {
-                competitorTime -=
-                  new Date(competitor.start_time) - getCompetitionStartDate();
-              }
-              if (
-                !isLiveMode &&
-                !isRealTime &&
-                isCustomStart &&
-                competitor.custom_offset
-              ) {
-                competitorTime -= Math.max(
-                  0,
-                  new Date(competitor.custom_offset) - getCompetitionStartDate()
-                );
-              }
-              if (getRelativeTime(competitorTime) > 0) {
-                finishLineCrosses.push({
-                  competitor: competitor,
-                  time: competitorTime,
-                  idx: oldCrossing.idx,
-                });
-                useOldCrossing = true;
+              crossCount++;
+              if (crossCount == oldCrossingForNTimes) {
+                var competitorTime = allPoints[oldCrossing.idx].timestamp;
+                if (
+                  !isLiveMode &&
+                  !isRealTime &&
+                  !isCustomStart &&
+                  competitor.start_time
+                ) {
+                  competitorTime -=
+                    new Date(competitor.start_time) - getCompetitionStartDate();
+                }
+                if (
+                  !isLiveMode &&
+                  !isRealTime &&
+                  isCustomStart &&
+                  competitor.custom_offset
+                ) {
+                  competitorTime -= Math.max(
+                    0,
+                    new Date(competitor.custom_offset) -
+                      getCompetitionStartDate()
+                  );
+                }
+                if (getRelativeTime(competitorTime) > 0) {
+                  finishLineCrosses.push({
+                    competitor: competitor,
+                    time: competitorTime,
+                    idx: oldCrossing.idx,
+                  });
+                  useOldCrossing = true;
+                }
               }
             }
           }
         }
         if (!useOldCrossing) {
+          var crossCount = 0;
           for (var i = 1; i < allPoints.length; i++) {
             var tPoint = allPoints[i];
             if (viewedTime < tPoint.timestamp) {
@@ -1571,34 +1606,38 @@ var drawCompetitors = function () {
                 )
               )
             ) {
-              var competitorTime = tPoint.timestamp;
-              if (
-                !isLiveMode &&
-                !isRealTime &&
-                !isCustomStart &&
-                competitor.start_time
-              ) {
-                competitorTime -=
-                  new Date(competitor.start_time) - getCompetitionStartDate();
-              }
-              if (
-                !isLiveMode &&
-                !isRealTime &&
-                isCustomStart &&
-                competitor.custom_offset
-              ) {
-                competitorTime -= Math.max(
-                  0,
-                  new Date(competitor.custom_offset) - getCompetitionStartDate()
-                );
-              }
-              if (getRelativeTime(competitorTime) > 0) {
-                finishLineCrosses.push({
-                  competitor: competitor,
-                  time: competitorTime,
-                  idx: i,
-                });
-                break;
+              crossCount++;
+              if (crossCount == oldCrossingForNTimes) {
+                var competitorTime = tPoint.timestamp;
+                if (
+                  !isLiveMode &&
+                  !isRealTime &&
+                  !isCustomStart &&
+                  competitor.start_time
+                ) {
+                  competitorTime -=
+                    new Date(competitor.start_time) - getCompetitionStartDate();
+                }
+                if (
+                  !isLiveMode &&
+                  !isRealTime &&
+                  isCustomStart &&
+                  competitor.custom_offset
+                ) {
+                  competitorTime -= Math.max(
+                    0,
+                    new Date(competitor.custom_offset) -
+                      getCompetitionStartDate()
+                  );
+                }
+                if (getRelativeTime(competitorTime) > 0) {
+                  finishLineCrosses.push({
+                    competitor: competitor,
+                    time: competitorTime,
+                    idx: i,
+                  });
+                  break;
+                }
               }
             }
           }
@@ -2265,7 +2304,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2022090401`)
+  return fetch(`${langFile}?v=2022120300`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

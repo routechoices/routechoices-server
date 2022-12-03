@@ -38,5 +38,6 @@
     "toggle": "Piilota/Näytä",
     "center": "Keskitä",
     "full-route": "Koko reitti",
-    "follow": "Seuraa"
+    "follow": "Seuraa",
+    "crossing-count": "Ylitysten määrä"
 }

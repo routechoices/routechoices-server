@@ -38,5 +38,6 @@
     "toggle": "Dölj/Visa",
     "center": "Centrera",
     "full-route": "Visa hela gps",
-    "follow": "Följ"
+    "follow": "Följ",
+    "crossing-count": "Antal korsningar"
 }

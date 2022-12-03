@@ -38,5 +38,6 @@
     "toggle": "Verberg/Toon",
     "center": "Centreer",
     "full-route": "Volledige route",
-    "follow": "Volgen"
+    "follow": "Volgen",
+    "crossing-count": "Aantal kruisingen"
 }

@@ -38,5 +38,6 @@
     "toggle": "Cacher/Afficher",
     "center": "Centrer",
     "full-route": "Itinéraire complet",
-    "follow": "Suivre"
+    "follow": "Suivre",
+    "crossing-count": "Nombre d'intersections"
 }

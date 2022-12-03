@@ -38,5 +38,6 @@
     "toggle": "Hide/Show",
     "center": "Center",
     "full-route": "Full route",
-    "follow": "Follow"
+    "follow": "Follow",
+    "crossing-count": "Number of crossings"
 }
