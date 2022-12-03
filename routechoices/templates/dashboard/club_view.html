@@ -23,8 +23,9 @@
 <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:event_list_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}"><i class="fa fa-trophy"></i> Events</a></li>
 </ul>
 {% block sub_sub_content %}
-<p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> {% if club.analytics_site %} <a href="{{ club.analytics_site }}" class="btn btn-success"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a>{% endif %}</p>
-<p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-at"></i> {% if club.domain %}Edit your{% else %}Use a{% endif %} custom domain</a></p>
+<p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
+<p><a class="btn btn-info" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-at"></i> Custom Domain Management</a></p>
+{% if club.analytics_site %}<p><a href="{{ club.analytics_site }}" class="btn btn-info"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a></p>{% endif %}
 <hr/>
 <h3>Edit info</h3>
 <p id="invite-btn"><a class="btn btn-info" href="{% url 'dashboard:club_invite_add_view'%}" ><i class="fa-solid fa-user-plus"></i> Invite more people</a></p>
