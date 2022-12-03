@@ -1228,6 +1228,42 @@ def event_competitors_view(request, event_id):
 
 @login_required
 @requires_club_in_session
+def event_competitors_printer_view(request, event_id):
+    club = request.club
+
+    event = get_object_or_404(
+        Event.objects.all().prefetch_related(
+            "notice", "competitors", "competitors__device"
+        ),
+        aid=event_id,
+    )
+    if event.club != club:
+        club = event.club
+        if not request.user.is_superuser:
+            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
+        else:
+            club = Club.objects.filter(aid=club.aid).first()
+        if not club:
+            return redirect("dashboard:club_select_view")
+        request.club = club
+        request.session["dashboard_club"] = club.aid
+
+    competitors = event.competitors.all()
+    for competitor in competitors:
+        competitor.device_display_str = competitor.device.get_display_str(club)
+    return render(
+        request,
+        "dashboard/event_competitors_printer.html",
+        {
+            "club": club,
+            "event": event,
+            "competitors": competitors,
+        },
+    )
+
+
+@login_required
+@requires_club_in_session
 def event_delete_view(request, event_id):
     club = request.club
 

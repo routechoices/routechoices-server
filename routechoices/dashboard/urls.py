@@ -68,6 +68,11 @@ urlpatterns = [
         name="event_competitors_view",
     ),
     re_path(
+        r"^events/(?P<event_id>[A-Za-z0-9_-]+)/competitors-printer-friendly/?$",
+        views.event_competitors_printer_view,
+        name="event_competitors_printer_view",
+    ),
+    re_path(
         r"^events/(?P<event_id>[A-Za-z0-9_-]+)/delete/?$",
         views.event_delete_view,
         name="event_delete_view",

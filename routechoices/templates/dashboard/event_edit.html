@@ -16,7 +16,6 @@
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
         {% if event %}
         {% if event.shortcut %}
         <div style="display: flex; text-align: center">
@@ -24,16 +23,21 @@
         </div>
         {% endif%}
         <div>
-            <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 3px"><i class="fa fa-sign-in"></i> View</a>
-            {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-save"></i> Export Page</a>{% endif %}
+            <h6>Links for all</h6>
+            <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm" style="margin-bottom: 6px"><i class="fa fa-sign-in"></i> Event Page</a>
+            {% if not event.hidden %}<a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary" style="margin-bottom: 6px"><i class="fa fa-save"></i> Export Page</a>{% endif %}
             {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
-                <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 3px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
+                <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary" style="margin-bottom: 6px"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
             {% endif %}
-            {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary " style="margin-bottom: 3px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
-            {% if event.is_live %} <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 3px"><i class="fa fa-bolt"></i> No Delay Live (Admin Only)</a>{% endif %}
-            {% if event.started %} <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}" class="btn btn-secondary btn-sm" id="upload_route_btn" style="margin-bottom: 3px">Upload Competitors Routes (Admin Only)</a>{% endif %}
+            {% if event.ended and event.map_id %}<a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary " style="margin-bottom: 6px"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
+            <h6>Links for admins</h6>
+            {% if event.is_live %} <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm" style="margin-bottom: 3px"><i class="fa fa-bolt"></i> No Delay Live</a>{% endif %}
+            {% if event.started %} <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}" class="btn btn-secondary btn-sm" id="upload_route_btn" style="margin-bottom: 3px"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>{% endif %}
+            <a href="{% url 'dashboard:event_competitors_printer_view' event_id=event.aid %}" class="btn btn-secondary btn-sm"  style="margin-bottom: 3px"><i class="fa-solid fa-print"></i> Competitor List For Printing</a>
         </div>
+        <hr/>
         {% endif%}
+        <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
