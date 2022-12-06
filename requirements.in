@@ -19,7 +19,7 @@ django-qr-code
 django-s3-storage
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
 djangorestframework
-drf-orjson-renderer @ git+https://github.com/rphlo/drf_orjson_renderer.git
+drf-orjson-renderer
 drf-yasg
 geoip2
 gitpython
