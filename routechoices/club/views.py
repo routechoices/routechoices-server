@@ -63,8 +63,6 @@ def club_view(request, **kwargs):
             selected_year = int(selected_year)
         except Exception:
             raise BadRequest("Invalid year")
-        if selected_year not in years:
-            raise Http404()
     if selected_year:
         event_list = event_list.filter(start_date__year=selected_year)
         months = list(
@@ -76,10 +74,10 @@ def club_view(request, **kwargs):
         if selected_month:
             try:
                 selected_month = int(selected_month)
+                if selected_month < 1 or selected_month > 12:
+                    raise ValueError()
             except Exception:
                 raise BadRequest("Invalid month")
-            if selected_month not in months:
-                raise Http404()
         if selected_month:
             event_list = event_list.filter(start_date__month=selected_month)
 

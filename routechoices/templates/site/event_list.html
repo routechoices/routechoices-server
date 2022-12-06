@@ -5,6 +5,7 @@
 {% load markdownify %}
 {% load index %}
 {% load compress %}
+{% load define_action %}
 
 {% block favicon %}{% if club.logo %}<link rel="icon" type="image/png" href="{{club.logo_url}}">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}?v=20220828">
 <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}?v=20220828">
@@ -30,6 +31,12 @@
 {% endblock %}
 
 {% block content %}
+{% if club %}
+  {% define club.nice_url as home_url %}
+{% else %}
+  {% url 'site:events_view' as home_url %}
+{% endif %}
+
 {% if club %}
 <div class="row">
   <div class="card" style="margin-bottom: 15px;">
@@ -80,22 +87,17 @@
   {% endfor %}
   </div>
   {% endif%}
-  {% if event_sets %}
+  {% if years %}
   <div style="margin-bottom: 15px;">
     <h2>Archived Events</h2>
-    {% if years %}
-      {% if club %}
-        {% if years %}
-          <div>{% if year %}<a href="{{club.nice_url}}">All</a>{% else %}All{% endif%} {% for y in years %} {% if year == y %}{{ y }}{% else %}<a href="{{club.nice_url}}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
-          {% if year %}<div>{% if month %}<a href="{{club.nice_url}}?year={{year}}">All</a>{% else %}All{% endif%} {% for m in months %} {% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{club.nice_url}}?year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>{% endif %}
-        {% endif %}
+      {% if home_url %}
+          <div>{% if year %}<a href="{{home_url}}">All</a>{% else %}All{% endif%}{% for y in years %}&nbsp;{% if year == y %}{{ y }}{% else %}<a href="{{home_url}}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
+          {% if year %}
+          <div>{% if month %}<a href="{{home_url}}?year={{year}}">All</a>{% else %}All{% endif%}{% for m in months %}&nbsp;{% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{home_url}}?year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>
+          {% endif %}
       {% else %}
-        {% if years %}
-          <div>{% if year %}<a href="{% url 'site:events_view' %}">All</a>{% else %}All{% endif%} {% for y in years %} {% if year == y %}{{ y }}{% else %}<a href="{% url 'site:events_view' %}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
-          {% if year %}<div>{% if month %}<a href="{% url 'site:events_view' %}?year={{year}}">All</a>{% else %}All{% endif%} {% for m in months %} {% if month == m %}{{ month_names|index:m }}{% else %}<a href="{% url 'site:events_view' %}?year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>{% endif %}
-        {% endif %}
+          <div>nope</div>
       {% endif %}
-    {% endif %}
   </div>
   {% endif %}
   <div>

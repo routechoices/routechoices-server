@@ -5,7 +5,6 @@ from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractMonth, ExtractYear
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
@@ -51,10 +50,10 @@ def events_view(request):
         if selected_month:
             try:
                 selected_month = int(selected_month)
+                if selected_month < 1 or selected_month > 12:
+                    raise ValueError()
             except Exception:
                 raise BadRequest("Invalid month")
-            if selected_month not in months:
-                raise Http404()
         if selected_month:
             event_list = event_list.filter(start_date__month=selected_month)
 
