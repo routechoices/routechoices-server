@@ -58,7 +58,6 @@ PyPi Packages:
     django                      BSD License
     django-admincommand         UNKNOWN
     django-allauth              MIT License
-    django-allauth-2fa          Apache Software License
     django-background-tasks     BSD License
     django-bootstrap5           BSD License
     django-compressor           MIT License
@@ -77,6 +76,7 @@ PyPi Packages:
     gitpython                   BSD License
     gps-encoding                MIT
     gpxpy                       Apache License, Version 2.0
+    kagi                        BSD-2-Clause license
     numpy                       BSD License
     opencv-python               MIT License
     orjson                      Apache Software License; MIT License

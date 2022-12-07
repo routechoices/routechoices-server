@@ -1,0 +1,30 @@
+{% extends "kagi/base.html" %}
+{% load i18n %}
+{% load django_bootstrap5 %}
+{% block content %}
+{{ block.super }}
+<h3>Add a TOTP (Authenticator) device</h3>
+
+<p>{% trans 'Scan this in your authenticator app:' %}</p>
+
+<a href="{{ otpauth }}">
+{{ qr_svg|safe }}
+</a>
+
+<p>
+  {% trans "Or, if you can't scan a QR Code, enter this key as a time-based account:" %}
+  <br/><a  href="{{ otpauth }}"><tt>{{ base32_key }}</tt></a>
+</p>
+
+<p>
+  {% trans 'Then, enter the token it gives you.' %}
+</p>
+
+<form method="POST">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <input type="hidden" name="base32_key" value="{{ base32_key }}">
+  <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
+</form>
+
+{% endblock %}

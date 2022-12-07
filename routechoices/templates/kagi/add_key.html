@@ -1,0 +1,21 @@
+
+{% extends "kagi/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block sub_content %}
+{{ block.super }}
+<h3>Add WebAuthn Key</h3>
+<p>{% trans 'To add a security key to your account, insert it, tap the button below, and accept the browser prompt to add the key.' %}</p>
+
+<form id="webauthn-provision-form" name="register" method="get">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button id="webauthn-provision-begin" type="submit" class="btn btn-primary">{% trans 'Add WebAuthn Key' %}</button>
+</form>
+
+<a href="{% url 'kagi:two-factor-settings' %}">{% trans '&larr; Back to 2FA settings' %}</a>
+
+<script src="{% static 'scripts/webauthn.js' %}?v=2"></script>
+{% endblock %}

@@ -1,0 +1,29 @@
+
+
+{% extends "kagi/base.html" %}
+{% load i18n %}
+
+{% block content %}
+{{ block.super }}
+<h3>Backup Codes</h3>
+
+{% if object_list %}
+<ul>
+  {% for code in object_list %}
+  <li>{{ code.code }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>
+  <i class="fa fa-warning"></i> You do not have any backup codes!
+</p>
+{% endif %}
+
+<form method="POST">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-primary" value="{% trans 'Create some backup codes' %}">
+</form>
+<p>
+<a href="{% url 'kagi:two-factor-settings' %}">{% trans '&larr; Back to 2FA settings' %}</a>
+</p>
+{% endblock %}

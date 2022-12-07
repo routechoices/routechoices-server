@@ -13,19 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import kagi
 from allauth.account import views as account_views
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path
+from django.views.generic.base import RedirectView
 
-from routechoices import forms, views
 from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 admin.site.site_header = "Routechoices.com Admin"
 admin.site.site_title = "Routechoices.com Admin Site"
 admin.site.index_title = "Welcome to Routechoices.com Administration Site"
-admin.site.login_form = forms.AdminSiteAuthForm
 
 sitemaps = {
     "static": StaticViewSitemap,
@@ -33,15 +33,11 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path(
-        "accounts/two_factor/setup",
-        views.TwoFactorSetup.as_view(),
-        name="two-factor-setup",
-    ),
-    path("accounts/", include("allauth_2fa.urls")),
+    path("mfa/", include("kagi.urls", namespace="kagi")),
+    path("accounts/login/", RedirectView.as_view(url="/login")),
     path("accounts/", include("allauth.urls")),
     path("signup/", account_views.signup, name="root_account_signup"),
-    path("login/", account_views.login, name="root_account_login"),
+    path("login/", kagi.views.login, name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
     path("admin/", admin.site.urls),
     path("invitations/", include("invitations.urls", namespace="invitations")),

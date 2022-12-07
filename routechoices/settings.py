@@ -61,10 +61,7 @@ INSTALLED_APPS = [
     "django_s3_storage",
     "qr_code",
     "compressor",
-    "django_otp",
-    "django_otp.plugins.otp_static",
-    "django_otp.plugins.otp_totp",
-    "allauth_2fa",
+    "kagi",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -186,7 +183,7 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-LOGIN_URL = "//www.routechoices.dev:8081/accounts/login/"
+LOGIN_URL = "https://routechoices.dev:8081/login"
 REDIRECT_ALLOWED_DOMAINS = ["api.routechoices.dev", "www.routechoices.dev"]
 LOGIN_REDIRECT_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = "/"
@@ -1198,7 +1195,6 @@ CSRF_COOKIE_HTTPONLY = False
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
-ALLAUTH_2FA_ALWAYS_REVEAL_BACKUP_TOKENS = False
 
 ANALYTICS_API_KEY = ""
 ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
@@ -1206,6 +1202,9 @@ ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
 REDIS_URL = "redis://redis"
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+RELYING_PARTY_ID = "routechoices.dev"
+RELYING_PARTY_NAME = "Routechoices.dev"
 
 try:
     from .local_settings import *  # noqa: F403, F401

@@ -1,9 +1,9 @@
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.signals import user_logged_in, user_signed_up
-from allauth_2fa.adapter import OTPAdapter
 from django.conf import settings
 
 
-class SiteAccountAdapter(OTPAdapter):
+class SiteAccountAdapter(DefaultAccountAdapter):
     def is_safe_url(self, url):
         try:
             from django.utils.http import url_has_allowed_host_and_scheme

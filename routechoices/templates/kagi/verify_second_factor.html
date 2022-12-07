@@ -1,0 +1,53 @@
+{% extends "kagi/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+{{ block.super }}
+<h3>2FA Verification</h3>
+<p>
+  {% trans 'Please verify one of the authentication methods below.' %}
+</p>
+
+
+{% if forms.webauthn %}
+<form id="webauthn-auth-form">
+    {% csrf_token %}
+    <div id="webauthn-error" style="color: red"></div>
+    <div id="webauthn-feature">
+      <button class="btn btn-primary" id="webauthn-auth-begin" type="submit">
+          {% trans "Tap here to log in with your WebAuthn key" %}
+      </button>
+    </div>
+</form>
+{% endif %}
+
+{% if forms.totp %}
+{% if forms.webauthn %}<hr/>{% endif %}
+<div class="method totp">
+  <p>{% trans 'Enter an Authenticator (TOTP) Token:' %}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {% bootstrap_form forms.totp %}
+    <button class="btn btn-primary" value="totp" name="type">{% trans 'Submit' %}</button>
+  </form>
+</div>
+{% endif %}
+
+{% if forms.backup %}
+{% if forms.webauthn or forms.totp %}<hr/>{% endif %}
+<div class="method backup">
+  <p>{% trans 'Use a backup code:' %}</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form forms.backup %}
+    <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
+  </form>
+</div>
+{% endif %}
+
+<script src="{% static 'scripts/webauthn.js' %}?v=2"></script>
+{% endblock %}

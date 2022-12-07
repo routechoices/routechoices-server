@@ -6,7 +6,6 @@ diskcache
 django
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth
-django-allauth-2fa
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
 django-compressor
@@ -25,6 +24,7 @@ geoip2
 gitpython
 gps-encoding
 gpxpy
+kagi @ git+https://github.com/justinmayer/kagi@ae2fa0da2a0c3bc8473526d00eb3e17a1229597b
 numpy
 opencv-python
 orjson
