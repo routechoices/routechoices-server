@@ -6,7 +6,7 @@ Media:
 ------
 
     Frontpage Video             CC-4.0 Floris Kloet https://livingstills.nl
-    Event list banner           Juuso-Valtteri Kivimäki www.juusovaltteri.com
+    Event list banner           Juuso-Valtteri Kivimäki https://www.juusovaltteri.com
 
 Translations:
 -------------
@@ -81,6 +81,7 @@ PyPi Packages:
     opencv-python               MIT License
     orjson                      Apache Software License; MIT License
     pillow-avif-plugin          MIT License
+    pillow-simd                 HPND License
     pip-tools                   BSD License
     psycopg2                    GNU Library or Lesser General Public License (LGPL)
     python-magic                MIT License
