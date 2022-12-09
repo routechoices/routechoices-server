@@ -462,7 +462,7 @@ var selectLiveMode = function (e) {
       refreshEventData();
     }
     currentTime =
-      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
+      +clock.now() - (fetchPositionInterval + 5 + 18 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     if (window.local.noDelay) {
       currentTime = +clock.now();
     }
