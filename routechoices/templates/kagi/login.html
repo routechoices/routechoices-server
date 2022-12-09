@@ -12,7 +12,7 @@
 <p>{% blocktrans %}Not created an account yet, then please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 
-<form class="login" method="POST" action="{% url 'root_account_login' %}">
+<form class="login" method="POST">
   {% csrf_token %}
   {% bootstrap_form form %}
   <button class="primaryAction btn btn-primary" type="submit">{% trans "Sign In" %}</button>

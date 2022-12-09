@@ -33,12 +33,13 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path("mfa/", include("kagi.urls", namespace="kagi")),
     path("accounts/login/", RedirectView.as_view(url="/login")),
+    path("mfa/login/", RedirectView.as_view(url="/login")),
+    path("mfa/", include("kagi.urls", namespace="kagi")),
     path("accounts/", include("allauth.urls")),
-    path("signup/", account_views.signup, name="root_account_signup"),
     path("login/", kagi.views.login, name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
+    path("signup/", account_views.signup, name="root_account_signup"),
     path("admin/", admin.site.urls),
     path("invitations/", include("invitations.urls", namespace="invitations")),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
