@@ -1294,7 +1294,9 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
 @login_required
 @requires_club_in_session
 def event_route_upload_view(request, event_id):
-    event = get_object_or_404(Event.prefetch_related("competitors"), aid=event_id)
+    event = get_object_or_404(
+        Event.objects.prefetch_related("competitors"), aid=event_id
+    )
     competitors = event.competitors.all().order_by("name")
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
