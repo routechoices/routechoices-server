@@ -62,20 +62,31 @@ DEFAULT_PAGE_SIZE = 25
 
 def requires_club_in_session(function):
     def wrap(request, *args, **kwargs):
-        if kwargs["event_id"] or kwargs["map_id"] or kwargs["event_set_id"]:
-            club = Club.objects.filter(admins=request.user).first()
-        elif "dashboard_club" not in request.session:
-            return redirect("dashboard:club_select_view")
-        else:
-            session_club = request.session["dashboard_club"]
-            if not request.user.is_superuser:
-                club = Club.objects.filter(
-                    admins=request.user, aid=session_club
-                ).first()
+        club = None
+        obj = None
+        if kwargs.get("event_id"):
+            obj = get_object_or_404(Event, aid=kwargs["event_id"])
+        elif kwargs.get("map_id"):
+            obj = get_object_or_404(Map, aid=kwargs["map_id"])
+        elif kwargs.get("event_set_id"):
+            obj = get_object_or_404(EventSet, aid=kwargs["event_set_id"])
+        if obj:
+            club_id = obj.club_id
+            if request.user.is_superuser:
+                club = Club.objects.filter(id=club_id).first()
             else:
-                club = Club.objects.filter(aid=session_club).first()
+                club = Club.objects.filter(admins=request.user, id=club_id).first()
+        elif "dashboard_club" in request.session:
+            session_club_aid = request.session["dashboard_club"]
+            if request.user.is_superuser:
+                club = Club.objects.filter(aid=session_club_aid).first()
+            else:
+                club = Club.objects.filter(
+                    admins=request.user, aid=session_club_aid
+                ).first()
         if not club:
             return redirect("dashboard:club_select_view")
+        request.session["dashboard_club"] = club.aid
         request.club = club
         return function(request, *args, **kwargs)
 
@@ -443,18 +454,7 @@ def map_create_view(request):
 @requires_club_in_session
 def map_edit_view(request, map_id):
     club = request.club
-
     raster_map = get_object_or_404(Map, aid=map_id)
-    if raster_map.club != club:
-        club = raster_map.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -489,18 +489,7 @@ def map_edit_view(request, map_id):
 @requires_club_in_session
 def map_delete_view(request, map_id):
     club = request.club
-
-    raster_map = get_object_or_404(Map, aid=map_id, club=club)
-    if raster_map.club != club:
-        club = raster_map.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+    raster_map = get_object_or_404(Map, aid=map_id)
 
     if request.method == "POST":
         raster_map.delete()
@@ -801,21 +790,11 @@ def event_set_create_view(request):
 @requires_club_in_session
 def event_set_edit_view(request, event_set_id):
     club = request.club
-
     event_set = get_object_or_404(
         EventSet.objects.all().prefetch_related("events"),
         aid=event_set_id,
     )
-    if event_set.club != club:
-        club = event_set.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+
     if request.method == "POST":
         form = EventSetForm(request.POST, instance=event_set, club=club)
         if form.is_valid():
@@ -839,19 +818,8 @@ def event_set_edit_view(request, event_set_id):
 @login_required
 @requires_club_in_session
 def event_set_delete_view(request, event_set_id):
-    club = request.club
-
     event_set = get_object_or_404(EventSet, aid=event_set_id)
-    if event_set.club != club:
-        club = event_set.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+
     if request.method == "POST":
         event_set.delete()
         messages.success(request, "Event set deleted")
@@ -988,23 +956,14 @@ MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
 @requires_club_in_session
 def event_edit_view(request, event_id):
     club = request.club
-
-    map_list = Map.objects.filter(club=club)
-    event_set_list = EventSet.objects.filter(club=club)
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
     )
-    if event.club != club:
-        club = event.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+
+    map_list = Map.objects.filter(club=club)
+    event_set_list = EventSet.objects.filter(club=club)
+
     use_competitor_formset = (
         event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT
     )
@@ -1140,21 +1099,11 @@ COMPETITORS_PAGE_SIZE = 50
 @requires_club_in_session
 def event_competitors_view(request, event_id):
     club = request.club
-
     event = get_object_or_404(
         Event.objects.all().prefetch_related("notice", "competitors"),
         aid=event_id,
     )
-    if event.club != club:
-        club = event.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+
     if event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT:
         raise Http404()
     page = request.GET.get("page", 1)
@@ -1235,23 +1184,12 @@ def event_competitors_view(request, event_id):
 @requires_club_in_session
 def event_competitors_printer_view(request, event_id):
     club = request.club
-
     event = get_object_or_404(
         Event.objects.all().prefetch_related(
             "notice", "competitors", "competitors__device"
         ),
         aid=event_id,
     )
-    if event.club != club:
-        club = event.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
 
     competitors = event.competitors.all()
     for competitor in competitors:
@@ -1270,23 +1208,13 @@ def event_competitors_printer_view(request, event_id):
 @login_required
 @requires_club_in_session
 def event_delete_view(request, event_id):
-    club = request.club
-
     event = get_object_or_404(Event, aid=event_id)
-    if event.club != club:
-        club = event.club
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=club.aid).first()
-        else:
-            club = Club.objects.filter(aid=club.aid).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
-        request.club = club
-        request.session["dashboard_club"] = club.aid
+
     if request.method == "POST":
         event.delete()
         messages.success(request, "Event deleted")
         return redirect("dashboard:event_list_view")
+
     return render(
         request,
         "dashboard/event_delete.html",
@@ -1364,15 +1292,9 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
 
 
 @login_required
+@requires_club_in_session
 def event_route_upload_view(request, event_id):
-    if request.user.is_superuser:
-        event = get_object_or_404(
-            Event,
-            aid=event_id,
-        )
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(Event, aid=event_id, club__in=club_list)
+    event = get_object_or_404(Event.prefetch_related("competitors"), aid=event_id)
     competitors = event.competitors.all().order_by("name")
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
