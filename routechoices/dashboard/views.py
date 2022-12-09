@@ -62,15 +62,20 @@ DEFAULT_PAGE_SIZE = 25
 
 def requires_club_in_session(function):
     def wrap(request, *args, **kwargs):
-        if "dashboard_club" not in request.session:
+        if kwargs["event_id"] or kwargs["map_id"] or kwargs["event_set_id"]:
+            club = Club.objects.filter(admins=request.user).first()
+        elif "dashboard_club" not in request.session:
             return redirect("dashboard:club_select_view")
-        session_club = request.session["dashboard_club"]
-        if not request.user.is_superuser:
-            club = Club.objects.filter(admins=request.user, aid=session_club).first()
         else:
-            club = Club.objects.filter(aid=session_club).first()
-        if not club:
-            return redirect("dashboard:club_select_view")
+            session_club = request.session["dashboard_club"]
+            if not request.user.is_superuser:
+                club = Club.objects.filter(
+                    admins=request.user, aid=session_club
+                ).first()
+            else:
+                club = Club.objects.filter(aid=session_club).first()
+            if not club:
+                return redirect("dashboard:club_select_view")
         request.club = club
         return function(request, *args, **kwargs)
 
