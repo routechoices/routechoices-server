@@ -64,12 +64,12 @@ def requires_club_in_session(function):
     def wrap(request, *args, **kwargs):
         club = None
         obj = None
-        if kwargs.get("event_id"):
-            obj = get_object_or_404(Event, aid=kwargs["event_id"])
-        elif kwargs.get("map_id"):
-            obj = get_object_or_404(Map, aid=kwargs["map_id"])
-        elif kwargs.get("event_set_id"):
-            obj = get_object_or_404(EventSet, aid=kwargs["event_set_id"])
+        if obj_aid := kwargs.get("event_id"):
+            obj = get_object_or_404(Event, aid=obj_aid)
+        elif obj_aid := kwargs.get("map_id"):
+            obj = get_object_or_404(Map, aid=obj_aid)
+        elif obj_aid := kwargs.get("event_set_id"):
+            obj = get_object_or_404(EventSet, aid=obj_aid)
         if obj:
             club_id = obj.club_id
             if request.user.is_superuser:
