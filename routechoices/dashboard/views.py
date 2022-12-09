@@ -74,8 +74,8 @@ def requires_club_in_session(function):
                 ).first()
             else:
                 club = Club.objects.filter(aid=session_club).first()
-            if not club:
-                return redirect("dashboard:club_select_view")
+        if not club:
+            return redirect("dashboard:club_select_view")
         request.club = club
         return function(request, *args, **kwargs)
 
