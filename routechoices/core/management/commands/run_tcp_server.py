@@ -355,12 +355,9 @@ class QueclinkConnection:
                     try:
                         lon = float(parts[11 + i * len_points])
                         lat = float(parts[12 + i * len_points])
-                        tim = (
-                            arrow.get(
-                                parts[13 + i * len_points], "YYYYMMDDHHmmss"
-                            ).int_timestamp
-                            - 18
-                        )  # Adjust for GPS time difference with UTC
+                        tim = arrow.get(
+                            parts[13 + i * len_points], "YYYYMMDDHHmmss"
+                        ).int_timestamp
                     except Exception as e:
                         print(f"Error parsing position: {str(e)}", flush=True)
                         continue
