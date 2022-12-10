@@ -1,6 +1,12 @@
-from django.urls import re_path
+from django.urls import path, re_path
 
 from routechoices.club import views
+from routechoices.club.sitemaps import DynamicViewSitemap, StaticViewSitemap
+
+sitemaps = {
+    "static": StaticViewSitemap,
+    "dynamic": DynamicViewSitemap,
+}
 
 
 def set_club(request, club_slug):
@@ -37,4 +43,11 @@ urlpatterns = [
         name="event_contribute_view",
     ),
     re_path(r"(?P<slug>[0-9a-zA-Z_-]+)/?$", views.event_view, name="event_view"),
+    path("sitemap.xml", views.sitemap, {"sitemaps": sitemaps}, name="club_sitemap"),
+    re_path(
+        "^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$",
+        views.sitemap,
+        {"sitemaps": sitemaps},
+        name="club_sitemap",
+    ),
 ]
