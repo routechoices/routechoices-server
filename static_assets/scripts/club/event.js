@@ -102,7 +102,6 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
     );
 
     map = L.map("map", {
-      // preferCanvas: true,
       center: [15, 0],
       maxZoom: 18,
       minZoom: 1,

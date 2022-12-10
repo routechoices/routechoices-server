@@ -1,4 +1,10 @@
 // @class TileLayer
+function releaseCanvas(canvas) {
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    ctx && ctx.clearRect(0, 0, 1, 1);
+}
 
 L.TileLayer.mergeOptions({
 	// @option keepBuffer
@@ -21,6 +27,7 @@ L.TileLayer.include({
 
 	_onRemoveLevel: function(z) {
 		if (this.options.dumpToCanvas) {
+			releaseCanvas(this._levels[z].canvas);
 			L.DomUtil.remove(this._levels[z].canvas);
 		}
 	},
@@ -93,6 +100,8 @@ L.TileLayer.include({
 			level.canvas.style.width = (level.canvas.width = neededSize.x) + "px";
 			level.canvas.style.height = (level.canvas.height = neededSize.y) + "px";
 			level.ctx.drawImage(tmpCanvas, 0, 0);
+			releaseCanvas(tmpCanvas);
+			delete tmpCanvas;
 			// level.ctx.putImageData(data, 0, 0, 0, 0, oldSize.x, oldSize.y);
 		}
 
@@ -129,6 +138,8 @@ L.TileLayer.include({
 				this._tmpContext.drawImage(level.canvas, 0, 0);
 				level.ctx.clearRect(0, 0, level.canvas.width, level.canvas.height);
 				level.ctx.drawImage(this._tmpCanvas, offset.x, offset.y);
+				releaseCanvas(this._tmpCanvas);
+				delete this._tmpCanvas;
 			}
 
 			mustRepositionCanvas = true; // Wait until new props are set
@@ -202,7 +213,7 @@ L.TileLayer.include({
 		// If dumping the pixels was successful, then hide the tile.
 		// Do not remove the tile itself, as it is needed to check if the whole
 		// level (and its canvas) should be removed (via level.el.children.length)
-		tile.el.style.display = "none";
+		// tile.el.style.display = "none";
 	},
 
 	// @section Extension methods
