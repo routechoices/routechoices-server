@@ -1,7 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from django_hosts.resolvers import reverse
 
-from routechoices.core.models import Event
+from routechoices.core.models import PRIVACY_PUBLIC, Event
 
 
 class StaticViewSitemap(Sitemap):
@@ -33,7 +33,7 @@ class DynamicViewSitemap(Sitemap):
         return ""
 
     def items(self):
-        events = Event.objects.filter(club__slug=self.club_slug)
+        events = Event.objects.filter(club__slug=self.club_slug, privacy=PRIVACY_PUBLIC)
         items = ()
         for event in events:
             items += (
