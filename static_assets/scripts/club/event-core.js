@@ -694,6 +694,7 @@ var refreshEventData = function () {
                   bounds: bounds,
                   tileSize: 512,
                   noWrap: true,
+                  className: "wms512",
                 }
               );
               mapChoices[m.title].data = m;
@@ -2118,6 +2119,7 @@ function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
     bounds: bounds,
     tileSize: 512,
     noWrap: true,
+    className: "wms512",
   });
   _rasterMap.data = data;
   _rasterMap.addTo(map);

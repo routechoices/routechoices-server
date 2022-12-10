@@ -284,6 +284,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                     bounds: bounds,
                     tileSize: 512,
                     noWrap: true,
+                    className: "wms512",
                   }
                 );
                 mapChoices[m.title].data = m;

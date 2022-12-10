@@ -249,3 +249,8 @@ img.emoji {
   user-select: none;
   -webkit-user-select: none;
 }
+
+.wms512 .leaflet-tile-container img {
+  width: 512.5px !important;
+  height: 512.5px !important;
+}
