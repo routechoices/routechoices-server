@@ -446,7 +446,7 @@ def sitemap(
     club = get_object_or_404(Club, slug__iexact=club_slug)
     if club.domain and not request.use_cname:
         return redirect(
-            f"{club.nice_url}sitemap{'-' if section else ''}{section if section else ''}"
+            f"{club.nice_url}sitemap{'-' if section else ''}{section if section else ''}.xml{'?p=' if page else ''}{page if page else ''}"
         )
     lastmod = None
     all_sites_lastmod = True
