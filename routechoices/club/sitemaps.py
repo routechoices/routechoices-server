@@ -47,7 +47,7 @@ class DynamicViewSitemap(Sitemap):
 
         items = (club_root,)
         for p in range(1, page_count):
-            items += (f"{club_root}?p={p+1}",)
+            items += (f"{club_root}?page={p+1}",)
         for event in events:
             items += (
                 f"{club_root}{event.slug}",

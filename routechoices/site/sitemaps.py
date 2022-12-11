@@ -65,7 +65,7 @@ class DynamicViewSitemap(Sitemap):
         root = reverse("site:events_view")
         items = (root,)
         for p in range(1, page_count):
-            items += (f"{root}?p={p+1}",)
+            items += (f"{root}?page={p+1}",)
         return items
 
     def location(self, item):
