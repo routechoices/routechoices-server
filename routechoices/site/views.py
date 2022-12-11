@@ -5,8 +5,10 @@ from django.core.exceptions import BadRequest
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.db.models.functions import ExtractMonth, ExtractYear
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
+from django_hosts.resolvers import reverse
 
 from routechoices.core.models import PRIVACY_PUBLIC, Event
 from routechoices.site.forms import ContactForm
@@ -152,3 +154,10 @@ def contact(request):
     else:
         form = ContactForm()
     return render(request, "site/contact.html", {"form": form})
+
+
+def robots_txt(request):
+    sitemap_url = reverse("django.contrib.sitemaps.views.index")
+    return HttpResponse(
+        f"Sitemap: {request.scheme}:{sitemap_url}\n", content_type="text/plain"
+    )

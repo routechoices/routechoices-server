@@ -1,10 +1,9 @@
 from django.urls import path, re_path
 
 from routechoices.club import views
-from routechoices.club.sitemaps import DynamicViewSitemap, StaticViewSitemap
+from routechoices.club.sitemaps import DynamicViewSitemap
 
 sitemaps = {
-    "static": StaticViewSitemap,
     "dynamic": DynamicViewSitemap,
 }
 
@@ -17,6 +16,16 @@ urlpatterns = [
     re_path(r"^$", views.club_view, name="club_view"),
     re_path(r"^logo/?$", views.club_logo, name="club_logo"),
     re_path(r"^feed/?$", views.club_live_event_feed, name="club_feed"),
+    path("robots.txt", views.robots_txt, name="robots.txt"),
+    path(
+        "sitemap.xml", views.sitemap_index, {"sitemaps": sitemaps}, name="club_sitemap"
+    ),
+    re_path(
+        "^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$",
+        views.sitemap,
+        {"sitemaps": sitemaps},
+        name="club_sitemap_sections",
+    ),
     re_path(
         r"\.well-known/acme-challenge/(?P<challenge>.+)$",
         views.acme_challenge,
@@ -43,11 +52,4 @@ urlpatterns = [
         name="event_contribute_view",
     ),
     re_path(r"(?P<slug>[0-9a-zA-Z_-]+)/?$", views.event_view, name="event_view"),
-    path("sitemap.xml", views.sitemap, {"sitemaps": sitemaps}, name="club_sitemap"),
-    re_path(
-        "^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$",
-        views.sitemap,
-        {"sitemaps": sitemaps},
-        name="club_sitemap",
-    ),
 ]

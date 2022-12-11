@@ -16,11 +16,12 @@ Including another URLconf
 import kagi
 from allauth.account import views as account_views
 from django.contrib import admin
-from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps import views as sitemaps_views
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
 from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
+from routechoices.site import views as site_views
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 admin.site.site_header = "Routechoices.com Admin"
@@ -59,12 +60,18 @@ urlpatterns = [
         dashboard_logo_download,
         name="dashboard_logo_download",
     ),
-    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
+    path("robots.txt", site_views.robots_txt, name="robots.txt"),
+    path(
+        "sitemap.xml",
+        sitemaps_views.index,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.index",
+    ),
     re_path(
         "^sitemap-(?P<section>[A-Za-z0-9-_]+).xml$",
-        sitemap,
+        sitemaps_views.sitemap,
         {"sitemaps": sitemaps},
-        name="sitemap",
+        name="django.contrib.sitemaps.views.sitemap",
     ),
     path("", include("user_sessions.urls", "user_sessions")),
     path("", include(("routechoices.site.urls", "site"), namespace="site")),
