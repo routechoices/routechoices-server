@@ -501,7 +501,7 @@ def sitemap(
 
     if section is not None:
         if section not in sitemaps:
-            raise Http404("No sitemap available for section: %r" % section)
+            raise Http404(f"No sitemap available for section: {section}")
         maps = [sitemaps[section]]
     else:
         maps = sitemaps.values()
