@@ -170,6 +170,8 @@ def wms_service(request):
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
 
+    test_time = get_params.get("time")
+
     if get_params.get("service") != "WMS":
         return HttpResponseBadRequest("Service must be WMS")
 
@@ -255,8 +257,10 @@ def wms_service(request):
             )
 
         data_out = raster_map.create_tile(
-            out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime
+            out_w, out_h, min_lat, max_lat, min_lon, max_lon, img_mime, test_time
         )
+        if test_time:
+            return HttpResponse(data_out)
         headers = None
         if event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}

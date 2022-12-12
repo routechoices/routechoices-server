@@ -36,7 +36,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
 from PIL import Image, ImageDraw, ImageFont
-from pillow_avif import AvifImagePlugin  # noqa: F401
+from pillow_heif import register_avif_opener
 
 from routechoices.lib import plausible
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -65,6 +65,8 @@ from routechoices.lib.validators import (
     validate_longitude,
     validate_nice_slug,
 )
+
+register_avif_opener()
 
 logger = logging.getLogger(__name__)
 
@@ -468,12 +470,20 @@ class Map(models.Model):
         return f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
 
     def create_tile(
-        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
+        self,
+        output_width,
+        output_height,
+        min_lat,
+        max_lat,
+        min_lon,
+        max_lon,
+        img_mime,
+        test_time,
     ):
         cache_key = self.tile_cache_key(
             output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
         )
-        use_cache = getattr(settings, "CACHE_TILES", False)
+        use_cache = getattr(settings, "CACHE_TILES", False) and not test_time
         cached = None
         if use_cache:
             try:
@@ -553,15 +563,28 @@ class Map(models.Model):
             ]
         )
         coeffs = cv2.getPerspectiveTransform(p1, p2)
-        orig = self.data
-        orig_mime_type = magic.from_buffer(orig, mime=True)
-        if orig_mime_type == "image/gif":
-            img = Image.open(BytesIO(orig)).convert("RGBA")
-            img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
-        else:
-            img_nparr = np.fromstring(orig, np.uint8)
-            img = cv2.imdecode(img_nparr, cv2.IMREAD_UNCHANGED)
-            img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2BGRA)
+
+        img_alpha = None
+        if use_cache:
+            try:
+                img_alpha = cache.get(f"img_data_{self.image.name}_raw")
+            except Exception:
+                pass
+
+        if img_alpha is None:
+            orig = self.data
+            orig_mime_type = magic.from_buffer(orig, mime=True)
+            if orig_mime_type == "image/gif":
+                img = Image.open(BytesIO(orig)).convert("RGBA")
+                img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGRA)
+            else:
+                img_nparr = np.fromstring(orig, np.uint8)
+                img = cv2.imdecode(img_nparr, cv2.IMREAD_UNCHANGED)
+                img_alpha = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2BGRA)
+
+            if use_cache and not cache.has_key(f"img_data_{self.image.name}_raw"):
+                cache.set(f"img_data_{self.image.name}_raw", img_alpha, 3600 * 24 * 30)
+
         tile_img = cv2.warpPerspective(
             img_alpha,
             coeffs,
@@ -570,6 +593,8 @@ class Map(models.Model):
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(255, 255, 255, 0),
         )
+        if test_time:
+            t0 = time.time()
         extra_args = []
         if img_mime == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
@@ -584,6 +609,9 @@ class Map(models.Model):
         else:
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
             data_out = BytesIO(buffer).getvalue()
+        if test_time:
+            return time.time() - t0
+
         if use_cache:
             try:
                 cache.set(cache_key, data_out, 3600 * 24 * 30)
