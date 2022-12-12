@@ -478,12 +478,11 @@ class Map(models.Model):
         min_lon,
         max_lon,
         img_mime,
-        test_time,
     ):
         cache_key = self.tile_cache_key(
             output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
         )
-        use_cache = getattr(settings, "CACHE_TILES", False) and not test_time
+        use_cache = getattr(settings, "CACHE_TILES", False)
         cached = None
         if use_cache:
             try:
@@ -593,8 +592,6 @@ class Map(models.Model):
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(255, 255, 255, 0),
         )
-        if test_time:
-            t0 = time.time()
         extra_args = []
         if img_mime == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
@@ -609,8 +606,6 @@ class Map(models.Model):
         else:
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
             data_out = BytesIO(buffer).getvalue()
-        if test_time:
-            return time.time() - t0
 
         if use_cache:
             try:
