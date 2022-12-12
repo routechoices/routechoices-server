@@ -82,7 +82,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "routechoices.core.middleware.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
