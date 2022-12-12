@@ -265,7 +265,14 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                   ],
                   [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
                 ];
-                rasterMap = addRasterMap(bounds, m.hash, true, 0, m);
+                rasterMap = addRasterMap(
+                  bounds,
+                  m.hash,
+                  m.max_zoom,
+                  true,
+                  0,
+                  m
+                );
                 mapChoices[m.title] = rasterMap;
               } else {
                 var bounds = [
@@ -285,6 +292,7 @@ var locale = urlLanguage || storedLanguage || browserLanguage || "en";
                     tileSize: 512,
                     noWrap: true,
                     className: "wms512",
+                    maxNativeZoom: m.max_zoom,
                   }
                 );
                 mapChoices[m.title].data = m;

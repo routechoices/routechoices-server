@@ -682,6 +682,7 @@ var refreshEventData = function () {
               rasterMap = addRasterMap(
                 bounds,
                 m.hash,
+                m.max_zoom,
                 !currentMapNewData,
                 i,
                 m
@@ -706,6 +707,7 @@ var refreshEventData = function () {
                   tileSize: 512,
                   noWrap: true,
                   className: "wms512",
+                  maxNativeZoom: m.max_zoom,
                 }
               );
               mapChoices[m.title].data = m;
@@ -2121,7 +2123,7 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
+function addRasterMap(bounds, hash, maxZoom, fit, idx = 0, data = null) {
   if (fit === undefined) {
     fit = false;
   }
@@ -2131,6 +2133,7 @@ function addRasterMap(bounds, hash, fit, idx = 0, data = null) {
     tileSize: 512,
     noWrap: true,
     className: "wms512",
+    maxNativeZoom: maxZoom,
   });
   _rasterMap.data = data;
   _rasterMap.addTo(map);

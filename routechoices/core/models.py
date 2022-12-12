@@ -461,7 +461,7 @@ class Map(models.Model):
 
     @property
     def max_zoom(self):
-        r = self.resolution / 1.193
+        r = self.resolution / 1.193  # 1.193 is meter per pixel at equator for zoom 18
         return math.ceil(math.log2(r)) + 18
 
     def tile_cache_key(
