@@ -80,7 +80,7 @@ PyPi Packages:
     numpy                       BSD License
     opencv-python               MIT License
     orjson                      Apache Software License; MIT License
-    pillow-avif-plugin          MIT License
+    pillow-heif                 Apache License, Version 2.0
     pillow-simd                 HPND License
     pip-tools                   BSD License
     psycopg2                    GNU Library or Lesser General Public License (LGPL)
