@@ -507,7 +507,7 @@ class Map(models.Model):
                         except Exception:
                             pass
                         return cached
-            n_channels = 4
+            n_channels = 4 if img_mime != "image/jpeg" else 3
             transparent_img = np.zeros(
                 (output_height, output_width, n_channels), dtype=np.uint8
             )
@@ -515,7 +515,8 @@ class Map(models.Model):
             if img_mime == "image/webp":
                 extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 10]
             elif img_mime == "image/jpeg":
-                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 20]
+                transparent_img[:, :] = (255, 255, 255)
+                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 10]
             if img_mime == "image/avif":
                 color_coverted = cv2.cvtColor(transparent_img, cv2.COLOR_RGBA2BGRA)
                 pil_image = Image.fromarray(color_coverted)

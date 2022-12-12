@@ -34,21 +34,21 @@ def tile_etag(request):
         else:
             img_mime = "image/png"
 
-        best_mime = None
+        better_mime = None
         if "image/avif" in http_accept.split(","):
-            best_mime = "image/avif"
+            better_mime = "image/avif"
         elif "image/webp" in http_accept.split(","):
-            best_mime = "image/webp"
+            better_mime = "image/webp"
 
         asked_mime = get_params.get("format")
         if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
             if img_mime == "image/apng":
                 img_mime = "image/png"
-        elif asked_mime == "image/jpeg" and not best_mime:
+        elif asked_mime == "image/jpeg" and not better_mime:
             img_mime = "image/jpeg"
-        elif best_mime:
-            img_mime = best_mime
+        elif better_mime:
+            img_mime = better_mime
         else:
             return None
 
@@ -180,21 +180,21 @@ def wms_service(request):
         heigth_raw = get_params.get("height")
 
         http_accept = request.META.get("HTTP_ACCEPT", "")
-        best_mime = None
+        better_mime = None
         if "image/avif" in http_accept.split(","):
-            best_mime = "image/avif"
+            better_mime = "image/avif"
         elif "image/webp" in http_accept.split(","):
-            best_mime = "image/webp"
+            better_mime = "image/webp"
 
         asked_mime = get_params.get("format")
         if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
             img_mime = asked_mime
             if img_mime == "image/apng":
                 img_mime = "image/png"
-        elif asked_mime == "image/jpeg" and not best_mime:
+        elif asked_mime == "image/jpeg" and not better_mime:
             img_mime = "image/jpeg"
-        elif best_mime:
-            img_mime = best_mime
+        elif better_mime:
+            img_mime = better_mime
         else:
             return HttpResponseBadRequest("invalid format")
 
