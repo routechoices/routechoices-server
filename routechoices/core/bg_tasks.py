@@ -718,14 +718,17 @@ def draw_livelox_route(name, club, url, bound, routes, res):
             map_model.delete()
         raise MapImportError("API returned error code")
     img_blob = ContentFile(r.content)
+    upscale = 4
     with Image.open(img_blob).convert("RGBA") as img:
-        course = Image.new("RGBA", img.size, (255, 255, 255, 0))
+        course = Image.new(
+            "RGBA", (img.size[0] * upscale, img.size[1] * upscale), (255, 255, 255, 0)
+        )
         coordinates = [f"{b['latitude']},{b['longitude']}" for b in bound[::-1]]
         map_model.corners_coordinates = ",".join(coordinates)
         map_model.image.save("imported_image", img_blob, save=False)
         draw = ImageDraw.Draw(course)
-        circle_size = int(40 * res)
-        line_width = int(8 * res)
+        circle_size = int(40 * res) * upscale
+        line_width = int(8 * res) * upscale
         line_color = (128, 0, 128, 180)
         for route in routes:
             ctrls = [
@@ -747,49 +750,49 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                     draw.line(
                         [
                             int(
-                                pt_s[0]
+                                pt_s[0] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.cos(angle)
                             ),
                             int(
-                                pt_s[1]
+                                pt_s[1] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.sin(angle)
                             ),
                             int(
-                                pt_s[0]
+                                pt_s[0] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.cos(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1]
+                                pt_s[1] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.sin(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[0]
+                                pt_s[0] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.cos(angle - 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1]
+                                pt_s[1] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.sin(angle - 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[0]
+                                pt_s[0] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.cos(angle)
                             ),
                             int(
-                                pt_s[1]
+                                pt_s[1] * upscale
                                 - (-1 if start_from_a else 1)
                                 * circle_size
                                 * math.sin(angle)
@@ -801,10 +804,10 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                     )
                 draw.line(
                     [
-                        int(pt_a[0] + circle_size * math.cos(angle)),
-                        int(pt_a[1] + circle_size * math.sin(angle)),
-                        int(pt_b[0] - circle_size * math.cos(angle)),
-                        int(pt_b[1] - circle_size * math.sin(angle)),
+                        int(pt_a[0] * upscale + circle_size * math.cos(angle)),
+                        int(pt_a[1] * upscale + circle_size * math.sin(angle)),
+                        int(pt_b[0] * upscale - circle_size * math.cos(angle)),
+                        int(pt_b[1] * upscale - circle_size * math.sin(angle)),
                     ],
                     fill=line_color,
                     width=line_width,
@@ -812,22 +815,22 @@ def draw_livelox_route(name, club, url, bound, routes, res):
                 pt_o = pt_b if start_from_a else pt_a
                 draw.ellipse(
                     [
-                        int(pt_o[0] - circle_size),
-                        int(pt_o[1] - circle_size),
-                        int(pt_o[0] + circle_size),
-                        int(pt_o[1] + circle_size),
+                        int(pt_o[0] * upscale - circle_size),
+                        int(pt_o[1] * upscale - circle_size),
+                        int(pt_o[0] * upscale + circle_size),
+                        int(pt_o[1] * upscale + circle_size),
                     ],
                     outline=line_color,
                     width=line_width,
                 )
                 if i == (len(ctrls) - 2):
-                    inner_circle_size = int(30 * res)
+                    inner_circle_size = int(30 * res) * upscale
                     draw.ellipse(
                         [
-                            int(pt_o[0] - inner_circle_size),
-                            int(pt_o[1] - inner_circle_size),
-                            int(pt_o[0] + inner_circle_size),
-                            int(pt_o[1] + inner_circle_size),
+                            int(pt_o[0] * upscale - inner_circle_size),
+                            int(pt_o[1] * upscale - inner_circle_size),
+                            int(pt_o[0] * upscale + inner_circle_size),
+                            int(pt_o[1] * upscale + inner_circle_size),
                         ],
                         outline=line_color,
                         width=line_width,
@@ -836,6 +839,7 @@ def draw_livelox_route(name, club, url, bound, routes, res):
         params = {
             "dpi": (72, 72),
         }
+        course = course.resize(img.size, resample=Image.Resampling.BICUBIC)
         out = Image.alpha_composite(img, course)
         out.save(out_buffer, "PNG", **params)
         out_buffer.seek(0)
