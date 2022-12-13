@@ -715,6 +715,7 @@ class Map(models.Model):
         br_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": max_lon})
         bl_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": min_lat, "lon": min_lon})
 
+        res_scale = 4
         MAX_SIZE = 4000
         offset = 30
         width = tr_xy["x"] - tl_xy["x"] + offset * 2
@@ -739,18 +740,23 @@ class Map(models.Model):
 
         new_map.corners_coordinates = f"{tl_latlon['lat']},{tl_latlon['lon']},{tr_latlon['lat']},{tr_latlon['lon']},{br_latlon['lat']},{br_latlon['lon']},{bl_latlon['lat']},{bl_latlon['lon']}"
         im = Image.new(
-            "RGBA", (int(width / scale), int(height / scale)), (255, 255, 255, 0)
+            "RGBA",
+            (int(width / scale) * res_scale, int(height / scale) * res_scale),
+            (255, 255, 255, 0),
         )
-        new_map.width = int(width / scale)
-        new_map.height = int(height / scale)
+        new_map.width = int(width / scale) * res_scale
+        new_map.height = int(height / scale) * res_scale
         draw = ImageDraw.Draw(im)
         for pts in seg:
             map_pts = [
                 new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True) for pt in pts
             ]
-            draw.line(map_pts, (255, 0, 0, 160), 15, joint="curve")
-            draw.line(map_pts, (255, 255, 255, 100), 10, joint="curve")
+            draw.line(map_pts, (255, 0, 0, 160), 15 * res_scale, joint="curve")
+            draw.line(map_pts, (255, 255, 255, 100), 10 * res_scale, joint="curve")
 
+        im = im.resize(
+            (int(width / scale), int(height / scale)), resample=Image.Resampling.BICUBIC
+        )
         out_buffer = BytesIO()
         im.save(out_buffer, "WEBP", dpi=(72, 72), quality=80)
         f_new = File(out_buffer)
