@@ -883,19 +883,39 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
     data = r.json()
     map_model = None
     map_projection = None
+
     try:
         map_data = data["map"]
-        map_url = map_data["url"]
-        map_bound = map_data["boundingQuadrilateral"]["vertices"]
-        map_resolution = map_data["resolution"]
         map_name = f"{map_data['name']} - {data['courses'][0]['name']}"
-        route_ctrls = [c["controls"] for c in data["courses"]]
-        map_projection = data["map"].get("projection")
-        map_model = draw_livelox_route(
-            map_name, club, map_url, map_bound, route_ctrls, map_resolution
-        )
+        map_bound = map_data["boundingQuadrilateral"]["vertices"]
     except Exception:
-        raise MapImportError("Could not import map")
+        raise MapImportError("Could not extract basic map info")
+    try:
+        map_url = f"https://www.livelox.com/Classes/MapImage?classIds={class_id}"
+        map_model, created = Map.objects.get_or_create(
+            name=map_name,
+            club=club,
+        )
+        if created:
+            r = requests.get(map_url, timeout=60)
+            if r.status_code != 200:
+                map_model.delete()
+                raise MapImportError("API returned error code")
+            img_blob = ContentFile(r.content)
+            coordinates = [f"{b['latitude']},{b['longitude']}" for b in map_bound[::-1]]
+            map_model.corners_coordinates = ",".join(coordinates)
+            map_model.image.save("imported_image", img_blob)
+    except Exception:
+        try:
+            map_url = map_data["url"]
+            map_resolution = map_data["resolution"]
+            route_ctrls = [c["controls"] for c in data["courses"]]
+            map_projection = data["map"].get("projection")
+            map_model = draw_livelox_route(
+                map_name, club, map_url, map_bound, route_ctrls, map_resolution
+            )
+        except Exception:
+            raise MapImportError("Could not get map")
 
     participant_data = [d for d in data["participants"] if d.get("routeData")]
     time_offset = 22089888e5
