@@ -1,30 +1,15 @@
-if (!navigator.canShare) {
-  document.getElementById("share_buttons").remove();
-}
-
-var supportedLanguages = {
-  en: "English",
-  es: "Español",
-  fr: "Français",
-  nl: "Nederlands",
-  fi: "Suomi",
-  sv: "Svenska",
-};
-
-function getLangIfSupported(code) {
-  return Object.keys(supportedLanguages).includes(code) ? code : null;
-}
-
-var queryString = window.location.search;
-var urlParams = new URLSearchParams(queryString);
-
-var urlLanguage = getLangIfSupported(urlParams.get("lang"));
-var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
-var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
-
-var locale = urlLanguage || storedLanguage || browserLanguage || "en";
-
 (function () {
+  window.addEventListener("resize", appHeight);
+  if (!navigator.canShare) {
+    document.getElementById("share_buttons").remove();
+  }
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString);
+
+  var urlLanguage = getLangIfSupported(urlParams.get("lang"));
+  var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
+  var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
+  var locale = urlLanguage || storedLanguage || browserLanguage || "en";
   clock = ServerClock({ url: window.local.serverClockUrl });
   banana = new Banana();
   updateText().then(function () {

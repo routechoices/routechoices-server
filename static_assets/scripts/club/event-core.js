@@ -1,20 +1,242 @@
-var alphabetizeNumber = function (integer) {
-  return Number(integer)
-    .toString(26)
-    .split("")
-    .map((c) =>
-      (c.charCodeAt() > 96
-        ? String.fromCharCode(c.charCodeAt() + 10)
-        : String.fromCharCode(97 + parseInt(c))
-      ).toUpperCase()
-    )
-    .join("");
+var COLORS = [
+  "#e6194B",
+  "#3cb44b",
+  "#4363d8",
+  "#f58231",
+  "#911eb4",
+  "#42d4f4",
+  "#f032e6",
+  "#bfef45",
+  "#469990",
+  "#9A6324",
+  "#800000",
+  "#aaffc3",
+  "#808000",
+  "#000075",
+  "#ffe119",
+  "#a9a9a9",
+  "#000000",
+];
+var locale = "en";
+var map = null;
+var isLiveMode = false;
+var liveUrl = null;
+var isLiveEvent = false;
+var isRealTime = true;
+var isCustomStart = false;
+var competitorList = [];
+var competitorRoutes = {};
+var routesLastFetched = -Infinity;
+var eventDataLastFetch = -Infinity;
+var fetchPositionInterval = 10;
+var playbackRate = 8;
+var playbackPaused = true;
+var prevDisplayRefresh = 0;
+var tailLength = 60;
+var isCurrentlyFetchingRoutes = false;
+var isFetchingEventData = false;
+var currentTime = 0;
+var lastDataTs = 0;
+var lastNbPoints = 0;
+var optionDisplayed = false;
+var mapHash = "";
+var mapUrl = null;
+var rasterMap = null;
+var searchText = null;
+var prevNotice = new Date(0);
+var resetMassStartContextMenuItem = null;
+var setMassStartContextMenuItem = null;
+var setFinishLineContextMenuItem = null;
+var removeFinishLineContextMenuItem = null;
+var clusters = {};
+var qrUrl = null;
+var finishLineCrosses = [];
+var finishLinePoints = [];
+var finishLinePoly = null;
+var finishLineSet = false;
+var rankControl = null;
+var groupControl = null;
+var panControl = null;
+var zoomControl = null;
+var rotateControl = null;
+var scaleControl = null;
+var showClusters = false;
+var showControls = !(L.Browser.touch && L.Browser.mobile);
+var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
+var zoomOnRunners = false;
+var clock = null;
+var banana = null;
+var sendInterval = 0;
+var endEvent = null;
+var initialCompetitorDataLoaded = false;
+var gpsEventSource = null;
+var maxParticipantsDisplayed = 300;
+var nbShown = 0;
+var smoothFactor = 1;
+var prevMapsJSONData = null;
+var mapSelectorLayer = null;
+var sidebarShown = true;
+var isMapMoving = false;
+var oldCrossingForNTimes = 1;
+var intersectionCheckZoom = 18;
+var supportedLanguages = {
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  nl: "Nederlands",
+  fi: "Suomi",
+  sv: "Svenska",
 };
-const appHeight = () => {
-  const doc = document.documentElement;
-  doc.style.setProperty("--app-height", `${window.innerHeight}px`);
+var backdropMaps = {
+  blank: L.tileLayer(
+    'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
+    {
+      attribution: "",
+      tileSize: 512,
+      className: "wms512",
+    }
+  ),
+  osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    className: "wms256",
+  }),
+  "gmap-street": L.tileLayer("https://mt0.google.com/vt/x={x}&y={y}&z={z}", {
+    attribution: "&copy; Google",
+    className: "wms256",
+  }),
+  "gmap-hybrid": L.tileLayer(
+    "https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}",
+    {
+      attribution: "&copy; Google",
+      className: "wms256",
+    }
+  ),
+  "topo-fi": L.tileLayer(
+    "https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg",
+    {
+      attribution: "&copy; National Land Survey of Finland",
+      className: "wms256",
+    }
+  ),
+  "mapant-fi": L.tileLayer(
+    "https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}",
+    {
+      attribution: "&copy; MapAnt.fi and National Land Survey of Finland",
+      className: "wms256",
+    }
+  ),
+  "topo-no": L.tileLayer(
+    "https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
+    {
+      attribution: "",
+      className: "wms256",
+    }
+  ),
+  "mapant-no": L.tileLayer("https://mapant.no/osm-tiles/{z}/{x}/{y}.png", {
+    attribution: "&copy; MapAnt.no",
+    className: "wms256",
+  }),
+  "mapant-es": L.tileLayer.wms("https://mapant.es/wms", {
+    layers: "mapant.es",
+    format: "image/png",
+    version: "1.3.0",
+    transparent: true,
+    attribution: "&copy; MapAnt.es",
+    className: "wms256",
+  }),
+  "topo-world": L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenTopoMap (CC-BY-SA)",
+    className: "wms256",
+  }),
+  "topo-world-alt": L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    {
+      attribution: "&copy; ArcGIS Online",
+      className: "wms256",
+    }
+  ),
 };
-window.addEventListener("resize", appHeight);
+
+Array.prototype.findIndex =
+  Array.prototype.findIndex ||
+  function (callback) {
+    if (this === null) {
+      throw new TypeError(
+        "Array.prototype.findIndex called on null or undefined"
+      );
+    } else if (typeof callback !== "function") {
+      throw new TypeError("callback must be a function");
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    for (var i = 0; i < length; i++) {
+      if (callback.call(thisArg, list[i], i, list)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+L.Control.EventState = L.Control.extend({
+  options: {
+    position: "topleft",
+  },
+  onAdd: function (map) {
+    var div = L.DomUtil.create("div");
+    div.style.userSelect = "none";
+    div.style["-webkit-user-select"] = "none";
+    this._div = div;
+    return div;
+  },
+  hide() {
+    if (!this._div) {
+      return;
+    }
+    this._div.style.display = "none";
+  },
+  setLive() {
+    if (!this._div) {
+      return;
+    }
+    this._div.innerHTML =
+      '<svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      banana.i18n("live-mode");
+    u(this._div).css({
+      display: "block",
+      fontSize: "20px",
+      color: "#fff",
+      backgroundColor: "red",
+      borderRadius: "15px",
+      padding: "3px 20px",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+    });
+  },
+  setReplay() {
+    this._div.innerHTML = banana.i18n("replay-mode");
+    u(this._div).css({
+      display: "block",
+      fontSize: "20px",
+      color: "#fff",
+      backgroundColor: "#666",
+      borderRadius: "15px",
+      padding: "3px 15px",
+      fontStyle: "normal",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+    });
+  },
+  onRemove: function (map) {
+    // Nothing to do here
+  },
+});
+
+L.control.eventState = function (opts) {
+  return new L.Control.EventState(opts);
+};
 
 L.Control.Ranking = L.Control.extend({
   onAdd: function (map) {
@@ -150,201 +372,87 @@ L.control.grouping = function (opts) {
   return new L.Control.Grouping(opts);
 };
 
-Array.prototype.findIndex =
-  Array.prototype.findIndex ||
-  function (callback) {
-    if (this === null) {
-      throw new TypeError(
-        "Array.prototype.findIndex called on null or undefined"
-      );
-    } else if (typeof callback !== "function") {
-      throw new TypeError("callback must be a function");
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    for (var i = 0; i < length; i++) {
-      if (callback.call(thisArg, list[i], i, list)) {
-        return i;
-      }
-    }
-    return -1;
-  };
+function getLangIfSupported(code) {
+  return Object.keys(supportedLanguages).includes(code) ? code : null;
+}
 
-var COLORS = [
-  "#e6194B",
-  "#3cb44b",
-  "#4363d8",
-  "#f58231",
-  "#911eb4",
-  "#42d4f4",
-  "#f032e6",
-  "#bfef45",
-  "#469990",
-  "#9A6324",
-  "#800000",
-  "#aaffc3",
-  "#808000",
-  "#000075",
-  "#ffe119",
-  "#a9a9a9",
-  "#000000",
-];
-
-var getColor = function (i) {
+function getColor(i) {
   return COLORS[i % COLORS.length];
-};
+}
 
 function getContrastYIQ(hexcolor) {
   hexcolor = hexcolor.replace("#", "");
-  var r = parseInt(hexcolor.substr(0, 2), 16);
-  var g = parseInt(hexcolor.substr(2, 2), 16);
-  var b = parseInt(hexcolor.substr(4, 2), 16);
+  var hexSize = 0x10;
+  var r = parseInt(hexcolor.substr(0, 2), hexSize);
+  var g = parseInt(hexcolor.substr(2, 2), hexSize);
+  var b = parseInt(hexcolor.substr(4, 2), hexSize);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq <= 168 ? "dark" : "light";
 }
 
-var map = null;
-var isLiveMode = false;
-var liveUrl = null;
-var isLiveEvent = false;
-var isRealTime = true;
-var isCustomStart = false;
-var competitorList = [];
-var competitorRoutes = {};
-var routesLastFetched = -Infinity;
-var eventDataLastFetch = -Infinity;
-var fetchPositionInterval = 10;
-var playbackRate = 8;
-var playbackPaused = true;
-var prevDisplayRefresh = 0;
-var tailLength = 60;
-var isCurrentlyFetchingRoutes = false;
-var isFetchingEventData = false;
-var currentTime = 0;
-var lastDataTs = 0;
-var lastNbPoints = 0;
-var optionDisplayed = false;
-var mapHash = "";
-var mapUrl = null;
-var rasterMap = null;
-var searchText = null;
-var prevNotice = new Date(0);
-var resetMassStartContextMenuItem = null;
-var setMassStartContextMenuItem = null;
-var setFinishLineContextMenuItem = null;
-var removeFinishLineContextMenuItem = null;
-var clusters = {};
-var qrUrl = null;
-var finishLineCrosses = [];
-var finishLinePoints = [];
-var finishLinePoly = null;
-var finishLineSet = false;
-var rankControl = null;
-var groupControl = null;
-var panControl = null;
-var zoomControl = null;
-var rotateControl = null;
-var scaleControl = null;
-var showClusters = false;
-var showControls = !(L.Browser.touch && L.Browser.mobile);
-var backdropMaps = {};
-var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
-var zoomOnRunners = false;
-var clock = null;
-var banana = null;
-var sendInterval = 0;
-var endEvent = null;
-var initialCompetitorDataLoaded = false;
-var gpsEventSource = null;
-var maxParticipantsDisplayed = 300;
-var nbShown = 0;
-var smoothFactor = 1;
-var prevMapsJSONData = null;
-var mapSelectorLayer = null;
-var sidebarShown = true;
-var isMapMoving = false;
-var oldCrossingForNTimes = 1;
-backdropMaps["blank"] = L.tileLayer(
-  'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
-  {
-    attribution: "",
-    tileSize: 512,
-    className: "wms512",
-  }
-);
-backdropMaps["osm"] = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    attribution:
-      'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    className: "wms256",
-  }
-);
-backdropMaps["gmap-street"] = L.tileLayer(
-  "https://mt0.google.com/vt/x={x}&y={y}&z={z}",
-  {
-    attribution: "&copy; Google",
-    className: "wms256",
-  }
-);
-backdropMaps["gmap-hybrid"] = L.tileLayer(
-  "https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}",
-  {
-    attribution: "&copy; Google",
-    className: "wms256",
-  }
-);
-backdropMaps["topo-fi"] = L.tileLayer(
-  "https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg",
-  {
-    attribution: "&copy; National Land Survey of Finland",
-    className: "wms256",
-  }
-);
-backdropMaps["mapant-fi"] = L.tileLayer(
-  "https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}",
-  {
-    attribution: "&copy; MapAnt.fi and National Land Survey of Finland",
-    className: "wms256",
-  }
-);
-backdropMaps["topo-no"] = L.tileLayer(
-  "https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
-  {
-    attribution: "",
-    className: "wms256",
-  }
-);
-backdropMaps["mapant-no"] = L.tileLayer(
-  "https://mapant.no/osm-tiles/{z}/{x}/{y}.png",
-  {
-    attribution: "&copy; MapAnt.no",
-    className: "wms256",
-  }
-);
-backdropMaps["mapant-es"] = L.tileLayer.wms("https://mapant.es/wms", {
-  layers: "mapant.es",
-  format: "image/png",
-  version: "1.3.0",
-  transparent: true,
-  attribution: "&copy; MapAnt.es",
-  className: "wms256",
-});
-backdropMaps["topo-world"] = L.tileLayer(
-  "https://tile.opentopomap.org/{z}/{x}/{y}.png",
-  {
-    attribution: "&copy; OpenTopoMap (CC-BY-SA)",
-    className: "wms256",
-  }
-);
-backdropMaps["topo-world-alt"] = L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-  {
-    attribution: "&copy; ArcGIS Online",
-    className: "wms256",
-  }
-);
+function getRunnerIcon(color, faded = false) {
+  var iconSize = 16;
+  var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
+  var isDark = getContrastYIQ(color) === "dark";
+  var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
+    isDark ? "white" : "black"
+  }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+  var runnerIcon = L.icon({
+    iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+    iconSize: [iconSize, iconSize],
+    shadowSize: [iconSize, iconSize],
+    iconAnchor: [iconSize / 2, iconSize / 2],
+    shadowAnchor: [0, 0],
+    popupAnchor: [0, 0],
+  });
+  return runnerIcon;
+}
+
+function getRunnerNameMarker(name, color, rightSide, faded = false) {
+  var iconHtml =
+    '<span style="opacity: ' +
+    (faded ? 0.4 : 0.75) +
+    ";color: " +
+    color +
+    '">' +
+    u("<span/>").text(name).html() +
+    "</span>";
+  var iconClass = "runner-icon runner-icon-" + getContrastYIQ(color);
+  var ic2 =
+    iconClass +
+    " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
+  var nameTagEl = document.createElement("div");
+  nameTagEl.className = ic2;
+  nameTagEl.innerHTML = iconHtml;
+  var mapEl = document.getElementById("map");
+  mapEl.appendChild(nameTagEl);
+  var nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
+  mapEl.removeChild(nameTagEl);
+  var runnerIcon = L.divIcon({
+    className: iconClass,
+    html: iconHtml,
+    iconAnchor: [rightSide ? nameTagWidth : 0, 0],
+  });
+  return runnerIcon;
+}
+
+function alphabetizeNumber(integer) {
+  return Number(integer)
+    .toString(26)
+    .split("")
+    .map((c) =>
+      (c.charCodeAt() > 96
+        ? String.fromCharCode(c.charCodeAt() + 10)
+        : String.fromCharCode(97 + parseInt(c))
+      ).toUpperCase()
+    )
+    .join("");
+}
+
+function appHeight() {
+  const doc = document.documentElement;
+  doc.style.setProperty("--app-height", `${window.innerHeight}px`);
+}
 
 function drawFinishLine(e) {
   finishLinePoints = [];
@@ -410,7 +518,7 @@ function drawFinishLineTmp(e) {
   }
 }
 
-var onStart = function () {
+function onStart() {
   if (isLiveEvent) {
     selectLiveMode();
   } else {
@@ -424,9 +532,71 @@ var onStart = function () {
   map.invalidateSize();
   fetchCompetitorRoutes(null, true);
   appHeight();
-};
+}
 
-var selectLiveMode = function (e) {
+function getCompetitionStartDate() {
+  var res = +clock.now();
+  competitorList.forEach(function (c) {
+    var route = competitorRoutes[c.id];
+    if (route) {
+      res =
+        res > route.getByIndex(0).timestamp
+          ? route.getByIndex(0).timestamp
+          : res;
+    }
+  });
+  return res;
+}
+
+function getCompetitionEndDate() {
+  var res = new Date(0);
+  competitorList.forEach(function (c) {
+    var route = competitorRoutes[c.id];
+    if (route) {
+      var idx = route.getPositionsCount() - 1;
+      res =
+        res < route.getByIndex(idx).timestamp
+          ? route.getByIndex(idx).timestamp
+          : res;
+    }
+  });
+  return res;
+}
+
+function getCompetitorsMaxDuration(customOffset) {
+  if (customOffset === undefined) {
+    customOffset = false;
+  }
+  var res = 0;
+  competitorList.forEach(function (c) {
+    var route = competitorRoutes[c.id];
+    if (route) {
+      var idx = route.getPositionsCount() - 1;
+
+      var dur =
+        route.getByIndex(idx).timestamp -
+        ((customOffset
+          ? +new Date(c.custom_offset)
+          : +new Date(c.start_time)) || getCompetitionStartDate());
+      res = res < dur ? dur : res;
+    }
+  });
+  return res;
+}
+
+function getCompetitorsMinCustomOffset() {
+  var res = 0;
+  competitorList.forEach(function (c) {
+    var route = competitorRoutes[c.id];
+    if (route) {
+      var off = c.custom_offset - c.start_time || 0;
+      res = res < off ? off : res;
+    }
+  });
+  return res;
+}
+
+function selectLiveMode(e) {
   if (e !== undefined) {
     e.preventDefault();
   }
@@ -487,9 +657,9 @@ var selectLiveMode = function (e) {
     }
   }
   window.requestAnimationFrame(whileLive);
-};
+}
 
-var selectReplayMode = function (e) {
+function selectReplayMode(e) {
   if (e !== undefined) {
     e.preventDefault();
   }
@@ -577,9 +747,9 @@ var selectReplayMode = function (e) {
     }
   }
   window.requestAnimationFrame(whileReplay);
-};
+}
 
-var fetchCompetitorRoutes = function (url) {
+function fetchCompetitorRoutes(url) {
   isCurrentlyFetchingRoutes = true;
   url = url || liveUrl;
   var data = {
@@ -629,9 +799,9 @@ var fetchCompetitorRoutes = function (url) {
       isCurrentlyFetchingRoutes = false;
     },
   });
-};
+}
 
-var refreshEventData = function () {
+function refreshEventData() {
   isFetchingEventData = true;
   reqwest({
     url: window.local.eventUrl,
@@ -726,13 +896,13 @@ var refreshEventData = function () {
       }
     },
   });
-};
+}
 
-var updateCompetitorList = function (newList) {
+function updateCompetitorList(newList) {
   newList.forEach(updateCompetitor);
-};
+}
 
-var setCustomStart = function (latlng) {
+function setCustomStart(latlng) {
   competitorList.forEach(function (c) {
     var minDist = Infinity;
     var minDistT = null;
@@ -751,9 +921,9 @@ var setCustomStart = function (latlng) {
       c.custom_offset = minDistT;
     }
   });
-};
+}
 
-var updateCompetitor = function (newData) {
+function updateCompetitor(newData) {
   var idx = competitorList.findIndex(function (c) {
     return c.id == newData.id;
   });
@@ -766,16 +936,6 @@ var updateCompetitor = function (newData) {
   } else {
     competitorList.push(newData);
   }
-};
-
-function getViewport() {
-  // https://stackoverflow.com/a/8876069
-
-  if (width <= 576) return "xs";
-  if (width <= 768) return "sm";
-  if (width <= 992) return "md";
-  if (width <= 1200) return "lg";
-  return "xl";
 }
 
 function hideSidebar() {
@@ -812,6 +972,24 @@ function showSidebar() {
   sidebarShown = true;
 }
 
+function toggleCompetitorList(e) {
+  e.preventDefault();
+  var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+  if (
+    sidebarShown &&
+    !optionDisplayed &&
+    !(u("#sidebar").hasClass("d-none") && width <= 576)
+  ) {
+    // we remove the competitor list
+    hideSidebar();
+  } else {
+    // we add the side bar
+    showSidebar();
+    displayCompetitorList(true);
+  }
+  map.invalidateSize();
+}
+
 function toggleFullCompetitor(c) {
   if (c.displayFullRoute) {
     c.displayFullRoute = null;
@@ -821,6 +999,29 @@ function toggleFullCompetitor(c) {
     u("#fullRouteIcon-" + c.id).attr({ fill: "#18bc9c" });
   }
 }
+
+function zoomOnCompetitor(compr) {
+  if (compr.focusing) {
+    return;
+  }
+  compr.focusing = true;
+  var route = competitorRoutes[compr.id];
+  if (!route) return;
+  var timeT = currentTime;
+  if (!isRealTime) {
+    if (isCustomStart) {
+      timeT += +new Date(compr.custom_offset) - getCompetitionStartDate();
+    } else {
+      timeT += +new Date(compr.start_time) - getCompetitionStartDate();
+    }
+  }
+  var loc = route.getByTime(timeT);
+  map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
+    animate: false,
+  });
+  compr.focusing = false;
+}
+
 function toggleFocusCompetitor(c) {
   const wasFocused = c.focused;
   competitorList.map((comp) => {
@@ -840,25 +1041,7 @@ function toggleFocusCompetitor(c) {
   }
 }
 
-function toggleCompetitorList(e) {
-  e.preventDefault();
-  var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
-  if (
-    sidebarShown &&
-    !optionDisplayed &&
-    !(u("#sidebar").hasClass("d-none") && width <= 576)
-  ) {
-    // we remove the competitor list
-    hideSidebar();
-  } else {
-    // we add the side bar
-    showSidebar();
-    displayCompetitorList(true);
-  }
-  map.invalidateSize();
-}
-
-var displayCompetitorList = function (force) {
+function displayCompetitorList(force) {
   if (!force && optionDisplayed) {
     return;
   }
@@ -1143,14 +1326,15 @@ var displayCompetitorList = function (force) {
   u(".tooltip").remove();
   const tooltipEls = u("#competitorSidebar").find('[data-bs-toggle="tooltip"]');
   tooltipEls.map((el) => new bootstrap.Tooltip(el, { trigger: "hover" }));
-};
-var filterCompetitorList = function (e) {
+}
+
+function filterCompetitorList(e) {
   var inputVal = u(e.target).val();
   searchText = inputVal.toLowerCase();
   displayCompetitorList();
-};
+}
 
-var displayOptions = function (ev) {
+function displayOptions(ev) {
   ev.preventDefault();
   if (optionDisplayed) {
     // hide sidebar
@@ -1328,89 +1512,9 @@ var displayOptions = function (ev) {
     });
   u("#sidebar").html("");
   u("#sidebar").append(mainDiv);
-};
+}
 
-var getCompetitionStartDate = function () {
-  var res = +clock.now();
-  competitorList.forEach(function (c) {
-    var route = competitorRoutes[c.id];
-    if (route) {
-      res =
-        res > route.getByIndex(0).timestamp
-          ? route.getByIndex(0).timestamp
-          : res;
-    }
-  });
-  return res;
-};
-var getCompetitionEndDate = function () {
-  var res = new Date(0);
-  competitorList.forEach(function (c) {
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var idx = route.getPositionsCount() - 1;
-      res =
-        res < route.getByIndex(idx).timestamp
-          ? route.getByIndex(idx).timestamp
-          : res;
-    }
-  });
-  return res;
-};
-var getCompetitorsMaxDuration = function (customOffset) {
-  if (customOffset === undefined) {
-    customOffset = false;
-  }
-  var res = 0;
-  competitorList.forEach(function (c) {
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var idx = route.getPositionsCount() - 1;
-
-      var dur =
-        route.getByIndex(idx).timestamp -
-        ((customOffset
-          ? +new Date(c.custom_offset)
-          : +new Date(c.start_time)) || getCompetitionStartDate());
-      res = res < dur ? dur : res;
-    }
-  });
-  return res;
-};
-var getCompetitorsMinCustomOffset = function () {
-  var res = 0;
-  competitorList.forEach(function (c) {
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var off = c.custom_offset - c.start_time || 0;
-      res = res < off ? off : res;
-    }
-  });
-  return res;
-};
-
-var zoomOnCompetitor = function (compr) {
-  if (compr.focusing) {
-    return;
-  }
-  compr.focusing = true;
-  var route = competitorRoutes[compr.id];
-  if (!route) return;
-  var timeT = currentTime;
-  if (!isRealTime) {
-    if (isCustomStart) {
-      timeT += +new Date(compr.custom_offset) - getCompetitionStartDate();
-    } else {
-      timeT += +new Date(compr.start_time) - getCompetitionStartDate();
-    }
-  }
-  var loc = route.getByTime(timeT);
-  map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
-    animate: false,
-  });
-  compr.focusing = false;
-};
-var getRelativeTime = function (currentTime) {
+function getRelativeTime(currentTime) {
   var viewedTime = currentTime;
   if (!isRealTime) {
     if (isCustomStart) {
@@ -1420,8 +1524,9 @@ var getRelativeTime = function (currentTime) {
     }
   }
   return viewedTime;
-};
-var getProgressBarText = function (currentTime) {
+}
+
+function getProgressBarText(currentTime) {
   var result = "";
   var viewedTime = currentTime;
   if (!isRealTime) {
@@ -1432,10 +1537,10 @@ var getProgressBarText = function (currentTime) {
     }
     var t = viewedTime / 1e3;
 
-    (to2digits = function (x) {
+    function to2digits(x) {
       return ("0" + Math.floor(x)).slice(-2);
-    }),
-      (result += t > 3600 ? Math.floor(t / 3600) + ":" : "");
+    }
+    result += t > 3600 ? Math.floor(t / 3600) + ":" : "";
     result += to2digits((t / 60) % 60) + ":" + to2digits(t % 60);
   } else {
     if (viewedTime === 0) {
@@ -1451,8 +1556,27 @@ var getProgressBarText = function (currentTime) {
     }
   }
   return result;
-};
-var drawCompetitors = function () {
+}
+
+function formatSpeed(s) {
+  var min = Math.floor(s / 60);
+  var sec = Math.floor(s % 60);
+  if (min > 99) {
+    return "--'--\"/km";
+  }
+  return min + "'" + ("0" + sec).slice(-2) + '"/km';
+}
+
+function checkVisible(elm) {
+  var rect = elm.getBoundingClientRect();
+  var viewHeight = Math.max(
+    document.documentElement.clientHeight,
+    window.innerHeight
+  );
+  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+}
+
+function drawCompetitors() {
   // play/pause button
   if (playbackPaused) {
     var html = '<i class="fa fa-play"></i> x' + playbackRate;
@@ -1545,21 +1669,21 @@ var drawCompetitors = function () {
           if (viewedTime >= oldTs) {
             if (
               L.LineUtil.segmentsIntersect(
-                map.project(finishLinePoints[0], 16),
-                map.project(finishLinePoints[1], 16),
+                map.project(finishLinePoints[0], intersectionCheckZoom),
+                map.project(finishLinePoints[1], intersectionCheckZoom),
                 map.project(
                   L.latLng([
                     allPoints[oldCrossing.idx].coords.latitude,
                     allPoints[oldCrossing.idx].coords.longitude,
                   ]),
-                  16
+                  intersectionCheckZoom
                 ),
                 map.project(
                   L.latLng([
                     allPoints[oldCrossing.idx - 1].coords.latitude,
                     allPoints[oldCrossing.idx - 1].coords.longitude,
                   ]),
-                  16
+                  intersectionCheckZoom
                 )
               )
             ) {
@@ -1608,18 +1732,18 @@ var drawCompetitors = function () {
             }
             if (
               L.LineUtil.segmentsIntersect(
-                map.project(finishLinePoints[0], 16),
-                map.project(finishLinePoints[1], 16),
+                map.project(finishLinePoints[0], intersectionCheckZoom),
+                map.project(finishLinePoints[1], intersectionCheckZoom),
                 map.project(
                   L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]),
-                  16
+                  intersectionCheckZoom
                 ),
                 map.project(
                   L.latLng([
                     allPoints[i - 1].coords.latitude,
                     allPoints[i - 1].coords.longitude,
                   ]),
-                  16
+                  intersectionCheckZoom
                 )
               )
             ) {
@@ -1747,32 +1871,14 @@ var drawCompetitors = function () {
             competitor.nameMarker = null;
           }
           if (competitor.nameMarker == undefined) {
-            var iconHtml =
-              '<span style="opacity: 0.4;color: ' +
-              competitor.color +
-              '">' +
-              u("<span/>").text(competitor.short_name).html() +
-              "</span>";
-            var iconClass =
-              "runner-icon runner-icon-" + getContrastYIQ(competitor.color);
-            var ic2 =
-              iconClass +
-              " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
-            getContrastYIQ(competitor.color);
-            var nameTagEl = document.createElement("div");
-            nameTagEl.className = ic2;
-            nameTagEl.innerHTML = iconHtml;
-            var mapEl = document.getElementById("map");
-            mapEl.appendChild(nameTagEl);
-            var nameTagWidth =
-              nameTagEl.childNodes[0].getBoundingClientRect().width;
-            mapEl.removeChild(nameTagEl);
-            competitor.isNameOnRight = pointX > mapMiddleX;
-            var runnerIcon = L.divIcon({
-              className: iconClass,
-              html: iconHtml,
-              iconAnchor: [competitor.isNameOnRight ? nameTagWidth : 0, 0],
-            });
+            var isOnRight = pointX > mapMiddleX;
+            competitor.isNameOnRight = isOnRight;
+            var runnerIcon = getRunnerNameMarker(
+              competitor.short_name,
+              competitor.color,
+              isOnRight,
+              true
+            );
             competitor.nameMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
               { icon: runnerIcon }
@@ -1797,19 +1903,7 @@ var drawCompetitors = function () {
 
       if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
         if (!competitor.mapMarker) {
-          var liveColor = tinycolor(competitor.color).setAlpha(0.75);
-          var isDark = getContrastYIQ(competitor.color) === "dark";
-          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
-            isDark ? "white" : "black"
-          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
-          var runnerIcon = L.icon({
-            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-            iconSize: [16, 16],
-            shadowSize: [16, 16],
-            iconAnchor: [8, 8],
-            shadowAnchor: [0, 0],
-            popupAnchor: [0, 0],
-          });
+          var runnerIcon = getRunnerIcon(competitor.color);
           competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             { icon: runnerIcon }
@@ -1842,34 +1936,13 @@ var drawCompetitors = function () {
           competitor.nameMarker = null;
         }
         if (competitor.nameMarker == undefined) {
-          var iconHtml = `<span style="color: ${competitor.color}">${u(
-            "<span/>"
-          )
-            .text(competitor.short_name)
-            .html()}</span>`;
-          var iconCSSClasses = `runner-icon runner-icon-${getContrastYIQ(
-            competitor.color
-          )} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
-
-          var nameTagEl = document.createElement("div");
-          nameTagEl.className = iconCSSClasses;
-          nameTagEl.innerHTML = iconHtml;
-
-          var mapEl = document.getElementById("map");
-          mapEl.appendChild(nameTagEl);
-
-          var nameTagWidth =
-            nameTagEl.childNodes[0].getBoundingClientRect().width;
-          mapEl.removeChild(nameTagEl);
-
-          competitor.isNameOnRight = pointX > mapMiddleX;
-
-          var runnerIcon = L.divIcon({
-            className: iconCSSClasses,
-            html: iconHtml,
-            iconAnchor: [competitor.isNameOnRight ? nameTagWidth : 0, 0],
-          });
-
+          var isNameOnRight = pointX > mapMiddleX;
+          var runnerIcon = getRunnerNameMarker(
+            competitor.short_name,
+            competitor.color,
+            isNameOnRight
+          );
+          competitor.isNameOnRight = isNameOnRight;
           competitor.nameMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             { icon: runnerIcon }
@@ -2003,19 +2076,7 @@ var drawCompetitors = function () {
             clusterCenter.location.longitude,
           ]);
         } else {
-          var liveColor = tinycolor(cluster.color).setAlpha(0.75);
-          var isDark = getContrastYIQ(cluster.color) === "dark";
-          var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
-            isDark ? "white" : "black"
-          }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
-          var runnerIcon = L.icon({
-            iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-            iconSize: [16, 16],
-            shadowSize: [16, 16],
-            iconAnchor: [8, 8],
-            shadowAnchor: [0, 0],
-            popupAnchor: [0, 0],
-          });
+          var runnerIcon = getRunnerIcon(cluster.color);
           cluster.mapMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
             { icon: runnerIcon }
@@ -2050,33 +2111,14 @@ var drawCompetitors = function () {
             clusterCenter.location.longitude,
           ]);
         } else {
-          var iconHtml =
-            '<span style="color: ' +
-            cluster.color +
-            '">' +
-            banana.i18n("group") +
-            " " +
-            alphabetizeNumber(d - 1) +
-            "</span>";
-          var iconClass =
-            "runner-icon runner-icon-" + getContrastYIQ(cluster.color);
-          var ic2 =
-            iconClass +
-            " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
-          var nameTagEl = document.createElement("div");
-          nameTagEl.className = ic2;
-          nameTagEl.innerHTML = iconHtml;
-          var mapEl = document.getElementById("map");
-          mapEl.appendChild(nameTagEl);
-          var nameTagWidth =
-            nameTagEl.childNodes[0].getBoundingClientRect().width;
-          mapEl.removeChild(nameTagEl);
-          cluster.isNameOnRight = pointX > mapMiddleX;
-          var runnerIcon = L.divIcon({
-            className: iconClass,
-            html: iconHtml,
-            iconAnchor: [cluster.isNameOnRight ? nameTagWidth : 0, 0],
-          });
+          var isNameOnRight = pointX > mapMiddleX;
+          cluster.isNameOnRight = isNameOnRight;
+          var groupName = banana.i18n("group") + " " + alphabetizeNumber(d - 1);
+          var runnerIcon = getRunnerNameMarker(
+            groupName,
+            cluster.color,
+            isNameOnRight
+          );
           cluster.nameMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
             { icon: runnerIcon }
@@ -2093,24 +2135,6 @@ var drawCompetitors = function () {
   if (finishLineSet) {
     rankControl.setValues(finishLineCrosses);
   }
-};
-
-function formatSpeed(s) {
-  var min = Math.floor(s / 60);
-  var sec = Math.floor(s % 60);
-  if (min > 99) {
-    return "--'--\"/km";
-  }
-  return min + "'" + ("0" + sec).slice(-2) + '"/km';
-}
-
-function checkVisible(elm) {
-  var rect = elm.getBoundingClientRect();
-  var viewHeight = Math.max(
-    document.documentElement.clientHeight,
-    window.innerHeight
-  );
-  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
 }
 
 function getParameterByName(name) {
@@ -2172,6 +2196,7 @@ function onPressCustomMassStart(e) {
     }
   }
 }
+
 function onPressResetMassStart(e) {
   isRealTime = false;
   isCustomStart = false;
@@ -2329,62 +2354,3 @@ function updateText() {
       banana.load(messages, banana.locale);
     });
 }
-
-L.Control.EventState = L.Control.extend({
-  options: {
-    position: "topleft",
-  },
-  onAdd: function (map) {
-    var div = L.DomUtil.create("div");
-    div.style.userSelect = "none";
-    div.style["-webkit-user-select"] = "none";
-    this._div = div;
-    return div;
-  },
-  hide() {
-    if (!this._div) {
-      return;
-    }
-    this._div.style.display = "none";
-  },
-  setLive() {
-    if (!this._div) {
-      return;
-    }
-    this._div.innerHTML =
-      '<svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
-      banana.i18n("live-mode");
-    u(this._div).css({
-      display: "block",
-      fontSize: "20px",
-      color: "#fff",
-      backgroundColor: "red",
-      borderRadius: "15px",
-      padding: "3px 20px",
-      fontStyle: "italic",
-      fontWeight: "bold",
-      textTransform: "uppercase",
-    });
-  },
-  setReplay() {
-    this._div.innerHTML = banana.i18n("replay-mode");
-    u(this._div).css({
-      display: "block",
-      fontSize: "20px",
-      color: "#fff",
-      backgroundColor: "#666",
-      borderRadius: "15px",
-      padding: "3px 15px",
-      fontStyle: "normal",
-      fontWeight: "bold",
-      textTransform: "uppercase",
-    });
-  },
-  onRemove: function (map) {
-    // Nothing to do here
-  },
-});
-
-L.control.eventState = function (opts) {
-  return new L.Control.EventState(opts);
-};
