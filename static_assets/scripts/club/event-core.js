@@ -1017,9 +1017,11 @@ function zoomOnCompetitor(compr) {
   }
   var loc = route.getByTime(timeT);
   map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
-    animate: false,
+    animate: true,
   });
-  compr.focusing = false;
+  setTimeout(function () {
+    compr.focusing = false;
+  }, 250);
 }
 
 function toggleFocusCompetitor(c) {
