@@ -456,13 +456,29 @@ class Map(models.Model):
     def resolution(self):
         """Return map image resolution in pixels/meters"""
         ll_a = self.map_xy_to_wsg84(0, 0)
-        ll_b = self.map_xy_to_wsg84(self.width, self.height)
-        return distance_xy(0, 0, self.width, self.height) / distance_latlon(ll_a, ll_b)
+        ll_b = self.map_xy_to_wsg84(self.width, 0)
+        ll_c = self.map_xy_to_wsg84(self.width, self.height)
+        ll_d = self.map_xy_to_wsg84(0, self.height)
+        return (
+            distance_xy(0, 0, 0, self.height)
+            + distance_xy(0, self.height, self.width, self.height)
+            + distance_xy(self.width, self.height, self.width, 0)
+            + distance_xy(self.width, 0, 0, 0)
+        ) / (
+            distance_latlon(ll_a, ll_b)
+            + distance_latlon(ll_b, ll_c)
+            + distance_latlon(ll_c, ll_d)
+            + distance_latlon(ll_d, ll_a)
+        )
 
     @property
     def max_zoom(self):
-        r = self.resolution / 1.193  # 1.193 is meter per pixel at equator for zoom 18
-        return math.ceil(math.log2(r)) + 18
+        center_latitude = self.map_xy_to_wsg84(self.width / 2, self.height / 2)["lat"]
+        meters_per_pixel_at_zoom_18 = (
+            40_075_016.686 * math.cos(center_latitude * math.pi / 180) / (2 ** (18 + 8))
+        )
+        r = self.resolution / meters_per_pixel_at_zoom_18
+        return math.floor(math.log2(r)) + 18
 
     def tile_cache_key(
         self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
