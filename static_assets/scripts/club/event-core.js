@@ -215,7 +215,7 @@ var competitorRoutes = {};
 var routesLastFetched = -Infinity;
 var eventDataLastFetch = -Infinity;
 var fetchPositionInterval = 10;
-var playbackRate = 16;
+var playbackRate = 8;
 var playbackPaused = true;
 var prevDisplayRefresh = 0;
 var tailLength = 60;
@@ -522,7 +522,7 @@ var selectReplayMode = function (e) {
   prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
   prevDisplayRefresh = performance.now();
-  playbackRate = 16;
+  playbackRate = 8;
   function whileReplay(ts) {
     if (
       isLiveEvent &&
