@@ -259,7 +259,6 @@ var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
 var maxParticipantsDisplayed = 300;
 var nbShown = 0;
-var refreshInterval = 100;
 var smoothFactor = 1;
 var prevMapsJSONData = null;
 var mapSelectorLayer = null;
@@ -457,19 +456,16 @@ var selectLiveMode = function (e) {
 
   isLiveMode = true;
   isRealTime = true;
-  (function whileLive() {
+  function whileLive(ts) {
     if (
-      performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
+      ts - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
       if (!window.local.noDelay) {
         fetchCompetitorRoutes();
       }
     }
-    if (
-      performance.now() - eventDataLastFetch > 30 * 1e3 &&
-      !isFetchingEventData
-    ) {
+    if (ts - eventDataLastFetch > 30 * 1e3 && !isFetchingEventData) {
       refreshEventData();
     }
     currentTime =
@@ -477,16 +473,20 @@ var selectLiveMode = function (e) {
     if (window.local.noDelay) {
       currentTime = +clock.now();
     }
-    drawCompetitors();
+    if (ts - prevDisplayRefresh > 100) {
+      drawCompetitors();
+      prevDisplayRefresh = ts;
+    }
     var isStillLive = +endEvent >= +clock.now();
     if (!isStillLive) {
       u("#live_button").remove();
       selectReplayMode();
     }
     if (isLiveMode) {
-      setTimeout(whileLive, refreshInterval);
+      window.requestAnimationFrame(whileLive);
     }
-  })();
+  }
+  window.requestAnimationFrame(whileLive);
 };
 
 var selectReplayMode = function (e) {
@@ -523,10 +523,10 @@ var selectReplayMode = function (e) {
   playbackPaused = true;
   prevDisplayRefresh = performance.now();
   playbackRate = 16;
-  (function whileReplay() {
+  function whileReplay(ts) {
     if (
       isLiveEvent &&
-      performance.now() - routesLastFetched > fetchPositionInterval * 1e3 &&
+      ts - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
       if (!window.local.noDelay) {
@@ -544,8 +544,7 @@ var selectReplayMode = function (e) {
 
     currentTime = Math.max(
       getCompetitionStartDate(),
-      prevShownTime +
-        (performance.now() - prevDisplayRefresh) * actualPlaybackRate
+      prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
     );
     var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
     if (isCustomStart) {
@@ -567,13 +566,17 @@ var selectReplayMode = function (e) {
       selectLiveMode();
       return;
     }
-    drawCompetitors();
-    prevShownTime = currentTime;
-    prevDisplayRefresh = performance.now();
-    if (!isLiveMode) {
-      setTimeout(whileReplay, refreshInterval);
+
+    if (ts - prevDisplayRefresh > 100) {
+      drawCompetitors();
+      prevDisplayRefresh = ts;
     }
-  })();
+    prevShownTime = currentTime;
+    if (!isLiveMode) {
+      window.requestAnimationFrame(whileReplay);
+    }
+  }
+  window.requestAnimationFrame(whileReplay);
 };
 
 var fetchCompetitorRoutes = function (url) {
