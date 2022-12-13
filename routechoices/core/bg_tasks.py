@@ -888,6 +888,7 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
         map_data = data["map"]
         map_name = f"{map_data['name']} - {data['courses'][0]['name']}"
         map_bound = map_data["boundingQuadrilateral"]["vertices"]
+        map_projection = data["map"].get("projection")
     except Exception:
         raise MapImportError("Could not extract basic map info")
     try:
@@ -910,7 +911,6 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
             map_url = map_data["url"]
             map_resolution = map_data["resolution"]
             route_ctrls = [c["controls"] for c in data["courses"]]
-            map_projection = data["map"].get("projection")
             map_model = draw_livelox_route(
                 map_name, club, map_url, map_bound, route_ctrls, map_resolution
             )
