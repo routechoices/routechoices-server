@@ -9,7 +9,7 @@
   var urlLanguage = getLangIfSupported(urlParams.get("lang"));
   var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
   var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
-  var locale = urlLanguage || storedLanguage || browserLanguage || "en";
+  locale = urlLanguage || storedLanguage || browserLanguage || "en";
   clock = ServerClock({ url: window.local.serverClockUrl });
   banana = new Banana();
   updateText().then(function () {

@@ -17,7 +17,7 @@ var COLORS = [
   "#a9a9a9",
   "#000000",
 ];
-var locale = "en";
+var locale = null;
 var map = null;
 var isLiveMode = false;
 var liveUrl = null;
