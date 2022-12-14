@@ -9,7 +9,7 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       return require("./cypress/plugins/index.js")(on, config);
     },
-    baseUrl: "https://www.routechoices.dev:8081",
+    baseUrl: "https://www.routechoices.dev",
   },
 
   component: {

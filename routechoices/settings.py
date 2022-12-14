@@ -92,7 +92,7 @@ SESSION_ENGINE = "user_sessions.backends.db"
 ROOT_URLCONF = "routechoices.urls"
 ROOT_HOSTCONF = "routechoices.hosts"
 DEFAULT_HOST = "www"
-PARENT_HOST = "routechoices.dev:8081"
+PARENT_HOST = "routechoices.dev"
 
 TEMPLATES = [
     {
@@ -182,7 +182,7 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-LOGIN_URL = "https://routechoices.dev:8081/login"
+LOGIN_URL = "https://routechoices.dev/login"
 REDIRECT_ALLOWED_DOMAINS = ["api.routechoices.dev", "www.routechoices.dev"]
 LOGIN_REDIRECT_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = "/"
@@ -1159,7 +1159,7 @@ SWAGGER_SETTINGS = {
 
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
-GPS_SSE_SERVER = "data.routechoices.dev:8081"
+GPS_SSE_SERVER = "data.routechoices.dev"
 LIVESTREAM_INTERNAL_SECRET = "<change-me>"
 
 POST_LOCATION_SECRETS = ["<replace-me>"]
@@ -1168,9 +1168,9 @@ XFF_TRUSTED_PROXY_DEPTH = 1
 
 CSP_DEFAULT_SRC = (
     "'self'",
-    "www.routechoices.dev:8081",
-    "api.routechoices.dev:8081",
-    "data.routechoices.dev:8081",
+    "www.routechoices.dev",
+    "api.routechoices.dev",
+    "data.routechoices.dev",
     "www.routechoices.com",
     "api.routechoices.com",
     "nominatim.openstreetmap.org",
@@ -1187,7 +1187,7 @@ CSP_WORKER_SRC = ("'self'", "blob:")
 CSP_CHILD_SRC = ("'self'", "blob:")
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.routechoices.dev:8081",
+    "https://*.routechoices.dev",
 ]
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = False

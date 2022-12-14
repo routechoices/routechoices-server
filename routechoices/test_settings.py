@@ -15,4 +15,4 @@ from .settings import *  # noqa
 DEBUG = False
 SITE_ID = 1
 
-SHORTCUT_BASE_URL = "http://www.routechoices.dev:8081/r/"
+SHORTCUT_BASE_URL = "http://www.routechoices.dev/r/"

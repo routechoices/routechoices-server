@@ -7,7 +7,7 @@ from routechoices.core.models import Club, Event
 
 class ClubViewsTestCase(LiveServerTestCase):
     def setUp(self):
-        self.client = Client(HTTP_HOST="kiilat.routechoices.dev:8081")
+        self.client = Client(HTTP_HOST="kiilat.routechoices.dev")
         self.user = User.objects.create_user(
             "alice", "alice@example.com", "pa$$word123"
         )
@@ -85,7 +85,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_no_club_pages_loads(self):
-        client = Client(HTTP_HOST="haldensk.routechoices.dev:8081")
+        client = Client(HTTP_HOST="haldensk.routechoices.dev")
         response = client.get(f"{self.live_server_url}/kiila-cup-69/does-not-exist")
         self.assertEqual(response.status_code, 404)
         self.assertIn("Page does not exist", response.content.decode())
