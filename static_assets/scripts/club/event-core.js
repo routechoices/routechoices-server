@@ -711,7 +711,6 @@ function selectReplayMode(e) {
       refreshEventData();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
-
     currentTime = Math.max(
       getCompetitionStartDate(),
       prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
@@ -746,7 +745,7 @@ function selectReplayMode(e) {
       window.requestAnimationFrame(whileReplay);
     }
   }
-  window.requestAnimationFrame(whileReplay);
+  whileReplay(performance.now());
 }
 
 function fetchCompetitorRoutes(url) {
