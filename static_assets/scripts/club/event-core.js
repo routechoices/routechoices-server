@@ -1544,7 +1544,8 @@ function getProgressBarText(currentTime) {
     result += t > 3600 ? Math.floor(t / 3600) + ":" : "";
     result += to2digits((t / 60) % 60) + ":" + to2digits(t % 60);
   } else {
-    if (viewedTime === 0) {
+    var t = Math.round(viewedTime / 1e3);
+    if (t === 0) {
       return "00:00:00";
     }
     if (
