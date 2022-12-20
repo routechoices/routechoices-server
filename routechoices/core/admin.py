@@ -127,6 +127,42 @@ class IsGPXFilter(admin.SimpleListFilter):
         return queryset.filter(is_gpx=False)
 
 
+class TimeStatusFilter(admin.SimpleListFilter):
+    title = "when it is"
+    parameter_name = "when"
+
+    def lookups(self, request, model_admin):
+        return [
+            (None, "All"),
+            ("future", "Future"),
+            ("live", "Live"),
+            ("past", "Past"),
+        ]
+
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == lookup,
+                "query_string": cl.get_query_string(
+                    {
+                        self.parameter_name: lookup,
+                    },
+                    [],
+                ),
+                "display": title,
+            }
+
+    def queryset(self, request, queryset):
+        if self.value() == "past":
+            return queryset.filter(end_date__lt=now())
+        elif self.value() == "future":
+            return queryset.filter(start_date__gt=now())
+        elif self.value() == "live":
+            return queryset.filter(start_date__lte=now(), end_date__gte=now())
+        else:
+            return queryset.all()
+
+
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -177,16 +213,30 @@ class NoticeInline(admin.TabularInline):
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "privacy",
         "club",
         "start_date",
+        "privacy",
+        "competitor_count",
         "shortcut_link",
     )
-    list_filter = ("club", "privacy")
+    list_filter = (TimeStatusFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(competitor_count=Count("competitors"))
+        )
+
     def shortcut_link(self, obj):
-        return mark_safe(f'<a href="{obj.shortcut}">Open</a>')
+        link = obj.shortcut or obj.get_absolute_url()
+        return mark_safe(f'<a href="{link}">{link}</a>')
+
+    def competitor_count(self, obj):
+        return obj.competitor_count
+
+    competitor_count.admin_order_field = "competitor_count"
 
 
 class DeviceCompetitorInline(admin.TabularInline):
