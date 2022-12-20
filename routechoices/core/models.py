@@ -19,7 +19,6 @@ import magic
 import numpy as np
 import orjson as json
 import redis
-import zstd
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -1106,6 +1105,7 @@ class Device(models.Model):
         through_fields=("device", "club"),
     )
     locations_encoded_compressed = models.BinaryField(blank=True, default=b"")
+    locations_encoded = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
     )
@@ -1168,16 +1168,6 @@ class Device(models.Model):
         # 3: 55-75
         # 4: 75-100
         return min(4, round((self.battery_level - 5) / 20))
-
-    @property
-    def locations_encoded(self):
-        if not self.locations_encoded_compressed:
-            return ""
-        return zstd.uncompress(bytes(self.locations_encoded_compressed)).decode()
-
-    @locations_encoded.setter
-    def locations_encoded(self, data):
-        self.locations_encoded_compressed = zstd.compress(data.encode())
 
     @property
     def locations_series(self):
@@ -1311,7 +1301,8 @@ class Device(models.Model):
     def location_count(self):
         # This use a property of the GPS encoding format
         n = 0
-        for x in self.locations_encoded:
+        encoded = self.locations_encoded
+        for x in encoded:
             if ord(x) - 63 < 0x20:
                 n += 1
         return n // 3
