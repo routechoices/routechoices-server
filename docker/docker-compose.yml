@@ -40,7 +40,7 @@ services:
       - "443:443/tcp"
     volumes:
       - ../static/:/usr/share/nginx/html/:ro
-      - ../nginx/certs:/usr/share/nginx/certs/:ro
+      - ../nginx/certs/:/usr/share/nginx/certs/:ro
       - ../nginx/routechoices.conf:/etc/nginx/conf.d/routechoices.conf:ro
     links:
       - minio
