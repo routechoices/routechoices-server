@@ -103,12 +103,6 @@ workflows:
                 - master
   build_image:
     jobs:
-      - build-and-test:
-          filters:
-            tags:
-              only: /v.*/
-            branches:
-              ignore: /.*/
       - build-docker:
           requires:
             - build-and-test
