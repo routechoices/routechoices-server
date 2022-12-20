@@ -104,8 +104,6 @@ workflows:
   build_image:
     jobs:
       - build-docker:
-          requires:
-            - build-and-test
           filters:
             tags:
               only: /v.*/
