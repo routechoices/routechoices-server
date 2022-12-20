@@ -1237,13 +1237,15 @@ class Device(models.Model):
         new_pts = []
         locations = self.locations_series
         all_ts = set()
+        max_ts = None
         if locations:
             all_ts = set(list(zip(*locations))[LOCATION_TIMESTAMP_INDEX])
+            max_ts = max(all_ts)
         for loc in loc_array:
             ts = int(loc[LOCATION_TIMESTAMP_INDEX])
             lat = loc[LOCATION_LATITUDE_INDEX]
             lon = loc[LOCATION_LONGITUDE_INDEX]
-            if ts in all_ts:
+            if max_ts and ts <= max_ts and ts in all_ts:
                 continue
             try:
                 validate_latitude(lat)
@@ -1255,6 +1257,10 @@ class Device(models.Model):
             if isinstance(lon, Decimal):
                 lon = float(lon)
             all_ts.add(ts)
+            if not max_ts:
+                max_ts = ts
+            else:
+                max_ts = max(ts, max_ts)
             new_pts.append((ts, lat, lon))
 
         if len(new_pts) == 0:
