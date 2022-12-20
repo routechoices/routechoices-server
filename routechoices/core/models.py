@@ -1173,7 +1173,7 @@ class Device(models.Model):
     def locations_encoded(self):
         if not self.locations_encoded_compressed:
             return ""
-        return zstd.decompress(bytes(self.locations_encoded_compressed)).decode()
+        return zstd.uncompress(bytes(self.locations_encoded_compressed)).decode()
 
     @locations_encoded.setter
     def locations_encoded(self, data):
@@ -1342,8 +1342,7 @@ class Device(models.Model):
             prev_t = t
 
         updated_encoded = gps_encoding.encode_data(updated_locations_list)
-        updated_encoded_compressed = zstd.compress(updated_encoded.encode())
-        if self.locations_encoded_compressed != updated_encoded_compressed:
+        if self.locations_encoded != updated_encoded:
             self.locations_series = updated_locations_list
             if save:
                 self.save()
