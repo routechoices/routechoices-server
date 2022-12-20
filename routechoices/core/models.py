@@ -1172,6 +1172,8 @@ class Device(models.Model):
 
     @property
     def locations_encoded_(self):
+        if not self.locations_encoded_compressed:
+            return ""
         return zstd.decompress(bytes(self.locations_encoded_compressed)).decode()
 
     @locations_encoded_.setter
