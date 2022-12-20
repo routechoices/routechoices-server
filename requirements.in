@@ -39,4 +39,3 @@ sewer==0.8.4
 tornado
 uwsgi
 websocket-client
-zstd

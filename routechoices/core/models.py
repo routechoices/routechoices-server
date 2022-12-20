@@ -1104,7 +1104,6 @@ class Device(models.Model):
         related_name="devices",
         through_fields=("device", "club"),
     )
-    locations_encoded_compressed = models.BinaryField(blank=True, default=b"")
     locations_encoded = models.TextField(blank=True, default="")
     battery_level = models.PositiveIntegerField(
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
