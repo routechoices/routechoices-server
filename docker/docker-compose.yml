@@ -34,13 +34,13 @@ services:
       - "1025"
   nginx:
     container_name: rc_nginx
-    image: ghcr.io/macbre/nginx-http3:latest
+    image: macbre/nginx-http3:latest
     ports:
       - "443:443/udp"
       - "443:443/tcp"
     volumes:
-      - ../static/:/usr/share/nginx/html/:ro
-      - ../nginx/certs/:/usr/share/nginx/certs/:ro
+      - ../static:/static:ro
+      - ../nginx/certs:/etc/nginx/ssl:ro
       - ../nginx/routechoices.conf:/etc/nginx/conf.d/routechoices.conf:ro
     links:
       - minio
