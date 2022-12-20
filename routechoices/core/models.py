@@ -19,6 +19,7 @@ import magic
 import numpy as np
 import orjson as json
 import redis
+import zstd
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -1104,7 +1105,7 @@ class Device(models.Model):
         related_name="devices",
         through_fields=("device", "club"),
     )
-    locations_encoded = models.TextField(blank=True, default="")
+    locations_encoded_compressed = models.BinaryField(blank=True, default=b"")
     battery_level = models.PositiveIntegerField(
         null=True, default=None, validators=[MaxValueValidator(100)], blank=True
     )
@@ -1169,22 +1170,30 @@ class Device(models.Model):
         return min(4, round((self.battery_level - 5) / 20))
 
     @property
+    def locations_encoded_(self):
+        return zstd.decompress(bytes(self.locations_encoded_compressed)).decode()
+
+    @locations_encoded_.setter
+    def locations_encoded_(self, data):
+        self.locations_encoded_compressed = zstd.compress(data.encode())
+
+    @property
     def locations_series(self):
-        if not self.locations_encoded:
+        if not self.locations_encoded_:
             return []
-        return gps_encoding.decode_data(self.locations_encoded)
+        return gps_encoding.decode_data(self.locations_encoded_)
 
     @locations_series.setter
     def locations_series(self, locations_list):
         sorted_locations = list(
             sorted(locations_list, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
         )
-        self.locations_encoded = gps_encoding.encode_data(sorted_locations)
+        self.locations_encoded_ = gps_encoding.encode_data(sorted_locations)
         self.update_cached_data()
 
     @property
     def locations(self):
-        if not self.locations_encoded:
+        if not self.locations_encoded_:
             return {"timestamps": [], "latitudes": [], "longitudes": []}
         locs = self.locations_series
         data = list(zip(*locs))
@@ -1300,7 +1309,7 @@ class Device(models.Model):
     def location_count(self):
         # This use a property of the GPS encoding format
         n = 0
-        for x in self.locations_encoded:
+        for x in self.locations_encoded_:
             if ord(x) - 63 < 0x20:
                 n += 1
         return n // 3
@@ -1331,7 +1340,8 @@ class Device(models.Model):
             prev_t = t
 
         updated_encoded = gps_encoding.encode_data(updated_locations_list)
-        if self.locations_encoded != updated_encoded:
+        updated_encoded_compressed = zstd.compress(updated_encoded.encode())
+        if self.locations_encoded_compressed != updated_encoded_compressed:
             self.locations_series = updated_locations_list
             if save:
                 self.save()
