@@ -28,7 +28,6 @@ context("Dashboard manipulations", () => {
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
     cy.get("#id_name").type("Jukola 2019 - 1st Leg");
-    cy.get("#id_slug").clear().type("Jukola-2019-1st-leg");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-16 10:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg");
@@ -62,7 +61,6 @@ context("Dashboard manipulations", () => {
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
     cy.get("#id_name").type("Jukola 2019 - 2nd Leg");
-    cy.get("#id_slug").clear().type("Jukola-2019-2nd-leg");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-16 00:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg"); // doesnt matter
@@ -90,7 +88,6 @@ context("Dashboard manipulations", () => {
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
     cy.get("#id_name").type("Jukola 2019 - 2nd Leg");
-    cy.get("#id_slug").clear().type("Jukola-2019-2nd-leg");
     cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-14 00:00:00");
     cy.get("#id_map_assignations-0-map").select("Jukola 2019 - 1st Leg");
