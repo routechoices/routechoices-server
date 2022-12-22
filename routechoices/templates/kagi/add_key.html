@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block sub_content %}
 {{ block.super }}
@@ -16,6 +17,11 @@
 </form>
 
 <a href="{% url 'kagi:two-factor-settings' %}">{% trans '&larr; Back to 2FA settings' %}</a>
+{% endblock %}
 
-<script src="{% static 'scripts/webauthn.js' %}?v=2"></script>
+{% block extra_body %}
+{{ block.super }}
+{% compress js %}
+<script src="{% static '/scripts/webauthn.js' %}?v=2"></script>
+{% endcompress %}
 {% endblock %}

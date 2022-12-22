@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block content %}
 {{ block.super }}
@@ -49,5 +50,11 @@
 </div>
 {% endif %}
 
-<script src="{% static 'scripts/webauthn.js' %}?v=2"></script>
+{% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+{% compress js %}
+<script src="{% static '/scripts/webauthn.js' %}?v=2"></script>
+{% endcompress %}
 {% endblock %}

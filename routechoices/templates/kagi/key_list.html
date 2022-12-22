@@ -51,7 +51,7 @@
 {% block extra_body %}
 {{ block.super }}
 {% compress js %}
-<script src="{% static 'scripts/webauthn.js' %}?v=2"></script>
+<script src="{% static '/scripts/webauthn.js' %}?v=2"></script>
 <script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/date_to_local.js' %}"></script>
