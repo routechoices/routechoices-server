@@ -16,7 +16,7 @@ context("Dashboard manipulations", () => {
     // Create club
     cy.createClub();
 
-    cy.contains("KangasalaSK").click();
+    cy.contains("Kangasala SK").click();
 
     // Create Map
     cy.createMap();
