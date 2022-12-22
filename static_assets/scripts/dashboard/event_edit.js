@@ -170,6 +170,45 @@ function showLocalTime(el) {
 }
 
 (function () {
+  var newSlug = u("#id_name").val() == "";
+  var slugEdited = false;
+  u("#id_slug")
+    .parent()
+    .find(".form-text")
+    .append(
+      '<button class="randomize_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
+    );
+  u(".randomize_btn").on("click", function (e) {
+    e.preventDefault();
+    var target = u(e.target).parent().parent().find(".form-control");
+    var result = "";
+    var characters = "23456789abcdefghijkmnopqrstuvwxyz";
+    var charactersLength = characters.length;
+    for (var i = 0; i < 6; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    target.val(result);
+    target.trigger("blur");
+  });
+  if (newSlug) {
+    u("#id_slug")
+      .on("blur", function (e) {
+        slugEdited = e.target.value !== "";
+      })
+      .val("");
+    u("#id_name").on("keyup", function (e) {
+      if (!slugEdited) {
+        var value = e.target.value;
+        var slug = slugify(value, {
+          strict: true,
+          replacement: "-",
+          trim: true,
+        });
+        u("#id_slug").val(slug.toLowerCase());
+      }
+    });
+  }
+
   new TomSelect("#id_event_set", {
     allowEmptyOption: true,
     render: {

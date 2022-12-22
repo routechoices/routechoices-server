@@ -1,4 +1,25 @@
 (function () {
+  var newSlug = u("#id_name").val() == "";
+  var slugEdited = false;
+  if (newSlug) {
+    u("#id_slug")
+      .on("blur", function (e) {
+        slugEdited = true;
+      })
+      .val("");
+    u("#id_name").on("keyup", function (e) {
+      if (!slugEdited) {
+        var value = e.target.value;
+        var slug = slugify(value, {
+          strict: true,
+          replacement: "-",
+          trim: true,
+        });
+        u("#id_slug").val(slug.toLowerCase());
+      }
+    });
+  }
+
   new TomSelect("#id_admins", {
     valueField: "id",
     labelField: "username",
