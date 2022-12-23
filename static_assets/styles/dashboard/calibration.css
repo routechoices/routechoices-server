@@ -37,3 +37,6 @@
   padding: 0 10px 0 30px;
   margin: 0;
 }
+.crosshair-cursor {
+  cursor: crosshair;
+}

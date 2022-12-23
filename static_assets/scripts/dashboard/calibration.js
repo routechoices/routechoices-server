@@ -240,6 +240,7 @@ function project(m, x, y) {
 
   function display_raster_map(image) {
     map_a = L.map("raster_map", { crs: L.CRS.Simple, minZoom: -5, maxZoom: 2 });
+    L.DomUtil.addClass(map_a._container, "crosshair-cursor");
     var bounds = [
       map_a.unproject([0, 0]),
       map_a.unproject([image.width, image.height]),
@@ -253,6 +254,7 @@ function project(m, x, y) {
   }
   function display_world_map() {
     map_b = L.map("tile_map").setView([0, 0], 2);
+    L.DomUtil.addClass(map_b._container, "crosshair-cursor");
     L.Control.geocoder({
       defaultMarkGeocode: false,
     })
@@ -343,6 +345,9 @@ function project(m, x, y) {
       }).addTo(map_a);
       markers_a.push(marker);
       check_calib();
+      if (markers_a.length === 4) {
+        L.DomUtil.removeClass(map_a._container, "crosshair-cursor");
+      }
     }
   }
 
@@ -354,6 +359,9 @@ function project(m, x, y) {
       }).addTo(map_b);
       markers_b.push(marker);
       check_calib();
+      if (markers_b.length === 4) {
+        L.DomUtil.removeClass(map_b._container, "crosshair-cursor");
+      }
     }
   }
 
@@ -426,7 +434,7 @@ function project(m, x, y) {
       markers_a[i].remove();
     }
     markers_a = [];
-
+    L.DomUtil.addClass(map_a._container, "crosshair-cursor");
     u("#to_step3_button").addClass("disabled");
   });
 
@@ -436,7 +444,7 @@ function project(m, x, y) {
       markers_b[i].remove();
     }
     markers_b = [];
-
+    L.DomUtil.addClass(map_b._container, "crosshair-cursor");
     u("#to_step3_button").addClass("disabled");
   });
   u("#to_step3_button").on("click", function (e) {
