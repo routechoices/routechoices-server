@@ -62,7 +62,7 @@ def validate_longitude(value):
 def validate_nice_slug(slug):
     if re.search(r"[^-a-zA-Z0-9_]", slug):
         raise ValidationError(
-            _("Only alphanumeric characters, " "hyphens and underscores are allowed.")
+            _("Only alphanumeric characters, hyphens and underscores are allowed.")
         )
     if len(slug) < 2:
         raise ValidationError(_("Too short. (min. 2 characters)"))
@@ -74,7 +74,7 @@ def validate_nice_slug(slug):
         raise ValidationError(_("Must end with an alphanumeric character."))
     if "--" in slug or "__" in slug or "-_" in slug or "_-" in slug:
         raise ValidationError(
-            _("Cannot include 2 non alphanumeric " "character in a row.")
+            _("Cannot include 2 non alphanumeric character in a row.")
         )
     if slug.lower() in settings.SLUG_BLACKLIST:
         raise ValidationError(_("Forbidden word."))
@@ -83,7 +83,7 @@ def validate_nice_slug(slug):
 def validate_domain_slug(slug):
     if re.search(r"[^-a-zA-Z0-9]", slug):
         raise ValidationError(
-            _("Only alphanumeric characters " "and hyphens are allowed.")
+            _("Only alphanumeric characters and hyphens are allowed.")
         )
     if len(slug) < 2:
         raise ValidationError(_("Too short. (min. 2 characters)"))
@@ -95,7 +95,7 @@ def validate_domain_slug(slug):
         raise ValidationError(_("Must end with an alphanumeric character."))
     if "--" in slug:
         raise ValidationError(
-            _("Cannot include 2 non alphanumeric " "character in a row.")
+            _("Cannot include 2 non alphanumeric character in a row.")
         )
     if slug.lower() in settings.SLUG_BLACKLIST:
         raise ValidationError(_("Forbidden word."))
