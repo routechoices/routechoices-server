@@ -181,6 +181,7 @@ function showLocalTime(el) {
     .getBoundingClientRect().width;
   u("#id_slug").css({
     width: "calc(100% - " + slugPrefixWidth + "px)",
+    "min-width": "150px",
     display: "inline-block",
   });
   u("#id_slug").parent().find(".form-label").text("URL");
