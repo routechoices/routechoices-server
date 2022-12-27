@@ -1,4 +1,6 @@
 (function () {
+  u("#id_slug").parent().find(".form-label").text("Domain Prefix");
+
   var newSlug = u("#id_name").val() == "";
   var slugEdited = false;
   u("#id_name").on("keyup", function (e) {

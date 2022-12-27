@@ -170,11 +170,27 @@ function showLocalTime(el) {
 }
 
 (function () {
+  var slugPrefix = u(
+    '<br/><span id="id_slug-prefix" style="padding-right: 5px;color: #999">' +
+      window.local.clubUrl +
+      "</span>"
+  );
+  u("#id_slug").before(slugPrefix);
+  var slugPrefixWidth = document
+    .getElementById("id_slug-prefix")
+    .getBoundingClientRect().width;
+  u("#id_slug").css({
+    width: "calc(100% - " + slugPrefixWidth + "px)",
+    display: "inline-block",
+  });
+  u("#id_slug").parent().find(".form-label").text("URL");
+
   var newSlug = u("#id_name").val() == "";
   var slugEdited = false;
   u("#id_slug")
     .parent()
     .find(".form-text")
+    .text("")
     .append(
       '<button class="randomize_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
     );
