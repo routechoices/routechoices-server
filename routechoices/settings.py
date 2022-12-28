@@ -157,8 +157,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 TIME_ZONE = "UTC"
 
-USE_L10N = True
-
 USE_TZ = True
 
 

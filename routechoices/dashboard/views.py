@@ -31,7 +31,7 @@ from PIL import Image
 from invitations.forms import InviteForm
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
-    IS_DB_SQLITE,
+    IS_DB_POSTGRES,
     Club,
     Competitor,
     Device,
@@ -246,7 +246,7 @@ def device_list_view(request):
         .order_by("device_id", "-start_time")
     )
 
-    if not IS_DB_SQLITE:
+    if IS_DB_POSTGRES:
         competitors = competitors.distinct("device_id")
     else:
         unique_devid = set()

@@ -3,6 +3,7 @@
 import datetime
 import re
 import uuid
+from datetime import timezone
 
 import django.core.validators
 import django.db.migrations.operations.special
@@ -10,7 +11,6 @@ import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
-from django.utils.timezone import utc
 
 import routechoices.core.models
 import routechoices.lib.helpers
@@ -601,7 +601,9 @@ class Migration(migrations.Migration):
             model_name="event",
             name="end_date",
             field=models.DateTimeField(
-                default=datetime.datetime(2099, 12, 31, 23, 59, 59, 999, tzinfo=utc),
+                default=datetime.datetime(
+                    2099, 12, 31, 23, 59, 59, 999, tzinfo=timezone.utc
+                ),
                 verbose_name="End Date (UTC) (*)",
             ),
             preserve_default=False,

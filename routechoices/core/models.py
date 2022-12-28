@@ -85,7 +85,9 @@ if settings.DATABASES["default"]["ENGINE"] not in (
 ):
     raise Exception("DB not supported")
 
-IS_DB_SQLITE = settings.DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3"
+IS_DB_POSTGRES = (
+    settings.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql_psycopg2"
+)
 
 
 class Point:
