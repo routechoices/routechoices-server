@@ -1,9 +1,9 @@
-{% extends "dashboard/home.html" %}
+{% extends "dashboard/account_edit.html" %}
 {% load static %}
 {% load i18n %}
 {% load compress %}
 
-{% block content %}
+{% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
         data-begin-activate="{% url 'kagi:begin-activate' %}"
         data-begin-assertion="{% url 'kagi:begin-assertion' %}"
@@ -11,13 +11,11 @@
         data-verify-assertion="{% url 'kagi:verify-assertion' %}"
         data-keys-list="{% url 'kagi:webauthn-keys' %}"
 ></script>
-
 {% compress js %}
 <script src="{% static '/kagi/base64js.min.js' %}"></script>
 <script src="{% static '/scripts/kagi.js' %}"></script>
 {% endcompress %}
 {{ block.super }}
-
 <div id="webauthn-undefined-error" style="display: none">
     {% blocktrans %}
     This browser is not among the <a href="https://caniuse.com/webauthn" target="_blank">

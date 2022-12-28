@@ -1,11 +1,9 @@
 {% extends "user_sessions/_base.html" %}
 {% load user_sessions i18n %}
 
-{% block sub_content %}
+{% block sub_sub_content %}
   {% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}
   {% trans "<em>unknown</em>" as unknown %}
-
-  <h3>{% trans "Active Sessions" %}</h3>
 
   <table class="table">
     <thead>

@@ -3,9 +3,7 @@
 {% load static %}
 {% load compress %}
 
-{% block content %}
-{{ block.super }}
-
+{% block sub_sub_content %}
 <h1>{% trans "TOTP (Authenticator) Devices" %}</h1>
 {% if object_list %}
 <table class="table">

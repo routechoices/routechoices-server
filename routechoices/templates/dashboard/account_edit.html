@@ -1,19 +1,27 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
+{% load django_bootstrap5 %}
 
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
-        <h4>Email Addresses</h4>
-        <p><a href="{% url 'account_email' %}" class="btn btn-primary">Edit email addresses</a></p>
-        <h4>Password</h4>
-        <p><a href="{% url 'account_set_password' %}" class="btn btn-primary">Change password</a></p>
-        <h4>Two-Factor Authentication</h4>
-        <p><a href="{% url 'kagi:two-factor-settings' %}" class="btn btn-primary">Two-Factor Settings</a></p>
-        <h4>Sessions</h4>
-        <p><a href="{% url 'user_sessions:session_list' %}" class="btn btn-primary">Review active sessions</a></p>
-        <h4>Account Deletion</h4>
-        <p><a href="{% url 'dashboard:account_delete_view' %}" class="btn btn-danger">Delete your account</a></p>
+        <h2><i class="fa-solid fa-user"></i> {{ user }}</h2>
+    </div>
+</div>
+<ul class="nav nav-tabs" style="margin-bottom:1em;">
+    <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'dashboard:account_edit_view' %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}"><i class="fa-solid fa-user"></i> Your Details</a></li>
+    <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'account_email' %}active{% endif %}" href="{% url 'account_email' %}"><i class="fa-solid fa-envelope"></i> Email Addresses</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'account_set_password' %}active{% endif %}" href="{% url 'account_set_password' %}"><i class="fa-solid fa-key"></i> Password</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'kagi:two-factor-settings' %}active{% endif %}" href="{% url 'kagi:two-factor-settings' %}"><i class="fa fa-map-o"></i> Two-Factor Authentication</a></li>
+<li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name == 'user_sessions:session_list' %}active{% endif %}" href="{% url 'user_sessions:session_list' %}"><i class="fa-solid fa-folder-open"></i> Sessions</a></li>
+</ul>
+{% block sub_sub_content %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="Save" class="btn btn-primary"> <a href="{% url 'dashboard:account_delete_view' %}" class="btn btn-danger">Delete account</a>
+    </form>
+{% endblock %}
     </div>
 </div>
 {% endblock %}

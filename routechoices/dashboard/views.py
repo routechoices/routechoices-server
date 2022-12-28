@@ -54,6 +54,7 @@ from routechoices.dashboard.forms import (
     UploadGPXForm,
     UploadKmzForm,
     UploadMapGPXForm,
+    UserForm,
 )
 from routechoices.lib.helpers import short_random_key
 from routechoices.lib.kmz import extract_ground_overlay_info
@@ -153,9 +154,19 @@ def check_calibration_view(request):
 
 @login_required
 def account_edit_view(request):
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+    else:
+        form = UserForm(instance=request.user)
     return render(
         request,
         "dashboard/account_edit.html",
+        {
+            "user": request.user,
+            "form": form,
+        },
     )
 
 

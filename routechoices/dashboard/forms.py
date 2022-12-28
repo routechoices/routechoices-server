@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.images import get_image_dimensions
@@ -31,7 +32,22 @@ from routechoices.lib.helpers import (
     check_txt_record,
     get_aware_datetime,
 )
-from routechoices.lib.validators import domain_validator
+from routechoices.lib.validators import domain_validator, validate_nice_slug
+
+
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].help_text = ""
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        validate_nice_slug(username)
+        return username
 
 
 class ClubForm(ModelForm):
