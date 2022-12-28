@@ -158,6 +158,8 @@ def account_edit_view(request):
         form = UserForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, "Changes saved.")
+            return redirect("dashboard:account_edit_view")
     else:
         form = UserForm(instance=request.user)
     return render(
