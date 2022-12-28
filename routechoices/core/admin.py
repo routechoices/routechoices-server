@@ -1,3 +1,4 @@
+from base64 import b32encode
 from datetime import timedelta
 
 import arrow
@@ -8,6 +9,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
 
 from routechoices.core.models import (
     Club,
@@ -418,6 +420,27 @@ class MyUserAdmin(UserAdmin):
 UserModel = get_user_model()
 admin.site.unregister(UserModel)
 admin.site.register(UserModel, MyUserAdmin)
+
+
+class BackupCodeAdmin(admin.ModelAdmin):
+    list_display = ("user", "code")
+
+
+class TOTPDeviceAdmin(admin.ModelAdmin):
+    list_display = ("user", "secret_base32")
+
+    def secret_base32(self, obj):
+        return b32encode(obj.key).decode()
+
+
+class WebAuthnKeyAdmin(admin.ModelAdmin):
+    list_display = ("user", "key_name")
+
+
+admin.site.register(BackupCode, BackupCodeAdmin)
+admin.site.register(TOTPDevice, TOTPDeviceAdmin)
+admin.site.unregister(WebAuthnKey)
+admin.site.register(WebAuthnKey, WebAuthnKeyAdmin)
 
 ADMIN_COMMAND_LIST = [
     "import_from_gpsseuranta",
