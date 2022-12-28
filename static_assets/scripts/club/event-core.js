@@ -1082,7 +1082,7 @@ function displayCompetitorList(force) {
         '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("follow") +
         '" style="padding: 0 3px 0 0;margin-left:1px">' +
-        '<i class="fa-solid fa-bullseye' +
+        '<i class="fa-solid fa-crosshairs' +
         (competitor.focused ? " route-focused" : "") +
         '" id="focusedIcon-' +
         competitor.id +
