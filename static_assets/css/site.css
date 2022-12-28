@@ -209,14 +209,14 @@ body {
   color: #13967d;
 }
 
-.route-displayed .fa-bullseye {
+.route-displayed .fa-crosshairs {
   color: black;
 }
 
-.route-not-displayed .fa-bullseye {
+.route-not-displayed .fa-crosshairs {
   color: #aaa;
 }
 
-.route-displayed .fa-bullseye.route-focused {
+.route-displayed .fa-crosshairs.route-focused {
   color: #18bc9c;
 }
