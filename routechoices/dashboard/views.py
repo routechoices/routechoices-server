@@ -2,6 +2,7 @@ import math
 import os
 import tempfile
 import zipfile
+from copy import deepcopy
 
 import gpxpy
 import requests
@@ -344,7 +345,8 @@ def club_view(request):
     club = request.club
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = ClubForm(request.POST, request.FILES, instance=club)
+        club_copy = deepcopy(club)
+        form = ClubForm(request.POST, request.FILES, instance=club_copy)
         # check whether it's valid:
         if form.is_valid():
             form.save()
@@ -367,10 +369,10 @@ def club_view(request):
 @requires_club_in_session
 def club_custom_domain_view(request):
     club = request.club
-
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = ClubDomainForm(request.POST, instance=club)
+        club_copy = deepcopy(club)
+        form = ClubDomainForm(request.POST, instance=club_copy)
         # check whether it's valid:
         if form.is_valid():
             form.save()
@@ -458,7 +460,8 @@ def map_edit_view(request, map_id):
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = MapForm(request.POST, request.FILES, instance=raster_map)
+        raster_map_copy = deepcopy(raster_map)
+        form = MapForm(request.POST, request.FILES, instance=raster_map_copy)
         form.instance.club = club
         # check whether it's valid:
         if form.is_valid():
@@ -796,7 +799,9 @@ def event_set_edit_view(request, event_set_id):
     )
 
     if request.method == "POST":
-        form = EventSetForm(request.POST, instance=event_set, club=club)
+        event_set_copy = deepcopy(event_set)
+        club_copy = deepcopy(club)
+        form = EventSetForm(request.POST, instance=event_set_copy, club=club_copy)
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved successfully")
@@ -978,15 +983,16 @@ def event_edit_view(request, event_id):
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = EventForm(request.POST, request.FILES, instance=event, club=club)
+        event_copy = deepcopy(event)
+        form = EventForm(request.POST, request.FILES, instance=event_copy, club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        extra_map_formset = ExtraMapFormSet(request.POST, instance=event)
+        extra_map_formset = ExtraMapFormSet(request.POST, instance=event_copy)
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
         formset = CompetitorFormSet(
             request.POST,
-            instance=event,
+            instance=event_copy,
         )
         args = {}
         if event.has_notice:
@@ -1129,9 +1135,10 @@ def event_competitors_view(request, event_id):
     all_devices = set(list(comp_devices_id) + list(own_devices_id))
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
+        event_copy = deepcopy(event)
         formset = CompetitorFormSet(
             request.POST,
-            instance=event,
+            instance=event_copy,
         )
         # check whether it's valid:
         if formset.is_valid():

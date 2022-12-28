@@ -60,45 +60,45 @@ def validate_longitude(value):
 
 
 def validate_nice_slug(slug):
+    errors = []
     if re.search(r"[^-a-zA-Z0-9_]", slug):
-        raise ValidationError(
+        errors.append(
             _("Only alphanumeric characters, hyphens and underscores are allowed.")
         )
     if len(slug) < 2:
-        raise ValidationError(_("Too short. (min. 2 characters)"))
+        errors.append(_("Too short. (min. 2 characters)"))
     elif len(slug) > 32:
-        raise ValidationError(_("Too long. (max. 32 characters)"))
+        errors.append(_("Too long. (max. 32 characters)"))
     if slug[0] in "_-":
-        raise ValidationError(_("Must start with an alphanumeric character."))
+        errors.append(_("Must start with an alphanumeric character."))
     if slug[-1] in "_-":
-        raise ValidationError(_("Must end with an alphanumeric character."))
+        errors.append(_("Must end with an alphanumeric character."))
     if "--" in slug or "__" in slug or "-_" in slug or "_-" in slug:
-        raise ValidationError(
-            _("Cannot include 2 non alphanumeric character in a row.")
-        )
+        errors.append(_("Cannot include 2 non alphanumeric character in a row."))
     if slug.lower() in settings.SLUG_BLACKLIST:
-        raise ValidationError(_("Forbidden word."))
+        raise errors.append(_("Forbidden word."))
+    if errors:
+        raise ValidationError(errors)
 
 
 def validate_domain_slug(slug):
+    errors = []
     if re.search(r"[^-a-zA-Z0-9]", slug):
-        raise ValidationError(
-            _("Only alphanumeric characters and hyphens are allowed.")
-        )
+        errors.append(_("Only alphanumeric characters and hyphens are allowed."))
     if len(slug) < 2:
-        raise ValidationError(_("Too short. (min. 2 characters)"))
+        errors.append(_("Too short. (min. 2 characters)"))
     elif len(slug) > 32:
-        raise ValidationError(_("Too long. (max. 32 characters)"))
+        errors.append(_("Too long. (max. 32 characters)"))
     if slug[0] in "-":
-        raise ValidationError(_("Must start with an alphanumeric character."))
+        errors.append(_("Must start with an alphanumeric character."))
     if slug[-1] in "-":
-        raise ValidationError(_("Must end with an alphanumeric character."))
+        errors.append(_("Must end with an alphanumeric character."))
     if "--" in slug:
-        raise ValidationError(
-            _("Cannot include 2 non alphanumeric character in a row.")
-        )
+        errors.append(_("Cannot include 2 non alphanumeric character in a row."))
     if slug.lower() in settings.SLUG_BLACKLIST:
-        raise ValidationError(_("Forbidden word."))
+        raise errors.append(_("Forbidden word."))
+    if errors:
+        raise ValidationError(errors)
 
 
 def validate_image_data_uri(value):
