@@ -952,6 +952,7 @@ function hideSidebar() {
     .removeClass("col-lg-3")
     .removeClass("col-xxl-2");
   sidebarShown = false;
+  map.invalidateSize();
 }
 
 function showSidebar() {
@@ -969,6 +970,7 @@ function showSidebar() {
     .addClass("col-lg-3")
     .addClass("col-xxl-2");
   sidebarShown = true;
+  map.invalidateSize();
 }
 
 function toggleCompetitorList(e) {
@@ -986,7 +988,6 @@ function toggleCompetitorList(e) {
     showSidebar();
     displayCompetitorList(true);
   }
-  map.invalidateSize();
 }
 
 function toggleFullCompetitor(c) {
@@ -1341,7 +1342,6 @@ function displayOptions(ev) {
     // hide sidebar
     optionDisplayed = false;
     hideSidebar();
-    map.invalidateSize();
     displayCompetitorList();
     return;
   }
@@ -1349,7 +1349,6 @@ function displayOptions(ev) {
   // show sidebar
   if (!sidebarShown || (u("#sidebar").hasClass("d-none") && width <= 576)) {
     showSidebar();
-    map.invalidateSize();
   }
   optionDisplayed = true;
   searchText = null;

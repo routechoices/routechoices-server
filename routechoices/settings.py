@@ -123,7 +123,7 @@ WSGI_APPLICATION = "routechoices.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "app_db",
         "USER": "app_user",
         "PASSWORD": "changeme",

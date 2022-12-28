@@ -80,13 +80,13 @@ LOCATION_LATITUDE_INDEX = 1
 LOCATION_LONGITUDE_INDEX = 2
 
 if settings.DATABASES["default"]["ENGINE"] not in (
-    "django.db.backends.postgresql_psycopg2",
+    "django.db.backends.postgresql",
     "django.db.backends.sqlite3",
 ):
     raise Exception("DB not supported")
 
 IS_DB_POSTGRES = (
-    settings.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql_psycopg2"
+    settings.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql"
 )
 
 
