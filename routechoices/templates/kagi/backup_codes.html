@@ -22,7 +22,4 @@
   {% csrf_token %}
   <input type="submit" class="btn btn-primary" value="{% trans 'Create some backup codes' %}">
 </form>
-<p>
-<a href="{% url 'kagi:two-factor-settings' %}">{% trans '&larr; Back to 2FA settings' %}</a>
-</p>
 {% endblock %}

@@ -14,8 +14,6 @@
     {% bootstrap_form form %}
     <button id="webauthn-provision-begin" type="submit" class="btn btn-primary">{% trans 'Add WebAuthn Key' %}</button>
 </form>
-
-<a href="{% url 'kagi:two-factor-settings' %}">{% trans '&larr; Back to 2FA settings' %}</a>
 {% endblock %}
 
 {% block extra_body %}
