@@ -8,7 +8,7 @@
     loadImage(
       src,
       function (d) {
-        callback(d.toDataURL("image/jpeg", 0.4));
+        callback(d.toDataURL("image/png"));
       },
       { orientation: 1 }
     );

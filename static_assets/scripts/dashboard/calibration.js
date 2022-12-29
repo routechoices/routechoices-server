@@ -466,10 +466,7 @@ function project(m, x, y) {
   u("#to_step4_button").on("click", function (e) {
     e.preventDefault();
     var el = window.opener.document.querySelector("#id_corners_coordinates");
-    el.value = calib_string;
-    var event = document.createEvent("Event");
-    event.initEvent("input", true, true);
-    el.dispatchEvent(event);
+    u(el).val(calib_string).trigger("change");
     window.close();
   });
   if (!window.opener) {

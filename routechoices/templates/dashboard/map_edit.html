@@ -12,6 +12,8 @@
             {% bootstrap_form form %}
             <p id="calibration_help" {% if context == 'create' %}class="d-none"{% endif %}>
                 To help figuring out the corners coordinates of the map <a target="_blank" rel="opener" href="{% url 'dashboard:calibration_view' %}">Click Here</a><br/>
+            </p>
+            <p id="calibration_preview" {% if context == 'create' %}class="d-none"{% endif %}>
                 To check calibration <a target="_blank" rel="opener" href="{% url 'dashboard:check_calibration_view' %}">Click Here</a>
             </p>
             <input type="submit" value="Save" class="btn btn-primary">

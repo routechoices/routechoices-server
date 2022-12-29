@@ -17,9 +17,9 @@
 
         {% if not events %}
             <p>You haven't created any events yet.</p>
-            <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event</a>
+            <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new event</a>
         {% else %}
-        <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new event</a></div>
+        <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new event</a></div>
         {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
         <table class="table table-striped">
           <thead>

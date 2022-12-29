@@ -2,7 +2,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   "//www.routechoices.com/static/vendor/pdfjs-2.7.570/pdf.worker.min.js";
 
 var extractCornersCoordsFromFilename = function (filename) {
-  var re = /(_\d+\.\d+){8}_\.(gif|png|jpg|jpeg|webp)$/gi;
+  var re = /(_[-]?\d+(\.\d+)?){8}_\.(gif|png|jpg|jpeg|webp)$/gi;
   var found = filename.match(re);
   if (!found) {
     return false;
@@ -90,8 +90,22 @@ var onPDF = function (ev, filename) {
         u("#id_corners_coordinates").val(bounds);
       }
       u("#calibration_help").removeClass("d-none");
+      u("#id_corners_coordinates").trigger("change");
     } else {
       u("#calibration_help").addClass("d-none");
+      u("#calibration_preview").addClass("d-none");
+    }
+  });
+
+  u("#id_corners_coordinates").on("change", function (e) {
+    var val = e.target.value;
+    var re = /[-]?\d+(\.\d+)?(,[-]?\d+(\.\d+)?){7}$/gi;
+    var found = val.match(re);
+    console.log(found, u("#id_image").val());
+    if (found && u("#id_image").val()) {
+      u("#calibration_preview").removeClass("d-none");
+    } else {
+      u("#calibration_preview").addClass("d-none");
     }
   });
 })();
