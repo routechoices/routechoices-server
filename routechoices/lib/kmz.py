@@ -10,7 +10,7 @@ class BadKMLException(Exception):
 def extract_ground_overlay_info(kml):
     doc = minidom.parseString(kml)
     out = []
-    main_name = "Unnamed"
+    main_name = "Untitled"
     try:
         main_name = doc.getElementsByTagName("name")[0].firstChild.nodeValue
     except Exception:
