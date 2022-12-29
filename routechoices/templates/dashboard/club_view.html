@@ -5,7 +5,9 @@
 {% load compress %}
 {%  block extra_head %}
 {{ block.super }}
+{% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+{% endcompress %}
 {%  endblock %}
 
 {% block sub_content %}

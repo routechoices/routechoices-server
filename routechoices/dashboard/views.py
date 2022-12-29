@@ -137,22 +137,6 @@ def club_select_view(request):
 
 
 @login_required
-def calibration_view(request):
-    return render(
-        request,
-        "dashboard/calibration.html",
-    )
-
-
-@login_required
-def check_calibration_view(request):
-    return render(
-        request,
-        "dashboard/check_calibration.html",
-    )
-
-
-@login_required
 def account_edit_view(request):
     if request.method == "POST":
         form = UserForm(request.POST, instance=request.user)

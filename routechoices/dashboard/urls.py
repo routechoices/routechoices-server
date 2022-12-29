@@ -8,12 +8,6 @@ urlpatterns = [
     re_path(
         r"^account/delete/?$", views.account_delete_view, name="account_delete_view"
     ),
-    re_path(r"^calibrate-map/?$", views.calibration_view, name="calibration_view"),
-    re_path(
-        r"^check-calibration/?$",
-        views.check_calibration_view,
-        name="check_calibration_view",
-    ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(
         r"^club/(?P<club_id>[A-Za-z0-9_-]+)/$",
