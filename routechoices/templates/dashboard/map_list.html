@@ -11,8 +11,8 @@
           <p>You haven't created any map yet.</p>
           {% endif %}
           <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
-          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub"/> Import from KMZ/KML</a>
-          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub"/> Import from GPX</a>
+          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from KMZ/KML</a>
+          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from GPX</a>
         </div>
         <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</a></p>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
