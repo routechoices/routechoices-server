@@ -6,20 +6,17 @@
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-        {% if not maps %}
-            <p>You haven't created any map yet.</p>
-            <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
-            <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
-            <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
-            <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</a></p>
-        {% else %}
         <div style="margin-bottom:15px">
+          {% if not maps %}
+          <p>You haven't created any map yet.</p>
+          {% endif %}
           <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary"><i class="fa fa-plus"></i> Create new map</a>
-          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary">Import from KMZ/KML</a>
-          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary">Import from GPX</a>
+          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub"/> Import from KMZ/KML</a>
+          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary"><img alt="kmz" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub"/> Import from GPX</a>
         </div>
         <p><a href="#howToKMZModal" data-bs-toggle="modal" data-bs-target="#howToKMZModal">See how to export a KMZ from OCAD</a></p>
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
+        {% if maps %}
         <table class="table table-striped" style="margin-top:15px">
             <tr><th>Name</th><th>Download</th></tr>
             {% for map in maps %}
@@ -32,8 +29,9 @@
             </tr>
             {% endfor %}
         </table>
-        {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
         {% endif %}
+        {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
+
     </div>
 </div>
 <div class="modal fade" id="howToKMZModal" tabindex="-1" role="dialog" aria-labelledby="howToKMZModalLabel" aria-hidden="true">
