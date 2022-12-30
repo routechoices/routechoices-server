@@ -7,10 +7,6 @@
   border-bottom: 1px solid #eee;
 }
 
-/*
-   * Sidebar
-   */
-
 .sidebar {
   position: fixed;
   top: 56px;
@@ -88,10 +84,6 @@
   background-color: #428bca;
 }
 
-/*
-   * Main content
-   */
-
 .main {
   position: fixed;
   top: 56px;
@@ -131,6 +123,7 @@
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000;
 }
+
 #progress_bar {
   overflow: initial;
 }
@@ -218,13 +211,6 @@
   margin-left: -4px;
 }
 
-img.emoji {
-  height: 1.3em;
-  width: 1.3em;
-  margin: 0 0.05em 0 0.1em;
-  vertical-align: -0.2em;
-}
-
 .speedometer,
 .odometer {
   font-feature-settings: "tnum";
@@ -250,12 +236,14 @@ img.emoji {
   -webkit-user-select: none;
 }
 
-.wms256 .leaflet-tile-container img {
-  width: 256.5px !important;
-  height: 256.5px !important;
+.route-displayed .fa-bullseye {
+  color: black;
 }
 
-.wms512 .leaflet-tile-container img {
-  width: 512.5px !important;
-  height: 512.5px !important;
+.route-not-displayed .fa-bullseye {
+  color: #aaa;
+}
+
+.route-displayed .fa-bullseye.route-focused {
+  color: #18bc9c;
 }

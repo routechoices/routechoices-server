@@ -112,6 +112,7 @@ var extractCornersCoordsFromFilename = function (filename) {
     return coords.join(",");
   }
 };
+
 var onPDF = function (ev, filename) {
   var loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(ev.target.result),
@@ -272,68 +273,6 @@ function project(m, x, y) {
   return [v[0] / v[2], v[1] / v[2]];
 }
 
-var backdropMaps = {
-  osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution:
-      'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    className: "wms256",
-  }),
-  "gmap-street": L.tileLayer("https://mt0.google.com/vt/x={x}&y={y}&z={z}", {
-    attribution: "&copy; Google",
-    className: "wms256",
-  }),
-  "gmap-hybrid": L.tileLayer(
-    "https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}",
-    {
-      attribution: "&copy; Google",
-      className: "wms256",
-    }
-  ),
-  "topo-fi": L.tileLayer(
-    "https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg",
-    {
-      attribution: "&copy; National Land Survey of Finland",
-      className: "wms256",
-    }
-  ),
-  "mapant-fi": L.tileLayer(
-    "https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}",
-    {
-      attribution: "&copy; MapAnt.fi and National Land Survey of Finland",
-      className: "wms256",
-    }
-  ),
-  "topo-no": L.tileLayer(
-    "https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
-    {
-      attribution: "",
-      className: "wms256",
-    }
-  ),
-  "mapant-no": L.tileLayer("https://mapant.no/osm-tiles/{z}/{x}/{y}.png", {
-    attribution: "&copy; MapAnt.no",
-    className: "wms256",
-  }),
-  "mapant-es": L.tileLayer.wms("https://mapant.es/wms", {
-    layers: "mapant.es",
-    format: "image/png",
-    version: "1.3.0",
-    transparent: true,
-    attribution: "&copy; MapAnt.es",
-    className: "wms256",
-  }),
-  "topo-world": L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenTopoMap (CC-BY-SA)",
-    className: "wms256",
-  }),
-  "topo-world-alt": L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-    {
-      attribution: "&copy; ArcGIS Online",
-      className: "wms256",
-    }
-  ),
-};
 (function () {
   function openCalibrationHelper() {
     u("#main").addClass("d-none");
@@ -499,6 +438,21 @@ var backdropMaps = {
     ];
   }
 
+  function getBaseLayers() {
+    return {
+      "Open Street Map": cloneLayer(backdropMaps["osm"]),
+      "Google Map Street": cloneLayer(backdropMaps["gmap-street"]),
+      "Google Map Satellite": cloneLayer(backdropMaps["gmap-hybrid"]),
+      "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
+      "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
+      "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
+      "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
+      "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
+      "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
+      "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
+    };
+  }
+
   function displayRasterMap(image) {
     if (rasterCalibMap) {
       rasterCalibMap.off();
@@ -533,19 +487,8 @@ var backdropMaps = {
     }
     previewMap = L.map("preview-map");
 
-    var defaultLayer = cloneLayer(backdropMaps["osm"]);
-    var baseLayers = {
-      "Open Street Map": defaultLayer,
-      "Google Map Street": cloneLayer(backdropMaps["gmap-street"]),
-      "Google Map Satellite": cloneLayer(backdropMaps["gmap-hybrid"]),
-      "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
-      "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
-      "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
-      "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
-      "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
-      "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
-      "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
-    };
+    var baseLayers = getBaseLayers();
+    var defaultLayer = baseLayers["Open Street Map"];
 
     previewMap.addLayer(defaultLayer);
     var bounds = cornersLatLng;
@@ -582,19 +525,8 @@ var backdropMaps = {
     });
     transformedImage.addTo(previewCalibMap);
 
-    var defaultLayer = cloneLayer(backdropMaps["osm"]);
-    var baseLayers = {
-      "Open Street Map": defaultLayer,
-      "Google Map Street": cloneLayer(backdropMaps["gmap-street"]),
-      "Google Map Satellite": cloneLayer(backdropMaps["gmap-hybrid"]),
-      "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
-      "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
-      "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
-      "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
-      "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
-      "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
-      "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
-    };
+    var baseLayers = getBaseLayers();
+    var defaultLayer = baseLayers["Open Street Map"];
 
     var controlLayersPrev = L.control.layers(baseLayers, {
       Map: transformedImage,
@@ -626,19 +558,9 @@ var backdropMaps = {
         worldCalibMap.fitBounds(bbox);
       })
       .addTo(worldCalibMap);
-    var defaultLayer = cloneLayer(backdropMaps["osm"]);
-    var baseLayers = {
-      "Open Street Map": defaultLayer,
-      "Google Map Street": cloneLayer(backdropMaps["gmap-street"]),
-      "Google Map Satellite": cloneLayer(backdropMaps["gmap-hybrid"]),
-      "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
-      "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
-      "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
-      "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
-      "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
-      "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
-      "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
-    };
+
+    var baseLayers = getBaseLayers();
+    var defaultLayer = baseLayers["Open Street Map"];
 
     worldCalibMap.addLayer(defaultLayer);
     var controlLayers = L.control.layers(baseLayers);
