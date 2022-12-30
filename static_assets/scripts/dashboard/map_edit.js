@@ -419,11 +419,9 @@ var backdropMaps = {
       fr.readAsDataURL(imageInput.files[0]);
     } else if (imageURL) {
       var img = new Image();
-      img.addEventListener("load", function () {
-        u("#calibration-help-text").text(calibHelpTexts[0]);
+      img.onload = function () {
         displayRasterMap(img);
-        displayWorldMap();
-      });
+      };
       img.src = imageURL;
     } else {
       closeCalibrationHelper();
