@@ -978,6 +978,7 @@ function displayCompetitorList(force) {
     return;
   }
   optionDisplayed = false;
+  var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
   var listDiv = u(
     '<div id="listCompetitor" style="overflow-y: auto;margin-top:3px;"/>'
   );
@@ -1254,6 +1255,9 @@ function displayCompetitorList(force) {
     u("#listCompetitor").remove();
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
+  }
+  if (scrollTopDiv) {
+    listDiv.nodes[0].scrollTop = scrollTopDiv;
   }
   u(".tooltip").remove();
   const tooltipEls = u("#competitorSidebar").find('[data-bs-toggle="tooltip"]');
