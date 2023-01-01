@@ -98,8 +98,8 @@ context("Dashboard manipulations", () => {
     cy.get("input[value='Save']").click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
+    cy.contains("Event with this Club, Event Set, and Name already exists.");
     cy.contains("Event with this Club and Slug already exists.");
-    cy.contains("Event with this Club and Name already exists.");
     cy.contains(
       "Extra maps can be set only if the main map field is set first"
     );

@@ -932,7 +932,7 @@ class Event(models.Model):
     class Meta:
         ordering = ["-start_date", "name"]
         unique_together = (
-            ("club", "name"),
+            ("club", "event_set", "name"),
             ("club", "slug"),
         )
         verbose_name = "event"
@@ -985,14 +985,23 @@ class Event(models.Model):
         return self.end_date < now()
 
     def validate_unique(self, exclude=None):
-        super().validate_unique(exclude)
+        errors = []
         qs = Event.objects.filter(
-            club__slug__iexact=self.club.slug, slug__iexact=self.slug
+            club_id=self.club_id, event_set_id=self.event_set_id, name__iexact=self.name
         )
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
-            raise ValidationError("Event with this Club and Slug already exists.")
+            errors.append("Event with this Club, Event Set, and Name already exists.")
+
+        qs = Event.objects.filter(club_id=self.club_id, slug__iexact=self.slug)
+        if self.id:
+            qs = qs.exclude(id=self.id)
+        if qs.exists():
+            errors.append("Event with this Club and Slug already exists.")
+        if errors:
+            raise ValidationError(errors)
+        super().validate_unique(exclude)
 
     def invalidate_cache(self):
         t0 = time.time()
