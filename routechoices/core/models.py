@@ -556,32 +556,6 @@ class Map(models.Model):
                     pass
             return data_out
 
-        r_w = (max_lon - min_lon) / output_width
-        r_h = (max_lat - min_lat) / output_height
-
-        tl = self.map_xy_to_spherical_mercator(0, 0)
-        tr = self.map_xy_to_spherical_mercator(self.width, 0)
-        br = self.map_xy_to_spherical_mercator(self.width, self.height)
-        bl = self.map_xy_to_spherical_mercator(0, self.height)
-
-        p1 = np.float32(
-            [
-                [0, 0],
-                [self.width, 0],
-                [self.width, self.height],
-                [0, self.height],
-            ]
-        )
-        p2 = np.float32(
-            [
-                [(tl[0] - min_lon) / r_w, (max_lat - tl[1]) / r_h],
-                [(tr[0] - min_lon) / r_w, (max_lat - tr[1]) / r_h],
-                [(br[0] - min_lon) / r_w, (max_lat - br[1]) / r_h],
-                [(bl[0] - min_lon) / r_w, (max_lat - bl[1]) / r_h],
-            ]
-        )
-        coeffs = cv2.getPerspectiveTransform(p1, p2)
-
         img_alpha = None
         if use_cache:
             try:
@@ -603,14 +577,52 @@ class Map(models.Model):
             if use_cache and not cache.has_key(f"img_data_{self.image.name}_raw"):
                 cache.set(f"img_data_{self.image.name}_raw", img_alpha, 3600 * 24 * 30)
 
+        scale = 1
+        while True:
+            r_w = (max_lon - min_lon) / output_width / scale
+            r_h = (max_lat - min_lat) / output_height / scale
+
+            tl = self.map_xy_to_spherical_mercator(0, 0)
+            tr = self.map_xy_to_spherical_mercator(self.width, 0)
+            br = self.map_xy_to_spherical_mercator(self.width, self.height)
+            bl = self.map_xy_to_spherical_mercator(0, self.height)
+            p1 = np.float32(
+                [
+                    [0, 0],
+                    [self.width, 0],
+                    [self.width, self.height],
+                    [0, self.height],
+                ]
+            )
+            p2 = np.float32(
+                [
+                    [(tl[0] - min_lon) / r_w, (max_lat - tl[1]) / r_h],
+                    [(tr[0] - min_lon) / r_w, (max_lat - tr[1]) / r_h],
+                    [(br[0] - min_lon) / r_w, (max_lat - br[1]) / r_h],
+                    [(bl[0] - min_lon) / r_w, (max_lat - bl[1]) / r_h],
+                ]
+            )
+            coeffs = cv2.getPerspectiveTransform(p1, p2)
+            if (
+                scale < 8
+                and max(coeffs[0][0], coeffs[0][1], coeffs[1][0], coeffs[1][1]) < 0.5
+            ):
+                scale *= 2
+            else:
+                break
+
         tile_img = cv2.warpPerspective(
             img_alpha,
             coeffs,
-            (output_width, output_height),
+            (int(output_width * scale), int(output_height * scale)),
             flags=cv2.INTER_AREA,
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(255, 255, 255, 0),
         )
+        if scale > 1:
+            tile_img = cv2.resize(
+                tile_img, (output_width, output_height), interpolation=cv2.INTER_AREA
+            )
         extra_args = []
         if img_mime == "image/webp":
             extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
