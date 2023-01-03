@@ -607,7 +607,13 @@ class Map(models.Model):
             coeffs = cv2.getPerspectiveTransform(p1, p2)
             if (
                 scale < 2
-                and max(coeffs[0][0], coeffs[0][1], coeffs[1][0], coeffs[1][1]) < 0.5
+                and max(
+                    abs(coeffs[0][0]),
+                    abs(coeffs[0][1]),
+                    abs(coeffs[1][0]),
+                    abs(coeffs[1][1]),
+                )
+                < 0.5
             ):
                 scale *= 2
             else:
