@@ -577,23 +577,25 @@ class Map(models.Model):
             if use_cache and not cache.has_key(f"img_data_{self.image.name}_raw"):
                 cache.set(f"img_data_{self.image.name}_raw", img_alpha, 3600 * 24 * 30)
 
+        tl = self.map_xy_to_spherical_mercator(0, 0)
+        tr = self.map_xy_to_spherical_mercator(self.width, 0)
+        br = self.map_xy_to_spherical_mercator(self.width, self.height)
+        bl = self.map_xy_to_spherical_mercator(0, self.height)
+
+        p1 = np.float32(
+            [
+                [0, 0],
+                [self.width, 0],
+                [self.width, self.height],
+                [0, self.height],
+            ]
+        )
+
         scale = 1
         while True:
             r_w = (max_lon - min_lon) / output_width / scale
             r_h = (max_lat - min_lat) / output_height / scale
 
-            tl = self.map_xy_to_spherical_mercator(0, 0)
-            tr = self.map_xy_to_spherical_mercator(self.width, 0)
-            br = self.map_xy_to_spherical_mercator(self.width, self.height)
-            bl = self.map_xy_to_spherical_mercator(0, self.height)
-            p1 = np.float32(
-                [
-                    [0, 0],
-                    [self.width, 0],
-                    [self.width, self.height],
-                    [0, self.height],
-                ]
-            )
             p2 = np.float32(
                 [
                     [(tl[0] - min_lon) / r_w, (max_lat - tl[1]) / r_h],
@@ -604,7 +606,7 @@ class Map(models.Model):
             )
             coeffs = cv2.getPerspectiveTransform(p1, p2)
             if (
-                scale < 8
+                scale < 2
                 and max(coeffs[0][0], coeffs[0][1], coeffs[1][0], coeffs[1][1]) < 0.5
             ):
                 scale *= 2
