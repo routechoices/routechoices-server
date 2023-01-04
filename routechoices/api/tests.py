@@ -152,6 +152,28 @@ class ImeiApiTestCase(EssentialApiBase):
         self.assertEqual(len(new_dev_id), 8)
 
 
+@override_settings(PARENT_HOST="localhost:8000")
+class EventCreationApiTestCase(EssentialApiBase):
+    def setUp(self):
+        super().setUp()
+        self.url = self.reverse_and_check("event_list", "/events")
+        self.club = Club.objects.create(name="Test club", slug="club")
+        self.club.admins.set([self.user])
+        self.client.force_login(self.user)
+
+    def test_ok(self):
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+            SERVER_NAME="api.localhost:8000",
+        )
+        print(res.content)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+
 @override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()), PARENT_HOST="localhost:8000")
 class MapApiTestCase(EssentialApiBase):
     def test_get_tile(self):

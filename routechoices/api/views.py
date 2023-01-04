@@ -31,6 +31,8 @@ from routechoices.core.models import (
     LOCATION_LATITUDE_INDEX,
     LOCATION_LONGITUDE_INDEX,
     LOCATION_TIMESTAMP_INDEX,
+    MAP_BLANK,
+    MAP_CHOICES,
     PRIVACY_PRIVATE,
     PRIVACY_PUBLIC,
     PRIVACY_SECRET,
@@ -50,6 +52,7 @@ from routechoices.lib.helpers import (
     random_device_id,
     set_content_disposition,
     short_random_key,
+    short_random_slug,
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
@@ -57,6 +60,7 @@ from routechoices.lib.validators import (
     validate_imei,
     validate_latitude,
     validate_longitude,
+    validate_nice_slug,
 )
 
 logger = logging.getLogger(__name__)
@@ -98,11 +102,19 @@ club_param = openapi.Parameter(
     description="Filter by this club slug",
     type=openapi.TYPE_STRING,
 )
+
 event_param = openapi.Parameter(
     "event",
     openapi.IN_QUERY,
     description="Filter by this event slug",
     type=openapi.TYPE_STRING,
+)
+
+mine_param = openapi.Parameter(
+    "mine",
+    openapi.IN_QUERY,
+    description="Filter weither you own it",
+    type=openapi.TYPE_BOOLEAN,
 )
 
 
@@ -152,6 +164,7 @@ def event_set_creation(request):
                         "club": "Kangasala SK",
                         "club_slug": "ksk",
                         "privacy": "public",
+                        "backdrop": "blank",
                         "open_registration": False,
                         "open_route_upload": False,
                         "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg",
@@ -175,8 +188,173 @@ def event_set_creation(request):
         ),
     },
 )
-@api_view(["GET"])
+@swagger_auto_schema(
+    method="post",
+    operation_id="create_event",
+    operation_description="Create event",
+    tags=["Events"],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "club_slug": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Club Slug",
+            ),
+            "name": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description='Event name. Default to "Untitled + random string"',
+            ),
+            "slug": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="URL path name. Default random",
+            ),
+            "start_date": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Start time (YYYY-MM-DDThh:mm:ssZ). Default to now",
+            ),
+            "end_date": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="End time, must be after the start_date (YYYY-MM-DDThh:mm:ssZ)",
+            ),
+            "privacy": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Privacy level (PUBLIC, SECRET or PRIVATE). Default to SECRET",
+            ),
+            "backdrop": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description=f"Backdrop map: one of {', '.join(m[0] for m in MAP_CHOICES)}. Default blank",
+            ),
+            "open_registration": openapi.Schema(
+                type=openapi.TYPE_BOOLEAN,
+                description="Can public register themselves to the event. Default False",
+            ),
+            "open_route_upload": openapi.Schema(
+                type=openapi.TYPE_BOOLEAN,
+                description="Can public upload their route to the event from GPS files, Default False",
+            ),
+        },
+        required=["club_slug", "end_date"],
+    ),
+    responses={
+        "201": openapi.Response(
+            description="Success response",
+            examples={
+                "application/json": [
+                    {
+                        "id": "PlCG3xFS-f4",
+                        "name": "Jukola 2019 - 1st Leg",
+                        "start_date": "2019-06-15T20:00:00Z",
+                        "end_date": "2019-06-16T00:00:00Z",
+                        "slug": "Jukola-2019-1st-leg",
+                        "club": "Kangasala SK",
+                        "club_slug": "ksk",
+                        "privacy": "public",
+                        "backdrop": "blank",
+                        "open_registration": False,
+                        "open_route_upload": False,
+                        "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg",
+                    },
+                ]
+            },
+        ),
+    },
+)
+@api_view(["GET", "POST"])
 def event_list(request):
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            raise ValidationError("authentication required")
+        club_slug = request.data.get("club_slug")
+        if not club_slug:
+            raise ValidationError("club_slug is required")
+        if request.user.is_superuser:
+            club = Club.objects.filter(slug__iexact=club_slug).first()
+        else:
+            club = Club.objects.filter(
+                admins=request.user, slug__iexact=club_slug
+            ).first()
+        if not club:
+            raise ValidationError("club not found")
+
+        name = f"Untitled {short_random_slug()}"
+        name_raw = request.data.get("name")
+        if name_raw:
+            name = name_raw
+
+        slug = short_random_slug()
+        slug_raw = request.data.get("slug")
+        if slug_raw:
+            try:
+                validate_nice_slug(slug_raw)
+            except Exception:
+                raise ValidationError("slug invalid")
+            else:
+                slug = slug_raw
+
+        start_date = arrow.now().datetime
+        start_date_raw = request.data.get("start_date")
+        if start_date_raw:
+            try:
+                start_date = arrow.get(start_date_raw).datetime
+            except Exception:
+                raise ValidationError("start_date invalid")
+
+        end_date_raw = request.data.get("end_date")
+        if not end_date_raw:
+            raise ValidationError("end_date is required")
+        try:
+            end_date = arrow.get(end_date_raw).datetime
+        except Exception:
+            raise ValidationError("end_date_invalid")
+        else:
+            if end_date <= start_date:
+                raise ValidationError("end_date invalid, should be after start_date")
+
+        backdrop_map = request.data.get("backdrop", MAP_BLANK)
+        if backdrop_map not in (m[0] for m in MAP_CHOICES):
+            raise ValidationError("backdrop invalid")
+
+        privacy = request.data.get("privacy", PRIVACY_SECRET)
+        if privacy.lower() not in (PRIVACY_PUBLIC, PRIVACY_SECRET, PRIVACY_PRIVATE):
+            raise ValidationError("privacy invalid")
+
+        open_registration = False
+        open_registration_raw = request.data.get("open_registration")
+        if open_registration_raw:
+            open_registration = True
+
+        allow_route_upload = False
+        allow_route_upload_raw = request.data.get("allow_route_upload")
+        if allow_route_upload_raw:
+            allow_route_upload = True
+
+        event = Event.objects.create(
+            club=club,
+            name=name,
+            slug=slug,
+            start_date=start_date,
+            end_date=end_date,
+            privacy=privacy,
+            backdrop_map=backdrop_map,
+            open_registration=open_registration,
+            allow_route_upload=allow_route_upload,
+        )
+        output = {
+            "id": event.aid,
+            "name": event.name,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "slug": event.slug,
+            "club": club.name,
+            "club_slug": club.slug.lower(),
+            "privacy": event.privacy,
+            "backdrop": event.backdrop_map,
+            "open_registration": event.open_registration,
+            "open_route_upload": event.allow_route_upload,
+            "url": request.build_absolute_uri(event.get_absolute_url()),
+        }
+        return Response(output, status=status.HTTP_201_CREATED)
+
     club_slug = request.GET.get("club")
     event_slug = request.GET.get("event")
 
@@ -213,11 +391,70 @@ def event_list(request):
                 "club": event.club.name,
                 "club_slug": event.club.slug.lower(),
                 "privacy": event.privacy,
+                "backdrop": event.backdrop_map,
                 "open_registration": event.open_registration,
                 "open_route_upload": event.allow_route_upload,
                 "url": request.build_absolute_uri(event.get_absolute_url()),
             }
         )
+    return Response(output)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_id="clubs_list",
+    operation_description="List clubs",
+    tags=["Clubs"],
+    manual_parameters=[mine_param],
+    responses={
+        "200": openapi.Response(
+            description="Success response",
+            examples={
+                "application/json": [
+                    {
+                        "id": "PlCG3xFS-f4",
+                        "name": "Kangasala SK",
+                        "slug": "ksk",
+                        "url": "https://ksk.routechoices.com/",
+                        "owner": False,
+                    },
+                    {
+                        "id": "ohFYzJep1hI",
+                        "name": "Halden SK",
+                        "slug": "halden-sk",
+                        "url": "https://gps.haldensk.no/",
+                        "owner": True,
+                    },
+                    "...",
+                ]
+            },
+        ),
+    },
+)
+@api_view(["GET"])
+def club_list(request):
+    only_yours = request.GET.get("mine")
+    clubs = Club.objects.all()
+    owned_clubs = Club.objects.none()
+    if request.user.is_superuser:
+        owned_clubs = clubs
+    elif request.user.is_authenticated:
+        owned_clubs = clubs.filter(admins=request.user)
+
+    if only_yours and not request.user.is_superuser:
+        clubs = clubs.filter(admins=request.user)
+
+    output = []
+    for club in clubs:
+        data = {
+            "id": club.aid,
+            "name": club.name,
+            "slug": club.slug,
+            "url": club.nice_url,
+            "owned": only_yours or request.user.is_superuser or (club in owned_clubs),
+        }
+        if not only_yours or data["owned"]:
+            output.append(data)
     return Response(output)
 
 
