@@ -160,48 +160,78 @@ var onPDF = function (ev, filename) {
   });
 };
 
-SpheroidProjection = (function () {
-  var p = "prototype",
-    m = Math,
-    pi = m.PI,
-    _180 = 180.0,
+const Point = (() => {
+  function point(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  return point;
+})();
+
+const LatLng = (() => {
+  function latlng(lat, lng) {
+    this.lat = lat;
+    this.lng = lng;
+  }
+  latlng.prototype.distance = function (latlng) {
+    const C = Math.PI / 180,
+      dlat = this.lat - latlng.lat,
+      dlon = this.lng - latlng.lng,
+      a =
+        Math.pow(Math.sin((C * dlat) / 2), 2) +
+        Math.cos(C * this.lat) *
+          Math.cos(C * latlng.lat) *
+          Math.pow(Math.sin((C * dlon) / 2), 2);
+    return 12756274 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+  return latlng;
+})();
+
+const SpheroidProjection = (() => {
+  const pi = Math.PI,
+    float180 = 180.0,
     rad = 6378137,
     originShift = pi * rad,
-    pi_180 = pi / _180;
+    piOver180 = pi / float180;
+
   function S() {}
-  S[p].latlng_to_meters = function (latlng) {
-    return {
-      x: latlng.lng * rad * pi_180,
-      y: m.log(m.tan(((90 + latlng.lat) * pi_180) / 2)) * rad,
-    };
+
+  S.prototype.latlngToMeters = function (latlng) {
+    return new Point(
+      latlng.lng * rad * piOver180,
+      Math.log(Math.tan(((90 + latlng.lat) * piOver180) / 2)) * rad
+    );
   };
-  S[p].meters_to_latlng = function (mxy) {
-    return {
-      lat: (2 * m.atan(m.exp(mxy.y / rad)) - pi / 2) / pi_180,
-      lng: mxy.x / rad / pi_180,
-    };
+
+  S.prototype.metersToLatLng = function (mxy) {
+    return new LatLng(
+      (2 * Math.atan(Math.exp(mxy.y / rad)) - pi / 2) / piOver180,
+      mxy.x / rad / piOver180
+    );
   };
-  S[p].resolution = function (zoom) {
-    return (2 * originShift) / (256 * m.pow(2, zoom));
+
+  S.prototype.resolution = function (zoom) {
+    return (2 * originShift) / (256 * Math.pow(2, zoom));
   };
-  S[p].zoom_for_pixel_size = function (pixelSize) {
-    for (i = 0; i < 30; i++) {
-      if (pixelSize > resolution(i)) {
-        return m.max(i - 1, 0);
+
+  S.prototype.zoomForPixelSize = function (pixelSize) {
+    for (let i = 0; i < 30; i++) {
+      if (pixelSize > this.resolution(i)) {
+        return Math.max(i - 1, 0);
       }
     }
   };
-  S[p].pixels_to_meters = function (px, py, zoom) {
-    var res = resolution(zoom),
+
+  S.prototype.pixelsToMeters = function (px, py, zoom) {
+    const res = this.resolution(zoom),
       mx = px * res - originShift,
       my = py * res - originShift;
-    return { x: mx, y: my };
+    return new Point(mx, my);
   };
   return S;
 })();
 
-function adj(m) {
-  // Compute the adjugate of m
+function adjugateMatrix(m) {
   return [
     m[4] * m[8] - m[5] * m[7],
     m[2] * m[7] - m[1] * m[8],
@@ -215,8 +245,7 @@ function adj(m) {
   ];
 }
 
-function multmm(a, b) {
-  // multiply two matrices
+function multiplyMatrices(a, b) {
   var c = Array(9);
   for (var i = 0; i !== 3; ++i) {
     for (var j = 0; j !== 3; ++j) {
@@ -230,8 +259,7 @@ function multmm(a, b) {
   return c;
 }
 
-function multmv(m, v) {
-  // multiply matrix and vector
+function multiplyMatrixByVector(m, v) {
   return [
     m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
     m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
@@ -239,38 +267,30 @@ function multmv(m, v) {
   ];
 }
 
-function basisToPoints(x1, y1, x2, y2, x3, y3, x4, y4) {
-  var m = [x1, x2, x3, y1, y2, y3, 1, 1, 1];
-  var v = multmv(adj(m), [x4, y4, 1]);
-  return multmm(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]);
+function basisToPoints(a, b, c, d) {
+  var m = [a.x, b.x, c.x, a.y, b.y, c.y, 1, 1, 1];
+  var v = multiplyMatrixByVector(adjugateMatrix(m), [d.x, d.y, 1]);
+  return multiplyMatrices(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]);
 }
 
 function general2DProjection(
-  x1s,
-  y1s,
-  x1d,
-  y1d,
-  x2s,
-  y2s,
-  x2d,
-  y2d,
-  x3s,
-  y3s,
-  x3d,
-  y3d,
-  x4s,
-  y4s,
-  x4d,
-  y4d
+  pt1RefA,
+  pt1RefB,
+  pt2RefA,
+  pt2RefB,
+  pt3RefA,
+  pt3RefB,
+  pt4RefA,
+  pt4RefB
 ) {
-  var s = basisToPoints(x1s, y1s, x2s, y2s, x3s, y3s, x4s, y4s);
-  var d = basisToPoints(x1d, y1d, x2d, y2d, x3d, y3d, x4d, y4d);
-  return multmm(d, adj(s));
+  var refAMatrix = basisToPoints(pt1RefA, pt2RefA, pt3RefA, pt4RefA);
+  var refBMatrix = basisToPoints(pt1RefB, pt2RefB, pt3RefB, pt4RefB);
+  return multiplyMatrices(refBMatrix, adjugateMatrix(refAMatrix));
 }
 
-function project(m, x, y) {
-  var v = multmv(m, [x, y, 1]);
-  return [v[0] / v[2], v[1] / v[2]];
+function project(matrix, x, y) {
+  var val = multiplyMatrixByVector(matrix, [x, y, 1]);
+  return [val[0] / val[2], val[1] / val[2]];
 }
 
 (function () {
@@ -602,43 +622,33 @@ function project(m, x, y) {
   }
 
   function computeCalibString() {
-    var xy_a = [];
-    var xy_b = [];
+    const rasterXY = [];
+    const worldXY = [];
     var proj = new SpheroidProjection();
-    for (var i = 0; i < markersRaster.length; i++) {
-      xy_a[i] = rasterCalibMap.project(markersRaster[i].getLatLng(), 0);
-    }
-    for (var i = 0; i < markersWorld.length; i++) {
-      xy_b[i] = proj.latlng_to_meters(markersWorld[i].getLatLng());
+    for (var i = 0; i < 4; i++) {
+      rasterXY[i] = rasterCalibMap.project(markersRaster[i].getLatLng(), 0);
+      worldXY[i] = proj.latlngToMeters(markersWorld[i].getLatLng());
     }
     var matrix3d = general2DProjection(
-      xy_a[0].x,
-      xy_a[0].y,
-      xy_b[0].x,
-      xy_b[0].y,
-      xy_a[1].x,
-      xy_a[1].y,
-      xy_b[1].x,
-      xy_b[1].y,
-      xy_a[2].x,
-      xy_a[2].y,
-      xy_b[2].x,
-      xy_b[2].y,
-      xy_a[3].x,
-      xy_a[3].y,
-      xy_b[3].x,
-      xy_b[3].y
+      rasterXY[0],
+      worldXY[0],
+      rasterXY[1],
+      worldXY[1],
+      rasterXY[2],
+      worldXY[2],
+      rasterXY[3],
+      worldXY[3]
     );
-    var cornersM = [
+    var cornersXY = [
       project(matrix3d, 0, 0),
       project(matrix3d, rasterMapImage.width, 0),
       project(matrix3d, rasterMapImage.width, rasterMapImage.height),
       project(matrix3d, 0, rasterMapImage.height),
     ];
-    for (var i = 0; i < cornersM.length; i++) {
-      cornersLatLng[i] = proj.meters_to_latlng({
-        x: cornersM[i][0],
-        y: cornersM[i][1],
+    for (var i = 0; i < cornersXY.length; i++) {
+      cornersLatLng[i] = proj.metersToLatLng({
+        x: cornersXY[i][0],
+        y: cornersXY[i][1],
       });
     }
     buildCalibString(cornersLatLng);
