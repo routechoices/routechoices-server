@@ -38,7 +38,7 @@
     var formData = new FormData(e.target);
     var data = {
       club_slug: window.local.clubSlug,
-      backdrop: "osm",
+      backdrop: formData.get("backdrop"),
       end_date: dayjs()
         .add(parseInt(formData.get("duration"), 10), "m")
         .toISOString(),
@@ -109,7 +109,6 @@
     });
   });
   selectizeDeviceInput();
-  u("#id_device_id-ts-control").attr("required", true);
   u("#id_name").val(window.local.username);
   var myUrl = new URL(window.location.href.replace(/#/g, "?"));
   var urlDevId = myUrl.searchParams.get("device_id");
