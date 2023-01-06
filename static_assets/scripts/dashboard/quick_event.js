@@ -109,6 +109,7 @@
     });
   });
   selectizeDeviceInput();
+  u("#id_device_id").attr("required", true);
   u("#id_name").val(window.local.username);
   var myUrl = new URL(window.location.href.replace(/#/g, "?"));
   var urlDevId = myUrl.searchParams.get("device_id");
