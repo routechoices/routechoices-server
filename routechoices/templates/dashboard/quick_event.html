@@ -1,0 +1,55 @@
+{% extends "dashboard/club_view.html" %}
+{% load static %}
+{% load hosts %}
+{% load compress %}
+
+{%  block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+{%  endblock %}
+
+{% block sub_sub_content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Create quick Event</h1>
+        <form action="" id="quick-creation-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-bold" required>Person's Name</label>
+                <input type="text" name="name" id="id_name" class="form-control"/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold" required>Device ID</label>
+                <select name="device_id" id="id_device_id" class="form-select">
+                </select>
+            </div>
+            <div class="mb-3">
+                <label lass="form-label fw-bold">Duration</label>
+                <select name="duration" id="id_duration" class="form-select">
+                    <option value="60">1 hour</option>
+                    <option value="180">3 hours</option>
+                    <option value="300">5 hours</option>
+                </select>
+            </div>
+            <input type="submit" value="Create Quick Event" class="btn btn-primary">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+{{ block.super }}
+<script src="{% static '/scripts/load-local-variables.js' %}"
+    data-api-base-url="{% host_url 'api_doc' host 'api' %}"
+    data-club-slug="{{ club.slug }}"
+    data-username="{{ request.user.username }}"
+    data-csrf-token="{{ csrf_token }}"
+></script>
+{% compress js %}
+<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.0/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/dayjs-1.10.6/dayjs.min.js' %}"></script>
+<script src="{% static '/scripts/dashboard/quick_event.js' %}"></script>
+{% endcompress %}
+{% endblock %}

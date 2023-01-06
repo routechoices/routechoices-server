@@ -2334,12 +2334,15 @@
 	   */
 
 
-	  load(value) {
+	  load(value, cb) {
 	    const self = this;
 	    if (!self.canLoad(value)) return;
 	    addClasses(self.wrapper, self.settings.loadingClass);
 	    self.loading++;
-	    const callback = self.loadCallback.bind(self);
+	    const callback = function () {
+			self.loadCallback.bind(self)(...arguments);
+			cb && cb(...arguments);
+		}
 	    self.settings.load.call(self, value, callback);
 	  }
 	  /**

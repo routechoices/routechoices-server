@@ -1364,6 +1364,19 @@ def event_route_upload_view(request, event_id):
     )
 
 
+@login_required
+@requires_club_in_session
+def quick_event(request):
+    club = request.club
+    return render(
+        request,
+        "dashboard/quick_event.html",
+        {
+            "club": club,
+        },
+    )
+
+
 @receiver(password_reset)
 @receiver(password_changed)
 def logoutOtherSessionsAfterPassChange(request, user, **kwargs):

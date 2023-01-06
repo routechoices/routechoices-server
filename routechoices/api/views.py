@@ -239,22 +239,20 @@ def event_set_creation(request):
         "201": openapi.Response(
             description="Success response",
             examples={
-                "application/json": [
-                    {
-                        "id": "PlCG3xFS-f4",
-                        "name": "Jukola 2019 - 1st Leg",
-                        "start_date": "2019-06-15T20:00:00Z",
-                        "end_date": "2019-06-16T00:00:00Z",
-                        "slug": "Jukola-2019-1st-leg",
-                        "club": "Kangasala SK",
-                        "club_slug": "ksk",
-                        "privacy": "public",
-                        "backdrop": "blank",
-                        "open_registration": False,
-                        "open_route_upload": False,
-                        "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg",
-                    },
-                ]
+                "application/json": {
+                    "id": "PlCG3xFS-f4",
+                    "name": "Jukola 2019 - 1st Leg",
+                    "start_date": "2019-06-15T20:00:00Z",
+                    "end_date": "2019-06-16T00:00:00Z",
+                    "slug": "Jukola-2019-1st-leg",
+                    "club": "Kangasala SK",
+                    "club_slug": "ksk",
+                    "privacy": "public",
+                    "backdrop": "blank",
+                    "open_registration": False,
+                    "open_route_upload": False,
+                    "url": "http://www.routechoices.com/ksk/Jukola-2019-1st-leg",
+                },
             },
         ),
     },
@@ -676,7 +674,11 @@ def event_register(request, event_id):
         return Response(res)
 
     if not event.open_registration:
-        raise PermissionDenied()
+        if not request.user.is_authenticated or (
+            not request.user.is_superuser
+            and request.user not in event.club.admins.all()
+        ):
+            raise PermissionDenied()
 
     lang = request.GET.get("lang", "en")
     if lang not in ("en", "es", "fi", "fr", "nl", "sv"):

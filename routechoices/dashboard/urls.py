@@ -95,4 +95,9 @@ urlpatterns = [
         views.event_set_delete_view,
         name="event_set_delete_view",
     ),
+    re_path(
+        r"^quick-event/?$",
+        views.quick_event,
+        name="quick_event_view",
+    ),
 ]
