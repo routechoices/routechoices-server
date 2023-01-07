@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@x.y
+
 commands:
   setup-docker:
     steps:
@@ -48,6 +51,7 @@ jobs:
     - run: ./dc restart django
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev
+    - browser-tools/install-chrome
     - run:
         name: Install Node.js and run cypress
         # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
@@ -57,9 +61,9 @@ jobs:
           nvm install v18 && nvm use v18 && nvm alias default v18
           node -v
           curl -o- -L https://yarnpkg.com/install.sh | bash
-          ~/.yarn/bin/yarn add cypress@12 cypress-file-upload cypress-real-events
+          ~/.yarn/bin/yarn add cypress@12 cypress-real-events
           ~/.yarn/bin/yarn cypress install
-          TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run
+          TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
     - store_artifacts:
         path: cypress/videos
     - store_artifacts:
