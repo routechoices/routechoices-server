@@ -170,7 +170,6 @@ class EventCreationApiTestCase(EssentialApiBase):
             },
             SERVER_NAME="api.localhost:8000",
         )
-        print(res.content)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
 
