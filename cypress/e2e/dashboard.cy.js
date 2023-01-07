@@ -104,5 +104,53 @@ context("Dashboard manipulations", () => {
       "Extra maps can be set only if the main map field is set first"
     );
     cy.contains("Competitor start time should be during the event time");
+
+    // Calibrate a map
+    cy.visit("/dashboard/maps/new");
+    cy.get("#id_name").type("Jukola 2019 - 1st Leg (manual calibration)");
+    const mapFileName =
+      "Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg";
+    cy.fixture(mapFileName, "binary")
+      .then(Cypress.Blob.binaryStringToBlob)
+      .then((fileContent) => {
+        cy.get("#id_image").attachFile({
+          fileContent,
+          fileName: "Jukola_1st_leg_blank.jpg",
+          encoding: "utf-8",
+        });
+
+        cy.get("#calibration-preview-opener").should("not.be.visible");
+        cy.get("#calibration-helper-opener").click();
+
+        cy.get("#to-calibration-step-2-button").should(
+          "have.class",
+          "disabled"
+        );
+        cy.get("#raster-map")
+          .click(10, 10)
+          .click(200, 10)
+          .click(200, 200)
+          .click(10, 200);
+        cy.get("#world-map")
+          .click(10, 10)
+          .click(200, 10)
+          .click(200, 200)
+          .click(10, 200);
+
+        cy.get("#to-calibration-step-2-button").should(
+          "not.have.class",
+          "disabled"
+        );
+        cy.get("#to-calibration-step-2-button").click();
+
+        cy.get("#validate-calibration-button").click();
+
+        cy.get("#calibration-preview-opener").should("be.visible");
+        cy.get("#id_corners_coordinates")
+          .invoke("val")
+          .then((val) => {
+            expect(/^[-]?\d+(\.\d+)?(,[-]?\d+(\.\d+)?){7}$/.test(val));
+          });
+      });
   });
 });
