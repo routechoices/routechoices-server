@@ -80,7 +80,7 @@ class Command(BaseCommand):
     help = "Create letsencrypt certificate for club custom domain"
 
     def add_arguments(self, parser):
-        parser.add_argument("domains", nargs="+", type=str)
+        parser.add_argument("domains", nargs="*", type=str)
 
     def handle(self, *args, **options):
         nginx_need_restart = False
