@@ -449,4 +449,5 @@ ADMIN_COMMAND_LIST = [
     "import_from_otracker",
     "import_from_sportrec",
     "import_from_tractrac",
+    "create_certificate",
 ]
