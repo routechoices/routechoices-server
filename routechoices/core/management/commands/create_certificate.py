@@ -1,5 +1,6 @@
 import os.path
 import subprocess
+from pathlib import Path
 
 import sewer.client
 from django.conf import settings
@@ -92,8 +93,11 @@ class Command(BaseCommand):
             )
             for club in clubs_w_domain:
                 domain = club.domain
-                if not os.path.exists(
-                    os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
+                if (
+                    not Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists()
+                    and not Path(
+                        f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp"
+                    ).exists()
                 ):
                     domains.append(domain)
             if not domains:
@@ -104,9 +108,11 @@ class Command(BaseCommand):
                 self.stderr.write("No club with this domain")
                 continue
 
-            if os.path.exists(
-                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
-            ):
+            if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").exists():
+                self.stderr.write("Certificates creation for this domain in progress")
+                continue
+
+            if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
                 self.stderr.write("Certificates for this domain already exists")
                 continue
 
@@ -126,11 +132,16 @@ class Command(BaseCommand):
                 is_new_acct=True,
                 contact_email="raphael@routechoices.com",
             )
+
+            Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").touch()
             try:
                 certificate = client.get_certificate()
             except Exception:
                 self.stderr.write("Failed to create certificate...")
                 continue
+            finally:
+                Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").unlink()
+
             cert_key = client.cert_key
 
             with open(
