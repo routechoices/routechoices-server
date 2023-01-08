@@ -96,6 +96,8 @@ class Command(BaseCommand):
                     os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
                 ):
                     domains.append(domain)
+            if not domains:
+                self.stderr.write("No clubs requires certificates")
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
