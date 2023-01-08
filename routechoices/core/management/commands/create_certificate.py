@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 ):
                     domains.append(domain)
             if not domains:
-                self.stderr.write("No clubs requires certificates")
+                self.stderr.write("No clubs require certificates")
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
