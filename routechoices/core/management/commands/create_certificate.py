@@ -81,6 +81,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("domains", nargs="*", type=str)
+        parser.add_argument("--post-hook", dest="post-hook", type=str, default=None)
 
     def handle(self, *args, **options):
         nginx_need_restart = False
