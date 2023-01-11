@@ -77,7 +77,8 @@ jobs:
     - run:
         name: Deploy
         command: |
-          ssh rphlo@routechoices.com 'sudo -u apps /apps/routechoices-server/bin/deploy ${CIRCLE_SHA1}'
+          export DEPLOY_CMD="sudo -u apps /apps/routechoices-server/bin/deploy $CIRCLE_SHA1"
+          ssh rphlo@routechoices.com $DEPLOY_CMD
 
   build-docker:
     machine:
