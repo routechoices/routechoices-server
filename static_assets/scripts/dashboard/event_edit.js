@@ -199,7 +199,7 @@ function showLocalTime(el) {
     e.preventDefault();
     var target = u(e.target).parent().parent().find(".form-control");
     var result = "";
-    var characters = "23456789abcdefghijkmnopqrstuvwxyz";
+    var characters = "23456789abcdefghijkmnpqrstuvwxyz";
     var charactersLength = characters.length;
     for (var i = 0; i < 6; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));

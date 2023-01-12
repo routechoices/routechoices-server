@@ -95,7 +95,7 @@ def random_device_id():
 
 
 def short_random_slug():
-    alphabet = "23456789abcdefghijkmnopqrstuvwxyz"
+    alphabet = "23456789abcdefghijkmnpqrstuvwxyz"
     return generate_random_string(alphabet, 6)
 
 
