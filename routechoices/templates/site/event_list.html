@@ -56,10 +56,10 @@
 </div>
 {% endif %}
 <div class="row">
-  {% if live_event_sets %}
+  {% if live_events %}
   <div><h2>Live Events</h2></div>
   <div>
-  {% for event_set in live_event_sets %}
+  {% for event_set in live_events %}
     <div class="card event-set-card" style="margin-bottom: 15px;">
       <div class="card-body">
           {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
@@ -104,8 +104,8 @@
   </div>
   {% endif %}
   <div>
-  {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
-  {% for event_set in event_sets %}
+  {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode %}{% endif %}
+  {% for event_set in events %}
     <div class="card event-set-card" style="margin-bottom: 15px;">
         <div class="card-body">
             {% if not event_set.fake %}<h4 style="font-weight: 700;">{{event_set.name}}</h4>{% if not club %}<div>By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}<hr/>{% endif%}
@@ -133,9 +133,9 @@
         </div>
     </div>
     {% endfor %}
-    {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
+    {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode %}{% endif %}
   </div>
-  {% if not live_event_sets and not event_sets %}
+  {% if not live_events and not events %}
     <div class="card">
       <div class="card-body">
         <h2 style="color: #888">No public events yet...</h2>

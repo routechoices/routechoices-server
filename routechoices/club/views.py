@@ -53,7 +53,7 @@ def club_view(request, **kwargs):
     if club.domain and not request.use_cname:
         return redirect(club.nice_url)
     event_list = Event.objects.filter(club=club, privacy=PRIVACY_PUBLIC).select_related(
-        "club"
+        "club", "event_set"
     )
     live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
     event_list = event_list.filter(end_date__lt=now())
@@ -89,59 +89,111 @@ def club_view(request, **kwargs):
         if selected_month:
             event_list = event_list.filter(start_date__month=selected_month)
 
-    event_sets = []
-    event_sets_keys = {}
-    for event in event_list[::-1]:
-        key = event.event_set or f"{event.aid}_E"
-        name = event.event_set or event.name
-        if key not in event_sets_keys.keys():
-            event_sets_keys[key] = len(event_sets)
-            event_sets.append(
-                {
-                    "name": name,
-                    "events": [
-                        event,
-                    ],
-                    "fake": event.event_set is None,
-                }
-            )
-        else:
-            idx = event_sets_keys[key]
-            event_sets[idx]["events"].append(event)
-    event_sets = event_sets[::-1]
+    events_wo_set = event_list.filter(event_set__isnull=True)
+    events_w_set = (
+        event_list.filter(event_set__isnull=False)
+        .order_by("event_set_id")
+        .distinct("event_set_id")
+    )
 
-    live_event_sets = []
-    live_event_sets_keys = {}
-    for event in live_events[::-1]:
-        key = event.event_set or f"{event.aid}_E"
-        name = event.event_set or event.name
-        if key not in live_event_sets_keys.keys():
-            live_event_sets_keys[key] = len(live_event_sets)
-            live_event_sets.append(
-                {
-                    "name": name,
-                    "events": [
-                        event,
-                    ],
-                    "fake": event.event_set is None,
-                }
-            )
-        else:
-            idx = live_event_sets_keys[key]
-            live_event_sets[idx]["events"].append(event)
-    live_event_sets = live_event_sets[::-1]
+    all_events = events_wo_set.union(events_w_set).order_by("-start_date", "name")
 
-    paginator = Paginator(event_sets, 25)
+    paginator = Paginator(all_events, 25)
     page = request.GET.get("page")
-    event_sets = paginator.get_page(page)
+    events_page = paginator.get_page(page)
+
+    events_set_ids = [e.event_set_id for e in events_page if e.event_set_id]
+    events_by_set = {}
+    if events_set_ids:
+        all_events_w_set = list(
+            Event.objects.select_related("club")
+            .filter(event_set_id__in=events_set_ids)
+            .order_by("start_date", "name")
+        )
+        for e in all_events_w_set:
+            if e.event_set_id in events_by_set.keys():
+                events_by_set[e.event_set_id].append(e)
+            else:
+                events_by_set[e.event_set_id] = [e]
+
+    events = []
+    for event in events_page:
+        event_set = event.event_set
+        if event_set is None:
+            events.append(
+                {
+                    "name": event.name,
+                    "events": [
+                        event,
+                    ],
+                    "fake": True,
+                }
+            )
+        else:
+            events.append(
+                {
+                    "name": event_set.name,
+                    "events": events_by_set[event_set.id],
+                    "fake": False,
+                }
+            )
+
+    live_events_wo_set = live_events.filter(event_set__isnull=True)
+    live_events_w_set = (
+        live_events.select_related("event_set")
+        .filter(event_set__isnull=False)
+        .order_by("event_set_id")
+        .distinct("event_set_id")
+    )
+
+    all_live_events = live_events_wo_set.union(live_events_w_set).order_by(
+        "-start_date", "name"
+    )
+
+    live_events_set_ids = [e.event_set_id for e in all_live_events if e.event_set_id]
+    live_events_by_set = {}
+    if live_events_set_ids:
+        all_live_events_w_set = list(
+            Event.objects.select_related("club")
+            .filter(event_set_id__in=live_events_set_ids)
+            .order_by("start_date", "name")
+        )
+        for e in all_live_events_w_set:
+            if e.event_set_id in live_events_by_set.keys():
+                live_events_by_set[e.event_set_id].append(e)
+            else:
+                live_events_by_set[e.event_set_id] = [e]
+
+    live_events = []
+    for event in all_live_events:
+        event_set = event.event_set
+        if event.event_set_id is None:
+            live_events.append(
+                {
+                    "name": event.name,
+                    "events": [
+                        event,
+                    ],
+                    "fake": True,
+                }
+            )
+        else:
+            live_events.append(
+                {
+                    "name": event_set.name,
+                    "events": live_events_by_set[event_set.id],
+                    "fake": False,
+                }
+            )
 
     return render(
         request,
         "site/event_list.html",
         {
             "club": club,
-            "event_sets": event_sets,
-            "live_event_sets": live_event_sets,
+            "events": events,
+            "events_page": events_page,
+            "live_events": live_events,
             "years": years,
             "months": months,
             "year": selected_year,

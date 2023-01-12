@@ -41,26 +41,17 @@ class DynamicViewSitemap(Sitemap):
     def items(self):
         event_list = Event.objects.filter(privacy=PRIVACY_PUBLIC)
         event_list = event_list.filter(end_date__lt=now())
-        event_sets = []
-        event_sets_keys = {}
-        for event in event_list[::-1]:
-            key = event.event_set or f"{event.aid}_E"
-            name = event.event_set or event.name
-            if key not in event_sets_keys.keys():
-                event_sets_keys[key] = len(event_sets)
-                event_sets.append(
-                    {
-                        "name": name,
-                        "events": [
-                            event,
-                        ],
-                        "fake": event.event_set is None,
-                    }
-                )
-            else:
-                idx = event_sets_keys[key]
-                event_sets[idx]["events"].append(event)
-        page_count = max(0, (len(event_sets) - 1)) // 25 + 1
+
+        events_wo_set = event_list.filter(event_set__isnull=True)
+        events_w_set = (
+            event_list.filter(event_set__isnull=False)
+            .order_by("event_set_id")
+            .distinct("event_set_id")
+        )
+
+        all_events = events_wo_set.union(events_w_set).order_by("-start_date", "name")
+
+        page_count = max(0, all_events.count() - 1) // 25 + 1
 
         root = reverse("site:events_view")
         items = (root,)
