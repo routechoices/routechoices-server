@@ -184,9 +184,6 @@ def wms_service(request):
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
 
-    if get_params.get("service") != "WMS":
-        return HttpResponseBadRequest("Service must be WMS")
-
     if get_params.get("request") == "GetMap":
         data_out = request.raster_map.create_tile(
             request.image_request["width"],
