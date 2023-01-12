@@ -12,7 +12,7 @@
       </ul>
       <ul class="navbar-nav d-flex">
         {% if user.is_authenticated %}<li><a class="nav-link" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>{% endif %}
-        <li class="nav-item"><a class="nav-link" href="{% host_url 'site:events_view' host 'www'%}?year={% now "Y" %}">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:trackers_view' host 'www'%}">Trackers</a></li>
         <li class="nav-item"><a class="nav-link" href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
         <li class="nav-item"><a class="nav-link" style="white-space:nowrap" href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
