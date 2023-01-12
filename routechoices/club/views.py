@@ -92,7 +92,7 @@ def club_view(request, **kwargs):
     events_wo_set = event_list.filter(event_set__isnull=True)
     events_w_set = (
         event_list.filter(event_set__isnull=False)
-        .order_by("event_set_id")
+        .order_by("event_set_id", "-start_date")
         .distinct("event_set_id")
     )
 
@@ -108,7 +108,7 @@ def club_view(request, **kwargs):
         all_events_w_set = list(
             Event.objects.select_related("club")
             .filter(event_set_id__in=events_set_ids)
-            .order_by("start_date", "name")
+            .order_by("-start_date", "name")
         )
         for e in all_events_w_set:
             events_by_set.setdefault(e.event_set_id, [])
@@ -140,7 +140,7 @@ def club_view(request, **kwargs):
     live_events_w_set = (
         live_events.select_related("event_set")
         .filter(event_set__isnull=False)
-        .order_by("event_set_id")
+        .order_by("event_set_id", "-start_date")
         .distinct("event_set_id")
     )
 
@@ -154,7 +154,7 @@ def club_view(request, **kwargs):
         all_live_events_w_set = list(
             Event.objects.select_related("club")
             .filter(event_set_id__in=live_events_set_ids)
-            .order_by("start_date", "name")
+            .order_by("-start_date", "name")
         )
         for e in all_live_events_w_set:
             live_events_by_set.setdefault(e.event_set_id, [])
