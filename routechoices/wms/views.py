@@ -53,10 +53,16 @@ def common_wms(function):
             elif better_mime:
                 img_mime = better_mime
             else:
-                return HttpResponseBadRequest("invalid format")
+                return HttpResponseBadRequest("invalid image format")
 
             if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
                 return HttpResponseBadRequest("missing mandatory parameters")
+
+            try:
+                out_w, out_h = int(width_raw), int(heigth_raw)
+            except Exception:
+                return HttpResponseBadRequest("invalid size parameters")
+
             try:
                 min_lon, min_lat, max_lon, max_lat = (
                     float(x) for x in bbox_raw.split(",")
@@ -82,7 +88,10 @@ def common_wms(function):
                     max_lon = max_xy["x"]
                 elif srs != "EPSG:3857":
                     return HttpResponseBadRequest("SRS not supported")
-                out_w, out_h = int(width_raw), int(heigth_raw)
+            except Exception:
+                return HttpResponseBadRequest("invalid bound parameters")
+
+            try:
                 if "/" in layers_raw:
                     layer_id, map_index = layers_raw.split("/")
                     map_index = int(map_index)
@@ -168,7 +177,6 @@ def tile_latest_modification(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-
     if get_params.get("request") == "GetMap":
         return max(
             request.raster_map.modification_date, request.event.modification_date
@@ -183,7 +191,6 @@ def wms_service(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-
     if get_params.get("request") == "GetMap":
         data_out = request.raster_map.create_tile(
             request.image_request["width"],
@@ -194,7 +201,6 @@ def wms_service(request):
             request.bound["max_lon"],
             request.image_request["mime"],
         )
-
         headers = None
         if request.event.privacy == PRIVACY_PRIVATE:
             headers = {"Cache-Control": "Private"}
@@ -247,6 +253,7 @@ def wms_service(request):
             l_min_xy = GLOBAL_MERCATOR.latlon_to_meters(
                 {"lat": min_lat, "lon": min_lon}
             )
+            # TODO: Use templates
             return f"""<Layer queryable="0" opaque="0" cascaded="0">
   <Name>{layer_id}</Name>
   <Title>{name} of {event.name} by {event.club}</Title>
