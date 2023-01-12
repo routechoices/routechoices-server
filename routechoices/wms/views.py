@@ -31,10 +31,6 @@ def common_wms(function):
             return HttpResponseBadRequest("Service must be WMS")
 
         if get_params.get("request") == "GetMap":
-            layers_raw = get_params.get("layers")
-            bbox_raw = get_params.get("bbox")
-            width_raw = get_params.get("width")
-            heigth_raw = get_params.get("height")
 
             http_accept = request.META.get("HTTP_ACCEPT", "")
             better_mime = None
@@ -43,7 +39,7 @@ def common_wms(function):
             elif "image/webp" in http_accept.split(","):
                 better_mime = "image/webp"
 
-            asked_mime = get_params.get("format")
+            asked_mime = get_params.get("format", "image/png")
             if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
                 img_mime = asked_mime
                 if img_mime == "image/apng":
@@ -55,6 +51,10 @@ def common_wms(function):
             else:
                 return HttpResponseBadRequest("invalid image format")
 
+            layers_raw = get_params.get("layers")
+            bbox_raw = get_params.get("bbox")
+            width_raw = get_params.get("width")
+            heigth_raw = get_params.get("height")
             if not layers_raw or not bbox_raw or not width_raw or not heigth_raw:
                 return HttpResponseBadRequest("missing mandatory parameters")
 
