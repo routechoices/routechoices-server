@@ -34,10 +34,17 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path("accounts/login/", RedirectView.as_view(url="/login")),
-    path("mfa/login/", RedirectView.as_view(url="/login")),
-    path("mfa/", include("kagi.urls", namespace="kagi")),
-    path("accounts/", include("allauth.urls")),
+    path("account/login/", RedirectView.as_view(url="/login")),
+    path("account/logout/", RedirectView.as_view(url="/logout")),
+    path("account/signup/", RedirectView.as_view(url="/signup")),
+    path("account/email/", RedirectView.as_view(url="/dashboard/account/emails")),
+    path(
+        "account/password/change/",
+        RedirectView.as_view(url="/dashboard/account/change-password"),
+    ),
+    path("account/", include("allauth.urls")),
+    path("dashboard/account/mfa/login/", RedirectView.as_view(url="/login")),
+    path("dashboard/account/mfa/", include("kagi.urls", namespace="kagi")),
     path("login/", kagi.views.login, name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
     path("signup/", account_views.signup, name="root_account_signup"),
@@ -73,6 +80,5 @@ urlpatterns = [
         {"sitemaps": sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
-    path("", include("user_sessions.urls", "user_sessions")),
     path("", include(("routechoices.site.urls", "site"), namespace="site")),
 ]

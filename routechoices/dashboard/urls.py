@@ -1,12 +1,30 @@
+from allauth.account import views as allauth_views
 from django.urls import re_path
+from user_sessions import views as user_sessions_views
 
 from routechoices.dashboard import views
 
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
+    re_path(r"^account/emails/?$", allauth_views.email, name="account_emails"),
+    re_path(
+        r"^account/change-password/?$",
+        allauth_views.password_change,
+        name="account_password_change",
+    ),
     re_path(
         r"^account/delete/?$", views.account_delete_view, name="account_delete_view"
+    ),
+    re_path(
+        r"^account/sessions/?$",
+        view=user_sessions_views.SessionListView.as_view(),
+        name="session_list",
+    ),
+    re_path(
+        r"^account/sessions/delete-others/?$",
+        view=user_sessions_views.SessionDeleteOtherView.as_view(),
+        name="session_delete_other",
     ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(

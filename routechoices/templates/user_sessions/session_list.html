@@ -29,7 +29,7 @@
   </table>
 
   {% if object_list.count > 1 %}
-    <form method="post" action="{% url 'user_sessions:session_delete_other' %}">
+    <form method="post" action="{% url 'dashboard:session_delete_other' %}">
       {% csrf_token %}
       <p>{% blocktrans %}You can also end all other sessions but the current.
         This will log you out on all other devices.{% endblocktrans %}</p>

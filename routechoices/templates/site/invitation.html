@@ -7,7 +7,7 @@
 {% if not target_user %}
 <h1>Invite is targeted to a different email address than yours</h1>
 <p>You were invited to manage club {{invitation.club}}, however the email provided for the invite is not listed in your account email addresses.</p>
-<p>To continue you can either add that email address to your account <a href={% url 'account_email' %}>here</a>, or create a new account in which case you need to <a href={% url 'root_account_logout' %}>logout</a> first.</p>
+<p>To continue you can either add that email address to your account <a href={% url 'dashboard:account_emails' %}>here</a>, or create a new account in which case you need to <a href={% url 'root_account_logout' %}>logout</a> first.</p>
 {% elif not invitation %}
 <h1>Invite cannot be found</h1>
 <p>No invite with such key exists in the database.</p>
