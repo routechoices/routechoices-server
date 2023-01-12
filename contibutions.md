@@ -6,6 +6,7 @@ Media:
 ------
 
     Frontpage Video             CC-4.0 Floris Kloet https://livingstills.nl
+    Frontpage Picture           Atro Saukko - Jukola 2021
     Event list banner           Juuso-Valtteri Kivimäki https://www.juusovaltteri.com
 
 Translations:
