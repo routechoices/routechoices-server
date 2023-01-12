@@ -1066,6 +1066,8 @@ def event_data(request, event_id):
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
     devices = (c.device_id for c in competitors)
+
+    # we need this to determine the end time of the competitor device stream
     all_devices_competitors = (
         Competitor.objects.filter(
             start_time__gte=event.start_date, device_id__in=devices

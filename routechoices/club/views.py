@@ -111,10 +111,8 @@ def club_view(request, **kwargs):
             .order_by("start_date", "name")
         )
         for e in all_events_w_set:
-            if e.event_set_id in events_by_set.keys():
-                events_by_set[e.event_set_id].append(e)
-            else:
-                events_by_set[e.event_set_id] = [e]
+            events_by_set.setdefault(e.event_set_id, [])
+            events_by_set[e.event_set_id].append(e)
 
     events = []
     for event in events_page:
@@ -159,10 +157,8 @@ def club_view(request, **kwargs):
             .order_by("start_date", "name")
         )
         for e in all_live_events_w_set:
-            if e.event_set_id in live_events_by_set.keys():
-                live_events_by_set[e.event_set_id].append(e)
-            else:
-                live_events_by_set[e.event_set_id] = [e]
+            live_events_by_set.setdefault(e.event_set_id, [])
+            live_events_by_set[e.event_set_id].append(e)
 
     live_events = []
     for event in all_live_events:
