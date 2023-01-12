@@ -25,11 +25,13 @@ from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
+from django.core.exceptions import BadRequest, ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
+from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -964,6 +966,130 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         self.invalidate_cache()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def extract_event_lists(cls, request, club=None):
+        page = request.GET.get("page")
+        selected_year = request.GET.get("year")
+        selected_month = request.GET.get("month")
+
+        event_qs = cls.objects.filter(privacy=PRIVACY_PUBLIC).select_related(
+            "club", "event_set"
+        )
+        if club is not None:
+            event_qs = event_qs.filter(club=club)
+
+        past_event_qs = event_qs.filter(end_date__lt=now())
+        live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
+
+        months = None
+        years = list(
+            past_event_qs.annotate(year=ExtractYear("start_date"))
+            .values_list("year", flat=True)
+            .order_by("-year")
+            .distinct()
+        )
+        if selected_year:
+            try:
+                selected_year = int(selected_year)
+            except Exception:
+                raise BadRequest("Invalid year")
+        if selected_year:
+            past_event_qs = past_event_qs.filter(start_date__year=selected_year)
+            months = list(
+                past_event_qs.annotate(month=ExtractMonth("start_date"))
+                .values_list("month", flat=True)
+                .order_by("-month")
+                .distinct()
+            )
+            if selected_month:
+                try:
+                    selected_month = int(selected_month)
+                    if selected_month < 1 or selected_month > 12:
+                        raise ValueError()
+                except Exception:
+                    raise BadRequest("Invalid month")
+            if selected_month:
+                past_event_qs = past_event_qs.filter(start_date__month=selected_month)
+
+        def list_events_sets(qs):
+            events_wo_set = qs.filter(event_set__isnull=True)
+            events_w_set = (
+                qs.filter(event_set__isnull=False)
+                .order_by("event_set_id", "-start_date")
+                .distinct("event_set_id")
+            )
+            return events_wo_set.union(events_w_set).order_by("-start_date", "name")
+
+        def events_to_sets(qs):
+            events_set_ids = [e.event_set_id for e in qs if e.event_set_id]
+            events_by_set = {}
+            if events_set_ids:
+                all_events_w_set = list(
+                    cls.objects.select_related("club")
+                    .filter(event_set_id__in=events_set_ids)
+                    .order_by("-start_date", "name")
+                )
+                for e in all_events_w_set:
+                    events_by_set.setdefault(e.event_set_id, [])
+                    events_by_set[e.event_set_id].append(e)
+
+            events = []
+            for event in qs:
+                event_set = event.event_set
+                if event_set is None:
+                    events.append(
+                        {
+                            "name": event.name,
+                            "events": [
+                                event,
+                            ],
+                            "fake": True,
+                        }
+                    )
+                else:
+                    events.append(
+                        {
+                            "name": event_set.name,
+                            "events": events_by_set[event_set.id],
+                            "fake": False,
+                        }
+                    )
+            return events
+
+        all_past_events = list_events_sets(past_event_qs)
+        paginator = Paginator(all_past_events, 25)
+        past_events_page = paginator.get_page(page)
+        past_events = events_to_sets(past_events_page)
+
+        all_live_events = list_events_sets(live_events_qs)
+        live_events = events_to_sets(all_live_events)
+
+        return {
+            "club": club,
+            "events": past_events,
+            "events_page": past_events_page,
+            "live_events": live_events,
+            "years": years,
+            "months": months,
+            "year": selected_year,
+            "month": selected_month,
+            "month_names": [
+                "",
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ],
+        }
 
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"

@@ -6,9 +6,8 @@ from django.contrib.sitemaps.views import (
     x_robots_tag,
 )
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import BadRequest, PermissionDenied
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.response import TemplateResponse
@@ -20,7 +19,7 @@ from django_hosts.resolvers import reverse
 
 from routechoices.api.views import serve_from_s3
 from routechoices.club import feeds
-from routechoices.core.models import PRIVACY_PRIVATE, PRIVACY_PUBLIC, Club, Event
+from routechoices.core.models import PRIVACY_PRIVATE, Club, Event
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
@@ -52,164 +51,9 @@ def club_view(request, **kwargs):
     club = get_object_or_404(Club, slug__iexact=club_slug)
     if club.domain and not request.use_cname:
         return redirect(club.nice_url)
-    event_list = Event.objects.filter(club=club, privacy=PRIVACY_PUBLIC).select_related(
-        "club", "event_set"
-    )
-    live_events = event_list.filter(start_date__lte=now(), end_date__gte=now())
-    event_list = event_list.filter(end_date__lt=now())
-    years = list(
-        event_list.annotate(year=ExtractYear("start_date"))
-        .values_list("year", flat=True)
-        .order_by("-year")
-        .distinct()
-    )
-    months = None
-    selected_year = request.GET.get("year")
-    selected_month = request.GET.get("month")
-    if selected_year:
-        try:
-            selected_year = int(selected_year)
-        except Exception:
-            raise BadRequest("Invalid year")
-    if selected_year:
-        event_list = event_list.filter(start_date__year=selected_year)
-        months = list(
-            event_list.annotate(month=ExtractMonth("start_date"))
-            .values_list("month", flat=True)
-            .order_by("-month")
-            .distinct()
-        )
-        if selected_month:
-            try:
-                selected_month = int(selected_month)
-                if selected_month < 1 or selected_month > 12:
-                    raise ValueError()
-            except Exception:
-                raise BadRequest("Invalid month")
-        if selected_month:
-            event_list = event_list.filter(start_date__month=selected_month)
-
-    events_wo_set = event_list.filter(event_set__isnull=True)
-    events_w_set = (
-        event_list.filter(event_set__isnull=False)
-        .order_by("event_set_id", "-start_date")
-        .distinct("event_set_id")
-    )
-
-    all_events = events_wo_set.union(events_w_set).order_by("-start_date", "name")
-
-    paginator = Paginator(all_events, 25)
-    page = request.GET.get("page")
-    events_page = paginator.get_page(page)
-
-    events_set_ids = [e.event_set_id for e in events_page if e.event_set_id]
-    events_by_set = {}
-    if events_set_ids:
-        all_events_w_set = list(
-            Event.objects.select_related("club")
-            .filter(event_set_id__in=events_set_ids)
-            .order_by("-start_date", "name")
-        )
-        for e in all_events_w_set:
-            events_by_set.setdefault(e.event_set_id, [])
-            events_by_set[e.event_set_id].append(e)
-
-    events = []
-    for event in events_page:
-        event_set = event.event_set
-        if event_set is None:
-            events.append(
-                {
-                    "name": event.name,
-                    "events": [
-                        event,
-                    ],
-                    "fake": True,
-                }
-            )
-        else:
-            events.append(
-                {
-                    "name": event_set.name,
-                    "events": events_by_set[event_set.id],
-                    "fake": False,
-                }
-            )
-
-    live_events_wo_set = live_events.filter(event_set__isnull=True)
-    live_events_w_set = (
-        live_events.select_related("event_set")
-        .filter(event_set__isnull=False)
-        .order_by("event_set_id", "-start_date")
-        .distinct("event_set_id")
-    )
-
-    all_live_events = live_events_wo_set.union(live_events_w_set).order_by(
-        "-start_date", "name"
-    )
-
-    live_events_set_ids = [e.event_set_id for e in all_live_events if e.event_set_id]
-    live_events_by_set = {}
-    if live_events_set_ids:
-        all_live_events_w_set = list(
-            Event.objects.select_related("club")
-            .filter(event_set_id__in=live_events_set_ids)
-            .order_by("-start_date", "name")
-        )
-        for e in all_live_events_w_set:
-            live_events_by_set.setdefault(e.event_set_id, [])
-            live_events_by_set[e.event_set_id].append(e)
-
-    live_events = []
-    for event in all_live_events:
-        event_set = event.event_set
-        if event.event_set_id is None:
-            live_events.append(
-                {
-                    "name": event.name,
-                    "events": [
-                        event,
-                    ],
-                    "fake": True,
-                }
-            )
-        else:
-            live_events.append(
-                {
-                    "name": event_set.name,
-                    "events": live_events_by_set[event_set.id],
-                    "fake": False,
-                }
-            )
 
     return render(
-        request,
-        "site/event_list.html",
-        {
-            "club": club,
-            "events": events,
-            "events_page": events_page,
-            "live_events": live_events,
-            "years": years,
-            "months": months,
-            "year": selected_year,
-            "month": selected_month,
-            "month_names": [
-                "",
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-            ],
-        },
+        request, "site/event_list.html", Event.extract_event_lists(request, club)
     )
 
 
