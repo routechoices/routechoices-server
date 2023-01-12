@@ -31,7 +31,6 @@ def common_wms(function):
             return HttpResponseBadRequest("Service must be WMS")
 
         if get_params.get("request") == "GetMap":
-
             http_accept = request.META.get("HTTP_ACCEPT", "")
             better_mime = None
             if "image/avif" in http_accept.split(","):
