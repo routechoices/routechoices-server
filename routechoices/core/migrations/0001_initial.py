@@ -323,7 +323,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "events",
                 "ordering": ["-start_date"],
                 "verbose_name": "event",
-                "unique_together": {("club", "slug"), ("club", "name")},
+                "unique_together": {("club", "slug")},
             },
         ),
         migrations.CreateModel(
