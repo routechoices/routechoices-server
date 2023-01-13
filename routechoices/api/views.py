@@ -1065,7 +1065,7 @@ def event_data(request, event_id):
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
-    devices = (c.device_id for c in competitors)
+    devices = (c.device_id for c in competitors if c.device_id)
 
     # we need this to determine the end time of the competitor device stream
     all_devices_competitors = (
