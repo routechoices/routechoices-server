@@ -131,30 +131,32 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
-      banana.i18n("live-mode");
+      '<div style="text-align: center;background-color: red;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;font-style: italic;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      banana.i18n("live-mode") +
+      '</div><div id="big-clock" style="text-align: center;padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
       color: "#fff",
-      backgroundColor: "red",
-      borderRadius: "15px",
-      padding: "3px 20px",
-      fontStyle: "italic",
+      border: "1px solid black",
+      borderRadius: "16px",
+      padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
     });
   },
   setReplay() {
-    this._div.innerHTML = banana.i18n("replay-mode");
+    this._div.innerHTML =
+      '<div style="text-align: center;background-color: #666;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;">' +
+      banana.i18n("replay-mode") +
+      '</div><div id="big-clock" style="text-align: center;padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
       color: "#fff",
-      backgroundColor: "#666",
-      borderRadius: "15px",
-      padding: "3px 15px",
-      fontStyle: "normal",
+      border: "1px solid black",
+      borderRadius: "16px",
+      padding: "0px",
       fontWeight: "bold",
       textTransform: "uppercase",
     });
@@ -1460,7 +1462,7 @@ function getRelativeTime(currentTime) {
   return viewedTime;
 }
 
-function getProgressBarText(currentTime) {
+function getProgressBarText(currentTime, bg = false) {
   var result = "";
   var viewedTime = currentTime;
   if (!isRealTime) {
@@ -1474,7 +1476,7 @@ function getProgressBarText(currentTime) {
     function to2digits(x) {
       return ("0" + Math.floor(x)).slice(-2);
     }
-    result += t > 3600 ? Math.floor(t / 3600) + ":" : "";
+    result += t > 3600 || bg ? Math.floor(t / 3600) + ":" : "";
     result += to2digits((t / 60) % 60) + ":" + to2digits(t % 60);
   } else {
     var t = Math.round(viewedTime / 1e3);
@@ -1486,6 +1488,9 @@ function getProgressBarText(currentTime) {
       dayjs(getCompetitionEndDate()).format("YYYY-MM-DD")
     ) {
       result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
+      if (bg) {
+        result = result.replace(" ", "<br/>");
+      }
     } else {
       result = dayjs(viewedTime).format("HH:mm:ss");
     }
@@ -1551,7 +1556,8 @@ function drawCompetitors() {
   u("#progress_bar")
     .css({ width: perc + "%" })
     .attr("aria-valuenow", perc);
-  u("#progress_bar_text").html(getProgressBarText(currentTime));
+  u("#progress_bar_text").text(getProgressBarText(currentTime));
+  u("#big-clock").html(getProgressBarText(currentTime, true));
 
   if (isMapMoving) return;
 
