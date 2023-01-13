@@ -1,7 +1,7 @@
 
 {% load static %}
 {% load hosts %}
-<header class="navbar navbar-expand-md navbar-light bg-light">
+<header class="navbar navbar-expand-md navbar-dark bg-primary" style="color: #fff;background-color: #111 !important">
   <div class="container">
     <a class="navbar-brand site-name" href="{% host_url 'site:events_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"></span> {{site.name}}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

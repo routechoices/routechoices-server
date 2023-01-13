@@ -6,7 +6,7 @@
   {% define event.club as club %}
 {% endif %}
 
-<header class="navbar navbar-expand-md navbar-light bg-light" style="z-index: 110001;padding: 3px 0">
+<header class="navbar navbar-expand-md navbar-dark bg-primary" style="z-index: 110001;padding: 3px 0;color: #fff;background-color: #111 !important">
   <div class="container">
     {% if club.logo and club.website %}
     <a class="navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{{club.logo_url}}" alt="club logo" height="40" width="40"></span></a>
