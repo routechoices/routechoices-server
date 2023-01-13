@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0038_remove_device_locations_encoded_compressed"),
+        ("core", "0034_event_emergency_contact"),
     ]
 
     operations = [
