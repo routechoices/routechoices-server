@@ -47,10 +47,12 @@
     {% endblock %}
     {% bootstrap_messages %}
     <div class='notifications top-right'></div>
+    {% block contentup %}
     <div class="container content">
     {% block content %}
     {% endblock %}
     </div>
+    {% endblock %}
     {% block footer %}
         {% if request.club_slug %}
         {% include "club/footer.html" %}
