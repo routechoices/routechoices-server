@@ -326,7 +326,7 @@ def event_list(request):
         if allow_route_upload_raw:
             allow_route_upload = True
 
-        event = Event.objects.create(
+        event = Event(
             club=club,
             name=name,
             slug=slug,
@@ -337,6 +337,11 @@ def event_list(request):
             open_registration=open_registration,
             allow_route_upload=allow_route_upload,
         )
+        try:
+            event.full_clean()
+        except Exception as e:
+            raise ValidationError(e)
+        event.save()
         output = {
             "id": event.aid,
             "name": event.name,
