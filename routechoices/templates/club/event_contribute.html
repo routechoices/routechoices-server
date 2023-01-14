@@ -34,8 +34,8 @@
   <div class="container content">
     {% if register_form %}
     <div class="col-12">
-        <h4 class="padded-multiline"><span>Add competitor</span></h4>
         <div class="row">
+            <h4 class="padded-multiline"><span>Add competitor</span></h4>
             <div class="mb-3">
                 <form action="" method="post" id="registration-form">
                     {% csrf_token %}
@@ -49,8 +49,8 @@
     {% endif %}
     {% if upload_form %}
     <div class="col-12">
-        <h4 class="padded-multiline"><span>Competitors Route upload</span></h2>
         <div class="row">
+            <h4 class="padded-multiline"><span>Competitors route upload</span></h2>
             <div class="mb-3">
                 <form action="" method="post" id="upload-form">
                     {% csrf_token %}
