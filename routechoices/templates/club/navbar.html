@@ -31,7 +31,10 @@
         </li>{% if is_event_page %}
         <li class="nav-item" id="export-nav-item">
           <a class="nav-link" href="{{ club.get_absolute_url }}{{event.slug}}/export" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="export-text">Export</span></a>
-        </li>{% endif %}
+        </li>
+        {% if event.ended and event.map_id %}
+          <li><a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="nav-link"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a></li>
+        {% endif %}{% endif %}
       </ul>
     </div>
     {% endif %}
