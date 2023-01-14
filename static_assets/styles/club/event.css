@@ -10,7 +10,7 @@
 .sidebar {
   position: fixed;
   top: 56px;
-  bottom: 98px;
+  bottom: 93px;
   left: 0;
   z-index: 10001;
   display: block;
@@ -26,28 +26,28 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 216px);
-  max-height: calc(var(--app-height) - 216px);
+  max-height: calc(100vh - 211px);
+  max-height: calc(var(--app-height) - 211px);
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 254px);
-  max-height: calc(var(--app-height) - 254px);
+  max-height: calc(100vh - 249px);
+  max-height: calc(var(--app-height) - 249px);
 }
 
 .sidebar.replay_mode #listCompetitor {
-  max-height: calc(100vh - 241px);
-  max-height: calc(var(--app-height) - 241px);
+  max-height: calc(100vh - 236px);
+  max-height: calc(var(--app-height) - 236px);
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 193px);
-  max-height: calc(var(--app-height) - 193px);
+  max-height: calc(100vh - 188px);
+  max-height: calc(var(--app-height) - 188px);
 }
 
 .sidebar.replay_mode #listOptions {
-  max-height: calc(100vh - 218px);
-  max-height: calc(var(--app-height) - 218px);
+  max-height: calc(100vh - 213px);
+  max-height: calc(var(--app-height) - 213px);
 }
 
 .time_bar {
@@ -55,12 +55,12 @@
   padding-top: 8px;
   bottom: 0px;
   left: 0px;
-  height: 98px;
+  height: 93px;
   background-color: #e5e5e5;
 }
 
 .time_bar.replay_mode {
-  height: 123px;
+  height: 118px;
 }
 
 .time_bar.loading {
@@ -87,14 +87,14 @@
 .main {
   position: fixed;
   top: 56px;
-  bottom: 98px;
+  bottom: 93px;
   right: 0px;
   left: 0px;
 }
 
 .sidebar.replay_mode,
 .main.replay_mode {
-  bottom: 123px;
+  bottom: 118px;
 }
 
 .sidebar.loading,
@@ -143,23 +143,23 @@
 
 @media only screen and (max-width: 574px) {
   .time_bar.replay_mode {
-    height: 160px;
+    height: 140px;
   }
   .main.replay_mode,
   .sidebar.replay_mode {
-    bottom: 160px;
+    bottom: 140px;
   }
   .sidebar.replay_mode #listCompetitor {
-    max-height: calc(100vh - 278px);
-    max-height: calc(var(--app-height) - 278px);
-  }
-  .sidebar.replay_mode #listCompetitor.with_search_bar {
-    max-height: calc(100vh - 316px);
-    max-height: calc(var(--app-height) - 316px);
-  }
-  .sidebar.replay_mode #listOptions {
     max-height: calc(100vh - 258px);
     max-height: calc(var(--app-height) - 258px);
+  }
+  .sidebar.replay_mode #listCompetitor.with_search_bar {
+    max-height: calc(100vh - 296px);
+    max-height: calc(var(--app-height) - 296px);
+  }
+  .sidebar.replay_mode #listOptions {
+    max-height: calc(100vh - 238px);
+    max-height: calc(var(--app-height) - 238px);
   }
 }
 
