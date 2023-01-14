@@ -609,8 +609,8 @@ function selectReplayMode(e) {
   eventStateControl.setReplay();
   u("#live_button").removeClass("active");
   u("#replay_button").addClass("active");
-  u("#replay_mode_buttons").css({ display: "inline-block" });
-  u("#replay_control_buttons").css({ display: "inline-block" });
+  u("#replay_mode_buttons").css({ display: "" });
+  u("#replay_control_buttons").css({ display: "" });
   if (!setMassStartContextMenuItem) {
     setMassStartContextMenuItem = map.contextmenu.insertItem(
       {
@@ -982,7 +982,7 @@ function displayCompetitorList(force) {
   optionDisplayed = false;
   var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
   var listDiv = u(
-    '<div id="listCompetitor" style="overflow-y: auto;margin-top:3px;"/>'
+    '<div id="listCompetitor" style="overflow-y:auto;margin-top:3px"/>'
   );
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
@@ -1039,7 +1039,7 @@ function displayCompetitorList(force) {
         </div>'
     );
     var diva = u(
-      '<div class="card" style="background-color:transparent; margin-top: 3px";/>'
+      '<div class="card mb-1" style="background-color:transparent";/>'
     ).append(div);
     u(div)
       .find(".color-tag")

@@ -9,23 +9,20 @@
       <div class="container">
         <div class="row">
           <h1>GPS Trackers</h1>
-          <div class="row justify-content-between" style="margin-bottom: 15px">
+          <div class="row justify-content-between mb-3">
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}"/></div>
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
             <div class="col align-self-center" style="text-align:center"><img style="height: 150px" alt="Mictrack MT825" src="{% static '/img/mictrack.png' %}"/></div>
-            <!--<div class="col col-md-3 col-6"><img style="height: 150px" src="{% static '/img/garmin.png' %}"/></div>-->
           </div>
           <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
           <p>For each method, devices are assigned a unique "device ID" that can be used on this website.</p>
           <p>If interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
           <p>See below more detailed instructions:</p>
           <p style="margin-top:2em; text-align:center">
-            <a role="button" class="btn btn-info" id="android-btn"  href="#android" style="margin-bottom: 5px"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
-            <a role="button" class="btn btn-primary" id="ios-btn" href="#ios" style="margin-bottom: 5px"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
-            <!--<a role="button" class="btn btn-primary" id="traccar-btn" data-toggle="modal" data-target="#traccar-modal" style="margin-bottom: 5px"><i class="fa fa-mobile-phone"></i> Tracking with a IPhone</a> -->
-            <a role="button" class="btn btn-danger" id="tmt250-btn" href="#hardware" style="margin-bottom: 5px"><i class="fa-solid fa-satellite-dish"></i> Tracking with a dedicated GPS tracker</a>
-            <!--<a role="button" class="btn btn-success" id="garmin-btn" data-toggle="modal" data-target="#garmin-modal" style="margin-bottom: 5px"><i class="fa fa-clock-o"></i> Tracking with a Garmin watch</a>-->
+            <a role="button" class="btn btn-info mb-1" id="android-btn"  href="#android"><i class="fa fa-android"></i> Tracking with an android smartphone</a>
+            <a role="button" class="btn btn-primary mb-1" id="ios-btn" href="#ios"><i class="fa fa-apple"></i> Tracking with a iPhone</a>
+            <a role="button" class="btn btn-danger mb-1" id="tmt250-btn" href="#hardware"><i class="fa-solid fa-satellite-dish"></i> Tracking with a dedicated GPS tracker</a>
           </p>
         </div>
       </div>
@@ -119,7 +116,7 @@
               <label for="IMEI">IMEI</label>
               <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
               <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{site.name}} platform.</small>
-              <div id="imeiErrorMsg" class="invalid-feedback d-none" style="margin-bottom: 5px">
+              <div id="imeiErrorMsg" class="invalid-feedback d-none mb-1">
                 <i class="fa fa-warning"></i> Invalid IMEI
               </div>
             </div>

@@ -10,7 +10,7 @@
 .sidebar {
   position: fixed;
   top: 56px;
-  bottom: 105px;
+  bottom: 98px;
   left: 0;
   z-index: 10001;
   display: block;
@@ -26,41 +26,41 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 223px);
-  max-height: calc(var(--app-height) - 223px);
+  max-height: calc(100vh - 216px);
+  max-height: calc(var(--app-height) - 216px);
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 261px);
-  max-height: calc(var(--app-height) - 261px);
+  max-height: calc(100vh - 254px);
+  max-height: calc(var(--app-height) - 254px);
 }
 
 .sidebar.replay_mode #listCompetitor {
-  max-height: calc(100vh - 248px);
-  max-height: calc(var(--app-height) - 248px);
+  max-height: calc(100vh - 241px);
+  max-height: calc(var(--app-height) - 241px);
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 200px);
-  max-height: calc(var(--app-height) - 200px);
+  max-height: calc(100vh - 193px);
+  max-height: calc(var(--app-height) - 193px);
 }
 
 .sidebar.replay_mode #listOptions {
-  max-height: calc(100vh - 248px);
-  max-height: calc(var(--app-height) - 225px);
+  max-height: calc(100vh - 218px);
+  max-height: calc(var(--app-height) - 218px);
 }
 
 .time_bar {
   position: absolute;
-  padding-top: 15px;
+  padding-top: 8px;
   bottom: 0px;
   left: 0px;
-  height: 105px;
+  height: 98px;
   background-color: #e5e5e5;
 }
 
 .time_bar.replay_mode {
-  height: 130px;
+  height: 123px;
 }
 
 .time_bar.loading {
@@ -87,14 +87,14 @@
 .main {
   position: fixed;
   top: 56px;
-  bottom: 105px;
+  bottom: 98px;
   right: 0px;
   left: 0px;
 }
 
 .sidebar.replay_mode,
 .main.replay_mode {
-  bottom: 130px;
+  bottom: 123px;
 }
 
 .sidebar.loading,

@@ -18,15 +18,15 @@
         <h1>Edit competitors <small><span class="utc-offset"></span></small></h1>
         <h3>{{event.name}}</h3>
         <hr/>
-        <div style="margin-bottom: 15px;">
-        <form method="GET" class="row">
-          <div class="col-auto">
-            <input class="form-control" type="search" value="{{search_query}}" name="q" placeholder="Search term"/>
-          </div>
-          <div class="col-auto">
-            <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> Search</button>
-          </div>
-        </form>
+        <div class="mb-3">
+            <form method="GET" class="row">
+            <div class="col-auto">
+                <input class="form-control" type="search" value="{{search_query}}" name="q" placeholder="Search term"/>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> Search</button>
+            </div>
+            </form>
         </div>
         {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
         <form action="" method="post">
@@ -63,8 +63,7 @@
             {% endfor %}
             </table>
             {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
-            <input type="submit" value="Save" class="btn btn-primary" id="submit-btn" style="margin-bottom: 3px"/>
-            {% if context == 'edit' %}<a href="{% url 'dashboard:event_delete_view' event_id=event.aid %}" class="btn btn-danger" style="margin-bottom: 3px">Delete</a>{% endif %}
+            <input type="submit" value="Save" class="btn btn-primary mb-1" id="submit-btn"/>
         </form>
     </div>
 </div>

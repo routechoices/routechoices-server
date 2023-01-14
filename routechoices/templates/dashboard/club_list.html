@@ -2,6 +2,12 @@
 {% load static %}
 {% load django_bootstrap5 %}
 
+{% block extra_head %}
+{{ block.super }}
+<style>
+  .club-card:hover{box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;}
+</style>
+{% endblock %}
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
@@ -16,19 +22,19 @@
           <p>Or request another user to add your username "{{request.user.username }}" to the list of admins of theirs.</p>
         </div>
         {% else %}
-        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new club</a>
         <h1>Select one of your club</h3>
+        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary mb-1"><i class="fa fa-plus-circle"></i> Create new club</a>
         {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
           {% for club in clubs %}
-            <div class="card flex-row flex-no-wrap" style="margin-bottom: 15px;">
+            <div class="card flex-row flex-no-wrap club-card mb-3">
               <div class="border-0">
-                <a class="link-primary" href="{% url 'dashboard:club_set_view' club_id=club.aid %}"><img class="card-img-left" style="border-radius: 3px 0 0 3px;" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" alt="Club {{ club.name }} Logo"></a>
+                <img class="card-img-left" style="border-radius: 3px 0 0 3px;" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" alt="Club {{ club.name }} Logo">
               </div>
               <div class="card-body px-2">
                 <div class="d-flex flex-row bd-highlight justify-content-between">
                     <div class="p-2 bd-highlight">
                         <div>
-                          <a class="link-primary stretched-link" href="{% url 'dashboard:club_set_view' club_id=club.aid %}"><b style="font-size: 1.3em;">{{ club.name }}</b></a>
+                          <a class="link-primary stretched-link" href="{% url 'dashboard:club_set_view' club_id=club.aid %}" style="text-decoration: none"><b style="font-size: 1.3em;">{{ club.name }}</b></a>
                         </div>
                     </div>
                 </div>

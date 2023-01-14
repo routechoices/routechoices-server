@@ -7,24 +7,29 @@
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
-
-        {% if not event_sets %}
+        <div class="mb-3">
+            {% if not event_sets %}
             <p>You haven't created any event sets yet.</p>
-            <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new event set</a>
-        {% else %}
-        <div style="margin-bottom:15px"><a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new event set</a></div>
+            {% endif %}
+            <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary mb-1"><i class="fa fa-plus-circle"></i> Create new event set</a>
+        </div>
+        {% if event_sets %}
         {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
-        <table class="table table-striped">
-            <tr>
-                <th>Name</th>
-                <th>Event Count</th>
-            </tr>
-            {% for event_set in event_sets %}
-            <tr>
-                <td><a href="{% url 'dashboard:event_set_edit_view' event_set_id=event_set.aid %}">{{ event_set.name }}</a></td>
-                <td>{{ event_set.events.all.count }}</td>
-            </tr>
-            {% endfor %}
+        <table class="table table-striped mb-3">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Event Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event_set in event_sets %}
+                <tr>
+                    <td><a href="{% url 'dashboard:event_set_edit_view' event_set_id=event_set.aid %}">{{ event_set.name }}</a></td>
+                    <td>{{ event_set.events.all.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
         {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
         {% endif %}

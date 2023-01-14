@@ -51,7 +51,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/contribute")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Add competitor")
-        self.assertContains(response, "Upload route for existing competitor")
+        self.assertContains(response, "Competitors Route upload")
 
         response = self.client.get(f"{self.live_server_url}/kiila-cup-1/does-not-exist")
         self.assertEqual(response.status_code, 404)
@@ -115,7 +115,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-2/contribute")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Add competitor")
-        self.assertNotContains(response, "Upload route for existing competitor")
+        self.assertNotContains(response, "Competitors Route upload")
 
     def test_past_event_pages_loads(self):
         Event.objects.create(
@@ -138,7 +138,7 @@ class ClubViewsTestCase(LiveServerTestCase):
         response = self.client.get(f"{self.live_server_url}/kiila-cup-3/contribute")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Add competitor")
-        self.assertContains(response, "Upload route for existing competitor")
+        self.assertContains(response, "Competitors Route upload")
 
     def test_private_event_page_load(self):
         Event.objects.create(
