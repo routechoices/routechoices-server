@@ -12,39 +12,54 @@
 {% block head_title %}{{ event.name }} contribution page | Powered by {{ site.name }}{% endblock %}
 {% block head_description %}{{ event.name }} by {{ event.club.name }} contribution page{% endblock %}
 
-{% block content %}
-<div class="row">
-    <h1>Contribute to event</h1>
-    <h2><a href="{{ event.get_absolute_url }}">{{ event.name }}</a></h2>
-    <hr/>
+{% block contentup %}
+<div class="container-fluid" style="padding: 0">
+    <div class="row" style="margin: 0px;">
+      <div style="background-color: #fff; width: 100%;">
+        <div class="container content">
+          <div class="row">
+            {% if event.event_set %}<h2 class="padded-multiline"><span>{{ event.event_set.name }}</span></h2>{% endif %}
+            <h2>{{ event.name }}</h2>
+
+            <h4>Contribute</h4>
+            <p>
+                Event {% if not event.hidden %}started {{event.start_date|timesince}} ago{% else %}starts on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}{% if event.ended %}, ended {{event.start_date|timesince}} ago{% endif %}.
+            </p>
+          </div>
+        </div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;padding:0"><path d="M0 1 L1 1 L0 0 Z"/></svg>
+    </div>
+  </div>
+  <div class="container content">
     {% if register_form %}
     <div class="col-12">
-        <h2>Add competitor</h2>
-        <p>Event {% if not event.hidden %}started {{event.start_date|timesince}} ago{% else %}starts on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
-        <form action="" method="post" id="registration-form" style="margin-bottom: 15px">
-            {% csrf_token %}
-            {% bootstrap_form register_form %}
-            <p id="warning-if-device-id" class="d-none"><i class="fa fa-warning"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
-            <input type="submit" value="Add competitor" class="btn btn-primary">
-        </form>
+        <h4 class="padded-multiline"><span>Add competitor</span></h4>
+        <div class="row">
+            <form action="" method="post" id="registration-form" style="margin-bottom: 15px">
+                {% csrf_token %}
+                {% bootstrap_form register_form %}
+                <p id="warning-if-device-id" class="d-none"><i class="fa fa-warning"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+                <input type="submit" value="Add competitor" class="btn btn-primary">
+            </form>
+        </div>
     </div>
-    {% endif %}
-    {% if upload_form and register_form %}
-    <hr/>
     {% endif %}
     {% if upload_form %}
     <div class="col-12">
-        <h2>Upload route for existing competitor</h2>
-        <form action="" method="post" id="upload-form" style="margin-bottom: 15px">
-            {% csrf_token %}
-            {% bootstrap_form upload_form %}
-            <p id="warning-if-open-registration" class="d-none"><i class="fa fa-warning"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
-            <input type="submit" value="Upload Route" class="btn btn-primary">
-        </form>
+        <h4 class="padded-multiline"><span>Competitors Route upload</span></h2>
+            <div class="row">
+            <form action="" method="post" id="upload-form" style="margin-bottom: 15px">
+                {% csrf_token %}
+                {% bootstrap_form upload_form %}
+                <p id="warning-if-open-registration" class="d-none"><i class="fa fa-warning"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
+                <input type="submit" value="Upload Route" class="btn btn-primary">
+            </form>
+        </div>
     </div>
     {% endif %}
     {% if not register_form and not upload_form %}
-    <div class="col-12">
+    <div class="col-12 text-center">
         <h2>Registration and route upload closed.</h2>
     </div>
     {% endif %}

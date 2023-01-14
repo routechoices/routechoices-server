@@ -148,7 +148,7 @@ def event_export_view(request, slug, **kwargs):
     club_slug = request.club_slug
     event = (
         Event.objects.all()
-        .select_related("club")
+        .select_related("club", "event_set")
         .prefetch_related("competitors")
         .filter(
             club__slug__iexact=club_slug,
@@ -159,14 +159,6 @@ def event_export_view(request, slug, **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         return render(request, "club/404_event.html", {"club": club}, status=404)
-    if event.start_date > now():
-        return render(
-            request,
-            "club/event_export_closed.html",
-            {
-                "event": event,
-            },
-        )
     # If event is private, page needs to be sent with cookies to prove identity, cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
@@ -268,7 +260,7 @@ def event_contribute_view(request, slug, **kwargs):
     club_slug = request.club_slug
     event = (
         Event.objects.all()
-        .select_related("club")
+        .select_related("club", "event_set")
         .filter(
             club__slug__iexact=club_slug,
             slug__iexact=slug,
