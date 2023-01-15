@@ -540,9 +540,6 @@ function selectLiveMode(e) {
     return;
   }
   u("#full_progress_bar").addClass("d-none");
-  u(".time_bar").removeClass("replay_mode");
-  u(".main").removeClass("replay_mode");
-  u(".sidebar").removeClass("replay_mode");
 
   eventStateControl.setLive();
   if (setMassStartContextMenuItem) {
@@ -607,9 +604,6 @@ function selectReplayMode(e) {
   u("#full_progress_bar").removeClass("d-none");
   u("#real_time_button").addClass("active");
   u("#mass_start_button").removeClass("active");
-  u(".time_bar").addClass("replay_mode");
-  u(".main").addClass("replay_mode");
-  u(".sidebar").addClass("replay_mode");
 
   eventStateControl.setReplay();
   u("#live_button").removeClass("active");
