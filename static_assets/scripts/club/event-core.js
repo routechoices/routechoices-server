@@ -631,6 +631,7 @@ function selectReplayMode(e) {
   prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
   prevDisplayRefresh = performance.now();
+  prevShownTime = currentTime;
   playbackRate = 8;
   function whileReplay(ts) {
     if (
