@@ -384,6 +384,11 @@ function alphabetizeNumber(integer) {
 function appHeight() {
   const doc = document.documentElement;
   doc.style.setProperty("--app-height", `${window.innerHeight}px`);
+  doc.style.setProperty(
+    "--ctrl-height",
+    `${document.getElementById("ctrl-wrapper").clientHeight}px`
+  );
+  console.log(document.getElementById("ctrl-wrapper").clientHeight);
 }
 
 function drawFinishLine(e) {
@@ -461,8 +466,8 @@ function onStart() {
   u(".main").removeClass("loading");
   u(".sidebar").removeClass("loading");
   u(".time_bar").removeClass("loading");
-  map.invalidateSize();
   fetchCompetitorRoutes(null, true);
+  map.invalidateSize();
   appHeight();
 }
 
@@ -555,6 +560,7 @@ function selectLiveMode(e) {
   u("#mass_start_button").removeClass("active");
   u("#replay_mode_buttons").hide();
   u("#replay_control_buttons").hide();
+  appHeight();
 
   isLiveMode = true;
   isRealTime = true;
@@ -611,6 +617,8 @@ function selectReplayMode(e) {
   u("#replay_button").addClass("active");
   u("#replay_mode_buttons").css({ display: "" });
   u("#replay_control_buttons").css({ display: "" });
+  appHeight();
+
   if (!setMassStartContextMenuItem) {
     setMassStartContextMenuItem = map.contextmenu.insertItem(
       {

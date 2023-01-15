@@ -1,5 +1,6 @@
 :root {
   —-app-height: 100%;
+  --ctrl-height: 0px;
 }
 
 .sub-header {
@@ -10,7 +11,7 @@
 .sidebar {
   position: fixed;
   top: 56px;
-  bottom: 93px;
+  bottom: calc(58px + var(--ctrl-height));
   left: 0;
   z-index: 10001;
   display: block;
@@ -26,41 +27,37 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 211px);
-  max-height: calc(var(--app-height) - 211px);
+  max-height: calc(100vh - 176px);
+  max-height: calc(var(--app-height) - 176px - var(--ctrl-height));
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 249px);
-  max-height: calc(var(--app-height) - 249px);
+  max-height: calc(100vh - 214px);
+  max-height: calc(var(--app-height) - 214px - var(--ctrl-height));
 }
 
 .sidebar.replay_mode #listCompetitor {
-  max-height: calc(100vh - 236px);
-  max-height: calc(var(--app-height) - 236px);
+  max-height: calc(100vh - 201px);
+  max-height: calc(var(--app-height) - 201px - var(--ctrl-height));
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 188px);
-  max-height: calc(var(--app-height) - 188px);
+  max-height: calc(100vh - 153px);
+  max-height: calc(var(--app-height) - 153px - var(--ctrl-height));
 }
 
 .sidebar.replay_mode #listOptions {
-  max-height: calc(100vh - 213px);
-  max-height: calc(var(--app-height) - 213px);
+  max-height: calc(100vh - 178px);
+  max-height: calc(var(--app-height) - 178px - var(--ctrl-height));
 }
 
 .time_bar {
   position: absolute;
-  padding-top: 8px;
+  padding-top: 5px;
   bottom: 0px;
   left: 0px;
-  height: 93px;
+  height: calc(58px + var(--ctrl-height));
   background-color: #e5e5e5;
-}
-
-.time_bar.replay_mode {
-  height: 118px;
 }
 
 .time_bar.loading {
@@ -73,6 +70,7 @@
   margin-bottom: 20px;
   margin-left: -20px;
 }
+
 .nav-sidebar > li > a {
   padding-right: 20px;
   padding-left: 20px;
@@ -87,14 +85,9 @@
 .main {
   position: fixed;
   top: 56px;
-  bottom: 93px;
+  bottom: calc(58px + var(--ctrl-height));
   right: 0px;
   left: 0px;
-}
-
-.sidebar.replay_mode,
-.main.replay_mode {
-  bottom: 118px;
 }
 
 .sidebar.loading,
@@ -139,28 +132,6 @@
   font-weight: 700;
   padding: 0 15px;
   white-space: nowrap;
-}
-
-@media only screen and (max-width: 574px) {
-  .time_bar.replay_mode {
-    height: 140px;
-  }
-  .main.replay_mode,
-  .sidebar.replay_mode {
-    bottom: 140px;
-  }
-  .sidebar.replay_mode #listCompetitor {
-    max-height: calc(100vh - 258px);
-    max-height: calc(var(--app-height) - 258px);
-  }
-  .sidebar.replay_mode #listCompetitor.with_search_bar {
-    max-height: calc(100vh - 296px);
-    max-height: calc(var(--app-height) - 296px);
-  }
-  .sidebar.replay_mode #listOptions {
-    max-height: calc(100vh - 238px);
-    max-height: calc(var(--app-height) - 238px);
-  }
 }
 
 .close {
@@ -251,6 +222,6 @@
 .btn-group-xs > .btn, .btn-xs {
   padding: .25rem .4rem;
   font-size: .875rem;
-  line-height: .5;
+  line-height: 1;
   border-radius: .2rem;
 }
