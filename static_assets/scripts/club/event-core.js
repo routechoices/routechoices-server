@@ -595,7 +595,6 @@ function selectLiveMode(e) {
     }
   }
   window.requestAnimationFrame(whileLive);
-  appHeight();
 }
 
 function selectReplayMode(e) {
@@ -687,7 +686,6 @@ function selectReplayMode(e) {
     }
   }
   whileReplay(performance.now());
-  appHeight();
 }
 
 function fetchCompetitorRoutes(url) {
@@ -1539,6 +1537,7 @@ function drawCompetitors() {
       u("#play_pause_button").html(html);
     }
   }
+  appHeight();
   // progress bar
   var perc = 0;
   if (isRealTime) {
