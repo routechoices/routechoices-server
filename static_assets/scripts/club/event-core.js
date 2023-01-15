@@ -455,19 +455,21 @@ function drawFinishLineTmp(e) {
 }
 
 function onStart() {
-  if (isLiveEvent) {
-    selectLiveMode();
-  } else {
-    u("#live_button").remove();
-    u("#replay_button").remove();
-    selectReplayMode();
-  }
-  u(".main").removeClass("loading");
-  u(".sidebar").removeClass("loading");
-  u(".time_bar").removeClass("loading");
-  fetchCompetitorRoutes(null, true);
-  map.invalidateSize();
-  appHeight();
+  fetchCompetitorRoutes(null, function () {
+    if (isLiveEvent) {
+      selectLiveMode();
+    } else {
+      u("#live_button").remove();
+      u("#replay_button").remove();
+      selectReplayMode();
+    }
+    u("#eventLoadingModal").remove();
+    u(".main").removeClass("loading");
+    u(".sidebar").removeClass("loading");
+    u(".time_bar").removeClass("loading");
+    map.invalidateSize();
+    appHeight();
+  });
 }
 
 function getCompetitionStartDate() {
@@ -622,10 +624,9 @@ function selectReplayMode(e) {
     );
   }
   isLiveMode = false;
-  prevShownTime = getCompetitionStartDate();
   playbackPaused = true;
   prevDisplayRefresh = performance.now();
-  prevShownTime = currentTime;
+  prevShownTime = getCompetitionStartDate();
   playbackRate = 8;
   function whileReplay(ts) {
     if (
@@ -684,7 +685,7 @@ function selectReplayMode(e) {
   whileReplay(performance.now());
 }
 
-function fetchCompetitorRoutes(url) {
+function fetchCompetitorRoutes(url, cb) {
   isCurrentlyFetchingRoutes = true;
   url = url || liveUrl;
   var data = {
@@ -728,7 +729,7 @@ function fetchCompetitorRoutes(url) {
         map.fitBounds(runnerPoints);
         zoomOnRunners = false;
       }
-      u("#eventLoadingModal").remove();
+      cb && cb();
     },
     error: function () {
       isCurrentlyFetchingRoutes = false;

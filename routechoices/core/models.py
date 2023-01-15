@@ -1021,15 +1021,21 @@ class Event(models.Model):
             )
             return events_wo_set.union(events_w_set).order_by("-start_date", "name")
 
-        def events_to_sets(qs):
+        def events_to_sets(qs, live=False):
             events_set_ids = [e.event_set_id for e in qs if e.event_set_id]
             events_by_set = {}
             if events_set_ids:
-                all_events_w_set = list(
+                all_events_w_set = (
                     cls.objects.select_related("club")
                     .filter(event_set_id__in=events_set_ids)
                     .order_by("-start_date", "name")
                 )
+                if live:
+                    all_events_w_set = all_events_w_set.filter(
+                        start_date__lte=now(), end_date__gte=now()
+                    )
+                else:
+                    all_events_w_set = all_events_w_set.filter(end_date__lt=now())
                 for e in all_events_w_set:
                     events_by_set.setdefault(e.event_set_id, [])
                     events_by_set[e.event_set_id].append(e)
@@ -1063,7 +1069,7 @@ class Event(models.Model):
         past_events = events_to_sets(past_events_page)
 
         all_live_events = list_events_sets(live_events_qs)
-        live_events = events_to_sets(all_live_events)
+        live_events = events_to_sets(all_live_events, live=True)
 
         return {
             "club": club,
