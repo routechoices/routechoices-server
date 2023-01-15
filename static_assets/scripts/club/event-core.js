@@ -1489,7 +1489,8 @@ function getProgressBarText(currentTime, bg = false) {
     }
     if (
       dayjs(getCompetitionStartDate()).format("YYYY-MM-DD") !==
-      dayjs(getCompetitionEndDate()).format("YYYY-MM-DD")
+        dayjs(getCompetitionEndDate()).format("YYYY-MM-DD") &&
+      !isLiveMode
     ) {
       result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
       if (bg) {
