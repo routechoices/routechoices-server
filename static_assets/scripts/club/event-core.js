@@ -388,7 +388,6 @@ function appHeight() {
     "--ctrl-height",
     `${document.getElementById("ctrl-wrapper").clientHeight}px`
   );
-  console.log(document.getElementById("ctrl-wrapper").clientHeight);
 }
 
 function drawFinishLine(e) {
@@ -651,6 +650,7 @@ function selectReplayMode(e) {
       refreshEventData();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
+
     currentTime = Math.max(
       getCompetitionStartDate(),
       prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
@@ -679,8 +679,9 @@ function selectReplayMode(e) {
     if (ts - prevDisplayRefresh > 100) {
       drawCompetitors();
       prevDisplayRefresh = ts;
+      prevShownTime = currentTime;
     }
-    prevShownTime = currentTime;
+
     if (!isLiveMode) {
       window.requestAnimationFrame(whileReplay);
     }
