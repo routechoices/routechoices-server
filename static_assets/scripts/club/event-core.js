@@ -595,6 +595,7 @@ function selectLiveMode(e) {
     }
   }
   window.requestAnimationFrame(whileLive);
+  appHeight();
 }
 
 function selectReplayMode(e) {
@@ -686,6 +687,7 @@ function selectReplayMode(e) {
     }
   }
   whileReplay(performance.now());
+  appHeight();
 }
 
 function fetchCompetitorRoutes(url) {
