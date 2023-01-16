@@ -5,6 +5,7 @@ from pathlib import Path
 import sewer.client
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.template.loader import render_to_string
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
@@ -13,68 +14,10 @@ from routechoices.lib.ssl_certificates import ClubAcmeProvider, write_account_ss
 
 
 def write_nginf_conf(domain):
-    with open(
-        os.path.join(settings.BASE_DIR, "nginx", "custom_domains", f"{domain}"),
-        "w",
-        encoding="utf_8",
-    ) as fp:
-        fp.write(
-            f"""server {{
-    server_name {domain};
-    if ($host = {domain}) {{
-        return 302 https://$host$request_uri;
-    }}
-    listen 80;
-    listen [::]:80;
-    return 404;
-}}
-
-server {{
-    server_name {domain};
-
-    ssl_certificate {os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.crt')};
-    ssl_certificate_key {os.path.join(settings.BASE_DIR, 'nginx', 'certs', f'{domain}.key')};
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-
-    location / {{
-       set $no_cache "";
-       if ($request_method !~ ^(GET|HEAD)$) {{
-           set $no_cache "1";
-       }}
-       if ($uri ~ ^(\\/dashboard|\\/admin)) {{
-           set $no_cache "1";
-       }}
-       if ($no_cache = "1") {{
-           add_header Set-Cookie "_mcnc=1; Max-Age=2; Path=/";
-           add_header X-Microcachable "0";
-       }}
-       if ($http_cookie ~* "_mcnc") {{
-           set $no_cache "1";
-       }}
-       uwsgi_cache microcache;
-       uwsgi_cache_key $scheme$host$request_method$request_uri;
-       uwsgi_cache_valid 200 1s;
-       uwsgi_cache_use_stale updating;
-       uwsgi_max_temp_file_size 5M;
-       uwsgi_no_cache $no_cache;
-       uwsgi_cache_bypass $no_cache;
-
-       client_max_body_size    20M;
-       proxy_set_header        Host $host;
-       proxy_set_header        X-Real-IP $remote_addr;
-       proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-       uwsgi_pass              unix://{os.path.join(settings.BASE_DIR, 'var', 'django.sock')};
-       uwsgi_pass_header       Authorization;
-       uwsgi_hide_header       X-Accel-Redirect;
-       uwsgi_hide_header       X-Sendfile;
-       uwsgi_pass_header       Set-Cookie;
-       uwsgi_intercept_errors  off;
-       include                 uwsgi_params;
-    }}
-}}
-"""
-        )
+    conf_file = render_to_string(
+        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}").write_text(conf_file)
 
 
 class Command(BaseCommand):
