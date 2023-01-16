@@ -34,6 +34,7 @@ from django.db import models
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
@@ -335,28 +336,10 @@ class Map(models.Model):
         doc_img = self.data
         mime_type = magic.from_buffer(doc_img, mime=True)
         ext = mime_type[6:]
-        doc_kml = f"""<?xml version="1.0" encoding="utf-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2"
-     xmlns:gx="http://www.google.com/kml/ext/2.2">
-  <Document>
-    <Folder>
-      <name>{self.name}</name>
-      <GroundOverlay>
-        <name>{self.name}</name>
-        <drawOrder>50</drawOrder>
-        <Icon>
-          <href>files/doc.{ext}</href>
-        </Icon>
-        <altitudeMode>clampToGround</altitudeMode>
-        <gx:LatLonQuad>
-          <coordinates>
-            {self.bound["bottomLeft"]["lon"]},{self.bound["bottomLeft"]["lat"]} {self.bound["bottomRight"]["lon"]},{self.bound["bottomRight"]["lat"]} {self.bound["topRight"]["lon"]},{self.bound["topRight"]["lat"]} {self.bound["topLeft"]["lon"]},{self.bound["topLeft"]["lat"]}
-          </coordinates>
-        </gx:LatLonQuad>
-      </GroundOverlay>
-    </Folder>
-  </Document>
-</kml>"""
+
+        doc_kml = render_to_string(
+            "kml.xml", {"name": self.name, "bound": self.bound, "ext": ext}
+        )
         kmz = BytesIO()
         with ZipFile(kmz, "w") as fp:
             with fp.open("doc.kml", "w") as file1:
