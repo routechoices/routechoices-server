@@ -220,7 +220,12 @@ def wms_service(request):
             Event.objects.filter(privacy=PRIVACY_PUBLIC)
             .filter(start_date__lte=now())
             .select_related("club", "map")
-            .prefetch_related("map_assignations")
+            .prefetch_related(
+                Prefetch(
+                    "map_assignations",
+                    queryset=MapAssignation.objects.select_related("map"),
+                )
+            )
         )
 
         layers = []
