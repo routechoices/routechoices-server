@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+     xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <Folder>
+      <name>{{ name }}</name>
+      <GroundOverlay>
+        <name>{{ name }}</name>
+        <drawOrder>50</drawOrder>
+        <Icon>
+          <href>files/doc.{{ ext }}</href>
+        </Icon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <gx:LatLonQuad>
+          <coordinates>
+            {{ bound.bottomLeft.lon }},{{ bound.bottomLeft.lat }} {{ bound.bottomRight.lon }},{{ bound.bottomRight.lat }} {{ bound.topRight.lon }},{{ bound.topRight.lat }} {{ bound.topLeft.lon }},{{ bound.topLeft.lat }}
+          </coordinates>
+        </gx:LatLonQuad>
+      </GroundOverlay>
+    </Folder>
+  </Document>
+</kml>
