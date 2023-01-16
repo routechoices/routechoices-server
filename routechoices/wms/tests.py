@@ -101,3 +101,17 @@ class MapApiTestCase(EssentialApiBase):
             SERVER_NAME="wms.localhost:8000",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        future_event = Event.objects.create(
+            club=club,
+            name="Test future event",
+            open_registration=True,
+            start_date=arrow.get().shift(minutes=1).datetime,
+            end_date=arrow.get().shift(hours=10).datetime,
+            map=raster_map,
+        )
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={future_event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            SERVER_NAME="wms.localhost:8000",
+        )
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
