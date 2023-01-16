@@ -411,6 +411,54 @@ class Map(models.Model):
         return {"width": self.width, "height": self.height}
 
     @property
+    def min_lon(self):
+        return min(
+            self.bound["topLeft"]["lon"],
+            self.bound["bottomLeft"]["lon"],
+            self.bound["bottomRight"]["lon"],
+            self.bound["topRight"]["lon"],
+        )
+
+    @property
+    def max_lon(self):
+        return max(
+            self.bound["topLeft"]["lon"],
+            self.bound["bottomLeft"]["lon"],
+            self.bound["bottomRight"]["lon"],
+            self.bound["topRight"]["lon"],
+        )
+
+    @property
+    def min_lat(self):
+        return min(
+            self.bound["topLeft"]["lat"],
+            self.bound["bottomLeft"]["lat"],
+            self.bound["bottomRight"]["lat"],
+            self.bound["topRight"]["lat"],
+        )
+
+    @property
+    def max_lat(self):
+        return max(
+            self.bound["topLeft"]["lat"],
+            self.bound["bottomLeft"]["lat"],
+            self.bound["bottomRight"]["lat"],
+            self.bound["topRight"]["lat"],
+        )
+
+    @property
+    def max_xy(self):
+        return GLOBAL_MERCATOR.latlon_to_meters(
+            {"lat": self.max_lat, "lon": self.max_lon}
+        )
+
+    @property
+    def min_xy(self):
+        return GLOBAL_MERCATOR.latlon_to_meters(
+            {"lat": self.min_lat, "lon": self.min_lon}
+        )
+
+    @property
     def alignment_points(self):
         a1 = Point(0, 0)
         b1 = Point(GLOBAL_MERCATOR.latlon_to_meters(self.bound["topLeft"]))

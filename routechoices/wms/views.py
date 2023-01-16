@@ -4,9 +4,9 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.http.response import Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.utils.timezone import now
 from django.views.decorators.http import etag, last_modified
-from django_hosts.resolvers import reverse
 
 from routechoices.core.models import (
     PRIVACY_PRIVATE,
@@ -27,10 +27,10 @@ def common_wms(function):
         for key in request.GET.keys():
             get_params[key.lower()] = request.GET[key]
 
-        if get_params.get("service") != "WMS":
+        if get_params.get("service", "").lower() != "wms":
             return HttpResponseBadRequest("Service must be WMS")
 
-        if get_params.get("request") == "GetMap":
+        if get_params.get("request", "").lower() == "getmap":
             http_accept = request.META.get("HTTP_ACCEPT", "")
             better_mime = None
             if "image/avif" in http_accept.split(","):
@@ -38,7 +38,7 @@ def common_wms(function):
             elif "image/webp" in http_accept.split(","):
                 better_mime = "image/webp"
 
-            asked_mime = get_params.get("format", "image/png")
+            asked_mime = get_params.get("format", "image/png").lower()
             if asked_mime in ("image/apng", "image/png", "image/webp", "image/avif"):
                 img_mime = asked_mime
                 if img_mime == "image/apng":
@@ -102,7 +102,9 @@ def common_wms(function):
             except Exception:
                 return HttpResponseBadRequest("invalid parameters")
 
-            event_qs = Event.objects.select_related("club")
+            event_qs = Event.objects.select_related("club").filter(
+                start_date__lte=now()
+            )
             if map_index == 0:
                 event_qs = event_qs.select_related("map")
             elif map_index > 0:
@@ -156,7 +158,7 @@ def tile_etag(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-    if get_params.get("request") == "GetMap":
+    if get_params.get("request", "").lower() == "getmap":
         etag = request.raster_map.tile_cache_key(
             request.image_request["width"],
             request.image_request["height"],
@@ -176,7 +178,7 @@ def tile_latest_modification(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-    if get_params.get("request") == "GetMap":
+    if get_params.get("request", "").lower() == "getmap":
         return max(
             request.raster_map.modification_date, request.event.modification_date
         )
@@ -190,7 +192,7 @@ def wms_service(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-    if get_params.get("request") == "GetMap":
+    if get_params.get("request", "").lower() == "getmap":
         data_out = request.raster_map.create_tile(
             request.image_request["width"],
             request.image_request["height"],
@@ -210,142 +212,43 @@ def wms_service(request):
             headers=headers,
         )
 
-    elif get_params.get("request") == "GetCapabilities":
+    elif get_params.get("request", "").lower() == "getcapabilities":
         max_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": 89.9, "lon": 180})
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": -89.9, "lon": -180})
 
         events = (
             Event.objects.filter(privacy=PRIVACY_PUBLIC)
+            .filter(start_date__lte=now())
             .select_related("club", "map")
             .prefetch_related("map_assignations")
         )
-        layers_xml = ""
 
-        def add_layer_xml(layer_id, event, name, layer):
-            min_lon = min(
-                layer.bound["topLeft"]["lon"],
-                layer.bound["bottomLeft"]["lon"],
-                layer.bound["bottomRight"]["lon"],
-                layer.bound["topRight"]["lon"],
-            )
-            max_lon = max(
-                layer.bound["topLeft"]["lon"],
-                layer.bound["bottomLeft"]["lon"],
-                layer.bound["bottomRight"]["lon"],
-                layer.bound["topRight"]["lon"],
-            )
-            min_lat = min(
-                layer.bound["topLeft"]["lat"],
-                layer.bound["bottomLeft"]["lat"],
-                layer.bound["bottomRight"]["lat"],
-                layer.bound["topRight"]["lat"],
-            )
-            max_lat = max(
-                layer.bound["topLeft"]["lat"],
-                layer.bound["bottomLeft"]["lat"],
-                layer.bound["bottomRight"]["lat"],
-                layer.bound["topRight"]["lat"],
-            )
-            l_max_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                {"lat": max_lat, "lon": max_lon}
-            )
-            l_min_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                {"lat": min_lat, "lon": min_lon}
-            )
-            # TODO: Use templates
-            return f"""<Layer queryable="0" opaque="0" cascaded="0">
-  <Name>{layer_id}</Name>
-  <Title>{name} of {event.name} by {event.club}</Title>
-    <SRS>EPSG:3857</SRS>
-    <SRS>EPSG:4326</SRS>
-    <SRS>CRS:84</SRS>
-    <EX_GeographicBoundingBox>
-      <westBoundLongitude>{min_lon}</westBoundLongitude>
-      <eastBoundLongitude>{max_lon}</eastBoundLongitude>
-      <southBoundLatitude>{min_lon}</southBoundLatitude>
-      <northBoundLatitude>{max_lat}</northBoundLatitude>
-    </EX_GeographicBoundingBox>
-    <LatLonBoundingBox minx="{min_lat}" miny="{min_lon}" maxx="{max_lat}" maxy="{max_lon}"/>
-    <BoundingBox SRS="EPSG:3857" minx="{l_min_xy['x']}" miny="{l_min_xy['y']}" maxx="{l_max_xy['x']}" maxy="{l_max_xy['y']}"/>
-    <BoundingBox SRS="EPSG:4326" minx="{min_lat}" miny="{min_lon}" maxx="{max_lat}" maxy="{max_lon}"/>
-    <BoundingBox SRS="CRS:84" minx="{min_lon}" miny="{min_lat}" maxx="{max_lon}" maxy="{max_lat}"/>
-  </Layer>"""
-
+        layers = []
         for event in events:
             if event.map:
-                layers_xml += add_layer_xml(
-                    event.aid,
-                    event,
-                    event.map_title if event.map_title else "Main map",
-                    event.map,
+                layers.append(
+                    {
+                        "id": event.aid,
+                        "event": event,
+                        "title": event.map_title if event.map_title else "Main map",
+                        "map": event.map,
+                    }
                 )
                 count_layer = 0
                 for layer in event.map_assignations.all():
                     count_layer += 1
-                    layers_xml += add_layer_xml(
-                        f"{event.aid}/{count_layer}", event, layer.title, layer.map
+                    layers.append(
+                        {
+                            "id": f"{event.aid}/{count_layer}",
+                            "event": event,
+                            "title": layer.title,
+                            "map": layer.map,
+                        }
                     )
-        data_xml = f"""<?xml version='1.0' encoding="UTF-8" standalone="no" ?>
-<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd"
- [
- <!ELEMENT VendorSpecificCapabilities EMPTY>
- ]>  <!-- end of DOCTYPE declaration -->
-<WMT_MS_Capabilities version="1.1.1">
-<Service>
-  <Name>OGC:WMS</Name>
-  <Title>Routechoices - WMS</Title>
-  <Abstract>Routechoices WMS server</Abstract>
-  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href=""/>
-  <Fees>none</Fees>
-  <AccessConstraints>none</AccessConstraints>
-  <MaxWidth>10000</MaxWidth>
-  <MaxHeight>10000</MaxHeight>
-</Service>
-<Capability>
-  <Request>
-    <GetCapabilities>
-      <Format>application/vnd.ogc.wms_xml</Format>
-      <DCPType>
-        <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{reverse('wms_service', host='wms', scheme=request.scheme)}?"/></Get>
-        </HTTP>
-      </DCPType>
-    </GetCapabilities>
-    <GetMap>
-      <Format>image/jpeg</Format>
-      <Format>image/png</Format>
-      <Format>image/avif</Format>
-      <Format>image/webp</Format>
-      <DCPType>
-        <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{reverse('wms_service', host='wms', scheme=request.scheme)}?"/></Get>
-        </HTTP>
-      </DCPType>
-    </GetMap>
-  </Request>
-  <Exception>
-    <Format>application/vnd.ogc.se_xml</Format>
-  </Exception>
-  <Layer>
-    <Name>all</Name>
-    <Title>Routechoices Maps</Title>
-    <SRS>EPSG:3857</SRS>
-    <SRS>EPSG:4326</SRS>
-    <SRS>CRS:84</SRS>
-    <EX_GeographicBoundingBox>
-      <westBoundLongitude>-180</westBoundLongitude>
-      <eastBoundLongitude>180</eastBoundLongitude>
-      <southBoundLatitude>-90</southBoundLatitude>
-      <northBoundLatitude>90</northBoundLatitude>
-    </EX_GeographicBoundingBox>
-    <LatLonBoundingBox minx="-180" miny="-85.0511287798" maxx="180" maxy="85.0511287798" />
-    <BoundingBox SRS="EPSG:3857" minx="{min_xy['x']}" miny="{min_xy['y']}" maxx="{max_xy['x']}" maxy="{max_xy['y']}"/>
-    <BoundingBox SRS="EPSG:4326" minx="-180.0" miny="-85.0511287798" maxx="180.0" maxy="85.0511287798" />
-    <BoundingBox SRS="CRS:84" minx="-90" miny="-180" maxx="90" maxy="-180"/>
-    {layers_xml}
-  </Layer>
-</Capability>
-</WMT_MS_Capabilities>
-"""
-        return HttpResponse(data_xml, content_type="text/xml")
+        return render(
+            request,
+            "wms/index.xml",
+            {"layers": layers, "min_xy": min_xy, "max_xy": max_xy},
+            content_type="text/xml",
+        )
     return HttpResponse(status=501)

@@ -1,0 +1,79 @@
+{% load hosts %}<?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd"
+ [
+ <!ELEMENT VendorSpecificCapabilities EMPTY>
+ ]>  <!-- end of DOCTYPE declaration -->
+<WMT_MS_Capabilities version="1.1.1">
+<Service>
+  <Name>OGC:WMS</Name>
+  <Title>Routechoices - WMS</Title>
+  <Abstract>Routechoices WMS server</Abstract>
+  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href=""/>
+  <Fees>none</Fees>
+  <AccessConstraints>none</AccessConstraints>
+  <MaxWidth>10000</MaxWidth>
+  <MaxHeight>10000</MaxHeight>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <Format>application/vnd.ogc.wms_xml</Format>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{request.scheme}}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <GetMap>
+      <Format>image/jpeg</Format>
+      <Format>image/png</Format>
+      <Format>image/avif</Format>
+      <Format>image/webp</Format>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{request.scheme}}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
+        </HTTP>
+      </DCPType>
+    </GetMap>
+  </Request>
+  <Exception>
+    <Format>application/vnd.ogc.se_xml</Format>
+  </Exception>
+  <Layer>
+    <Name>all</Name>
+    <Title>Routechoices Maps</Title>
+    <SRS>EPSG:3857</SRS>
+    <SRS>EPSG:4326</SRS>
+    <SRS>CRS:84</SRS>
+    <EX_GeographicBoundingBox>
+      <westBoundLongitude>-180</westBoundLongitude>
+      <eastBoundLongitude>180</eastBoundLongitude>
+      <southBoundLatitude>-90</southBoundLatitude>
+      <northBoundLatitude>90</northBoundLatitude>
+    </EX_GeographicBoundingBox>
+    <LatLonBoundingBox minx="-180" miny="-85.0511287798" maxx="180" maxy="85.0511287798" />
+    <BoundingBox SRS="EPSG:3857" minx="{{ min_xy.x }}" miny="{{ min_xy.y }}" maxx="{{ max_xy.x }}" maxy="{{ max_xy.y }}"/>
+    <BoundingBox SRS="EPSG:4326" minx="-180.0" miny="-85.0511287798" maxx="180.0" maxy="85.0511287798" />
+    <BoundingBox SRS="CRS:84" minx="-90" miny="-180" maxx="90" maxy="-180"/>
+    {% for layer in layers %}
+    <Layer queryable="0" opaque="0" cascaded="0">
+        <Name>{{ layer.id }}</Name>
+        <Title>{{ layer.title }} of {{ layer.event.name }} by {{ layer.event.club.name }}</Title>
+        <SRS>EPSG:3857</SRS>
+        <SRS>EPSG:4326</SRS>
+        <SRS>CRS:84</SRS>
+        <EX_GeographicBoundingBox>
+        <westBoundLongitude>{{ layer.map.min_lon }}</westBoundLongitude>
+        <eastBoundLongitude>{{ layer.map.max_lon }}</eastBoundLongitude>
+        <southBoundLatitude>{{ layer.map.min_lon }}</southBoundLatitude>
+        <northBoundLatitude>{{ layer.map.max_lat }}</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <LatLonBoundingBox minx="{{ layer.map.min_lat }}" miny="{{ layer.map.min_lon }}" maxx="{{ layer.map.max_lat }}" maxy="{{ layer.map.max_lon }}"/>
+        <BoundingBox SRS="EPSG:3857" minx="{{ layer.map.min_xy.x }}" miny="{{ layer.map.min_xy.y }}" maxx="{{ layer.map.max_xy.x }}" maxy="{{ layer.map.max_xy.y }}"/>
+        <BoundingBox SRS="EPSG:4326" minx="{{ layer.map.min_lat }}" miny="{{ layer.map.min_lon }}" maxx="{{ layer.map.max_lat }}" maxy="{{ layer.map.max_lon }}"/>
+        <BoundingBox SRS="CRS:84" minx="{{ layer.map.min_lon }}" miny="{{ layer.map.min_lat }}" maxx="{{ layer.map.max_lon }}" maxy="{{ layer.map.max_lat }}"/>
+    </Layer>
+    {% endfor %}
+  </Layer>
+</Capability>
+</WMT_MS_Capabilities>
