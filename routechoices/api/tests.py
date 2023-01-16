@@ -31,7 +31,7 @@ class EssentialApiBase(APITestCase):
 
     def reverse_and_check(self, path, expected, host="api"):
         url = reverse(path, host=host)
-        self.assertEqual(url, f"//{host}.localhost:8000{expected}")
+        self.assertEqual(url, f"//{host}.routechoices.dev{expected}")
         return url
 
     def get_device_id(self):
@@ -39,35 +39,34 @@ class EssentialApiBase(APITestCase):
         return d.aid
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class EssentialApiTestCase1(EssentialApiBase):
     def test_api_root(self):
         url = self.reverse_and_check("api_doc", "/")
-        res = self.client.get(url, SERVER_NAME="api.localhost:8000")
+        res = self.client.get(url, SERVER_NAME="api.routechoices.dev")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_get_time(self):
         url = self.reverse_and_check("time_api", "/time")
         t1 = time.time()
-        res = self.client.get(url, SERVER_NAME="api.localhost:8000")
+        res = self.client.get(url, SERVER_NAME="api.routechoices.dev")
         t2 = time.time()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(t1 < res.data.get("time") < t2)
 
     def test_get_device_id_legacy(self):
         url = self.reverse_and_check("device_id_api", "/device_id")
-        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
+        res = self.client.post(url, SERVER_NAME="api.routechoices.dev")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(len(res.data.get("device_id")) == 8)
         self.assertTrue(res.data.get("device_id") != self.get_device_id())
 
     def test_create_device_id(self):
         url = self.reverse_and_check("device_api", "/device")
-        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
+        res = self.client.post(url, SERVER_NAME="api.routechoices.dev")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         self.client.force_login(self.user)
-        res = self.client.post(url, SERVER_NAME="api.localhost:8000")
+        res = self.client.post(url, SERVER_NAME="api.routechoices.dev")
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         dev_id = res.data.get("device_id")
         self.assertTrue(dev_id.isdigit())
@@ -75,7 +74,6 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertTrue(dev_id != self.get_device_id())
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class ImeiApiTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()
@@ -83,13 +81,13 @@ class ImeiApiTestCase(EssentialApiBase):
 
     def test_get_imei_invalid(self):
         res = self.client.post(
-            self.url, {"imei": "abcd"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "abcd"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_imei_valid(self):
         res = self.client.post(
-            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         dev_id = res.data.get("device_id")
@@ -99,7 +97,7 @@ class ImeiApiTestCase(EssentialApiBase):
 
         # request with same imei
         res = self.client.post(
-            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(dev_id, res.data.get("device_id"))
@@ -109,7 +107,7 @@ class ImeiApiTestCase(EssentialApiBase):
         device.aid = "1234abcd"
         device.save()
         res = self.client.post(
-            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         new_dev_id = res.data.get("device_id")
@@ -133,7 +131,7 @@ class ImeiApiTestCase(EssentialApiBase):
         device.aid = "1234abcd"
         device.save()
         res = self.client.post(
-            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         new_dev_id = res.data.get("device_id")
@@ -143,7 +141,7 @@ class ImeiApiTestCase(EssentialApiBase):
         event.end_date = arrow.get().shift(seconds=-1).datetime
         event.save()
         res = self.client.post(
-            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.localhost:8000"
+            self.url, {"imei": "123456789123458"}, SERVER_NAME="api.routechoices.dev"
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         new_dev_id = res.data.get("device_id")
@@ -152,7 +150,6 @@ class ImeiApiTestCase(EssentialApiBase):
         self.assertEqual(len(new_dev_id), 8)
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class EventCreationApiTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()
@@ -168,12 +165,12 @@ class EventCreationApiTestCase(EssentialApiBase):
                 "club_slug": "club",
                 "end_date": arrow.now().shift(minutes=60),
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
 
-@override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()), PARENT_HOST="localhost:8000")
+@override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()))
 class MapApiTestCase(EssentialApiBase):
     def test_get_tile(self):
         url = self.reverse_and_check("wms_service", "/", "wms")
@@ -197,13 +194,13 @@ class MapApiTestCase(EssentialApiBase):
         )
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -220,14 +217,14 @@ class MapApiTestCase(EssentialApiBase):
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/jpeg")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
             HTTP_ACCEPT="image/avif",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -235,39 +232,38 @@ class MapApiTestCase(EssentialApiBase):
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fpng&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/png")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fwebp&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/webp")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Favif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res["content-type"], "image/avif")
 
         res = self.client.get(
             f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fgif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
-            SERVER_NAME="wms.localhost:8000",
+            SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class LocationApiTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()
@@ -285,7 +281,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
@@ -300,7 +296,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t+2},{t+3}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
@@ -315,7 +311,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t+2},{t+3}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         nb_points = len(Device.objects.get(aid=dev_id).locations["timestamps"])
@@ -338,7 +334,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},NaN",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -357,7 +353,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -376,7 +372,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -395,7 +391,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": settings.POST_LOCATION_SECRETS[0],
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -417,7 +413,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": "bad secret",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -433,7 +429,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data.get("device_id"), dev_id)
@@ -453,7 +449,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": "bad secret",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
@@ -468,7 +464,7 @@ class LocationApiTestCase(EssentialApiBase):
                 "timestamps": f"{t},{t+1}",
                 "secret": "bad secret",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -476,7 +472,6 @@ class LocationApiTestCase(EssentialApiBase):
         self.assertIn("No such device ID", errors[0])
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class RouteUploadApiTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()
@@ -499,7 +494,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
             kwargs={"competitor_id": self.competitor.aid},
         )
         self.assertEqual(
-            self.url, f"//api.localhost:8000/competitors/{self.competitor.aid}/route"
+            self.url, f"//api.routechoices.dev/competitors/{self.competitor.aid}/route"
         )
 
     def test_route_upload_api_valid(self):
@@ -511,7 +506,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{ t },{t + 1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
@@ -525,7 +520,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.3,3.4",
                 "timestamps": f"{t+2},{t+3}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -540,7 +535,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.3,3.4,3.5",
                 "timestamps": f"{t+2},{t+3},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
@@ -556,7 +551,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},NaN",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -571,7 +566,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},Nope",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -586,7 +581,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,NaN",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -602,7 +597,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,182",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -618,7 +613,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -634,7 +629,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -653,7 +648,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1",
                 "timestamps": f"{t}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -674,7 +669,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -689,7 +684,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
                 "longitudes": "3.1,3.2",
                 "timestamps": f"{t},{t+1}",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -700,7 +695,6 @@ class RouteUploadApiTestCase(EssentialApiBase):
         )
 
 
-@override_settings(PARENT_HOST="localhost:8000")
 class RegistrationApiTestCase(EssentialApiBase):
     def test_registration(self):
         device_id = self.get_device_id()
@@ -714,7 +708,7 @@ class RegistrationApiTestCase(EssentialApiBase):
             end_date=arrow.get().shift(hours=1).datetime,
         )
         url = reverse("event_register", host="api", kwargs={"event_id": event.aid})
-        self.assertEqual(url, f"//api.localhost:8000/events/{event.aid}/register")
+        self.assertEqual(url, f"//api.routechoices.dev/events/{event.aid}/register")
         res = self.client.post(
             url,
             {
@@ -722,7 +716,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Alice",
                 "short_name": "🇺🇸 A",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # name exists
@@ -733,7 +727,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Alice",
                 "short_name": "🇺🇸 Al",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -748,7 +742,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Albert",
                 "short_name": "🇺🇸 A",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -764,7 +758,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "short_name": "🇺🇸 Al",
                 "start_time": arrow.get().shift(hours=-1).datetime,
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -782,7 +776,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "short_name": "🇺🇸 B",
                 "start_time": "unreadable",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         errors = json.loads(res.content)
@@ -796,7 +790,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "",
                 "short_name": "🇺🇸 B",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         errors = json.loads(res.content)
@@ -810,7 +804,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Bob",
                 "short_name": "🇺🇸 B",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -826,7 +820,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "short_name": "🇺🇸 B",
                 "start_time": arrow.get().shift(minutes=+1).datetime,
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # ended event
@@ -840,7 +834,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Charles",
                 "short_name": "🇺🇸 C",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         errors = json.loads(res.content)
@@ -858,7 +852,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Dick",
                 "short_name": "🇺🇸 D",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # ok event
@@ -872,7 +866,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Elsa",
                 "short_name": "🇺🇸 E",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # private event not logged in
@@ -886,7 +880,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Frank",
                 "short_name": "🇺🇸 F",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # private event logged in as not admin
@@ -901,7 +895,7 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "George",
                 "short_name": "🇺🇸 G",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         # private event logged in as admin ok
@@ -913,6 +907,6 @@ class RegistrationApiTestCase(EssentialApiBase):
                 "name": "Hugh",
                 "short_name": "🇺🇸 H",
             },
-            SERVER_NAME="api.localhost:8000",
+            SERVER_NAME="api.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
