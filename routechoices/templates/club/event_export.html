@@ -64,7 +64,7 @@
           <div class="card-body">
             <h5 class="card-title">{{ competitor.name }}</h5>
             <a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-sm btn-primary mb-1"><i class="fa fa-download"></i> GPX</a>
-            {% if 0 and event.map %}
+            {% if event.map %}
             <a href="https://mapdump.com/new#title={{ event.name|urlencode }}%20-%20{{competitor.name|urlencode}}&kmz=https:{% host_url 'event_kmz_download' event_id=event.aid host 'api' %}&gpx=https:{% host_url 'competitor_gpx_download' competitor_id=competitor.aid host 'api' %}" class="btn btn-sm btn-primary mb-1" target="_blank" rel="noopener noreferrer"><i class="fa fa-external-link"></i> MapDump.com</a>
             {% endif %}
           </div>
