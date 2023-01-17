@@ -30,7 +30,7 @@ opencv-python
 orjson
 pillow-heif
 pillow-simd
-psycopg2
+psycopg
 python-magic
 pywatchman
 redis
