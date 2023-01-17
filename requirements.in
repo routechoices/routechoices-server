@@ -16,7 +16,7 @@ django-markdownify
 django-oauth-toolkit
 django-qr-code
 django-s3-storage
-django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
+django-user-sessions
 djangorestframework
 drf-orjson-renderer
 drf-yasg
