@@ -13,7 +13,7 @@ django-cors-headers
 django-csp
 django-hosts
 django-markdownify
-django-oauth-toolkit @ git+https://github.com/jazzband/django-oauth-toolkit.git#235e3f84c3ad86c05f22c15dfaac202ad06d7654
+django-oauth-toolkit
 django-qr-code
 django-s3-storage
 django-user-sessions @ git+https://github.com/rphlo/django-user-sessions.git
