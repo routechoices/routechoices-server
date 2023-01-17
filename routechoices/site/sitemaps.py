@@ -42,14 +42,14 @@ class DynamicViewSitemap(Sitemap):
         event_list = Event.objects.filter(privacy=PRIVACY_PUBLIC)
         event_list = event_list.filter(end_date__lt=now())
 
-        events_wo_set = event_list.filter(event_set__isnull=True)
-        events_w_set = (
+        events_witout_sets = event_list.filter(event_set__isnull=True)
+        first_events_of_each_set = (
             event_list.filter(event_set__isnull=False)
-            .order_by("event_set_id")
+            .order_by("event_set_id", "-start_date")
             .distinct("event_set_id")
         )
 
-        all_events = events_wo_set.union(events_w_set, all=True).order_by(
+        all_events = events_witout_sets.union(first_events_of_each_set).order_by(
             "-start_date", "name"
         )
 

@@ -1044,13 +1044,13 @@ class Event(models.Model):
                 past_event_qs = past_event_qs.filter(start_date__month=selected_month)
 
         def list_events_sets(qs):
-            events_wo_set = qs.filter(event_set__isnull=True)
-            events_w_set = (
+            events_witout_sets = qs.filter(event_set__isnull=True)
+            first_events_of_each_set = (
                 qs.filter(event_set__isnull=False)
                 .order_by("event_set_id", "-start_date")
                 .distinct("event_set_id")
             )
-            return events_wo_set.union(events_w_set, all=True).order_by(
+            return events_witout_sets.union(first_events_of_each_set).order_by(
                 "-start_date", "name"
             )
 
