@@ -49,7 +49,9 @@ class DynamicViewSitemap(Sitemap):
             .distinct("event_set_id")
         )
 
-        all_events = events_wo_set.union(events_w_set).order_by("-start_date", "name")
+        all_events = events_wo_set.union(events_w_set, all=True).order_by(
+            "-start_date", "name"
+        )
 
         page_count = max(0, all_events.count() - 1) // 25 + 1
 

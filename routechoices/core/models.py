@@ -1050,7 +1050,9 @@ class Event(models.Model):
                 .order_by("event_set_id", "-start_date")
                 .distinct("event_set_id")
             )
-            return events_wo_set.union(events_w_set).order_by("-start_date", "name")
+            return events_wo_set.union(events_w_set, all=True).order_by(
+                "-start_date", "name"
+            )
 
         def events_to_sets(qs, live=False):
             events_set_ids = [e.event_set_id for e in qs if e.event_set_id]
