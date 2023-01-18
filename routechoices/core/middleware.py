@@ -137,21 +137,19 @@ class XForwardedForMiddleware:
 class HostsRequestMiddleware(HostsBaseMiddleware):
     def process_request(self, request):
         # Find best match, falling back to settings.DEFAULT_HOST
-        host, kwargs = self.get_host(request.get_host())
+        try:
+            host, kwargs = self.get_host(request.get_host())
+        except DisallowedHost:
+            return HttpResponse(status=444)
         # Hack for custom domains
         default_domain = settings.PARENT_HOST
         default_subdomain_suffix = f".{default_domain}"
-        try:
-            raw_host = request.get_host()
-        except DisallowedHost:
-            return HttpResponse(status=444)
+        raw_host = request.get_host()
         if raw_host[-1] == ".":
             raw_host = raw_host[:-1]
         if raw_host == default_domain:
             return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
-
         request.use_cname = False
-
         if raw_host.endswith(default_subdomain_suffix):
             slug = raw_host[: -(len(default_subdomain_suffix))].lower()
             if slug not in ("www", "api", "wms"):
