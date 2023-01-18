@@ -24,7 +24,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <img src="{% static "img/export_kmz.gif"%}" width="100%" alt="how to export kmz from ocad gif"/>
+            <video playsinline autoplay muted loop width="100%">
+              <source src="{% static 'img/export_kmz.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
+              <source src="{% static 'img/export_kmz.webm'%}" type="video/webm">
+              <img src="{% static "img/export_kmz.gif"%}" loading="lazy"/>
+            </video>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary mb-1" data-bs-dismiss="modal">Close</button>
