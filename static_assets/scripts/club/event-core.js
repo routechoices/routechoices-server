@@ -1164,7 +1164,7 @@ function displayCompetitorList(force) {
     competitor.odometer = div.find(".odometer");
   });
   if (competitorList.length === 0) {
-    var div = u("<div/>");
+    var div = u('<div class="text-center"/>');
     var txt = banana.i18n("no-competitors");
     div.html("<h3>" + txt + "</h3>");
     listDiv.append(div);
