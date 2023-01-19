@@ -39,7 +39,7 @@
             <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1"><i class="fa fa-bolt"></i> No Delay Live</a>
             {% endif %}
             {% if event.started %}
-            <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}" class="btn btn-secondary mb-1" id="upload_route_btn"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>
+            <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1" id="upload_route_btn"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>
             {% endif %}
             <a href="{% url 'dashboard:event_competitors_printer_view' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1"><i class="fa-solid fa-print"></i> Competitor List For Printing</a>
         </div>

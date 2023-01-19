@@ -943,7 +943,10 @@ function zoomOnCompetitor(compr) {
   }
   compr.focusing = true;
   var route = competitorRoutes[compr.id];
-  if (!route) return;
+  if (!route) {
+    compr.focusing = false;
+    return;
+  }
   var timeT = currentTime;
   if (!isRealTime) {
     if (isCustomStart) {
