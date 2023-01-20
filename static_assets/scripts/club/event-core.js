@@ -792,7 +792,7 @@ function refreshEventData() {
                 bounds,
                 m.hash,
                 m.max_zoom,
-                !currentMapNewData,
+                currentMapNewData,
                 i,
                 m
               );
