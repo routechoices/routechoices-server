@@ -10,7 +10,7 @@
   var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
   var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
   locale = urlLanguage || storedLanguage || browserLanguage || "en";
-  clock = ServerClock({ url: window.local.serverClockUrl });
+  clock = ServerClock({ url: window.local.serverClockUrl, burstSize: 1 });
   setTimeout(clock.stopRefreshes, 1000);
   backdropMaps["blank"] = L.tileLayer(
     'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
