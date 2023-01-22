@@ -10,8 +10,8 @@
 
 .sidebar {
   position: fixed;
-  top: 56px;
-  bottom: calc(58px + var(--ctrl-height));
+  top: 46px;
+  bottom: calc(55px + var(--ctrl-height));
   left: 0;
   z-index: 10001;
   display: block;
@@ -27,18 +27,18 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 176px);
-  max-height: calc(var(--app-height) - 176px - var(--ctrl-height));
+  max-height: calc(100vh - 166px);
+  max-height: calc(var(--app-height) - 166px - var(--ctrl-height));
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 214px);
-  max-height: calc(var(--app-height) - 214px - var(--ctrl-height));
+  max-height: calc(100vh - 204px);
+  max-height: calc(var(--app-height) - 204px - var(--ctrl-height));
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 153px);
-  max-height: calc(var(--app-height) - 153px - var(--ctrl-height));
+  max-height: calc(100vh - 143px);
+  max-height: calc(var(--app-height) - 143px - var(--ctrl-height));
 }
 
 .time_bar {
@@ -46,12 +46,12 @@
   padding-top: 5px;
   bottom: 0px;
   left: 0px;
-  height: calc(58px + var(--ctrl-height));
+  height: calc(55px + var(--ctrl-height));
   background-color: #e5e5e5;
 }
 
 .time_bar.loading {
-  height: 50px;
+  height: 40px;
 }
 
 /* Sidebar navigation */
@@ -74,15 +74,15 @@
 
 .main {
   position: fixed;
-  top: 56px;
-  bottom: calc(58px + var(--ctrl-height));
+  top: 46px;
+  bottom: calc(55px + var(--ctrl-height));
   right: 0px;
   left: 0px;
 }
 
 .sidebar.loading,
 .main.loading {
-  bottom: 50px;
+  bottom: 46px;
 }
 
 .main-alerts {
