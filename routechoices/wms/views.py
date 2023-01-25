@@ -62,30 +62,32 @@ def common_wms(function):
             except Exception:
                 return HttpResponseBadRequest("invalid size parameters")
 
+            srs = get_params.get("srs")
             try:
-                min_lon, min_lat, max_lon, max_lat = (
-                    float(x) for x in bbox_raw.split(",")
-                )
-                srs = get_params.get("srs")
                 if srs in ("CRS:84", "EPSG:4326"):
                     min_lat, min_lon, max_lat, max_lon = (
                         float(x) for x in bbox_raw.split(",")
                     )
                     if srs == "EPSG:4326":
                         min_lon, min_lat, max_lon, max_lat = (
-                            float(x) for x in bbox_raw.split(",")
+                            min_lat,
+                            min_lon,
+                            max_lat,
+                            max_lon,
                         )
                     min_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                        {"lat": min_lat, "lon": min_lon}
+                        {"lat": min_lat, "min_lon": min_lon}
                     )
+                    min_x = min_xy["x"]
+                    min_y = min_xy["y"]
                     max_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                        {"lat": max_lat, "lon": max_lon}
+                        {"lat": max_lat, "min_lon": max_lon}
                     )
-                    min_lat = min_xy["y"]
-                    min_lon = min_xy["x"]
-                    max_lat = max_xy["y"]
-                    max_lon = max_xy["x"]
-                elif srs != "EPSG:3857":
+                    max_x = max_xy["x"]
+                    max_y = max_xy["y"]
+                elif srs == "EPSG:3857":
+                    min_x, min_y, max_x, max_y = (float(x) for x in bbox_raw.split(","))
+                else:
                     return HttpResponseBadRequest("SRS not supported")
             except Exception:
                 return HttpResponseBadRequest("invalid bound parameters")
@@ -142,10 +144,10 @@ def common_wms(function):
                 "height": out_h,
             }
             request.bound = {
-                "min_lat": min_lat,
-                "max_lat": max_lat,
-                "min_lon": min_lon,
-                "max_lon": max_lon,
+                "min_x": min_x,
+                "max_x": max_x,
+                "min_y": min_y,
+                "max_y": max_y,
             }
         return function(request, *args, **kwargs)
 
@@ -162,11 +164,11 @@ def tile_etag(request):
         etag = request.raster_map.tile_cache_key(
             request.image_request["width"],
             request.image_request["height"],
-            request.bound["min_lat"],
-            request.bound["max_lat"],
-            request.bound["min_lon"],
-            request.bound["max_lon"],
             request.image_request["mime"],
+            request.bound["min_x"],
+            request.bound["max_x"],
+            request.bound["min_y"],
+            request.bound["max_y"],
         )
         h = hashlib.sha256()
         h.update(etag.encode("utf-8"))
@@ -196,11 +198,11 @@ def wms_service(request):
         data_out = request.raster_map.create_tile(
             request.image_request["width"],
             request.image_request["height"],
-            request.bound["min_lat"],
-            request.bound["max_lat"],
-            request.bound["min_lon"],
-            request.bound["max_lon"],
             request.image_request["mime"],
+            request.bound["min_x"],
+            request.bound["max_x"],
+            request.bound["min_y"],
+            request.bound["max_y"],
         )
         headers = None
         if request.event.privacy == PRIVACY_PRIVATE:

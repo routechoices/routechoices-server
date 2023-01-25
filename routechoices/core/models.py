@@ -516,7 +516,7 @@ class Map(models.Model):
         return math.floor(math.log2(r)) + 18
 
     def tile_cache_key(
-        self, output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
+        self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
     ):
         return f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
 
@@ -524,14 +524,17 @@ class Map(models.Model):
         self,
         output_width,
         output_height,
-        min_lat,
-        max_lat,
-        min_lon,
-        max_lon,
         img_mime,
+        min_x,
+        max_x,
+        min_y,
+        max_y,
     ):
+        """
+        Coordinates must be given in spherical mercator X Y
+        """
         cache_key = self.tile_cache_key(
-            output_width, output_height, min_lat, max_lat, min_lon, max_lon, img_mime
+            output_width, output_height, img_mime, min_x, max_x, min_y, max_y
         )
         use_cache = getattr(settings, "CACHE_TILES", False)
         cached = None
@@ -544,7 +547,7 @@ class Map(models.Model):
                 if cached:
                     return cached
 
-        if not self.intersects_with_tile(min_lon, max_lon, max_lat, min_lat):
+        if not self.intersects_with_tile(min_x, max_x, min_y, max_y):
             blank_cache_key = f"blank_tile_{output_width}_{output_height}_{img_mime}"
             if use_cache:
                 try:
@@ -626,15 +629,15 @@ class Map(models.Model):
 
         scale = 1
         while True:
-            r_w = (max_lon - min_lon) / output_width / scale
-            r_h = (max_lat - min_lat) / output_height / scale
+            r_w = (max_x - min_x) / output_width / scale
+            r_h = (max_y - min_y) / output_height / scale
 
             p2 = np.float32(
                 [
-                    [(tl[0] - min_lon) / r_w, (max_lat - tl[1]) / r_h],
-                    [(tr[0] - min_lon) / r_w, (max_lat - tr[1]) / r_h],
-                    [(br[0] - min_lon) / r_w, (max_lat - br[1]) / r_h],
-                    [(bl[0] - min_lon) / r_w, (max_lat - bl[1]) / r_h],
+                    [(tl[0] - min_x) / r_w, (max_y - tl[1]) / r_h],
+                    [(tr[0] - min_x) / r_w, (max_y - tr[1]) / r_h],
+                    [(br[0] - min_x) / r_w, (max_y - br[1]) / r_h],
+                    [(bl[0] - min_x) / r_w, (max_y - bl[1]) / r_h],
                 ]
             )
             coeffs = cv2.getPerspectiveTransform(p1, p2)
@@ -686,14 +689,14 @@ class Map(models.Model):
                 pass
         return data_out
 
-    def intersects_with_tile(self, min_lon, max_lon, min_lat, max_lat):
+    def intersects_with_tile(self, min_x, max_x, min_y, max_y):
         tile_bounds_poly = Polygon(
             LinearRing(
-                (min_lon, min_lat),
-                (min_lon, max_lat),
-                (max_lon, max_lat),
-                (max_lon, min_lat),
-                (min_lon, min_lat),
+                (min_x, min_y),
+                (min_x, max_y),
+                (max_x, max_y),
+                (max_x, min_y),
+                (min_x, min_y),
             )
         )
         map_bounds_poly = Polygon(
