@@ -29,10 +29,9 @@ numpy
 opencv-python
 orjson
 pillow-heif
-pillow-simd
+pillow
 psycopg2
 python-magic
-pywatchman
 redis
 requests
 sewer==0.8.4

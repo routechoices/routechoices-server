@@ -82,11 +82,10 @@ PyPi Packages:
     opencv-python               MIT License
     orjson                      Apache Software License; MIT License
     pillow-heif                 Apache License, Version 2.0
-    pillow-simd                 HPND License
+    pillow                      HPND License
     pip-tools                   BSD License
     psycopg2                    GNU Library or Lesser General Public License (LGPL)
     python-magic                MIT License
-    pywatchman                  BSD License
     redis                       MIT License
     requests                    Apache Software License
     sewer                       MIT License

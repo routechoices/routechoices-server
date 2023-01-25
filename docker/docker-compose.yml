@@ -54,8 +54,6 @@ services:
     stop_signal: SIGINT
     volumes:
       - ../:/app/:rw
-    environment:
-      DJANGO_WATCHMAN_TIMEOUT: 20
     ports:
       - "2000:2000"
       - "2001:2001"
@@ -69,4 +67,4 @@ services:
       - minio
       - smtp
       - redis
-    command: ['/venv/bin/uwsgi', "--py-autoreload", "1", "--http",  "0.0.0.0:8000", "--wsgi-file", "/app/routechoices/wsgi.py", "--processes", "8"]
+    command: ['uwsgi', "--py-autoreload", "1", "--http",  "0.0.0.0:8000", "--wsgi-file", "/app/routechoices/wsgi.py", "--processes", "8"]

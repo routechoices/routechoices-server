@@ -1,24 +1,39 @@
+FROM python:3.11 as builder
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 libpq5
+
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:$PATH"
+
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+
+# final stage
 FROM python:3.11
 
-RUN mkdir /app/
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends libgdal-dev libgl1 libpq5 \
+    && apt-get autoremove -y \
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache /wheels/*
+
 
 # Copy in your requirements file
 WORKDIR /app/
 ADD . /app/
 
-RUN set -ex \
-    && apt-get update && apt-get install -y libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 watchman libpq5 --no-install-recommends \
-
-    && apt-get autoremove -y \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-
-ENV PATH="/root/.cargo/bin:$PATH"
-
-RUN python -m venv /venv \
-    && /venv/bin/pip install --upgrade pip \
-    && /venv/bin/pip install -r /app/requirements.txt
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 
 
@@ -37,7 +52,7 @@ ENV DJANGO_SETTINGS_MODULE=routechoices.settings
 # ENV UWSGI_VIRTUALENV=/venv UWSGI_WSGI_FILE=routechoices/wsgi.py UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_WORKERS=2 UWSGI_THREADS=8 UWSGI_UID=1000 UWSGI_GID=2000 UWSGI_LAZY_APPS=1 UWSGI_WSGI_ENV_BEHAVIOR=holy
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
-RUN DATABASE_URL=none /venv/bin/python manage.py collectstatic --noinput
+RUN DATABASE_URL=none python manage.py collectstatic --noinput
 # ENTRYPOINT ["/app/docker-entrypoint.sh"]
 # Start uWSGI
 # CMD ["/venv/bin/uwsgi", "--http-auto-chunked", "--http-keepalive"]
