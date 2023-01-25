@@ -840,6 +840,7 @@ MAP_BLANK = "blank"
 MAP_OSM = "osm"
 MAP_GOOGLE_STREET = "gmap-street"
 MAP_GOOGLE_SAT = "gmap-hybrid"
+MAP_GOOGLE_TERRAIN = "gmap-terrain"
 MAP_MAPANT_FI = "mapant-fi"
 MAP_MAPANT_NO = "mapant-no"
 MAP_MAPANT_ES = "mapant-es"
@@ -853,6 +854,7 @@ MAP_CHOICES = (
     (MAP_OSM, "Open Street Map"),
     (MAP_GOOGLE_STREET, "Google Map Street"),
     (MAP_GOOGLE_SAT, "Google Map Satellite"),
+    (MAP_GOOGLE_TERRAIN, "Google Map Terrain"),
     (MAP_MAPANT_FI, "Mapant Finland"),
     (MAP_MAPANT_NO, "Mapant Norway"),
     (MAP_MAPANT_ES, "Mapant Spain"),
