@@ -5,8 +5,10 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN set -ex \
-    && apt-get update && apt-get install -y --no-install-recommends libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev g++ git libmagic-dev libgl1 libpq5
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
@@ -22,13 +24,12 @@ COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
 
-RUN set -ex \
-    && apt-get update && apt-get install -y --no-install-recommends libgdal-dev libgl1 libpq5 \
-    && apt-get autoremove -y \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends libgdal-dev libgl1 libpq5 && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 RUN pip install --no-cache /wheels/*
-
 
 # Copy in your requirements file
 WORKDIR /app/
