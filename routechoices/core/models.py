@@ -979,7 +979,7 @@ class Event(models.Model):
         blank=True,
         verbose_name="Event Set",
         related_name="events",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     emergency_contact = models.EmailField(
         null=True,

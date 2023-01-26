@@ -19,12 +19,12 @@ urlpatterns = [
     re_path(
         r"^account/sessions/?$",
         view=user_sessions_views.SessionListView.as_view(),
-        name="session_list",
+        name="account_session_list",
     ),
     re_path(
         r"^account/sessions/delete-others/?$",
         view=user_sessions_views.SessionDeleteOtherView.as_view(),
-        name="session_delete_other",
+        name="account_session_delete_other",
     ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(
