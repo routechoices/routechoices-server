@@ -6,6 +6,7 @@ import math
 import os.path
 import re
 import time
+from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
@@ -1017,6 +1018,9 @@ class Event(models.Model):
 
         past_event_qs = event_qs.filter(end_date__lt=now())
         live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
+        upcoming_events_qs = event_qs.filter(
+            start_date__gt=now(), start_date__lte=now() + timedelta(hours=24)
+        )
 
         months = None
         years = list(
@@ -1059,7 +1063,7 @@ class Event(models.Model):
                 "-start_date", "name"
             )
 
-        def events_to_sets(qs, live=False):
+        def events_to_sets(qs, type="past"):
             events_set_ids = [e.event_set_id for e in qs if e.event_set_id]
             events_by_set = {}
             if events_set_ids:
@@ -1068,9 +1072,14 @@ class Event(models.Model):
                     .filter(event_set_id__in=events_set_ids)
                     .order_by("-start_date", "name")
                 )
-                if live:
+                if type == "live":
                     all_events_w_set = all_events_w_set.filter(
                         start_date__lte=now(), end_date__gte=now()
+                    )
+                elif type == "upcoming":
+                    all_events_w_set = all_events_w_set.filter(
+                        start_date__gt=now(),
+                        start_date__lte=now() + timedelta(hours=24),
                     )
                 else:
                     all_events_w_set = all_events_w_set.filter(end_date__lt=now())
@@ -1107,13 +1116,17 @@ class Event(models.Model):
         past_events = events_to_sets(past_events_page)
 
         all_live_events = list_events_sets(live_events_qs)
-        live_events = events_to_sets(all_live_events, live=True)
+        live_events = events_to_sets(all_live_events, type="live")
+
+        all_upcoming_events = list_events_sets(upcoming_events_qs)
+        upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
 
         return {
             "club": club,
             "events": past_events,
             "events_page": past_events_page,
             "live_events": live_events,
+            "upcoming_events": upcoming_events,
             "years": years,
             "months": months,
             "year": selected_year,

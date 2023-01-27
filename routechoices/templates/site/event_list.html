@@ -92,7 +92,7 @@
                   <i class="fa-solid fa-ellipsis"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
-                  {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
+                  {% if event.allow_route_upload or event.open_registration and not event.ended  %}
                   <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a></li>
                   {% endif %}
                   <li><a href="{{event.club.nice_url}}{{event.slug}}/export" class="dropdown-item"><i class="fa fa-save"></i> Export</a></li>
@@ -102,6 +102,48 @@
                 </ul>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+  </div>
+  {% endif%}
+  {% if upcoming_events %}
+  <div>
+    <h2>Upcoming Events</h2>
+    <h6>Starting in next 24 hours</h6>
+  </div>
+  <div>
+  {% for event_set in upcoming_events reversed %}
+    <div class="row">
+      <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
+      {% if not club %}<div style="font-size: 0.8em; margin-left: 25px;margin-bottom: 5px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+    </div>
+    {% for event in event_set.events reversed %}
+      <div class="card event-set-card" style="margin-bottom: 15px;">
+        <div class="card-body">
+          <div class="d-flex flex-row bd-highlight justify-content-between">
+            <div class="p-2 bd-highlight">
+              <div>
+                <a class="link-primary stretched-link" href="{{ event.get_absolute_url }}" style="text-decoration:none"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
+              </div>
+              <div>
+                <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+              </div>
+            </div>
+            {% if event.open_registration and not event.ended  %}
+            <div class="p-2 bd-highlight justify-end">
+              <div class="dropdown dropend" style="z-index: 1">
+                <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
+                  <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa fa-circle-plus"></i> Competitor registration</a></li>
+                </ul>
+              </div>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>

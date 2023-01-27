@@ -29,31 +29,31 @@ class Command(BaseCommand):
             club=club,
             name="My future event",
             slug="future-default",
-            start_date=arrow.get("2040-06-15 20:00:00").datetime,
-            end_date=arrow.get("2040-06-16 20:00:00").datetime,
+            start_date=arrow.now().shift(days=2).datetime,
+            end_date=arrow.now().shift(days=3).datetime,
         )
         Event.objects.create(
             club=club,
             name="My future event with open registration",
             slug="future-open-registration",
-            start_date=arrow.get("2040-06-15 20:00:00").datetime,
-            end_date=arrow.get("2040-06-16 20:00:00").datetime,
+            start_date=arrow.now().shift(days=2).datetime,
+            end_date=arrow.now().shift(days=3).datetime,
             open_registration=True,
         )
         Event.objects.create(
             club=club,
             name="My future event with upload allowed",
             slug="future-upload-allowed",
-            start_date=arrow.get("2040-06-15 20:00:00").datetime,
-            end_date=arrow.get("2040-06-16 20:00:00").datetime,
+            start_date=arrow.now().shift(days=2).datetime,
+            end_date=arrow.now().shift(days=3).datetime,
             allow_route_upload=True,
         )
         Event.objects.create(
             club=club,
             name="My future event with open registration and upload allowed",
             slug="future-open-registration-upload-allowed",
-            start_date=arrow.get("2040-06-15 20:00:00").datetime,
-            end_date=arrow.get("2040-06-16 20:00:00").datetime,
+            start_date=arrow.now().shift(days=2).datetime,
+            end_date=arrow.now().shift(days=3).datetime,
             open_registration=True,
             allow_route_upload=True,
         )
