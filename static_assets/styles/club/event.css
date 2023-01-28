@@ -206,7 +206,7 @@
 }
 
 .route-displayed .fa-crosshairs.route-focused {
-  color: #18bc9c;
+  color: #20c997;
 }
 
 .btn-group-xs > .btn,
@@ -215,4 +215,22 @@
   font-size: 0.875rem;
   line-height: 1;
   border-radius: 0.2rem;
+}
+
+.leaflet-control-layers-selector {
+  box-sizing: border-box;
+  appearance: none;
+  background: white;
+  outline: 2px solid #ccc;
+  border: 2px solid white;
+  border-radius: 3px;
+  width: 14px;
+  height: 14px;
+  vertical-align: -1px;
+  margin: 3px 3px 0 0;
+}
+
+.leaflet-control-layers-selector:checked {
+  background: #0d6efd;
+  outline-color: #0d6efd;
 }
