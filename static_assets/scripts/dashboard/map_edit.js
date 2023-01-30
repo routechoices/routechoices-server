@@ -1,5 +1,5 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "//www.routechoices.com/static/vendor/pdfjs-2.7.570/pdf.worker.min.js";
+  "//www.routechoices.com/static/vendor/pdfjs-3.3.122/pdf.worker.js";
 
 var extractCornersCoordsFromFilename = function (filename) {
   var re = /(_[-]?\d+(\.\d+)?){8}_\.(gif|png|jpg|jpeg|webp)$/;

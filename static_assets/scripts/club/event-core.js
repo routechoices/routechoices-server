@@ -889,7 +889,9 @@ function hideSidebar() {
     .removeClass("col-lg-3")
     .removeClass("col-xxl-2");
   sidebarShown = false;
-  map.invalidateSize();
+  try {
+    map.invalidateSize();
+  } catch {}
 }
 
 function showSidebar() {
@@ -907,7 +909,9 @@ function showSidebar() {
     .addClass("col-lg-3")
     .addClass("col-xxl-2");
   sidebarShown = true;
-  map.invalidateSize();
+  try {
+    map.invalidateSize();
+  } catch {}
 }
 
 function toggleCompetitorList(e) {
@@ -1172,7 +1176,7 @@ function displayCompetitorList(force) {
     div.html("<h3>" + txt + "</h3>");
     listDiv.append(div);
   }
-  if (searchText === null) {
+  if (!searchText) {
     var mainDiv = u(
       '<div id="competitorSidebar" style="display: flex;flex-direction: column;"/>'
     );
@@ -1255,7 +1259,6 @@ function displayCompetitorList(force) {
           .on("input", filterCompetitorList)
           .attr("placeholder", banana.i18n("search-competitors"))
       );
-      listDiv.addClass("with_search_bar");
     }
     mainDiv.append(topDiv);
     mainDiv.append(listDiv);
@@ -1265,6 +1268,9 @@ function displayCompetitorList(force) {
     u("#listCompetitor").remove();
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
+  }
+  if (competitorList.length > 10) {
+    listDiv.addClass("with_search_bar");
   }
   if (scrollTopDiv) {
     listDiv.nodes[0].scrollTop = scrollTopDiv;
