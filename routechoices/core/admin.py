@@ -358,6 +358,7 @@ class MapAdmin(admin.ModelAdmin):
         "creation_date",
         "resolution",
         "max_zoom",
+        "rotation",
     )
     list_filter = ("club",)
 

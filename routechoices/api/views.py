@@ -507,6 +507,7 @@ def club_list(request):
                                 "bottomRight": {"lat": 61.42094, "lon": 24.23851},
                                 "bottomLeft": {"lat": 61.42533, "lon": 24.18156},
                             },
+                            "rotation": 3.25,
                             "url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
                             "title": "",
                             "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
@@ -586,6 +587,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": event.map_title,
                 "coordinates": event.map.bound,
+                "rotation": event.map.rotation,
                 "hash": event.map.hash,
                 "max_zoom": event.map.max_zoom,
                 "modification_date": event.map.modification_date,
@@ -604,6 +606,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": m.title,
                 "coordinates": m.map.bound,
+                "rotation": m.map.rotation,
                 "hash": m.map.hash,
                 "max_zoom": m.map.max_zoom,
                 "modification_date": m.map.modification_date,
