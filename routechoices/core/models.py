@@ -524,15 +524,15 @@ class Map(models.Model):
         bl = self.map_xy_to_spherical_mercator(0, self.height)
         rot = (
             (
-                math.atan2(tr[1] - tl[1], tr[0] - tl[0]) * 180 / math.pi
-                + math.atan2(br[1] - tr[1], br[0] - tr[0]) * 180 / math.pi
-                + 90
-                + math.atan2(bl[1] - br[1], bl[0] - br[0]) * 180 / math.pi
-                + 180
-                + math.atan2(tl[1] - bl[1], tl[0] - bl[0]) * 180 / math.pi
-                + 270
+                math.atan2(tr[1] - tl[1], tr[0] - tl[0])
+                + math.atan2(br[1] - tr[1], br[0] - tr[0])
+                + math.atan2(bl[1] - br[1], bl[0] - br[0])
+                + math.atan2(tl[1] - bl[1], tl[0] - bl[0])
+                + math.pi
             )
             / 4
+            * 180
+            / math.pi
             + 360
         ) % 360
         if rot > 45:
