@@ -11,7 +11,7 @@
             {% if not event_sets %}
             <p>You haven't created any event sets yet.</p>
             {% endif %}
-            <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary mb-1"><i class="fa fa-plus-circle"></i> Create new event set</a>
+            <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event set</a>
         </div>
         {% if event_sets %}
         {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}

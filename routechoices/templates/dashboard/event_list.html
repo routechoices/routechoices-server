@@ -18,7 +18,7 @@
             {% if not events %}
             <p>You haven't created any events yet.</p>
             {%endif%}
-            <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary mb-1"><i class="fa fa-plus-circle"></i> Create new event</a>
+            <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event</a>
         </div>
         {% if events %}
         {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
@@ -39,20 +39,20 @@
                 <td><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></td>
                 <td>{% if event.event_set %}{{ event.event_set }}{% else %}-{% endif %}</td>
                 <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}" style="white-space: nowrap;font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
-                <td><span style="white-space: nowrap;"><i class="fa fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
-                <td>{% if event.is_live %}<i style="color:green" class="fa fa-check-circle"></i>{% else %}<i style="color:red" class="fa fa-times-circle"></i>{% endif %}</a></td>
+                <td><span style="white-space: nowrap;"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
+                <td>{% if event.is_live %}<i style="color:green" class="fa-solid fa-circle-check"></i>{% else %}<i style="color:red" class="fa-solid fa-circle-xmark"></i>{% endif %}</a></td>
                 <td>
-                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa fa-sign-in"></i> View</a>
+                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> View</a>
                     {% if not event.hidden %}
-                    <a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary mb-1"><i class="fa fa-save"></i> Export</a>
+                    <a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-floppy-disk"></i> Export</a>
                     {% endif %}
                     {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
-                    <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary mb-1"><i class="fa fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
+                    <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
                     {% endif %}
                     {% if event.ended and event.map_id %}
-                    <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary mb-1"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a>{% endif %}
+                    <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>{% endif %}
                     {% if event.is_live %}
-                    <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1"><i class="fa fa-bolt"></i> No Delay Live (Admin Only)</a>
+                    <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1"><i class="fa-solid fa-bolt"></i> No Delay Live (Admin Only)</a>
                     {% endif %}
                 </td>
             </tr>

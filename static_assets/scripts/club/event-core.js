@@ -780,7 +780,7 @@ function refreshEventData() {
             ) {
               m.title =
                 !m.title && m.default
-                  ? '<i class="fa fa-star"></i> Main Map'
+                  ? '<i class="fa-solid fa-star"></i> Main Map'
                   : u("<span/>").text(m.title).html();
               var bounds = [
                 [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
@@ -800,7 +800,7 @@ function refreshEventData() {
             } else {
               m.title =
                 !m.title && m.default
-                  ? '<i class="fa fa-star"></i> Main Map'
+                  ? '<i class="fa-solid fa-star"></i> Main Map'
                   : u("<span/>").text(m.title).html();
               var bounds = [
                 [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
@@ -1007,7 +1007,7 @@ function displayCompetitorList(force) {
     nbShown += competitor.isShown ? 1 : 0;
     var div = u('<div class="card-body" style="padding:5px 10px 2px 10px;"/>');
     div.html(
-      '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa fa-circle fa-3x icon-sidebar" style="color:' +
+      '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
         <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px"><b>' +
@@ -1021,7 +1021,7 @@ function displayCompetitorList(force) {
         (competitor.isShown ? "off" : "on") +
         '" style="padding: 0 3px 0 0" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("toggle") +
-        '"><i class="fa fa-toggle-' +
+        '"><i class="fa-solid fa-toggle-' +
         (competitor.isShown ? "on" : "off") +
         '" ></i></button>' +
         // toggle follow competitor
@@ -1036,7 +1036,7 @@ function displayCompetitorList(force) {
         // center on competitor
         '<button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("center") +
-        '"><i class="fa fa-map-marker"></i></button>' +
+        '"><i class="fa-solid fa-location-dot"></i></button>' +
         // toggle full route
         '<button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("full-route") +
@@ -1184,7 +1184,7 @@ function displayCompetitorList(force) {
     topDiv.append(
       u('<div style="text-align:right;margin-bottom:-15px"/>').append(
         u('<button class="btn btn-default btn-sm" aria-label="close"/>')
-          .html('<i class="fa fa-times"></i>')
+          .html('<i class="fa-solid fa-xmark"></i>')
           .on("click", toggleCompetitorList)
       )
     );
@@ -1193,10 +1193,10 @@ function displayCompetitorList(force) {
       var showAllTxt = banana.i18n("show-all");
       topDiv.append(
         '<div style="text-align: center;white-space: nowrap">' +
-          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye"></i> ' +
+          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa-solid fa-eye"></i> ' +
           showAllTxt +
           "</button>" +
-          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa fa-eye-slash"></i> ' +
+          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa-solid fa-eye-slash"></i> ' +
           hideAllTxt +
           "</button>" +
           "</div>"
@@ -1306,7 +1306,7 @@ function displayOptions(ev) {
   mainDiv.append(
     u('<div style="text-align:right;"/>').append(
       u('<button class="btn btn-default btn-sm" aria-label="close"/>')
-        .html('<i class="fa fa-times"></i>')
+        .html('<i class="fa-solid fa-xmark"></i>')
         .on("click", displayOptions)
     )
   );
@@ -1348,7 +1348,7 @@ function displayOptions(ev) {
         "<h4>" +
         banana.i18n("map-controls") +
         "</h4>" +
-        '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa fa-toggle-' +
+        '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa-solid fa-toggle-' +
         (showControls ? "on" : "off") +
         '"></i> ' +
         banana.i18n("show-map-controls") +
@@ -1356,12 +1356,12 @@ function displayOptions(ev) {
         "<h4>" +
         banana.i18n("groupings") +
         "</h4>" +
-        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa fa-toggle-' +
+        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa-solid fa-toggle-' +
         (showClusters ? "on" : "off") +
         '"></i> ' +
         banana.i18n("show-groupings") +
         "</button>" +
-        '<h4><i class="fa fa-language"></i> ' +
+        '<h4><i class="fa-solid fa-language"></i> ' +
         banana.i18n("language") +
         "</h4>" +
         '<select class="form-select" id="languageSelector">' +
@@ -1534,12 +1534,12 @@ function checkVisible(elm) {
 function drawCompetitors() {
   // play/pause button
   if (playbackPaused) {
-    var html = '<i class="fa fa-play"></i> x' + playbackRate;
+    var html = '<i class="fa-solid fa-play"></i> x' + playbackRate;
     if (u("#play_pause_button").html() != html) {
       u("#play_pause_button").html(html);
     }
   } else {
-    var html = '<i class="fa fa-pause"></i> x' + playbackRate;
+    var html = '<i class="fa-solid fa-pause"></i> x' + playbackRate;
     if (u("#play_pause_button").html() != html) {
       u("#play_pause_button").html(html);
     }

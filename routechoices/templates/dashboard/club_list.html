@@ -17,13 +17,13 @@
           <h3>Welcome to your dashboard.</h3>
           <p>It seems you don't have a club yet! No worries...</p>
           <p>
-            You can: <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Create new club</a>
+            You can: <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
           </p>
           <p>Or request another user to add your username "{{request.user.username }}" to the list of admins of theirs.</p>
         </div>
         {% else %}
         <h1>Select one of your club</h3>
-        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary mb-1"><i class="fa fa-plus-circle"></i> Create new club</a>
+        <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
         {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode %}{% endif %}
           {% for club in clubs %}
             <div class="card flex-row flex-no-wrap club-card mb-3">

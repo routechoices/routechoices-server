@@ -248,7 +248,7 @@
               if (m.default) {
                 m.title = m.title
                   ? u("<span/>").text(m.title).html()
-                  : '<i class="fa fa-star"></i> Main Map';
+                  : '<i class="fa-solid fa-star"></i> Main Map';
                 var bounds = [
                   [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
                   [m.coordinates.topRight.lat, m.coordinates.topRight.lon],

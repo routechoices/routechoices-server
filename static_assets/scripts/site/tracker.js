@@ -38,7 +38,7 @@
         u("#imeiDevId").addClass("d-none");
         try {
           u("#imeiErrorMsg").html(
-            '<i class="fa fa-warning"></i> ' +
+            '<i class="fa-solid fa-triangle-exclamation"></i> ' +
               u("<div/>").text(JSON.parse(req.responseText)[0]).text()
           );
         } catch {}

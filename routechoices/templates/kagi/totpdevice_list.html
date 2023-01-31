@@ -31,7 +31,7 @@
 </table>
 {% else %}
 <p>
-  <i class="fa fa-warning"></i> You do not have any TOTP (Authenticator) device!
+  <i class="fa-solid fa-triangle-exclamation	"></i> You do not have any TOTP (Authenticator) device!
 </p>
 {% endif %}
 <a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">{% trans 'Add a TOTP (Authenticator) Device' %}</a>

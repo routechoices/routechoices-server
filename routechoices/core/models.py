@@ -1405,6 +1405,12 @@ class Device(models.Model):
         return min(4, round((self.battery_level - 5) / 20))
 
     @property
+    def battery_level_text(self):
+        return ["empty", "quarter", "half", "three-quarters", "full"][
+            self.battery_level_0_4
+        ]
+
+    @property
     def locations_series(self):
         if not self.locations_encoded:
             return []

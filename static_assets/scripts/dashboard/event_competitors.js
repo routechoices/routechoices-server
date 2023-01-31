@@ -67,7 +67,7 @@ function showLocalTime(el) {
   u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
     addText: "",
-    deleteText: '<i class="fa fa-trash fa-2x"></i>',
+    deleteText: '<i class="fa-solid fa-trash-can fa-2x"></i>',
     prefix: "competitors",
   });
   u(".dynamic-form-add").hide();

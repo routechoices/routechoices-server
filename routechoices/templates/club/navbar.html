@@ -13,7 +13,7 @@
     {% elif club.logo %}
     <span class="navbar-brand site-name" style="display:inline-block;"><img src="{{club.logo_url}}" alt="club logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span>
     {% elif club.website %}
-    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa fa-house-chimney fa-2x" style="font-size: 30px; vertical-align: -5px"></i></a></span>
+    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-house-chimney fa-2x" style="font-size: 30px; vertical-align: -5px"></i></a></span>
     {% else %}
     <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{% static 'img/logo.png' %}" alt="logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span></a>
     {% endif %}
@@ -33,7 +33,7 @@
           <a class="nav-link" href="{{ club.get_absolute_url }}{{event.slug}}/export" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="export-text">Export</span></a>
         </li>
         {% if event.ended and event.map_id %}
-          <li><a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="nav-link"><i class="fa fa-external-link" aria-hidden="true"></i> 2DRerun</a></li>
+          <li><a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="nav-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a></li>
         {% endif %}{% endif %}
       </ul>
     </div>

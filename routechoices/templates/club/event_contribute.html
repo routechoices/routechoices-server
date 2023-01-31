@@ -40,7 +40,7 @@
                 <form action="" method="post" id="registration-form">
                     {% csrf_token %}
                     {% bootstrap_form register_form %}
-                    <p id="warning-if-device-id" class="d-none"><i class="fa fa-warning"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+                    <p id="warning-if-device-id" class="d-none"><i class="fa-solid fa-triangle-exclamation"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
                     <input type="submit" value="Add competitor" class="btn btn-primary">
                 </form>
             </div>
@@ -55,7 +55,7 @@
                 <form action="" method="post" id="upload-form">
                     {% csrf_token %}
                     {% bootstrap_form upload_form %}
-                    <p id="warning-if-open-registration" class="d-none"><i class="fa fa-warning"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
+                    <p id="warning-if-open-registration" class="d-none"><i class="fa-solid fa-triangle-exclamation"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
                     <input type="submit" value="Upload Route" class="btn btn-primary">
                 </form>
             </div>
