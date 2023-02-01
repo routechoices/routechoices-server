@@ -206,7 +206,7 @@
   {% endfor %}
   {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode %}{% endif %}
   </div>
-  {% if not live_events and not events %}
+  {% if not live_events and not events and not upcoming_events %}
     <div class="card">
       <div class="card-body">
         <h2 style="color: #888">No public events yet...</h2>
