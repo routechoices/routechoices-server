@@ -9,7 +9,7 @@
     <div class="col-12">
         <div class="mb-3">
             {% if not event_sets %}
-            <p>You haven't created any event sets yet.</p>
+            <p>You haven't created any event sets.</p>
             {% endif %}
             <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event set</a>
         </div>
