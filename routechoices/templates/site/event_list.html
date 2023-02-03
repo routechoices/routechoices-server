@@ -4,6 +4,7 @@
 {% load hosts %}
 {% load markdownify %}
 {% load index %}
+{% load math %}
 {% load compress %}
 {% load define_action %}
 
@@ -87,7 +88,7 @@
               </div>
             </div>
             <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown dropstart" style="z-index: 1">
+              <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
                 <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fa-solid fa-bars"></i>
                 </a>
@@ -134,7 +135,7 @@
             </div>
             {% if event.open_registration and not event.ended  %}
             <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown dropstart" style="z-index: 1">
+              <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
                 <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fa-solid fa-bars"></i>
                 </a>
@@ -184,7 +185,7 @@
             </div>
           </div>
           <div class="p-2 bd-highlight justify-end">
-            <div class="dropdown dropstart" style="z-index: 1">
+            <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
               <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-bars"></i>
               </a>
