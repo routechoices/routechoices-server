@@ -87,9 +87,9 @@
               </div>
             </div>
             <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown dropend" style="z-index: 1">
-                <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fa-solid fa-ellipsis"></i>
+              <div class="dropdown dropstart" style="z-index: 1">
+                <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-bars"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
                   {% if event.allow_route_upload or event.open_registration and not event.ended  %}
@@ -134,9 +134,9 @@
             </div>
             {% if event.open_registration and not event.ended  %}
             <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown dropend" style="z-index: 1">
-                <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fa-solid fa-ellipsis"></i>
+              <div class="dropdown dropstart" style="z-index: 1">
+                <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-bars"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
                   <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor registration</a></li>
@@ -184,9 +184,9 @@
             </div>
           </div>
           <div class="p-2 bd-highlight justify-end">
-            <div class="dropdown dropend" style="z-index: 1">
-              <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-ellipsis"></i>
+            <div class="dropdown dropstart" style="z-index: 1">
+              <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
               </a>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
                 {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
