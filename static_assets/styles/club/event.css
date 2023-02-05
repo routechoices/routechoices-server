@@ -124,6 +124,10 @@
   white-space: nowrap;
 }
 
+.icon-focused {
+  z-index: 10000000 !important;
+}
+
 .close {
   margin-bottom: 3px;
 }

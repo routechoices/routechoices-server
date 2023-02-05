@@ -322,7 +322,7 @@ function getContrastYIQ(hexcolor) {
   return yiq <= 168 ? "dark" : "light";
 }
 
-function getRunnerIcon(color, faded = false) {
+function getRunnerIcon(color, faded = false, focused = true) {
   var iconSize = 16;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
   var isDark = getContrastYIQ(color) === "dark";
@@ -336,11 +336,18 @@ function getRunnerIcon(color, faded = false) {
     iconAnchor: [iconSize / 2, iconSize / 2],
     shadowAnchor: [0, 0],
     popupAnchor: [0, 0],
+    className: focused ? "icon-focused" : "",
   });
   return runnerIcon;
 }
 
-function getRunnerNameMarker(name, color, rightSide, faded = false) {
+function getRunnerNameMarker(
+  name,
+  color,
+  rightSide,
+  faded = false,
+  focused = false
+) {
   var iconHtml =
     '<span style="opacity: ' +
     (faded ? 0.4 : 0.75) +
@@ -349,7 +356,10 @@ function getRunnerNameMarker(name, color, rightSide, faded = false) {
     '">' +
     u("<span/>").text(name).html() +
     "</span>";
-  var iconClass = "runner-icon runner-icon-" + getContrastYIQ(color);
+  var iconClass =
+    "runner-icon runner-icon-" +
+    getContrastYIQ(color) +
+    (focused ? " icon-focused" : "");
   var ic2 =
     iconClass +
     " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
@@ -985,6 +995,10 @@ function toggleFocusCompetitor(c) {
     u("#focusedIcon-" + c.id).addClass("route-focused");
     zoomOnCompetitor(c);
   }
+  c.nameMarker.remove();
+  c.nameMarker = null;
+  c.mapMarker.remove();
+  c.mapMarker = null;
 }
 
 function displayCompetitorList(force) {
@@ -1834,7 +1848,8 @@ function drawCompetitors() {
               competitor.short_name,
               competitor.color,
               isOnRight,
-              true
+              true,
+              competitor.focused
             );
             competitor.nameMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
@@ -1860,7 +1875,11 @@ function drawCompetitors() {
 
       if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
         if (!competitor.mapMarker) {
-          var runnerIcon = getRunnerIcon(competitor.color);
+          var runnerIcon = getRunnerIcon(
+            competitor.color,
+            false,
+            competitor.focused
+          );
           competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
             { icon: runnerIcon }
@@ -1897,7 +1916,9 @@ function drawCompetitors() {
           var runnerIcon = getRunnerNameMarker(
             competitor.short_name,
             competitor.color,
-            isNameOnRight
+            isNameOnRight,
+            false,
+            competitor.focused
           );
           competitor.isNameOnRight = isNameOnRight;
           competitor.nameMarker = L.marker(
@@ -2074,7 +2095,7 @@ function drawCompetitors() {
           var runnerIcon = getRunnerNameMarker(
             groupName,
             cluster.color,
-            isNameOnRight
+            isNameOnRight.value
           );
           cluster.nameMarker = L.marker(
             [clusterCenter.location.latitude, clusterCenter.location.longitude],
