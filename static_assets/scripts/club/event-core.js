@@ -995,10 +995,14 @@ function toggleFocusCompetitor(c) {
     u("#focusedIcon-" + c.id).addClass("route-focused");
     zoomOnCompetitor(c);
   }
-  c.nameMarker.remove();
-  c.nameMarker = null;
-  c.mapMarker.remove();
-  c.mapMarker = null;
+  if (c.nameMarker) {
+    c.nameMarker.remove();
+    c.nameMarker = null;
+  }
+  if (c.mapMarker) {
+    c.mapMarker.remove();
+    c.mapMarker = null;
+  }
 }
 
 function displayCompetitorList(force) {
