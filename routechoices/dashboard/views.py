@@ -1197,7 +1197,9 @@ def event_competitors_printer_view(request, event_id):
 
     competitors = event.competitors.all()
     for competitor in competitors:
-        competitor.device_display_str = competitor.device.get_display_str(club)
+        competitor.device_display_str = (
+            competitor.device.get_display_str(club) if competitor.device else "-"
+        )
     return render(
         request,
         "dashboard/event_competitors_printer.html",
