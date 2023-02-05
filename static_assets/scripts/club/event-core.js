@@ -981,8 +981,19 @@ function zoomOnCompetitor(compr) {
 function toggleFocusCompetitor(c) {
   const wasFocused = c.focused;
   competitorList.map((comp) => {
-    comp.focused = false;
-    u("#focusedIcon-" + comp.id).removeClass("route-focused");
+    if (comp.focused) {
+      comp.focused = false;
+      u("#focusedIcon-" + comp.id).removeClass("route-focused");
+
+      if (comp.nameMarker) {
+        comp.nameMarker.remove();
+        comp.nameMarker = null;
+      }
+      if (comp.mapMarker) {
+        comp.mapMarker.remove();
+        comp.mapMarker = null;
+      }
+    }
   });
   if (wasFocused) {
     c.focused = false;
