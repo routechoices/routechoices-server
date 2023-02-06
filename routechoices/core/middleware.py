@@ -152,7 +152,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         request.use_cname = False
         if raw_host.endswith(default_subdomain_suffix):
             slug = raw_host[: -(len(default_subdomain_suffix))].lower()
-            if slug not in ("www", "api", "wms"):
+            if slug not in ("api", "tiles", "wms", "www"):
                 club_exists = Club.objects.filter(slug__iexact=slug).exists()
                 if not club_exists:
                     request.club_slug = True

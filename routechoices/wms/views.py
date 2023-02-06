@@ -76,12 +76,12 @@ def common_wms(function):
                             max_lon,
                         )
                     min_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                        {"lat": min_lat, "min_lon": min_lon}
+                        {"lat": min_lat, "lon": min_lon}
                     )
                     min_x = min_xy["x"]
                     min_y = min_xy["y"]
                     max_xy = GLOBAL_MERCATOR.latlon_to_meters(
-                        {"lat": max_lat, "min_lon": max_lon}
+                        {"lat": max_lat, "lon": max_lon}
                     )
                     max_x = max_xy["x"]
                     max_y = max_xy["y"]

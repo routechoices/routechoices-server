@@ -933,6 +933,7 @@ SLUG_BLACKLIST = [
     "themes",
     "thread",
     "threads",
+    "tiles",
     "tmp",
     "today",
     "todo",
