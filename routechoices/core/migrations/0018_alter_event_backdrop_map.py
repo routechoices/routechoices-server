@@ -6,7 +6,6 @@ import routechoices.core.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0017_alter_club_description_alter_event_map_title_and_more"),
     ]

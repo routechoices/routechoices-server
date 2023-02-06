@@ -7,7 +7,6 @@ import routechoices.lib.helpers
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0030_alter_club_description"),
     ]

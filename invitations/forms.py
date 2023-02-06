@@ -41,9 +41,9 @@ class CleanEmailMixin:
         }
         try:
             self.validate_invitation(email, club)
-        except (AlreadyInvited):
+        except AlreadyInvited:
             raise forms.ValidationError(errors["already_invited"])
-        except (UserAlreadyAdmin):
+        except UserAlreadyAdmin:
             raise forms.ValidationError(errors["already_admin"])
         return email
 
