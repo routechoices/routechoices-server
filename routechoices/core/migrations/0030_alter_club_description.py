@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0029_remove_event_allow_live_chat_delete_chatmessage"),
     ]

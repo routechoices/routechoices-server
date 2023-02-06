@@ -181,7 +181,6 @@ class Command(BaseCommand):
     help = "Run SSE servers."
 
     def handle(self, *args, **options):
-
         loop = asyncio.get_event_loop()
 
         manager = SubscriptionManager()

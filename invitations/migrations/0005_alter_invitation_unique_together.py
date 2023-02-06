@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0017_alter_club_description_alter_event_map_title_and_more"),
         ("invitations", "0004_invitation_club_alter_invitation_email_and_more"),
