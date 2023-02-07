@@ -1138,11 +1138,14 @@ class Event(models.Model):
         past_events_page = paginator.get_page(page)
         past_events = events_to_sets(past_events_page)
 
-        all_live_events = list_events_sets(live_events_qs)
-        live_events = events_to_sets(all_live_events, type="live")
+        if past_events_page.start_index() == 1:
+            all_live_events = list_events_sets(live_events_qs)
+            live_events = events_to_sets(all_live_events, type="live")
 
-        all_upcoming_events = list_events_sets(upcoming_events_qs)
-        upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
+            all_upcoming_events = list_events_sets(upcoming_events_qs)
+            upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
+        else:
+            live_events = upcoming_events = cls.objects.none()
 
         return {
             "club": club,
