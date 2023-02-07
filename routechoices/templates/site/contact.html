@@ -3,15 +3,27 @@
 
 {% load django_bootstrap5 %}
 
-{% block content %}
-<h1>Contact</h1>
-  <p>Any questions?</p><p>Drop an email at <a href="mailto:info@routechoices.com?Subject=Hello" target="_top">info@routechoices.com</a>{% if request.user.is_authenticated %} or use the form below</p>
-  <p>
-    <form action="" method="post">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      <input type="submit" value="Send" class="btn btn-primary">
-    </form>
-  </p>
-  {% endif %}
+{% block contentup %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-9 col-lg-7 mx-auto">
+      <div class="card border-0 shadow rounded-3 my-5">
+        <div class="card-body p-4 p-sm-5">
+          <h3 class="card-title mb-5">Contact</h3>
+          <p>Any questions?</p><p>Drop an email at <a href="mailto:info@routechoices.com?Subject=Hello" target="_top">info@routechoices.com</a>{% if request.user.is_authenticated %} or use the form below</p>
+          <p>
+            <form action="" method="post">
+              {% csrf_token %}
+              {% bootstrap_form form %}
+              <div class="d-grid">
+              <input type="submit" value="Send" class="btn btn-primary">
+              </div>
+            </form>
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

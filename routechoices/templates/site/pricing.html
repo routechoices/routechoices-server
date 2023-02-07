@@ -7,74 +7,59 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <!--PRICE HEADING START-->
-        <div class="price-heading clearfix">
-            <h1>Pricing</h1>
-            <p>{{site.name}} is a not-for-profit, free and open source project.</p>
-            <p>No revenue is generated from it, and your data is not sold to third party.</p>
-            <p>Due to Finnish law, I can not accept donations.</p>
-        </div>
-        <!--//PRICE HEADING END-->
-    </div>
-</div>
-<div id="generic_price_table">
-<!--BLOCK ROW START-->
-<div class="row" style="display: grid;justify-content: center;">
-    <div style="width: 390px;max-width:100%">
-        <!--PRICE CONTENT START-->
-        <div class="generic_content active clearfix">
-
-            <!--HEAD PRICE DETAIL START-->
-            <div class="generic_head_price clearfix">
-
-                <!--HEAD CONTENT START-->
-                <div class="generic_head_content clearfix">
-
-                    <!--HEAD START-->
-                    <div class="head_bg"></div>
-                    <div class="head">
+<div class="row text-center">
+    <h3>Pricing</h3>
+    <p>{{site.name}} is a not-for-profit, free and open source project.</p>
+    <p>No revenue is generated from it, and your data is not sold to third party.</p>
+    <p>Due to Finnish law, I can not accept donations.</p>
+    <div id="generic_price_table">
+        <!--BLOCK ROW START-->
+        <div class="row" style="display: grid;justify-content: center;">
+            <div style="width: 390px;max-width:100%">
+                <!--PRICE CONTENT START-->
+                <div class="generic_content active clearfix">
+                    <!--HEAD PRICE DETAIL START-->
+                    <div class="generic_head_price clearfix">
+                    <!--HEAD CONTENT START-->
+                    <div class="generic_head_content clearfix">
+                        <!--HEAD START-->
+                        <div class="head_bg">
+                        </div>
+                        <div class="head">
                         <span>Free</span>
+                        </div>
+                        <!--//HEAD END-->
                     </div>
-                    <!--//HEAD END-->
-                </div>
-                <!--//HEAD CONTENT END-->
-
-                <!--PRICE START-->
-                <div class="generic_price_tag clearfix">
-                    <span class="price">
+                    <!--//HEAD CONTENT END-->
+                    <!--PRICE START-->
+                    <div class="generic_price_tag clearfix">
+                        <span class="price">
                         <span class="currency">0</span>
                         <span class="cent">.00</span>
                         <span class="sign">€</span>
-                    </span>
+                        </span>
+                    </div>
+                    <!--//PRICE END-->
+                    </div>
+                    <!--//HEAD PRICE DETAIL END-->
+                    <!--FEATURE LIST START-->
+                    <div class="generic_feature_list">
+                    <ul>
+                        <li><span>Unlimited Events</span></li>
+                        <li><span>Custom Domains</span></li>
+                        <li><span>Public, Secret and Private Events</span></li>
+                        <li><span>Up to 10 club administrators</span></li>
+                    </ul>
+                    </div>
+                    <!--//FEATURE LIST END-->
+                    <!--BUTTON START-->
+                    <div class="generic_price_btn clearfix">
+                        <a class="" href="{% url 'root_account_signup'%}">Sign up</a>
+                    </div>
+                    <!--//BUTTON END-->
                 </div>
-                <!--//PRICE END-->
-
             </div>
-            <!--//HEAD PRICE DETAIL END-->
-
-            <!--FEATURE LIST START-->
-            <div class="generic_feature_list">
-                <ul>
-                    <li><span>Unlimited Events</span></li>
-                    <li><span>Public, Secret and Private Events</span></li>
-                    <li><span>Custom Domains</span></li>
-                    <li><span>Up to 10 club administrators</span></li>
-                </ul>
-            </div>
-            <!--//FEATURE LIST END-->
-
-            <!--BUTTON START-->
-            <div class="generic_price_btn clearfix">
-                <a class="" href="{% url 'root_account_signup'%}">Sign up</a>
-            </div>
-            <!--//BUTTON END-->
-
         </div>
-        <!--//PRICE CONTENT END-->
-
     </div>
-</div>
 </div>
 {% endblock %}
