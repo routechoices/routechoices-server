@@ -76,7 +76,7 @@ def validate_nice_slug(slug):
     if "--" in slug or "__" in slug or "-_" in slug or "_-" in slug:
         errors.append(_("Cannot include 2 non alphanumeric characters in a row."))
     if slug.lower() in settings.SLUG_BLACKLIST:
-        raise errors.append(_("Forbidden word."))
+        errors.append(_("Forbidden word."))
     if errors:
         raise ValidationError(errors)
 
@@ -96,7 +96,7 @@ def validate_domain_slug(slug):
     if "--" in slug:
         errors.append(_("Cannot include 2 non alphanumeric characters in a row."))
     if slug.lower() in settings.SLUG_BLACKLIST:
-        raise errors.append(_("Forbidden word."))
+        errors.append(_("Forbidden word."))
     if errors:
         raise ValidationError(errors)
 
