@@ -5,50 +5,61 @@
 {% load compress %}
 
 {% block content %}
-<h3>2FA Verification</h3>
-<p>
-  {% trans 'Please verify one of the authentication methods below.' %}
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+      <div class="card border-0 shadow rounded-3 my-5">
+        <div class="card-body p-4 p-sm-5">
+          <h3 class="card-title text-center mb-5">2FA Verification</h3>
+          <p>
+            {% trans 'Please verify one of the authentication methods below.' %}
+          </p>
+          {% if forms.webauthn %}
+          <form id="webauthn-auth-form">
+              {% csrf_token %}
+              <div id="webauthn-error" style="color: red"></div>
+              <div id="webauthn-feature" class="d-grid">
+                <button class="btn btn-primary" id="webauthn-auth-begin" type="submit">
+                    {% trans "Tap here to log in with your WebAuthn key" %}
+                </button>
+              </div>
+          </form>
+          {% endif %}
 
+          {% if forms.totp %}
+          {% if forms.webauthn %}<hr/>{% endif %}
+          <div class="method totp">
+            <p>{% trans 'Enter an Authenticator (TOTP) Token:' %}</p>
 
-{% if forms.webauthn %}
-<form id="webauthn-auth-form">
-    {% csrf_token %}
-    <div id="webauthn-error" style="color: red"></div>
-    <div id="webauthn-feature">
-      <button class="btn btn-primary" id="webauthn-auth-begin" type="submit">
-          {% trans "Tap here to log in with your WebAuthn key" %}
-      </button>
+            <form method="post">
+              {% csrf_token %}
+              {% bootstrap_form forms.totp %}
+              <div class="d-grid">
+                <button class="btn btn-primary" value="totp" name="type">{% trans 'Submit' %}</button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+
+          {% if forms.backup %}
+          {% if forms.webauthn or forms.totp %}<hr/>{% endif %}
+          <div class="method backup">
+            <p>{% trans 'Use a backup code:' %}</p>
+
+            <form method="POST">
+              {% csrf_token %}
+              {% bootstrap_form forms.backup %}
+              <div class="d-grid">
+                <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
-</form>
-{% endif %}
-
-{% if forms.totp %}
-{% if forms.webauthn %}<hr/>{% endif %}
-<div class="method totp">
-  <p>{% trans 'Enter an Authenticator (TOTP) Token:' %}</p>
-
-  <form method="post">
-    {% csrf_token %}
-    {% bootstrap_form forms.totp %}
-    <button class="btn btn-primary" value="totp" name="type">{% trans 'Submit' %}</button>
-  </form>
+  </div>
 </div>
-{% endif %}
-
-{% if forms.backup %}
-{% if forms.webauthn or forms.totp %}<hr/>{% endif %}
-<div class="method backup">
-  <p>{% trans 'Use a backup code:' %}</p>
-
-  <form method="POST">
-    {% csrf_token %}
-    {% bootstrap_form forms.backup %}
-    <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
-  </form>
-</div>
-{% endif %}
-
 {% endblock %}
 
 {% block extra_body %}
