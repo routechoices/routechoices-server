@@ -1138,7 +1138,7 @@ class Event(models.Model):
         past_events_page = paginator.get_page(page)
         past_events = events_to_sets(past_events_page)
 
-        if past_events_page.start_index() == 1:
+        if past_events_page.number == 1:
             all_live_events = list_events_sets(live_events_qs)
             live_events = events_to_sets(all_live_events, type="live")
 
