@@ -41,30 +41,30 @@
   {% url 'site:events_view' as home_url %}
 {% endif %}
 {% if club %}
-<div class="container-fluid" style="padding: 0">
-  <div class="row" style="margin: 0px;">
-    <div style="background-color: #fff; width: 100%;">
+<div class="container-fluid p-0">
+  <div class="row m-0">
+    <div class="w-100" style="background-color: #fff;">
       <div class="container content">
         <div class="row">
           {{club.description|markdownify }}
         </div>
       </div>
     </div>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;padding:0"><path d="M0 1 L1 1 L0 0 Z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 1 L1 1 L0 0 Z"/></svg>
   </div>
 </div>
 <div class="container content">
 {% else %}
-<div class="container-fluid" style="padding: 0">
-<div class="row" style="margin: 0px;">
-  <div style="background-color: #000; width: 100%;">
+<div class="container-fluid p-0">
+<div class="row m-0">
+  <div class="w-100" style="background-color: #000;">
     <picture>
       <source srcset="{% static 'img/banner.avif'%}" type="image/avif">
       <source srcset="{% static 'img/banner.webp'%}" type="image/webp">
       <img src="{% static 'img/banner.jpg'%}?v=20230113" alt="Banner" style="width: 100%; max-width: 1024px">
     </picture>
   </div>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;padding:0"><path d="M0 1 L1 1 L0 0 Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 1 L1 1 L0 0 Z"/></svg>
 </div>
 </div>
 <div class="container content">
@@ -76,15 +76,15 @@
   {% for event_set in live_events %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
-      {% if not club %}<div style="font-size: 0.8em; margin-left: 25px;margin-bottom: 5px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% for event in event_set.events %}
-      <div class="card event-set-card" style="margin-bottom: 15px;">
+      <div class="card event-set-card mb-3">
         <div class="card-body">
           <div class="d-flex flex-row bd-highlight justify-content-between">
             <div class="p-2 bd-highlight">
               <div>
-                <a class="link-primary stretched-link" href="{{ event.get_absolute_url }}" style="text-decoration:none"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span style="background-color:red;color:#fff;margin-left: 5px;padding: 2px 7px;border-radius: 5px;"><b><i>LIVE</i></b></span>
+                <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic" style="font-size: 1em;"><b><i>LIVE</i></b></span>
               </div>
             </div>
             <div class="p-2 bd-highlight justify-end">
@@ -119,15 +119,15 @@
   {% for event_set in upcoming_events reversed %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
-      {% if not club %}<div style="font-size: 0.8em; margin-left: 25px;margin-bottom: 5px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% for event in event_set.events reversed %}
-      <div class="card event-set-card" style="margin-bottom: 15px;">
+      <div class="card event-set-card mb-3">
         <div class="card-body">
           <div class="d-flex flex-row bd-highlight justify-content-between">
             <div class="p-2 bd-highlight">
               <div>
-                <a class="link-primary stretched-link" href="{{ event.get_absolute_url }}" style="text-decoration:none"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
+                <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
               </div>
               <div>
                 <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
@@ -170,7 +170,7 @@
   {% for event_set in events %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
-      {% if not club %}<div style="font-size: 0.8em; margin-left: 25px;margin-bottom: 5px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% for event in event_set.events %}
     <div class="card event-set-card mb-3">
@@ -178,7 +178,7 @@
         <div class="d-flex flex-row bd-highlight justify-content-between">
           <div class="p-2 bd-highlight">
             <div>
-              <a class="link-primary stretched-link" href="{{ event.get_absolute_url }}" style="text-decoration:none"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
+              <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
             </div>
             <div>
               <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>

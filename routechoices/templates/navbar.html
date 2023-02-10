@@ -3,7 +3,7 @@
 {% load hosts %}
 <header class="navbar navbar-expand-md navbar-dark bg-primary" style="color: #fff;background-color: #111 !important">
   <div class="container">
-    <a class="navbar-brand site-name" href="{% host_url 'site:home_view' host 'www' %}"><span style="display:inline-block;"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"  width="34.66" style="vertical-align: text-bottom;"></span> {{site.name}}</a>
+    <a class="navbar-brand site-name" href="{% host_url 'site:home_view' host 'www' %}"><span class="d-inline-block"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"  width="34.66" style="vertical-align: text-bottom;"></span> {{site.name}}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -16,8 +16,8 @@
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:trackers_view' %} active{% endif %}" href="{% host_url 'site:trackers_view' host 'www'%}">Trackers</a></li>
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:pricing_view' %} active{% endif %}" href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:contact_view' %} active{% endif %} text-nowrap" href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
-        <li class="nav-item">{% if user.is_authenticated %}<a href="{% host_url 'root_account_logout' host 'www'%}" style="margin-left: 0px;margin-top: 0" class="btn btn-danger navbar-btn">Logout</a>{% else %}<a href="{% host_url 'root_account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn" style="margin-left: 0px;margin-top: 0;margin-right:5px">Login</a>{% endif %}</li>
-        {% if not user.is_authenticated %}<li class="nav-item"><a href="{% host_url 'root_account_signup' host 'www'%}" style="margin-top: 0;" class="btn btn-success navbar-btn text-nowrap">Sign up for free</a></li>{% endif %}
+        <li class="nav-item">{% if user.is_authenticated %}<a href="{% host_url 'root_account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0 ms-0">Logout</a>{% else %}<a href="{% host_url 'root_account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn ms-0 mt-0 me-2">Login</a>{% endif %}</li>
+        {% if not user.is_authenticated %}<li class="nav-item"><a href="{% host_url 'root_account_signup' host 'www'%}" class="btn btn-success navbar-btn text-nowrap mt-0">Sign up for free</a></li>{% endif %}
       </ul>
     </div>
   </div>

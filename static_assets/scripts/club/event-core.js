@@ -17,6 +17,7 @@ var COLORS = [
   "#a9a9a9",
   "#000000",
 ];
+var toast = null;
 var locale = null;
 var map = null;
 var isLiveMode = false;
@@ -131,9 +132,9 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<div class="text-center" style="background-color: red;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;font-style: italic;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      '<div class="text-center m-0 py-0 px-3 fst-italic" style="background-color: red;border-radius: 15px 15px 0 0;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
       banana.i18n("live-mode") +
-      '</div><div id="big-clock" class="text-center" style="padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="text-center py-0 px-3" style="background-color: #fff;color: #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -147,16 +148,16 @@ L.Control.EventState = L.Control.extend({
   },
   setReplay() {
     this._div.innerHTML =
-      '<div class="text-center" style="background-color: #666;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;">' +
+      '<div class="text-center m-0 py-0 px-3" style="background-color: #666;border-radius: 15px 15px 0 0;">' +
       banana.i18n("replay-mode") +
-      '</div><div id="big-clock" class="text-center" style="padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="text-center py-0 px-3" style="background-color: #fff;color: #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
       color: "#fff",
       border: "1px solid black",
       borderRadius: "16px",
-      padding: "0px",
+      padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
     });
@@ -216,13 +217,13 @@ L.Control.Ranking = L.Control.extend({
     });
     ranking.forEach(function (c, i) {
       innerOut.append(
-        '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap" style="float:left;display:inline-block;overflow:hidden;text-overflow:ellipsis;width:135px;">' +
+        '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px; height: 1em;"><span class="text-nowrap d-inline-block float-start" style=width: 135px;">' +
           (i + 1) +
           ' <span style="color: ' +
           c.competitor.color +
           '">⬤</span> ' +
           u("<span/>").text(c.competitor.name).html() +
-          '</span><span class="text-nowrap" style="float:right;display:inline-block;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px" title="' +
+          '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
           getProgressBarText(c.time) +
           '">' +
           getProgressBarText(c.time) +
@@ -279,7 +280,7 @@ L.Control.Grouping = L.Control.extend({
         "<h6>" + banana.i18n("group") + " " + alphabetizeNumber(i) + "</h6>";
       k.parts.forEach(function (ci) {
         out +=
-          '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap" style="float:left;display:inline-block;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: ' +
+          '<div class="text-nowrap " style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
           c[ci].color +
           '">⬤</span> ' +
           u("<span/>").text(c[ci].name).html() +
@@ -759,8 +760,8 @@ function refreshEventData() {
       isFetchingEventData = false;
       if (response.announcement && response.announcement != prevNotice) {
         prevNotice = response.announcement;
-        u("#alert-text").text(prevNotice);
-        u(".page-alert").show();
+        u(".text-alert-content").text(prevNotice);
+        toast.show();
       }
       if (JSON.stringify(response.maps) !== prevMapsJSONData) {
         prevMapsJSONData = JSON.stringify(response.maps);
@@ -1022,9 +1023,7 @@ function displayCompetitorList(force) {
   }
   optionDisplayed = false;
   var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
-  var listDiv = u(
-    '<div id="listCompetitor" style="overflow-y:auto;margin-top:3px"/>'
-  );
+  var listDiv = u('<div id="listCompetitor" style="overflow-y:auto;mt-1px"/>');
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
@@ -1034,40 +1033,40 @@ function displayCompetitorList(force) {
         ? nbShown < maxParticipantsDisplayed
         : competitor.isShown;
     nbShown += competitor.isShown ? 1 : 0;
-    var div = u('<div class="card-body" style="padding:5px 10px 2px 10px;"/>');
+    var div = u('<div class="card-body px-2 py-1"/>');
     div.html(
-      '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
+      '<div class="float-start color-tag me-2" style="cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
-        <div><div class="text-nowrap" style="text-overflow: ellipsis; overflow: hidden; padding-left: 3px"><b>' +
+        <div><div class="text-nowrap overflow-hidden ps-1 text-truncate"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div style="text-overflow: ellipsis; overflow: hidden; padding-left: 3px" class="text-nowrap ' +
+        <div class="text-nowrap text-truncate overflow-hidden ps-1 ' +
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
-        '<button type="button" class="toggle_competitor_btn btn btn-default btn-sm" aria-label="toggle ' +
-        (competitor.isShown ? "off" : "on") +
-        '" style="padding: 0 3px 0 0" data-bs-toggle="tooltip" data-bs-title="' +
+        '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-7px;padding-top: 1px" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("toggle") +
-        '"><i class="fa-solid fa-toggle-' +
-        (competitor.isShown ? "on" : "off") +
-        '" ></i></button>' +
+        '"><input class="form-check-input competitor-switch" type="checkbox" id="switch-competitor-' +
+        competitor.id +
+        '"' +
+        (competitor.isShown ? " checked" : "") +
+        "></div>" +
         // toggle follow competitor
-        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
+        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor py-0 pe-1 ps-0 ms-1" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("follow") +
-        '" style="padding: 0 3px 0 0;margin-left:1px">' +
+        '">' +
         '<i class="fa-solid fa-crosshairs' +
         (competitor.focused ? " route-focused" : "") +
         '" id="focusedIcon-' +
         competitor.id +
         '"></i></button>' +
         // center on competitor
-        '<button type="button" class="center_competitor_btn btn btn-default btn-sm" aria-label="focus" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
+        '<button type="button" class="center_competitor_btn btn btn-default btn-sm p-0" aria-label="focus" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("center") +
         '"><i class="fa-solid fa-location-dot"></i></button>' +
         // toggle full route
-        '<button type="button" class="full_competitor_btn btn btn-default btn-sm" aria-label="full route" style="padding: 0" data-bs-toggle="tooltip" data-bs-title="' +
+        '<button type="button" class="full_competitor_btn btn btn-default btn-sm p-0 ms-2" aria-label="full route" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("full-route") +
         '"><svg id="fullRouteIcon-' +
         competitor.id +
@@ -1120,22 +1119,17 @@ function displayCompetitorList(force) {
         });
       });
     u(div)
-      .find(".toggle_competitor_btn")
+      .find(".competitor-switch")
       .on("click", function (e) {
-        e.preventDefault();
-        var icon = u(this).find("i");
-        if (icon.hasClass("fa-toggle-on")) {
-          icon.removeClass("fa-toggle-on").addClass("fa-toggle-off");
-          icon
+        if (!e.target.checked) {
+          competitor.isShown = false;
+          competitor.focused = false;
+          u("#focusedIcon-" + competitor.id).removeClass("route-focused");
+          u(e.target)
             .parent()
             .parent()
             .removeClass("route-displayed")
             .addClass("route-not-displayed");
-          competitor.isShown = false;
-
-          competitor.focused = false;
-          u("#focusedIcon-" + competitor.id).removeClass("route-focused");
-
           if (competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker);
           }
@@ -1162,13 +1156,12 @@ function displayCompetitorList(force) {
             });
             return;
           }
-          icon.removeClass("fa-toggle-off").addClass("fa-toggle-on");
-          icon
+          competitor.isShown = true;
+          u(e.target)
             .parent()
             .parent()
             .removeClass("route-not-displayed")
             .addClass("route-displayed");
-          competitor.isShown = true;
           updateCompetitor(competitor);
           nbShown += 1;
         }
@@ -1206,9 +1199,7 @@ function displayCompetitorList(force) {
     listDiv.append(div);
   }
   if (!searchText) {
-    var mainDiv = u(
-      '<div id="competitorSidebar" style="display: flex;flex-direction: column;"/>'
-    );
+    var mainDiv = u('<div id="competitorSidebar" class="d-flex flex-column"/>');
     var topDiv = u("<div/>");
     topDiv.append(
       u('<div class="text-end" style="margin-bottom:-15px"/>').append(
@@ -1355,7 +1346,7 @@ function displayOptions(ev) {
     u(
       '<div id="listOptions" style="overflow-y:auto;overflow-x: hidden;" />'
     ).html(
-      "<h4>" +
+      '<div class="mb-2"><h4>' +
         banana.i18n("tails") +
         "</h4>" +
         '<div class="form-group">' +
@@ -1374,23 +1365,24 @@ function displayOptions(ev) {
         '"style="width:70px" /></div>' +
         "</div>" +
         "</div>" +
-        "<h4>" +
+        '</div><div class="mb-2"><h4>' +
         banana.i18n("map-controls") +
         "</h4>" +
-        '<button type="button" class="toggle_controls_btn btn btn-default btn-sm"><i class="fa-solid fa-toggle-' +
-        (showControls ? "on" : "off") +
-        '"></i> ' +
+        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-controls-switch"' +
+        (showControls ? " checked" : "") +
+        '><label class="form-check-label" for="toggle-controls-switch">' +
         banana.i18n("show-map-controls") +
-        "</button>" +
-        "<h4>" +
+        "</label></div>" +
+        '</div><div class="mb-2"><h4>' +
         banana.i18n("groupings") +
         "</h4>" +
-        '<button type="button" class="toggle_cluster_btn btn btn-default btn-sm"><i class="fa-solid fa-toggle-' +
-        (showClusters ? "on" : "off") +
-        '"></i> ' +
+        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-clusters-switch"' +
+        (showClusters ? " checked" : "") +
+        '><label class="form-check-label" for="toggle-clusters-switch">' +
         banana.i18n("show-groupings") +
-        "</button>" +
-        '<h4><i class="fa-solid fa-language"></i> ' +
+        "</label></div>" +
+        '</div><div class="mb-2"><h4 class="text-nowrap">' +
+        '<i class="fa-solid fa-language"></i> ' +
         banana.i18n("language") +
         "</h4>" +
         '<select class="form-select" id="languageSelector">' +
@@ -1411,7 +1403,7 @@ function displayOptions(ev) {
         (qrUrl
           ? `<h4>${banana.i18n("qr-link")}</h4>
 <p class="text-center">
-<img style="padding:10px" src="${qrDataUrl}" alt="qr"><br/>
+<img class="p-2" src="${qrDataUrl}" alt="qr"><br/>
 <a class="small fw-bold" href="${qrUrl}">${qrUrl.replace(
               /^https?:\/\//,
               ""
@@ -1442,13 +1434,24 @@ function displayOptions(ev) {
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
     });
   u(mainDiv)
-    .find(".toggle_cluster_btn")
+    .find("#toggle-controls-switch")
     .on("click", function (e) {
-      if (showClusters) {
-        u(".toggle_cluster_btn")
-          .find(".fa-toggle-on")
-          .removeClass("fa-toggle-on")
-          .addClass("fa-toggle-off");
+      if (!e.target.checked) {
+        showControls = false;
+        map.removeControl(panControl);
+        map.removeControl(zoomControl);
+        map.removeControl(rotateControl);
+      } else {
+        map.addControl(panControl);
+        map.addControl(zoomControl);
+        map.addControl(rotateControl);
+        showControls = true;
+      }
+    });
+  u(mainDiv)
+    .find("#toggle-clusters-switch")
+    .on("click", function (e) {
+      if (!e.target.checked) {
         showClusters = false;
         map.removeControl(groupControl);
         Object.values(clusters).forEach(function (c) {
@@ -1457,36 +1460,9 @@ function displayOptions(ev) {
         });
         clusters = {};
       } else {
-        u(".toggle_cluster_btn")
-          .find(".fa-toggle-off")
-          .removeClass("fa-toggle-off")
-          .addClass("fa-toggle-on");
         groupControl = L.control.grouping({ position: "topright" });
         map.addControl(groupControl);
         showClusters = true;
-      }
-    });
-  u(mainDiv)
-    .find(".toggle_controls_btn")
-    .on("click", function (e) {
-      if (showControls) {
-        u(".toggle_controls_btn")
-          .find(".fa-toggle-on")
-          .removeClass("fa-toggle-on")
-          .addClass("fa-toggle-off");
-        showControls = false;
-        map.removeControl(panControl);
-        map.removeControl(zoomControl);
-        map.removeControl(rotateControl);
-      } else {
-        u(".toggle_controls_btn")
-          .find(".fa-toggle-off")
-          .removeClass("fa-toggle-off")
-          .addClass("fa-toggle-on");
-        map.addControl(panControl);
-        map.addControl(zoomControl);
-        map.addControl(rotateControl);
-        showControls = true;
       }
     });
   u("#sidebar").html("");

@@ -31,12 +31,11 @@
     u("#club-events-link-text").text(
       banana.i18n("club-events-link-text", window.local.clubName)
     );
-
-    u(".page-alerts").hide();
-    u(".page-alert .close").on("click", function (e) {
-      e.preventDefault();
-      u(this).closest(".page-alert").hide();
+    toast = new bootstrap.Toast(document.getElementById("text-alert"), {
+      animation: false,
+      autohide: false,
     });
+    toast.hide();
 
     document
       .querySelector(".navbar")
@@ -308,8 +307,8 @@
           }
           if (response.announcement) {
             prevNotice = response.announcement;
-            u("#alert-text").text(prevNotice);
-            u(".page-alerts").show();
+            u(".text-alert-content").text(prevNotice);
+            toast.show();
           }
           if (!setFinishLineContextMenuItem) {
             setFinishLineContextMenuItem = map.contextmenu.insertItem(

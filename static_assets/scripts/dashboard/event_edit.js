@@ -53,7 +53,7 @@ function onAddedCompetitorRow(row) {
     .each(function (el) {
       var localTimeDisplay = u(el).parent().find(".local_time");
       localTimeDisplay.before(
-        '<button class="set_time_now_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-clock"></i> Set Now</button>'
+        '<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2 float-end"><i class="fa-solid fa-clock"></i> Set Now</button>'
       );
       u(el)
         .parent()
@@ -171,7 +171,7 @@ function showLocalTime(el) {
 
 (function () {
   var slugPrefix = u(
-    '<br/><span id="id_slug-prefix" style="padding-right: 5px;color: #999">' +
+    '<br/><span id="id_slug-prefix" class="pe-2" style="color: #999">' +
       window.local.clubUrl +
       "</span>"
   );
@@ -193,7 +193,7 @@ function showLocalTime(el) {
     .find(".form-text")
     .text("")
     .append(
-      '<button class="randomize_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
+      '<button class="randomize_btn btn btn-info btn-sm float-end py-1 px-2"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
     );
   u(".randomize_btn").on("click", function (e) {
     e.preventDefault();
@@ -332,7 +332,7 @@ function showLocalTime(el) {
 
     var localTimeDisplay = u(el).parent().find(".local_time");
     localTimeDisplay.before(
-      '<button class="set_time_now_btn btn btn-info btn-sm" style="padding: 3px 8px;float:right"><i class="fa-solid fa-clock"></i> Set Now</button>'
+      '<button class="set_time_now_btn btn btn-info btn-sm float-end py-1 px-2"><i class="fa-solid fa-clock"></i> Set Now</button>'
     );
     u(el)
       .parent()

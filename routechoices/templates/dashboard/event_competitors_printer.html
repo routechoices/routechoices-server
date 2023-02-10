@@ -9,9 +9,6 @@
 {% endcompress %}
 <style>
     @media print {
-        .no-print{
-            display:none;
-        }
         body {
             font-size: 0.5em;
         }
@@ -22,7 +19,7 @@
 <div class="container">
 <div class="row">
     <div class="col-12">
-        <h3>Competitors of {{event.name}} <button id="print-btn" class="btn btn-success no-print mb-1">Print</button></h3>
+        <h3>Competitors of {{event.name}} <button id="print-btn" class="btn btn-success d-print-none mb-1">Print</button></h3>
         <table class="table competitor_table">
             <thead>
                 <tr>
