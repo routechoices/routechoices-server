@@ -131,9 +131,9 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<div style="text-align: center;background-color: red;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;font-style: italic;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      '<div class="text-center" style="background-color: red;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;font-style: italic;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
       banana.i18n("live-mode") +
-      '</div><div id="big-clock" style="text-align: center;padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="text-center" style="padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -147,9 +147,9 @@ L.Control.EventState = L.Control.extend({
   },
   setReplay() {
     this._div.innerHTML =
-      '<div style="text-align: center;background-color: #666;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;">' +
+      '<div class="text-center" style="background-color: #666;margin: 0;padding: 0px 15px;border-radius: 15px 15px 0 0;">' +
       banana.i18n("replay-mode") +
-      '</div><div id="big-clock" style="text-align: center;padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="text-center" style="padding: 0px 15px;background-color: #fff;color:  #000;border-radius: 0 0 15px 15px;"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -216,13 +216,13 @@ L.Control.Ranking = L.Control.extend({
     });
     ranking.forEach(function (c, i) {
       innerOut.append(
-        '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:135px;">' +
+        '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap" style="float:left;display:inline-block;overflow:hidden;text-overflow:ellipsis;width:135px;">' +
           (i + 1) +
           ' <span style="color: ' +
           c.competitor.color +
           '">⬤</span> ' +
           u("<span/>").text(c.competitor.name).html() +
-          '</span><span style="float:right;display:inline-block;white-space:nowrap;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px" title="' +
+          '</span><span class="text-nowrap" style="float:right;display:inline-block;overflow:hidden;width:55px;font-feature-settings:tnum;font-variant-numeric:tabular-nums lining-nums;margin-right:10px" title="' +
           getProgressBarText(c.time) +
           '">' +
           getProgressBarText(c.time) +
@@ -279,7 +279,7 @@ L.Control.Grouping = L.Control.extend({
         "<h6>" + banana.i18n("group") + " " + alphabetizeNumber(i) + "</h6>";
       k.parts.forEach(function (ci) {
         out +=
-          '<div style="clear:both;white-space:nowrap;width:200px;height:1em"><span style="float:left;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: ' +
+          '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap" style="float:left;display:inline-block;overflow:hidden;text-overflow:ellipsis;width:195px;"><span style="color: ' +
           c[ci].color +
           '">⬤</span> ' +
           u("<span/>").text(c[ci].name).html() +
@@ -1039,10 +1039,10 @@ function displayCompetitorList(force) {
       '<div class="float-start color-tag" style="margin-right: 5px; cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
-        <div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px"><b>' +
+        <div><div class="text-nowrap" style="text-overflow: ellipsis; overflow: hidden; padding-left: 3px"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;padding-left: 3px" class="' +
+        <div style="text-overflow: ellipsis; overflow: hidden; padding-left: 3px" class="text-nowrap ' +
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
@@ -1211,7 +1211,7 @@ function displayCompetitorList(force) {
     );
     var topDiv = u("<div/>");
     topDiv.append(
-      u('<div style="text-align:right;margin-bottom:-15px"/>').append(
+      u('<div class="text-end" style="margin-bottom:-15px"/>').append(
         u('<button class="btn btn-default btn-sm" aria-label="close"/>')
           .html('<i class="fa-solid fa-xmark"></i>')
           .on("click", toggleCompetitorList)
@@ -1221,7 +1221,7 @@ function displayCompetitorList(force) {
       var hideAllTxt = banana.i18n("hide-all");
       var showAllTxt = banana.i18n("show-all");
       topDiv.append(
-        '<div style="text-align: center;white-space: nowrap">' +
+        '<div class="text-center text-nowrap">' +
           '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa-solid fa-eye"></i> ' +
           showAllTxt +
           "</button>" +
@@ -1333,7 +1333,7 @@ function displayOptions(ev) {
   searchText = null;
   var mainDiv = u("<div/>");
   mainDiv.append(
-    u('<div style="text-align:right;"/>').append(
+    u('<div class="text-end"/>').append(
       u('<button class="btn btn-default btn-sm" aria-label="close"/>')
         .html('<i class="fa-solid fa-xmark"></i>')
         .on("click", displayOptions)
@@ -1410,9 +1410,9 @@ function displayOptions(ev) {
         "</select>" +
         (qrUrl
           ? `<h4>${banana.i18n("qr-link")}</h4>
-<p style="text-align:center">
+<p class="text-center">
 <img style="padding:10px" src="${qrDataUrl}" alt="qr"><br/>
-<a class="small" style="font-weight: bold" href="${qrUrl}">${qrUrl.replace(
+<a class="small fw-bold" href="${qrUrl}">${qrUrl.replace(
               /^https?:\/\//,
               ""
             )}</a>

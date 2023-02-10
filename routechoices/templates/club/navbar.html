@@ -18,7 +18,7 @@
     <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span style="display:inline-block;"><img src="{% static 'img/logo.png' %}" alt="logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span></a>
     {% endif %}
     {% if club %}
-    <span style="display:inline-block;max-width: calc(100% - 120px);overflow: hidden; white-space: nowrap;text-overflow: ellipsis;" title="{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}">{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}</span>
+    <span class="text-nowrap" style="display:inline-block;max-width: calc(100% - 120px);overflow: hidden;text-overflow: ellipsis;" title="{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}">{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}</span>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

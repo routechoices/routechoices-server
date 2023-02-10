@@ -27,9 +27,9 @@
             <tr>
                 <th>Name</th>
                 <th>Set</th>
-                <th style="white-space: nowrap">Start Date</th>
+                <th class="text-nowrap">Start Date</th>
                 <th>Privacy</th>
-                <th style="white-space: nowrap">Is Live</th>
+                <th class="text-nowrap">Is Live</th>
                 <th>Actions</th>
             </tr>
           </thead>
@@ -38,8 +38,8 @@
             <tr class="collapsable">
                 <td><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></td>
                 <td>{% if event.event_set %}{{ event.event_set }}{% else %}-{% endif %}</td>
-                <td><span class="date-utc" data-date="{{ event.start_date|date:'c' }}" style="white-space: nowrap;font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
-                <td><span style="white-space: nowrap;"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
+                <td><span class="date-utc text-nowrap" data-date="{{ event.start_date|date:'c' }}" style="font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
+                <td><span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
                 <td>{% if event.is_live %}<i style="color:green" class="fa-solid fa-circle-check"></i>{% else %}<i style="color:red" class="fa-solid fa-circle-xmark"></i>{% endif %}</a></td>
                 <td>
                     <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> View</a>

@@ -18,8 +18,8 @@
     <div class="col-12">
         {% if event %}
         {% if event.shortcut %}
-        <div style="display: flex; text-align: center">
-            <div><p>{% qr_from_text event.shortcut size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText" style="font-weight: bold" href="{{ event.shortcut }}">{{ event.shortcut_text }}</a></small></p></div>
+        <div  class="text-center" style="display: flex;">
+            <div><p>{% qr_from_text event.shortcut size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText fw-bold" href="{{ event.shortcut }}">{{ event.shortcut_text }}</a></small></p></div>
         </div>
         {% endif%}
         <div>

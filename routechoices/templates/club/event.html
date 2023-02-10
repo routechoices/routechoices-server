@@ -47,24 +47,24 @@
         <div class="event-tool mb-1">
           <div class="d-flex flex-wrap">
             <div class="d-inline-flex flex-row flex-nowrap">
-              <div class="btn-group mb-1" role="group" id="view_mods_buttons" style="white-space: nowrap;">
-                <button class="btn btn-xs btn-secondary" id="live_button" style="white-space: nowrap;font-weight: bold;font-style: italic;">Live</button>
-                <button class="btn btn-xs btn-secondary" id="replay_button" style="white-space: nowrap;">Replay</button>
+              <div class="btn-group mb-1 text-nowrap" role="group" id="view_mods_buttons">
+                <button class="btn btn-xs btn-secondary text-nowrap fw-bold fst-italic" id="live_button">Live</button>
+                <button class="btn btn-xs btn-secondary text-nowrap" id="replay_button">Replay</button>
               </div>
-              <div class="btn-group mb-1" role="group" id="replay_mode_buttons" style="white-space: nowrap;margin-left:2px">
-                <button class="btn btn-xs btn-secondary active" id="real_time_button" style="white-space: nowrap;">Real Time</button>
-                <button class="btn btn-xs btn-secondary" id="mass_start_button" style="white-space: nowrap;">Mass start</button>
+              <div class="btn-group mb-1 text-nowrap" role="group" id="replay_mode_buttons" style="margin-left:2px">
+                <button class="btn btn-xs btn-secondary active text-nowrap" id="real_time_button">Real Time</button>
+                <button class="btn btn-xs btn-secondary text-nowrap" id="mass_start_button">Mass start</button>
               </div>
             </div>
             <div class="d-inline-flex flex-row justify-content-between flex-nowrap" style="margin-left:2px;flex-grow: 1;">
               <div>
-                <div class="btn-group mb-1" role="group" id="replay_control_buttons" style="white-space: nowrap;">
+                <div class="btn-group mb-1 text-nowrap" role="group" id="replay_control_buttons">
                   <button class="btn btn-xs btn-secondary" id="prev_button"  aria-label="slower"><i class="fa-solid fa-backward"></i></button>
                   <button class="btn btn-xs btn-secondary" id="play_pause_button" aria-label="play/pause"><i class="fa-solid fa-play"></i></button>
                   <button class="btn btn-xs btn-secondary" id="next_button" aria-label="faster"><i class="fa-solid fa-forward"></i></button>
                 </div>
               </div>
-              <div style="white-space: nowrap;margin-left:2px">
+              <div class="text-nowrap" style="margin-left:2px">
                 <div class="btn-group mb-1" role="group"><button class="btn btn-xs btn-secondary" id="runners_show_button" aria-label="competitors"><i class="fa-solid fa-users"></i></button></div>
                 <div class="btn-group mb-1" role="group" id="options_buttons"><button class="btn btn-xs btn-secondary" id="options_show_button" aria-label="options"><i class="fa-solid fa-gear"></i></button></div>
                 <div class="btn-group mb-1" role="group" id="share_buttons"><button class="btn btn-xs btn-secondary" id="share_button" aria-label="share"><i class="fa-solid fa-share-nodes"></i></button></div>
@@ -85,7 +85,7 @@
 <div class="modal" tabindex="-1" role="dialog" id="eventLoadingModal" style="display: block; z-index: 10002">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-body" style="text-align: center">
+      <div class="modal-body text-center">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#999" width="100"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg>
         <h1 id="loading-text">Loading...</h1>
       </div>
@@ -96,10 +96,10 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal" style="z-index: 10002">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex justify-content-center" style="text-align: center">
+      <div class="modal-header d-flex justify-content-center text-center">
          <h2 class="modal-title" id="event-not-started-text">Event not yet started</h2>
       </div>
-      <div class="modal-body" style="text-align: center">
+      <div class="modal-body text-center">
         <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
     </div>
@@ -115,7 +115,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="color-picker" style="text-align:center"></div>
+        <div id="color-picker text-center"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary cancel-text" data-bs-dismiss="modal" id="">Cancel</button>
