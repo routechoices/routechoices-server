@@ -88,7 +88,7 @@ context("Dashboard manipulations", () => {
     cy.forceVisit("/kangasala-sk/Jukola-2019-1st-leg");
     cy.contains("Olav Lundanes", { timeout: 20000 }); // in competitor list
     cy.contains("KooVee"); // on map
-    cy.get("competitor-switch").eq(1).uncheck();
+    cy.get(".competitor-switch").eq(1).uncheck();
     cy.contains("#map", "KooVee").should("not.exist");
 
     // Create Event with all fields info
