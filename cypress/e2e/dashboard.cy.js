@@ -115,6 +115,8 @@ context("Dashboard manipulations", () => {
     cy.url().should("match", /\/dashboard\/events$/);
     cy.forceVisit("/kangasala-sk/Jukola-2019-2nd-leg");
     cy.contains("Haldin", { timeout: 20000 });
+    cy.get(".color-tag").first().click();
+    cy.contains("Select new color for Mats");
 
     // trigger as many errors has possible
     cy.visit("/dashboard/events");
