@@ -296,6 +296,7 @@
               });
               mapSelectorLayer.addTo(map);
               map.on("baselayerchange", function (e) {
+                console.log(e.layer.data.rotation);
                 map.setBearing(e.layer.data.rotation);
                 map.fitBounds(e.layer.options.bounds);
                 map.zoomIn(0.5, { animate: false });
