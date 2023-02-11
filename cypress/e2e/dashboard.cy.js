@@ -86,8 +86,10 @@ context("Dashboard manipulations", () => {
     cy.contains("The upload of the GPX file was successful");
 
     cy.forceVisit("/kangasala-sk/Jukola-2019-1st-leg");
-    cy.contains("Olav Lundanes", { timeout: 20000 });
-    cy.contains("KooVee");
+    cy.contains("Olav Lundanes", { timeout: 20000 }); // in competitor list
+    cy.contains("KooVee"); // on map
+    cy.get("competitor-switch").eq(1).uncheck();
+    cy.contains("#map", "KooVee").should("not.exist");
 
     // Create Event with all fields info
     cy.visit("/dashboard/events");
