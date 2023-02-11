@@ -943,6 +943,9 @@ function toggleCompetitorList(e) {
 }
 
 function toggleFullCompetitor(c) {
+  if (!c.isShown) {
+    return;
+  }
   if (c.displayFullRoute) {
     c.displayFullRoute = null;
     u("#fullRouteIcon-" + c.id).attr({ fill: null });
@@ -953,7 +956,7 @@ function toggleFullCompetitor(c) {
 }
 
 function zoomOnCompetitor(compr) {
-  if (compr.focusing) {
+  if (!compr.isShown || compr.focusing) {
     return;
   }
   compr.focusing = true;
@@ -1047,15 +1050,19 @@ function displayCompetitorList(force) {
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
-        '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-7px;padding-top: 1px" data-bs-toggle="tooltip" data-bs-title="' +
+        '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-5px;padding-top: 1px" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("toggle") +
         '"><input class="form-check-input competitor-switch" type="checkbox" id="switch-competitor-' +
         competitor.id +
         '"' +
         (competitor.isShown ? " checked" : "") +
         "></div>" +
+        // center on competitor
+        '<button type="button" class="center_competitor_btn btn btn-default btn-sm p-0 mx-1" aria-label="focus" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("center") +
+        '"><i class="fa-solid fa-location-dot"></i></button>' +
         // toggle follow competitor
-        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm" aria-label="focus on competitor py-0 pe-1 ps-0 ms-1" data-bs-toggle="tooltip" data-bs-title="' +
+        '<button type="button" class="focus_competitor_btn btn btn-default btn-sm p-0 mx-1" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("follow") +
         '">' +
         '<i class="fa-solid fa-crosshairs' +
@@ -1063,17 +1070,17 @@ function displayCompetitorList(force) {
         '" id="focusedIcon-' +
         competitor.id +
         '"></i></button>' +
-        // center on competitor
-        '<button type="button" class="center_competitor_btn btn btn-default btn-sm p-0" aria-label="focus" data-bs-toggle="tooltip" data-bs-title="' +
-        banana.i18n("center") +
-        '"><i class="fa-solid fa-location-dot"></i></button>' +
         // toggle full route
-        '<button type="button" class="full_competitor_btn btn btn-default btn-sm p-0 ms-2" aria-label="full route" data-bs-toggle="tooltip" data-bs-title="' +
+        '<button type="button" class="full_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="full route" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("full-route") +
         '"><svg id="fullRouteIcon-' +
         competitor.id +
         '" ' +
-        (competitor.displayFullRoute ? 'fill="#20c997"' : "") +
+        (competitor.isShown
+          ? competitor.displayFullRoute
+            ? 'fill="#20c997"'
+            : ""
+          : 'fill="#aaa"') +
         ' viewBox="0 0 48 48" width="20px"><path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>' +
         "</svg></button>" +
         '<span class="float-end"><small class="speedometer"></small> <small class="odometer"></small></span>\
@@ -1127,6 +1134,8 @@ function displayCompetitorList(force) {
           competitor.isShown = false;
           competitor.focused = false;
           u("#focusedIcon-" + competitor.id).removeClass("route-focused");
+          competitor.displayFullRoute = null;
+          u("#fullRouteIcon-" + competitor.id).attr({ fill: "#aaa" });
           u(e.target)
             .parent()
             .parent()
@@ -1164,6 +1173,8 @@ function displayCompetitorList(force) {
             .parent()
             .removeClass("route-not-displayed")
             .addClass("route-displayed");
+
+          u("#fullRouteIcon-" + competitor.id).attr({ fill: null });
           updateCompetitor(competitor);
           nbShown += 1;
         }
@@ -1229,9 +1240,8 @@ function displayCompetitorList(force) {
       .on("click", function () {
         competitorList.forEach(function (competitor) {
           competitor.isShown = false;
-
           competitor.focused = false;
-          u("#focusedIcon-" + competitor.id).removeClass("route-focused");
+          competitor.displayFullRoute = false;
 
           if (competitor.mapMarker) {
             map.removeLayer(competitor.mapMarker);

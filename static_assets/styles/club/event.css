@@ -200,6 +200,10 @@
   color: #aaa;
 }
 
+.route-not-displayed .fa-location-dot {
+  color: #aaa;
+}
+
 .route-displayed .fa-crosshairs.route-focused {
   color: #20c997;
 }
