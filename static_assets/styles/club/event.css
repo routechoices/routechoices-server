@@ -27,18 +27,18 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 166px);
-  max-height: calc(var(--app-height) - 166px - var(--ctrl-height));
+  max-height: calc(100vh - 182px);
+  max-height: calc(var(--app-height) - 182px - var(--ctrl-height));
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 204px);
-  max-height: calc(var(--app-height) - 204px - var(--ctrl-height));
+  max-height: calc(100vh - 220px);
+  max-height: calc(var(--app-height) - 220px - var(--ctrl-height));
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 143px);
-  max-height: calc(var(--app-height) - 143px - var(--ctrl-height));
+  max-height: calc(100vh - 142px);
+  max-height: calc(var(--app-height) - 142px - var(--ctrl-height));
 }
 
 .time_bar {

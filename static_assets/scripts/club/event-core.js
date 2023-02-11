@@ -1023,7 +1023,9 @@ function displayCompetitorList(force) {
   }
   optionDisplayed = false;
   var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
-  var listDiv = u('<div id="listCompetitor" style="overflow-y:auto;mt-1px"/>');
+  var listDiv = u(
+    '<div id="listCompetitor" style="overflow-y:auto;" class="mt-1"/>'
+  );
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
     competitor.color = competitor.color || getColor(ii);
@@ -1202,7 +1204,7 @@ function displayCompetitorList(force) {
     var mainDiv = u('<div id="competitorSidebar" class="d-flex flex-column"/>');
     var topDiv = u("<div/>");
     topDiv.append(
-      u('<div class="text-end" style="margin-bottom:-15px"/>').append(
+      u('<div class="text-end mb-0"/>').append(
         u('<button class="btn btn-default btn-sm" aria-label="close"/>')
           .html('<i class="fa-solid fa-xmark"></i>')
           .on("click", toggleCompetitorList)
@@ -1324,7 +1326,7 @@ function displayOptions(ev) {
   searchText = null;
   var mainDiv = u("<div/>");
   mainDiv.append(
-    u('<div class="text-end"/>').append(
+    u('<div class="text-end mb-0"/>').append(
       u('<button class="btn btn-default btn-sm" aria-label="close"/>')
         .html('<i class="fa-solid fa-xmark"></i>')
         .on("click", displayOptions)
