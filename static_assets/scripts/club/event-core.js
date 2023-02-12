@@ -1050,7 +1050,7 @@ function displayCompetitorList(force) {
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
-        '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-5px;padding-top: 1px" data-bs-toggle="tooltip" data-bs-title="' +
+        '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-5px;padding-top: 2px" data-bs-toggle="tooltip" data-bs-title="' +
         banana.i18n("toggle") +
         '"><input class="form-check-input competitor-switch" type="checkbox" id="switch-competitor-' +
         competitor.id +
