@@ -2146,8 +2146,9 @@ function addRasterMap(bounds, hash, maxZoom, fit, idx = 0, data = null) {
   _rasterMap.data = data;
   _rasterMap.addTo(map);
   if (fit) {
-    map.setBearing(data.rotation);
-    map.fitBounds(bounds);
+    map.setZoom(18, { animate: false });
+    map.setBearing(data.rotation, { animate: false });
+    map.fitBounds(bounds, { animate: false });
     map.zoomIn(0.5, { animate: false });
   }
   return _rasterMap;

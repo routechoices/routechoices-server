@@ -296,9 +296,9 @@
               });
               mapSelectorLayer.addTo(map);
               map.on("baselayerchange", function (e) {
-                console.log(e.layer.data.rotation);
-                map.setBearing(e.layer.data.rotation);
-                map.fitBounds(e.layer.options.bounds);
+                map.setZoom(18, { animate: false });
+                map.setBearing(e.layer.data.rotation, { animate: false });
+                map.fitBounds(e.layer.options.bounds, { animate: false });
                 map.zoomIn(0.5, { animate: false });
                 rasterMap = e.layer;
               });
