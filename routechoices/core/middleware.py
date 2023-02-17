@@ -79,7 +79,6 @@ class XForwardedForMiddleware:
         path = request.path_info.lstrip("/")
         depth = self.depth
         exempt = any(m.match(path) for m in XFF_EXEMPT_URLS)
-
         if "HTTP_X_FORWARDED_FOR" in request.META:
             header = request.META["HTTP_X_FORWARDED_FOR"]
             levels = [x.strip() for x in header.split(",")]
