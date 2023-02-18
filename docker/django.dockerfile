@@ -35,7 +35,7 @@ RUN pip install --no-cache /wheels/*
 WORKDIR /app/
 ADD . /app/
 
-RUN git config --global --add safe.directory
+RUN git config --global --add safe.directory /app/
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 
