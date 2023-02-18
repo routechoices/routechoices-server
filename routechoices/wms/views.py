@@ -1,5 +1,3 @@
-import hashlib
-
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -15,7 +13,7 @@ from routechoices.core.models import (
     MapAssignation,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import safe64encode
+from routechoices.lib.helpers import safe64encodedsha
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
 GLOBAL_MERCATOR = GlobalMercator()
@@ -161,7 +159,7 @@ def tile_etag(request):
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
     if get_params.get("request", "").lower() == "getmap":
-        etag = request.raster_map.tile_cache_key(
+        key = request.raster_map.tile_cache_key(
             request.image_request["width"],
             request.image_request["height"],
             request.image_request["mime"],
@@ -170,9 +168,7 @@ def tile_etag(request):
             request.bound["min_y"],
             request.bound["max_y"],
         )
-        h = hashlib.sha256()
-        h.update(etag.encode("utf-8"))
-        return safe64encode(h.digest())
+        return safe64encodedsha(key)
     return None
 
 

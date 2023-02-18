@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import re
 import time
@@ -53,7 +52,7 @@ from routechoices.lib.helpers import (
     epoch_to_datetime,
     initial_of_name,
     random_device_id,
-    safe64encode,
+    safe64encodedsha,
     set_content_disposition,
     short_random_key,
     short_random_slug,
@@ -1005,9 +1004,7 @@ def event_data_etag_func(request, event_id):
     live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
     if use_cache and cache.has_key(live_cache_key):
         request.cache_key_found = live_cache_key
-        h = hashlib.sha256()
-        h.update(live_cache_key.encode("utf-8"))
-        return safe64encode(h.digest())
+        return safe64encodedsha(live_cache_key)
 
     event = (
         Event.objects.select_related("club")
@@ -1028,9 +1025,7 @@ def event_data_etag_func(request, event_id):
     # return it if we do
     if use_cache and not event.is_live and cache.has_key(cache_key):
         request.cache_key_found = cache_key
-        h = hashlib.sha256()
-        h.update(cache_key.encode("utf-8"))
-        return safe64encode(h.digest())
+        return safe64encodedsha(cache_key)
 
     # If we dont have cache check if we are currently generating cache
     # if so return previous cache data if available
@@ -1040,13 +1035,9 @@ def event_data_etag_func(request, event_id):
         and cache.has_key(prev_cache_key)
     ):
         request.cache_key_found = prev_cache_key
-        h = hashlib.sha256()
-        h.update(prev_cache_key.encode("utf-8"))
-        return safe64encode(h.digest())
+        return safe64encodedsha(prev_cache_key)
 
-    h = hashlib.sha256()
-    h.update(cache_key.encode("utf-8"))
-    return safe64encode(h.digest())
+    return safe64encodedsha(cache_key)
 
 
 @swagger_auto_schema(

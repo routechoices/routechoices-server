@@ -1,6 +1,5 @@
 import base64
 import bisect
-import hashlib
 import logging
 import math
 import os.path
@@ -54,7 +53,7 @@ from routechoices.lib.helpers import (
     project,
     random_device_id,
     random_key,
-    safe64encode,
+    safe64encodedsha,
     short_random_slug,
     time_base64,
 )
@@ -763,10 +762,7 @@ class Map(models.Model):
 
     @property
     def hash(self):
-        h = hashlib.sha256()
-        h.update(self.path.encode("utf-8"))
-        h.update(self.corners_coordinates.encode("utf-8"))
-        return safe64encode(h.digest())
+        return safe64encodedsha(f"{self.path}:{self.corners_coordinates}")
 
     @property
     def bound(self):

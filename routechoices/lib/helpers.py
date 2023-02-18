@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import math
 import os
 import os.path
@@ -38,6 +39,12 @@ def safe32encode(b):
 
 def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip("=")
+
+
+def safe64encodedsha(txt):
+    h = hashlib.sha256()
+    h.update(txt.encode("utf-8"))
+    return safe64encode(h.digest())
 
 
 def safe64decode(b):

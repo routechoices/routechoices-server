@@ -1,5 +1,3 @@
-import hashlib
-
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http.response import Http404, HttpResponseBadRequest
@@ -9,7 +7,7 @@ from django.views.decorators.http import condition
 
 from routechoices.core.models import PRIVACY_PRIVATE, Event, MapAssignation
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import safe64encode
+from routechoices.lib.helpers import safe64encodedsha
 from routechoices.lib.slippy_tiles import tile_xy_to_north_west_latlon
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
@@ -133,7 +131,7 @@ def tile_etag(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-    etag = request.raster_map.tile_cache_key(
+    key = request.raster_map.tile_cache_key(
         request.image_request["width"],
         request.image_request["height"],
         request.image_request["mime"],
@@ -142,9 +140,7 @@ def tile_etag(request):
         request.bound["min_y"],
         request.bound["max_y"],
     )
-    h = hashlib.sha256()
-    h.update(etag.encode("utf-8"))
-    return safe64encode(h.digest())
+    return safe64encodedsha(key)
 
 
 def tile_latest_modification(request):
