@@ -1287,6 +1287,7 @@ class Event(models.Model):
         cache_prefix = "live" if self.is_live else "archived"
         cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
         cache.delete(cache_key)
+        cache.delete(f"etag-{cache_key}")
 
     @property
     def has_notice(self):
