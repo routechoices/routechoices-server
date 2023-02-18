@@ -1164,13 +1164,13 @@ def event_data(request, event_id):
     headers = {}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
+
     if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
         except Exception:
             pass
-        else:
-            headers["Etag"] = f'"{safe64encodedsha(cache_key)}"'
+
     return Response(res, headers=headers)
 
 
