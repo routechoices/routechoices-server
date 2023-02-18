@@ -237,7 +237,10 @@ Follow our events live or replay them later.
 
     @property
     def logo_url(self):
-        return f"{self.nice_url}logo?v={int(self.modification_date.timestamp())}"
+        path = reverse(
+            "club_logo", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
+        )
+        return f"https:{path}?v={int(self.modification_date.timestamp())}"
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
