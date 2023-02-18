@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import re
 import time
@@ -12,11 +13,12 @@ from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db.models import Q
+from django.db.models import Max, Prefetch, Q
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from django.views.decorators.http import condition
 from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -44,12 +46,14 @@ from routechoices.core.models import (
     EventSet,
     ImeiDevice,
     Map,
+    MapAssignation,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     epoch_to_datetime,
     initial_of_name,
     random_device_id,
+    safe64encode,
     set_content_disposition,
     short_random_key,
     short_random_slug,
@@ -461,6 +465,34 @@ def club_list(request):
     return Response(output)
 
 
+def event_detail_last_mod_func(request, event_id):
+    event = (
+        Event.objects.select_related("club", "notice", "map")
+        .prefetch_related(
+            Prefetch(
+                "map_assignations",
+                queryset=MapAssignation.objects.select_related("map"),
+            )
+        )
+        .filter(aid=event_id)
+        .first()
+    )
+    request.event = event
+    if not event:
+        return None
+    max_mod_date = event.modification_date
+    if event.has_notice:
+        max_mod_date = max(max_mod_date, event.notice.modification_date)
+    if event.map:
+        max_mod_date = max(max_mod_date, event.map.modification_date)
+        maps_modification_date = event.map_assignations.all().aggregate(
+            Max("map__modification_date")
+        )["map__modification_date__max"]
+        if maps_modification_date:
+            max_mod_date = max(max_mod_date, maps_modification_date)
+    return max_mod_date
+
+
 @swagger_auto_schema(
     method="get",
     operation_id="event_detail",
@@ -488,15 +520,6 @@ def club_list(request):
                         "send_interval": 5,
                         "tail_length": 60,
                     },
-                    "competitors": [
-                        {
-                            "id": "pwaCro4TErI",
-                            "name": "Olav Lundanes (Halden SK)",
-                            "short_name": "Halden SK",
-                            "start_time": "2019-06-15T20:00:00Z",
-                        },
-                        "...",
-                    ],
                     "data_url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
                     "announcement": "",
                     "maps": [
@@ -523,15 +546,9 @@ def club_list(request):
     },
 )
 @api_view(["GET"])
+@condition(last_modified_func=event_detail_last_mod_func)
 def event_detail(request, event_id):
-    event = (
-        Event.objects.select_related("club", "notice")
-        .prefetch_related(
-            "competitors",
-        )
-        .filter(aid=event_id)
-        .first()
-    )
+    event = request.event
     if not event:
         res = {"error": "No event match this id"}
         return Response(res)
@@ -562,7 +579,6 @@ def event_detail(request, event_id):
             "send_interval": event.send_interval,
             "tail_length": event.tail_length,
         },
-        "competitors": [],
         "data_url": request.build_absolute_uri(
             reverse("event_data", host="api", kwargs={"event_id": event.aid})
         ),
@@ -572,16 +588,6 @@ def event_detail(request, event_id):
 
     if event.start_date < now():
         output["announcement"] = event.notice.text if event.has_notice else ""
-
-        for c in event.competitors.all():
-            output["competitors"].append(
-                {
-                    "id": c.aid,
-                    "name": c.name,
-                    "short_name": c.short_name,
-                    "start_time": c.start_time,
-                }
-            )
 
         if event.map:
             map_data = {
@@ -984,6 +990,65 @@ def competitor_route_upload(request, competitor_id):
     )
 
 
+def event_data_etag_func(request, event_id):
+    t0 = time.time()
+    request.start_time = t0
+    request.cache_key_found = None
+    request.event = None
+
+    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
+    if not use_cache:
+        return None
+
+    cache_interval = EVENT_CACHE_INTERVAL
+    live_cache_ts = int(t0 // cache_interval)
+    live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
+    if use_cache and cache.has_key(live_cache_key):
+        request.cache_key_found = live_cache_key
+        h = hashlib.sha256()
+        h.update(live_cache_key.encode("utf-8"))
+        return safe64encode(h.digest())
+
+    event = (
+        Event.objects.select_related("club")
+        .filter(aid=event_id, start_date__lt=now())
+        .first()
+    )
+    if not event:
+        res = {"error": "No event match this id"}
+        return Response(res)
+
+    request.event = event
+
+    cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
+    cache_prefix = "live" if event.is_live else "archived"
+    cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
+    prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
+    # then if we have a cache for that
+    # return it if we do
+    if use_cache and not event.is_live and cache.has_key(cache_key):
+        request.cache_key_found = cache_key
+        h = hashlib.sha256()
+        h.update(cache_key.encode("utf-8"))
+        return safe64encode(h.digest())
+
+    # If we dont have cache check if we are currently generating cache
+    # if so return previous cache data if available
+    elif (
+        use_cache
+        and cache.has_key(f"{cache_key}:processing")
+        and cache.has_key(prev_cache_key)
+    ):
+        request.cache_key_found = prev_cache_key
+        h = hashlib.sha256()
+        h.update(prev_cache_key.encode("utf-8"))
+        return safe64encode(h.digest())
+
+    h = hashlib.sha256()
+    h.update(cache_key.encode("utf-8"))
+    return safe64encode(h.digest())
+
+
 @swagger_auto_schema(
     method="get",
     operation_id="event_data",
@@ -1012,53 +1077,36 @@ def competitor_route_upload(request, competitor_id):
     },
 )
 @api_view(["GET"])
+@condition(etag_func=event_data_etag_func)
 def event_data(request, event_id):
-    t0 = time.time()
-    # First check if we have a live event cache
-    # if we do return cache
-    cache_interval = EVENT_CACHE_INTERVAL
-    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
-    live_cache_ts = int(t0 // cache_interval)
-    live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
-    live_cached_res = cache.get(live_cache_key)
-    if use_cache and live_cached_res:
-        return Response(live_cached_res)
+    if request.cache_key_found:
+        try:
+            data = cache.get(request.cache_key_found)
+        except Exception:
+            pass
+        else:
+            return Response(data)
 
-    event = (
-        Event.objects.select_related("club")
-        .filter(aid=event_id, start_date__lt=now())
-        .first()
-    )
+    # else generate data and set that we are generating cache
+    if request.event:
+        event = request.event
+    else:
+        event = (
+            Event.objects.select_related("club")
+            .filter(aid=event_id, start_date__lt=now())
+            .first()
+        )
     if not event:
         res = {"error": "No event match this id"}
         return Response(res)
 
+    t0 = request.start_time
+    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
+    cache_interval = EVENT_CACHE_INTERVAL
     cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
     cache_prefix = "live" if event.is_live else "archived"
     cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
-    prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
-    # then if we have a cache for that
-    # return it if we do
-    cached_res = None
-    if use_cache and not event.is_live:
-        try:
-            cached_res = cache.get(cache_key)
-        except Exception:
-            pass
-        else:
-            if cached_res:
-                return Response(cached_res)
-    # If we dont have cache check if we are currently generating cache
-    # if so return previous cache data if available
-    elif use_cache and cache.get(f"{cache_key}:processing"):
-        try:
-            cached_res = cache.get(prev_cache_key)
-        except Exception:
-            pass
-        else:
-            if cached_res:
-                return Response(cached_res)
-    # else generate data and set that we are generating cache
+
     if use_cache:
         try:
             cache.set(f"{cache_key}:processing", 1, 15)

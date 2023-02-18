@@ -5,7 +5,7 @@ from django.db.models import Prefetch
 from django.http.response import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.views.decorators.http import etag, last_modified
+from django.views.decorators.http import condition
 
 from routechoices.core.models import PRIVACY_PRIVATE, Event, MapAssignation
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -155,8 +155,7 @@ def tile_latest_modification(request):
 
 
 @common_tile
-@etag(tile_etag)
-@last_modified(tile_latest_modification)
+@condition(etag_func=tile_etag, last_modified_func=tile_latest_modification)
 def serve_tile(request):
     get_params = {}
     for key in request.GET.keys():
