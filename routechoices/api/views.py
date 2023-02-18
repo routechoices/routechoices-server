@@ -1036,7 +1036,7 @@ def event_data_etag_func(request, event_id):
         request.cache_key_found = prev_cache_key
         return safe64encodedsha(prev_cache_key)
 
-    return safe64encodedsha(cache_key)
+    return None
 
 
 @swagger_auto_schema(
@@ -1161,14 +1161,16 @@ def event_data(request, event_id):
         "duration": (time.time() - t0),
         "timestamp": time.time(),
     }
+    headers = {}
+    if event.privacy == PRIVACY_PRIVATE:
+        headers["Cache-Control"] = "Private"
     if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
         except Exception:
             pass
-    headers = None
-    if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        else:
+            headers["Etag"] = f'"{safe64encodedsha(cache_key)}"'
     return Response(res, headers=headers)
 
 
