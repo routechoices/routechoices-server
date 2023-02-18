@@ -12,7 +12,7 @@ from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db.models import Max, Prefetch, Q
+from django.db.models import Prefetch, Q
 from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
@@ -484,11 +484,8 @@ def event_detail_last_mod_func(request, event_id):
         max_mod_date = max(max_mod_date, event.notice.modification_date)
     if event.map:
         max_mod_date = max(max_mod_date, event.map.modification_date)
-        maps_modification_date = event.map_assignations.all().aggregate(
-            Max("map__modification_date")
-        )["map__modification_date__max"]
-        if maps_modification_date:
-            max_mod_date = max(max_mod_date, maps_modification_date)
+        for map_a in event.map_assignations.all():
+            max_mod_date = max(max_mod_date, map_a.map.modification_date)
     return max_mod_date
 
 
@@ -607,7 +604,7 @@ def event_detail(request, event_id):
                 ),
             }
             output["maps"].append(map_data)
-        for i, m in enumerate(event.map_assignations.all().select_related("map")):
+        for i, m in enumerate(event.map_assignations.all()):
             map_data = {
                 "title": m.title,
                 "coordinates": m.map.bound,
