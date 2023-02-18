@@ -22,8 +22,9 @@ from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import renderers, status
-from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.decorators import api_view, renderer_classes, throttle_classes
 from rest_framework.exceptions import ValidationError
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
@@ -542,6 +543,7 @@ def event_detail_last_mod_func(request, event_id):
     },
 )
 @api_view(["GET"])
+@renderer_classes([JSONRenderer])
 @condition(last_modified_func=event_detail_last_mod_func)
 def event_detail(request, event_id):
     event = request.event
@@ -1065,6 +1067,7 @@ def event_data_etag_func(request, event_id):
     },
 )
 @api_view(["GET"])
+@renderer_classes([JSONRenderer])
 @condition(etag_func=event_data_etag_func)
 def event_data(request, event_id):
     if request.cache_key_found:
@@ -1569,28 +1572,7 @@ def device_ownership_api_view(request, club_id, device_id):
 )
 @api_view(["GET"])
 def event_map_download(request, event_id, map_index="0"):
-    event = get_object_or_404(
-        Event.objects.all().select_related("club", "map"),
-        aid=event_id,
-        start_date__lt=now(),
-    )
-    if map_index == "0" and not event.map:
-        raise Http404
-    elif event.extra_maps.all().count() < int(map_index):
-        raise Http404
-
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
-    if map_index == "0":
-        raster_map = event.map
-    else:
-        raster_map = (
-            event.map_assignations.select_related("map").all()[int(map_index) - 1].map
-        )
+    event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     file_path = raster_map.path
     mime_type = raster_map.mime_type
 
@@ -1637,28 +1619,7 @@ def event_map_thumb_download(request, event_id):
 )
 @api_view(["GET"])
 def event_kmz_download(request, event_id, map_index="0"):
-    event = get_object_or_404(
-        Event.objects.all().select_related("club", "map"),
-        aid=event_id,
-        start_date__lt=now(),
-    )
-    if map_index == "0" and not event.map:
-        raise Http404
-    elif event.extra_maps.all().count() < int(map_index):
-        raise Http404
-
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
-    if map_index == "0":
-        raster_map = event.map
-    else:
-        raster_map = (
-            event.map_assignations.select_related("map").all()[int(map_index) - 1].map
-        )
+    event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     kmz_data = raster_map.kmz
 
     headers = None
@@ -1709,7 +1670,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
 @api_view(["GET"])
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
-        Competitor.objects.all().select_related("event", "event__club"),
+        Competitor.objects.all().select_related("event", "event__club", "device"),
         aid=competitor_id,
         start_time__lt=now(),
     )
@@ -1865,7 +1826,12 @@ def two_d_rerun_race_data(request):
         raise Http404()
     event = get_object_or_404(
         Event.objects.all().prefetch_related(
-            "competitors",
+            Prefetch(
+                "competitors",
+                queryset=Competitor.objects.select_related("device").order_by(
+                    "start_time", "name"
+                ),
+            )
         ),
         aid=event_id,
         start_date__lt=now(),
@@ -1876,14 +1842,40 @@ def two_d_rerun_race_data(request):
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
-    competitors = (
-        event.competitors.select_related("device").all().order_by("start_time", "name")
+
+    competitors = event.competitors.all()
+    devices = (c.device_id for c in competitors if c.device_id)
+    # we need this to determine the end time of the competitor device stream
+    all_devices_competitors = (
+        Competitor.objects.filter(
+            start_time__gte=event.start_date, device_id__in=devices
+        )
+        .only("device_id", "start_time")
+        .order_by("start_time")
     )
+    start_times_by_device = {}
+    for c in all_devices_competitors:
+        start_times_by_device.setdefault(c.device_id, [])
+        start_times_by_device[c.device_id].append(c.start_time)
+
     nb_points = 0
     results = []
     for c in competitors:
-        locations = c.locations
-        nb_points += len(locations)
+        from_date = c.start_time
+        next_competitor_start_time = None
+        if c.device_id:
+            for nxt in start_times_by_device.get(c.device_id, []):
+                if nxt > c.start_time:
+                    next_competitor_start_time = nxt
+                    break
+        end_date = now()
+        if next_competitor_start_time:
+            end_date = min(next_competitor_start_time, end_date)
+        end_date = min(event.end_date, end_date)
+        nb, locations = (0, "")
+        if c.device_id:
+            nb, locations = c.device.get_locations_between_dates(from_date, end_date)
+        nb_points += nb
         results += [
             [
                 c.aid,

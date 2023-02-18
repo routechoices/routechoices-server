@@ -1,11 +1,7 @@
-from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch
-from django.http.response import Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404
-from django.utils.timezone import now
+from django.http.response import HttpResponseBadRequest
 from django.views.decorators.http import condition
 
-from routechoices.core.models import PRIVACY_PRIVATE, Event, MapAssignation
+from routechoices.core.models import PRIVACY_PRIVATE, Event
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import safe64encodedsha
 from routechoices.lib.slippy_tiles import tile_xy_to_north_west_latlon
@@ -67,46 +63,20 @@ def common_tile(function):
 
         try:
             if "/" in layers_raw:
-                layer_id, map_index = layers_raw.split("/")
+                event_id, map_index = layers_raw.split("/")
                 map_index = int(map_index)
                 if map_index < 0:
                     raise ValueError()
             else:
-                layer_id = layers_raw
+                event_id = layers_raw
                 map_index = 0
         except Exception:
             return HttpResponseBadRequest("invalid parameters")
 
-        event_qs = Event.objects.select_related("club").filter(start_date__lte=now())
-        if map_index == 0:
-            event_qs = event_qs.select_related("map")
-        elif map_index > 0:
-            event_qs = event_qs.prefetch_related(
-                Prefetch(
-                    "map_assignations",
-                    queryset=MapAssignation.objects.select_related("map"),
-                )
-            )
+        event, raster_map = Event.get_public_map_at_index(
+            request.user, event_id, map_index
+        )
 
-        event = get_object_or_404(event_qs, aid=layer_id)
-
-        if (
-            not event
-            or (map_index == 0 and not event.map_id)
-            or (map_index > 0 and map_index > event.map_assignations.all().count())
-        ):
-            raise Http404
-
-        if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-            if (
-                not request.user.is_authenticated
-                or not event.club.admins.filter(id=request.user.id).exists()
-            ):
-                raise PermissionDenied()
-        if map_index == 0:
-            raster_map = event.map
-        else:
-            raster_map = event.map_assignations.all()[int(map_index) - 1].map
         request.event = event
         request.raster_map = raster_map
         request.image_request = {

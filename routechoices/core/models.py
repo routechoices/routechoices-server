@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
-from django.core.exceptions import BadRequest, ValidationError
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.core.files.base import ContentFile, File
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
@@ -34,6 +34,8 @@ from django.db import models
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -1025,6 +1027,53 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         self.invalidate_cache()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def get_public_map_at_index(cls, user, event_id, map_index):
+        event_qs = (
+            cls.objects.all()
+            .select_related("club")
+            .filter(
+                start_date__lt=now(),
+            )
+        )
+        try:
+            map_index = int(map_index)
+            if map_index < 0:
+                raise ValueError()
+        except Exception:
+            raise Http404
+
+        if map_index == 0:
+            event_qs = event_qs.select_related("map")
+        elif map_index > 0:
+            event_qs = event_qs.prefetch_related(
+                models.Prefetch(
+                    "map_assignations",
+                    queryset=MapAssignation.objects.select_related("map"),
+                )
+            )
+
+        event = get_object_or_404(event_qs, aid=event_id)
+
+        if (
+            not event
+            or (map_index == 0 and not event.map_id)
+            or (map_index > 0 and map_index > event.map_assignations.all().count())
+        ):
+            raise Http404
+
+        if event.privacy == PRIVACY_PRIVATE and not user.is_superuser:
+            if (
+                not user.is_authenticated
+                or not event.club.admins.filter(id=user.id).exists()
+            ):
+                raise PermissionDenied()
+        if map_index == 0:
+            raster_map = event.map
+        else:
+            raster_map = event.map_assignations.all()[map_index - 1].map
+        return event, raster_map
 
     @classmethod
     def extract_event_lists(cls, request, club=None):
