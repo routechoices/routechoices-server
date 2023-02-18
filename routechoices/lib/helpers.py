@@ -43,7 +43,9 @@ def safe64encode(b):
 
 def safe64encodedsha(txt):
     h = hashlib.sha256()
-    h.update(txt.encode("utf-8"))
+    if isinstance(txt, str):
+        txt = txt.encode("utf-8")
+    h.update(txt)
     return safe64encode(h.digest())
 
 

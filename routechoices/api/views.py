@@ -1003,38 +1003,42 @@ def event_data_etag_func(request, event_id):
     live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
     if use_cache and cache.has_key(live_cache_key):
         request.cache_key_found = live_cache_key
-        return safe64encodedsha(live_cache_key)
 
-    event = (
-        Event.objects.select_related("club")
-        .filter(aid=event_id, start_date__lt=now())
-        .first()
-    )
-    if not event:
-        res = {"error": "No event match this id"}
-        return Response(res)
+    if request.cache_key_found is None:
+        event = (
+            Event.objects.select_related("club")
+            .filter(aid=event_id, start_date__lt=now())
+            .first()
+        )
+        if not event:
+            return None
 
-    request.event = event
+        request.event = event
 
-    cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
-    cache_prefix = "live" if event.is_live else "archived"
-    cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
-    prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
-    # then if we have a cache for that
-    # return it if we do
-    if use_cache and not event.is_live and cache.has_key(cache_key):
-        request.cache_key_found = cache_key
-        return safe64encodedsha(cache_key)
+        cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
+        cache_prefix = "live" if event.is_live else "archived"
+        cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
+        prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
+        # then if we have a cache for that
+        # return it if we do
+        if use_cache and not event.is_live and cache.has_key(cache_key):
+            request.cache_key_found = cache_key
 
-    # If we dont have cache check if we are currently generating cache
-    # if so return previous cache data if available
-    elif (
-        use_cache
-        and cache.has_key(f"{cache_key}:processing")
-        and cache.has_key(prev_cache_key)
-    ):
-        request.cache_key_found = prev_cache_key
-        return safe64encodedsha(prev_cache_key)
+        # If we dont have cache check if we are currently generating cache
+        # if so return previous cache data if available
+        elif (
+            use_cache
+            and cache.has_key(f"{cache_key}:processing")
+            and cache.has_key(prev_cache_key)
+        ):
+            request.cache_key_found = prev_cache_key
+
+    if request.cache_key_found:
+        etag_key = f"etag-{request.cache_key_found}"
+        try:
+            return cache.get(etag_key)
+        except Exception:
+            pass
 
     return None
 
@@ -1076,7 +1080,7 @@ def event_data(request, event_id):
         except Exception:
             pass
         else:
-            return Response(data)
+            return HttpResponse(data, content_type="application/json")
 
     # else generate data and set that we are generating cache
     if request.event:
@@ -1164,14 +1168,19 @@ def event_data(request, event_id):
     headers = {}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
-
+    res = json.dumps(res)
     if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
+            etag = safe64encodedsha(res)
+            cache.set(
+                f"etag-{cache_key}", etag, 20 if event.is_live else 7 * 24 * 3600 + 60
+            )
         except Exception:
             pass
-
-    return Response(res, headers=headers)
+        else:
+            headers["ETag"] = f'"{etag}"'
+    return HttpResponse(res, headers=headers, content_type="application/json")
 
 
 def event_data_load_test(request, event_id):
