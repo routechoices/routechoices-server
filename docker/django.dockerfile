@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 && \
+    apt-get install -y --no-install-recommends g++ libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
@@ -34,6 +34,8 @@ RUN pip install --no-cache /wheels/*
 # Copy in your requirements file
 WORKDIR /app/
 ADD . /app/
+
+RUN git config --global --add safe.directory
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 
