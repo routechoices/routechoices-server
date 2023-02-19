@@ -1018,9 +1018,7 @@ def event_data(request, event_id):
         except Exception:
             pass
         else:
-            return HttpResponse(
-                data, headers={"X-Cache-Hit": 1}, content_type="application/json"
-            )
+            return Response(data, headers={"X-Cache-Hit": 1})
 
     event = (
         Event.objects.select_related("club")
@@ -1055,9 +1053,7 @@ def event_data(request, event_id):
         except Exception:
             pass
         else:
-            return HttpResponse(
-                data, headers={"X-Cache-Hit": 1}, content_type="application/json"
-            )
+            return Response(data, headers={"X-Cache-Hit": 1})
 
     # else generate data and set that we are generating cache
     if use_cache:
@@ -1130,20 +1126,13 @@ def event_data(request, event_id):
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
 
-    res = json.dumps(res)
-
     if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
         except Exception:
             pass
 
-    return HttpResponse(res, headers=headers, content_type="application/json")
-
-
-def event_data_load_test(request, event_id):
-    event_data(request, event_id)
-    return HttpResponse("ok")
+    return Response(res, headers=headers)
 
 
 @swagger_auto_schema(

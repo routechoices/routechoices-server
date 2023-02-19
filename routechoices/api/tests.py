@@ -29,8 +29,8 @@ class EssentialApiBase(APITestCase):
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
         )
 
-    def reverse_and_check(self, path, expected, host="api"):
-        url = reverse(path, host=host)
+    def reverse_and_check(self, path, expected, host="api", extra_kwargs=None):
+        url = reverse(path, host=host, kwargs=extra_kwargs)
         self.assertEqual(url, f"//{host}.routechoices.dev{expected}")
         return url
 
@@ -170,6 +170,58 @@ class EventCreationApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
 
+class EventApiTestCase(EssentialApiBase):
+    def test_live_event_detail(self):
+        club = Club.objects.create(name="Test club", slug="club")
+        event = Event.objects.create(
+            club=club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().shift(minutes=-1).datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        url = self.reverse_and_check(
+            "event_detail", f"/events/{event.aid}", "api", {"event_id": event.aid}
+        )
+        res = self.client.get(
+            url,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["event"]["name"], "Test event")
+
+    def test_live_event_data(self):
+        club = Club.objects.create(name="Test club", slug="club")
+        event = Event.objects.create(
+            club=club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().shift(minutes=-1).datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        url = self.reverse_and_check(
+            "event_data", f"/events/{event.aid}/data", "api", {"event_id": event.aid}
+        )
+        res = self.client.get(
+            url,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["competitors"], [])
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        event.save()
+        res = self.client.get(
+            url,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+
+
 @override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()))
 class MapApiTestCase(EssentialApiBase):
     def test_get_tile(self):
@@ -262,6 +314,57 @@ class MapApiTestCase(EssentialApiBase):
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_should_hit_cache(self):
+        url = self.reverse_and_check("wms_service", "/", "wms")
+        club = Club.objects.create(name="Test club", slug="club")
+        raster_map = Map.objects.create(
+            club=club,
+            name="Test map",
+            corners_coordinates="61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18156",
+            width=1,
+            height=1,
+        )
+        raster_map.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map.save()
+        event = Event.objects.create(
+            club=club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().shift(minutes=-1).datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+            map=raster_map,
+        )
+        # tile that intersect
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            SERVER_NAME="wms.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "0")
+        # same tile
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            SERVER_NAME="wms.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        # tile that dont intersect
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=-7903588.724687226,5234407.696968872,-7902977.228460945,5235019.193195154",
+            SERVER_NAME="wms.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "0")
+        # same tile
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=-7903588.724687226,5234407.696968872,-7902977.228460945,5235019.193195154",
+            SERVER_NAME="wms.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        # another tile that dont intersect
+        res = self.client.get(
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=-7903589.724687226,5234407.696968872,-7902977.228460945,5235019.19319515",
+            SERVER_NAME="wms.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "2")
 
 
 class LocationApiTestCase(EssentialApiBase):
