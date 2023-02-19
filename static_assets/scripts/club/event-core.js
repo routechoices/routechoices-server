@@ -35,7 +35,6 @@ var playbackPaused = true;
 var prevDisplayRefresh = 0;
 var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
-var isFetchingEventData = false;
 var currentTime = 0;
 var lastDataTs = 0;
 var lastNbPoints = 0;
@@ -69,6 +68,7 @@ var clock = null;
 var banana = null;
 var sendInterval = 0;
 var endEvent = null;
+var startEvent = null;
 var initialCompetitorDataLoaded = false;
 var gpsEventSource = null;
 var maxParticipantsDisplayed = 300;
@@ -582,9 +582,6 @@ function selectLiveMode(e) {
         fetchCompetitorRoutes();
       }
     }
-    if (ts - eventDataLastFetch > 30 * 1e3 && !isFetchingEventData) {
-      refreshEventData();
-    }
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     if (window.local.noDelay) {
@@ -594,9 +591,9 @@ function selectLiveMode(e) {
       drawCompetitors();
       prevDisplayRefresh = ts;
     }
-    var isStillLive = +endEvent >= +clock.now();
+    var isStillLive = endEvent >= clock.now();
     if (!isStillLive) {
-      u("#live_button").remove();
+      u("#live_button").hide();
       selectReplayMode();
     }
     if (isLiveMode) {
@@ -649,13 +646,6 @@ function selectReplayMode(e) {
         fetchCompetitorRoutes();
       }
     }
-    if (
-      isLiveEvent &&
-      performance.now() - eventDataLastFetch > 30 * 1e3 &&
-      !isFetchingEventData
-    ) {
-      refreshEventData();
-    }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
 
     currentTime = Math.max(
@@ -689,6 +679,17 @@ function selectReplayMode(e) {
       prevShownTime = currentTime;
     }
 
+    var isStillLive = isLiveEvent && endEvent >= clock.now();
+    var isBackLive = !isLiveEvent && endEvent >= clock.now();
+    if (!isStillLive) {
+      u("#live_button").hide();
+      isLiveEvent = false;
+    }
+    if (isBackLive) {
+      u("#live_button").show();
+      isLiveEvent = true;
+    }
+
     if (!isLiveMode) {
       window.requestAnimationFrame(whileReplay);
     }
@@ -711,7 +712,10 @@ function fetchCompetitorRoutes(url, cb) {
     type: "json",
     success: function (response) {
       if (!response || !response.competitors) {
-        isCurrentlyFetchingRoutes = false;
+        // Prevent fetching competitor data for 1 second
+        setTimeout(function () {
+          isCurrentlyFetchingRoutes = false;
+        }, 1000);
         cb && cb();
         return;
       }
@@ -754,7 +758,6 @@ function fetchCompetitorRoutes(url, cb) {
 }
 
 function refreshEventData() {
-  isFetchingEventData = true;
   reqwest({
     url: window.local.eventUrl,
     data: { t: +new Date() },
@@ -763,13 +766,40 @@ function refreshEventData() {
     type: "json",
     success: function (response) {
       eventDataLastFetch = performance.now();
-      isFetchingEventData = false;
+      endEvent = new Date(response.event.end_date);
+
+      if (new Date(response.event.start_date) != startEvent) {
+        var oldStart = startEvent;
+        startEvent = new Date(response.event.start_date);
+        var startDateTxt = dayjs(startEvent)
+          .local()
+          .locale(locale)
+          .format("LLLL");
+        u("#event-start-date-text").text(
+          banana.i18n("event-start-date-text", startDateTxt)
+        );
+        // user changed the event start from past to in the future
+        if (oldStart < clock.now() && startEvent > clock.now()) {
+          window.location.reload();
+          return;
+        }
+        // user changed the event start from future to in the past
+        if (oldStart > clock.now() && startEvent < clock.now()) {
+          window.location.reload();
+          return;
+        }
+      }
+
       if (response.announcement && response.announcement != prevNotice) {
         prevNotice = response.announcement;
         u(".text-alert-content").text(prevNotice);
         toast.show();
       }
-      if (response.maps && JSON.stringify(response.maps) !== prevMapsJSONData) {
+
+      if (
+        Array.isArray(response.maps) &&
+        JSON.stringify(response.maps) !== prevMapsJSONData
+      ) {
         prevMapsJSONData = JSON.stringify(response.maps);
         var currentMapNewData = response.maps.find(function (m) {
           return (
@@ -781,7 +811,7 @@ function refreshEventData() {
         var currentMapStillExists = response.maps.find(function (m) {
           return rasterMap && m.id === rasterMap.data.id;
         });
-        if (currentMapNewData || response.maps.length === 0) {
+        if (rasterMap && (currentMapNewData || response.maps.length === 0)) {
           rasterMap.remove();
         }
         if (mapSelectorLayer) {
@@ -843,7 +873,9 @@ function refreshEventData() {
             mapSelectorLayer = L.control.layers(mapChoices, null, {
               collapsed: false,
             });
-            mapSelectorLayer.addTo(map);
+            try {
+              mapSelectorLayer.addTo(map);
+            } catch (e) {}
           }
         }
       }

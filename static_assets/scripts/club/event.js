@@ -85,11 +85,12 @@
     };
     thumb.addEventListener("touchmove", touchProgressBar);
 
-    u(".date-utc").each(function (el) {
-      var _el = u(el);
-      _el.text(dayjs(_el.data("date")).local().locale(locale).format("LLLL"));
-    });
-    var startDateTxt = u("#event-start-date-text").find(".date-utc").text();
+    var startDateTxt = dayjs(
+      u("#event-start-date-text").find(".date-utc").data("date")
+    )
+      .local()
+      .locale(locale)
+      .format("LLLL");
     u("#event-start-date-text").text(
       banana.i18n("event-start-date-text", startDateTxt)
     );
@@ -165,8 +166,8 @@
       type: "json",
       success: function (response) {
         backdropMaps[response.event.backdrop || "blank"].addTo(map);
-        var now = new Date();
-        var startEvent = new Date(response.event.start_date);
+        var now = clock.now();
+        startEvent = new Date(response.event.start_date);
         endEvent = new Date(response.event.end_date);
         if (startEvent > now) {
           try {
@@ -187,7 +188,7 @@
           u("#export-nav-item").remove();
           preRaceModal.show();
           window.setInterval(function () {
-            if (new Date() > startEvent) {
+            if (clock.now() > startEvent) {
               location.reload();
             }
           }, 1e3);
@@ -322,6 +323,7 @@
           }
           onStart();
         }
+        setInterval(refreshEventData, 1 * 1e3);
       },
       error: function () {
         u("#eventLoadingModal").remove();
