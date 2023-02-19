@@ -155,7 +155,7 @@ def tile_latest_modification(request):
 
 
 @common_wms
-@condition(etag_func=tile_etag, last_modified_func=tile_latest_modification)
+@condition(etag_func=tile_etag)
 def wms_service(request):
     get_params = {}
     for key in request.GET.keys():

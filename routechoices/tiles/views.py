@@ -121,7 +121,7 @@ def tile_latest_modification(request):
 
 
 @common_tile
-@condition(etag_func=tile_etag, last_modified_func=tile_latest_modification)
+@condition(etag_func=tile_etag)
 def serve_tile(request):
     get_params = {}
     for key in request.GET.keys():
