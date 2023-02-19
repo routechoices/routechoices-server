@@ -710,6 +710,11 @@ function fetchCompetitorRoutes(url, cb) {
     withCredentials: true,
     type: "json",
     success: function (response) {
+      if (!response || !response.competitors) {
+        isCurrentlyFetchingRoutes = false;
+        cb && cb();
+        return;
+      }
       var runnerPoints = [];
       response.competitors.forEach(function (competitor, idx) {
         if (competitor.encoded_data) {
@@ -763,7 +768,7 @@ function refreshEventData() {
         u(".text-alert-content").text(prevNotice);
         toast.show();
       }
-      if (JSON.stringify(response.maps) !== prevMapsJSONData) {
+      if (response.maps && JSON.stringify(response.maps) !== prevMapsJSONData) {
         prevMapsJSONData = JSON.stringify(response.maps);
         var currentMapNewData = response.maps.find(function (m) {
           return (
