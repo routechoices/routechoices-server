@@ -757,6 +757,7 @@ function refreshEventData() {
   isFetchingEventData = true;
   reqwest({
     url: window.local.eventUrl,
+    data: { t: +new Date() },
     withCredentials: true,
     crossOrigin: true,
     type: "json",

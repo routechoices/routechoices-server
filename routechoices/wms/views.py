@@ -143,17 +143,6 @@ def tile_etag(request):
     return None
 
 
-def tile_latest_modification(request):
-    get_params = {}
-    for key in request.GET.keys():
-        get_params[key.lower()] = request.GET[key]
-    if get_params.get("request", "").lower() == "getmap":
-        return max(
-            request.raster_map.modification_date, request.event.modification_date
-        )
-    return None
-
-
 @common_wms
 @condition(etag_func=tile_etag)
 def wms_service(request):

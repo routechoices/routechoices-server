@@ -113,13 +113,6 @@ def tile_etag(request):
     return safe64encodedsha(key)
 
 
-def tile_latest_modification(request):
-    get_params = {}
-    for key in request.GET.keys():
-        get_params[key.lower()] = request.GET[key]
-    return max(request.raster_map.modification_date, request.event.modification_date)
-
-
 @common_tile
 @condition(etag_func=tile_etag)
 def serve_tile(request):

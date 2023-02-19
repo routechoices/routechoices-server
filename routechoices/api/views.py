@@ -17,7 +17,6 @@ from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from django.views.decorators.http import condition
 from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -53,7 +52,6 @@ from routechoices.lib.helpers import (
     epoch_to_datetime,
     initial_of_name,
     random_device_id,
-    safe64encodedsha,
     set_content_disposition,
     short_random_key,
     short_random_slug,
@@ -465,33 +463,6 @@ def club_list(request):
     return Response(output)
 
 
-def event_detail_last_mod_func(request, event_id):
-    event = (
-        Event.objects.select_related("club", "notice", "map")
-        .prefetch_related(
-            Prefetch(
-                "map_assignations",
-                queryset=MapAssignation.objects.select_related("map"),
-            )
-        )
-        .filter(aid=event_id)
-        .first()
-    )
-    request.event = event
-    if not event:
-        return None
-    max_mod_date = event.modification_date
-    if event.started:
-        max_mod_date = max(max_mod_date, event.start_date)
-    if event.has_notice:
-        max_mod_date = max(max_mod_date, event.notice.modification_date)
-    if event.map:
-        max_mod_date = max(max_mod_date, event.map.modification_date)
-        for map_a in event.map_assignations.all():
-            max_mod_date = max(max_mod_date, map_a.map.modification_date)
-    return max_mod_date
-
-
 @swagger_auto_schema(
     method="get",
     operation_id="event_detail",
@@ -546,9 +517,19 @@ def event_detail_last_mod_func(request, event_id):
 )
 @api_view(["GET"])
 @renderer_classes([JSONRenderer])
-@condition(last_modified_func=event_detail_last_mod_func)
 def event_detail(request, event_id):
-    event = request.event
+    event = (
+        Event.objects.select_related("club", "notice", "map")
+        .prefetch_related(
+            Prefetch(
+                "map_assignations",
+                queryset=MapAssignation.objects.select_related("map"),
+            )
+        )
+        .filter(aid=event_id)
+        .first()
+    )
+
     if not event:
         res = {"error": "No event match this id"}
         return Response(res)
@@ -990,61 +971,6 @@ def competitor_route_upload(request, competitor_id):
     )
 
 
-def event_data_etag_func(request, event_id):
-    t0 = time.time()
-    request.start_time = t0
-    request.cache_key_found = None
-    request.event = None
-
-    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
-    if not use_cache:
-        return None
-
-    cache_interval = EVENT_CACHE_INTERVAL
-    live_cache_ts = int(t0 // cache_interval)
-    live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
-    if use_cache and cache.has_key(live_cache_key):
-        request.cache_key_found = live_cache_key
-
-    if request.cache_key_found is None:
-        event = (
-            Event.objects.select_related("club")
-            .filter(aid=event_id, start_date__lt=now())
-            .first()
-        )
-        if not event:
-            return None
-
-        request.event = event
-
-        cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
-        cache_prefix = "live" if event.is_live else "archived"
-        cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
-        prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
-        # then if we have a cache for that
-        # return it if we do
-        if use_cache and not event.is_live and cache.has_key(cache_key):
-            request.cache_key_found = cache_key
-
-        # If we dont have cache check if we are currently generating cache
-        # if so return previous cache data if available
-        elif (
-            use_cache
-            and cache.has_key(f"{cache_key}:processing")
-            and cache.has_key(prev_cache_key)
-        ):
-            request.cache_key_found = prev_cache_key
-
-    if request.cache_key_found:
-        etag_key = f"etag-{request.cache_key_found}"
-        try:
-            return cache.get(etag_key)
-        except Exception:
-            pass
-
-    return None
-
-
 @swagger_auto_schema(
     method="get",
     operation_id="event_data",
@@ -1073,48 +999,76 @@ def event_data_etag_func(request, event_id):
     },
 )
 @api_view(["GET"])
-@renderer_classes([JSONRenderer])
-@condition(etag_func=event_data_etag_func)
 def event_data(request, event_id):
-    if request.cache_key_found:
+    t0 = time.time()
+    cache_key_found = None
+    event = None
+
+    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
+    if not use_cache:
+        return None
+
+    cache_interval = EVENT_CACHE_INTERVAL
+    live_cache_ts = int(t0 // cache_interval)
+    live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
+    if use_cache and cache.has_key(live_cache_key):
+        cache_key_found = live_cache_key
         try:
-            data = cache.get(request.cache_key_found)
+            data = cache.get(cache_key_found)
+        except Exception:
+            pass
+        else:
+            return HttpResponse(data, content_type="application/json")
+
+    event = (
+        Event.objects.select_related("club")
+        .filter(aid=event_id, start_date__lt=now())
+        .first()
+    )
+    if not event:
+        res = {"error": "No event match this id"}
+        return Response(res)
+
+    cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
+    cache_prefix = "live" if event.is_live else "archived"
+    cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
+    prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
+    # then if we have a cache for that
+    # return it if we do
+    if use_cache and not event.is_live and cache.has_key(cache_key):
+        cache_key_found = cache_key
+
+    # If we dont have cache check if we are currently generating cache
+    # if so return previous cache data if available
+    elif (
+        use_cache
+        and cache.has_key(f"{cache_key}:processing")
+        and cache.has_key(prev_cache_key)
+    ):
+        cache_key_found = prev_cache_key
+
+    if cache_key_found:
+        try:
+            data = cache.get(cache_key_found)
         except Exception:
             pass
         else:
             return HttpResponse(data, content_type="application/json")
 
     # else generate data and set that we are generating cache
-    if request.event:
-        event = request.event
-    else:
-        event = (
-            Event.objects.select_related("club")
-            .filter(aid=event_id, start_date__lt=now())
-            .first()
-        )
-    if not event:
-        res = {"error": "No event match this id"}
-        return Response(res)
-
-    t0 = request.start_time
-    use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
-    cache_interval = EVENT_CACHE_INTERVAL
-    cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
-    cache_prefix = "live" if event.is_live else "archived"
-    cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
-
     if use_cache:
         try:
             cache.set(f"{cache_key}:processing", 1, 15)
         except Exception:
             pass
+
     if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
         if (
             not request.user.is_authenticated
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
+
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
@@ -1167,21 +1121,19 @@ def event_data(request, event_id):
         "duration": (time.time() - t0),
         "timestamp": time.time(),
     }
+
     headers = {}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
+
     res = json.dumps(res)
+
     if use_cache:
         try:
             cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
-            etag = safe64encodedsha(res)
-            cache.set(
-                f"etag-{cache_key}", etag, 20 if event.is_live else 7 * 24 * 3600 + 60
-            )
         except Exception:
             pass
-        else:
-            headers["ETag"] = f'"{etag}"'
+
     return HttpResponse(res, headers=headers, content_type="application/json")
 
 
