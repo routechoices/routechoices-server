@@ -481,6 +481,8 @@ def event_detail_last_mod_func(request, event_id):
     if not event:
         return None
     max_mod_date = event.modification_date
+    if event.started:
+        max_mod_date = max(max_mod_date, event.start_date)
     if event.has_notice:
         max_mod_date = max(max_mod_date, event.notice.modification_date)
     if event.map:
