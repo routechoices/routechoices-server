@@ -1018,7 +1018,9 @@ def event_data(request, event_id):
         except Exception:
             pass
         else:
-            return HttpResponse(data, content_type="application/json")
+            return HttpResponse(
+                data, headers={"X-Cache-Hit": 1}, content_type="application/json"
+            )
 
     event = (
         Event.objects.select_related("club")
@@ -1053,7 +1055,9 @@ def event_data(request, event_id):
         except Exception:
             pass
         else:
-            return HttpResponse(data, content_type="application/json")
+            return HttpResponse(
+                data, headers={"X-Cache-Hit": 1}, content_type="application/json"
+            )
 
     # else generate data and set that we are generating cache
     if use_cache:

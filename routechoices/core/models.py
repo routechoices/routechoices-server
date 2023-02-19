@@ -572,8 +572,7 @@ class Map(models.Model):
             except Exception:
                 pass
             else:
-                if cached:
-                    return cached
+                return cached, 1
 
         if not self.intersects_with_tile(min_x, max_x, min_y, max_y):
             blank_cache_key = f"blank_tile_{output_width}_{output_height}_{img_mime}"
@@ -583,12 +582,12 @@ class Map(models.Model):
                 except Exception:
                     pass
                 else:
-                    if cached:
-                        try:
-                            cache.set(cache_key, cached, 3600 * 24 * 30)
-                        except Exception:
-                            pass
-                        return cached
+                    try:
+                        cache.set(cache_key, cached, 3600 * 24 * 30)
+                    except Exception:
+                        pass
+                    return cached, 2
+
             n_channels = 4 if img_mime != "image/jpeg" else 3
             transparent_img = np.zeros(
                 (output_height, output_width, n_channels), dtype=np.uint8
@@ -618,7 +617,7 @@ class Map(models.Model):
                     cache.set(blank_cache_key, data_out, 3600 * 24 * 30)
                 except Exception:
                     pass
-            return data_out
+            return data_out, 0
 
         img_alpha = None
         if use_cache:
@@ -715,7 +714,7 @@ class Map(models.Model):
                 cache.set(cache_key, data_out, 3600 * 24 * 30)
             except Exception:
                 pass
-        return data_out
+        return data_out, 0
 
     def intersects_with_tile(self, min_x, max_x, min_y, max_y):
         tile_bounds_poly = Polygon(

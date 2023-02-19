@@ -119,8 +119,7 @@ def serve_tile(request):
     get_params = {}
     for key in request.GET.keys():
         get_params[key.lower()] = request.GET[key]
-
-    data_out = request.raster_map.create_tile(
+    data_out, cache_hit = request.raster_map.create_tile(
         request.image_request["width"],
         request.image_request["height"],
         request.image_request["mime"],
@@ -129,7 +128,7 @@ def serve_tile(request):
         request.bound["min_y"],
         request.bound["max_y"],
     )
-    headers = None
+    headers = {"X-Cache-Hit": cache_hit}
     if request.event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
     return StreamingHttpRangeResponse(
