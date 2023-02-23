@@ -34,10 +34,14 @@ def set_content_disposition(filename):
 
 
 def safe32encode(b):
+    if isinstance(b, str):
+        b = b.encode("utf-8")
     return base64.b32encode(b).decode().rstrip("=").lower()
 
 
 def safe64encode(b):
+    if isinstance(b, str):
+        b = b.encode("utf-8")
     return base64.urlsafe_b64encode(b).decode().rstrip("=")
 
 

@@ -568,7 +568,7 @@ class MicTrackConnection:
             return
         if self.protocol_version == 1:
             logger.info(
-                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         else:
             logger.info(
@@ -697,7 +697,7 @@ class MicTrackConnection:
                 return False
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             data = data_raw.split("#")
             await self._process_data(data)
@@ -728,7 +728,7 @@ class MicTrackConnection:
                 data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             await self._process_data2(data)
         except Exception as e:
