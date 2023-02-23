@@ -132,15 +132,13 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<div class="text-center m-0 py-0 px-3 fst-italic" style="background-color: red;border-radius: 15px 15px 0 0;"><svg style="color: #fff;margin-top: -5px;margin-left: -10px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" preserveAspectRatio="xMidYMid meet" x="955"  stroke="#fff" width="20"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite"/><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite"/></circle></g></svg> ' +
+      '<div class="m-0 py-0 px-3 fst-italic" style="color: red;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("live-mode") +
-      '</div><div id="big-clock" class="text-center py-0 px-3" style="background-color: #fff;color: #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="py-0 px-3" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
       color: "#fff",
-      border: "1px solid black",
-      borderRadius: "16px",
       padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
@@ -148,15 +146,13 @@ L.Control.EventState = L.Control.extend({
   },
   setReplay() {
     this._div.innerHTML =
-      '<div class="text-center m-0 py-0 px-3" style="background-color: #666;border-radius: 15px 15px 0 0;">' +
+      '<div class="m-0 py-0 px-3" style="color: #666;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("replay-mode") +
-      '</div><div id="big-clock" class="text-center py-0 px-3" style="background-color: #fff;color: #000;border-radius: 0 0 15px 15px;"></div>';
+      '</div><div id="big-clock" class="py-0 px-3" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
       color: "#fff",
-      border: "1px solid black",
-      borderRadius: "16px",
       padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
@@ -323,13 +319,13 @@ function getContrastYIQ(hexcolor) {
   return yiq <= 168 ? "dark" : "light";
 }
 
-function getRunnerIcon(color, faded = false, focused = true) {
+function getRunnerIcon(color, faded = false, focused = false) {
   var iconSize = 16;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
   var isDark = getContrastYIQ(color) === "dark";
   var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
     isDark ? "white" : "black"
-  }" stroke-width="1px" cx="8" cy="8" r="6"/></svg>`;
+  }" stroke-width="${focused ? 3 : 1}px" cx="8" cy="8" r="6"/></svg>`;
   var runnerIcon = L.icon({
     iconUrl: encodeURI("data:image/svg+xml," + svgRect),
     iconSize: [iconSize, iconSize],
