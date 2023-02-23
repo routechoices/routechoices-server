@@ -183,7 +183,7 @@ class TMT250Connection:
             self.stream.close()
             return
         logger.info(
-            f"{time.time()}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
+            f"{arrow.now().datetime}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
         )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
@@ -213,7 +213,7 @@ class TMT250Connection:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
                 logger.info(
-                    f"{time.time()}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}"
+                    f"{arrow.now().datetime}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}"
                 )
                 await self._on_read_line(data[:data_len])
             except Exception as e:
@@ -271,7 +271,7 @@ class QueclinkConnection:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
             logger.info(
-                f"{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}"
+                f"{arrow.now().datetime}, GL300 DATA, {self.aid}, {self.address}, {data}"
             )
             print(f"Received data ({data})", flush=True)
             parts = data.split(",")
@@ -395,7 +395,9 @@ class QueclinkConnection:
     async def read_line(self):
         data_bin = await self.stream.read_until(b"$")
         data = data_bin.decode("ascii")
-        logger.info(f"{time.time()}, GL300 DATA, {self.aid}, {self.address}, {data}")
+        logger.info(
+            f"{arrow.now().datetime}, GL300 DATA, {self.aid}, {self.address}, {data}"
+        )
         print(f"Received data ({data})")
         await self.send_pending_commands()
         return await self.process_line(data)
@@ -568,11 +570,11 @@ class MicTrackConnection:
             return
         if self.protocol_version == 1:
             logger.info(
-                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         else:
             logger.info(
-                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {data_bin}"
+                f"{arrow.now().datetime}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
@@ -697,7 +699,7 @@ class MicTrackConnection:
                 return False
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{time.time()}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             data = data_raw.split("#")
             await self._process_data(data)
@@ -728,7 +730,7 @@ class MicTrackConnection:
                 data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{time.time()}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             await self._process_data2(data)
         except Exception as e:
@@ -789,7 +791,7 @@ class Command(BaseCommand):
             tracktape_server.listen(settings.TRACKTAPE_PORT)
         try:
             print("Start listening TCP data...", flush=True)
-            logger.info(f"{time.time()}, UP")
+            logger.info(f"{arrow.now().datetime}, UP")
             IOLoop.current().start()
         except (KeyboardInterrupt, SystemExit):
             tmt250_server.stop()
@@ -799,5 +801,5 @@ class Command(BaseCommand):
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)
-            logger.info(f"{time.time()}, DOWN")
+            logger.info(f"{arrow.now().datetime}, DOWN")
             logging.shutdown()
