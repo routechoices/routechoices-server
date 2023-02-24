@@ -1074,13 +1074,13 @@ function displayCompetitorList(force) {
     nbShown += competitor.isShown ? 1 : 0;
     var div = u('<div class="card-body px-2 py-1"/>');
     div.html(
-      '<div class="float-start color-tag me-2" style="cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
+      '<div class="float-start color-tag me-1" style="cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
-        <div><div class="text-nowrap overflow-hidden ps-0 text-truncate"><b>' +
+        <div><div class="text-nowrap overflow-hidden ps-1 text-truncate"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
+        <div class="text-nowrap text-truncate overflow-hidden ps-1 ' +
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
