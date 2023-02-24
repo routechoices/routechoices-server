@@ -1187,6 +1187,8 @@ function displayCompetitorList(force) {
           competitor.mapMarker = null;
           competitor.nameMarker = null;
           competitor.tail = null;
+          u(e.target).parent().parent().find(".speedometer").text("");
+          u(e.target).parent().parent().find(".odometer").text("");
           updateCompetitor(competitor);
           nbShown -= 1;
         } else {
