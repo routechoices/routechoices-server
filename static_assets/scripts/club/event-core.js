@@ -213,7 +213,7 @@ L.Control.Ranking = L.Control.extend({
     });
     ranking.forEach(function (c, i) {
       innerOut.append(
-        '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px; height: 1em;"><span class="text-nowrap d-inline-block float-start" style=width: 135px;">' +
+        '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px;"><span class="text-nowrap d-inline-block float-start overflow-hidden text-truncate" style="width: 135px;">' +
           (i + 1) +
           ' <span style="color: ' +
           c.competitor.color +
