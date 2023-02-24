@@ -276,7 +276,7 @@ L.Control.Grouping = L.Control.extend({
         "<h6>" + banana.i18n("group") + " " + alphabetizeNumber(i) + "</h6>";
       k.parts.forEach(function (ci) {
         out +=
-          '<div class="text-nowrap " style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
+          '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
           c[ci].color +
           '">⬤</span> ' +
           u("<span/>").text(c[ci].name).html() +
@@ -1077,10 +1077,10 @@ function displayCompetitorList(force) {
       '<div class="float-start color-tag me-2" style="cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
         '"></i></div>\
-        <div><div class="text-nowrap overflow-hidden ps-1 text-truncate"><b>' +
+        <div><div class="text-nowrap overflow-hidden ps-0 text-truncate"><b>' +
         u("<div/>").text(competitor.name).html() +
         '</b></div>\
-        <div class="text-nowrap text-truncate overflow-hidden ps-1 ' +
+        <div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
         (competitor.isShown ? "route-displayed" : "route-not-displayed") +
         '">' +
         // toggle on off
