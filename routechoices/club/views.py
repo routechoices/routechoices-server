@@ -361,10 +361,10 @@ def manifest(request):
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}manifest.json")
     return HttpResponse(
-        """{{
+        f"""{{
   "icons": [
-    {{ "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" }},
-    {{ "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }}
+    {{ "src": "/icon-192.png{club.logo_last_mod}", "type": "image/png", "sizes": "192x192" }},
+    {{ "src": "/icon-512.png{club.logo_last_mod}", "type": "image/png", "sizes": "512x512" }}
   ]
 }}""",
         content_type="application/json",
