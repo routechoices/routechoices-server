@@ -8,9 +8,9 @@
 {% load compress %}
 {% load define_action %}
 
-{% block favicon %}<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png">
-<link rel="icon" sizes="any" href="{{club.nice_url}}favicon.ico">
-{% if club %}<link rel="manifest" href="{{club.nice_url}}manifest.json">{% else %}<link rel="manifest" href="{% static 'manifest.json' %}?v=20230117">{% endif %}
+{% block favicon %}<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png{{club.logo_last_mod}}">
+<link rel="icon" sizes="any" href="{{club.nice_url}}favicon.ico{{club.logo_last_mod}}">
+{% if club %}<link rel="manifest" href="{{club.nice_url}}manifest.json{{club.logo_last_mod}}">{% else %}<link rel="manifest" href="{% static 'manifest.json' %}?v=20230117">{% endif %}
 {% endblock %}
 
 {% block head_title %}GPS Tracking of Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}

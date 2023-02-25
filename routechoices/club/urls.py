@@ -15,12 +15,11 @@ def set_club(request, club_slug):
 urlpatterns = [
     re_path(r"^$", views.club_view, name="club_view"),
     re_path(r"^logo/?$", views.club_logo, name="club_logo"),
-    re_path("favicon.ico", views.club_favicon, name="club_favicon"),
     re_path(
-        "apple-touch-icon.png", views.club_apple_icon, name="club_apple_touch_icon"
+        r"(?P<icon_name>favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png)",
+        views.club_favicon,
+        name="club_favicon",
     ),
-    path("icon-192.png", views.club_icon_192, name="club_logo_192"),
-    path("icon-512.png", views.club_icon_512, name="club_logo_512"),
     path("manifest.json", views.manifest, name="manifest"),
     path("robots.txt", views.robots_txt, name="robots.txt"),
     path(

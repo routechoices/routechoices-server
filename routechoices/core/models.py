@@ -255,6 +255,10 @@ Follow our events live or replay them later.
         )
         return f"https:{path}?v={int(self.modification_date.timestamp())}"
 
+    @property
+    def logo_last_mod(self):
+        return f"?v={int(self.modification_date.timestamp())}"
+
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Club.objects.filter(slug__iexact=self.slug)
