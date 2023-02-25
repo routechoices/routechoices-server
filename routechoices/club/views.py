@@ -408,7 +408,7 @@ def manifest(request):
     {{ "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }}
   ]
 }}""",
-        content_type="text/plain",
+        content_type="application/json",
     )
 
 
