@@ -84,6 +84,12 @@ def club_favicon(request, icon_name, **kwargs):
     bypass_resp = handle_legacy_request(
         "club_favicon", kwargs.get("club_slug"), kwargs={"icon_name": icon_name}
     )
+    table = {
+        "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
+        "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
+        "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
+        "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
+    }
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
@@ -95,12 +101,6 @@ def club_favicon(request, icon_name, **kwargs):
         with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
             data = fp.read()
     else:
-        table = {
-            "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
-            "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
-            "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
-            "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
-        }
         data = club.logo_scaled(
             table.get(icon_name)["size"], table.get(icon_name)["format"]
         )
