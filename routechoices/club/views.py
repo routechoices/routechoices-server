@@ -82,7 +82,7 @@ def club_logo(request, **kwargs):
 
 def club_favicon(request, icon_name, **kwargs):
     bypass_resp = handle_legacy_request(
-        "club_favicon", kwargs.get("club_slug"), kwargs={"icon_name": icon_name}
+        "club_favicon", kwargs.get("club_slug"), icon_name=icon_name
     )
     table = {
         "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
