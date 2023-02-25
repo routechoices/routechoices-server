@@ -236,6 +236,18 @@ Follow our events live or replay them later.
         )
         return f"{self.url_protocol}:{path}"
 
+    def logo_scaled(self, width, ext="PNG"):
+        logo = None
+        if not self.logo:
+            return None
+        with self.logo.open("rb") as fp:
+            logo_b = fp.read()
+        logo = Image.open(BytesIO(logo_b))
+        logo_s = logo.resize((width, width), Image.BILINEAR)
+        buffer = BytesIO()
+        logo_s.save(buffer, ext, quality=10)
+        return buffer.getvalue()
+
     @property
     def logo_url(self):
         path = reverse(

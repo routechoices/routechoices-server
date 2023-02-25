@@ -3,8 +3,7 @@
 {% load define_action %}
 
 {% block favicon %}{% if event.club %}{% define event.club as club %}{% endif %}
-{% if club.logo %}<link rel="icon" type="image/png" href="{{club.logo_url}}">{% else %}<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}?v=20220828">
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}?v=20220828">
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}?v=20220828">
-<link rel="mask-icon" href="{% static 'safari-pinned-tab.svg' %}?v=20220828" color="#5bbad5">
-<link rel="shortcut icon" href="{% static 'favicon.ico' %}?v=20220828">{% endif %}{% endblock %}
+<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png">
+<link rel="icon" sizes="any" href="{{club.nice_url}}favicon.ico">
+<link rel="manifest" href="{{club.nice_url}}manifest.json">
+{% endblock %}

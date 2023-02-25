@@ -20,6 +20,7 @@ from django_hosts.resolvers import reverse
 from routechoices.api.views import serve_from_s3
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event
+from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
@@ -66,7 +67,9 @@ def club_logo(request, **kwargs):
         return redirect(
             reverse("club_logo", host="clubs", host_kwargs={"club_slug": club_slug})
         )
-    club = get_object_or_404(Club, slug__iexact=club_slug, logo__isnull=False)
+    club = get_object_or_404(
+        Club.objects.exclude(logo=""), slug__iexact=club_slug, logo__isnull=False
+    )
     file_path = club.logo.name
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
@@ -75,6 +78,76 @@ def club_logo(request, **kwargs):
         filename=f"{club.name}.png",
         mime="image/png",
     )
+
+
+def club_favicon(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_favicon", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(Club, slug__iexact=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}favicon.ico")
+    logo = club.logo
+    if not logo:
+        with open(f"{settings.BASE_DIR}/static_assets/favicon.ico", "rb") as fp:
+            data = fp.read()
+    else:
+        data = club.logo_scaled(32, "ICO")
+    return StreamingHttpRangeResponse(request, data, content_type="image/x-icon")
+
+
+def club_apple_icon(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_favicon", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(Club, slug__iexact=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}favicon.ico")
+    logo = club.logo
+    if not logo:
+        with open(
+            f"{settings.BASE_DIR}/static_assets/apple-touch-icon.png", "rb"
+        ) as fp:
+            data = fp.read()
+    else:
+        data = club.logo_scaled(180)
+    return StreamingHttpRangeResponse(request, data, content_type="image/png")
+
+
+def club_icon_192(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_favicon", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(Club, slug__iexact=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}favicon.ico")
+    logo = club.logo
+    if not logo:
+        with open(f"{settings.BASE_DIR}/static_assets/icon-192.png", "rb") as fp:
+            data = fp.read()
+    else:
+        data = club.logo_scaled(192)
+    return StreamingHttpRangeResponse(request, data, content_type="image/png")
+
+
+def club_icon_512(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_favicon", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(Club, slug__iexact=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}favicon.ico")
+    logo = club.logo
+    if not logo:
+        with open(f"{settings.BASE_DIR}/static_assets/icon-512.png", "rb") as fp:
+            data = fp.read()
+    else:
+        data = club.logo_scaled(512)
+    return StreamingHttpRangeResponse(request, data, content_type="image/png")
 
 
 def club_live_event_feed(request, **kwargs):
@@ -320,6 +393,22 @@ def robots_txt(request):
         return redirect(f"{club.nice_url}robots.txt")
     return HttpResponse(
         f"Sitemap: {club.nice_url}sitemap.xml\n", content_type="text/plain"
+    )
+
+
+def manifest(request):
+    club_slug = request.club_slug
+    club = get_object_or_404(Club, slug=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}manifest.json")
+    return HttpResponse(
+        """{{
+  "icons": [
+    {{ "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" }},
+    {{ "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }}
+  ]
+}}""",
+        content_type="text/plain",
     )
 
 
