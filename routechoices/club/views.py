@@ -84,29 +84,25 @@ def club_favicon(request, icon_name, **kwargs):
     bypass_resp = handle_legacy_request(
         "club_favicon", kwargs.get("club_slug"), icon_name=icon_name
     )
-    table = {
-        "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
-        "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
-        "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
-        "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
-    }
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug__iexact=club_slug)
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}{icon_name}")
+    icon_info = {
+        "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
+        "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
+        "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
+        "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
+    }.get(icon_name)
     logo = club.logo
     if not logo:
         with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
             data = fp.read()
     else:
-        data = club.logo_scaled(
-            table.get(icon_name)["size"], table.get(icon_name)["format"]
-        )
-    return StreamingHttpRangeResponse(
-        request, data, content_type=table.get(icon_name)["mime"]
-    )
+        data = club.logo_scaled(icon_info["size"], icon_info["format"])
+    return StreamingHttpRangeResponse(request, data, content_type=icon_info["mime"])
 
 
 def club_live_event_feed(request, **kwargs):
