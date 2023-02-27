@@ -271,3 +271,7 @@
 .leaflet-control-layers-base > label > span {
   cursor: pointer;
 }
+
+.competitor-switch {
+  cursor: pointer;
+}
