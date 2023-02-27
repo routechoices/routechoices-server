@@ -764,20 +764,14 @@
                 .rotate(-this._bearing);
         },
 
-        /**
-         * Overrides leaflet function to return float values instead of
-         * rounded ones
-         *
-         * @param {L.LatLon}
-         * @returns {L.Point}
-         */
-        latLngToLayerPoint(latlng) {
-            if (!this._rotate && mapProto.latLngToLayerPoint) {
-                return mapProto.latLngToLayerPoint.apply(this, arguments);
-            }
-            const projectedPoint = this.project(L.latLng(latlng));
-            return projectedPoint._subtract(this.getPixelOrigin());
-        },
+        // latLngToLayerPoint: function (latlng) {
+        //     var projectedPoint = this.project(L.latLng(latlng))._round();
+        //     return projectedPoint._subtract(this.getPixelOrigin());
+        // },
+
+        // latLngToContainerPoint: function (latlng) {
+    	// 	return this.layerPointToContainerPoint(this.latLngToLayerPoint(toLatLng(latlng)));
+    	// },
 
         /**
          * Given latlng bounds, returns the bounds in projected pixel
@@ -794,10 +788,19 @@
             if (!this._rotate && mapProto.mapBoundsToContainerBounds) {
                 return mapProto.mapBoundsToContainerBounds.apply(this, arguments);
             }
-            const nw = this.latLngToContainerPoint(bounds.getNorthWest()),
-                ne = this.latLngToContainerPoint(bounds.getNorthEast()),
-                sw = this.latLngToContainerPoint(bounds.getSouthWest()),
-                se = this.latLngToContainerPoint(bounds.getSouthEast());
+
+            // const nw = this.latLngToContainerPoint(bounds.getNorthWest()),
+            //       ne = this.latLngToContainerPoint(bounds.getNorthEast()),
+            //       sw = this.latLngToContainerPoint(bounds.getSouthWest()),
+            //       se = this.latLngToContainerPoint(bounds.getSouthEast());
+
+            // same as `this.latLngToContainerPoint(latlng)` but with floating point precision
+            const origin = this.getPixelOrigin();
+            const nw = this.layerPointToContainerPoint(this.project(bounds.getNorthWest())._subtract(origin)),
+                  ne = this.layerPointToContainerPoint(this.project(bounds.getNorthEast())._subtract(origin)),
+                  sw = this.layerPointToContainerPoint(this.project(bounds.getSouthWest())._subtract(origin)),
+                  se = this.layerPointToContainerPoint(this.project(bounds.getSouthEast())._subtract(origin));
+
             return L.bounds([
                 L.point(Math.min(nw.x, ne.x, se.x, sw.x), Math.min(nw.y, ne.y, se.y, sw.y)), // [ minX, minY ]
                 L.point(Math.max(nw.x, ne.x, se.x, sw.x), Math.max(nw.y, ne.y, se.y, sw.y))  // [ maxX, maxY ]
