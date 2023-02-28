@@ -249,15 +249,15 @@ Follow our events live or replay them later.
         return buffer.getvalue()
 
     @property
+    def logo_last_mod(self):
+        return f"?v={int(self.modification_date.timestamp())}"
+
+    @property
     def logo_url(self):
         path = reverse(
             "club_logo", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
         )
-        return f"https:{path}?v={int(self.modification_date.timestamp())}"
-
-    @property
-    def logo_last_mod(self):
-        return f"?v={int(self.modification_date.timestamp())}"
+        return f"https:{path}{self.logo_last_mod}"
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
