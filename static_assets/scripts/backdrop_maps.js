@@ -47,6 +47,14 @@ var backdropMaps = {
     attribution: "&copy; MapAnt.no",
     className: "wms256",
   }),
+  "topo-fr": L.tileLayer(
+    "https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&tilematrix={z}&tilecol={x}&tilerow={y}",
+    {
+      attribution:
+        '<a href="https://www.ign.fr/" target="_blank">&copy; IGN France</a>',
+      className: "wms256",
+    }
+  ),
   "mapant-es": L.tileLayer.wms("https://mapant.es/wms", {
     layers: "mapant.es",
     format: "image/png",
@@ -162,6 +170,7 @@ function getBaseLayers() {
     "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
     "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
     "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
+    "Topo France": cloneLayer(backdropMaps["topo-fr"]),
     "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
     "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
     "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),

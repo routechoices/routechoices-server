@@ -892,6 +892,7 @@ MAP_MAPANT_FI = "mapant-fi"
 MAP_MAPANT_NO = "mapant-no"
 MAP_MAPANT_ES = "mapant-es"
 MAP_TOPO_FI = "topo-fi"
+MAP_TOPO_FR = "topo-fr"
 MAP_TOPO_NO = "topo-no"
 MAP_TOPO_WRLD = "topo-world"
 MAP_TOPO_WRLD_ALT = "topo-world-alt"
@@ -906,6 +907,7 @@ MAP_CHOICES = (
     (MAP_MAPANT_NO, "Mapant Norway"),
     (MAP_MAPANT_ES, "Mapant Spain"),
     (MAP_TOPO_FI, "Topo Finland"),
+    (MAP_TOPO_FR, "Topo France"),
     (MAP_TOPO_NO, "Topo Norway"),
     (MAP_TOPO_WRLD, "Topo World (OpenTopo)"),
     (MAP_TOPO_WRLD_ALT, "Topo World (ArcGIS)"),
