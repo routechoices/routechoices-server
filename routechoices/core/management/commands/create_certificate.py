@@ -13,7 +13,7 @@ from routechoices.lib.helpers import check_cname_record
 from routechoices.lib.ssl_certificates import ClubAcmeProvider, write_account_ssl_key
 
 
-def write_nginf_conf(domain):
+def write_nginx_conf(domain):
     conf_file = render_to_string(
         "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
     )
@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
             )
             write_account_ssl_key(domain, acct_key)
-            write_nginf_conf(domain)
+            write_nginx_conf(domain)
             nginx_need_restart = True
         if nginx_need_restart:
             print("Reload nginx for changes to take effect...")
