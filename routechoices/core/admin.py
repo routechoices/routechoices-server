@@ -399,6 +399,7 @@ class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + (
         "date_joined",
         "has_verified_email",
+        "clubs",
     )
     actions = [
         "clean_fake_users",
@@ -416,6 +417,9 @@ class MyUserAdmin(UserAdmin):
             ).exists()
             if not has_verified_email:
                 obj.delete()
+
+    def clubs(self, obj):
+        return ", ".join(Club.objects.filter(admins=obj).values_list("name", flat=True))
 
 
 UserModel = get_user_model()
