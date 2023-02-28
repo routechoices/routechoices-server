@@ -1031,6 +1031,10 @@ function toggleFocusCompetitor(c) {
         comp.mapMarker.remove();
         comp.mapMarker = null;
       }
+      if (comp.tail) {
+        comp.tail.remove();
+        comp.tail = null;
+      }
     }
   });
   if (wasFocused) {
@@ -1051,6 +1055,10 @@ function toggleFocusCompetitor(c) {
   if (c.mapMarker) {
     c.mapMarker.remove();
     c.mapMarker = null;
+  }
+  if (c.tail) {
+    c.tail.remove();
+    c.tail = null;
   }
 }
 
@@ -2002,6 +2010,7 @@ function drawCompetitors() {
             opacity: 0.75,
             weight: 5,
             smoothFactor: smoothFactor,
+            className: competitor.focused ? "icon-focused" : "",
           }).addTo(map);
         } else {
           competitor.tail.setLatLngs(tailLatLng);
