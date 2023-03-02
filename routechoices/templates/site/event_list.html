@@ -9,7 +9,7 @@
 {% load define_action %}
 
 {% block favicon %}<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png{{club.logo_last_mod}}">
-<link rel="icon" sizes="any" href="{{club.nice_url}}favicon.ico{{club.logo_last_mod}}">
+<link rel="icon" sizes="32x32" href="{{club.nice_url}}favicon.ico{{club.logo_last_mod}}">
 {% if club %}<link rel="manifest" href="{{club.nice_url}}manifest.json{{club.logo_last_mod}}">{% else %}<link rel="manifest" href="{% static 'manifest.json' %}?v=20230117">{% endif %}
 {% endblock %}
 
