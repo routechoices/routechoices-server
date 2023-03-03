@@ -1327,6 +1327,7 @@ def event_route_upload_view(request, event_id):
                     aid=f"{short_random_key()}_GPX", is_gpx=True
                 )
                 start_time = None
+                end_time = None
                 points = []
                 for track in gpx.tracks:
                     for segment in track.segments:
@@ -1341,16 +1342,22 @@ def event_route_upload_view(request, event_id):
                                 )
                                 if not start_time:
                                     start_time = point.time
-                device.add_locations(points, push_forward=False)
-                competitor = form.cleaned_data["competitor"]
-                competitor.device = device
-                if start_time and event.start_date <= start_time <= event.end_date:
-                    competitor.start_time = start_time
-                competitor.save()
+                                end_time = point.time
+                if len(points) == 0:
+                    error = "File does not contain valid points"
+                else:
+                    device.add_locations(points, push_forward=False)
+                    competitor = form.cleaned_data["competitor"]
+                    competitor.device = device
+                    if start_time and event.start_date <= start_time <= event.end_date:
+                        competitor.start_time = start_time
+                    competitor.save()
             if error:
                 messages.error(request, error)
             else:
                 messages.success(request, "The upload of the GPX file was successful")
+                if start_time < event.start_date or end_time > event.end_date:
+                    messages.warning(request, "Some points were outside of the event schedule...")
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
 
     else:
