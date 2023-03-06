@@ -1357,7 +1357,9 @@ def event_route_upload_view(request, event_id):
             else:
                 messages.success(request, "The upload of the GPX file was successful")
                 if start_time < event.start_date or end_time > event.end_date:
-                    messages.warning(request, "Some points were outside of the event schedule...")
+                    messages.warning(
+                        request, "Some points were outside of the event schedule..."
+                    )
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
 
     else:
