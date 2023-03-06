@@ -419,7 +419,8 @@ class QueclinkConnection:
 
 class TrackTapeConnection:
     def __init__(self, stream, address):
-        print(f"received a new connection from {address} on port 2004")
+        print(f"received a new connection from {address} on port 2003")
+        self.aid = random_key()
         self.imei = None
         self.address = address
         self.stream = stream
@@ -473,6 +474,9 @@ class TrackTapeConnection:
             return False
         locs = data.get("positions", [])
         loc_array = []
+        logger.info(
+            f"{arrow.now().datetime}, TRCKTP DATA, {self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
+        )
         for loc in locs:
             try:
                 tim = arrow.get(loc.get("timestamp")).int_timestamp
