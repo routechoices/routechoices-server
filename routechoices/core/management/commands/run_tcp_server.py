@@ -474,7 +474,13 @@ class TrackTapeConnection:
         imei = data.get("id")
         if imei != self.imei:
             return False
-        locs = data.get("locations", [])
+        try:
+            battery_level = int(data.get("batteryLevel"))
+        except Exception:
+            pass
+        else:
+            self.db_device.battery_level = battery_level
+        locs = data.get("positions", [])
         loc_array = []
         logger.info(
             f"{arrow.now().datetime}, TRCKTP DATA, {self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
