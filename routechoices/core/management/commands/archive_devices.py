@@ -8,7 +8,10 @@ from routechoices.lib.helpers import short_random_key
 
 
 class Command(BaseCommand):
-    help = "Archives a device if it contains more than 1 days worth of locations before last start"
+    help = (
+        "Archives a device if it contains more than 1 days worth of locations"
+        " before last start"
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("--force", action="store_true", default=False)

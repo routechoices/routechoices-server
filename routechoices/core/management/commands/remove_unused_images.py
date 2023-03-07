@@ -51,10 +51,12 @@ class Command(BaseCommand):
         if force:
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Successfully removed {self.n_image_removed} files, keeping {self.n_image_keeped}"
+                    f"Successfully removed {self.n_image_removed} files, "
+                    "keeping {self.n_image_keeped}"
                 )
             )
         else:
             self.stdout.write(
-                f"Would remove {self.n_image_removed} files, keeping {self.n_image_keeped}"
+                f"Would remove {self.n_image_removed} files, "
+                f"keeping {self.n_image_keeped}"
             )

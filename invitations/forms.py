@@ -32,11 +32,13 @@ class CleanEmailMixin:
             club = Club.objects.filter(id=self.data.get("club")).first()
 
         errors = {
-            "already_invited": _(
-                "An invite to manage this club with this email address has already been sent to this email address."
+            "already_invited": (
+                "An invite to manage this club with this email address "
+                "has already been sent to this email address."
             ),
-            "already_admin": _(
-                "The email address is already associated with an account that is managing this club"
+            "already_admin": (
+                "The email address is already associated with an account "
+                "that is managing this club"
             ),
         }
         try:

@@ -15,7 +15,11 @@ class Migration(migrations.Migration):
             name="send_interval",
             field=models.PositiveIntegerField(
                 default=5,
-                help_text="If you use dedicated trackers, enter here the sending interval you set your devices to, if you use the official smartphone app leave the value at 5 seconds",
+                help_text=(
+                    "If you use dedicated trackers, enter here the sending "
+                    "interval you set your devices to, if you use the official "
+                    "smartphone app leave the value at 5 seconds"
+                ),
                 validators=[django.core.validators.MinValueValidator(1)],
                 verbose_name="Send interval (seconds)",
             ),

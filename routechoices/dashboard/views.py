@@ -675,15 +675,7 @@ def map_kmz_upload_view(request):
                             "https://"
                         ):
                             with tempfile.TemporaryFile() as dest:
-                                headers = requests.utils.default_headers()
-                                headers.update(
-                                    {
-                                        "User-Agent": "Python3/Requests/Routechoices.com",
-                                    }
-                                )
-                                r = requests.get(
-                                    image_path, headers=headers, timeout=10
-                                )
+                                r = requests.get(image_path, timeout=10)
                                 if r.status_code != 200:
                                     raise Exception("Could not reach image source")
                                 dest.write(r.content)
@@ -723,7 +715,10 @@ def map_kmz_upload_view(request):
                         new_map.save()
                 messages.success(
                     request,
-                    f"The import of the map{'s' if len(new_maps) > 1 else ''} was successful",
+                    (
+                        f"The import of the map{'s' if len(new_maps) > 1 else ''}"
+                        " was successful"
+                    ),
                 )
                 return redirect("dashboard:map_list_view")
             else:
@@ -1272,7 +1267,11 @@ def dashboard_map_download(request, map_id, *args, **kwargs):
         settings.AWS_S3_BUCKET,
         request,
         file_path,
-        filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
+        filename=(
+            f"{raster_map.name}_"
+            f"{raster_map.corners_coordinates_short.replace(',', '_')}_."
+            f"{mime_type[6:]}"
+        ),
         mime=mime_type,
     )
 
@@ -1357,7 +1356,9 @@ def event_route_upload_view(request, event_id):
             else:
                 messages.success(request, "The upload of the GPX file was successful")
                 if start_time < event.start_date or end_time > event.end_date:
-                    messages.warning(request, "Some points were outside of the event schedule...")
+                    messages.warning(
+                        request, "Some points were outside of the event schedule..."
+                    )
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
 
     else:

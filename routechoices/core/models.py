@@ -156,7 +156,10 @@ class Club(models.Model):
 Follow our events live or replay them later.
 
 *This website is powered by Routechoices.com*""",
-        help_text="This text will be displayed on the club site frontpage, use markdown formatting",
+        help_text=(
+            "This text will be displayed on the club site frontpage, "
+            "use markdown formatting"
+        ),
     )
     domain = models.CharField(
         max_length=128,
@@ -567,7 +570,12 @@ class Map(models.Model):
     def tile_cache_key(
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
     ):
-        return f"tiles_{self.aid}_{self.hash}_{output_width}_{output_height}_{min_lon}_{max_lon}_{min_lat}_{max_lat}_{img_mime}"
+        return (
+            f"tiles_{self.aid}_{self.hash}_"
+            f"{output_width}_{output_height}_"
+            f"{min_lon}_{max_lon}_{min_lat}_{max_lat}_"
+            f"{img_mime}"
+        )
 
     def create_tile(
         self,
@@ -843,7 +851,12 @@ class Map(models.Model):
             {"x": bl_xy["x"] - offset * scale, "y": bl_xy["y"] - offset * scale}
         )
 
-        new_map.corners_coordinates = f"{tl_latlon['lat']},{tl_latlon['lon']},{tr_latlon['lat']},{tr_latlon['lon']},{br_latlon['lat']},{br_latlon['lon']},{bl_latlon['lat']},{bl_latlon['lon']}"
+        new_map.corners_coordinates = (
+            f"{tl_latlon['lat']},{tl_latlon['lon']},"
+            f"{tr_latlon['lat']},{tr_latlon['lon']},"
+            f"{br_latlon['lat']},{br_latlon['lon']},"
+            f"{bl_latlon['lat']},{bl_latlon['lon']}"
+        )
         im = Image.new(
             "RGBA",
             (int(width / scale) * res_scale, int(height / scale) * res_scale),
@@ -981,7 +994,11 @@ class Event(models.Model):
         max_length=8,
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
-        help_text="Public: Listed on the front page | Secret: Can be opened with a link, however not listed on frontpage | Private: Only a logged in admin of the club can access the page",
+        help_text=(
+            "Public: Listed on the front page | "
+            "Secret: Can be opened with a link, however not listed on frontpage | "
+            "Private: Only a logged in admin of the club can access the page"
+        ),
     )
     backdrop_map = BackroundMapChoicesField()
     map = models.ForeignKey(
@@ -1014,13 +1031,20 @@ class Event(models.Model):
     send_interval = models.PositiveIntegerField(
         "Send interval (seconds)",
         default=5,
-        help_text="If using dedicated trackers, enter here the sending interval set for the devices to, if using the official smartphone app leave the value at 5 seconds",
+        help_text=(
+            "If using dedicated trackers, enter here the sending "
+            "interval set for the devices to, if using the "
+            "official smartphone app leave the value at 5 seconds"
+        ),
         validators=[MinValueValidator(1)],
     )
     tail_length = models.PositiveIntegerField(
         "Tail length (seconds)",
         default=60,
-        help_text="Default tail length when a user open the event. Can be overriden by the viewers in the event page settings tab.",
+        help_text=(
+            "Default tail length when a user open the event. "
+            "Can be overriden by the viewers in the event page settings tab."
+        ),
     )
     event_set = models.ForeignKey(
         EventSet,
@@ -1033,7 +1057,11 @@ class Event(models.Model):
     emergency_contact = models.EmailField(
         null=True,
         blank=True,
-        help_text="Email address of a person available to respond in the case a competitor carrying a GPS tracker with SOS feature enabled triggers the SOS button.",
+        help_text=(
+            "Email address of a person available to respond "
+            "in the case a competitor carrying a GPS tracker "
+            "with SOS feature enabled triggers the SOS button."
+        ),
     )
 
     class Meta:
@@ -1448,12 +1476,16 @@ class Device(models.Model):
             device = self
 
         owner = None
-        # Use this instead of .filter(club=club).first() as club_ownership are already loaded, hence avoiding n+1 query
+        # Use this instead of .filter(club=club).first()
+        # as club_ownership are already loaded avoiding n+1 query
         for ownership in device.club_ownerships.all():
             if ownership.club_id == club.id:
                 owner = ownership
                 break
-        return f"{device.aid} {f' ({owner.nickname})' if owner and owner.nickname else ''}{'*' if original_device else ''}"
+        return (
+            f"{device.aid} {f'({owner.nickname})' if owner and owner.nickname else ''}"
+            f"{'*' if original_device else ''}"
+        )
 
     def get_nickname(self, club):
         original_device = self.get_original_device()
@@ -1462,7 +1494,8 @@ class Device(models.Model):
         else:
             device = self
         owner = None
-        # Use this instead of .filter(club=club).first() as club_ownership are already loaded, hence avoiding n+1 query
+        # Use this instead of .filter(club=club).first()
+        # as club_ownership are already loaded avoiding n+1 query
         for ownership in device.club_ownerships.all():
             if ownership.club_id == club.id:
                 owner = ownership
@@ -1746,10 +1779,15 @@ class Device(models.Model):
 
         if to_emails:
             msg = EmailMessage(
-                f"Routechoices.com - SOS from competitor {competitor.name} in event {event.name} [{now().isoformat()}]",
-                f"""Competitor {competitor.name} has triggered the SOS button of his GPS tracker during event {event.name}
-
-His latest known location is latitude, longitude: {lat}, {lon}""",
+                (
+                    f"Routechoices.com - SOS from competitor {competitor.name}"
+                    f" in event {event.name} [{now().isoformat()}]"
+                ),
+                (
+                    f"Competitor {competitor.name} has triggered the SOS button"
+                    f" of his GPS tracker during event {event.name}\r\n\r\n"
+                    f"His latest known location is latitude, longitude: {lat}, {lon}"
+                ),
                 settings.DEFAULT_FROM_EMAIL,
                 list(to_emails),
             )

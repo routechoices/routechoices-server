@@ -116,7 +116,8 @@ class ImeiApiTestCase(EssentialApiBase):
         self.assertEqual(len(new_dev_id), 8)
         self.assertNotEqual(new_dev_id, self.get_device_id())
 
-        # test device with alpha character dont get new id if assigned a competitor in future
+        # test device with alpha character dont get new id if assigned
+        # a competitor in future
         club = Club.objects.create(name="Test club", slug="club")
         event = Event.objects.create(
             club=club,
@@ -230,11 +231,18 @@ class MapApiTestCase(EssentialApiBase):
         raster_map = Map.objects.create(
             club=club,
             name="Test map",
-            corners_coordinates="61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18156",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
             width=1,
             height=1,
         )
-        raster_map.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
         raster_map.save()
         event = Event.objects.create(
             club=club,
@@ -244,15 +252,26 @@ class MapApiTestCase(EssentialApiBase):
             end_date=arrow.get().shift(hours=1).datetime,
             map=raster_map,
         )
+        query_espg = "srs=EPSG%3A3857&"
+        query_bbox = "bbox=2690583,8727274,2693029,8729720"
+        query_size = "width=512&height=512&"
+        query_junk = "styles=&transparent=false&version=1.1.1&"
+        def_query = f"{query_junk}{query_espg}{query_size}{query_bbox}"
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         # requesting 2nd non existing map of event
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&"
+                f"format=image%2Fjpeg&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -260,17 +279,27 @@ class MapApiTestCase(EssentialApiBase):
         raster_map2 = Map.objects.create(
             club=club,
             name="Test map",
-            corners_coordinates="61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18156",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
             width=1,
             height=1,
         )
-        raster_map2.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map2.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
         raster_map2.save()
         MapAssignation.objects.create(event=event, map=raster_map2, title="Other route")
 
         # requesting 2nd existing map of event
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&"
+                f"format=image%2Fjpeg&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -278,7 +307,10 @@ class MapApiTestCase(EssentialApiBase):
 
         # serve avif if accepted
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
             HTTP_ACCEPT="image/avif",
         )
@@ -287,14 +319,20 @@ class MapApiTestCase(EssentialApiBase):
 
         # requesting 3rd non existing map of event
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&"
+                f"format=image%2Fjpeg&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # serve png if asked
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fpng&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fpng&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -302,7 +340,10 @@ class MapApiTestCase(EssentialApiBase):
 
         # serve webp if asked
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fwebp&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fwebp&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -310,7 +351,10 @@ class MapApiTestCase(EssentialApiBase):
 
         # serve avif if asked
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Favif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Favif&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -318,7 +362,10 @@ class MapApiTestCase(EssentialApiBase):
 
         # return error if gif is asked
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&styles=&format=image%2Fgif&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox=2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341",
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fgif&{def_query}"
+            ),
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -329,11 +376,18 @@ class MapApiTestCase(EssentialApiBase):
         raster_map = Map.objects.create(
             club=club,
             name="Test map",
-            corners_coordinates="61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18156",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
             width=1,
             height=1,
         )
-        raster_map.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
         raster_map.save()
         event = Event.objects.create(
             club=club,
@@ -342,6 +396,11 @@ class MapApiTestCase(EssentialApiBase):
             start_date=arrow.get().shift(minutes=-1).datetime,
             end_date=arrow.get().shift(hours=1).datetime,
             map=raster_map,
+        )
+        base_url = (
+            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&"
+            "format=image%2Fjpeg&transparent=false&version=1.1.1&"
+            "width=512&height=512&srs=EPSG%3A3857"
         )
         intersecting_bbox = (
             "2690583.395638204,8727274.141488286,2693029.3805433298,8729720.12639341"
@@ -354,13 +413,13 @@ class MapApiTestCase(EssentialApiBase):
         )
         # tile that intersect, first query should not hit cache
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={intersecting_bbox}",
+            f"{base_url}&bbox={intersecting_bbox}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "0")
         # same tile, 2nd query should hit cache
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={intersecting_bbox}",
+            f"{base_url}&bbox={intersecting_bbox}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "1")
@@ -370,25 +429,25 @@ class MapApiTestCase(EssentialApiBase):
         )
         raster_map.save()
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={intersecting_bbox}",
+            f"{base_url}&bbox={intersecting_bbox}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "0")
         # tile that dont intersect, first query should not hit cache
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={non_intersecting_bbox}",
+            f"{base_url}&bbox={non_intersecting_bbox}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "0")
         # same tile, 2nd query should hit cache
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={non_intersecting_bbox}",
+            f"{base_url}&bbox={non_intersecting_bbox}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "1")
         # another tile that dont intersect, should hit cache of blank tiles
         res = self.client.get(
-            f"{url}?service=WMS&request=GetMap&layers={event.aid}&styles=&format=image%2Fjpeg&transparent=false&version=1.1.1&width=512&height=512&srs=EPSG%3A3857&bbox={non_intersecting_bbox_2}",
+            f"{base_url}&bbox={non_intersecting_bbox_2}",
             SERVER_NAME="wms.routechoices.dev",
         )
         self.assertEqual(res.headers["X-Cache-Hit"], "2")

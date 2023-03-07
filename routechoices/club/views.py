@@ -139,7 +139,8 @@ def event_view(request, slug, **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         return render(request, "club/404_event.html", {"club": club}, status=404)
-    # If event is private, page needs to send ajax with cookies to prove identity, cannot be done from custom domain
+    # If event is private, page needs to send ajax with cookies to prove identity,
+    # cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
             return redirect(
@@ -187,7 +188,8 @@ def event_export_view(request, slug, **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         return render(request, "club/404_event.html", {"club": club}, status=404)
-    # If event is private, page needs to be sent with cookies to prove identity, cannot be done from custom domain
+    # If event is private, page needs to be sent with cookies to prove identity,
+    # cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
         if request.use_cname:
             return redirect(
@@ -357,12 +359,14 @@ def manifest(request):
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}manifest.json")
     return HttpResponse(
-        f"""{{
-  "icons": [
-    {{ "src": "/icon-192.png{club.logo_last_mod}", "type": "image/png", "sizes": "192x192" }},
-    {{ "src": "/icon-512.png{club.logo_last_mod}", "type": "image/png", "sizes": "512x512" }}
-  ]
-}}""",
+        (
+            '{"icons": ['
+            f'{{"src":"/icon-192.png{club.logo_last_mod}",'
+            '"type":"image/png","sizes":"192x192"},'
+            f'{{"src":"/icon-512.png{club.logo_last_mod}",'
+            '"type":"image/png","sizes":"512x512"}'
+            "]}"
+        ),
         content_type="application/json",
     )
 

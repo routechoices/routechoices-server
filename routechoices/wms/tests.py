@@ -21,7 +21,11 @@ class MapApiTestCase(EssentialApiBase):
             width=1,
             height=1,
         )
-        raster_map.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXN"
+            "SR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
         raster_map.save()
         event = Event.objects.create(
             club=club,
@@ -50,7 +54,11 @@ class MapApiTestCase(EssentialApiBase):
             width=1,
             height=1,
         )
-        raster_map2.data_uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        raster_map2.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXN"
+            "SR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
         raster_map2.save()
         MapAssignation.objects.create(event=event, map=raster_map2, title="Other route")
 

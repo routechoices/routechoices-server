@@ -15,8 +15,14 @@ class Migration(migrations.Migration):
             name="description",
             field=models.TextField(
                 blank=True,
-                default="# GPS tracking powered by routechoices.com\n\nBrowse our events here.",
-                help_text="This text will be displayed on the club site frontpage, use markdown formatting",
+                default=(
+                    "# GPS tracking powered by routechoices.com\n\n"
+                    "Browse our events here."
+                ),
+                help_text=(
+                    "This text will be displayed on the club site frontpage, "
+                    "use markdown formatting"
+                ),
             ),
         ),
         migrations.AlterField(
@@ -34,7 +40,11 @@ class Migration(migrations.Migration):
             name="send_interval",
             field=models.PositiveIntegerField(
                 default=5,
-                help_text="If using dedicated trackers, enter here the sending interval set for the devices to, if using the official smartphone app leave the value at 5 seconds",
+                help_text=(
+                    "If using dedicated trackers, enter here the sending interval "
+                    "set for the devices to, if using the official smartphone app "
+                    "leave the value at 5 seconds"
+                ),
                 validators=[django.core.validators.MinValueValidator(1)],
                 verbose_name="Send interval (seconds)",
             ),

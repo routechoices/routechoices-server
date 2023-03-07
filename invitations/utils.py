@@ -48,5 +48,6 @@ def get_invitation_model():
         raise ImproperlyConfigured("path must be of the form 'app_label.model_name'")
     except LookupError:
         raise ImproperlyConfigured(
-            f"path refers to model '{app_settings.INVITATION_MODEL}' that has not been installed"
+            f"path refers to model '{app_settings.INVITATION_MODEL}' that has not "
+            "been installed"
         )

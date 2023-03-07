@@ -185,7 +185,12 @@ def import_map_from_otracker(club, map_data, name):
     if r.status_code != 200:
         raise MapImportError("API returned error code")
     map_file = ContentFile(r.content)
-    coordinates = f"{map_data['options']['tl']['lat']},{map_data['options']['tl']['lon']},{map_data['options']['tr']['lat']},{map_data['options']['tr']['lon']},{map_data['options']['br']['lat']},{map_data['options']['br']['lon']},{map_data['options']['bl']['lat']},{map_data['options']['bl']['lon']}"
+    coordinates = (
+        f"{map_data['options']['tl']['lat']},{map_data['options']['tl']['lon']},"
+        f"{map_data['options']['tr']['lat']},{map_data['options']['tr']['lon']},"
+        f"{map_data['options']['br']['lat']},{map_data['options']['br']['lon']},"
+        f"{map_data['options']['bl']['lat']},{map_data['options']['bl']['lon']}"
+    )
     map_model, created = Map.objects.get_or_create(
         name=name,
         club=club,
@@ -328,7 +333,10 @@ def import_single_event_from_gps_seuranta(event_id):
 
     for c_raw in event_data["COMPETITOR"]:
         c_data = c_raw.strip().split("|")
-        start_time_raw = f"{c_data[1]}{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        start_time_raw = (
+            f"{c_data[1]}"
+            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        )
         if len(start_time_raw) == 12:
             start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
         else:
@@ -920,7 +928,11 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
     participant_data = [d for d in data["participants"] if d.get("routeData")]
     time_offset = 22089888e5
     relay_name = "-".join(map(str, relay_legs))
-    event_name = f"{event_data['class']['event']['name']} - {event_data['class']['name']}{(' ' + relay_name) if relay_legs else ''}"
+    event_name = (
+        f"{event_data['class']['event']['name']} - "
+        f"{event_data['class']['name']}"
+        f"{(' ' + relay_name) if relay_legs else ''}"
+    )
     event_start = arrow.get(
         event_data["class"]["event"]["timeInterval"]["start"]
     ).datetime

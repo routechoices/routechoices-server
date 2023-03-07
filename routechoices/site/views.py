@@ -24,7 +24,10 @@ def contact(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             from_email = EmailAddress.objects.get_primary(request.user)
-            subject = f'Routechoices.com contact form - {form.cleaned_data["subject"]} [{from_email}]'
+            subject = (
+                "Routechoices.com contact form - "
+                f'{form.cleaned_data["subject"]} [{from_email}]'
+            )
             message = form.cleaned_data["message"]
             msg = EmailMessage(
                 subject,

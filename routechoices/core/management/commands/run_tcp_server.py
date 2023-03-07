@@ -183,7 +183,8 @@ class TMT250Connection:
             self.stream.close()
             return
         logger.info(
-            f"{arrow.now().datetime}, TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
+            f"{arrow.now().datetime}, TMT250 CONN, "
+            f"{self.aid}, {self.address}: {safe64encode(bytes(data))}"
         )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
@@ -213,7 +214,9 @@ class TMT250Connection:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
                 logger.info(
-                    f"{arrow.now().datetime}, TMT250 DATA, {self.aid}, {self.address}: {safe64encode(bytes(data[:data_len]))}"
+                    f"{arrow.now().datetime}, TMT250 DATA, "
+                    f"{self.aid}, {self.address}: "
+                    f"{safe64encode(bytes(data[:data_len]))}"
                 )
                 await self._on_read_line(data[:data_len])
             except Exception as e:
@@ -248,7 +251,8 @@ class TMT250Connection:
                     self.db_device.send_sos, thread_sensitive=True
                 )()
                 print(
-                    f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                    f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon}"
+                    f" email sent to {sos_sent_to}",
                     flush=True,
                 )
             await self.stream.write(self.decoder.generate_response())
@@ -271,7 +275,8 @@ class QueclinkConnection:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
             logger.info(
-                f"{arrow.now().datetime}, GL300 DATA, {self.aid}, {self.address}, {data}"
+                f"{arrow.now().datetime}, GL300 DATA, "
+                f"{self.aid}, {self.address}, {data}"
             )
             print(f"Received data ({data})", flush=True)
             parts = data.split(",")
@@ -370,7 +375,8 @@ class QueclinkConnection:
                         self.db_device.send_sos, thread_sensitive=True
                     )()
                     print(
-                        f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                        f"SOS triggered by device {sos_device_aid}, {sos_lat},"
+                        f" {sos_lon} email sent to {sos_sent_to}",
                         flush=True,
                     )
             elif parts[0] == "+ACK:GTHBD":
@@ -483,7 +489,8 @@ class TrackTapeConnection:
         locs = data.get("positions", [])
         loc_array = []
         logger.info(
-            f"{arrow.now().datetime}, TRCKTP DATA, {self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
+            f"{arrow.now().datetime}, TRCKTP DATA, "
+            f"{self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
         )
         for loc in locs:
             try:
@@ -582,11 +589,13 @@ class MicTrackConnection:
             return
         if self.protocol_version == 1:
             logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA, "
+                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         else:
             logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA2, "
+                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
@@ -653,7 +662,10 @@ class MicTrackConnection:
                 self.db_device.send_sos, thread_sensitive=True
             )()
             print(
-                f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                (
+                    f"SOS triggered by device {sos_device_aid}, "
+                    f"{sos_lat}, {sos_lon} email sent to {sos_sent_to}"
+                ),
                 flush=True,
             )
 
@@ -695,7 +707,10 @@ class MicTrackConnection:
                 self.db_device.send_sos, thread_sensitive=True
             )()
             print(
-                f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon} email sent to {sos_sent_to}",
+                (
+                    f"SOS triggered by device {sos_device_aid}, "
+                    f"{sos_lat}, {sos_lon} email sent to {sos_sent_to}"
+                ),
                 flush=True,
             )
 
@@ -711,7 +726,8 @@ class MicTrackConnection:
                 return False
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA, "
+                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             data = data_raw.split("#")
             await self._process_data(data)
@@ -742,7 +758,8 @@ class MicTrackConnection:
                 data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})")
             logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"{arrow.now().datetime}, MICTRK DATA2, "
+                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             await self._process_data2(data)
         except Exception as e:

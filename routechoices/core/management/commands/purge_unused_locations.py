@@ -57,11 +57,15 @@ class Command(BaseCommand):
             if dev_del_loc_count_total:
                 if orig_pts_count - pts_count_after_deduplication > 0:
                     self.stdout.write(
-                        f"Device {device.aid}, extra {dev_del_loc_count_total} locations, including {orig_pts_count - pts_count_after_deduplication} duplicates"
+                        f"Device {device.aid}, "
+                        f"extra {dev_del_loc_count_total} locations, "
+                        f"including {orig_pts_count - pts_count_after_deduplication} "
+                        "duplicates"
                     )
                 else:
                     self.stdout.write(
-                        f"Device {device.aid}, extra {dev_del_loc_count_total} locations"
+                        f"Device {device.aid},"
+                        f" extra {dev_del_loc_count_total} locations"
                     )
             deleted_count += dev_del_loc_count_total
             if force and dev_del_loc_count_invalids:

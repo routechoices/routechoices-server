@@ -84,8 +84,14 @@ class Migration(migrations.Migration):
                     "description",
                     models.TextField(
                         blank=True,
-                        default="# GPS tracking powered by routechoices.com\n        \nBrowse our events here.\n        ",
-                        help_text="This text will be displayed on your site frontpage, use markdown formatting",
+                        default=(
+                            "# GPS tracking powered by routechoices.com\n\n"
+                            "Browse our events here."
+                        ),
+                        help_text=(
+                            "This text will be displayed on your site frontpage, "
+                            "use markdown formatting"
+                        ),
                     ),
                 ),
                 (
@@ -143,7 +149,10 @@ class Migration(migrations.Migration):
                         validators=[
                             django.core.validators.RegexValidator(
                                 re.compile("^[-a-zA-Z0-9_]+\\Z"),
-                                "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                                (
+                                    "Enter a valid 'slug' consisting of letters, "
+                                    "numbers, underscores or hyphens."
+                                ),
                                 "invalid",
                             )
                         ],
@@ -210,7 +219,12 @@ class Migration(migrations.Migration):
                 (
                     "corners_coordinates",
                     models.CharField(
-                        help_text="Latitude and longitude of map corners separated by commas in following order Top Left, Top right, Bottom Right, Bottom left. eg: 60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073",
+                        help_text=(
+                            "Latitude and longitude of map corners separated by commas "
+                            "in following order "
+                            "Top Left, Top right, Bottom Right, Bottom left. eg: "
+                            "60.519,22.078,60.518,22.115,60.491,22.112,60.492,22.073"
+                        ),
                         max_length=255,
                         validators=[
                             routechoices.lib.validators.validate_corners_coordinates
@@ -260,7 +274,10 @@ class Migration(migrations.Migration):
                     "slug",
                     models.CharField(
                         db_index=True,
-                        help_text="This the text that will be used in the urls of your events",
+                        help_text=(
+                            "This the text that will be used in "
+                            "the urls of your events"
+                        ),
                         max_length=50,
                         validators=[routechoices.lib.validators.validate_nice_slug],
                     ),
@@ -301,7 +318,13 @@ class Migration(migrations.Migration):
                         ],
                         default="public",
                         max_length=8,
-                        help_text="Public: Listed on the front page | Secret: Can be opened with a link, however not listed on frontpage | Private: Only a logged in admin of the club can access the page",
+                        help_text=(
+                            "Public: Listed on the front page | "
+                            "Secret: Can be opened with a link, "
+                            "however not listed on frontpage | "
+                            "Private: Only a logged in admin of the club"
+                            " can access the page"
+                        ),
                     ),
                 ),
                 (
@@ -315,7 +338,10 @@ class Migration(migrations.Migration):
                     "allow_route_upload",
                     models.BooleanField(
                         default=False,
-                        help_text="Participants can add their GPS trace from a file after the event.",
+                        help_text=(
+                            "Participants can add their GPS trace "
+                            "from a file after the event."
+                        ),
                     ),
                 ),
             ],
@@ -384,7 +410,10 @@ class Migration(migrations.Migration):
                 validators=[
                     django.core.validators.RegexValidator(
                         re.compile("^[-a-zA-Z0-9_]+\\Z"),
-                        "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                        (
+                            "Enter a valid “slug” consisting of letters, numbers, "
+                            "underscores or hyphens."
+                        ),
                         "invalid",
                     )
                 ],
@@ -583,7 +612,9 @@ class Migration(migrations.Migration):
                     "text",
                     models.CharField(
                         blank=True,
-                        help_text="Optional text that will be displayed on the event page",
+                        help_text=(
+                            "Optional text that will be displayed on the event page"
+                        ),
                         max_length=280,
                     ),
                 ),
@@ -817,7 +848,10 @@ class Migration(migrations.Migration):
                 validators=[
                     django.core.validators.RegexValidator(
                         re.compile("^[-a-zA-Z0-9_]+\\Z"),
-                        "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                        (
+                            "Enter a valid “slug” consisting of letters, numbers, "
+                            "underscores or hyphens."
+                        ),
                         "invalid",
                     )
                 ],
@@ -908,8 +942,14 @@ class Migration(migrations.Migration):
             name="description",
             field=models.TextField(
                 blank=True,
-                default="# GPS tracking powered by routechoices.com\n\nBrowse our events here.",
-                help_text="This text will be displayed on your site frontpage, use markdown formatting",
+                default=(
+                    "# GPS tracking powered by routechoices.com\n\n"
+                    "Browse our events here."
+                ),
+                help_text=(
+                    "This text will be displayed on your site frontpage, "
+                    "use markdown formatting"
+                ),
             ),
         ),
         migrations.AddField(

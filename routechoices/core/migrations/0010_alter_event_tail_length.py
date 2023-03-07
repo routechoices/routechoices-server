@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
             name="tail_length",
             field=models.PositiveIntegerField(
                 default=60,
-                help_text="Default tail length when a user open the event. Can be overriden by the viewers in the event page settings tab.",
+                help_text=(
+                    "Default tail length when a user open the event. "
+                    "Can be overriden by the viewers in the event page settings tab."
+                ),
                 verbose_name="Tail length (seconds)",
             ),
         ),

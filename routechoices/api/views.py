@@ -216,23 +216,35 @@ def event_set_creation(request):
             ),
             "end_date": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="End time, must be after the start_date (YYYY-MM-DDThh:mm:ssZ)",
+                description=(
+                    "End time, must be after the start_date (YYYY-MM-DDThh:mm:ssZ)"
+                ),
             ),
             "privacy": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="Privacy level (PUBLIC, SECRET or PRIVATE). Default to SECRET",
+                description=(
+                    "Privacy level (PUBLIC, SECRET or PRIVATE). Default to SECRET",
+                ),
             ),
             "backdrop": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description=f"Backdrop map: one of {', '.join(m[0] for m in MAP_CHOICES)}. Default blank",
+                description=(
+                    f"Backdrop map: one of {', '.join(m[0] for m in MAP_CHOICES)}."
+                    " Default blank"
+                ),
             ),
             "open_registration": openapi.Schema(
                 type=openapi.TYPE_BOOLEAN,
-                description="Can public register themselves to the event. Default False",
+                description=(
+                    "Can public register themselves to the event. Default False"
+                ),
             ),
             "open_route_upload": openapi.Schema(
                 type=openapi.TYPE_BOOLEAN,
-                description="Can public upload their route to the event from GPS files, Default False",
+                description=(
+                    "Can public upload their route to the event from GPS files,"
+                    " Default False"
+                ),
             ),
         },
         required=["club_slug", "end_date"],
@@ -490,7 +502,9 @@ def club_list(request):
                         "send_interval": 5,
                         "tail_length": 60,
                     },
-                    "data_url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/data",
+                    "data_url": (
+                        "https://www.routechoices.com/api/events/PlCG3xFS-f4/data"
+                    ),
                     "announcement": "",
                     "maps": [
                         {
@@ -501,7 +515,9 @@ def club_list(request):
                                 "bottomLeft": {"lat": 61.42533, "lon": 24.18156},
                             },
                             "rotation": 3.25,
-                            "url": "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
+                            "url": (
+                                "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
+                            ),
                             "title": "",
                             "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
                             "max_zoom": 18,
@@ -637,7 +653,10 @@ def event_detail(request, event_id):
             ),
             "start_time": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="Start time, must be within the event schedule if provided (YYYY-MM-DDThh:mm:ssZ)",
+                description=(
+                    "Start time, must be within the event schedule if provided"
+                    " (YYYY-MM-DDThh:mm:ssZ)"
+                ),
             ),
         },
         required=["name"],
@@ -693,7 +712,9 @@ def event_register(request, event_id):
             "no-device-id": "ID del dispositivo no encontrado",
             "no-name": "Falta el nombre",
             "invalid-start-time": "La hora de inicio no pudo ser analizada",
-            "bad-start-time": "La hora de inicio del competidor debe ser durante la hora del evento.",
+            "bad-start-time": (
+                "La hora de inicio del competidor debe ser durante la hora del evento."
+            ),
             "bad-name": "Nombre ya en uso en este evento",
             "bad-sname": "Nombre corto ya en uso en este evento",
             "registration-closed": "Las inscripciones están cerradas",
@@ -702,7 +723,9 @@ def event_register(request, event_id):
             "no-device-id": "Identifiant de l'appareil introuvable",
             "no-name": "Nom est manquant",
             "invalid-start-time": "Impossible d'extraire l'heure de début",
-            "bad-start-time": "L'heure de départ du concurrent doit être durant l'événement",
+            "bad-start-time": (
+                "L'heure de départ du concurrent doit être durant l'événement"
+            ),
             "bad-name": "Nom déjà utilisé dans cet événement",
             "bad-sname": "Nom abrégé déjà utilisé dans cet événement",
             "registration-closed": "Les inscriptions sont closes",
@@ -848,24 +871,33 @@ def competitor_api(request, competitor_id):
 @swagger_auto_schema(
     method="post",
     operation_id="competitor_route_upload",
-    operation_description="Upload route for an existing competitor (Delete existing data)",
+    operation_description=(
+        "Upload route for an existing competitor (Delete existing data)"
+    ),
     tags=["Competitors"],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
             "latitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations latitudes (in degrees) separated by commas",
+                description=(
+                    "A list of locations latitudes (in degrees) separated by commas"
+                ),
                 example="60.12345,60.12346,60.12347",
             ),
             "longitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations longitudes (in degrees) separated by commas",
+                description=(
+                    "A list of locations longitudes (in degrees) separated by commas"
+                ),
                 example="20.12345,20.12346,20.12347",
             ),
             "timestamps": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="A list of locations timestamps (UNIX epoch in seconds) separated by commas",
+                description=(
+                    "A list of locations timestamps "
+                    "(UNIX epoch in seconds) separated by commas"
+                ),
                 example="1661489045,1661489046,1661489047",
             ),
         },
@@ -1164,17 +1196,24 @@ def ip_latlon(request):
             ),
             "latitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="List of locations latitudes (in degrees) separated by commas",
+                description=(
+                    "List of locations latitudes (in degrees) separated by commas"
+                ),
                 example="60.12345,60.12346,60.12347",
             ),
             "longitudes": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="List of locations longitudes (in degrees) separated by commas",
+                description=(
+                    "List of locations longitudes (in degrees) separated by commas"
+                ),
                 example="20.12345,20.12346,20.12347",
             ),
             "timestamps": openapi.Schema(
                 type=openapi.TYPE_STRING,
-                description="List of locations timestamps (UNIX epoch in seconds) separated by commas",
+                description=(
+                    "List of locations timestamps "
+                    "(UNIX epoch in seconds) separated by commas"
+                ),
                 example="1661489045,1661489046,1661489047",
             ),
             "battery": openapi.Schema(
@@ -1541,7 +1580,11 @@ def event_map_download(request, event_id, map_index="0"):
         settings.AWS_S3_BUCKET,
         request,
         file_path,
-        filename=f"{raster_map.name}_{raster_map.corners_coordinates_short.replace(',', '_')}_.{mime_type[6:]}",
+        filename=(
+            f"{raster_map.name}_"
+            f"{raster_map.corners_coordinates_short.replace(',', '_')}_."
+            f"{mime_type[6:]}"
+        ),
         mime=mime_type,
         headers=headers,
     )
@@ -1660,54 +1703,6 @@ def competitor_gpx_download(request, competitor_id):
 )
 @api_view(["GET"])
 def two_d_rerun_race_status(request):
-    """
-
-    http://3drerun.worldofo.com/2d/?server=wwww.routechoices.com/api/woo&eventid={event.aid}&liveid=1
-
-    /**/jQuery17036881551647526467_1620995291937(
-        {
-            "status":"OK",
-            "racename":"RELAY Leg 1 WOMEN",
-            "racestarttime":"2021-05-13T14:40:00.000Z",
-            "raceendtime":"2021-05-13T15:10:00.000Z",
-            "mapurl":"https://live.tractrac.com/events/event_20210430_EGKEuropea1/maps/c0c1bcb0-952d-0139-f8bb-10bf48d758ce/original_gabelungen-sprintrelay-neuchatel-women-with-forking-names.jpg",
-            "caltype":"3point",
-            "mapw":3526,
-            "maph":2506,
-            "calibration":[
-                [6.937006566873767,46.99098930845227,1316,1762],
-                [6.94023934338905,46.99479213285202,2054,518],
-                [6.943056285345106,46.99316207691443,2682,1055]
-            ],
-            "competitors":[
-                ["5bc546e0-960e-0139-fc65-10bf48d758ce","01 SUI Aebersold",null],
-                ["5bc7dde0-960e-0139-fc66-10bf48d758ce","02 SWE Strand",null],
-                ["5bca9e30-960e-0139-fc67-10bf48d758ce","03 NOR Haestad Bjornstad",null],
-                ["5bcbc240-960e-0139-fc68-10bf48d758ce","04 CZE Knapova",null],
-                ["5bccf5c0-960e-0139-fc69-10bf48d758ce","05 AUT Nilsson Simkovics",null],
-                ["5bcdd230-960e-0139-fc6a-10bf48d758ce","07 DEN Lind",null],
-                ["5bce9aa0-960e-0139-fc6b-10bf48d758ce","08 RUS Ryabkina",null],
-                ["5bcf6450-960e-0139-fc6c-10bf48d758ce","09 FIN Klemettinen",null],
-                ["5bd04a50-960e-0139-fc6d-10bf48d758ce","10 ITA Dallera",null],
-                ["5bd15890-960e-0139-fc6e-10bf48d758ce","11 LAT Grosberga",null],
-                ["5bd244b0-960e-0139-fc6f-10bf48d758ce","12 EST Kaasiku",null],
-                ["5bd31de0-960e-0139-fc70-10bf48d758ce","13 FRA Basset",null],
-                ["5bd3e5a0-960e-0139-fc71-10bf48d758ce","14 UKR Babych",null],
-                ["5bd4b6d0-960e-0139-fc72-10bf48d758ce","15 LTU Gvildyte",null],
-                ["5bd58cf0-960e-0139-fc73-10bf48d758ce","16 GER Winkler",null],
-                ["5bd662f0-960e-0139-fc74-10bf48d758ce","17 BUL Gotseva",null],
-                ["5bd73b60-960e-0139-fc75-10bf48d758ce","18 POR Rodrigues",null],
-                ["5bd81980-960e-0139-fc76-10bf48d758ce","19 BEL de Smul",null],
-                ["5bda1a60-960e-0139-fc77-10bf48d758ce","20 ESP Garcia Castro",null],
-                ["5bdb05e0-960e-0139-fc78-10bf48d758ce","21 HUN Weiler",null],
-                ["5bdc1870-960e-0139-fc79-10bf48d758ce","22 POL Wisniewska",null],
-                ["5bdcfd50-960e-0139-fc7a-10bf48d758ce","23 TUR Bozkurt",null]
-            ],
-            "controls":[]
-        }
-    );
-    """
-
     event_id = request.GET.get("eventid")
     if not event_id:
         raise Http404()

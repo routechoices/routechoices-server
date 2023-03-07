@@ -61,7 +61,11 @@ class Command(BaseCommand):
                 for feed in feeds:
                     last_fetch = last_fetched.get(feed.id, last_fetch_default)
                     now = arrow.utcnow().format("YYYY-MM-DD[T]HH:mm:ssZZ")
-                    url = f"https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/{feed.feed_id}/message.xml?startDate={last_fetch}&endDate={now}"
+                    url = (
+                        f"https://api.findmespot.com/spot-main-web/consumer"
+                        f"/rest-api/2.0/public/feed/{feed.feed_id}/message.xml?"
+                        f"startDate={last_fetch}&endDate={now}"
+                    )
                     last_fetched[feed.id] = now
                     res = requests.get(url)
                     if res.status_code == 200:
