@@ -469,6 +469,8 @@ class TrackTapeConnection:
             pass
 
     async def _process_data(self, data):
+        if not self.db_device.user_agent:
+            self.db_device.user_agent = "TrackTape"
         imei = data.get("id")
         if imei != self.imei:
             return False
