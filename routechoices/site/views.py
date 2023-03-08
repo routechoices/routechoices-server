@@ -71,7 +71,7 @@ class CustomLoginView(LoginView):
         return user.webauthn_keys.exists() or user.totp_devices.exists()
 
     def form_valid(self, form):
-        user = form.user
+        user = form.get_user()
         if not self.requires_two_factor(user):
             # no keys registered, use single-factor auth
             return super().form_valid(form)

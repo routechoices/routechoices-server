@@ -29,7 +29,7 @@ Cypress.Commands.add(
   "login",
   (username = "admin", password = "pa$$word123") => {
     cy.visit("/login/");
-    cy.get("#id_username").type(username);
+    cy.get("#id_login").type(username);
     cy.get("#id_password").type(password + "{enter}");
   }
 );
