@@ -6,7 +6,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
@@ -187,7 +187,7 @@ class ClubAdmin(admin.ModelAdmin):
         return obj.event_count
 
     def admin_list(self, obj):
-        return ", ".join(obj.admins.all().values_list("username", flat=True))
+        return ", ".join((a.username for a in obj.admins.all()))
 
     event_count.admin_order_field = "event_count"
 
@@ -414,8 +414,25 @@ class MyUserAdmin(UserAdmin):
         "clean_fake_users",
     ]
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("club_set")
+            .prefetch_related(
+                Prefetch(
+                    "emailaddress_set",
+                    queryset=EmailAddress.objects.filter(verified=True),
+                )
+            )
+        )
+
+    @admin.display(boolean=True)
     def has_verified_email(self, obj):
-        return EmailAddress.objects.filter(user=obj, verified=True).exists()
+        return obj.emailaddress_set.exists()
+
+    def clubs(self, obj):
+        return ", ".join((c.name for c in obj.club_set.all()))
 
     def clean_fake_users(self, request, queryset):
         two_weeks_ago = now() - timedelta(days=14)
@@ -426,9 +443,6 @@ class MyUserAdmin(UserAdmin):
             ).exists()
             if not has_verified_email:
                 obj.delete()
-
-    def clubs(self, obj):
-        return ", ".join(Club.objects.filter(admins=obj).values_list("name", flat=True))
 
 
 UserModel = get_user_model()
