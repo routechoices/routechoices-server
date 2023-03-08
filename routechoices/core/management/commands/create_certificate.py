@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 if (
                     not Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists()
                     and not Path(
-                        f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp"
+                        f"{settings.BASE_DIR}/nginx/certs/{domain}.lock"
                     ).exists()
                 ):
                     domains.append(domain)
@@ -51,12 +51,12 @@ class Command(BaseCommand):
                 self.stderr.write("No club with this domain")
                 continue
 
-            if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").exists():
-                self.stderr.write("Certificates creation for this domain in progress")
+            if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").exists():
+                self.stderr.write("Certificate creation for this domain in progress")
                 continue
 
             if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
-                self.stderr.write("Certificates for this domain already exists")
+                self.stderr.write("Certificate for this domain already exists")
                 continue
 
             if not check_cname_record(domain):
@@ -76,14 +76,14 @@ class Command(BaseCommand):
                 contact_email="raphael@routechoices.com",
             )
 
-            Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").touch()
+            Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").touch()
             try:
                 certificate = client.get_certificate()
             except Exception:
                 self.stderr.write("Failed to create certificate...")
                 continue
             finally:
-                Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.tmp").unlink()
+                Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
 
             cert_key = client.cert_key
 
