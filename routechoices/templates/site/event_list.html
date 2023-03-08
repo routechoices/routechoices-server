@@ -153,16 +153,27 @@
   {% endfor %}
   </div>
   {% endif%}
-  {% if years %}
+  {% if years or search_text %}
   <div class="mb-3">
     <h2>Archived Events</h2>
       {% if home_url %}
-          <div>{% if year %}<a href="{{home_url}}">All</a>{% else %}All{% endif%}{% for y in years %}&nbsp;{% if year == y %}{{ y }}{% else %}<a href="{{home_url}}?year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
-          {% if year %}
-          <div>{% if month %}<a href="{{home_url}}?year={{year}}">All</a>{% else %}All{% endif%}{% for m in months %}&nbsp;{% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{home_url}}?year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>
-          {% endif %}
-      {% else %}
-          <div>nope</div>
+        <form class="mb-3 row" method="GET">
+          <div class="col-auto">
+            <input class="form-control" type="search" placeholder="Search" name="q" value="{{search_text}}">
+          </div>
+          <div class="col-auto">
+            <input class="btn btn-primary" type="submit" value="Search">
+          </div>
+        </form>
+        {% if search_text %}
+        Results for search: "<i>{{search_text}}</i>"
+        {% endif %}
+        {% if years %}
+        <div>{% if year %}<a href="{{home_url}}{% if search_text %}?q={{search_text|urlencode}}{% endif %}">All</a>{% else %}All{% endif%}{% for y in years %}&nbsp;{% if year == y %}{{ y }}{% else %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
+        {% if year %}
+        <div>{% if month %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{year}}">All</a>{% else %}All{% endif%}{% for m in months %}&nbsp;{% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>
+        {% endif %}
+        {% endif %}
       {% endif %}
   </div>
   {% endif %}

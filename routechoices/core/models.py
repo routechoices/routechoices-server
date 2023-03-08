@@ -31,6 +31,7 @@ from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
+from django.db.models import Q
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
@@ -1132,6 +1133,7 @@ class Event(models.Model):
         page = request.GET.get("page")
         selected_year = request.GET.get("year")
         selected_month = request.GET.get("month")
+        search_text_raw = request.GET.get("q", "").strip()
 
         event_qs = cls.objects.filter(privacy=PRIVACY_PUBLIC).select_related(
             "club", "event_set"
@@ -1144,6 +1146,24 @@ class Event(models.Model):
         upcoming_events_qs = event_qs.filter(
             start_date__gt=now(), start_date__lte=now() + timedelta(hours=24)
         )
+
+        if search_text_raw:
+            search_text = search_text_raw
+            quoted_terms = re.findall(r"\"(.+?)\"", search_text)
+            if quoted_terms:
+                search_text = re.sub(r"\"(.+?)\"", "", search_text)
+            search_terms = search_text.split(" ")
+            search_text_query = Q()
+            for search_term in search_terms + quoted_terms:
+                key_name = "name__icontains"
+                key_club_name = "club__name__icontains"
+                key_set_name = "event_set__name__icontains"
+                search_text_query &= (
+                    Q(**{key_name: search_term})
+                    | Q(**{key_club_name: search_term})
+                    | Q(**{key_set_name: search_term})
+                )
+            past_event_qs = past_event_qs.filter(search_text_query)
 
         months = None
         years = list(
@@ -1214,6 +1234,8 @@ class Event(models.Model):
                             all_events_w_set = all_events_w_set.filter(
                                 start_date__month=selected_month
                             )
+                    if search_text_raw:
+                        all_events_w_set = all_events_w_set.filter(search_text_query)
                 for e in all_events_w_set:
                     events_by_set.setdefault(e.event_set_id, [])
                     events_by_set[e.event_set_id].append(e)
@@ -1246,7 +1268,7 @@ class Event(models.Model):
         past_events_page = paginator.get_page(page)
         past_events = events_to_sets(past_events_page)
 
-        if past_events_page.number == 1 and not selected_year:
+        if past_events_page.number == 1 and not selected_year and not search_text_raw:
             all_live_events = list_events_sets(live_events_qs)
             live_events = events_to_sets(all_live_events, type="live")
 
@@ -1265,6 +1287,7 @@ class Event(models.Model):
             "months": months,
             "year": selected_year,
             "month": selected_month,
+            "search_text": search_text_raw,
             "month_names": [
                 "",
                 "January",
