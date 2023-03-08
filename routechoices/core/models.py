@@ -1206,6 +1206,14 @@ class Event(models.Model):
                     )
                 else:
                     all_events_w_set = all_events_w_set.filter(end_date__lt=now())
+                    if selected_year:
+                        all_events_w_set = all_events_w_set.filter(
+                            start_date__year=selected_year
+                        )
+                        if selected_month:
+                            all_events_w_set = all_events_w_set.filter(
+                                start_date__month=selected_month
+                            )
                 for e in all_events_w_set:
                     events_by_set.setdefault(e.event_set_id, [])
                     events_by_set[e.event_set_id].append(e)
@@ -1238,7 +1246,7 @@ class Event(models.Model):
         past_events_page = paginator.get_page(page)
         past_events = events_to_sets(past_events_page)
 
-        if past_events_page.number == 1:
+        if past_events_page.number == 1 and not selected_year:
             all_live_events = list_events_sets(live_events_qs)
             live_events = events_to_sets(all_live_events, type="live")
 
