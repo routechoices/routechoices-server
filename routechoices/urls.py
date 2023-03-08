@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import kagi
 from allauth.account import views as account_views
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
@@ -45,7 +44,7 @@ urlpatterns = [
     path("account/", include("allauth.urls")),
     path("dashboard/account/mfa/login/", RedirectView.as_view(url="/login")),
     path("dashboard/account/mfa/", include("kagi.urls", namespace="kagi")),
-    path("login/", kagi.views.login, name="root_account_login"),
+    path("login/", site_views.CustomLoginView.as_view(), name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
     path("signup/", account_views.signup, name="root_account_signup"),
     path("admin/", admin.site.urls),
