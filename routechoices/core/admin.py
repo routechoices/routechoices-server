@@ -168,17 +168,26 @@ class TimeStatusFilter(admin.SimpleListFilter):
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "slug",
-        "domain",
         "creation_date",
+        "slug",
+        "admin_list",
         "event_count",
+        "domain",
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(event_count=Count("events"))
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("admins")
+            .annotate(event_count=Count("events"))
+        )
 
     def event_count(self, obj):
         return obj.event_count
+
+    def admin_list(self, obj):
+        return ", ".join(obj.admins.all().values_list("username", flat=True))
 
     event_count.admin_order_field = "event_count"
 
