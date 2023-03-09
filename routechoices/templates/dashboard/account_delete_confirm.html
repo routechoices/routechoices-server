@@ -1,43 +1,34 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-{% load django_bootstrap5 %}
+{% load account %}
 
-{% block sub_content %}
-{% if confirmation %}
-{% if confirmation_valid %}
-<div class="row">
-    <div class="col-12">
-        <h4>Delete your account?</h4>
-        <p><i class="fa-solid fa-triangle-exclamation	"></i> This is permanent!</p>
-        <p><form method="post" action="">
-            <input type="hidden" name="confirmation_key" value="{{confirmation_key}}" />
-            <input type="submit" class="btn btn-danger" value="Delete account" />
-            {% csrf_token %}
-        </form></p>
+{% block head_title %}Confirm Account Deletion{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+      <div class="card border-0 shadow rounded-3 my-5">
+        <div class="card-body p-4 p-sm-5">
+          <h3 class="card-title text-center mb-5">Confirm Account Deletion</h3>
+          {% if confirmation_valid %}
+          {% user_display request.user as user_display %}
+          <p>Please confirm that you want to delete your account {{ user_display }}.</p>
+          <p>This is definitive and cannot be reversed.</p>
+          <form method="post" action="">
+              {% csrf_token %}
+              <input type="hidden" name="confirmation_key" value="{{confirmation_key}}" />
+              <div class="d-grid">
+                  <button class="primaryAction btn btn-danger" type="submit">Confirm</button>
+              </div>
+          </form>
+          {% else %}
+          <p>This account deletion confirmation link is either expired, invalid or not destinated for account {{ request.user }}.</p>
+          <p>Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
-</div>
-{% else %}
-<p>This account deletion confirmation link expired or is invalid. Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.</p>
-{% endif %}
-{% else %}
-{% if sent %}
-<div class="row">
-  <div class="col-12">
-    <p>An email message with a confirmation link has been sent to your primary address.</p>
   </div>
 </div>
-{% else %}
-<div class="row">
-  <div class="col-12">
-      <h4>Delete your account?</h4>
-      <p>Note that deleting your account does NOT delete your clubs, clubs maps, or clubs events.</p>
-      <p>To ensure your identity we will send you an email with a confirmation link.</p>
-      <p><form method="post" action="">
-          <input type="submit" class="btn btn-danger" value="Send the link" />
-          {% csrf_token %}
-      </form></p>
-  </div>
-</div>
-{% endif %}
-{% endif %}
 {% endblock %}

@@ -172,7 +172,7 @@ def account_delete_view(request):
             return render(
                 request,
                 "dashboard/account_delete_confirm.html",
-                {"confirmation": True, "confirmation_valid": False},
+                {"confirmation_valid": False},
             )
         else:
             temp_key = token_generator.make_token(user)
@@ -194,8 +194,8 @@ def account_delete_view(request):
             )
             return render(
                 request,
-                "dashboard/account_delete_confirm.html",
-                {"confirmation": False, "sent": True},
+                "dashboard/account_delete.html",
+                {"sent": True},
             )
     conf_key = request.GET.get("confirmation_key")
     if conf_key:
@@ -204,7 +204,6 @@ def account_delete_view(request):
                 request,
                 "dashboard/account_delete_confirm.html",
                 {
-                    "confirmation": True,
                     "confirmation_valid": True,
                     "confirmation_key": conf_key,
                 },
@@ -212,12 +211,12 @@ def account_delete_view(request):
         return render(
             request,
             "dashboard/account_delete_confirm.html",
-            {"confirmation": True, "confirmation_valid": False},
+            {"confirmation_valid": False},
         )
     return render(
         request,
-        "dashboard/account_delete_confirm.html",
-        {"confirmation": False, "sent": False},
+        "dashboard/account_delete.html",
+        {"sent": False},
     )
 
 
