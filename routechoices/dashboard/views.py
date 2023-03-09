@@ -630,13 +630,7 @@ def map_kmz_upload_view(request):
                             raise Exception("Fishy KML")
 
                         with tempfile.TemporaryFile() as dest:
-                            headers = requests.utils.default_headers()
-                            headers.update(
-                                {
-                                    "User-Agent": "Python3/Requests/Routechoices.com",
-                                }
-                            )
-                            r = requests.get(image_path, headers=headers, timeout=10)
+                            r = requests.get(image_path, timeout=10)
                             if r.status_code != 200:
                                 raise Exception("Could not reach image source")
                             dest.write(r.content)
