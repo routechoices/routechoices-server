@@ -28,7 +28,7 @@
           {% for club in clubs %}
             <div class="card flex-row flex-no-wrap club-card mb-3">
               <div class="border-0">
-                <img class="card-img-left" style="border-radius: 3px 0 0 3px;" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" alt="Club {{ club.name }} Logo">
+                <img class="card-img-left" style="border-radius: 3px 0 0 3px;" src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" width="80px" alt="Club {{ club.name }} Logo">
               </div>
               <div class="card-body px-2">
                 <div class="d-flex flex-row bd-highlight justify-content-between">
