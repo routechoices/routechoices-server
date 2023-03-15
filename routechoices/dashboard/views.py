@@ -27,6 +27,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.timezone import now
 from PIL import Image
+from user_sessions.views import SessionDeleteOtherView
 
 from invitations.forms import InviteForm
 from routechoices.api.views import serve_from_s3
@@ -1384,3 +1385,8 @@ def quick_event(request):
 @receiver(password_changed)
 def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
     user.session_set.exclude(session_key=request.session.session_key).delete()
+
+
+def CustomSessionDeleteOtherView(SessionDeleteOtherView):
+    def get_success_url(self):
+        return str(reverse_lazy('dashboard:account_session_list'))
