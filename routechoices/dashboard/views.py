@@ -24,7 +24,7 @@ from django.db.models import Case, Q, Value, When
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, revetse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.timezone import now
 from PIL import Image
 from user_sessions.views import SessionDeleteOtherView
