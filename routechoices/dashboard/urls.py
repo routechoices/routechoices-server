@@ -23,7 +23,7 @@ urlpatterns = [
     ),
     re_path(
         r"^account/sessions/delete-others/?$",
-        view=user_sessions_views.SessionDeleteOtherView.as_view(),
+        view=views.CustomSessionDeleteOtherView.as_view(),
         name="account_session_delete_other",
     ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
