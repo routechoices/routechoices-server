@@ -1387,6 +1387,7 @@ def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
     user.session_set.exclude(session_key=request.session.session_key).delete()
 
 
-def CustomSessionDeleteOtherView(SessionDeleteOtherView):
+class CustomSessionDeleteOtherView(SessionDeleteOtherView):
     def get_success_url(self):
         return str(reverse_lazy('dashboard:account_session_list'))
+        
