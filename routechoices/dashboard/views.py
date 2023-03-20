@@ -11,6 +11,8 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
 from allauth.account.signals import password_changed, password_reset
 from allauth.account.utils import user_username
+from allauth.account.views import EmailView
+from allauth.decorators import rate_limit
 from allauth.utils import build_absolute_uri
 from defusedxml import minidom
 from django.conf import settings
@@ -25,6 +27,7 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from PIL import Image
 from user_sessions.views import SessionDeleteOtherView
@@ -1389,5 +1392,17 @@ def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
 
 class CustomSessionDeleteOtherView(SessionDeleteOtherView):
     def get_success_url(self):
-        return str(reverse_lazy('dashboard:account_session_list'))
-        
+        return str(reverse_lazy("dashboard:account_session_list"))
+
+
+@method_decorator(rate_limit(action="manage_email"), name="dispatch")
+class CustomEmailView(EmailView):
+    def get_context_data(self, **kwargs):
+        ret = super().get_context_data(**kwargs)
+        ret["user_emailaddresses"] = self.request.user.emailaddress_set.all().order_by(
+            "-primary", "-verified", "email"
+        )
+        return ret
+
+
+email = login_required(CustomEmailView.as_view())
