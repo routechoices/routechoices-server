@@ -2,15 +2,27 @@
 {% load i18n %}
 
 {% block sub_sub_content %}
-<h2>{% trans "Status" %}</h2>
-<ul>
-  <li>{% trans "WebAuthn" %}: {% if webauthn_enabled %}{% trans "On" %}{% else %}{% trans "Off" %}{% endif %}</li>
-  <li>{% trans "TOTP" %}: {% if totp_enabled %}{% trans "On" %}{% else %}{% trans "Off" %}{% endif %}</li>
-  <li>{% trans "Backup codes" %}: {% if backup_codes_count %}{{ backup_codes_count }} {% trans "remaining" %}{% else %}{% trans "None generated" %}{% endif %}</li>
-</ul>
-<p>
-  <a class="btn btn-primary mb-1" href="{% url 'kagi:webauthn-keys' %}">{% trans 'Manage WebAuthn keys' %}</a>
-  <a class="btn btn-primary mb-1" href="{% url 'kagi:backup-codes' %}">{% trans 'Manage backup codes' %}</a>
-  <a class="btn btn-primary mb-1" href="{% url 'kagi:totp-devices' %}">{% trans 'Manage TOTP (Authenticator) devices' %}</a></p>
-</p>
+<h3>{% trans "WebAuthn" %}</h3>
+{% if webauthn_enabled %}
+<a class="btn btn-primary mb-1" href="{% url 'kagi:webauthn-keys' %}">{% trans 'Manage WebAuthn keys' %}</a>
+{% else %}
+<a class="btn btn-primary" href="{% url 'kagi:add-webauthn-key' %}">Add a key</a>
+{% endif %}
+<hr/>
+<h3>{% trans "TOTP" %}</h3>
+{% if totp_enabled %}
+<a class="btn btn-primary mb-1" href="{% url 'kagi:totp-devices' %}">{% trans 'Manage TOTP (Authenticator) devices' %}</a></p>
+{% else %}
+<a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">{% trans 'Add a TOTP (Authenticator) Device' %}</a>
+{% endif %}
+<hr/>
+<h3>{% trans "Backup codes" %}</h3>
+{% if backup_codes_count %}
+<a class="btn btn-primary mb-1" href="{% url 'kagi:backup-codes' %}">{% trans 'Manage backup codes' %}</a>
+{% else %}
+<form method="POST" action="{% url 'kagi:backup-codes' %}">
+  {% csrf_token %}
+  <input type="submit" class="btn btn-primary" value="{% trans 'Create some backup codes' %}">
+</form>
+{% endif %}
 {% endblock %}
