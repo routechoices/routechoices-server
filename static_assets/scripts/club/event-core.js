@@ -203,7 +203,7 @@ L.Control.Ranking = L.Control.extend({
           banana.i18n("ranking") +
           "</h6><label>" +
           banana.i18n("crossing-count") +
-          '</label>&nbsp;<input type="number" min="1" id="crossing-time" step="1" value="1" class="cross-count" style="width: 38px">' +
+          '</label>&nbsp;<input type="number" min="1" id="crossing-time" step="1" value="1" class="d-inline-block cross-count form-control" style="font-size: 0.7rem;width: 75px">' +
           "</div>"
       );
     }
