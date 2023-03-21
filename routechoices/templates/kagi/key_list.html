@@ -9,7 +9,7 @@
 <h3>WebAuthn Keys</h3>
 
 {% if object_list %}
-<table class="table">
+<table class="table table-striped">
   <thead>
     <tr>
       <th>{% trans 'Key name' %}</th>
@@ -27,7 +27,7 @@
       <td>
         <form method="post">{% csrf_token %}
           <input name="key_id" type="hidden" value="{{ key.pk }}">
-          <input class="btn btn-danger" type="submit" name="delete" value="X">
+          <button class="btn btn-danger" type="submit" name="delete"><i class="fa-solid fa-xmark"></i></button>
         </form>
       </td>
     </tr>

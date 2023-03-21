@@ -18,9 +18,9 @@
 <hr/>
 <h3>{% trans "Backup codes" %}</h3>
 {% if backup_codes_count %}
-<a class="btn btn-primary mb-1" href="{% url 'kagi:backup-codes' %}">{% trans 'Manage backup codes' %}</a>
+<a class="btn btn-primary mb-1" href="{% url 'backup-codes' %}">{% trans 'Manage backup codes' %}</a>
 {% else %}
-<form method="POST" action="{% url 'kagi:backup-codes' %}">
+<form method="POST" action="{% url 'backup-codes' %}">
   {% csrf_token %}
   <input type="submit" class="btn btn-primary" value="{% trans 'Create some backup codes' %}">
 </form>

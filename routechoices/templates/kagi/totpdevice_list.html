@@ -6,7 +6,7 @@
 {% block sub_sub_content %}
 <h1>{% trans "TOTP (Authenticator) Devices" %}</h1>
 {% if object_list %}
-<table class="table">
+<table class="table table-striped">
   <thead>
     <tr>
       <th>{% trans 'Added on' %}</th>
@@ -22,7 +22,7 @@
       <td>
         <form method="post">{% csrf_token %}
           <input name="device_id" type="hidden" value="{{ device.pk }}">
-          <input class="btn btn-danger" type="submit" name="delete" value="X">
+          <button class="btn btn-danger" type="submit" name="delete"><i class="fa-solid fa-xmark"></i></button>
         </form>
       </td>
     </tr>

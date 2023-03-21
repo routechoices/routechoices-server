@@ -290,14 +290,16 @@ function showLocalTime(el) {
   $(".formset_row").formset({
     addText: '<i class="fa-solid fa-circle-plus"></i> Add Competitor',
     addCssClass: "btn btn-info add-competitor-btn",
-    deleteText: '<i class="fa-solid fa-trash-can fa-2x"></i>',
+    deleteText:
+      '<button class="btn btn-danger"><i class="fa-solid fa-xmark"></i></button>',
     prefix: "competitors",
     added: onAddedCompetitorRow,
   });
   $(".extra_map_formset_row").formset({
     addText: '<i class="fa-solid fa-circle-plus"></i> Add Map',
     addCssClass: "btn btn-info add-map-btn",
-    deleteText: '<i class="fa-solid fa-trash-can fa-2x"></i>',
+    deleteText:
+      '<button class="btn btn-danger"><i class="fa-solid fa-xmark"></i></button>',
     prefix: "map_assignations",
     formCssClass: "extra_map_formset_row",
   });

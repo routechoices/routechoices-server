@@ -7,11 +7,14 @@
 <h3>Backup Codes</h3>
 
 {% if object_list %}
-<ul>
+<p>
   {% for code in object_list %}
-  <li>{{ code.code }}</li>
+  <span class="badge bg-secondary fs-6 mb-1 font-monospace">{{ code.code }}</span>
+  {% if forloop.counter|divisibleby:3 %}
+  <br/>
+  {% endif %}
   {% endfor %}
-</ul>
+</p>
 {% else %}
 <p>
   <i class="fa-solid fa-triangle-exclamation"></i> You do not have any backup codes!
@@ -20,6 +23,6 @@
 
 <form method="POST">
   {% csrf_token %}
-  <input type="submit" class="btn btn-primary" value="{% trans 'Create some backup codes' %}">
+  <input type="submit" class="btn btn-primary" value="{% trans 'Create new backup codes' %}">
 </form>
 {% endblock %}

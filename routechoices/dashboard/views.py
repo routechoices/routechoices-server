@@ -24,11 +24,12 @@ from django.core.files import File
 from django.core.paginator import Paginator
 from django.db.models import Case, Q, Value, When
 from django.dispatch import receiver
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
+from kagi.views.backup_codes import BackupCodesView
 from PIL import Image
 from user_sessions.views import SessionDeleteOtherView
 
@@ -1406,3 +1407,14 @@ class CustomEmailView(EmailView):
 
 
 email = login_required(CustomEmailView.as_view())
+
+
+class CustomBackupCodesView(BackupCodesView):
+    def post(self, request):
+        request.user.backup_codes.all().delete()
+        for i in range(12):
+            request.user.backup_codes.create_backup_code()
+        return HttpResponseRedirect(request.build_absolute_uri())
+
+
+backup_codes = login_required(CustomBackupCodesView.as_view())

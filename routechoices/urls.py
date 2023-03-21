@@ -19,7 +19,11 @@ from django.contrib.sitemaps import views as sitemaps_views
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
-from routechoices.dashboard.views import dashboard_logo_download, dashboard_map_download
+from routechoices.dashboard.views import (
+    backup_codes,
+    dashboard_logo_download,
+    dashboard_map_download,
+)
 from routechoices.site import views as site_views
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
@@ -43,6 +47,7 @@ urlpatterns = [
     ),
     path("account/", include("allauth.urls")),
     path("dashboard/account/mfa/login/", RedirectView.as_view(url="/login")),
+    path("dashboard/account/mfa/backup-codes/", backup_codes, name="backup-codes"),
     path("dashboard/account/mfa/", include("kagi.urls", namespace="kagi")),
     path("login/", site_views.CustomLoginView.as_view(), name="root_account_login"),
     path("logout/", account_views.logout, name="root_account_logout"),
