@@ -1,5 +1,5 @@
 (function () {
-  u("input[type='password']").after(
+  /*  u("input[type='password']").after(
     '<i class="fa-regulat fa-eye-slash togglePassword"></i>'
   );
   u(".togglePassword").on("click", function (e) {
@@ -11,4 +11,5 @@
         el.type = el.type == "password" ? "text" : "password";
       });
   });
+*/
 })();
