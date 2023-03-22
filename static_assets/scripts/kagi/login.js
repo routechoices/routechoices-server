@@ -1,7 +1,7 @@
 (function () {
   u("input[type='password']")
     .wrap('<div class="input-group mb-3"></div>')
-    .after(
+  u("input[type='password']").after(
       '<span class="input-group-text togglePassword"><i class="fa-regular fa-eye-slash"></i></span>'
     )
   u(".togglePassword").on("click", function (e) {
