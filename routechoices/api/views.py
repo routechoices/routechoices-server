@@ -1549,7 +1549,10 @@ def device_ownership_api_view(request, club_id, device_id):
     else:
         club = get_object_or_404(Club, aid=club_id)
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
-    ownership = get_object_or_404(DeviceClubOwnership, device=device, club=club)
+
+    ownership, _created = DeviceClubOwnership.objects.get_or_create(
+        device=device, club=club
+    )
     if request.method == "PATCH":
         nick = request.data.get("nickname", "")
         if nick and len(nick) > 12:

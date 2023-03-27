@@ -1,3 +1,91 @@
+function displayErrors(err) {
+  u("#importErrors")
+    .text(err)
+    .css({ display: "block", "white-space": "pre-line" });
+}
+
+function displaySuccess(msg) {
+  u("#importSuccess").text(msg).css({ display: "block" });
+}
+
+function onCsvParsed(result) {
+  u("#csv_input").val("");
+  var nImported = 0;
+  var errors = "";
+  if (result.errors.length > 0) {
+    errors = "No lines found";
+  }
+  console.log(result.errors);
+  if (!errors) {
+    result.data.forEach(function (l) {
+      var empty = false;
+      if (l.length == 1 && l[0] == "") {
+        empty = true;
+      }
+      if (!empty && l.length != 2) {
+        errors += "All rows should have 2 columns\n";
+      } else {
+        var imei = l[0];
+        var nickname = l[1];
+        if (nickname.length > 12) {
+          errors +=
+            "IMEI " +
+            imei +
+            ', nickname "' +
+            nickname +
+            '": nickname too long (Max 12 characters)\n';
+          return;
+        }
+        reqwest({
+          url: window.local.apiBaseUrl + "device/",
+          method: "post",
+          data: {
+            imei: imei,
+            csrfmiddlewaretoken: window.local.csrfToken,
+          },
+          type: "json",
+          withCredentials: true,
+          crossOrigin: true,
+        })
+          .then(function (resp) {
+            var deviceId = resp.device_id;
+            reqwest({
+              url:
+                window.local.apiBaseUrl +
+                "clubs/" +
+                window.local.clubId +
+                "/devices/" +
+                deviceId +
+                "/",
+              method: "patch",
+              data: {
+                nickname: nickname,
+              },
+              headers: { "X-CSRFToken": window.local.csrfToken },
+              type: "json",
+              withCredentials: true,
+              crossOrigin: true,
+            })
+              .then(function () {
+                nImported++;
+                displaySuccess(nImported + " devices imported");
+              })
+              .fail(function () {
+                errors +=
+                  "IMEI " + imei + ', nickname "' + nickname + '": Failure\n';
+                displayErrors(errors);
+              });
+          })
+          .fail(function () {
+            errors +=
+              "IMEI " + imei + ', nickname "' + nickname + '": Invalid IMEI\n';
+            displayErrors(errors);
+          });
+      }
+    });
+  }
+}
+
 (function () {
   new TomSelect("#id_device", {
     valueField: "id",
@@ -28,5 +116,10 @@
         },
       });
     },
+  });
+
+  u("#importCSVImei").on("submit", function (e) {
+    e.preventDefault();
+    Papa.parse(u("#csv_input").nodes[0].files[0], { complete: onCsvParsed });
   });
 })();
