@@ -1054,6 +1054,10 @@ class Event(models.Model):
         verbose_name="Event Set",
         related_name="events",
         on_delete=models.SET_NULL,
+        help_text=(
+            "Events within the same event set will be grouped together "
+            "on the event listing page."
+        ),
     )
     emergency_contact = models.EmailField(
         null=True,
