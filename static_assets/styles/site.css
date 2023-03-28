@@ -337,3 +337,11 @@ body {
   background-size: cover;
   background-position: center;
 }
+
+.dark-link {
+  color: var(--bs-gray-900);
+}
+
+.dark-link:hover {
+  color: var(--bs-gray-700);
+}
