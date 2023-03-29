@@ -124,6 +124,9 @@ DATABASES = {
         "PASSWORD": "changeme",
         "HOST": "db",
         "PORT": "",
+        "OPTIONS": {
+            "server_side_binding": True,
+        },
     }
 }
 
