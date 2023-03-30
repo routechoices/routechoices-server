@@ -345,3 +345,22 @@ body {
 .dark-link:hover {
   color: var(--bs-gray-700);
 }
+.collapse .if-not-collapsed {
+  display: inline-block;
+}
+.collapse.show .if-not-collapsed {
+  display: none;
+}
+.collapsing .if-not-collapsed {
+  display: none;
+}
+
+.collapse .if-collapsed {
+  display: none;
+}
+.collapse.show .if-collapsed {
+  display: block;
+}
+.collapsing .if-collapsed {
+  display: block;
+}

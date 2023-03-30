@@ -4,20 +4,28 @@
 <header class="navbar navbar-expand-md navbar-dark bg-primary" style="color: #fff;background-color: #111 !important">
   <div class="container">
     <a class="navbar-brand site-name" href="{% host_url 'site:home_view' host 'www' %}"><span class="d-inline-block"><img src="{% static 'img/logo.svg' %}" alt="_" height="25"  width="34.66" style="vertical-align: text-bottom;"></span> {{site.name}}</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav1" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav1">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
       </ul>
-      <ul class="navbar-nav d-flex">
-        {% if user.is_authenticated %}<li><a class="nav-link{% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>{% endif %}
+      <ul class="navbar-nav d-flex flex-start">
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:events_view' %} active{% endif %}" href="{% host_url 'site:events_view' host 'www'%}">Events</a></li>
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:trackers_view' %} active{% endif %}" href="{% host_url 'site:trackers_view' host 'www'%}">Trackers</a></li>
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:pricing_view' %} active{% endif %}" href="{% host_url 'site:pricing_view' host 'www'%}">Pricing</a></li>
         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'site:contact_view' %} active{% endif %} text-nowrap" href="{% host_url 'site:contact_view' host 'www'%}">Contact us</a></li>
-        <li class="nav-item">{% if user.is_authenticated %}<a href="{% host_url 'root_account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0 ms-0">Logout</a>{% else %}<a href="{% host_url 'root_account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn ms-0 mt-0 me-2">Login</a>{% endif %}</li>
-        {% if not user.is_authenticated %}<li class="nav-item"><a href="{% host_url 'root_account_signup' host 'www'%}" class="btn btn-success navbar-btn text-nowrap mt-0">Sign up for free</a></li>{% endif %}
+      </ul>
+      <div class="vr if-not-collapsed me-2"></div>
+      <hr class="if-collapsed" />
+      <ul class="navbar-nav d-flex">
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link me-2 {% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>
+        <li class="nav-item"><a href="{% host_url 'root_account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0">Logout</a></li>
+        {% else %}
+        <li class="nav-item"><a href="{% host_url 'root_account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn mt-0 me-2">Login</a></li>
+        <li class="nav-item"><a href="{% host_url 'root_account_signup' host 'www'%}" class="btn btn-success navbar-btn text-nowrap mt-0">Sign up for free</a></li>
+        {% endif %}
       </ul>
     </div>
   </div>
