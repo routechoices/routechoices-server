@@ -7,7 +7,7 @@ import routechoices.lib.validators
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0040_alter_event_event_set"),
+        ("core", "0041_alter_event_event_set"),
     ]
 
     operations = [
