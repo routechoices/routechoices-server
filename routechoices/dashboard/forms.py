@@ -1,5 +1,6 @@
 from io import BytesIO
 
+import arrow
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files import File
@@ -14,6 +15,7 @@ from django.forms import (
     ModelForm,
     inlineformset_factory,
 )
+from django.models import Q
 from PIL import Image
 
 from routechoices.core.models import (
@@ -60,6 +62,23 @@ class ClubForm(ModelForm):
         if admins.count() > 10:
             raise ValidationError("Clubs can only have a maximum of 10 admins")
         return admins
+
+    def clean_slug(self):
+        slug = self.cleaned_data["slug"].lower()
+
+        club_with_slug_qs = Club.objects.filter(
+            Q(slug=slug)
+            | Q(
+                slug_changed_from=slug,
+                slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
+            ),
+        )
+        if self.instance:
+            club_with_slug_qs = club_with_slug_qs.exclude(pk=self.instance.pk)
+
+        if club_with_slug_qs.exists():
+            raise ValidationError("Domain prefix already registered.")
+        return slug
 
     def clean_logo(self):
         logo = self.cleaned_data["logo"]

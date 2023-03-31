@@ -149,6 +149,17 @@ class Club(models.Model):
         unique=True,
         help_text=".routechoices.com",
     )
+    slug_changed_from = models.CharField(
+        max_length=50,
+        validators=[
+            validate_domain_slug,
+        ],
+        blank=True,
+        null=True,
+        default="",
+        editable=False,
+    )
+    slug_changed_at = models.DateTimeField(null=True, blank=True, editable=False)
     admins = models.ManyToManyField(User)
     description = models.TextField(
         blank=True,
@@ -198,9 +209,14 @@ Follow our events live or replay them later.
             if old_domain and old_domain != self.domain:
                 delete_domain(old_domain)
             if self.analytics_site:
-                if old_self.analytics_domain != self.analytics_domain:
+                if old_self.slug != self.slug:
+                    self.slug_changed_from = old_self.slug
+                    self.slug_changed_at = now()
+
+                    # TODO: In future use change domain
                     plausible.delete_domain(old_self.analytics_domain)
                     self.analytics_site = ""
+
         self.slug = self.slug.lower()
         if not self.analytics_site:
             analytics_site, created = plausible.create_shared_link(
