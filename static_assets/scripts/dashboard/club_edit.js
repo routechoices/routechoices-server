@@ -58,7 +58,7 @@
     u("#id_admins-ts-label").parent().after(inviteBtn);
   }
   var submitForm = document.getElementById("change_form");
-  if (submitForm && window.local.clubHasAnalytics) {
+  if (submitForm) {
     submitForm.addEventListener("submit", function confirmResetStats(e) {
       if (
         window.local.clubSlug &&
@@ -68,7 +68,7 @@
         swal(
           {
             title: "Confirm",
-            text: "If you proceed to change your club slug, you will loose your pages visits statistics history",
+            text: "If you proceed you will loose your pages analytics history.\n\nYou may change your domain prefix only once every 72 hours.",
             type: "warning",
             confirmButtonText: "Continue",
             showCancelButton: true,

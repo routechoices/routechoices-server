@@ -1,13 +1,14 @@
-""" XFF Middleware """
 import logging
 import time
 from importlib import import_module
 from re import compile
 
+import arrow
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 from django.core.exceptions import DisallowedHost
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect, render
@@ -149,11 +150,18 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if raw_host == default_domain:
             return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
         request.use_cname = False
+        club = None
         if raw_host.endswith(default_subdomain_suffix):
             slug = raw_host[: -(len(default_subdomain_suffix))].lower()
             if slug not in ("api", "tiles", "wms", "www"):
-                club_exists = Club.objects.filter(slug__iexact=slug).exists()
-                if not club_exists:
+                club = Club.objects.filter(
+                    Q(slug__iexact=slug)
+                    | Q(
+                        slug_changed_from__iexact=slug,
+                        slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
+                    )
+                ).first()
+                if not club:
                     request.club_slug = True
                     if request.path != "/":
                         return render(request, "404.html", status=404)
@@ -165,6 +173,8 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
             original_host = f"{club.slug.lower()}{default_subdomain_suffix}"
             host, kwargs = self.get_host(original_host)
             request.use_cname = True
+        if club:
+            request.club_slug = club.slug
         # This is the main part of this middleware
         request.urlconf = host.urlconf
         request.host = host

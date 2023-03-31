@@ -1,28 +1,11 @@
-import arrow
-from django.models import Q
 from django.urls import path, re_path
 
 from routechoices.club import views
 from routechoices.club.sitemaps import DynamicViewSitemap
-from routechoices.core.models import Club
 
 sitemaps = {
     "dynamic": DynamicViewSitemap,
 }
-
-
-def set_club(request, club_slug):
-    club = Club.objects.filter(
-        Q(slug=club_slug)
-        | Q(
-            slug_changed_from=club_slug,
-            slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
-        )
-    ).first()
-    if club:
-        request.club_slug = club.slug
-    else:
-        request.club_slug = club_slug
 
 
 urlpatterns = [

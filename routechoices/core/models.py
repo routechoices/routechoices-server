@@ -204,12 +204,13 @@ Follow our events live or replay them later.
             old_domain = old_self.domain
             if old_domain and old_domain != self.domain:
                 delete_domain(old_domain)
-            if self.analytics_site:
-                if old_self.slug != self.slug:
-                    self.slug_changed_from = old_self.slug
-                    self.slug_changed_at = now()
+            if old_self.slug != self.slug:
+                self.slug_changed_from = old_self.slug
+                self.slug_changed_at = now()
 
-                    # TODO: In future use change domain
+                if self.analytics_site:
+                    # TODO: In future use change domain API endpoint
+                    # instead of deleting old site
                     plausible.delete_domain(old_self.analytics_domain)
                     self.analytics_site = ""
 

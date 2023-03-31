@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.images import get_image_dimensions
 from django.core.validators import FileExtensionValidator
+from django.db.models import Q
 from django.forms import (
     CharField,
     DateTimeInput,
@@ -15,7 +16,6 @@ from django.forms import (
     ModelForm,
     inlineformset_factory,
 )
-from django.models import Q
 from PIL import Image
 
 from routechoices.core.models import (
@@ -75,6 +75,14 @@ class ClubForm(ModelForm):
         )
         if self.instance:
             club_with_slug_qs = club_with_slug_qs.exclude(pk=self.instance.pk)
+            if (
+                self.instance.slug_changed_at
+                and self.instance.slug_changed_at
+                > arrow.now().shift(hours=-72).datetime
+            ):
+                raise ValidationError(
+                    "Domain prefix can be changed only once every 72 hours."
+                )
 
         if club_with_slug_qs.exists():
             raise ValidationError("Domain prefix already registered.")
