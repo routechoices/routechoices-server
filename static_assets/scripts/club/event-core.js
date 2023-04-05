@@ -1510,7 +1510,7 @@ function displayOptions(ev) {
       if (!e.target.checked) {
         showClusters = false;
         map.removeControl(groupControl);
-        for (var [key, c] of clusters) {
+        for (var [key, c] of Object.entries(clusters)) {
           if (c.mapMarker) {
             map.removeLayer(c.mapMarker);
             clusters[key].mapMarker = null;
