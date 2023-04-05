@@ -54,4 +54,9 @@ urlpatterns = [
         name="event_contribute_view",
     ),
     re_path(r"(?P<slug>[0-9a-zA-Z_-]+)/?$", views.event_view, name="event_view"),
+    re_path(
+        r"events/(?P<slug>[0-9a-zA-Z_-]+)/?$",
+        views.event_set_view,
+        name="event_set_view",
+    ),
 ]

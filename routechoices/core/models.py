@@ -972,6 +972,32 @@ class EventSet(models.Model):
         Club, verbose_name="Club", related_name="event_sets", on_delete=models.CASCADE
     )
     name = models.CharField(verbose_name="Name", max_length=255)
+    create_page = models.BooleanField(
+        default=False,
+        help_text="Whether a page with all the events of the set will be generated",
+    )
+    slug = models.CharField(
+        verbose_name="Slug",
+        max_length=50,
+        validators=[
+            validate_nice_slug,
+        ],
+        db_index=True,
+        help_text="This is used to build the url of this event set page",
+        null=True,
+        blank=True,
+        default="",
+    )
+    list_secret_events = models.BooleanField(
+        default=False,
+        help_text="Whether secret events are listed in the event set page",
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.create_page:
+            self.slug = ""
+            self.list_secret_events = False
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-creation_date", "name"]
@@ -979,6 +1005,95 @@ class EventSet(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def url(self):
+        if self.create_page:
+            return f"{self.club.nice_url}events/{self.slug}"
+        return ""
+
+    def validate_unique(self, exclude=None):
+        errors = []
+        qs = EventSet.objects.filter(club_id=self.club_id, name__iexact=self.name)
+        if self.id:
+            qs = qs.exclude(id=self.id)
+        if qs.exists():
+            errors.append("Event Set with this Club and Name already exists.")
+
+        if self.create_page:
+            qs = EventSet.objects.filter(
+                club_id=self.club_id, create_page=True, slug__iexact=self.slug
+            )
+            if self.id:
+                qs = qs.exclude(id=self.id)
+            if qs.exists():
+                errors.append("Event Set with this Club and Slug already exists.")
+        if errors:
+            raise ValidationError(errors)
+        super().validate_unique(exclude)
+
+    def extract_event_lists(self, request):
+        event_qs = self.events
+        if self.list_secret_events:
+            event_qs = event_qs.exclude(privacy=PRIVACY_PRIVATE).select_related(
+                "club", "event_set"
+            )
+        else:
+            event_qs = event_qs.filter(privacy=PRIVACY_PUBLIC).select_related(
+                "club", "event_set"
+            )
+        past_event_qs = event_qs.filter(end_date__lt=now())
+        live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
+        upcoming_events_qs = event_qs.filter(
+            start_date__gt=now(), start_date__lte=now() + timedelta(hours=24)
+        )
+
+        def events_to_sets(qs, type="past"):
+            all_events_w_set = event_qs.order_by("-start_date", "name")
+            if type == "live":
+                all_events_w_set = all_events_w_set.filter(
+                    start_date__lte=now(), end_date__gte=now()
+                )
+            elif type == "upcoming":
+                all_events_w_set = all_events_w_set.filter(
+                    start_date__gt=now(),
+                    start_date__lte=now() + timedelta(hours=24),
+                )
+            else:
+                all_events_w_set = all_events_w_set.filter(end_date__lt=now())
+            if not all_events_w_set.exists():
+                return []
+            events = [
+                {
+                    "name": self.name,
+                    "events": all_events_w_set,
+                    "fake": False,
+                }
+            ]
+            return events
+
+        all_past_events = past_event_qs
+        past_events = events_to_sets(all_past_events)
+
+        all_live_events = live_events_qs
+        live_events = events_to_sets(all_live_events, type="live")
+
+        all_upcoming_events = upcoming_events_qs
+        upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
+
+        return {
+            "event_set_page": True,
+            "club": self.club,
+            "events": past_events,
+            "live_events": live_events,
+            "upcoming_events": upcoming_events,
+            "years": [],
+            "months": [],
+            "year": None,
+            "month": None,
+            "search_text": None,
+            "month_names": [],
+        }
 
 
 class Event(models.Model):
@@ -1217,13 +1332,13 @@ class Event(models.Model):
                 past_event_qs = past_event_qs.filter(start_date__month=selected_month)
 
         def list_events_sets(qs):
-            events_witout_sets = qs.filter(event_set__isnull=True)
+            events_without_sets = qs.filter(event_set__isnull=True)
             first_events_of_each_set = (
                 qs.filter(event_set__isnull=False)
                 .order_by("event_set_id", "-start_date")
                 .distinct("event_set_id")
             )
-            return events_witout_sets.union(first_events_of_each_set).order_by(
+            return events_without_sets.union(first_events_of_each_set).order_by(
                 "-start_date", "name"
             )
 
@@ -1233,7 +1348,7 @@ class Event(models.Model):
             if events_set_ids:
                 all_events_w_set = (
                     cls.objects.select_related("club")
-                    .filter(event_set_id__in=events_set_ids)
+                    .filter(event_set_id__in=events_set_ids, privacy=PRIVACY_PUBLIC)
                     .order_by("-start_date", "name")
                 )
                 if type == "live":

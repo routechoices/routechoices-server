@@ -19,7 +19,7 @@ from django_hosts.resolvers import reverse
 
 from routechoices.api.views import serve_from_s3
 from routechoices.club import feeds
-from routechoices.core.models import PRIVACY_PRIVATE, Club, Event
+from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
@@ -166,6 +166,36 @@ def event_view(request, slug, **kwargs):
     if event.privacy == PRIVACY_PRIVATE:
         response["Cache-Control"] = "private"
     return response
+
+
+@xframe_options_exempt
+@cache_page(5 if not settings.DEBUG else 0)
+def event_set_view(request, slug, **kwargs):
+    bypass_resp = handle_legacy_request(
+        "event_view", kwargs.get("club_slug"), slug=slug
+    )
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    if not club_slug:
+        club_slug = request.club_slug
+    event_set = (
+        EventSet.objects.all()
+        .select_related("club")
+        .prefetch_related("events")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
+    )
+    if not event_set:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        return render(request, "club/404_event_set.html", {"club": club}, status=404)
+
+    return render(
+        request, "site/event_list.html", event_set.extract_event_lists(request)
+    )
 
 
 def event_export_view(request, slug, **kwargs):

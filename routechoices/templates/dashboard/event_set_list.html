@@ -20,6 +20,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Event Count</th>
+                    <th>Link</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,6 +28,7 @@
                 <tr>
                     <td><a href="{% url 'dashboard:event_set_edit_view' event_set_id=event_set.aid %}">{{ event_set.name }}</a></td>
                     <td>{{ event_set.events.all.count }}</td>
+                    <td>{% if event_set.url %}<a href="{{ event_set.url }}">View</a>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>

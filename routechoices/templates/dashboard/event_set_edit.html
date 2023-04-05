@@ -2,15 +2,17 @@
 {% load static %}
 {% load django_bootstrap5 %}
 {% load hosts %}
+{% load qr_code %}
 {% load compress %}
-{%  block extra_head %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
-{%  endblock %}
 
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
+        {% if event_set.url %}
+        <div  class="text-center d-flex">
+            <div><p>{% qr_from_text event_set.url size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText fw-bold" href="{{ event_set.url }}">{{ event_set.url }}</a></small></p></div>
+        </div>
+        {% endif%}
         <h1>{% if context == 'edit' %}Edit Event Set{% else %}New Event Set{% endif %}</h1>
         <form action="" method="post">
             {% csrf_token %}
@@ -30,4 +32,12 @@
 <h4>Not used in any events</h4>
 {% endif %}
 {% endif %}
+<script
+  src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
+  data-club-url="{{club.nice_url}}"></script>
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/vendor/slugify-1.6.5/slugify.js' %}"></script>
+<script src="{% static '/scripts/dashboard/event_set_edit.js' %}"></script>
+{% endcompress %}
 {% endblock %}

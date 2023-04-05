@@ -217,7 +217,7 @@ class EventSetForm(ModelForm):
 
     class Meta:
         model = EventSet
-        fields = ["name"]
+        fields = ["name", "create_page", "slug", "list_secret_events"]
 
     def validate_unique(self):
         exclude = self._get_validation_exclusions()

@@ -64,7 +64,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
 
 
 class HasLocationFilter(admin.SimpleListFilter):
-    title = "wether it has locations"
+    title = "Whether it has locations"
     parameter_name = "has_locations"
 
     def lookups(self, request, model_admin):
@@ -81,7 +81,7 @@ class HasLocationFilter(admin.SimpleListFilter):
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
-    title = "wether it has competitors associated with"
+    title = "Whether it has competitors associated with"
     parameter_name = "has_competitors"
 
     def lookups(self, request, model_admin):
@@ -98,7 +98,7 @@ class HasCompetitorFilter(admin.SimpleListFilter):
 
 
 class IsGPXFilter(admin.SimpleListFilter):
-    title = "wether it is an actual device"
+    title = "Whether it is an actual device"
     parameter_name = "device_type"
 
     def lookups(self, request, model_admin):
