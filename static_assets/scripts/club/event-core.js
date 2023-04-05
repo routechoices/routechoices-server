@@ -1510,10 +1510,16 @@ function displayOptions(ev) {
       if (!e.target.checked) {
         showClusters = false;
         map.removeControl(groupControl);
-        Object.values(clusters).forEach(function (c) {
-          map.removeLayer(c.mapMarker);
-          map.removeLayer(c.nameMarker);
-        });
+        for (var [key, c] of clusters) {
+          if (c.mapMarker) {
+            map.removeLayer(c.mapMarker);
+            clusters[key].mapMarker = null;
+          }
+          if (c.nameMarker) {
+            map.removeLayer(c.nameMarker);
+            clusters[key].nameMarker = null;
+          }
+        }
         clusters = {};
       } else {
         groupControl = L.control.grouping({ position: "topright" });
