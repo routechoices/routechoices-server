@@ -71,14 +71,21 @@
 <div class="container content">
 {% endif %}
 <div class="row">
+  {%if event_set_page %}
+  <div class="row mb-3">
+    <h4 class="padded-multiline"><span>{{event_set.name}}</span></h4>
+  </div>
+  {% endif %}
   {% if live_events %}
   <div><h2>Live Events</h2></div>
   <div>
   {% for event_set in live_events %}
+    {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
+    {% endif %}
     {% for event in event_set.events %}
       <div class="card event-set-card mb-3">
         <div class="card-body">
@@ -118,10 +125,12 @@
   </div>
   <div>
   {% for event_set in upcoming_events reversed %}
+    {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
+    {% endif%}
     {% for event in event_set.events reversed %}
       <div class="card event-set-card mb-3">
         <div class="card-body">
@@ -153,10 +162,10 @@
   {% endfor %}
   </div>
   {% endif%}
-  {% if years or search_text %}
-  <div class="mb-3">
+  {% if years or search_text or event_set_page %}
+  <div {% if not event_set_page %}class="mb-3"{% endif%}>
     <h2>Archived Events</h2>
-      {% if home_url %}
+      {% if home_url and not event_set_page %}
         <form class="mb-3 row" method="GET">
           <div class="col-auto">
             <input class="form-control" type="search" placeholder="Search" name="q" value="{{search_text}}">
@@ -180,10 +189,12 @@
   <div>
   {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode %}{% endif %}
   {% for event_set in events %}
+    {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
+    {% endif %}
     {% for event in event_set.events %}
     <div class="card event-set-card mb-3">
       <div class="card-body">

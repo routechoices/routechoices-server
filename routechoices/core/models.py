@@ -1082,6 +1082,7 @@ class EventSet(models.Model):
         upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
 
         return {
+            "event_set": self,
             "event_set_page": True,
             "club": self.club,
             "events": past_events,
