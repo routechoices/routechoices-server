@@ -16,8 +16,8 @@
 <link rel="manifest" href="{% static 'manifest.json' %}?v=2023c">{% endif %}
 {% endblock %}
 
-{% block head_title %}GPS Tracking of Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
-{% block head_description %}List of public events{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}{% endblock %}
+{% block head_title %}GPS Tracking of Events{%if event_set_page%} {{event_set.name}}{% endif %}{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
+{% block head_description %}List of events{%if event_set_page%} {{event_set.name}}{% endif %}{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}{% endblock %}
 
 {% block extra_head %}
 <link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} {% else %}{% endif%}GPS Tracking Event Feed" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
