@@ -983,14 +983,14 @@ class EventSet(models.Model):
             validate_nice_slug,
         ],
         db_index=True,
-        help_text="This is used to build the url of this event set page",
+        help_text="This is used to build the url of the page",
         null=True,
         blank=True,
         default="",
     )
     list_secret_events = models.BooleanField(
         default=False,
-        help_text="Whether secret events are listed in the event set page",
+        help_text="Whether the page lists the secret events of the event set",
     )
 
     def save(self, *args, **kwargs):
