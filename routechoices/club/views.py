@@ -172,7 +172,7 @@ def event_view(request, slug, **kwargs):
 @cache_page(5 if not settings.DEBUG else 0)
 def event_set_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_view", kwargs.get("club_slug"), slug=slug
+        "event_set_view", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
