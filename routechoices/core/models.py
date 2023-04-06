@@ -1012,6 +1012,10 @@ class EventSet(models.Model):
             return f"{self.club.nice_url}events/{self.slug}"
         return ""
 
+    @property
+    def hide_secret_events(self):
+        return not self.list_secret_events
+
     def validate_unique(self, exclude=None):
         errors = []
         qs = EventSet.objects.filter(club_id=self.club_id, name__iexact=self.name)
