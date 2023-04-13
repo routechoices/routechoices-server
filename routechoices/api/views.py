@@ -1146,7 +1146,7 @@ def event_data(request, event_id):
             "short_name": c.short_name,
             "start_time": c.start_time,
         }
-        if event.is_live:
+        if event.is_live and c.device_id:
             c_data["battery_level"] = c.device.battery_level
         results.append(c_data)
     res = {
