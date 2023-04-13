@@ -42,7 +42,3 @@ repos:
     hooks:
     -   id: ruff
         args: [--fix, --exit-non-zero-on-fix]
--   repo: https://github.com/zahorniak/pre-commit-circleci.git
-    rev: v0.6 # Ensure this is the latest tag, comparing to the Releases tab
-    hooks:
-    -   id: circleci_validate
