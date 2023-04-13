@@ -1100,7 +1100,7 @@ function displayCompetitorList(force) {
         ? nbShown < maxParticipantsDisplayed
         : competitor.isShown;
     nbShown += competitor.isShown ? 1 : 0;
-    var div = u('<div class="card-body px-1 pt-0 pb-0"/>');
+    var div = u('<div class="card-body px-1 pt-1 pb-0"/>');
     div.html(
       '<div class="float-start color-tag me-1" style="cursor: pointer"><i class="media-object fa-solid fa-circle fa-3x icon-sidebar" style="color:' +
         competitor.color +
