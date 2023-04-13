@@ -1020,6 +1020,7 @@ def competitor_route_upload(request, competitor_id):
                             "name": "Olav Lundanes (Halden SK)",
                             "short_name": "Halden SK",
                             "start_time": "2019-06-15T20:00:00Z",
+                            "battery_level": 84,
                         }
                     ],
                     "nb_points": 0,
@@ -1138,15 +1139,16 @@ def event_data(request, event_id):
                 from_date, end_date, encoded=True
             )
         nb_points += nb
-        results.append(
-            {
-                "id": c.aid,
-                "encoded_data": encoded_data,
-                "name": c.name,
-                "short_name": c.short_name,
-                "start_time": c.start_time,
-            }
-        )
+        c_data = {
+            "id": c.aid,
+            "encoded_data": encoded_data,
+            "name": c.name,
+            "short_name": c.short_name,
+            "start_time": c.start_time,
+        }
+        if event.is_live:
+            c_data["battery_level"] = c.device.battery_level
+        results.append(c_data)
     res = {
         "competitors": results,
         "nb_points": nb_points,
