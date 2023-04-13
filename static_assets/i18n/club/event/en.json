@@ -39,5 +39,6 @@
     "center": "Center",
     "full-route": "Full route",
     "follow": "Follow",
-    "crossing-count": "Number of crossings"
+    "crossing-count": "Number of crossings",
+    "highlight": "Highlight"
 }

@@ -1042,19 +1042,6 @@ function toggleFocusCompetitor(c) {
     if (comp.focused) {
       comp.focused = false;
       u("#focusedIcon-" + comp.id).removeClass("route-focused");
-
-      if (comp.nameMarker) {
-        comp.nameMarker.remove();
-        comp.nameMarker = null;
-      }
-      if (comp.mapMarker) {
-        comp.mapMarker.remove();
-        comp.mapMarker = null;
-      }
-      if (comp.tail) {
-        comp.tail.remove();
-        comp.tail = null;
-      }
     }
   });
   if (wasFocused) {
@@ -1067,6 +1054,21 @@ function toggleFocusCompetitor(c) {
     c.focused = true;
     u("#focusedIcon-" + c.id).addClass("route-focused");
     zoomOnCompetitor(c);
+  }
+}
+
+function toggleHighlightCompetitor(c) {
+  const wasHighlighted = c.highlighted;
+  if (wasHighlighted) {
+    c.highlighted = false;
+    u("#highlightIcon-" + c.id).removeClass("competitor-highlighted");
+  } else {
+    if (!c.isShown) {
+      return;
+    }
+    c.highlighted = true;
+    u("#highlightIcon-" + c.id).addClass("competitor-highlighted");
+    console.log("ddd");
   }
   if (c.nameMarker) {
     c.nameMarker.remove();
@@ -1130,6 +1132,15 @@ function displayCompetitorList(force) {
         '<i class="fa-solid fa-crosshairs' +
         (competitor.focused ? " route-focused" : "") +
         '" id="focusedIcon-' +
+        competitor.id +
+        '"></i></button>' +
+        // toggle highligh competitor
+        '<button type="button" class="highlight_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="highlight competitor" data-bs-toggle="tooltip" data-bs-title="' +
+        banana.i18n("highlight") +
+        '">' +
+        '<i class="fa-solid fa-highlighter' +
+        (competitor.highlighted ? " competitor-highlighted" : "") +
+        '" id="highlightIcon-' +
         competitor.id +
         '"></i></button>' +
         // toggle full route
@@ -1210,6 +1221,7 @@ function displayCompetitorList(force) {
         if (!e.target.checked) {
           competitor.isShown = false;
           competitor.focused = false;
+          competitor.highlighted = false;
           u("#focusedIcon-" + competitor.id).removeClass("route-focused");
           competitor.displayFullRoute = null;
           u("#fullRouteIcon-" + competitor.id).attr({ fill: "#aaa" });
@@ -1273,6 +1285,11 @@ function displayCompetitorList(force) {
       .on("click", function () {
         toggleFocusCompetitor(competitor);
       });
+    u(div)
+      .find(".highlight_competitor_btn")
+      .on("click", function () {
+        toggleHighlightCompetitor(competitor);
+      });
     if (
       searchText === null ||
       searchText === "" ||
@@ -1320,6 +1337,7 @@ function displayCompetitorList(force) {
         competitorList.forEach(function (competitor) {
           competitor.isShown = false;
           competitor.focused = false;
+          competitor.highlighted = false;
           competitor.displayFullRoute = false;
 
           if (competitor.mapMarker) {
@@ -1937,7 +1955,7 @@ function drawCompetitors() {
               competitor.color,
               isOnRight,
               true,
-              competitor.focused
+              competitor.highlighted
             );
             competitor.nameMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
@@ -1966,7 +1984,7 @@ function drawCompetitors() {
           var runnerIcon = getRunnerIcon(
             competitor.color,
             false,
-            competitor.focused
+            competitor.highlighted
           );
           competitor.mapMarker = L.marker(
             [loc.coords.latitude, loc.coords.longitude],
@@ -2006,7 +2024,7 @@ function drawCompetitors() {
             competitor.color,
             isNameOnRight,
             false,
-            competitor.focused
+            competitor.highlighted
           );
           competitor.isNameOnRight = isNameOnRight;
           competitor.nameMarker = L.marker(
@@ -2416,7 +2434,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023020300`)
+  return fetch(`${langFile}?v=2023041300`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

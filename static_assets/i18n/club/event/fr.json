@@ -39,5 +39,6 @@
     "center": "Centrer",
     "full-route": "Itinéraire complet",
     "follow": "Suivre",
-    "crossing-count": "Nombre d'intersections"
+    "crossing-count": "Nombre d'intersections",
+    "highlight": "Souligner"
 }

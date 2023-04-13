@@ -232,11 +232,19 @@
   color: #aaa;
 }
 
+.route-not-displayed .fa-highlighter {
+  color: #aaa;
+}
+
 .route-not-displayed .fa-location-dot {
   color: #aaa;
 }
 
 .route-displayed .fa-crosshairs.route-focused {
+  color: #20c997;
+}
+
+.route-displayed .fa-highlighter.competitor-highlighted {
   color: #20c997;
 }
 
