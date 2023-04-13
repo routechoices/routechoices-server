@@ -1039,12 +1039,16 @@ class EventSet(models.Model):
     def extract_event_lists(self, request):
         event_qs = self.events
         if self.list_secret_events:
-            event_qs = event_qs.exclude(privacy=PRIVACY_PRIVATE).select_related(
-                "club", "event_set"
+            event_qs = (
+                event_qs.exclude(privacy=PRIVACY_PRIVATE)
+                .select_related("club", "event_set")
+                .prefetch_related("competitors")
             )
         else:
-            event_qs = event_qs.filter(privacy=PRIVACY_PUBLIC).select_related(
-                "club", "event_set"
+            event_qs = (
+                event_qs.filter(privacy=PRIVACY_PUBLIC)
+                .select_related("club", "event_set")
+                .prefetch_related("competitors")
             )
         past_event_qs = event_qs.filter(end_date__lt=now())
         live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
@@ -1276,8 +1280,10 @@ class Event(models.Model):
         selected_month = request.GET.get("month")
         search_text_raw = request.GET.get("q", "").strip()
 
-        event_qs = cls.objects.filter(privacy=PRIVACY_PUBLIC).select_related(
-            "club", "event_set"
+        event_qs = (
+            cls.objects.filter(privacy=PRIVACY_PUBLIC)
+            .select_related("club", "event_set")
+            .prefetch_related("competitors")
         )
         if club is not None:
             event_qs = event_qs.filter(club=club)
@@ -1353,6 +1359,7 @@ class Event(models.Model):
             if events_set_ids:
                 all_events_w_set = (
                     cls.objects.select_related("club")
+                    .prefetch_related("competitors")
                     .filter(event_set_id__in=events_set_ids, privacy=PRIVACY_PUBLIC)
                     .order_by("-start_date", "name")
                 )

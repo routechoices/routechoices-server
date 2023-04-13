@@ -90,9 +90,12 @@
       <div class="card event-set-card mb-3">
         <div class="card-body">
           <div class="d-flex flex-row bd-highlight justify-content-between">
-            <div class="p-2 bd-highlight">
+            <div class="px-2 py-1 bd-highlight">
               <div>
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic" style="font-size: 1em;"><b><i>LIVE</i></b></span>
+              </div>
+              <div style="color: grey; font-size:0.75em;line-height:0.8em">
+                <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
               </div>
             </div>
             <div class="p-2 bd-highlight justify-end">
@@ -135,12 +138,15 @@
       <div class="card event-set-card mb-3">
         <div class="card-body">
           <div class="d-flex flex-row bd-highlight justify-content-between">
-            <div class="p-2 bd-highlight">
+            <div class="px-2 py-1 bd-highlight">
               <div>
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
               </div>
               <div>
                 <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+              </div>
+              <div style="color: grey; font-size:0.75em;line-height:0.8em">
+                <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
               </div>
             </div>
             {% if event.open_registration and not event.ended  %}
@@ -199,12 +205,15 @@
     <div class="card event-set-card mb-3">
       <div class="card-body">
         <div class="d-flex flex-row bd-highlight justify-content-between">
-          <div class="p-2 bd-highlight">
+          <div class="px-2 py-1 bd-highlight">
             <div>
               <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
             </div>
             <div>
               <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+            </div>
+            <div style="color: grey; font-size:0.75em;line-height:0.8em">
+              <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
             </div>
           </div>
           <div class="p-2 bd-highlight justify-end">
