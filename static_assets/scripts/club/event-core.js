@@ -200,7 +200,7 @@ L.Control.Ranking = L.Control.extend({
     ) {
       u(".leaflet-control-ranking").prepend(
         '<div class="result-list-title">' +
-          '<h6><i class="fa-solid fa-wreath-laurel"></i> ' +
+          '<h6><i class="fa-solid fa-trophy"></i> ' +
           banana.i18n("ranking") +
           "</h6><label>" +
           banana.i18n("crossing-count") +
