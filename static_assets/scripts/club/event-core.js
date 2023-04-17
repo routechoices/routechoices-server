@@ -1654,12 +1654,12 @@ function checkVisible(elm) {
 function drawCompetitors() {
   // play/pause button
   if (playbackPaused) {
-    var html = '<i class="fa-solid fa-play"></i> x' + playbackRate;
+    var html = '<i class="fa-solid fa-play fa-fw"></i> x' + playbackRate;
     if (u("#play_pause_button").html() != html) {
       u("#play_pause_button").html(html);
     }
   } else {
-    var html = '<i class="fa-solid fa-pause"></i> x' + playbackRate;
+    var html = '<i class="fa-solid fa-pause fa-fw"></i> x' + playbackRate;
     if (u("#play_pause_button").html() != html) {
       u("#play_pause_button").html(html);
     }
