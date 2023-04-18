@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                     ("mapant-es", "Mapant Spain"),
                     ("topo-fi", "Topo Finland"),
                     ("topo-no", "Topo Norway"),
+                    ("topo-uk", "Topo UK"),
                     ("topo-world", "Topo World (OpenTopo)"),
                     ("topo-world-alt", "Topo World (ArcGIS)"),
                 ],

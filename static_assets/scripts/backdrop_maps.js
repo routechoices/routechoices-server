@@ -43,6 +43,13 @@ var backdropMaps = {
       className: "wms256",
     }
   ),
+  "topo-uk": L.tileLayer(
+    "https://api.os.uk/maps/raster/v1/zxy/Outdoor_3857/{z}/{x}/{y}.png?key=5T04qXvNDxLX1gCEAXS0INCgLvczGRYw",
+    {
+      attribution: "&copy; Ordnance Survey",
+      className: "wms256",
+    }
+  ),
   "mapant-no": L.tileLayer("https://mapant.no/osm-tiles/{z}/{x}/{y}.png", {
     attribution: "&copy; MapAnt.no",
     className: "wms256",
@@ -172,6 +179,7 @@ function getBaseLayers() {
     "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
     "Topo France": cloneLayer(backdropMaps["topo-fr"]),
     "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
+    "Topo UK": cloneLayer(backdropMaps["topo-uk"]),
     "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
     "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
   };
