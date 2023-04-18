@@ -140,6 +140,11 @@
     });
 
     eventStateControl = L.control.eventState();
+    coordsControl = L.control.mapCenterCoord({
+      position: "bottomright",
+      icon: false,
+      template: "{y}, {x}",
+    });
     panControl = L.control.pan();
     zoomControl = L.control.zoom();
     rotateControl = L.control.rotate({ closeOnZeroBearing: false });
@@ -155,8 +160,8 @@
       zoomControl.addTo(map);
       rotateControl.addTo(map);
     }
+    coordsControl.addTo(map);
     scaleControl.addTo(map);
-
     map.doubleClickZoom.disable();
     map.on("dblclick", onPressCustomMassStart);
     reqwest({
