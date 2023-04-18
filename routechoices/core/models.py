@@ -1514,11 +1514,14 @@ class Event(models.Model):
     def invalidate_cache(self):
         t0 = time.time()
         cache_interval = EVENT_CACHE_INTERVAL
-        cache_ts = int(t0 // (cache_interval if self.is_live else 7 * 24 * 3600))
-        cache_prefix = "live" if self.is_live else "archived"
-        cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
-        cache.delete(cache_key)
-        cache.delete(f"etag-{cache_key}")
+        for cache_prefix in ("live", "archived"):
+            cache_ts = int(
+                t0 // (cache_interval if cache_prefix == "live" else 7 * 24 * 3600)
+            )
+            cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
+            cache.delete(cache_key)
+            cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts - 1}"
+            cache.delete(cache_key)
 
     @property
     def has_notice(self):
