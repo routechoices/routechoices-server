@@ -242,7 +242,7 @@
   {% if not live_events and not events and not upcoming_events %}
     <div class="card">
       <div class="card-body">
-        <h2 style="color: #888">No {% if event_set_page and event_set.hide_secret_events %}public {% endif %}events...</h2>
+        <h2 style="color: #888">No {% if not event_set_page or event_set.hide_secret_events %}public {% endif %}events...</h2>
       </div>
     </div>
   {% endif %}
