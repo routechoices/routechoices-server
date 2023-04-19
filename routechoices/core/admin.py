@@ -224,6 +224,7 @@ class NoticeInline(admin.TabularInline):
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "event_set",
         "club",
         "start_date",
         "privacy",
@@ -237,6 +238,7 @@ class EventAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
+            .select_related("event_set")
             .annotate(competitor_count=Count("competitors"))
         )
 
