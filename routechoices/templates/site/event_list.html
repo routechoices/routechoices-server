@@ -120,6 +120,7 @@
     {% endfor %}
   {% endfor %}
   </div>
+  <hr/>
   {% endif%}
   {% if upcoming_events %}
   <div>
@@ -167,6 +168,9 @@
     {% endfor %}
   {% endfor %}
   </div>
+  {% if years or search_text or event_set_page and events %}
+  <hr/>
+  {% endif%}
   {% endif%}
   {% if years or search_text or event_set_page and events %}
   <div {% if not event_set_page %}class="mb-3"{% endif%}>
