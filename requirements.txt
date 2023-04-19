@@ -89,7 +89,7 @@ sewer==0.8.4
 six==1.16.0
 smmap==5.0.0
 soupsieve==2.4
-sqlparse==0.4.3
+sqlparse==0.4.4
 tinycss2==1.1.1
 tornado==6.2
 typing-extensions==4.5.0
