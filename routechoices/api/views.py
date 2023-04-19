@@ -79,7 +79,13 @@ class PostDataThrottle(AnonRateThrottle):
 
 
 def serve_from_s3(
-    bucket, request, path, filename="", mime="application/force-download", headers=None
+    bucket,
+    request,
+    path,
+    filename="",
+    mime="application/force-download",
+    headers=None,
+    dl=True,
 ):
     url = s3_object_url(path, bucket)
     url = url[len(settings.AWS_S3_ENDPOINT_URL) :]
@@ -94,7 +100,7 @@ def serve_from_s3(
         response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
         response["X-Accel-Buffering"] = "no"
     response["Content-Type"] = mime
-    response["Content-Disposition"] = set_content_disposition(filename)
+    response["Content-Disposition"] = set_content_disposition(filename, dl=dl)
     return response
 
 
@@ -1592,6 +1598,7 @@ def event_map_download(request, event_id, map_index="0"):
         ),
         mime=mime_type,
         headers=headers,
+        dl=False,
     )
 
 

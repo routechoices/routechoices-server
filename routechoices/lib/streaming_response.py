@@ -6,8 +6,6 @@ from wsgiref.util import FileWrapper
 import magic
 from django.http import StreamingHttpResponse
 
-from routechoices.lib.helpers import set_content_disposition
-
 range_re = re.compile(r"bytes\s*=\s*(\d+)\s*-\s*(\d*)", re.I)
 
 
@@ -47,7 +45,6 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
     range_match = range_re.match(range_header)
     size = len(data)
     content_type = kwargs.pop("content_type", None)
-    filename = kwargs.pop("filename", None)
     if not content_type:
         content_type = magic.from_buffer(data, mime=True) or "application/octet-stream"
     fileIO = BytesIO(data)
@@ -72,6 +69,4 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
         )
         resp["Content-Length"] = str(size)
     resp["Accept-Ranges"] = "bytes"
-    if filename:
-        resp["Content-Disposition"] = set_content_disposition(filename)
     return resp

@@ -1271,6 +1271,7 @@ def dashboard_map_download(request, map_id, *args, **kwargs):
             f"{mime_type[6:]}"
         ),
         mime=mime_type,
+        dl=False,
     )
 
 
@@ -1291,6 +1292,7 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
         file_path,
         filename=f"{club.name}.png",
         mime="image/png",
+        dl=False,
     )
 
 

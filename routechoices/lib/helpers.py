@@ -29,8 +29,9 @@ def epoch_to_datetime(t):
     return datetime.utcfromtimestamp(int(t)).replace(tzinfo=UTC_TZ)
 
 
-def set_content_disposition(filename):
-    return f"attachment; filename*=UTF-8''{urllib.parse.quote(filename, safe='')}"
+def set_content_disposition(filename, dl=True):
+    prefix = "attachment; " if dl else ""
+    return f"{prefix}filename*=UTF-8''{urllib.parse.quote(filename, safe='')}"
 
 
 def safe32encode(b):

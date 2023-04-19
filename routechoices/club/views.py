@@ -22,6 +22,7 @@ from django_hosts.resolvers import reverse
 
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
+from routechoices.lib.helpers import set_content_disposition
 from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
@@ -81,12 +82,13 @@ def club_logo(request, **kwargs):
         s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
         logo = buf.getvalue()
         cache.set(logo_key, logo, 31 * 24 * 3600)
-    return StreamingHttpRangeResponse(
+    resp = StreamingHttpRangeResponse(
         request,
         logo,
-        filename=f"{club.name}.png",
         content_type="image/png",
     )
+    resp["Content-Disposition"] = set_content_disposition(f"{club.name}.png", dl=False)
+    return resp
 
 
 def club_favicon(request, icon_name, **kwargs):
