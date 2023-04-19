@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.sitemaps.views import (
@@ -6,6 +8,7 @@ from django.contrib.sitemaps.views import (
     x_robots_tag,
 )
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404, HttpResponse
@@ -17,9 +20,9 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
 
-from routechoices.api.views import serve_from_s3
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
+from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
@@ -63,20 +66,26 @@ def club_logo(request, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    # if request.use_cname:
-    #    return redirect(
-    #        reverse("club_logo", host="clubs", host_kwargs={"club_slug": club_slug})
-    #    )
     club = get_object_or_404(
         Club.objects.exclude(logo=""), slug__iexact=club_slug, logo__isnull=False
     )
-    file_path = club.logo.name
-    return serve_from_s3(
-        settings.AWS_S3_BUCKET,
+    if club.domain and not request.use_cname:
+        return redirect(club.logo_url)
+    logo_key = f"club_logo:{club.aid}:{club.modification_date.timestamp()}"
+    if cache.has_key(logo_key):
+        logo = cache.get(logo_key)
+    else:
+        file_path = club.logo.name
+        buf = BytesIO()
+        s3_client = get_s3_client()
+        s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
+        logo = buf.getvalue()
+        cache.set(logo_key, logo, 31 * 24 * 3600)
+    return StreamingHttpRangeResponse(
         request,
-        file_path,
+        logo,
         filename=f"{club.name}.png",
-        mime="image/png",
+        content_type="image/png",
     )
 
 

@@ -275,10 +275,7 @@ Follow our events live or replay them later.
 
     @property
     def logo_url(self):
-        path = reverse(
-            "club_logo", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
-        )
-        return f"https:{path}{self.logo_last_mod}"
+        return f"{self.nice_url}logo{self.logo_last_mod}"
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)

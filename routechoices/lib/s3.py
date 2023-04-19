@@ -43,3 +43,8 @@ def s3_delete_key(key, bucket):
 def upload_to_s3(bucket, key, fileobj):
     s3 = get_s3_client()
     s3.upload_fileobj(fileobj, bucket, key)
+
+
+def download_from_s3(bucket, key, fileobj):
+    s3 = get_s3_client()
+    s3.download_fileobj(bucket, fileobj, key)
