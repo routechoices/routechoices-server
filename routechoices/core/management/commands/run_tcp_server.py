@@ -804,29 +804,47 @@ class TrackTapeServer(GenericTCPServer):
 class Command(BaseCommand):
     help = "Run a TCP server for GPS trackers."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--tmt250-port", nargs="?", type=int, help="Teltonika Handler Port"
+        )
+        parser.add_argument(
+            "--mictrack-port", nargs="?", type=int, help="Mictrack Handler Port"
+        )
+        parser.add_argument(
+            "--queclink-port", nargs="?", type=int, help="Queclink Handler Port"
+        )
+        parser.add_argument(
+            "--tracktape-port", nargs="?", type=int, help="Tracktape Handler Port"
+        )
+
     def handle(self, *args, **options):
         signal.signal(signal.SIGTERM, sigterm_handler)
-        if settings.TMT250_PORT:
+        if options.get("tmt250_port"):
             tmt250_server = TMT250Server()
-            tmt250_server.listen(settings.TMT250_PORT)
-        if settings.QUECLINK_PORT:
+            tmt250_server.listen(options["tmt250_port"])
+        if options.get("queclink_port"):
             queclink_server = QueclinkServer()
-            queclink_server.listen(settings.QUECLINK_PORT)
-        if settings.MICTRACK_PORT:
+            queclink_server.listen(options["queclink_port"])
+        if options.get("mictrack_port"):
             mictrack_server = MicTrackServer()
-            mictrack_server.listen(settings.MICTRACK_PORT)
-        if settings.TRACKTAPE_PORT:
+            mictrack_server.listen(options["mictrack_port"])
+        if options.get("tracktape_port"):
             tracktape_server = TrackTapeServer()
-            tracktape_server.listen(settings.TRACKTAPE_PORT)
+            tracktape_server.listen(options["tracktape_port"])
         try:
             print("Start listening TCP data...", flush=True)
             logger.info(f"{arrow.now().datetime}, UP")
             IOLoop.current().start()
         except (KeyboardInterrupt, SystemExit):
-            tmt250_server.stop()
-            queclink_server.stop()
-            mictrack_server.stop()
-            tracktape_server.stop()
+            if options.get("tmt250_port"):
+                tmt250_server.stop()
+            if options.get("queclink_port"):
+                queclink_server.stop()
+            if options.get("mictrack_port"):
+                mictrack_server.stop()
+            if options.get("tracktape_port"):
+                tracktape_server.stop()
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)

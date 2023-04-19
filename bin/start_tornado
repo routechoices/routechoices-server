@@ -11,11 +11,11 @@ then
   echo "already running"
  else
   echo "starting"
-  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server > ${BASEDIR}/logs/tornado.log 2> ${BASEDIR}/logs/tornado.error.log &
+  nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server --tmt250-port=12000 --mictrack-port=12001 --queclink-port=12002 --tracktape-port=12003  > ${BASEDIR}/logs/tornado.log 2> ${BASEDIR}/logs/tornado.error.log &
   echo $! > $PID_FILE
  fi
 else
  echo "starting"
- nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server > ${BASEDIR}/logs/tornado.log 2> ${BASEDIR}/logs/tornado.error.log &
+ nohup ${BASEDIR}/env/bin/python ${BASEDIR}/manage.py run_tcp_server --tmt250-port=12000 --mictrack-port=12001 --queclink-port=12002 --tracktape-port=12003 > ${BASEDIR}/logs/tornado.log 2> ${BASEDIR}/logs/tornado.error.log &
  echo $! > $PID_FILE
 fi
