@@ -63,10 +63,10 @@ def club_logo(request, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    if request.use_cname:
-        return redirect(
-            reverse("club_logo", host="clubs", host_kwargs={"club_slug": club_slug})
-        )
+    # if request.use_cname:
+    #    return redirect(
+    #        reverse("club_logo", host="clubs", host_kwargs={"club_slug": club_slug})
+    #    )
     club = get_object_or_404(
         Club.objects.exclude(logo=""), slug__iexact=club_slug, logo__isnull=False
     )
