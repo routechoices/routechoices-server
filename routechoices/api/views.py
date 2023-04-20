@@ -94,12 +94,13 @@ def serve_from_s3(
     if request.method == "GET":
         response_status = status.HTTP_206_PARTIAL_CONTENT
 
-    response = HttpResponse("", status=response_status, headers=headers)
+    response = HttpResponse(
+        "", status=response_status, headers=headers, content_type=mime
+    )
 
     if request.method == "GET":
         response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
         response["X-Accel-Buffering"] = "no"
-    response["Content-Type"] = mime
     response["Content-Disposition"] = set_content_disposition(filename, dl=dl)
     return response
 
