@@ -269,7 +269,7 @@ class MapApiTestCase(EssentialApiBase):
         # requesting 2nd non existing map of event
         res = self.client.get(
             (
-                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&"
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&"
                 f"format=image%2Fjpeg&{def_query}"
             ),
             SERVER_NAME="wms.routechoices.dev",
@@ -297,7 +297,7 @@ class MapApiTestCase(EssentialApiBase):
         # requesting 2nd existing map of event
         res = self.client.get(
             (
-                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F1&"
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&"
                 f"format=image%2Fjpeg&{def_query}"
             ),
             SERVER_NAME="wms.routechoices.dev",
@@ -320,7 +320,7 @@ class MapApiTestCase(EssentialApiBase):
         # requesting 3rd non existing map of event
         res = self.client.get(
             (
-                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F2&"
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}%2F3&"
                 f"format=image%2Fjpeg&{def_query}"
             ),
             SERVER_NAME="wms.routechoices.dev",
