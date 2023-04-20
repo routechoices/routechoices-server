@@ -196,7 +196,7 @@ def wms_service(request):
                         "map": event.map,
                     }
                 )
-                count_layer = 0
+                count_layer = 1
                 for layer in event.map_assignations.all():
                     count_layer += 1
                     layers.append(
