@@ -73,8 +73,10 @@ def club_logo(request, **kwargs):
     if club.domain and not request.use_cname:
         return redirect(club.logo_url)
     logo_key = f"club_logo:{club.aid}:{club.modification_date.timestamp()}"
+    headers = {}
     if cache.has_key(logo_key):
         logo = cache.get(logo_key)
+        headers["X-Cache-Hit"] = 1
     else:
         file_path = club.logo.name
         buf = BytesIO()
@@ -82,10 +84,12 @@ def club_logo(request, **kwargs):
         s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
         logo = buf.getvalue()
         cache.set(logo_key, logo, 31 * 24 * 3600)
+
     resp = StreamingHttpRangeResponse(
         request,
         logo,
         content_type="image/png",
+        headers=headers,
     )
     resp["Content-Disposition"] = set_content_disposition(f"{club.name}.png", dl=False)
     return resp
