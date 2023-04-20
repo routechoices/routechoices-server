@@ -268,7 +268,7 @@
                   m.hash,
                   m.max_zoom,
                   true,
-                  0,
+                  1,
                   m
                 );
                 mapChoices[m.title] = rasterMap;
