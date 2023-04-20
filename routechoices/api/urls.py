@@ -84,12 +84,12 @@ urlpatterns = [
         name="competitor_gpx_download",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>\d+)?$",
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/map/(?P<map_index>[1-9]\d*)?$",
         views.event_map_download,
         name="event_map_download",
     ),
     re_path(
-        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/(?P<map_index>\d+)?$",
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/kmz/(?P<map_index>[1-9]\d*)?$",
         views.event_kmz_download,
         name="event_kmz_download",
     ),

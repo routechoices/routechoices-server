@@ -625,7 +625,7 @@ def event_detail(request, event_id):
                     reverse(
                         "event_map_download",
                         host="api",
-                        kwargs={"event_id": event.aid, "map_index": (i + 1)},
+                        kwargs={"event_id": event.aid, "map_index": (i + 2)},
                     )
                 ),
             }
@@ -1579,7 +1579,7 @@ def device_ownership_api_view(request, club_id, device_id):
     auto_schema=None,
 )
 @api_view(["GET"])
-def event_map_download(request, event_id, map_index="0"):
+def event_map_download(request, event_id, map_index="1"):
     event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     file_path = raster_map.path
     mime_type = raster_map.mime_type
@@ -1631,7 +1631,7 @@ def event_map_thumb_download(request, event_id):
     auto_schema=None,
 )
 @api_view(["GET"])
-def event_kmz_download(request, event_id, map_index="0"):
+def event_kmz_download(request, event_id, map_index="1"):
     event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     kmz_data = raster_map.kmz
 

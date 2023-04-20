@@ -45,8 +45,8 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{ map.title }}</h5>
-            <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> Image</a>
-            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> KMZ</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> Image</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> KMZ</a>
           </div>
         </div>
       </div>

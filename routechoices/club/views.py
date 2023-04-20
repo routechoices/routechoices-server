@@ -273,7 +273,7 @@ def event_export_view(request, slug, **kwargs):
     return response
 
 
-def event_map_view(request, slug, index="0", **kwargs):
+def event_map_view(request, slug, index="1", **kwargs):
     bypass_resp = handle_legacy_request(
         "event_map_view", kwargs.get("club_slug"), slug=slug, index=index
     )
@@ -292,7 +292,7 @@ def event_map_view(request, slug, index="0", **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}{slug}map/{index if index != '0' else ''}")
+            return redirect(f"{club.nice_url}{slug}map/{index if index != '1' else ''}")
         return render(request, "club/404_event.html", {"club": club}, status=404)
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/map/{index}")
@@ -305,7 +305,7 @@ def event_map_view(request, slug, index="0", **kwargs):
     )
 
 
-def event_kmz_view(request, slug, index="0", **kwargs):
+def event_kmz_view(request, slug, index="1", **kwargs):
     bypass_resp = handle_legacy_request(
         "event_kmz_view", kwargs.get("club_slug"), slug=slug, index=index
     )
@@ -324,7 +324,7 @@ def event_kmz_view(request, slug, index="0", **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}{slug}kmz/{index if index != '0' else ''}")
+            return redirect(f"{club.nice_url}{slug}kmz/{index if index != '1' else ''}")
         return render(request, "club/404_event.html", {"club": club}, status=404)
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/kmz/{index}")

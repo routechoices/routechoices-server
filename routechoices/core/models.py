@@ -809,7 +809,7 @@ class Map(models.Model):
 
     @property
     def hash(self):
-        return safe64encodedsha(f"{self.path}:{self.corners_coordinates}")
+        return safe64encodedsha(f"{self.path}:{self.corners_coordinates}:20230420")
 
     @property
     def bound(self):
@@ -1227,6 +1227,7 @@ class Event(models.Model):
 
     @classmethod
     def get_public_map_at_index(cls, user, event_id, map_index):
+        """map_index is 1 based"""
         event_qs = (
             cls.objects.all()
             .select_related("club")
@@ -1236,11 +1237,12 @@ class Event(models.Model):
         )
         try:
             map_index = int(map_index)
-            if map_index < 0:
+            if map_index <= 0:
                 raise ValueError()
         except Exception:
             raise Http404
 
+        map_index -= 1
         if map_index == 0:
             event_qs = event_qs.select_related("map")
         elif map_index > 0:
