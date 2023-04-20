@@ -285,7 +285,7 @@
                 mapChoices[m.title] = L.tileLayer.wms(
                   window.local.wmsServiceUrl + "?v=" + m.hash,
                   {
-                    layers: window.local.eventId + "/" + i,
+                    layers: window.local.eventId + "/" + (i + 1),
                     bounds: bounds,
                     tileSize: 512,
                     noWrap: true,
