@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load compress %}
 
 {% block extra_head %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
+{% endcompress %}
 {% endblock %}
 
 {% block content %}
 <div class="row text-center">
     <h3>Pricing</h3>
-    <p>{{site.name}} is a not-for-profit, free and open source project.</p>
-    <p>No revenue is generated from it, and your data is not sold to third party.</p>
-    <p>Due to Finnish law, I can not accept donations.</p>
     <div id="generic_price_table">
         <!--BLOCK ROW START-->
         <div class="row d-grid justify-content-center">
@@ -62,5 +62,8 @@
             </div>
         </div>
     </div>
+    <p>{{site.name}} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
+    <p>No revenue is generated from it, and your data is not sold to third party.</p>
+    <p>Due to Finnish law, I can not accept donations.</p>
 </div>
 {% endblock %}
