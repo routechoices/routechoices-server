@@ -381,11 +381,17 @@ class CompetitorForm(ModelForm):
         start = self.cleaned_data.get("start_time")
         orig_event = self.cleaned_data.get("event")
         if self.data.get("start_date"):
-            event_start = get_aware_datetime(self.data.get("start_date"))
+            try:
+                event_start = get_aware_datetime(self.data.get("start_date"))
+            except Exception:
+                event_start = orig_event.start_date
         else:
             event_start = orig_event.start_date
         if self.data.get("end_date"):
-            event_end = get_aware_datetime(self.data.get("end_date"))
+            try:
+                event_end = get_aware_datetime(self.data.get("end_date"))
+            except Exception:
+                event_end = orig_event.end_date
         else:
             event_end = orig_event.end_date
         if start and (event_start > start or start > event_end):
