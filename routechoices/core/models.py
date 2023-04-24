@@ -919,6 +919,7 @@ MAP_GOOGLE_TERRAIN = "gmap-terrain"
 MAP_MAPANT_FI = "mapant-fi"
 MAP_MAPANT_NO = "mapant-no"
 MAP_MAPANT_ES = "mapant-es"
+MAP_MAPANT_SV = "mapant-sv"
 MAP_TOPO_FI = "topo-fi"
 MAP_TOPO_FR = "topo-fr"
 MAP_TOPO_NO = "topo-no"
@@ -935,6 +936,7 @@ MAP_CHOICES = (
     (MAP_MAPANT_FI, "Mapant Finland"),
     (MAP_MAPANT_NO, "Mapant Norway"),
     (MAP_MAPANT_ES, "Mapant Spain"),
+    (MAP_MAPANT_SV, "Mapant Sweden"),
     (MAP_TOPO_FI, "Topo Finland"),
     (MAP_TOPO_FR, "Topo France"),
     (MAP_TOPO_NO, "Topo Norway"),
