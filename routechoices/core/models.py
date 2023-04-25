@@ -916,6 +916,7 @@ MAP_OSM = "osm"
 MAP_GOOGLE_STREET = "gmap-street"
 MAP_GOOGLE_SAT = "gmap-hybrid"
 MAP_GOOGLE_TERRAIN = "gmap-terrain"
+MAP_MAPANT_CH = "mapant-ch"
 MAP_MAPANT_FI = "mapant-fi"
 MAP_MAPANT_NO = "mapant-no"
 MAP_MAPANT_ES = "mapant-es"
@@ -937,6 +938,7 @@ MAP_CHOICES = (
     (MAP_MAPANT_NO, "Mapant Norway"),
     (MAP_MAPANT_ES, "Mapant Spain"),
     (MAP_MAPANT_SV, "Mapant Sweden"),
+    (MAP_MAPANT_CH, "Mapant Switzerland"),
     (MAP_TOPO_FI, "Topo Finland"),
     (MAP_TOPO_FR, "Topo France"),
     (MAP_TOPO_NO, "Topo Norway"),
