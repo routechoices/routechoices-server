@@ -54,7 +54,7 @@ var backdropMaps = {
     attribution: "&copy; MapAnt.no",
     className: "wms256",
   }),
-  "mapant-sv": L.tileLayer(
+  "mapant-se": L.tileLayer(
     "https://gokartor-proxy.routechoices.com/{z}/{x}/{y}.jpg",
     {
       attribution: "&copy; gokartor.se",
@@ -183,7 +183,7 @@ function getBaseLayers() {
     "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
     "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
     "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
-    "Mapant Sweden": cloneLayer(backdropMaps["mapant-sv"]),
+    "Mapant Sweden": cloneLayer(backdropMaps["mapant-se"]),
     "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
     "Topo France": cloneLayer(backdropMaps["topo-fr"]),
     "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
