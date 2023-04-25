@@ -62,7 +62,7 @@ var backdropMaps = {
     }
   ),
   "mapant-se": L.tileLayer(
-    "/https://tile-proxy.routechoices.com/se/{z}/{x}/{y}.jpg",
+    "https://tile-proxy.routechoices.com/se/{z}/{x}/{y}.jpg",
     {
       attribution: "&copy; gokartor.se",
       className: "wms256",
