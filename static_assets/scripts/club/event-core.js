@@ -371,7 +371,10 @@ function getRunnerNameMarker(
   var runnerIcon = L.divIcon({
     className: iconClass,
     html: iconHtml,
-    iconAnchor: [rightSide ? nameTagWidth : 0, 0],
+    iconAnchor: [
+      rightSide ? nameTagWidth + (focused ? 10 : 0) : focused ? -10 : 0,
+      0,
+    ],
   });
   return runnerIcon;
 }
