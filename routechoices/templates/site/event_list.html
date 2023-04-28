@@ -197,7 +197,7 @@
   </div>
   {% endif %}
   <div>
-  {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show=8 %}{% endif %}
+  {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}{% endif %}
   {% for event_set in events %}
     {% if not event_set_page %}
     <div class="row">
@@ -241,7 +241,7 @@
     </div>
     {% endfor %}
   {% endfor %}
-  {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="7" %}{% endif %}
+  {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}{% endif %}
   </div>
   {% if not live_events and not events and not upcoming_events %}
     <div class="card">
