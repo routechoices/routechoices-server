@@ -1,0 +1,47 @@
+{% load static %}{% load compress %}<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>Map | Routechoices.com</title>
+    <link rel="shortcut icon" href="{% static 'favicon.ico'%}">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% compress css %}
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.3/leaflet.css'%}"/>
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css'%}"/>
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-locate-control-0.76.1/L.Control.Locate.min.css'%}"/>
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.css'%}"/>
+    {% endcompress %}
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+        .leaflet-kmzuploader {
+            background-color: #fff;
+            padding: 3px
+        }
+        .wms256 .leaflet-tile-container img {
+          width: 256.5px !important;
+          height: 256.5px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    {% compress js %}
+    <script src="{% static '/vendor/leaflet-1.9.3/leaflet.js'%}"></script>
+    <script src="{% static '/vendor/leaflet-image-transform-2022.02.26/leaflet-image-transform.min.js'%}"></script>
+    <script src="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.js'%}"></script>
+    <script src="{% static '/vendor/leaflet-locate-control-0.76.1/L.Control.Locate.min.js'%}"></script>
+    <script src="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.js'%}"></script>
+    <script src="{% static '/vendor/gpxparser-3.0.8/GPXParser.min.js'%}"></script>
+    <script src="{% static '/vendor/jszip-3.10.1/jszip.min.js'%}"></script>
+    <script src="{% static '/scripts/backdrop_maps.js'%}"></script>
+    <script src="{% static '/scripts/site/map.js'%}"></script>
+    {% endcompress %}
+</body>
+</html>
