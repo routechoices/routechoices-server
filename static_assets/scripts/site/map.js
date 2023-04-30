@@ -13,8 +13,13 @@
   var baseLayers = getBaseLayers();
   var defaultLayer = baseLayers["Open Street Map"];
   map.addLayer(defaultLayer);
-  map.addControl(L.control.layers(baseLayers));
-
+  var controlLayers = L.control.layers(baseLayers);
+  map.addControl(controlLayers);
+  if (L.Browser.touch && L.Browser.mobile) {
+    map.on("baselayerchange", function (e) {
+      controlLayers.collapse();
+    });
+  }
   // GPS location
   L.control.locate().addTo(map);
 
