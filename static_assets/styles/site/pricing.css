@@ -111,7 +111,7 @@
   color: #fff;
 }
 #generic_price_table {
-  margin: 25px 0;
+  margin: 0;
 }
 .row .table {
   padding: 28px 0;
@@ -241,14 +241,6 @@
 #generic_price_table .generic_content .generic_feature_list ul li {
   font-size: 18px;
   padding: 15px 0;
-  transition: all 0.3s ease-in-out 0s;
-}
-#generic_price_table .generic_content .generic_feature_list ul li:hover {
-  transition: all 0.3s ease-in-out 0s;
-  -moz-transition: all 0.3s ease-in-out 0s;
-  -ms-transition: all 0.3s ease-in-out 0s;
-  -o-transition: all 0.3s ease-in-out 0s;
-  -webkit-transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table .generic_content .generic_feature_list ul li .fa {
   padding: 0 10px;
@@ -271,40 +263,6 @@
   text-transform: uppercase;
 }
 
-#generic_price_table .generic_content,
-#generic_price_table .generic_content:hover,
-#generic_price_table
-  .generic_content
-  .generic_head_price
-  .generic_head_content
-  .head_bg,
-#generic_price_table
-  .generic_content:hover
-  .generic_head_price
-  .generic_head_content
-  .head_bg,
-#generic_price_table
-  .generic_content
-  .generic_head_price
-  .generic_head_content
-  .head
-  h2,
-#generic_price_table
-  .generic_content:hover
-  .generic_head_price
-  .generic_head_content
-  .head
-  h2,
-#generic_price_table .generic_content .price,
-#generic_price_table .generic_content:hover .price,
-#generic_price_table .generic_content .generic_price_btn a,
-#generic_price_table .generic_content:hover .generic_price_btn a {
-  transition: all 0.3s ease-in-out 0s;
-  -moz-transition: all 0.3s ease-in-out 0s;
-  -ms-transition: all 0.3s ease-in-out 0s;
-  -o-transition: all 0.3s ease-in-out 0s;
-  -webkit-transition: all 0.3s ease-in-out 0s;
-}
 @media (max-width: 320px) {
 }
 
@@ -359,35 +317,27 @@
 }
 #generic_price_table_home .blue {
   background: #3498db;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .emerald {
   background: #2ecc71;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .grey {
   background: #7f8c8d;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .midnight {
   background: #34495e;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .orange {
   background: #e67e22;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .purple {
   background: #9b59b6;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .red {
   background: #e74c3c;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .turquoise {
   background: #1abc9c;
-  transition: all 0.3s ease-in-out 0s;
 }
 
 #generic_price_table_home .blue:hover,
@@ -402,7 +352,6 @@
   border-bottom-right-radius: 50px;
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
-  transition: all 0.3s ease-in-out 0s;
 }
 #generic_price_table_home .divider {
   border-bottom: 1px solid #ddd;

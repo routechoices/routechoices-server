@@ -8,14 +8,10 @@
 {% block contentup %}
 <div class="container-fluid p-0">
   <div class="row m-0">
-    <div class="w-100" style="background-color: #fff;">
-      <div class="container content">
-        <div class="row">
-          <div class="row justify-content-between mb-3">
-            <div class="col align-self-center text-center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}"/></div>
-            <div class="col align-self-center text-center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
-            <div class="col align-self-center text-center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
-          </div>
+    <div class="w-100" style="background: linear-gradient(120deg, #a095de 0%, #e391cc 100%)">
+      <div class="container content" style="min-height: 100px">
+        <div class="row text-center font-weight-bold">
+          <h2>GPS Trackers</h2>
         </div>
       </div>
     </div>
@@ -24,111 +20,123 @@
 </div>
 <div class="container content">
   <div class="row">
-    <h2>GPS Trackers</h2>
-    <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
-    <p>For each method, devices are assigned a unique "device ID" that can be used on this website.</p>
-    <p>If interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
-    <p>See below more detailed instructions:</p>
-    <p class="text-center" style="margin-top:2em;">
-      <a role="button" class="btn btn-info mb-1" id="android-btn"  href="#android"><i class="fa-brands fa-android"></i> Tracking with an android smartphone</a>
-      <a role="button" class="btn btn-primary mb-1" id="ios-btn" href="#ios"><i class="fa-brands fa-apple"></i> Tracking with a iPhone</a>
-      <a role="button" class="btn btn-danger mb-1" id="tmt250-btn" href="#hardware"><i class="fa-solid fa-satellite-dish"></i> Tracking with a dedicated GPS tracker</a>
-    </p>
-    <div id="android">
-      <h4><i class="fa-brands fa-android"></i> Android</h4>
-      <div>
-        <p>
-          Install the Android app from Google Play app, Search "Routechoices Tracker", by Raphael Stefanini.
-        </p>
-        <p>
-          <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker'><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
-        </p>
-        <p>
-          Upon opening the app, it will display a device ID.
-        </p>
-        <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
-        <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
-        <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
-        <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
-        <ul>
-          <li>
-            On recent versions of Android make sure that Routechoices Tracker has been added to battery optimization exceptions.
-          </li>
-          <li>
-            Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
-          </li>
-        </ul>
-        </p>
-      </div>
-    </div>
-    <hr/>
-    <div id="ios">
-      <h4><i class="fa-brands fa-apple"></i> iOS</h4>
-      <div>
-        <p>
-          Install the iOS app from Apple AppStore app, Search "Routechoices Tracker", by Raphael Stefanini.
-        </p>
-        <p>
-          <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
-        </p>
-        <p>
-          Upon opening the app, it will display a device ID.
-          </p>
-        <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
-        <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
-        <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
-        <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
-          <ul>
-            <li>
-              Make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
-            </li>
-            <li>
-              Ensure that the settings in "Settings > Privacy > Location Services > Routechoices Tracker" is set to "Always"
-            </li>
-          </ul>
-        </p>
-      </div>
-    </div>
-    <hr/>
-    <div id="hardware">
-      <h4><i class="fa-solid fa-satellite-dish"></i> Dedicated GPS Trackers</h4>
-      <div>
-        <p>
-          The dedicated GPS trackers supported are:
-          <ul>
-            <li>Queclink GL200</li>
-            <li>Queclink GL3XX series</li>
-            <li>Queclink GL5XX series</li>
-            <li>Teltonika TMT250</li>
-          </ul>
-        </p>
-        <p>
-          Configure the devices to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
-          <ul>
-            <li>Teltonika devices: <code>port 2000</code></li>
-            <li>Queclink devices: <code>port 2002</code></li>
-          </ul>
-          Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on usage as this settings can affect battery life.<br/>
-          You can find some devices configurations file <a target="_blank" href="https://github.com/routechoices/trackers-config">here</a>.
-        </p>
-        <h5>Device ID</h5>
-        <p>Devices must be registered by acquiring a device ID (see below) that can be used on this website.</p>
-        <p>Once done simply turn on the tracker during events and its locations will be saved to the server.</p>
-        <h6>Get a device ID for a tracker</h6>
-        <form id="imeiForm">
-          <div class="form-group">
-            <label for="IMEI">IMEI</label>
-            <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
-            <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{site.name}} platform.</small>
-            <div id="imeiErrorMsg" class="invalid-feedback d-none mb-1">
-              <i class="fa-solid fa-triangle-exclamation"></i> Invalid IMEI
+    <div class="col-12 mx-auto">
+       <div class="card border-0 shadow rounded-3 my-3">
+         <div class="card-body p-4 p-sm-5">
+          <div class="row">
+            <div class="row justify-content-between mb-3">
+              <div class="col align-self-center text-center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}"/></div>
+              <div class="col align-self-center text-center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
+              <div class="col align-self-center text-center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        <br/>
-        <div id="imeiDevId" class="well d-none" >
-          <p>IMEI: <code id="imeiRes"></code><br/>Device ID <button class="btn btn-sm btn-secondary" id="copyDevIdBtn"><span class="imeiDevId roboto"></span> <i class="fa-regular fa-copy fa-fw"></i></button></p>
+          <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
+          <p>For each method, devices are assigned a unique "device ID" that can be used on this website.</p>
+          <p>If interested in acquiring dedicated trackers, contact us for informations about resellers.</p>
+          <p>See below more detailed instructions:</p>
+          <p class="text-center" style="margin-top:2em;">
+            <a role="button" class="btn btn-info mb-1" id="android-btn"  href="#android"><i class="fa-brands fa-android"></i> Tracking with an android smartphone</a>
+            <a role="button" class="btn btn-primary mb-1" id="ios-btn" href="#ios"><i class="fa-brands fa-apple"></i> Tracking with a iPhone</a>
+            <a role="button" class="btn btn-danger mb-1" id="tmt250-btn" href="#hardware"><i class="fa-solid fa-satellite-dish"></i> Tracking with a dedicated GPS tracker</a>
+          </p>
+          <div id="android">
+            <h4><i class="fa-brands fa-android"></i> Android</h4>
+            <div>
+              <p>
+                Install the Android app from Google Play app, Search "Routechoices Tracker", by Raphael Stefanini.
+              </p>
+              <p>
+                <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker'><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
+              </p>
+              <p>
+                Upon opening the app, it will display a device ID.
+              </p>
+              <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
+              <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
+              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
+              <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
+              <ul>
+                <li>
+                  On recent versions of Android make sure that Routechoices Tracker has been added to battery optimization exceptions.
+                </li>
+                <li>
+                  Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
+                </li>
+              </ul>
+              </p>
+            </div>
+          </div>
+          <hr/>
+          <div id="ios">
+            <h4><i class="fa-brands fa-apple"></i> iOS</h4>
+            <div>
+              <p>
+                Install the iOS app from Apple AppStore app, Search "Routechoices Tracker", by Raphael Stefanini.
+              </p>
+              <p>
+                <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
+              </p>
+              <p>
+                Upon opening the app, it will display a device ID.
+                </p>
+              <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
+              <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
+              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
+              <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
+                <ul>
+                  <li>
+                    Make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
+                  </li>
+                  <li>
+                    Ensure that the settings in "Settings > Privacy > Location Services > Routechoices Tracker" is set to "Always"
+                  </li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          <hr/>
+          <div id="hardware">
+            <h4><i class="fa-solid fa-satellite-dish"></i> Dedicated GPS Trackers</h4>
+            <div>
+              <p>
+                The dedicated GPS trackers supported are:
+                <ul>
+                  <li>Queclink GL200</li>
+                  <li>Queclink GL3XX series</li>
+                  <li>Queclink GL5XX series</li>
+                  <li>Teltonika TMT250</li>
+                </ul>
+              </p>
+              <p>
+                Configure the devices to share data with TCP protocol to server <code>routechoices.com</code> on the following port:
+                <ul>
+                  <li>Teltonika devices: <code>port 2000</code></li>
+                  <li>Queclink devices: <code>port 2002</code></li>
+                </ul>
+                Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on usage as this settings can affect battery life.<br/>
+                You can find some devices configurations file <a target="_blank" href="https://github.com/routechoices/trackers-config">here</a>.
+              </p>
+              <h5>Device ID</h5>
+              <p>Devices must be registered by acquiring a device ID (see below) that can be used on this website.</p>
+              <p>Once done simply turn on the tracker during events and its locations will be saved to the server.</p>
+              <h6>Get a device ID for a tracker</h6>
+              <form id="imeiForm">
+                <div class="form-group">
+                  <label for="IMEI">IMEI</label>
+                  <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
+                  <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{site.name}} platform.</small>
+                  <div id="imeiErrorMsg" class="invalid-feedback d-none mb-1">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid IMEI
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+              <br/>
+              <div id="imeiDevId" class="well d-none" >
+                <p>IMEI: <code id="imeiRes"></code><br/>Device ID <button class="btn btn-sm btn-secondary" id="copyDevIdBtn"><span class="imeiDevId roboto"></span> <i class="fa-regular fa-copy fa-fw"></i></button></p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
