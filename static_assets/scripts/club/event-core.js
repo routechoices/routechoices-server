@@ -347,7 +347,11 @@ function getRunnerNameMarker(
   focused = false
 ) {
   var iconHtml =
-    '<span style="opacity: ' +
+    '<span style="' +
+    (focused
+      ? "padding-bottom: 0px;border-bottom: 4px solid " + color + ";"
+      : "") +
+    "opacity: " +
     (faded ? 0.4 : 0.75) +
     ";color: " +
     color +
