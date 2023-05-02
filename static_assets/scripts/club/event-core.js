@@ -828,7 +828,7 @@ function refreshEventData() {
         var currentMapStillExists = response.maps.find(function (m) {
           return rasterMap && m.id === rasterMap.data.id;
         });
-        if (rasterMap && (currentMapNewData || response.maps.length === 0)) {
+        if (rasterMap && (currentMapNewData || response.maps.length <= 1)) {
           rasterMap.remove();
         }
         if (mapSelectorLayer) {
@@ -840,7 +840,8 @@ function refreshEventData() {
             var m = response.maps[i];
             if (
               (currentMapStillExists && m.id === currentMapStillExists.id) ||
-              (!currentMapStillExists && m.default)
+              (!currentMapStillExists && m.default) ||
+              response.maps.length === 1
             ) {
               m.title =
                 !m.title && m.default
@@ -856,7 +857,7 @@ function refreshEventData() {
                 bounds,
                 m.hash,
                 m.max_zoom,
-                currentMapNewData,
+                currentMapNewData || response.maps.length === 1,
                 i + 1,
                 m
               );

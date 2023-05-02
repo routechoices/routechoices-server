@@ -14,6 +14,7 @@ InvitationAdminChangeForm = get_invitation_admin_change_form()
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ("email", "club", "sent", "accepted")
     raw_id_fields = ("inviter",)
+    actions = ["resend"]
 
     def get_form(self, request, obj=None, **kwargs):
         if obj:
@@ -23,6 +24,13 @@ class InvitationAdmin(admin.ModelAdmin):
             kwargs["form"].user = request.user
             kwargs["form"].request = request
         return super().get_form(request, obj, **kwargs)
+
+    def resend(self, request, queryset):
+        for obj in queryset:
+            if not obj.sent:
+                obj.send_invitation(request)
+
+    resend.short_description = "Resend invitations"
 
 
 admin.site.register(Invitation, InvitationAdmin)
