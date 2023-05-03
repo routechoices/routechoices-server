@@ -75,7 +75,7 @@ fontawesomeSubset(
       "language",
     ],
   },
-  "sass/webfonts"
+  "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"
 );
 
 var a = sass.compile(
@@ -90,4 +90,7 @@ var c = sass.compile(
 var d = sass.compile(
   "static_assets/vendor/fontawesome-free-6.4.0-web/scss/brands.scss"
 ).css;
-fs.writeFileSync("all.css", [a, b, c, d].join("\n"));
+fs.writeFileSync(
+  "static_assets/vendor/fontawesome-free-6.4.0-web/css/all.css",
+  [a, b, c, d].join("\n")
+);
