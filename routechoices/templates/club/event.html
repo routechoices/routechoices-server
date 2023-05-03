@@ -92,9 +92,10 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="eventNotStartedModal" style="z-index: 10002">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header d-flex justify-content-center text-center">
-         <h2 class="modal-title" id="event-not-started-text">Event not yet started</h2>
+      <div class="modal-header d-flex justify-content-center text-center" style="background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
+         <h2 class="modal-title" id="event-not-started-text" style="font-family: Atkinson Hyperlegible, sans-serif;font-weight: 700;">Event not yet started</h2>
       </div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#fff" style="margin-top: -2em;" class="p-0"><path d="M0 1 L1 1 L0 0.5 Z"></path></svg>
       <div class="modal-body text-center">
         <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
       </div>
