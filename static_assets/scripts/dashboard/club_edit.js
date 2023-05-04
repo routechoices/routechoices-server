@@ -68,7 +68,7 @@
         swal(
           {
             title: "Confirm",
-            text: "If you proceed you will loose your pages analytics history.\n\nYou may change your domain prefix only once every 72hours.\nYour pages will still be accessible at the old domain during those 72hours.",
+            text: "You may change your domain prefix only once every 72hours.\nYour pages will still be accessible at the old domain during those 72hours.",
             type: "warning",
             confirmButtonText: "Continue",
             showCancelButton: true,

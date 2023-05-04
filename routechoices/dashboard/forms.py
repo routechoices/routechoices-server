@@ -73,6 +73,13 @@ class ClubForm(ModelForm):
                 self.instance.slug_changed_at
                 and self.instance.slug_changed_at
                 > arrow.now().shift(hours=-72).datetime
+                and not (
+                    (
+                        self.instance.slug_changed_from
+                        and slug == self.instance.slug_changed_from
+                    )
+                    or slug == self.instance.slug
+                )
             ):
                 raise ValidationError(
                     "Domain prefix can be changed only once every 72 hours."

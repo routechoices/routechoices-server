@@ -213,9 +213,9 @@ Follow our events live or replay them later.
                 self.slug_changed_at = now()
 
                 if self.analytics_site:
-                    # TODO: In future use change domain API endpoint
-                    # instead of deleting old site
-                    plausible.delete_domain(old_self.analytics_domain)
+                    plausible.change_domain(
+                        old_self.analytics_domain, self.analytics_domain
+                    )
                     self.analytics_site = ""
 
         self.slug = self.slug.lower()

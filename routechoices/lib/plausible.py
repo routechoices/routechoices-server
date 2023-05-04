@@ -46,6 +46,18 @@ def create_shared_link(domain, name):
     return "", False
 
 
+def change_domain(from_domain, to_domain):
+    if not settings.ANALYTICS_API_KEY:
+        return False
+    r = requests.put(
+        f"{settings.ANALYTICS_API_URL}/sites/{from_domain}",
+        headers={"authorization": f"Bearer {settings.ANALYTICS_API_KEY}"},
+        data={"domain": to_domain},
+        timeout=5,
+    )
+    return r.status_code == 200
+
+
 def delete_domain(domain):
     if not settings.ANALYTICS_API_KEY:
         return False
