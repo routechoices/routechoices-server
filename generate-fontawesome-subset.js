@@ -16,6 +16,7 @@ fontawesomeSubset(
       "arrow-up-right-from-square",
       "backward",
       "play",
+      "pause",
       "forward",
       "users",
       "gear",
