@@ -10,6 +10,7 @@ fontawesomeSubset(
     brands: ["twitter", "instagram", "github", "android", "apple"],
     regular: ["window-restore", "map", "copy"],
     solid: [
+      "chart-pie",
       "trash-can",
       "triangle-exclamation",
       "download",
