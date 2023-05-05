@@ -1,4 +1,4 @@
-context("Dashboard manipulations", () => {
+context("Dashboard actions", () => {
   before(() => {
     // https://on.cypress.io/visit
     cy.getDeviceId();
@@ -67,7 +67,7 @@ context("Dashboard manipulations", () => {
     cy.get("#id_end_date").focus().realType("2019-06-16 10:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg");
 
-    cy.get("input[value='Save']").click();
+    cy.get("#submit-btn").click();
     cy.url().should("match", /\/dashboard\/events$/);
 
     cy.get("a").contains("Jukola 2019 - 1st Leg").click();
@@ -109,7 +109,7 @@ context("Dashboard manipulations", () => {
       .realType("2019-06-15 20:00:10");
 
     cy.intercept("POST", "/dashboard/events/new").as("eventSubmit");
-    cy.get("input[value='Save']").click();
+    cy.get("#submit-btn").click();
     cy.wait("@eventSubmit").then(({ request, response }) => {
       expect(response.statusCode).to.eq(302);
       expect(request.body).to.contain("&competitors-0-device=2&");
@@ -134,7 +134,7 @@ context("Dashboard manipulations", () => {
     cy.get("#id_competitors-0-start_time")
       .focus()
       .realType("2019-06-16 20:00:10");
-    cy.get("input[value='Save']").click();
+    cy.get("#submit-btn").click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
     cy.contains("Event with this Club, Event Set, and Name already exists.");

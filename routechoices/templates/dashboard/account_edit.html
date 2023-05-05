@@ -19,7 +19,7 @@
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary mb-1"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button type="submit" class="btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         <a href="{% url 'dashboard:account_delete_view' %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete account</a>
     </form>
 {% endblock %}

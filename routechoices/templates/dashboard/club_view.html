@@ -38,7 +38,7 @@
 <form action="" method="post" enctype="multipart/form-data" id="change_form">
   {% csrf_token %}
   {% bootstrap_form form %}
-  <button type="submit" class="btn btn-primary mb-1"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+  <button type="submit" class="btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
   <a href="{% url 'dashboard:club_delete_view' %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
 </form>
 {% endblock %}
