@@ -8,7 +8,7 @@ const sass = require("sass");
 fontawesomeSubset(
   {
     brands: ["twitter", "instagram", "github", "android", "apple"],
-    regular: ["window-restore", "map", "copy"],
+    regular: ["window-restore", "map", "copy", "clock"],
     solid: [
       "chart-pie",
       "trash-can",
