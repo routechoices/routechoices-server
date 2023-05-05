@@ -28,7 +28,7 @@
               </span>
             </p>
             <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-            {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Delete</a>{% endif %}
+            {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> Delete</a>{% endif %}
         </form>
         {% if map %}
         <hr/>

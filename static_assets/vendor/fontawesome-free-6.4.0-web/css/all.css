@@ -401,6 +401,10 @@ readers do not read off random characters that represent icons */
   content: "\f200";
 }
 
+.fa-shuffle::before {
+  content: "\f074";
+}
+
 .fa-window-restore::before {
   content: "\f2d2";
 }
@@ -591,6 +595,14 @@ readers do not read off random characters that represent icons */
 
 .fa-circle-check::before {
   content: "\f058";
+}
+
+.fa-circle-user::before {
+  content: "\f2bd";
+}
+
+.fa-circle-xmark::before {
+  content: "\f057";
 }
 
 .fa-image::before {
