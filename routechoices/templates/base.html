@@ -39,7 +39,9 @@
     {% include "navbar.html" %}
     {% endif %}
     {% endblock %}
+    <div id="django-messages">
     {% bootstrap_messages %}
+    </div>
     <div class='notifications top-right'></div>
     {% block contentup %}
     <div class="container content">
