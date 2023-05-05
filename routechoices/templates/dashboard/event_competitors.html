@@ -63,7 +63,7 @@
             {% endfor %}
             </table>
             {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
-            <input type="submit" value="Save" class="btn btn-primary mb-1" id="submit-btn"/>
+            <button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         </form>
     </div>
 </div>

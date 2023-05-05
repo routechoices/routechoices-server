@@ -17,8 +17,8 @@
         <form action="" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <input type="submit" value="Save" class="btn btn-primary mb-1" id="submit-btn"/>
-            {% if context == 'edit' %}<a href="{% url 'dashboard:event_set_delete_view' event_set_id=event_set.aid %}" class="btn btn-danger mb-1">Delete</a>{% endif %}
+            <button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            {% if context == 'edit' %}<a href="{% url 'dashboard:event_set_delete_view' event_set_id=event_set.aid %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>{% endif %}
         </form>
     </div>
 </div>

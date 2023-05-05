@@ -5,15 +5,15 @@
 {% block sub_sub_content %}
 <h3>Custom domain</h3>
 {% if club.domain %}
-<p>You use a custom domain <a href="{{club.nice_url}}">{{club.nice_url}}</a></p>
-{% if not club.use_https %}<p>{{ site.name }} can provide SSL certificates for your custom domains. Contact us to set it up.</p>{% endif %}
+<p>Your pages are accesible at your custom domain <a href="{{club.nice_url}}">{{club.nice_url}}</a></p>
+{% if not club.use_https %}<p>{{ site.name }} is in process of issuing you a SSL certificate, it might take a couple of minutes.</p>{% endif %}
 <form method="POST" class="post-form">
     {% csrf_token %}
     <input type="hidden" name="domain" maxlength="128" class="form-control" id="id_domain"></input>
-<button class="btn btn-danger" type="submit" class="save btn btn-secondary">Remove</button>
+<button class="btn btn-danger" type="submit" class="save btn btn-secondary"><i class="fa-solid fa-xmark"></i> Remove</button>
 </form>
 {% else %}
-<p>If you don't have a domain of your own, get one <a href="https://gandi.link/f/1a96fb21" target="_blank" rel="noopener noreferrer">here</a></p>
+<p>If you don't have a domain of your own, you can get one <a href="https://gandi.link/f/1a96fb21" target="_blank" rel="noopener noreferrer">here</a></p>
 <h4>Set the following DNS record</h4>
 <table class="table">
 <tr>
@@ -39,7 +39,7 @@
 <form method="POST" class="post-form">
 {% csrf_token %}
 {% bootstrap_form form %}
-<button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary">Save</button>
+<button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary"><i class="fa-solid fa-floppy-disk"></i> Save</button>
 </form>
 <p>
 <small>
