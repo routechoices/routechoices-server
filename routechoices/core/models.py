@@ -1928,11 +1928,14 @@ class Device(models.Model):
 
     def get_events(self, from_time, to_time, should_be_ended=False):
         qs = (
-            self.competitor_set.all().filter(
+            self.competitor_set.all()
+            .filter(
                 event__end_date__gte=from_time,
                 start_time__lte=to_time,
             )
-        ).select_related("event")
+            .select_related("event")
+            .order_by("start_time")
+        )
         if should_be_ended:
             qs = qs.filter(event__end_date__lt=now())
         return set([c.event for c in qs])
