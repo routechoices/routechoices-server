@@ -33,7 +33,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator, validat
 from django.db import models
 from django.db.models import Q
 from django.db.models.functions import ExtractMonth, ExtractYear
-from django.db.models.signals import post_delete, post_save, pre_delete
+from django.db.models.signals import post_delete, pre_delete
 from django.dispatch import receiver
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
@@ -1810,6 +1810,14 @@ class Device(models.Model):
         if save:
             self.save()
 
+        new_pts = list(sorted(new_pts, key=itemgetter(LOCATION_TIMESTAMP_INDEX)))
+        archived_events_affected = self.get_events(
+            from_time=epoch_to_datetime(new_pts[0][LOCATION_TIMESTAMP_INDEX]),
+            to_time=epoch_to_datetime(new_pts[-1][LOCATION_TIMESTAMP_INDEX]),
+            should_be_ended=True,
+        )
+        for archived_event_affected in archived_events_affected:
+            archived_event_affected.invalidate_cache()
         if push_forward:
             try:
                 competitor = self.get_competitor(load_event=True)
@@ -1817,9 +1825,6 @@ class Device(models.Model):
                     event = competitor.event
                     if event.is_live:
                         event_id = event.aid
-                        new_pts = list(
-                            sorted(new_pts, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
-                        )
                         new_data = gps_encoding.encode_data(new_pts)
                         client = redis.from_url(settings.REDIS_URL)
                         client.publish(
@@ -1913,13 +1918,26 @@ class Device(models.Model):
             qs = qs.select_related("event")
         return qs.first()
 
-    def get_event(self, at=None):
-        if not at:
+    def get_event(self, at=None, test=False):
+        if at is None:
             at = now()
         c = self.get_competitor(at=at, load_event=True)
+        if test:
+            raise Exception(c.name, c.event, at)
         if c:
             return c.event
         return None
+
+    def get_events(self, from_time, to_time, should_be_ended=False):
+        qs = (
+            self.competitor_set.all().filter(
+                start_time__gte=from_time,
+                start_time__lte=to_time,
+            )
+        ).select_related("event")
+        if should_be_ended:
+            qs = qs.filter(event__end_date__lt=now())
+        return set([c.event for c in qs])
 
     def get_last_competitor(self, load_event=False):
         qs = self.competitor_set.all().order_by("-start_time")
@@ -1981,13 +1999,6 @@ class Device(models.Model):
             msg.send()
 
         return self.aid, lat, lon, list(to_emails)
-
-
-@receiver(post_save, sender=Device)
-def invalidate_ended_event_using_device_cache(sender, instance, **kwargs):
-    event = instance.get_event(at=instance.last_location_datetime)
-    if event and event.ended:
-        event.invalidate_cache()
 
 
 class DeviceArchiveReference(models.Model):
@@ -2074,7 +2085,40 @@ class Competitor(models.Model):
     def save(self, *args, **kwargs):
         if not self.start_time:
             self.start_time = self.event.start_date
+        next_event = self.event
+        next_event.invalidate_cache()
+        current_self = None
+        if self.pk:
+            current_self = Competitor.objects.get(id=self.id)
+            next_device = self.device
+            next_start = self.start_time
+            prev_device = current_self.device
+            prev_start = current_self.start_time
+            prev_event = current_self.event
         super().save(*args, **kwargs)
+        if current_self:
+            if prev_event != next_event:
+                prev_event.invalidate_cache()
+            if prev_device:
+                if prev_start != next_start:
+                    events_between_prev_and_next_starts = prev_device.get_events(
+                        from_time=min(prev_start, next_start),
+                        to_time=max(prev_start, next_start),
+                    )
+                    for event_in_range in events_between_prev_and_next_starts:
+                        event_in_range.invalidate_cache()
+                else:
+                    event_at_start = prev_device.get_event(at=next_start)
+                    if event_at_start:
+                        event_at_start.invalidate_cache()
+            if next_device and next_device != prev_device:
+                if prev_start != next_start:
+                    events_between_prev_and_next_starts = next_device.get_events(
+                        from_time=min(prev_start, next_start),
+                        to_time=max(prev_start, next_start),
+                    )
+                    for event_in_range in events_between_prev_and_next_starts:
+                        event_in_range.invalidate_cache()
 
     @property
     def started(self):
@@ -2138,9 +2182,13 @@ class Competitor(models.Model):
         )
 
 
-@receiver([post_save, post_delete], sender=Competitor)
+@receiver([post_delete], sender=Competitor)
 def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
+    if instance.device:
+        new_event_for_device = instance.device.get_event(at=instance.start_time)
+        if new_event_for_device:
+            new_event_for_device.invalidate_cache()
 
 
 class SpotFeed(models.Model):
