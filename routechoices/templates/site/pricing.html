@@ -4,6 +4,7 @@
 {% load compress %}
 
 {% block extra_head %}
+{{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
 {% endcompress %}

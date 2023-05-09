@@ -2,6 +2,7 @@
 {% load static %}
 {% load compress %}
 {% block extra_head %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'styles/site/tracker.css' %}?_=2022022600" />
 {% endblock %}
 
@@ -25,9 +26,9 @@
          <div class="card-body p-4 p-sm-5">
           <div class="row">
             <div class="row justify-content-between mb-3">
-              <div class="col align-self-center text-center"><img style="height: 150px" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}?v=20230503"/></div>
-              <div class="col align-self-center text-center"><img style="height: 150px" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}"/></div>
-              <div class="col align-self-center text-center"><img style="height: 150px" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}"/></div>
+              <div class="col align-self-center text-center"><img height="150" width="150" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}?v=20230509"/></div>
+              <div class="col align-self-center text-center"><img height="150" width="150" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}?v=20230509"/></div>
+              <div class="col align-self-center text-center"><img height="150" width="150" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}?v=20230509"/></div>
             </div>
           </div>
           <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
@@ -53,7 +54,7 @@
               </p>
               <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
               <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
-              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
+              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen goes to sleep.</b></p>
               <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
               <ul>
                 <li>
@@ -81,7 +82,7 @@
                 </p>
               <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
               <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
-              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen go to sleep.</b></p>
+              <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen goes to sleep.</b></p>
               <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
                 <ul>
                   <li>
@@ -114,7 +115,7 @@
                   <li>Queclink devices: <code>port 2002</code></li>
                 </ul>
                 Recommended data push interval is 5 seconds and GPS data acquisition interval to 1 second, but feel free to adjust the settings depending on usage as this settings can affect battery life.<br/>
-                You can find some devices configurations file <a target="_blank" href="https://github.com/routechoices/trackers-config">here</a>.
+                <a target="_blank" href="https://github.com/routechoices/trackers-config" aria-label="Config file download page">Configuration file for most common devices</a>.
               </p>
               <h5>Device ID</h5>
               <p>Devices must be registered by acquiring a device ID (see below) that can be used on this website.</p>
