@@ -191,6 +191,177 @@ class EventApiTestCase(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["event"]["name"], "Test event")
 
+    def test_cache_invalidation(self):
+        club = Club.objects.create(name="Test club", slug="club")
+        event_a = Event.objects.create(
+            club=club,
+            name="Test event A",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        event_b = Event.objects.create(
+            club=club,
+            name="Test event B",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        event_c = Event.objects.create(
+            club=club,
+            name="Test event C",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        url_data_a = self.reverse_and_check(
+            "event_data",
+            f"/events/{event_a.aid}/data",
+            "api",
+            {"event_id": event_a.aid},
+        )
+        url_data_b = self.reverse_and_check(
+            "event_data",
+            f"/events/{event_b.aid}/data",
+            "api",
+            {"event_id": event_b.aid},
+        )
+        url_data_c = self.reverse_and_check(
+            "event_data",
+            f"/events/{event_c.aid}/data",
+            "api",
+            {"event_id": event_c.aid},
+        )
+        device = Device.objects.create()
+        device_b = Device.objects.create()
+        competitor_a = Competitor.objects.create(
+            name="Alice A",
+            short_name="A",
+            event=event_a,
+            device=device,
+            start_time=arrow.get().shift(minutes=-70).datetime,
+        )
+        Competitor.objects.create(
+            name="Alice B",
+            short_name="A",
+            event=event_b,
+            device=device,
+            start_time=arrow.get().shift(minutes=-75).datetime,
+        )
+        Competitor.objects.create(
+            name="Alice C",
+            short_name="A",
+            event=event_c,
+            device=device_b,
+            start_time=arrow.get().shift(minutes=-73).datetime,
+        )
+        # fetch so cache exist
+        self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.client.get(
+            url_data_b,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.client.get(
+            url_data_c,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        # Assert cache exists
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        # Upload data in event B timespan should invalidate cache
+        device.add_location(arrow.get().shift(minutes=-72).timestamp(), 0.2, 0.1)
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        res = self.client.get(
+            url_data_b,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url_data_b,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        # Updating competitor A name should invalidate event A
+        competitor_a.name = "Bob"
+        competitor_a.save()
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        # Updating competitor A start time should invalidate event A and B
+        competitor_a.start_time = arrow.get().shift(minutes=-71).datetime
+        competitor_a.save()
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url_data_b,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        # Updating competitor A start time should invalidate event A and B
+        competitor_a.start_time = arrow.get().shift(minutes=-76).datetime
+        competitor_a.save()
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url_data_b,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        # Updating competitor A device should invalidate only event A if
+        # time is before event C start
+        competitor_a.device = device_b
+        competitor_a.save()
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url_data_c,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertEqual(res.headers["X-Cache-Hit"], "1")
+        # Reset data
+        competitor_a.device = device
+        competitor_a.start_time = arrow.get().shift(minutes=-70).datetime
+        competitor_a.save()
+        self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        # Updating competitor A device should invalidate event A and B if
+        # time is after event C start
+        competitor_a.device = device_b
+        competitor_a.save()
+        res = self.client.get(
+            url_data_a,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+        res = self.client.get(
+            url_data_c,
+            SERVER_NAME="api.routechoices.dev",
+        )
+        self.assertIsNone(res.headers.get("X-Cache-Hit"))
+
     def test_live_event_data(self):
         club = Club.objects.create(name="Test club", slug="club")
         event = Event.objects.create(

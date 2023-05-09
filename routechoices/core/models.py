@@ -1918,12 +1918,10 @@ class Device(models.Model):
             qs = qs.select_related("event")
         return qs.first()
 
-    def get_event(self, at=None, test=False):
+    def get_event(self, at=None):
         if at is None:
             at = now()
         c = self.get_competitor(at=at, load_event=True)
-        if test:
-            raise Exception(c.name, c.event, at)
         if c:
             return c.event
         return None
@@ -1931,7 +1929,7 @@ class Device(models.Model):
     def get_events(self, from_time, to_time, should_be_ended=False):
         qs = (
             self.competitor_set.all().filter(
-                start_time__gte=from_time,
+                event__end_date__gte=from_time,
                 start_time__lte=to_time,
             )
         ).select_related("event")
@@ -2095,10 +2093,26 @@ class Competitor(models.Model):
             prev_device = current_self.device
             prev_start = current_self.start_time
             prev_event = current_self.event
+            # We proceed the future device before save so we can properly fetch
+            # data as they are before update
+            if next_device and next_device != prev_device:
+                if prev_start != next_start:
+                    events_between_prev_and_next_starts = next_device.get_events(
+                        from_time=min(prev_start, next_start),
+                        to_time=max(prev_start, next_start),
+                    )
+                    for event_in_range in events_between_prev_and_next_starts:
+                        event_in_range.invalidate_cache()
+                else:
+                    event_at_start = next_device.get_event(at=next_start)
+                    if event_at_start:
+                        event_at_start.invalidate_cache()
         super().save(*args, **kwargs)
         if current_self:
             if prev_event != next_event:
                 prev_event.invalidate_cache()
+            # We proceed the old device after save so we can properly fetch
+            # data as they are after update
             if prev_device:
                 if prev_start != next_start:
                     events_between_prev_and_next_starts = prev_device.get_events(
@@ -2111,14 +2125,6 @@ class Competitor(models.Model):
                     event_at_start = prev_device.get_event(at=next_start)
                     if event_at_start:
                         event_at_start.invalidate_cache()
-            if next_device and next_device != prev_device:
-                if prev_start != next_start:
-                    events_between_prev_and_next_starts = next_device.get_events(
-                        from_time=min(prev_start, next_start),
-                        to_time=max(prev_start, next_start),
-                    )
-                    for event_in_range in events_between_prev_and_next_starts:
-                        event_in_range.invalidate_cache()
 
     @property
     def started(self):
