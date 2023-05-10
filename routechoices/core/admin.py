@@ -165,6 +165,7 @@ class TimeStatusFilter(admin.SimpleListFilter):
             return queryset.all()
 
 
+@admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -221,6 +222,7 @@ class NoticeInline(admin.TabularInline):
     fields = ("text",)
 
 
+@admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -268,6 +270,7 @@ class DeviceOwnershipInline(admin.TabularInline):
     ordering = ("creation_date",)
 
 
+@admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         "aid",
@@ -345,6 +348,7 @@ class DeviceAdmin(admin.ModelAdmin):
         return get_device_name(obj.user_agent) or obj.user_agent
 
 
+@admin.register(DeviceArchiveReference)
 class DeviceArchiveReferenceAdmin(admin.ModelAdmin):
     list_display = (
         "archive",
@@ -353,6 +357,7 @@ class DeviceArchiveReferenceAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(ImeiDevice)
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
         "imei",
@@ -362,6 +367,7 @@ class ImeiDeviceAdmin(admin.ModelAdmin):
     search_fields = ("imei", "device__aid")
 
 
+@admin.register(SpotDevice)
 class SpotDeviceAdmin(admin.ModelAdmin):
     list_display = (
         "messenger_id",
@@ -370,10 +376,12 @@ class SpotDeviceAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(SpotFeed)
 class SpotFeedAdmin(admin.ModelAdmin):
     list_display = ("feed_id",)
 
 
+@admin.register(Map)
 class MapAdmin(admin.ModelAdmin):
     list_display = (
         "name",
@@ -386,6 +394,7 @@ class MapAdmin(admin.ModelAdmin):
     list_filter = ("club",)
 
 
+@admin.register(DeviceClubOwnership)
 class DeviceClubOwnershipAdmin(admin.ModelAdmin):
     list_display = ("device", "club", "nickname")
     list_filter = ("club",)
@@ -401,23 +410,17 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
     search_fields = ("device__aid", "nickname")
 
 
+@admin.register(TcpDeviceCommand)
 class TcpDeviceCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
     autocomplete_fields = ("target",)
 
 
-admin.site.register(Club, ClubAdmin)
-admin.site.register(Device, DeviceAdmin)
-admin.site.register(DeviceArchiveReference, DeviceArchiveReferenceAdmin)
-admin.site.register(ImeiDevice, ImeiDeviceAdmin)
-admin.site.register(Event, EventAdmin)
-admin.site.register(Map, MapAdmin)
-admin.site.register(SpotDevice, SpotDeviceAdmin)
-admin.site.register(SpotFeed, SpotFeedAdmin)
-admin.site.register(DeviceClubOwnership, DeviceClubOwnershipAdmin)
-admin.site.register(TcpDeviceCommand, TcpDeviceCommandAdmin)
+UserModel = get_user_model()
+admin.site.unregister(UserModel)
 
 
+@admin.register(UserModel)
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + (
         "date_joined",
@@ -459,15 +462,12 @@ class MyUserAdmin(UserAdmin):
                 obj.delete()
 
 
-UserModel = get_user_model()
-admin.site.unregister(UserModel)
-admin.site.register(UserModel, MyUserAdmin)
-
-
+@admin.register(BackupCode)
 class BackupCodeAdmin(admin.ModelAdmin):
     list_display = ("user", "code")
 
 
+@admin.register(TOTPDevice)
 class TOTPDeviceAdmin(admin.ModelAdmin):
     list_display = ("user", "secret_base32")
 
@@ -475,14 +475,13 @@ class TOTPDeviceAdmin(admin.ModelAdmin):
         return b32encode(obj.key).decode()
 
 
+admin.site.unregister(WebAuthnKey)
+
+
+@admin.register(WebAuthnKey)
 class WebAuthnKeyAdmin(admin.ModelAdmin):
     list_display = ("user", "key_name")
 
-
-admin.site.register(BackupCode, BackupCodeAdmin)
-admin.site.register(TOTPDevice, TOTPDeviceAdmin)
-admin.site.unregister(WebAuthnKey)
-admin.site.register(WebAuthnKey, WebAuthnKeyAdmin)
 
 ADMIN_COMMAND_LIST = [
     "import_from_gpsseuranta",
