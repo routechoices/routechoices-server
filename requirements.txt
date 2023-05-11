@@ -20,7 +20,7 @@ defusedxml==0.7.1
 deprecated==1.2.13
 diskcache==5.6.1
 django==4.2.1
-django-admincommand @ git+https://github.com/rphlo/django-admincommand.git@37d7a4be32886d379b543edc7199ec18b480b140
+django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.54.0
 django-appconf==1.0.5
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
