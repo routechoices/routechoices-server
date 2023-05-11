@@ -4,7 +4,7 @@ from routechoices.core.models import Club, DeviceClubOwnership, ImeiDevice
 
 
 class Command(BaseCommand):
-    help = "Export users email list"
+    help = "Export club's device list"
 
     def add_arguments(self, parser):
         parser.add_argument("club_slug", nargs=1, type=str)
