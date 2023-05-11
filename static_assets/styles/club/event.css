@@ -104,7 +104,7 @@
 .runner-icon.icon-focused > span {
   padding: 0px 5px;
   background: #fff;
-  border: 2px solid #000;
+  outline: 2px solid #000;
   border-radius: 5px;
 }
 

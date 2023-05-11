@@ -323,10 +323,10 @@ function getContrastYIQ(hexcolor) {
 function getRunnerIcon(color, faded = false, focused = false) {
   var iconSize = 16;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
-  var isDark = getContrastYIQ(color) === "dark";
-  var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="${
-    isDark ? "white" : "black"
-  }" stroke-width="${focused ? 3 : 1}px" cx="8" cy="8" r="6"/></svg>`;
+  //var isDark = getContrastYIQ(color) === "dark";
+  var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
+    focused ? 3 : 1
+  }px" cx="8" cy="8" r="6"/></svg>`;
   var runnerIcon = L.icon({
     iconUrl: encodeURI("data:image/svg+xml," + svgRect),
     iconSize: [iconSize, iconSize],
