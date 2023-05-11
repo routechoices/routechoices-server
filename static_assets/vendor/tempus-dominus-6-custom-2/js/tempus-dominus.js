@@ -800,7 +800,7 @@
         keepInvalid: false,
         debug: false,
         allowInputToggle: false,
-        viewDate: new DateTime(),
+        viewDate: new DateTime().startOf('date'),
         multipleDates: false,
         multipleDatesSeparator: '; ',
         promptTimeOnDateChange: false,
