@@ -105,7 +105,8 @@ def short_random_key():
 
 def random_device_id():
     alphabet = "0123456789"
-    return generate_random_string(alphabet, 8)
+    start = generate_random_string(alphavet[1:], 1)
+    return f"{start}{generate_random_string(alphabet, 7)}"
 
 
 def short_random_slug():
