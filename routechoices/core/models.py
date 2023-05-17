@@ -31,7 +31,7 @@ from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
-from django.db.models import Q
+from django.db.models import F, Min, Q
 from django.db.models.functions import ExtractMonth, ExtractYear
 from django.db.models.signals import post_delete, pre_delete
 from django.dispatch import receiver
@@ -1820,8 +1820,8 @@ class Device(models.Model):
             archived_event_affected.invalidate_cache()
         if push_forward:
             try:
-                competitor = self.get_competitor(load_event=True)
-                if competitor:
+                competitors = self.get_competitors_at(load_event=True)
+                for competitor in competitors:
                     event = competitor.event
                     if event.is_live:
                         event_id = event.aid
@@ -1906,25 +1906,24 @@ class Device(models.Model):
     def last_location_datetime(self):
         return self._last_location_datetime
 
-    def get_competitor(self, at=None, load_event=False):
+    def get_competitors_at(self, at=None, load_event=False):
         if not at:
             at = now()
         qs = (
             self.competitor_set.all()
             .filter(start_time__lte=at, event__end_date__gte=at)
-            .order_by("-start_time")
+            .annotate(min_start=Min("start_time"))
+            .filter(start_time=F("min_start"))
         )
         if load_event:
             qs = qs.select_related("event")
-        return qs.first()
+        return qs
 
-    def get_event(self, at=None):
+    def get_events_at(self, at=None):
         if at is None:
             at = now()
-        c = self.get_competitor(at=at, load_event=True)
-        if c:
-            return c.event
-        return None
+        competitors = self.get_competitors_at(at=at, load_event=True)
+        return set([c.event for c in competitors])
 
     def get_events(self, from_time, to_time, should_be_ended=False):
         qs = (
@@ -1965,41 +1964,43 @@ class Device(models.Model):
         lat = None
         lon = None
 
-        competitor = self.get_competitor(at=now(), load_event=True)
+        competitors = self.get_competitors_at(at=now(), load_event=True)
 
         if self.last_location:
             _, lat, lon = self.last_location
 
-        if not competitor:
+        if not competitors:
             return self.aid, lat, lon, None
+        all_to_emails = set()
+        for competitor in competitors:
+            event = competitor.event
+            to_emails = set()
+            if event.emergency_contact:
+                to_emails.add(event.emergency_contact)
+            else:
+                club = event.club
+                for user in club.admins.all():
+                    to_email = EmailAddress.objects.get_primary(user) or user.email
+                    to_emails.add(to_email)
 
-        event = competitor.event
-        to_emails = set()
-        if event.emergency_contact:
-            to_emails.add(event.emergency_contact)
-        else:
-            club = event.club
-            for user in club.admins.all():
-                to_email = EmailAddress.objects.get_primary(user) or user.email
-                to_emails.add(to_email)
-
-        if to_emails:
-            msg = EmailMessage(
-                (
-                    f"Routechoices.com - SOS from competitor {competitor.name}"
-                    f" in event {event.name} [{now().isoformat()}]"
-                ),
-                (
-                    f"Competitor {competitor.name} has triggered the SOS button"
-                    f" of his GPS tracker during event {event.name}\r\n\r\n"
-                    f"His latest known location is latitude, longitude: {lat}, {lon}"
-                ),
-                settings.DEFAULT_FROM_EMAIL,
-                list(to_emails),
-            )
-            msg.send()
-
-        return self.aid, lat, lon, list(to_emails)
+            if to_emails:
+                msg = EmailMessage(
+                    (
+                        f"Routechoices.com - SOS from competitor {competitor.name}"
+                        f" in event {event.name} [{now().isoformat()}]"
+                    ),
+                    (
+                        f"Competitor {competitor.name} has triggered the SOS button"
+                        f" of his GPS tracker during event {event.name}\r\n\r\n"
+                        f"His latest known location is latitude, longitude: "
+                        f"{lat}, {lon}"
+                    ),
+                    settings.DEFAULT_FROM_EMAIL,
+                    list(to_emails),
+                )
+                msg.send()
+            all_to_emails = all_to_emails.union(to_emails)
+        return self.aid, lat, lon, list(all_to_emails)
 
 
 class DeviceArchiveReference(models.Model):
@@ -2107,9 +2108,9 @@ class Competitor(models.Model):
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    event_at_start = next_device.get_event(at=next_start)
-                    if event_at_start:
-                        event_at_start.invalidate_cache()
+                    events_at_start = next_device.get_events_at(at=next_start)
+                    for event_then in events_at_start:
+                        event_then.invalidate_cache()
         super().save(*args, **kwargs)
         if current_self:
             if prev_event != next_event:
@@ -2125,9 +2126,9 @@ class Competitor(models.Model):
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    event_at_start = prev_device.get_event(at=next_start)
-                    if event_at_start:
-                        event_at_start.invalidate_cache()
+                    events_at_start = prev_device.get_events_at(at=next_start)
+                    for event_then in events_at_start:
+                        event_then.invalidate_cache()
 
     @property
     def started(self):
@@ -2195,9 +2196,9 @@ class Competitor(models.Model):
 def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
     if instance.device:
-        new_event_for_device = instance.device.get_event(at=instance.start_time)
-        if new_event_for_device:
-            new_event_for_device.invalidate_cache()
+        new_events_for_device = instance.device.get_events_at(at=instance.start_time)
+        for event in new_events_for_device:
+            event.invalidate_cache()
 
 
 class SpotFeed(models.Model):
