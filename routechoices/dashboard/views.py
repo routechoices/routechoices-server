@@ -92,7 +92,9 @@ def requires_club_in_session(function):
                     admins=request.user, aid=session_club_aid
                 ).first()
         if not club:
-            return redirect("dashboard:club_select_view")
+            return redirect(
+                reverse("dashboard:club_select_view") + "?next=" + request.path
+            )
         request.session["dashboard_club"] = club.aid
         request.club = club
         return function(request, *args, **kwargs)
@@ -136,9 +138,12 @@ def club_select_view(request):
 
     paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
+    next_page = request.GET.get("next")
     clubs = paginator.get_page(page)
 
-    return render(request, "dashboard/club_list.html", {"clubs": clubs})
+    return render(
+        request, "dashboard/club_list.html", {"clubs": clubs, "next": next_page}
+    )
 
 
 @login_required
@@ -337,6 +342,9 @@ def club_set_view(request, club_id):
     else:
         club = get_object_or_404(Club, aid=club_id, admins=request.user)
     request.session["dashboard_club"] = club.aid
+    next_page = request.GET.get("next")
+    if next_page:
+        return redirect(next_page)
     return redirect("dashboard:club_view")
 
 
