@@ -888,8 +888,8 @@ class Map(models.Model):
             map_pts = [
                 new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True) for pt in pts
             ]
-            draw.line(map_pts, (255, 255, 255, 160), 15 * res_scale, joint="curve")
-            draw.line(map_pts, (255, 0, 0, 100), 10 * res_scale, joint="curve")
+            draw.line(map_pts, (255, 255, 255, 200), 22 * res_scale, joint="curve")
+            draw.line(map_pts, (255, 0, 0, 160), 16 * res_scale, joint="curve")
 
         im = im.resize(
             (int(width / scale), int(height / scale)), resample=Image.Resampling.BICUBIC
