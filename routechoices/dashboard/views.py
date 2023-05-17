@@ -138,7 +138,7 @@ def club_select_view(request):
 
     paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
-    next_page = request.GET.get("next")
+    next_page = request.GET.get("next", "")
     clubs = paginator.get_page(page)
 
     return render(
