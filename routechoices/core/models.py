@@ -192,6 +192,10 @@ Follow our events live or replay them later.
     )
     analytics_site = models.URLField(max_length=256, blank=True)
 
+    upgraded = models.BooleanField(default=False)
+    upgraded_date = models.DateTimeField(blank=True, null=True)
+    order_id = models.CharField(max_length=200, blank=True, null=True)
+
     class Meta:
         ordering = ["name"]
         verbose_name = "club"

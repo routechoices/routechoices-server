@@ -1,0 +1,46 @@
+{% extends "dashboard/home.html" %}
+
+{% block sub_content %}
+<content>
+    {% if not club.upgraded %}
+    <h4>Hey!</h4>
+    <p>
+        {{ site.name }} will never sell your data, or display ads.
+        <br>
+        <br>
+        To keep the servers running I offer you the opportunity to become partner<br>
+        You'll get your club's name featured on a dedicated page and ensure the prosperity of the site in the long term.
+    </p>
+    <p>
+        <b>
+            Support the platform for 4.99€ per month <small style="font-size: 10px; color: grey;">(or 49.99€ per year)</small> + VAT
+        </b>
+    </p>
+
+    <p>
+        <a href="https://routechoices.lemonsqueezy.com/checkout/buy/ef3824b6-1792-4a80-b217-e5f90dd50874?checkout[custom][club]={{club.slug}}" class="btn btn-primary" role="button">Become Partner</a>
+    </p>
+    <hr>
+    <h4>Need convincing?</h4>
+    <p>
+        {{ site.name }} 's relative value is great when compared to stringing together disparate services.
+        <br>
+        <br>
+        We offer a bundle that together includes:<br>
+        Server time, image hosting, privacy respecting analytics, custom domain, SSL certificates.<br>
+        Overall a custom equivalent setup can cost upwards of 30€/mo per club.
+        <br>
+        <br>
+        {{ site.name }} integrates all of these services for free.
+        <br>
+        <br>
+        When compared to other live GPS platforms, {{ site.name }} comes in as being faster and more affordable.
+        <br>
+        <br>
+        Most importantly, you'll be supporting the small, fast internet, and a live GPS tracking platform built to last forever</a>.
+    </p>
+    {% else %}
+    <h3>You are already a {{ site.name }}'s Partner. Thank You</h3>
+    {% endif %}
+</content>
+{% endblock %}

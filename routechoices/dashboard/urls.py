@@ -118,4 +118,5 @@ urlpatterns = [
         views.quick_event,
         name="quick_event_view",
     ),
+    re_path(r"^upgrade/?$", views.upgrade, name="upgrade"),
 ]

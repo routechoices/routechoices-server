@@ -1420,3 +1420,16 @@ class CustomBackupCodesView(BackupCodesView):
 
 
 backup_codes = login_required(CustomBackupCodesView.as_view())
+
+
+@login_required
+@requires_club_in_session
+def upgrade(request):
+    club = request.club
+    return render(
+        request,
+        "dashboard/upgrade.html",
+        {
+            "club": club,
+        },
+    )

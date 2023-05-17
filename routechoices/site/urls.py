@@ -30,9 +30,10 @@ urlpatterns = [
     ),
     re_path(
         r"^pricing/?$",
-        TemplateView.as_view(template_name="site/pricing.html"),
+        views.pricing_page,
         name="pricing_view",
     ),
+    re_path(r"^lemon-webhook/?$", views.lemon_webhook, name="lemon_webhook"),
     re_path(
         r"^r/(?P<event_id>[0-9a-zA-Z_-]+)/?$",
         views.event_shortcut,

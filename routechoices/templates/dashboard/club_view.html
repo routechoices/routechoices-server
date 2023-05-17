@@ -25,6 +25,11 @@
   <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:event_list_view dashboard:event_create_view dashboard:event_edit_view dashboard:event_route_upload_view dashboard:quick_event_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}"><i class="fa-solid fa-trophy"></i> Events</a></li>
 </ul>
 {% block sub_sub_content %}
+{% if not club.upgraded %}
+<p style="background-color: rgb(0,255,0,0.2); text-align:center; padding: 5px">
+    <a href="{% url 'dashboard:upgrade'%}">Become Partner</a> to support the platform!
+</p>
+{% endif %}
 <p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
 <p>
   <a class="btn btn-info mb-1" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>

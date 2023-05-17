@@ -1,10 +1,12 @@
 {% extends "dashboard/home.html" %}
-{% load static %}s
 
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
         <h1><i class="fa-solid fa-triangle-exclamation"></i> Delete club {{ club.name }}?</h1>
+        {% if club.upgraded %}
+        <p>Ensure your subscription is cancelled on <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a> before deleting your account.</p>
+        {% else %}
         <p>This will delete all maps and events under this club.</p>
         <p>There is no way to recover your data if you confirm this step.</p>
         <form action="" method="post">
@@ -14,6 +16,7 @@
             </div>
             <button type="submit" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this club data!</button>
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

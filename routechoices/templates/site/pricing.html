@@ -80,8 +80,21 @@
                     </div>
                     <div>
                         <p>{{site.name}} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
-                        <p>No revenue is generated from it, and your data is not sold to third party.</p>
-                        <p>Due to Finnish law, I can not accept donations.</p>
+                        <p>We will never display ads, and your data is not sold to third party.</p>
+                    </div>
+                    <div>
+                        <p>You can become partner and like the following clubs and contribute to maintain the platform alive.</p>
+                        <h4>Partners</h4>
+                        <div class="row justify-content-between">
+                            {% for club in partner_clubs %}
+                            <div class="col align-self-center text-center">
+                                {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
+                                <img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+                                <span class="fw-bold">{{ club.name }}</span>
+                                {% if club.website %}</a>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
