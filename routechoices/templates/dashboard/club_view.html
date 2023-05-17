@@ -27,11 +27,7 @@
 {% block sub_sub_content %}
 {% if not club.upgraded %}
 <p class="p-1 text-center" style="background-color: rgb(0,255,0,0.2);">
-    <a href="{% url 'dashboard:upgrade'%}">Become Partner</a> to support the platform!
-</p>
-{% else %}
-<p class="p-1 text-center">
-    Thank you for being a partner! You can manage your subscription on <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>.
+  Support the platform, <a href="{% url 'dashboard:upgrade'%}">Become Partner</a>!
 </p>
 {% endif %}
 <p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
@@ -50,6 +46,12 @@
   <button type="submit" class="btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
   <a href="{% url 'dashboard:club_delete_view' %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
 </form>
+{% if club.upgraded %}
+<hr/>
+<p class="p-1 text-center">
+  Thank you for being a partner! You can manage your subscription on <a href="https://app.lemonsqueezy.com/my-orders/" target="_blank">LemonSqueezy</a>.
+</p>
+{% endif %}
 {% endblock %}
 {% endblock %}
 
