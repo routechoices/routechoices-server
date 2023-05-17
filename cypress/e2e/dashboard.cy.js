@@ -11,7 +11,7 @@ context("Dashboard actions", () => {
 
   it("Create an Event", function () {
     cy.login();
-    cy.url().should("match", /\/dashboard\/clubs$/);
+    cy.url().should("match", /\/dashboard\/clubs\?next=\/dashboard\/$/);
 
     // Create club
     cy.createClub();
