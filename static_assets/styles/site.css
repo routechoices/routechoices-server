@@ -319,6 +319,28 @@ body {
   -webkit-box-decoration-break: clone;
 }
 
+.header-multiline {
+  line-height: 1.4;
+  padding: 2px 0;
+  margin: 0px auto 0.5em 0px;
+  max-width: calc(100% - 35px);
+}
+
+.header-multiline span {
+  font-weight: bold;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  display: inline;
+  padding: 0.45rem 0px;
+
+  /* Needs prefixing */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .image-banner2 {
   background-image: url("../img/banner2.jpg"); /* fallback for non image-set browser */
   background-image: -webkit-image-set(

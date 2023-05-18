@@ -3,6 +3,8 @@
 {% load django_bootstrap5 %}
 {% load compress %}
 
+{% block head_title %}Pricing | {{site.name}} | Live GPS tracking for orienteering{% endblock %}
+
 {% block extra_head %}
 {{ block.super }}
 {% compress css %}
