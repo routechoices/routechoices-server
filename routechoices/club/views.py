@@ -19,6 +19,7 @@ from django.utils.timezone import now
 from django.views.decorators.cache import cache_page
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
+from PIL import Image
 
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
@@ -73,22 +74,44 @@ def club_logo(request, **kwargs):
     if club.domain and not request.use_cname:
         return redirect(club.logo_url)
     logo_key = f"club_logo:{club.aid}:{club.modification_date.timestamp()}"
+    logo_key_avif = f"club_logo_avif:{club.aid}:{club.modification_date.timestamp()}"
     headers = {}
-    if cache.has_key(logo_key):
-        logo = cache.get(logo_key)
-        headers["X-Cache-Hit"] = 1
-    else:
-        file_path = club.logo.name
-        buf = BytesIO()
-        s3_client = get_s3_client()
-        s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
-        logo = buf.getvalue()
-        cache.set(logo_key, logo, 31 * 24 * 3600)
+    http_accept = request.META.get("HTTP_ACCEPT", "")
+    serve_avif = "image/avif" in http_accept.split(",")
+    logo = None
+    if serve_avif:
+        if cache.has_key(logo_key_avif):
+            logo = cache.get(logo_key_avif)
+            headers["X-Cache-Hit"] = 1
+
+    if not logo:
+        if cache.has_key(logo_key):
+            logo_png = cache.get(logo_key)
+            if serve_avif:
+                headers["X-Cache-Hit"] = 0.5
+            else:
+                headers["X-Cache-Hit"] = 1
+        else:
+            file_path = club.logo.name
+            buf = BytesIO()
+            s3_client = get_s3_client()
+            s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
+            logo_png = buf.getvalue()
+            cache.set(logo_key, logo_png, 31 * 24 * 3600)
+
+        if serve_avif:
+            pil_image = Image.open(BytesIO(logo_png))
+            buf = BytesIO()
+            pil_image.save(buf, "AVIF", quality=80)
+            logo = buf.getvalue()
+            cache.set(logo_key_avif, logo, 31 * 24 * 3600)
+        else:
+            logo = logo_png
 
     resp = StreamingHttpRangeResponse(
         request,
         logo,
-        content_type="image/png",
+        content_type="image/avif" if serve_avif else "image/png",
         headers=headers,
     )
     resp["Content-Disposition"] = set_content_disposition(f"{club.name}.png", dl=False)
