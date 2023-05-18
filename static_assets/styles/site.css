@@ -291,16 +291,6 @@ body {
   color: #13967d;
 }
 
-.wms256 .leaflet-tile-container img {
-  width: 256.5px !important;
-  height: 256.5px !important;
-}
-
-.wms512 .leaflet-tile-container img {
-  width: 512.5px !important;
-  height: 512.5px !important;
-}
-
 .padded-multiline {
   line-height: 1.4;
   padding: 2px 0;
