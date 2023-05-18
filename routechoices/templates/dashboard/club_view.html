@@ -16,7 +16,12 @@
         <h1><img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80px" height="80px" alt="Club {{ club.name }} Logo" class="rounded"> {{ club.name }}</h1>
     </div>
 </div>
-<a class="btn btn-success btn-sm mb-1" href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
+<a class="btn btn-success btn-sm mb-3" href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
+{% if not club.upgraded %}
+<p class="p-1 text-center" style="background: linear-gradient(120deg, #98d6a699 0%, #98cdd699 100%);">
+  Support the platform, <a href="{% url 'dashboard:upgrade'%}">Become Partner!</a>
+</p>
+{% endif %}
 <ul class="nav nav-tabs mb-3">
   <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:club_view dashboard:club_custom_domain_view dashboard:club_invite_add_view' %}active{% endif %}" href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club Info</a></li>
   <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:device_list_view dashboard:device_add_view' %}active{% endif %}" href="{% url 'dashboard:device_list_view' %}"><i class="fa-solid fa-mobile-screen-button"></i> Devices</a></li>
@@ -25,11 +30,6 @@
   <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:event_list_view dashboard:event_create_view dashboard:event_edit_view dashboard:event_route_upload_view dashboard:quick_event_view' %}active{% endif %}" href="{% url 'dashboard:event_list_view' %}"><i class="fa-solid fa-trophy"></i> Events</a></li>
 </ul>
 {% block sub_sub_content %}
-{% if not club.upgraded %}
-<p class="p-1 text-center" style="background-color: rgb(0,255,0,0.2);">
-  Support the platform, <a href="{% url 'dashboard:upgrade'%}">Become Partner</a>!
-</p>
-{% endif %}
 <p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
 <p>
   <a class="btn btn-info mb-1" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
