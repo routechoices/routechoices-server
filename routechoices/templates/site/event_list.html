@@ -74,7 +74,7 @@
   </div>
   {% endif %}
   {% if live_events %}
-  <div><h2 class="header-multiline"><span style="background-color: #db9b95;background-image: linear-gradient(120deg, #db9b95 0%, #dbda95 100%)">Live Events</span></h2></div>
+  <div><h2 class="header-multiline"><span style="background-color: #000;">Live Events</span></h2></div>
   <div>
   {% for event_set in live_events %}
     {% if not event_set_page %}
@@ -121,7 +121,7 @@
   {% endif%}
   {% if upcoming_events %}
   <div>
-    <h2 class="header-multiline"><span style="background-color: #a095de;background-image: linear-gradient(120deg, #a095de 0%, #e391cc 100%)">Upcoming Events</span></h2>
+    <h2 class="header-multiline"><span style="background-color: #000;">Upcoming Events</span></h2>
     <h6>Starting in next 24 hours</h6>
   </div>
   <div>
@@ -171,7 +171,7 @@
   {% endif%}
   {% if years or search_text or event_set_page and events %}
   <div {% if not event_set_page %}class="mb-3"{% endif%}>
-    <h2 class="header-multiline"><span style="background-color:#98d6a699;background-image: linear-gradient(120deg, #98cdd6 0%, #98d6a6 100%);">Archived Events</span></h2>
+    <h2 class="header-multiline"><span style="background-color:#000;">Archived Events</span></h2>
       {% if home_url and not event_set_page %}
         <form class="mb-3 row" method="GET">
           <div class="col-auto">
