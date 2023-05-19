@@ -69,14 +69,15 @@
 {% endif %}
 <div class="row">
   {%if event_set_page %}
-  <div class="row mb-3">
+  <div class="row">
     <h4 class="padded-multiline"><span>{{event_set.name}}</span></h4>
   </div>
   {% endif %}
   {% if live_events %}
-  <div><h2 class="header-multiline mb-0"><span style="background-color: #000;">Live Events</span></h2></div>
+  <div><h2 class="header-multiline mb-3"><span style="background-color: #000;">Live Events</span></h2></div>
   <div>
   {% for event_set in live_events %}
+    <div>
     {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
@@ -115,17 +116,19 @@
         </div>
       </div>
     {% endfor %}
+    </div>
   {% endfor %}
   </div>
   <hr/>
   {% endif%}
   {% if upcoming_events %}
-  <div>
-    <h2 class="header-multiline mb-0"><span style="background-color: #000;">Upcoming Events</span></h2>
+  <div class="mb-3">
+    <h2 class="header-multiline"><span style="background-color: #000;">Upcoming Events</span></h2>
     <h6>Starting in next 24 hours</h6>
   </div>
   <div>
   {% for event_set in upcoming_events reversed %}
+    <div>
     {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
@@ -163,15 +166,17 @@
         </div>
       </div>
     {% endfor %}
+    </div>
   {% endfor %}
   </div>
   {% if years or search_text or event_set_page and events %}
   <hr/>
   {% endif%}
   {% endif%}
+  <div class="mb-3">
   {% if years or search_text or event_set_page and events %}
   <div {% if not event_set_page %}class="mb-3"{% endif%}>
-    <h2 class="header-multiline"><span style="background-color:#000;">Archived Events</span></h2>
+    <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif%}"><span style="background-color:#000;">Archived Events</span></h2>
       {% if home_url and not event_set_page %}
         <form class="mb-3 row" method="GET">
           <div class="col-auto">
@@ -193,9 +198,10 @@
       {% endif %}
   </div>
   {% endif %}
-  <div>
   {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}{% endif %}
+  </div>
   {% for event_set in events %}
+    <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
       <h4 class="padded-multiline"><span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}</span></h4>
@@ -237,6 +243,7 @@
       </div>
     </div>
     {% endfor %}
+    </div>
   {% endfor %}
   {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}{% endif %}
   </div>

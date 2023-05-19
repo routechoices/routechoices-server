@@ -294,8 +294,8 @@ body {
 .padded-multiline {
   line-height: 1.4;
   padding: 2px 0;
-  margin: 20px auto 0.5em 15px;
-  max-width: calc(100% - 35px);
+  margin: 0 0 0.5em 10px;
+  max-width: calc(100% - 20px);
 }
 
 .padded-multiline span {
@@ -312,8 +312,8 @@ body {
 .header-multiline {
   line-height: 1.4;
   padding: 2px 0;
-  margin: 0px auto 0.5em 0px;
-  max-width: calc(100% - 35px);
+  margin: 0;
+  max-width: 100%;
 }
 
 .header-multiline span {
