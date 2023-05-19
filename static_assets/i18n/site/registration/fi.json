@@ -1,0 +1,16 @@
+{
+    "dev-id": "Laitetunnus",
+    "refresh": "Lataa uudelleen",
+    "settings": "Asetukset",
+    "name": "Nimi",
+    "short-name": "Lyhyt nimi",
+    "save": "Tallenna",
+    "event": "Tapahtuma",
+    "no-events": "Ei tapahtumia, joihin ilmoittautua.",
+    "register-this": "Rekisteröi tähän tapahtumaan",
+    "registered": "Olet rekisteröitynyt.",
+    "registration-info": "Voit suoratoistaa GPS-tietosi vain yhdelle kilpailijalle kerrallaan. Jos rekisteröidyt nyt, GPS-tietovirtasi siirretään välittömästi tälle kilpailijalle.",
+    "registration-info-time": "Voit suoratoistaa GPS-tietosi vain yhdelle kilpailijalle kerrallaan. Jos rekisteröidyt nyt, GPS-tietovirtasi vaihdetaan tälle kilpailijalle viimeistään $1",
+    "error": "Jotain meni pieleen.",
+    "register": "Ilmoittaudu tapahtumaan"
+}

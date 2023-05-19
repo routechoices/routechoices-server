@@ -1,0 +1,16 @@
+{
+    "dev-id": "Device ID",
+    "refresh": "Refresh",
+    "settings": "Settings",
+    "name": "Name",
+    "short-name": "Shortname",
+    "save": "Save",
+    "event": "Event",
+    "no-events": "No events to register to.",
+    "register-this": "Register for this event",
+    "registered": "You have been registered.",
+    "registration-info": "You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor immediately.",
+    "registration-info-time": "You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor at latest on $1",
+    "error": "Something went wrong.",
+    "register": "Register to an event"
+}

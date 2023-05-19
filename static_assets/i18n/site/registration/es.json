@@ -1,0 +1,16 @@
+{
+    "dev-id": "Dispositivo ID",
+    "refresh": "Actualizar",
+    "settings": "Ajustes",
+    "name": "Nombre",
+    "short-name": "Nombre corto",
+    "save": "Guardar",
+    "event": "Evento",
+    "no-events": "No hay eventos para registrarse",
+    "register-this": "Registrarse en este evento",
+    "registered": "Has sido registrado",
+    "registration-info": "Puede transmitir sus datos GPS a un solo competidor a la vez. Si se registra ahora, su flujo de datos GPS se cambiará a este competidor inmediatamente.",
+    "registration-info-time": "Puede transmitir sus datos GPS a un solo competidor a la vez. Si se registra ahora, su flujo de datos GPS se cambiará a este competidor a más tardar en $1",
+    "error": "Algo salió mal",
+    "register": "Registrarse en el evento"
+}

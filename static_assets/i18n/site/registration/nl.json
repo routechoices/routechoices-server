@@ -1,0 +1,16 @@
+{
+    "dev-id": "Toestel ID",
+    "refresh": "Refresh",
+    "settings": "Instellingen",
+    "name": "Naam",
+    "short-name": "Korte naam",
+    "save": "Opslaan",
+    "event": "Evenement",
+    "no-events": "Geen evenemten om te registreren",
+    "register-this": "Register voor dit evenement",
+    "registered": "Je bent geregistreerd",
+    "registration-info": "Je kan je GPS data streamen naar 1 atleet per sessie. Als je nu registreert, zal je GPS data stream verandert worden naar een andere atleet.",
+    "registration-info-time": "Je kan je GPS data streamen naar 1 atleet per sessie. Als je nu registreert,zal je GPS data stream verandert worden naar deze atleet ten laatste op",
+    "error": "Er ging iets verkeerd",
+    "register": "Registreer voor event"
+}

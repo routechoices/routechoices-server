@@ -1,0 +1,16 @@
+{
+    "dev-id": "Identifiant de l'appareil",
+    "refresh": "Actualiser",
+    "settings": "Options",
+    "name": "Nom",
+    "short-name": "Nom abrégé",
+    "save": "Enregistrer",
+    "event": "Événement",
+    "no-events": "Aucun événement auquel s'inscrire.",
+    "register-this": "S'inscrire à cet événement",
+    "registered": "Vous avez été enregistré.",
+    "registration-info": "Vous pouvez diffuser vos données GPS à un seul concurrent à la fois. Si vous vous inscrivez maintenant, votre flux de données GPS sera immédiatement transféré à ce concurrent.",
+    "registration-info-time": "Vous pouvez diffuser vos données GPS à un seul concurrent à la fois. Si vous vous inscrivez maintenant, votre flux de données GPS sera basculé vers ce concurrent au plus tard le $1",
+    "error": "Quelque chose s'est mal passé.",
+    "register": "Inscription à un événement"
+}
