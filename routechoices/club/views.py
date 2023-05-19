@@ -114,7 +114,9 @@ def club_logo(request, **kwargs):
         content_type="image/avif" if serve_avif else "image/png",
         headers=headers,
     )
-    resp["Content-Disposition"] = set_content_disposition(f"{club.name}.png", dl=False)
+    resp["Content-Disposition"] = set_content_disposition(
+        f"{club.name}.{'avif' if serve_avif else 'png'}", dl=False
+    )
     return resp
 
 
