@@ -241,7 +241,7 @@
   {% if events_page.paginator.num_pages > 1 %}{% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}{% endif %}
   </div>
   {% if not live_events and not events and not upcoming_events %}
-    <div class="card">
+    <div class="card border-0 shadow mb-3">
       <div class="card-body">
         <h2 style="color: #888">No {% if not event_set_page or event_set.hide_secret_events %}public {% endif %}events...</h2>
       </div>
