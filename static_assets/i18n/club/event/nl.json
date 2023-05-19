@@ -40,5 +40,7 @@
     "full-route": "Volledige route",
     "follow": "Volgen",
     "crossing-count": "Aantal kruisingen",
-    "highlight": "Hoogtepunt"
+    "highlight": "Hoogtepunt",
+    "location": "Lokaliteit",
+    "show-location": "Toon mijn locatie"
 }

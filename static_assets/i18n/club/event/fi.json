@@ -40,5 +40,7 @@
     "full-route": "Koko reitti",
     "follow": "Seuraa",
     "crossing-count": "Ylitysten määrä",
-    "highlight": "Kohokohta"
+    "highlight": "Kohokohta",
+    "location": "Sijainti",
+    "show-location": "Näytä sijaintini"
 }

@@ -61,6 +61,7 @@ var panControl = null;
 var zoomControl = null;
 var rotateControl = null;
 var scaleControl = null;
+var locateControl = null;
 var showClusters = false;
 var showControls = !(L.Browser.touch && L.Browser.mobile);
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
@@ -81,6 +82,7 @@ var sidebarShown = true;
 var isMapMoving = false;
 var oldCrossingForNTimes = 1;
 var intersectionCheckZoom = 18;
+var showUserLocation = false;
 var supportedLanguages = {
   en: "English",
   es: "Español",
@@ -1502,7 +1504,7 @@ function displayOptions(ev) {
         '<i class="fa-solid fa-language"></i> ' +
         banana.i18n("language") +
         "</h4>" +
-        '<select class="form-select" id="languageSelector">' +
+        '<select class="form-select mb-2" id="languageSelector">' +
         Object.keys(supportedLanguages)
           .map(function (l) {
             return (
@@ -1517,6 +1519,14 @@ function displayOptions(ev) {
           })
           .join("") +
         "</select>" +
+        '<div class="mb-2"><h4>' +
+        banana.i18n("location") +
+        "</h4>" +
+        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-location-switch"' +
+        (showUserLocation ? " checked" : "") +
+        '><label class="form-check-label" for="toggle-location-switch">' +
+        banana.i18n("show-location") +
+        "</label></div><div>" +
         (qrUrl
           ? `<h4>${banana.i18n("qr-link")}</h4>
 <p class="text-center">
@@ -1529,6 +1539,16 @@ function displayOptions(ev) {
           : "")
     )
   );
+  u(mainDiv)
+    .find("#toggle-location-switch")
+    .on("click", function (e) {
+      if (!e.target.checked) {
+        locateControl.stop();
+      } else {
+        locateControl.start();
+      }
+    });
+
   u(mainDiv)
     .find("#languageSelector")
     .on("change", function (e) {
@@ -2442,7 +2462,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023051200`)
+  return fetch(`${langFile}?v=2023051900`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

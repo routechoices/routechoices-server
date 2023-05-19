@@ -40,5 +40,7 @@
     "full-route": "Full route",
     "follow": "Follow",
     "crossing-count": "Number of crossings",
-    "highlight": "Highlight"
+    "highlight": "Highlight",
+    "location": "Location",
+    "show-location": "Show my location"
 }

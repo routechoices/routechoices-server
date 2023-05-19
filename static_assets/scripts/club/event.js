@@ -138,7 +138,18 @@
     map.on("zoomend", function () {
       isMapMoving = false;
     });
-
+    locateControl = L.control
+      .locate({
+        flyTo: true,
+        returnToPrevBounds: true,
+        showCompass: false,
+        showPopup: false,
+        locateOptions: {
+          watch: true,
+          enableHighAccuracy: true,
+        },
+      })
+      .addTo(map);
     eventStateControl = L.control.eventState();
     coordsControl = L.control.mapCenterCoord({
       position: "bottomright",

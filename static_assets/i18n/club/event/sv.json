@@ -40,5 +40,7 @@
     "full-route": "Visa hela gps",
     "follow": "Följ",
     "crossing-count": "Antal korsningar",
-    "highlight": "Markera"
+    "highlight": "Markera",
+    "location": "Läge",
+    "show-location": "Visa min läge"
 }

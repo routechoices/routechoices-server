@@ -258,3 +258,9 @@
 .competitor-switch {
   cursor: pointer;
 }
+
+.leaflet-control-locate {
+  width: 0;
+  height: 0;
+  display: none;
+}

@@ -40,5 +40,7 @@
   "full-route": "Routa completa",
   "follow": "Seguir",
   "crossing-count": "Recuento de intersecciones",
-  "highlight": "Destacar"
+  "highlight": "Destacar",
+  "location": "Ubicación",
+  "show-location": "Mostrar mi ubicación"
 }

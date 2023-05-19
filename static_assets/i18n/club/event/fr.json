@@ -40,5 +40,7 @@
     "full-route": "Itinéraire complet",
     "follow": "Suivre",
     "crossing-count": "Nombre d'intersections",
-    "highlight": "Souligner"
+    "highlight": "Souligner",
+    "location": "Position",
+    "show-location": "Afficher ma position"
 }
