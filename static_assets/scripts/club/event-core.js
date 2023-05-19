@@ -63,7 +63,7 @@ var rotateControl = null;
 var scaleControl = null;
 var locateControl = null;
 var showClusters = false;
-var showControls = !(L.Browser.touch && L.Browser.mobile);
+var showControls = false;
 var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
 var zoomOnRunners = false;
 var clock = null;
@@ -135,9 +135,9 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<div class="m-0 py-0 px-3 fst-italic" style="color: red;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
+      '<div class="m-0 py-0 px-2 fst-italic" style="color: red;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("live-mode") +
-      '</div><div id="big-clock" class="py-0 px-3" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"></div>';
+      '</div><div id="big-clock" class="py-0 px-2" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -145,13 +145,14 @@ L.Control.EventState = L.Control.extend({
       padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
+      marginLeft: "0px",
     });
   },
   setReplay() {
     this._div.innerHTML =
-      '<div class="m-0 py-0 px-3" style="color: #666;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
+      '<div class="m-0 py-0 px-2" style="color: #666;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("replay-mode") +
-      '</div><div id="big-clock" class="py-0 px-3" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
+      '</div><div id="big-clock" class="py-0 px-2" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -159,6 +160,7 @@ L.Control.EventState = L.Control.extend({
       padding: "0",
       fontWeight: "bold",
       textTransform: "uppercase",
+      marginLeft: "0px",
     });
   },
   onRemove: function (map) {

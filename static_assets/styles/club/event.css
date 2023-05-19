@@ -157,7 +157,7 @@
 
 .leaflet-left.has-leaflet-pan-control .leaflet-control-rotate {
   position: relative;
-  left: 24px;
+  left: 18px;
 }
 
 .time_bar .btn-secondary:focus {
@@ -263,4 +263,14 @@
   width: 0;
   height: 0;
   display: none;
+}
+
+.leaflet-touch .leaflet-control-pan-right-wrap {
+  left: 40px;
+}
+.leaflet-touch .leaflet-control-pan-up-wrap {
+  left: 20px;
+}
+.leaflet-touch .leaflet-control-pan-down-wrap {
+  left: 20px;
 }

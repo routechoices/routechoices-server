@@ -7,11 +7,11 @@
 */
 .leaflet-left.has-leaflet-pan-control .leaflet-control-zoom {
 	position: relative;
-	left: 24px;
+	left: 18px;
 }
 .leaflet-right.has-leaflet-pan-control .leaflet-control-zoom {
 	position: relative;
-	right: 24px;
+	right: 18px;
 }
 
 /*
