@@ -45,7 +45,7 @@
       <div class="row justify-content-between">
         {% for club in partner_clubs %}
         <div class="col align-self-center text-center">
-            {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
+            {% if club.website %}<a href="{{ club.website }}" target="_blank" class="d-inline-block text-decoration-none dark-link">{% endif %}
             <img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
             <span class="fw-bold">{{ club.name }}</span>
             {% if club.website %}</a>{% endif %}
