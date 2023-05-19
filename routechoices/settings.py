@@ -577,6 +577,7 @@ SLUG_BLACKLIST = [
     "ldap-status",
     "learn",
     "legal",
+    "lemon-webhook",
     "license",
     "licensing",
     "limit",
