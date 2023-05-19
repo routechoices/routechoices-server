@@ -1475,7 +1475,7 @@ class Event(models.Model):
     def shortcut(self):
         shortcut_url = getattr(settings, "SHORTCUT_BASE_URL", None)
         if shortcut_url:
-            return f"{shortcut_url}{self.aid}"
+            return f"{shortcut_url}{self.club.slug}/{self.slug}"
         return None
 
     @property
