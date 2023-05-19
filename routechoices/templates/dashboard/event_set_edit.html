@@ -10,7 +10,7 @@
     <div class="col-12">
         {% if event_set.url %}
         <div  class="text-center d-flex">
-            <div><p>{% qr_from_text event_set.url size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText fw-bold" href="{{ event_set.url }}">{{ event_set.url }}</a></small></p></div>
+            <div><p>{% qr_from_text event_set.shortcut size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText fw-bold" href="{{ event_set.shortcut }}">{{ event_set.shortcut_text }}</a></small></p></div>
         </div>
         {% endif%}
         <h1>{% if context == 'edit' %}Edit Event Set{% else %}New Event Set{% endif %}</h1>

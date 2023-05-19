@@ -34,6 +34,11 @@ urlpatterns = [
         name="acme_challenge",
     ),
     re_path(
+        r"e/(?P<slug>[0-9a-zA-Z_-]+)/?$",
+        views.event_set_shortcut,
+        name="event_set_shortcut",
+    ),
+    re_path(
         r"events/(?P<slug>[0-9a-zA-Z_-]+)/?$",
         views.event_set_view,
         name="event_set_view",

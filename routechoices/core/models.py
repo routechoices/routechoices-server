@@ -1020,6 +1020,20 @@ class EventSet(models.Model):
         return ""
 
     @property
+    def shortcut(self):
+        shortcut_url = getattr(settings, "SHORTCUT_BASE_URL", None)
+        if shortcut_url:
+            return f"{shortcut_url}{self.club.slug}/e/{self.slug}"
+        return None
+
+    @property
+    def shortcut_text(self):
+        shortcut_url = self.shortcut
+        if shortcut_url:
+            return shortcut_url.partition("://")[2]
+        return None
+
+    @property
     def hide_secret_events(self):
         return not self.list_secret_events
 
