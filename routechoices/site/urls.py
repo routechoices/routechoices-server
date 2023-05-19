@@ -31,7 +31,8 @@ urlpatterns = [
         views.pricing_page,
         name="pricing_view",
     ),
-    re_path(r"^lemon-webhook/?$", views.lemon_webhook, name="lemon_webhook"),
+    re_path(r"^webhooks/lemonsqueeze/?$", views.lemon_webhook, name="lemon_webhook"),
+    re_path(r"^lemon-webhook/?$", views.lemon_webhook, name="_lemon_webhook"),
     re_path(
         r"^(?P<club_slug>[0-9a-zA-Z][0-9a-zA-Z-]+)/",
         include(("routechoices.club.urls", "club"), namespace="club"),
