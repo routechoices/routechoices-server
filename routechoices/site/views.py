@@ -29,11 +29,6 @@ def pricing_page(request):
     return render(request, "site/pricing.html", {"partner_clubs": partners})
 
 
-def event_shortcut(request, event_id):
-    event = get_object_or_404(Event.objects.select_related("club"), aid=event_id)
-    return redirect(event.get_absolute_url())
-
-
 def events_view(request):
     return render(request, "site/event_list.html", Event.extract_event_lists(request))
 
