@@ -33,11 +33,6 @@ urlpatterns = [
     ),
     re_path(r"^lemon-webhook/?$", views.lemon_webhook, name="lemon_webhook"),
     re_path(
-        r"^r/(?P<event_id>[0-9a-zA-Z_-]+)/?$",
-        views.event_shortcut,
-        name="event_shortcut",
-    ),
-    re_path(
         r"^(?P<club_slug>[0-9a-zA-Z][0-9a-zA-Z-]+)/",
         include(("routechoices.club.urls", "club"), namespace="club"),
     ),
