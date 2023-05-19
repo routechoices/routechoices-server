@@ -1542,7 +1542,8 @@ function displayOptions(ev) {
   u(mainDiv)
     .find("#toggle-location-switch")
     .on("click", function (e) {
-      if (!e.target.checked) {
+      showUserLocation = e.target.checked;
+      if (!showUserLocation) {
         locateControl.stop();
       } else {
         locateControl.start();
