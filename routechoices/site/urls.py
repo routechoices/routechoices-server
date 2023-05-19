@@ -4,9 +4,7 @@ from django.views.generic import TemplateView
 from routechoices.site import feeds, views
 
 urlpatterns = [
-    re_path(
-        r"^$", TemplateView.as_view(template_name="site/home.html"), name="home_view"
-    ),
+    re_path(r"^$", views.home_page, name="home_view"),
     re_path(r"^contact/?$", views.contact, name="contact_view"),
     re_path(r"^events/?$", views.events_view, name="events_view"),
     re_path(r"^events/feed/?$", feeds.live_event_feed, name="events_feed"),

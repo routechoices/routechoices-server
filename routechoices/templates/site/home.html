@@ -38,32 +38,19 @@
 <div class="container-fluid frontpage_text px-2 py-5" style="background-color: #fff;">
   <div class="container">
     <div class="text-center">
-      <h2 style="margin-bottom: 30px"><b>They trust us</b></h2>
+      <div class="mb-5">
+      <h2 class="mb-0"><b>They trust us</b></h2>
+      <small>And help the platform running</small>
+      </div>
       <div class="row justify-content-between">
+        {% for club in partner_clubs %}
         <div class="col align-self-center text-center">
-          <a href="https://stage-orientation.fr" target="_blank" class="text-decoration-none dark-link">
-            <img src="{% static 'img/arvik.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
-            <span class="fw-bold">Arvik</span>
-          </a>
+            {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
+            <img src="{% if club.logo %}{{club.logo.url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
+            <span class="fw-bold">{{ club.name }}</span>
+            {% if club.website %}</a>{% endif %}
         </div>
-        <div class="col align-self-center text-center">
-          <a href="http://www.hyvinkaanrasti.fi" target="_blank" class="text-decoration-none dark-link">
-            <img src="{% static 'img/hyvinkaan_rasti.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
-            <span class="fw-bold">Hyvinkään Rasti</span>
-          </a>
-        </div>
-        <div class="col align-self-center text-center">
-          <a href="https://kiilat.com" target="_blank" class="text-decoration-none dark-link">
-            <img src="{% static 'img/kemion_kiilat.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
-            <span class="fw-bold">Kemiön Kiilat</span>
-          </a>
-        </div>
-        <div class="col align-self-center text-center">
-          <a href="https://www.schoolofoutdoors.uk/" target="_blank" class="text-decoration-none dark-link">
-            <img src="{% static 'img/schoolofoutdoors.png' %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="logo" />
-            <span class="fw-bold">School of Outdoors</span>
-          </a>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>

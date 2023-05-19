@@ -19,6 +19,11 @@ from routechoices.core.models import Club, Event
 from routechoices.site.forms import ContactForm
 
 
+def home_page(request):
+    partners = Club.objects.filter(upgraded=True).order_by("name")
+    return render(request, "site/home.html", {"partner_clubs": partners})
+
+
 def pricing_page(request):
     partners = Club.objects.filter(upgraded=True).order_by("name")
     return render(request, "site/pricing.html", {"partner_clubs": partners})
