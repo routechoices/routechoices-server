@@ -75,7 +75,6 @@
   {% endif %}
   {% if live_events %}
   <div><h2 class="header-multiline mb-3"><span style="background-color: #000;">Live Events</span></h2></div>
-  <div>
   {% for event_set in live_events %}
     <div class="mb-4">
     {% if not event_set_page %}
@@ -118,7 +117,6 @@
     {% endfor %}
     </div>
   {% endfor %}
-  </div>
   <hr/>
   {% endif%}
   {% if upcoming_events %}
@@ -126,7 +124,6 @@
     <h2 class="header-multiline"><span style="background-color: #000;">Upcoming Events</span></h2>
     <h6>Starting in next 24 hours</h6>
   </div>
-  <div>
   {% for event_set in upcoming_events reversed %}
     <div class="mb-4">
     {% if not event_set_page %}
@@ -168,7 +165,6 @@
     {% endfor %}
     </div>
   {% endfor %}
-  </div>
   {% if years or search_text or event_set_page and events %}
   <hr/>
   {% endif%}
