@@ -34,7 +34,7 @@ for a {{ site_name }} account and login below:{% endblocktrans %}</p>
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 {% endif %}
 
-<form class="login" method="POST" action="{% url 'root_account_login' %}">
+<form class="login" method="POST" action="{% url 'site:account_login' %}">
   {% csrf_token %}
   {% bootstrap_form form %}
   {% if redirect_field_value %}

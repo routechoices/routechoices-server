@@ -11,7 +11,7 @@
       <div class="card border-0 shadow rounded-3 my-5">
         <div class="card-body p-4 p-sm-5">
           <h3 class="card-title text-center mb-5">{% trans "Logout" %}</h3>
-          <form method="post" action="{% url 'root_account_logout' %}">
+          <form method="post" action="{% url 'site:account_logout' %}">
             {% csrf_token %}
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>

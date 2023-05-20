@@ -94,7 +94,7 @@ class AcceptInvite(SingleObjectMixin, View):
                     "invitations/messages/invite_for_other.txt",
                     {"email": invitation.email, "club": invitation.club},
                 )
-                return redirect("root_account_logout")
+                return redirect("site:account_logout")
 
         get_invitations_adapter().stash_verified_email(self.request, invitation.email)
 

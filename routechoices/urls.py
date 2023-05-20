@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from allauth.account import views as account_views
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
 from django.urls import include, path, re_path
@@ -24,7 +23,6 @@ from routechoices.dashboard.views import (
     dashboard_logo_download,
     dashboard_map_download,
 )
-from routechoices.site import views as site_views
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 admin.site.site_header = "Routechoices.com Admin"
@@ -46,18 +44,19 @@ urlpatterns = [
         RedirectView.as_view(url="/dashboard/account/change-password"),
     ),
     path("account/", include("allauth.urls")),
+    path("admin/", admin.site.urls),
+    path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
     path("dashboard/account/mfa/login/", RedirectView.as_view(url="/login")),
     path("dashboard/account/mfa/backup-codes/", backup_codes, name="backup-codes"),
     path("dashboard/account/mfa/", include("kagi.urls", namespace="kagi")),
-    path("login/", site_views.CustomLoginView.as_view(), name="root_account_login"),
-    path("logout/", account_views.logout, name="root_account_logout"),
-    path("signup/", account_views.signup, name="root_account_signup"),
-    path("admin/", admin.site.urls),
-    path("invitations/", include("invitations.urls", namespace="invitations")),
-    path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
     path(
         "dashboard/",
         include(("routechoices.dashboard.urls", "dashboard"), namespace="dashboard"),
+    ),
+    path("invitations/", include("invitations.urls", namespace="invitations")),
+    path(
+        "webhooks/",
+        include(("routechoices.webhooks.urls", "webhooks"), namespace="webhooks"),
     ),
     re_path(
         r"^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
@@ -71,7 +70,6 @@ urlpatterns = [
         dashboard_logo_download,
         name="dashboard_logo_download",
     ),
-    path("robots.txt", site_views.robots_txt, name="robots.txt"),
     path(
         "sitemap.xml",
         sitemaps_views.index,

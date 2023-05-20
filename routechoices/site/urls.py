@@ -1,3 +1,4 @@
+from allauth.account import views as account_views
 from django.urls import include, re_path
 from django.views.generic import TemplateView
 
@@ -5,6 +6,9 @@ from routechoices.site import feeds, views
 
 urlpatterns = [
     re_path(r"^$", views.home_page, name="home_view"),
+    re_path(r"^login/?$", views.CustomLoginView.as_view(), name="account_login"),
+    re_path(r"^logout/?$", account_views.logout, name="account_logout"),
+    re_path(r"^signup/?$", account_views.signup, name="account_signup"),
     re_path(r"^contact/?$", views.contact, name="contact_view"),
     re_path(r"^events/?$", views.events_view, name="events_view"),
     re_path(r"^events/feed/?$", feeds.live_event_feed, name="events_feed"),
@@ -31,7 +35,7 @@ urlpatterns = [
         views.pricing_page,
         name="pricing_view",
     ),
-    re_path(r"^webhooks/lemonsqueezy/?$", views.lemon_webhook, name="lemon_webhook"),
+    re_path(r"^robots\.txt$", views.robots_txt, name="robots.txt"),
     re_path(
         r"^(?P<club_slug>[0-9a-zA-Z][0-9a-zA-Z-]+)/",
         include(("routechoices.club.urls", "club"), namespace="club"),

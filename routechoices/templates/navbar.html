@@ -21,11 +21,11 @@
       <ul class="navbar-nav d-flex">
         {% if user.is_authenticated %}
         <li class="nav-item"><a class="nav-link me-2 {% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>
-        <li class="nav-item"><a href="{% host_url 'root_account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0">Logout</a></li>
+        <li class="nav-item"><a href="{% host_url 'site:account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0">Logout</a></li>
         {% else %}
         <span class="if-not-collapsed me-2"></span>
-        <li class="nav-item"><a href="{% host_url 'root_account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn mt-0 me-2">Login</a></li>
-        <li class="nav-item"><a href="{% host_url 'root_account_signup' host 'www'%}" class="btn btn-success navbar-btn text-nowrap mt-0">Sign up for free</a></li>
+        <li class="nav-item"><a href="{% host_url 'site:account_login' host 'www' %}" class="btn btn-primary navbar-btn loginBtn mt-0 me-2">Login</a></li>
+        <li class="nav-item"><a href="{% host_url 'site:account_signup' host 'www'%}" class="btn btn-success navbar-btn text-nowrap mt-0">Sign up for free</a></li>
         {% endif %}
       </ul>
     </div>
