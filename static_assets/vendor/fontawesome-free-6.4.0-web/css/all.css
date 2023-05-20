@@ -681,6 +681,14 @@ readers do not read off random characters that represent icons */
   content: "\f1ab";
 }
 
+.fa-arrows-rotate::before {
+  content: "\f021";
+}
+
+.fa-thumbs-up::before {
+  content: "\f164";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

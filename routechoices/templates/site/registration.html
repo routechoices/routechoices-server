@@ -5,41 +5,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" href='{% static 'favicon.ico' %}?v=2023c' />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         {% compress css %}
+        <link rel="stylesheet" href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}"/>
         <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}"/>
+        <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
         {% endcompress %}
-        <style>
-            .swal-button {
-                background-color:#0275d8;
-                color:#fff;
-                border:none;
-                box-shadow:none;
-                border-radius:5px;
-                font-weight:600;
-                font-size:14px;
-                padding:10px 24px;
-                margin:0;
-                cursor:pointer
-            }
-            .swal-button:not([disabled]):hover {
-                background-color:#06c
-            }
-            .swal-button:active {
-                background-color:#0275d8
-            }
-            .swal-button:focus {
-                outline:none;
-                box-shadow: none
-             }
-            .swal-button[disabled] {
-                opacity:.5;
-                cursor:default
-            }
-            .swal-button::-moz-focus-inner {
-                border:0
-            }
-        </style>
     </head>
     <body>
     <div class="container">
@@ -60,28 +30,28 @@
             </form>
         </div>
         <div id="p2" class="d-none">
-            <div style="margin-bottom: 15px"><i class="fa fa-user"></i> <span id="user-summary"></span></div>
-            <div><button class="btn user-setting-btn btn-secondary"><i class="fa fa-cog"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa fa-refresh"></i> <span class="refresh-text">Refresh</span></button></div>
+            <div style="margin-bottom: 15px"><i class="fa-solid fa-user"></i> <span id="user-summary"></span></div>
+            <div><button class="btn user-setting-btn btn-secondary"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
             <form id="form2">
                 <label for="events" class="form-label" id="event-label">Event</label>
                 <select class="form-select" id="events" name="events" onchange="onEventSelect()"></select>
                 <p id="warningA" class="d-none">
-                    <i class="fa fa-warning"></i> <span id="registration-info">You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor immediately.</span>
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="registration-info">You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor immediately.</span>
                 </p>
                 <p id="warningB" class="d-none">
-                    <i class="fa fa-warning"></i> <span id="event_start_notice"></span>
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="event_start_notice"></span>
                 </p>
                 <input style="margin-top:15px" class="form-control btn btn-primary" type="submit" id="register-btn" value="Register for event" />
             </form>
 
         </div>
         <div id="p3" class="d-none">
-            <div><button class="btn user-setting-btn btn-secondary"><i class="fa fa-cog"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa fa-refresh"></i> <span class="refresh-text">Refresh</span></button></div>
-            <h1><i class="fa fa-warning" style="color:crimson"></i> <span id="no-events">No events to register.</span></h1>
+            <div><button class="btn user-setting-btn btn-secondary"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
+            <h1><i class="fa-solid fa-triangle-exclamation" style="color:crimson"></i> <span id="no-events">No events to register.</span></h1>
         </div>
         <div id="p4" class="d-none">
-            <div><button class="btn user-setting-btn btn-secondary"><i class="fa fa-cog"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa fa-refresh"></i> <span class="refresh-text">Refresh</span></button></div>
-            <h1><i class="fa fa-success" style="color:green"></i> <span id="registered">You have been registered.</span></h1>
+            <div><button class="btn user-setting-btn btn-secondary"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
+            <h1><i class="fa-solid fa-thumbs-up"></i> <span id="registered">You have been registered.</span></h1>
         </div>
     </div>
     </div>
@@ -89,9 +59,10 @@
         data-static-root="{% static '' %}"
         data-api-root="{% host_url 'api_doc' host 'api' %}"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     {% compress js %}
+    <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
     <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
     <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
     <script src="{% static '/scripts/site/registration.js' %}"></script>

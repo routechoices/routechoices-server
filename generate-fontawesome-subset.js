@@ -10,6 +10,7 @@ fontawesomeSubset(
     brands: ["twitter", "instagram", "github", "android", "apple"],
     regular: ["window-restore", "map", "copy", "clock", "eye", "eye-slash"],
     solid: [
+      "arrows-rotate",
       "trash-can",
       "triangle-exclamation",
       "download",
@@ -78,6 +79,7 @@ fontawesomeSubset(
       "chevron-left",
       "chevron-right",
       "calendar-check",
+      "thumbs-up",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"
