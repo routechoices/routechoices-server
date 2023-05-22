@@ -34,7 +34,7 @@ services:
       - "1025"
   nginx:
     container_name: rc_nginx
-    image: macbre/nginx-http3:latest
+    image: rphlo/nginx:latest
     ports:
       - "443:443/udp"
       - "443:443/tcp"
@@ -45,6 +45,7 @@ services:
     links:
       - minio
       - django
+    command: ['nginx', '-g', 'daemon off;']
   redis:
     container_name: rc_redis
     image: redis:7.0.4
