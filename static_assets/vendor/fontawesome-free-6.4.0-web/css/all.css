@@ -689,6 +689,10 @@ readers do not read off random characters that represent icons */
   content: "\f164";
 }
 
+.fa-file-arrow-up::before {
+  content: "\f574";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

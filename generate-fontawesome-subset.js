@@ -80,6 +80,7 @@ fontawesomeSubset(
       "chevron-right",
       "calendar-check",
       "thumbs-up",
+      "file-arrow-up",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"
