@@ -20,7 +20,7 @@
       <hr class="if-navbar-toggled mt-0 mb {% if user.is_authenticated %}mb-0{% else %}mb-2{% endif %}" />
       <ul class="navbar-nav d-flex">
         {% if user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link me-2 {% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link me-2 dashboard-navbar-link{% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}" href="{% host_url 'dashboard:home_view'%}">Dashboard</a></li>
         <li class="nav-item"><a href="{% host_url 'site:account_logout' host 'www'%}" class="btn btn-danger navbar-btn mt-0">Logout</a></li>
         {% else %}
         <span class="if-not-collapsed me-2"></span>

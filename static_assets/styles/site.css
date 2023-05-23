@@ -361,8 +361,14 @@ body {
 .if-navbar-toggled {
   display: block;
 }
+
 .if-navbar-not-toggled {
   display: none;
+}
+
+.navbar-expand-md .dashboard-navbar-link {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 @media (min-width: 576px) {
@@ -382,6 +388,11 @@ body {
 
   .navbar-expand-md .if-navbar-not-toggled {
     display: block;
+  }
+
+  .navbar-expand-md .dashboard-navbar-link {
+    margin-bottom: 0;
+    margin-top: 0;
   }
 }
 
