@@ -228,7 +228,7 @@ body {
 }
 
 .loginBtn {
-  margin-bottom: 0;
+  margin-bottom: 10px;
 }
 
 @media screen and (max-width: 767px) {
@@ -238,10 +238,6 @@ body {
 
   #myFooter .info {
     text-align: center;
-  }
-
-  .loginBtn {
-    margin-bottom: 5px;
   }
 }
 
@@ -401,6 +397,10 @@ body {
   .navbar-expand-lg .dashboard-navbar-link {
     margin-bottom: 0;
     margin-top: 0;
+  }
+
+  .navbar-expand-lg .loginBtn {
+    margin-bottom: 0;
   }
 }
 
