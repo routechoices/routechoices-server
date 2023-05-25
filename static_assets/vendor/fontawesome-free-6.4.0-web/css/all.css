@@ -693,6 +693,18 @@ readers do not read off random characters that represent icons */
   content: "\f574";
 }
 
+.fa-tag::before {
+  content: "\f02b";
+}
+
+.fa-table-columns::before {
+  content: "\f0db";
+}
+
+.fa-arrow-right-from-bracket::before {
+  content: "\f08b";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

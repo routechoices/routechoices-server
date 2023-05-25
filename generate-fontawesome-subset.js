@@ -81,6 +81,9 @@ fontawesomeSubset(
       "calendar-check",
       "thumbs-up",
       "file-arrow-up",
+      "tag",
+      "table-columns",
+      "arrow-right-from-bracket",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"

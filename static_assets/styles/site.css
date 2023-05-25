@@ -366,7 +366,7 @@ body {
   display: none;
 }
 
-.navbar-expand-md .dashboard-navbar-link {
+.navbar-expand-lg .dashboard-navbar-link {
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -389,11 +389,6 @@ body {
   .navbar-expand-md .if-navbar-not-toggled {
     display: block;
   }
-
-  .navbar-expand-md .dashboard-navbar-link {
-    margin-bottom: 0;
-    margin-top: 0;
-  }
 }
 
 @media (min-width: 992px) {
@@ -402,6 +397,10 @@ body {
   }
   .navbar-expand-lg .if-navbar-not-toggled {
     display: block;
+  }
+  .navbar-expand-lg .dashboard-navbar-link {
+    margin-bottom: 0;
+    margin-top: 0;
   }
 }
 

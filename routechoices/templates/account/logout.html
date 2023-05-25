@@ -10,14 +10,14 @@
     <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
       <div class="card border-0 shadow rounded-3 my-5">
         <div class="card-body p-4 p-sm-5">
-          <h3 class="card-title text-center mb-5">{% trans "Logout" %}</h3>
+          <h3 class="card-title text-center mb-5">{% trans "Confirm Logout?" %}</h3>
           <form method="post" action="{% url 'site:account_logout' %}">
             {% csrf_token %}
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
             {% endif %}
             <div class="d-grid">
-              <button class="btn btn-danger" type="submit">{% trans 'Confirm Logout' %}</button>
+              <button class="btn btn-danger" type="submit">{% trans 'Logout' %} <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
             </div>
           </form>
         </div>
