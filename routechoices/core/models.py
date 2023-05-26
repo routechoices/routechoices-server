@@ -151,11 +151,8 @@ class Club(models.Model):
     )
     slug_changed_from = models.CharField(
         max_length=50,
-        validators=[
-            validate_domain_slug,
-        ],
+        validators=[validate_domain_slug],
         blank=True,
-        null=True,
         default="",
         editable=False,
     )
@@ -194,7 +191,7 @@ Follow our events live or replay them later.
 
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
-    order_id = models.CharField(max_length=200, blank=True, null=True)
+    order_id = models.CharField(max_length=200, blank=True, default="")
 
     class Meta:
         ordering = ["name"]
@@ -1142,9 +1139,7 @@ class Event(models.Model):
     slug = models.CharField(
         verbose_name="Slug",
         max_length=50,
-        validators=[
-            validate_nice_slug,
-        ],
+        validators=[validate_nice_slug],
         db_index=True,
         help_text="This is used to build the url of this event",
         default=short_random_slug,
@@ -1222,12 +1217,11 @@ class Event(models.Model):
         ),
     )
     emergency_contact = models.EmailField(
-        null=True,
+        default="",
         blank=True,
         help_text=(
-            "Email address of a person available to respond "
-            "in the case a competitor carrying a GPS tracker "
-            "with SOS feature enabled triggers the SOS button."
+            "Email address of a person available to respond in the case a competitor "
+            "carrying a GPS tracker with SOS feature enabled triggers the SOS button."
         ),
     )
 
@@ -2010,7 +2004,7 @@ class Device(models.Model):
                     (
                         f"Competitor {competitor.name} has triggered the SOS button"
                         f" of his GPS tracker during event {event.name}\r\n\r\n"
-                        f"His latest known location is latitude, longitude: "
+                        "His latest known location is latitude, longitude: "
                         f"{lat}, {lon}"
                     ),
                     settings.DEFAULT_FROM_EMAIL,

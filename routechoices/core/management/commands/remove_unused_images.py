@@ -52,7 +52,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Successfully removed {self.n_image_removed} files, "
-                    "keeping {self.n_image_keeped}"
+                    f"keeping {self.n_image_keeped}"
                 )
             )
         else:

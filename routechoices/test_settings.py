@@ -16,3 +16,5 @@ DEBUG = False
 SITE_ID = 1
 
 SHORTCUT_BASE_URL = "http://www.routechoices.dev/r/"
+
+SECURE_SSL_REDIRECT = False

@@ -26,7 +26,7 @@ from django.db.models import Case, Q, Value, When
 from django.dispatch import receiver
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from kagi.views.backup_codes import BackupCodesView
@@ -1403,7 +1403,7 @@ def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
 
 class CustomSessionDeleteOtherView(SessionDeleteOtherView):
     def get_success_url(self):
-        return str(reverse_lazy("dashboard:account_session_list"))
+        return str(reverse("dashboard:account_session_list"))
 
 
 @method_decorator(rate_limit(action="manage_email"), name="dispatch")
