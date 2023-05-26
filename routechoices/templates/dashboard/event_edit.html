@@ -35,9 +35,6 @@
             <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>
             {% endif %}
             <h6>Links for admins</h6>
-            {% if event.is_live %}
-            <a href="{% url 'dashboard:event_view_live' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1"><i class="fa-solid fa-bolt"></i> No Delay Live</a>
-            {% endif %}
             {% if event.started %}
             <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}" class="btn btn-secondary btn-sm mb-1" id="upload_route_btn"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>
             {% endif %}

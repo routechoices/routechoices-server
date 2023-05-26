@@ -86,7 +86,6 @@ PyPi Packages:
     pip-tools                   BSD License
     psycopg2                    GNU Library or Lesser General Public License (LGPL)
     python-magic                MIT License
-    redis                       MIT License
     requests                    Apache Software License
     sewer                       MIT License
     tornado                     Apache Software License

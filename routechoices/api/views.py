@@ -994,7 +994,7 @@ def competitor_route_upload(request, competitor_id):
             user_agent=request.session.user_agent[:200],
             is_gpx=True,
         )
-        device.add_locations(loc_array, push_forward=False)
+        device.add_locations(loc_array)
         competitor.device = device
         competitor.save()
 

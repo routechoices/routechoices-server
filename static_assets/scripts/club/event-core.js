@@ -72,7 +72,6 @@ var sendInterval = 0;
 var endEvent = null;
 var startEvent = null;
 var initialCompetitorDataLoaded = false;
-var gpsEventSource = null;
 var maxParticipantsDisplayed = 300;
 var nbShown = 0;
 var smoothFactor = 1;
@@ -587,15 +586,10 @@ function selectLiveMode(e) {
       ts - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!window.local.noDelay) {
-        fetchCompetitorRoutes();
-      }
+      fetchCompetitorRoutes();
     }
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
-    if (window.local.noDelay) {
-      currentTime = +clock.now();
-    }
     if (ts - prevDisplayRefresh > 100) {
       drawCompetitors();
       prevDisplayRefresh = ts;
@@ -652,9 +646,7 @@ function selectReplayMode(e) {
       ts - routesLastFetched > fetchPositionInterval * 1e3 &&
       !isCurrentlyFetchingRoutes
     ) {
-      if (!window.local.noDelay) {
-        fetchCompetitorRoutes();
-      }
+      fetchCompetitorRoutes();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
 
@@ -758,10 +750,6 @@ function fetchCompetitorRoutes(url, cb) {
       });
 
       updateCompetitorList(response.competitors);
-      if (!initialCompetitorDataLoaded && window.local.noDelay) {
-        initialCompetitorDataLoaded = true;
-        connectToGpsEvents();
-      }
       displayCompetitorList();
       routesLastFetched = performance.now();
       lastDataTs = response.timestamp;
@@ -2384,67 +2372,6 @@ function touchProgressBar(e) {
     u("#full_progress_bar").size().width;
   e.preventDefault();
   onMoveProgressBar(perc);
-}
-
-var connectGpsAttempts;
-var connectGpsTimeoutMs;
-
-function resetGpsConnectTimeout() {
-  connectGpsAttempts = 0;
-  connectGpsTimeoutMs = 100;
-}
-resetGpsConnectTimeout();
-
-function bumpGpsConnectTimeout() {
-  connectGpsAttempts++;
-
-  if (connectGpsTimeoutMs === 100 && connectGpsAttempts === 20) {
-    connectGpsAttempts = 0;
-    connectGpsTimeoutMs = 300;
-  } else if (connectGpsTimeoutMs === 300 && connectGpsAttempts === 20) {
-    connectGpsAttempts = 0;
-    connectGpsTimeoutMs = 1000;
-  } else if (connectGpsTimeoutMs === 1000 && connectGpsAttempts === 20) {
-    connectGpsAttempts = 0;
-    connectGpsTimeoutMs = 3000;
-  }
-  if (connectGpsAttempts === 0) {
-    console.debug(
-      "Live GPS data stream connection error, retrying every " +
-        connectGpsTimeoutMs +
-        "ms"
-    );
-  }
-}
-
-function connectToGpsEvents() {
-  gpsEventSource = new EventSource(window.local.gpsStreamUrl, {
-    withCredentials: true,
-  });
-  // Listen for messages
-  gpsEventSource.addEventListener("open", function () {});
-  gpsEventSource.addEventListener("message", function (event) {
-    resetGpsConnectTimeout();
-    const message = JSON.parse(event.data);
-    if (message.type === "ping") {
-      // pass
-    } else if (message.type === "locations") {
-      var route = PositionArchive.fromEncoded(message.data);
-      if (competitorRoutes[message.competitor]) {
-        for (var i = 0; i < route.getPositionsCount(); i++) {
-          competitorRoutes[message.competitor].add(route.getByIndex(i));
-        }
-      } else {
-        competitorRoutes[message.competitor] = route;
-      }
-    }
-  });
-  gpsEventSource.addEventListener("error", function () {
-    gpsEventSource.close();
-    gpsEventSource = null;
-    bumpGpsConnectTimeout();
-    setTimeout(connectToGpsEvents, connectGpsTimeoutMs);
-  });
 }
 
 function shareUrl(e) {

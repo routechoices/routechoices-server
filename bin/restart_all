@@ -6,7 +6,7 @@ BASEDIR=$(dirname $DIR)
 cd $BASEDIR
 
 ./bin/reload
-./bin/restart_spot
 ./bin/restart_task_queue
 ./bin/restart_tornado
-./bin/restart_sse
+# next ones arent in use at the moment
+./bin/restart_spot

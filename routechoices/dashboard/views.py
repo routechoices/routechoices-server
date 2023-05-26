@@ -1232,32 +1232,6 @@ def event_delete_view(request, event_id):
 
 
 @login_required
-def event_view_live(request, event_id):
-    if request.user.is_superuser:
-        event = get_object_or_404(
-            Event,
-            aid=event_id,
-            start_date__lte=now(),
-            end_date__gte=now(),
-        )
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-        event = get_object_or_404(
-            Event,
-            aid=event_id,
-            club__in=club_list,
-            start_date__lte=now(),
-            end_date__gte=now(),
-        )
-    resp_args = {
-        "event": event,
-        "no_delay": True,
-        "gps_server": getattr(settings, "GPS_SSE_SERVER", None),
-    }
-    return render(request, "club/event.html", resp_args)
-
-
-@login_required
 def dashboard_map_download(request, map_id, *args, **kwargs):
     if request.user.is_superuser:
         raster_map = get_object_or_404(
@@ -1353,7 +1327,7 @@ def event_route_upload_view(request, event_id):
                 if len(points) == 0:
                     error = "File does not contain valid points"
                 else:
-                    device.add_locations(points, push_forward=False)
+                    device.add_locations(points)
                     competitor = form.cleaned_data["competitor"]
                     competitor.device = device
                     if start_time and event.start_date <= start_time <= event.end_date:

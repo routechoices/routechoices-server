@@ -32,7 +32,6 @@ pillow-heif
 pillow
 psycopg
 python-magic
-redis
 requests
 sewer==0.8.4
 tornado

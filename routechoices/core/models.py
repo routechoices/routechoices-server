@@ -17,8 +17,6 @@ import gpxpy
 import gpxpy.gpx
 import magic
 import numpy as np
-import orjson as json
-import redis
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -1781,7 +1779,7 @@ class Device(models.Model):
         result = gps_encoding.encode_data(locs)
         return len(locs), result
 
-    def add_locations(self, loc_array, /, *, save=True, push_forward=True):
+    def add_locations(self, loc_array, /, *, save=True):
         if len(loc_array) == 0:
             return
         new_pts = []
@@ -1823,38 +1821,20 @@ class Device(models.Model):
             self.save()
 
         new_pts = list(sorted(new_pts, key=itemgetter(LOCATION_TIMESTAMP_INDEX)))
-        archived_events_affected = self.get_events(
+        archived_events_affected = self.get_events_between_dates(
             from_time=epoch_to_datetime(new_pts[0][LOCATION_TIMESTAMP_INDEX]),
             to_time=epoch_to_datetime(new_pts[-1][LOCATION_TIMESTAMP_INDEX]),
             should_be_ended=True,
         )
         for archived_event_affected in archived_events_affected:
             archived_event_affected.invalidate_cache()
-        if push_forward:
-            try:
-                competitors = self.get_competitors_at(load_event=True)
-                for competitor in competitors:
-                    event = competitor.event
-                    if event.is_live:
-                        event_id = event.aid
-                        new_data = gps_encoding.encode_data(new_pts)
-                        client = redis.from_url(settings.REDIS_URL)
-                        client.publish(
-                            f"routechoices_event_data:{event_id}",
-                            json.dumps(
-                                {"competitor": competitor.aid, "data": new_data}
-                            ),
-                        )
-            except Exception:
-                pass
 
-    def add_location(self, timestamp, lat, lon, /, *, save=True, push_forward=True):
+    def add_location(self, timestamp, lat, lon, /, *, save=True):
         self.add_locations(
             [
                 (timestamp, lat, lon),
             ],
             save=save,
-            push_forward=push_forward,
         )
 
     @property
@@ -1918,9 +1898,7 @@ class Device(models.Model):
     def last_location_datetime(self):
         return self._last_location_datetime
 
-    def get_competitors_at(self, at=None, load_event=False):
-        if not at:
-            at = now()
+    def get_competitors_at_date(self, at, load_event=False):
         qs = (
             self.competitor_set.all()
             .filter(start_time__lte=at, event__end_date__gte=at)
@@ -1931,13 +1909,11 @@ class Device(models.Model):
             qs = qs.select_related("event")
         return qs
 
-    def get_events_at(self, at=None):
-        if at is None:
-            at = now()
-        competitors = self.get_competitors_at(at=at, load_event=True)
+    def get_events_at_date(self, at):
+        competitors = self.get_competitors_at_date(at=at, load_event=True)
         return set([c.event for c in competitors])
 
-    def get_events(self, from_time, to_time, should_be_ended=False):
+    def get_events_between_dates(self, from_time, to_time, should_be_ended=False):
         qs = (
             self.competitor_set.all()
             .filter(
@@ -1976,7 +1952,7 @@ class Device(models.Model):
         lat = None
         lon = None
 
-        competitors = self.get_competitors_at(at=now(), load_event=True)
+        competitors = self.get_competitors_at_date(now(), load_event=True)
 
         if self.last_location:
             _, lat, lon = self.last_location
@@ -2113,14 +2089,16 @@ class Competitor(models.Model):
             # data as they are before update
             if next_device and next_device != prev_device:
                 if prev_start != next_start:
-                    events_between_prev_and_next_starts = next_device.get_events(
-                        from_time=min(prev_start, next_start),
-                        to_time=max(prev_start, next_start),
+                    events_between_prev_and_next_starts = (
+                        next_device.get_events_between_dates(
+                            from_time=min(prev_start, next_start),
+                            to_time=max(prev_start, next_start),
+                        )
                     )
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = next_device.get_events_at(at=next_start)
+                    events_at_start = next_device.get_events_at_date(at=next_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
         super().save(*args, **kwargs)
@@ -2131,14 +2109,16 @@ class Competitor(models.Model):
             # data as they are after update
             if prev_device:
                 if prev_start != next_start:
-                    events_between_prev_and_next_starts = prev_device.get_events(
-                        from_time=min(prev_start, next_start),
-                        to_time=max(prev_start, next_start),
+                    events_between_prev_and_next_starts = (
+                        prev_device.get_events_between_dates(
+                            from_time=min(prev_start, next_start),
+                            to_time=max(prev_start, next_start),
+                        )
                     )
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = prev_device.get_events_at(at=next_start)
+                    events_at_start = prev_device.get_events_at_date(at=next_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
 
@@ -2208,7 +2188,9 @@ class Competitor(models.Model):
 def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
     if instance.device:
-        new_events_for_device = instance.device.get_events_at(at=instance.start_time)
+        new_events_for_device = instance.device.get_events_at_date(
+            at=instance.start_time
+        )
         for event in new_events_for_device:
             event.invalidate_cache()
 

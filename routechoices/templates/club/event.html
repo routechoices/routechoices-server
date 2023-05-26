@@ -136,17 +136,14 @@
 {% endblock %}
 {% block extra_body %}{{ block.super }}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
-  data-event-id="{{event.aid}}"
-  {% if event.privacy == "public" %}data-show-qr="1"{% endif%}
-  data-data-url="{% host_url 'event_data' event_id=event.aid host 'api' %}"
-  data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
-  data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"
-  data-server-clock-url="{% host_url 'time_api' host 'api' %}"
   data-club-name="{{ event.club.name }}"
-  data-static-root="{% static '' %}"
   data-csrf-token="{{ csrf_token }}"
-  data-no-delay={% if no_delay %}"1"
-  data-gps-stream-url="https://{{gps_server}}/sse/{{event.aid}}"{% else %}""{% endif %}
+  data-data-url="{% host_url 'event_data' event_id=event.aid host 'api' %}"
+  data-event-id="{{event.aid}}"
+  data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
+  data-server-clock-url="{% host_url 'time_api' host 'api' %}"
+  data-static-root="{% static '' %}"
+  data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"
 ></script>
 {% compress js %}
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
