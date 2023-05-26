@@ -51,7 +51,7 @@ itypes==1.2.0
 jinja2==3.1.2
 jmespath==1.0.1
 jwcrypto==1.4.2
-kagi @ git+https://github.com/rphlo/kagi@c49deeee6ab55ebdb79a681055dae40f1d896919
+kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 markdown==3.4.3
 markupsafe==2.1.2
 maxminddb==2.2.0
