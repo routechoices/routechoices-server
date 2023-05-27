@@ -1,49 +1,48 @@
 !(function () {
   "use strict";
-  var r = window.location,
-    a = window.document,
-    t = window.localStorage,
-    o = a.currentScript,
-    l = o.getAttribute("data-api") || new URL(o.src).origin + "/api/event",
-    w = t && t.plausible_ignore;
-  function s(t) {
-    console.warn("Ignoring Event: " + t);
+  var a = window.location,
+    r = window.document,
+    o = r.currentScript,
+    l = o.getAttribute("data-api") || new URL(o.src).origin + "/api/event";
+  function s(t, e) {
+    t && console.warn("Ignoring Event: " + t), e && e.callback && e.callback();
   }
-  function e(t, e) {
+  function t(t, e) {
     if (
-      /^localhost$|^127(\.[0-9]+){0,2}\.[0-9]+$|^\[::1?\]$/.test(r.hostname) ||
-      "file:" === r.protocol
+      /^localhost$|^127(\.[0-9]+){0,2}\.[0-9]+$|^\[::1?\]$/.test(a.hostname) ||
+      "file:" === a.protocol
     )
-      return s("localhost");
+      return s("localhost", e);
     if (
-      !(
-        window._phantom ||
-        window.__nightmare ||
-        window.navigator.webdriver ||
-        window.Cypress
-      )
-    ) {
-      if ("true" == w) return s("localStorage flag");
-      var n = {};
-      (n.n = t),
-        (n.u = e.u || r.href),
+      window._phantom ||
+      window.__nightmare ||
+      window.navigator.webdriver ||
+      window.Cypress
+    )
+      return s(null, e);
+    try {
+      if ("true" === window.localStorage.plausible_ignore)
+        return s("localStorage flag", e);
+    } catch (t) {}
+    var n = {},
+      i =
+        ((n.n = t),
+        (n.u = e.u || a.href),
         (n.d = e.d || o.getAttribute("data-domain")),
-        (n.r = a.referrer || null),
-        (n.w = window.innerWidth),
+        (n.r = r.referrer || null),
         e && e.meta && (n.m = JSON.stringify(e.meta)),
-        e && e.props && (n.p = JSON.stringify(e.props));
-      var i = new XMLHttpRequest();
-      i.open("POST", l, !0),
-        i.setRequestHeader("Content-Type", "text/plain"),
-        i.send(JSON.stringify(n)),
-        (i.onreadystatechange = function () {
-          4 == i.readyState && e && e.callback && e.callback();
-        });
-    }
+        e && e.props && (n.p = e.props),
+        new XMLHttpRequest());
+    i.open("POST", l, !0),
+      i.setRequestHeader("Content-Type", "text/plain"),
+      i.send(JSON.stringify(n)),
+      (i.onreadystatechange = function () {
+        4 === i.readyState && e && e.callback && e.callback();
+      });
   }
-  var n = (window.plausible && window.plausible.q) || [];
-  window.plausible = e;
-  for (var i = 0; i < n.length; i++) e.apply(this, n[i]);
+  var e = (window.plausible && window.plausible.q) || [];
+  window.plausible = t;
+  for (var n, i = 0; i < e.length; i++) t.apply(this, e[i]);
 })();
 window.plausible =
   window.plausible ||
