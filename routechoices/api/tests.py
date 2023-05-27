@@ -273,6 +273,7 @@ class EventApiTestCase(EssentialApiBase):
             url_data_a,
             SERVER_NAME="api.routechoices.dev",
         )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.headers["X-Cache-Hit"], "1")
         # Upload data in event B timespan should invalidate cache
         device.add_location(arrow.get().shift(minutes=-72).timestamp(), 0.2, 0.1)

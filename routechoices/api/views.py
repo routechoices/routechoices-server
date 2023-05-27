@@ -1066,8 +1066,8 @@ def event_data(request, event_id):
         .first()
     )
     if not event:
-        res = {"error": "No event match this id"}
-        return Response(res)
+        response = {"error": "No event match this id"}
+        return Response(response)
 
     cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
     cache_prefix = "live" if event.is_live else "archived"
@@ -1112,7 +1112,9 @@ def event_data(request, event_id):
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
-    devices = (c.device_id for c in competitors if c.device_id)
+    devices = (
+        competitor.device_id for competitor in competitors if competitor.device_id
+    )
 
     # we need this to determine the end time of the competitor device stream
     all_devices_competitors = (
@@ -1123,42 +1125,44 @@ def event_data(request, event_id):
         .order_by("start_time")
     )
     start_times_by_device = {}
-    for c in all_devices_competitors:
-        start_times_by_device.setdefault(c.device_id, [])
-        start_times_by_device[c.device_id].append(c.start_time)
-    nb_points = 0
-    results = []
-    for c in competitors:
-        from_date = c.start_time
+    for competitor in all_devices_competitors:
+        start_times_by_device.setdefault(competitor.device_id, [])
+        start_times_by_device[competitor.device_id].append(competitor.start_time)
+    total_nb_pts = 0
+    competitors_data = []
+    for competitor in competitors:
+        from_date = competitor.start_time
         next_competitor_start_time = None
-        if c.device_id:
-            for nxt in start_times_by_device.get(c.device_id, []):
-                if nxt > c.start_time:
-                    next_competitor_start_time = nxt
+        if competitor.device_id:
+            for start_time in start_times_by_device.get(competitor.device_id, []):
+                if start_time > competitor.start_time:
+                    next_competitor_start_time = start_time
                     break
         end_date = now()
         if next_competitor_start_time:
             end_date = min(next_competitor_start_time, end_date)
         end_date = min(event.end_date, end_date)
-        nb, encoded_data = (0, "")
-        if c.device_id:
-            nb, encoded_data = c.device.get_locations_between_dates(
-                from_date, end_date, encoded=True
+        nb_pts = 0
+        encoded_data = ""
+        if competitor.device_id:
+            encoded_data, np_pts = competitor.device.get_locations_between_dates(
+                from_date, end_date, encode=True
             )
-        nb_points += nb
-        c_data = {
-            "id": c.aid,
+        total_nb_pts += nb_pts
+        competitor_data = {
+            "id": competitor.aid,
             "encoded_data": encoded_data,
-            "name": c.name,
-            "short_name": c.short_name,
-            "start_time": c.start_time,
+            "name": competitor.name,
+            "short_name": competitor.short_name,
+            "start_time": competitor.start_time,
         }
-        if event.is_live and c.device_id:
-            c_data["battery_level"] = c.device.battery_level
-        results.append(c_data)
-    res = {
-        "competitors": results,
-        "nb_points": nb_points,
+        if event.is_live and competitor.device_id:
+            competitor_data["battery_level"] = competitor.device.battery_level
+        competitors_data.append(competitor_data)
+
+    response = {
+        "competitors": competitors_data,
+        "nb_points": total_nb_pts,
         "duration": (time.time() - t0),
         "timestamp": time.time(),
     }
@@ -1169,11 +1173,11 @@ def event_data(request, event_id):
 
     if use_cache:
         try:
-            cache.set(cache_key, res, 20 if event.is_live else 7 * 24 * 3600 + 60)
+            cache.set(cache_key, response, 20 if event.is_live else 7 * 24 * 3600 + 60)
         except Exception:
             pass
 
-    return Response(res, headers=headers)
+    return Response(response, headers=headers)
 
 
 @swagger_auto_schema(
@@ -1824,7 +1828,7 @@ def two_d_rerun_race_data(request):
         start_times_by_device.setdefault(c.device_id, [])
         start_times_by_device[c.device_id].append(c.start_time)
 
-    nb_points = 0
+    total_nb_pts = 0
     results = []
     for c in competitors:
         from_date = c.start_time
@@ -1838,10 +1842,13 @@ def two_d_rerun_race_data(request):
         if next_competitor_start_time:
             end_date = min(next_competitor_start_time, end_date)
         end_date = min(event.end_date, end_date)
-        nb, locations = (0, "")
+        nb_pts = 0
+        locations = []
         if c.device_id:
-            nb, locations = c.device.get_locations_between_dates(from_date, end_date)
-        nb_points += nb
+            locations, nb_pts = c.device.get_locations_between_dates(
+                from_date, end_date
+            )
+        total_nb_pts += nb_pts
         results += [
             [
                 c.aid,
@@ -1854,7 +1861,7 @@ def two_d_rerun_race_data(request):
         ]
     response_json = {
         "containslastpos": 1,
-        "lastpos": nb_points,
+        "lastpos": total_nb_pts,
         "status": "OK",
         "data": results,
     }

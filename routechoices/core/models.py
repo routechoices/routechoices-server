@@ -1767,17 +1767,17 @@ class Device(models.Model):
             self._last_location_latitude = None
             self._last_location_longitude = None
 
-    def get_locations_between_dates(self, from_date, end_date, /, *, encoded=False):
+    def get_locations_between_dates(self, from_date, end_date, /, *, encode=False):
         from_ts = from_date.timestamp()
         end_ts = end_date.timestamp()
         locs = self.locations_series
         from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
         end_idx = bisect.bisect_right(locs, end_ts, key=itemgetter(0))
         locs = locs[from_idx:end_idx]
-        if not encoded:
-            return len(locs), locs
-        result = gps_encoding.encode_data(locs)
-        return len(locs), result
+        if not encode:
+            return locs, len(locs)
+        encoded_locs = gps_encoding.encode_data(locs)
+        return encoded_locs, len(locs)
 
     def add_locations(self, loc_array, /, *, save=True):
         if len(loc_array) == 0:
@@ -1822,8 +1822,8 @@ class Device(models.Model):
 
         new_pts = list(sorted(new_pts, key=itemgetter(LOCATION_TIMESTAMP_INDEX)))
         archived_events_affected = self.get_events_between_dates(
-            from_time=epoch_to_datetime(new_pts[0][LOCATION_TIMESTAMP_INDEX]),
-            to_time=epoch_to_datetime(new_pts[-1][LOCATION_TIMESTAMP_INDEX]),
+            epoch_to_datetime(new_pts[0][LOCATION_TIMESTAMP_INDEX]),
+            epoch_to_datetime(new_pts[-1][LOCATION_TIMESTAMP_INDEX]),
             should_be_ended=True,
         )
         for archived_event_affected in archived_events_affected:
@@ -1898,27 +1898,27 @@ class Device(models.Model):
     def last_location_datetime(self):
         return self._last_location_datetime
 
-    def get_competitors_at_date(self, at, load_event=False):
+    def get_competitors_at_date(self, at, /, *, load_events=False):
         qs = (
             self.competitor_set.all()
             .filter(start_time__lte=at, event__end_date__gte=at)
             .annotate(min_start=Min("start_time"))
             .filter(start_time=F("min_start"))
         )
-        if load_event:
+        if load_events:
             qs = qs.select_related("event")
         return qs
 
     def get_events_at_date(self, at):
-        competitors = self.get_competitors_at_date(at=at, load_event=True)
+        competitors = self.get_competitors_at_date(at, load_events=True)
         return set([c.event for c in competitors])
 
-    def get_events_between_dates(self, from_time, to_time, should_be_ended=False):
+    def get_events_between_dates(self, from_date, to_date, /, *, should_be_ended=False):
         qs = (
             self.competitor_set.all()
             .filter(
-                event__end_date__gte=from_time,
-                start_time__lte=to_time,
+                event__end_date__gte=from_date,
+                start_time__lte=to_date,
             )
             .select_related("event")
             .order_by("start_time")
@@ -2091,14 +2091,14 @@ class Competitor(models.Model):
                 if prev_start != next_start:
                     events_between_prev_and_next_starts = (
                         next_device.get_events_between_dates(
-                            from_time=min(prev_start, next_start),
-                            to_time=max(prev_start, next_start),
+                            min(prev_start, next_start),
+                            max(prev_start, next_start),
                         )
                     )
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = next_device.get_events_at_date(at=next_start)
+                    events_at_start = next_device.get_events_at_date(next_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
         super().save(*args, **kwargs)
@@ -2111,14 +2111,14 @@ class Competitor(models.Model):
                 if prev_start != next_start:
                     events_between_prev_and_next_starts = (
                         prev_device.get_events_between_dates(
-                            from_time=min(prev_start, next_start),
-                            to_time=max(prev_start, next_start),
+                            min(prev_start, next_start),
+                            max(prev_start, next_start),
                         )
                     )
                     for event_in_range in events_between_prev_and_next_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = prev_device.get_events_at_date(at=next_start)
+                    events_at_start = prev_device.get_events_at_date(next_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
 
@@ -2145,7 +2145,7 @@ class Competitor(models.Model):
         to_date = min(now(), self.event.end_date)
         if next_competitor_start_time:
             to_date = min(next_competitor_start_time, to_date)
-        _, locs = self.device.get_locations_between_dates(from_date, to_date)
+        locs, _ = self.device.get_locations_between_dates(from_date, to_date)
         return locs
 
     @property
@@ -2188,9 +2188,7 @@ class Competitor(models.Model):
 def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
     if instance.device:
-        new_events_for_device = instance.device.get_events_at_date(
-            at=instance.start_time
-        )
+        new_events_for_device = instance.device.get_events_at_date(instance.start_time)
         for event in new_events_for_device:
             event.invalidate_cache()
 
