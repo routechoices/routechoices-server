@@ -111,8 +111,6 @@ class Point:
 
 
 def logo_upload_path(instance=None, file_name=None):
-    import os.path
-
     tmp_path = ["logos"]
     time_hash = time_base64()
     basename = instance.aid + "_" + time_hash
@@ -293,8 +291,6 @@ def delete_club_receiver(sender, instance, using, **kwargs):
 
 
 def map_upload_path(instance=None, file_name=None):
-    import os.path
-
     tmp_path = ["maps"]
     time_hash = time_base64()
     basename = instance.aid + "_" + time_hash
