@@ -401,7 +401,12 @@ class CompetitorForm(ModelForm):
                 event_end = orig_event.end_date
         else:
             event_end = orig_event.end_date
-        if start and (event_start > start or start > event_end):
+        if (
+            start
+            and event_start
+            and event_end
+            and (event_start > start or start > event_end)
+        ):
             raise ValidationError(
                 "Competitor start time should be during the event time"
             )
