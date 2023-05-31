@@ -80,6 +80,7 @@ window.onload = function () {
       document.getElementById("p1").classList.remove("d-none");
     }
   });
+  document.getElementById("events").addEventListener("change", onEventSelect);
 };
 document.getElementById("form1").onsubmit = function (ev) {
   ev.preventDefault();
