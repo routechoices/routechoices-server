@@ -58,7 +58,6 @@ window.onload = function () {
     if (userInfo) {
       try {
         userInfo = JSON.parse(userInfo);
-        console.log(userInfo);
         document.getElementById("name").value = userInfo.name;
         document.getElementById("sname").value = userInfo.short_name;
         document.getElementById("devid").value = devid || userInfo.devid || "";
