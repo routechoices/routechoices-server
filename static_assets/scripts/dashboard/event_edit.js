@@ -162,9 +162,8 @@ function showLocalTime(el) {
   var val = u(el).val();
   var local = "";
   if (val) {
-    local =
-      dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss") +
-      " Local time";
+    local = dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss");
+    local += local === "Invalid Date" ? "" : " Local time";
   }
   u(el).parent().find(".local_time").text(local);
 }
