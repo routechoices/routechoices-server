@@ -273,7 +273,6 @@ function showLocalTime(el) {
       },
     };
     var val = u(el).val();
-    new tempusDominus.TempusDominus(el, options);
     if (
       val &&
       /^\d{4}-\d{2}-\d{2}/.test(val) &&
@@ -285,6 +284,7 @@ function showLocalTime(el) {
     } else {
       u(el).val("");
     }
+    new tempusDominus.TempusDominus(el, options);
   });
   u('label[for$="-DELETE"]').parent(".form-group").hide();
   $(".formset_row").formset({
