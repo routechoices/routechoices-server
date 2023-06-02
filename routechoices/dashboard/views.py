@@ -595,10 +595,14 @@ def map_gpx_upload_view(request):
                 if not has_points:
                     error = "Could not find points in this file"
                 else:
-                    new_map = Map.from_points(segments)
-                    new_map.name = form.cleaned_data["gpx_file"].name[:-4]
-                    new_map.club = club
-                    new_map.save()
+                    try:
+                        new_map = Map.from_points(segments)
+                    except Exception:
+                        error = "Could not generate a map from this file"
+                    else:
+                        new_map.name = form.cleaned_data["gpx_file"].name[:-4]
+                        new_map.club = club
+                        new_map.save()
             if error:
                 messages.error(request, error)
             else:
