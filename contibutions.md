@@ -75,7 +75,7 @@ PyPi Packages:
     drf-yasg                    BSD License
     geoip2                      Apache Software License
     gitpython                   BSD License
-    gps-encoding                MIT
+    gps-data-codec              MIT
     gpxpy                       Apache License, Version 2.0
     kagi                        BSD-2-Clause license
     numpy                       BSD License
