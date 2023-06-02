@@ -399,13 +399,31 @@ function alphabetizeNumber(integer) {
     .join("");
 }
 
-function appHeight() {
+function onAppResize() {
   const doc = document.documentElement;
   doc.style.setProperty("--app-height", `${window.innerHeight}px`);
   doc.style.setProperty(
     "--ctrl-height",
     `${document.getElementById("ctrl-wrapper").clientHeight}px`
   );
+  var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+  if (
+    u("#sidebar").hasClass("d-sm-block") &&
+    u("#sidebar").hasClass("d-none")
+  ) {
+    // the sidebar hasnt beeen manually collapsed yet
+    if (!u("#map").hasClass("no-sidebar") && width <= 576) {
+      u("#map").addClass("no-sidebar");
+      u("#permanent-sidebar .btn").removeClass("active");
+    } else if (u("#map").hasClass("no-sidebar") && width > 576) {
+      u("#map").removeClass("no-sidebar");
+      if (optionDisplayed) {
+        u("#options_show_button").addClass("active");
+      } else {
+        u("#runners_show_button").addClass("active");
+      }
+    }
+  }
 }
 
 function drawFinishLine(e) {
@@ -485,8 +503,9 @@ function onStart() {
     u(".main").removeClass("loading");
     u(".sidebar").removeClass("loading");
     u(".time_bar").removeClass("loading");
+    u("#permanent-sidebar").removeClass("loading");
     map.invalidateSize();
-    appHeight();
+    onAppResize();
   });
 }
 
@@ -577,7 +596,7 @@ function selectLiveMode(e) {
   u("#mass_start_button").removeClass("active");
   u("#replay_mode_buttons").hide();
   u("#replay_control_buttons").hide();
-  appHeight();
+  onAppResize();
 
   isLiveMode = true;
   isRealTime = true;
@@ -624,7 +643,7 @@ function selectReplayMode(e) {
   u("#replay_button").addClass("active");
   u("#replay_mode_buttons").css({ display: "" });
   u("#replay_control_buttons").css({ display: "" });
-  appHeight();
+  onAppResize();
 
   if (!setMassStartContextMenuItem) {
     setMassStartContextMenuItem = map.contextmenu.insertItem(
@@ -936,6 +955,7 @@ function updateCompetitor(newData) {
 function hideSidebar() {
   u("#map")
     .addClass("col-12")
+    .addClass("no-sidebar")
     .removeClass("col-sm-7")
     .removeClass("col-lg-9")
     .removeClass("col-xxl-10");
@@ -948,6 +968,7 @@ function hideSidebar() {
     .removeClass("col-lg-3")
     .removeClass("col-xxl-2");
   sidebarShown = false;
+  u("#permanent-sidebar .btn").removeClass("active");
   try {
     map.invalidateSize();
   } catch {}
@@ -958,7 +979,8 @@ function showSidebar() {
     .addClass("col-12")
     .addClass("col-sm-7")
     .addClass("col-lg-9")
-    .addClass("col-xxl-10");
+    .addClass("col-xxl-10")
+    .removeClass("no-sidebar");
   u("#sidebar")
     .removeClass("d-none")
     .addClass("col-12")
@@ -993,6 +1015,8 @@ function toggleCompetitorList(e) {
     // we add the side bar
     showSidebar();
     displayCompetitorList(true);
+    u("#permanent-sidebar .btn").removeClass("active");
+    u("#runners_show_button").addClass("active");
   }
 }
 
@@ -1310,13 +1334,6 @@ function displayCompetitorList(force) {
   if (!searchText) {
     var mainDiv = u('<div id="competitorSidebar" class="d-flex flex-column"/>');
     var topDiv = u("<div/>");
-    topDiv.append(
-      u('<div class="text-end mb-0"/>').append(
-        u('<button class="btn btn-default btn-sm" aria-label="close"/>')
-          .html('<i class="fa-solid fa-xmark"></i>')
-          .on("click", toggleCompetitorList)
-      )
-    );
     if (competitorList.length) {
       var hideAllTxt = banana.i18n("hide-all");
       var showAllTxt = banana.i18n("show-all");
@@ -1429,16 +1446,11 @@ function displayOptions(ev) {
   if (!sidebarShown || (u("#sidebar").hasClass("d-none") && width <= 576)) {
     showSidebar();
   }
+  u("#permanent-sidebar .btn").removeClass("active");
+  u("#options_show_button").addClass("active");
   optionDisplayed = true;
   searchText = null;
   var mainDiv = u("<div/>");
-  mainDiv.append(
-    u('<div class="text-end mb-0"/>').append(
-      u('<button class="btn btn-default btn-sm" aria-label="close"/>')
-        .html('<i class="fa-solid fa-xmark"></i>')
-        .on("click", displayOptions)
-    )
-  );
   var qrDataUrl = null;
   if (qrUrl) {
     var qr = new QRious();
@@ -1683,7 +1695,7 @@ function drawCompetitors() {
       u("#play_pause_button").html(html);
     }
   }
-  appHeight();
+  onAppResize();
   // progress bar
   var perc = 0;
   if (isRealTime) {

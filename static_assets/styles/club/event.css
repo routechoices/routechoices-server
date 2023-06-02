@@ -16,10 +16,28 @@
   z-index: 10001;
   display: block;
   padding: 5px;
+  padding-right: 24px;
   overflow-x: hidden;
   overflow-y: hidden; /* Scrollable contents if viewport is shorter than content. */
   background-color: #f5f5f5;
   border-left: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+#permanent-sidebar {
+  width: 24px;
+  padding: 1px;
+  position: fixed;
+  top: 46px;
+  bottom: calc(55px + var(--ctrl-height));
+  right: 0;
+  z-index: 10002;
+  background-color: #f5f5f5;
+}
+
+.main.no-sidebar {
+  right: 24px;
+  width: calc(100% - 24px);
+  border-right: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .tooltip {
@@ -27,18 +45,18 @@
 }
 
 .sidebar #listCompetitor {
-  max-height: calc(100vh - 182px);
-  max-height: calc(var(--app-height) - 182px - var(--ctrl-height));
+  max-height: calc(100vh - 149px);
+  max-height: calc(var(--app-height) - 149px - var(--ctrl-height));
 }
 
 .sidebar #listCompetitor.with_search_bar {
-  max-height: calc(100vh - 220px);
-  max-height: calc(var(--app-height) - 220px - var(--ctrl-height));
+  max-height: calc(100vh - 187px);
+  max-height: calc(var(--app-height) - 187px - var(--ctrl-height));
 }
 
 .sidebar #listOptions {
-  max-height: calc(100vh - 142px);
-  max-height: calc(var(--app-height) - 142px - var(--ctrl-height));
+  max-height: calc(100vh - 109px);
+  max-height: calc(var(--app-height) - 109px - var(--ctrl-height));
 }
 
 .time_bar {
@@ -81,8 +99,16 @@
 }
 
 .sidebar.loading,
+#permanent-sidebar.loading,
 .main.loading {
   bottom: 46px;
+}
+
+#permanent-sidebar {
+  display: block;
+}
+#permanent-sidebar.loading {
+  display: none;
 }
 
 .main-alerts {
@@ -137,11 +163,6 @@
 
 .close {
   margin-bottom: 3px;
-}
-
-/* REQUIRED */
-#share_button {
-  margin-left: 5px;
 }
 
 .modal-backdrop,
@@ -273,4 +294,17 @@
 }
 .leaflet-touch .leaflet-control-pan-down-wrap {
   left: 20px;
+}
+
+#permanent-sidebar .btn {
+  border-width: 0px;
+  padding: 1px;
+}
+#permanent-sidebar .btn.active {
+  color: #20c997;
+}
+
+#permanent-sidebar .bottom-btn {
+  position: fixed;
+  bottom: calc(55px + var(--ctrl-height));
 }

@@ -1,5 +1,5 @@
 (function () {
-  window.addEventListener("resize", appHeight);
+  window.addEventListener("resize", onAppResize);
   if (!navigator.canShare) {
     document.getElementById("share_buttons").remove();
   }
@@ -191,6 +191,7 @@
           } catch {}
           u(".event-tool").hide();
           u("#eventLoadingModal").remove();
+          u("#permanent-sidebar").remove();
           var preRaceModal = new bootstrap.Modal(
             document.getElementById("eventNotStartedModal"),
             { backdrop: "static", keyboard: false }
@@ -201,6 +202,7 @@
               e.preventDefault();
             });
           hideSidebar();
+          u("#map").removeClass("no-sidebar");
           u("#export-nav-item").remove();
           preRaceModal.show();
           window.setInterval(function () {
