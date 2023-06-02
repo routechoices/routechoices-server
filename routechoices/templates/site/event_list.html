@@ -107,9 +107,6 @@
                   <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a></li>
                   {% endif %}
                   <li><a href="{{event.club.nice_url}}{{event.slug}}/export" class="dropdown-item"><i class="fa-solid fa-floppy-disk"></i> Export</a></li>
-                  {% if event.ended and event.map_id %}
-                  <li><a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="dropdown-item"><i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i> 2DRerun</a></li>
-                  {% endif %}
                 </ul>
               </div>
             </div>
@@ -235,9 +232,6 @@
                 <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a></li>
                 {% endif %}
                 <li><a href="{{event.club.nice_url}}{{event.slug}}/export" class="dropdown-item"><i class="fa-solid fa-floppy-disk"></i> Export</a></li>
-                {% if event.ended and event.map_id %}
-                <li><a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="dropdown-item"><i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i> 2DRerun</a></li>
-                {% endif %}
               </ul>
             </div>
           </div>

@@ -1723,48 +1723,47 @@ def two_d_rerun_race_status(request):
     event_id = request.GET.get("eventid")
     if not event_id:
         raise Http404()
-    event = get_object_or_404(
-        Event.objects.all()
-        .select_related("club", "map")
-        .prefetch_related(
-            "competitors",
-        ),
-        aid=event_id,
-        start_date__lt=now(),
+    map_idx = 1
+    if "/" in event_id:
+        event_id, map_idx = event_id.split("/", 1)
+        try:
+            map_idx = int(map_idx)
+        except Exception:
+            raise Http404()
+    if map_idx < 1:
+        raise Http404()
+    event, raster_map = Event.get_public_map_at_index(
+        request.user, event_id, map_idx, load_competitors=True
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
     response_json = {
         "status": "OK",
         "racename": event.name,
         "racestarttime": event.start_date,
         "raceendtime": event.end_date,
-        "mapurl": f"{event.get_absolute_map_url()}?.jpg",
+        "mapurl": (
+            f"{event.get_absolute_map_url()}{map_idx if map_idx != 1 else ''}?.jpg"
+        ),
         "caltype": "3point",
-        "mapw": event.map.width,
-        "maph": event.map.height,
+        "mapw": raster_map.width,
+        "maph": raster_map.height,
         "calibration": [
             [
-                event.map.bound["topLeft"]["lon"],
-                event.map.bound["topLeft"]["lat"],
+                raster_map.bound["topLeft"]["lon"],
+                raster_map.bound["topLeft"]["lat"],
                 0,
                 0,
             ],
             [
-                event.map.bound["topRight"]["lon"],
-                event.map.bound["topRight"]["lat"],
-                event.map.width,
+                raster_map.bound["topRight"]["lon"],
+                raster_map.bound["topRight"]["lat"],
+                raster_map.width,
                 0,
             ],
             [
-                event.map.bound["bottomLeft"]["lon"],
-                event.map.bound["bottomLeft"]["lat"],
+                raster_map.bound["bottomLeft"]["lon"],
+                raster_map.bound["bottomLeft"]["lat"],
                 0,
-                event.map.height,
+                raster_map.height,
             ],
         ],
         "competitors": [],

@@ -1236,7 +1236,7 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def get_public_map_at_index(cls, user, event_id, map_index):
+    def get_public_map_at_index(cls, user, event_id, map_index, load_competitors=False):
         """map_index is 1 based"""
         event_qs = (
             cls.objects.all()
@@ -1245,6 +1245,10 @@ class Event(models.Model):
                 start_date__lt=now(),
             )
         )
+        if load_competitors:
+            event_qs = event_qs.prefetch_related(
+                "competitors",
+            )
         try:
             map_index = int(map_index)
             if map_index <= 0:
