@@ -250,6 +250,8 @@ def general_2d_projection(a1, a2, a3, a4, b1, b2, b3, b4):
 
 def project(m, x, y):
     v = multiply_matrix_vector(m, [x, y, 1])
+    if v[2] == 0:
+        return 0, 0
     return v[0] / v[2], v[1] / v[2]
 
 
