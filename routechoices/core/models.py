@@ -12,7 +12,7 @@ from operator import itemgetter
 from zipfile import ZipFile
 
 import cv2
-import gps_encoding
+import gps_data_codec
 import gpxpy
 import gpxpy.gpx
 import magic
@@ -1716,14 +1716,14 @@ class Device(models.Model):
     def locations_series(self):
         if not self.locations_encoded:
             return []
-        return gps_encoding.decode_data(self.locations_encoded)
+        return gps_data_codec.decode(self.locations_encoded)
 
     @locations_series.setter
     def locations_series(self, locations_list):
         sorted_locations = list(
             sorted(locations_list, key=itemgetter(LOCATION_TIMESTAMP_INDEX))
         )
-        self.locations_encoded = gps_encoding.encode_data(sorted_locations)
+        self.locations_encoded = gps_data_codec.encode(sorted_locations)
         self.update_cached_data()
 
     @property
@@ -1772,7 +1772,7 @@ class Device(models.Model):
         locs = locs[from_idx:end_idx]
         if not encode:
             return locs, len(locs)
-        encoded_locs = gps_encoding.encode_data(locs)
+        encoded_locs = gps_data_codec.encode(locs)
         return encoded_locs, len(locs)
 
     def add_locations(self, loc_array, /, *, save=True):
@@ -1868,7 +1868,7 @@ class Device(models.Model):
             )
             prev_t = t
 
-        updated_encoded = gps_encoding.encode_data(updated_locations_list)
+        updated_encoded = gps_data_codec.encode(updated_locations_list)
         if self.locations_encoded != updated_encoded:
             self.locations_series = updated_locations_list
             if save:
@@ -2146,7 +2146,7 @@ class Competitor(models.Model):
 
     @property
     def encoded_data(self):
-        result = gps_encoding.encode_data(self.locations)
+        result = gps_data_codec.encode(self.locations)
         return result
 
     @property
