@@ -69,7 +69,7 @@
 }
 
 .time_bar.loading {
-  height: 40px;
+  display: none;
 }
 
 /* Sidebar navigation */
