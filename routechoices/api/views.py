@@ -714,6 +714,9 @@ def event_register(request, event_id):
             "bad-name": "Name already in use in this event",
             "bad-sname": "Short name already in use in this event",
             "registration-closed": "Registration is closed",
+            "start-time-already-used": (
+                "This device is already registered for this same start time"
+            ),
         },
         "es": {
             "no-device-id": "ID del dispositivo no encontrado",
@@ -725,6 +728,9 @@ def event_register(request, event_id):
             "bad-name": "Nombre ya en uso en este evento",
             "bad-sname": "Nombre corto ya en uso en este evento",
             "registration-closed": "Las inscripciones están cerradas",
+            "start-time-already-used": (
+                "Este dispositivo ya está registrado para esta misma hora de inicio"
+            ),
         },
         "fr": {
             "no-device-id": "Identifiant de l'appareil introuvable",
@@ -736,6 +742,9 @@ def event_register(request, event_id):
             "bad-name": "Nom déjà utilisé dans cet événement",
             "bad-sname": "Nom abrégé déjà utilisé dans cet événement",
             "registration-closed": "Les inscriptions sont closes",
+            "start-time-already-used": (
+                "Cet appareil est déjà enregistré pour cette même heure de départ"
+            ),
         },
         "fi": {
             "no-device-id": "Laitetunnusta ei löydy",
@@ -745,6 +754,9 @@ def event_register(request, event_id):
             "bad-name": "Nimi on jo käytössä tässä tapahtumassa",
             "bad-sname": "Lyhyt nimi jo käytössä tässä tapahtumassa",
             "registration-closed": "Ilmoittautumiset on suljettu",
+            "start-time-already-used": (
+                "Tämä laite on jo rekisteröity samalle aloitusajalle"
+            ),
         },
         "nl": {
             "no-device-id": "Toestel ID niet gevonden",
@@ -754,6 +766,9 @@ def event_register(request, event_id):
             "bad-name": "Naam al in gebruik in dit evenement",
             "bad-sname": "Korte naam al in gebruik in dit evenement",
             "registration-closed": "Inschrijvingen zijn gesloten",
+            "start-time-already-used": (
+                "Dit toestel is al aangemeld voor dezelfde starttijd"
+            ),
         },
         "sv": {
             "no-device-id": "Enhets-ID hittades inte",
@@ -763,6 +778,9 @@ def event_register(request, event_id):
             "bad-name": "Namnet används redan i det här evenemanget",
             "bad-sname": "Kortnamn används redan i det här evenemanget",
             "registration-closed": "Anmälningarna är stängda",
+            "start-time-already-used": (
+                "Enheten är redan registrerad för samma starttid."
+            ),
         },
     }
 
@@ -808,6 +826,12 @@ def event_register(request, event_id):
 
     if not device and device_id:
         errs.append(err_messages[lang]["no-device-id"])
+
+    if (
+        device
+        and Competitor.objects.filter(start_time=start_time, device=device).exists()
+    ):
+        errs.append(err_messages[lang]["start-time-already-used"])
 
     if errs:
         raise ValidationError(errs)
