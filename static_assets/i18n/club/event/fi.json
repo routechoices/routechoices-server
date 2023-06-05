@@ -42,5 +42,6 @@
     "crossing-count": "Ylitysten määrä",
     "highlight": "Kohokohta",
     "location": "Sijainti",
-    "show-location": "Näytä sijaintini"
+    "show-location": "Näytä sijaintini",
+    "unknown": "Ei saatavilla"
 }

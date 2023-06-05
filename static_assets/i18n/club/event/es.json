@@ -42,5 +42,6 @@
   "crossing-count": "Recuento de intersecciones",
   "highlight": "Destacar",
   "location": "Ubicación",
-  "show-location": "Mostrar mi ubicación"
+  "show-location": "Mostrar mi ubicación",
+  "unknown": "No disponible"
 }

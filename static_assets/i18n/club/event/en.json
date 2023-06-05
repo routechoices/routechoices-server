@@ -42,5 +42,6 @@
     "crossing-count": "Number of crossings",
     "highlight": "Highlight",
     "location": "Location",
-    "show-location": "Show my location"
+    "show-location": "Show my location",
+    "unknown": "Not available"
 }

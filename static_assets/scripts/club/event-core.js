@@ -1188,10 +1188,10 @@ function displayCompetitorList(force) {
             (competitorBatteyLevels[competitor.id] !== null
               ? "grey"
               : "lightgrey") +
-            '; cursor: pointer" class="battery_level" data-bs-toggle="tooltip" data-bs-title="' +
+            '; cursor: pointer" class="battery_level" data-bs-toggle="tooltip" data-bs-custom-class="higher-z-index" data-bs-title="' +
             (competitorBatteyLevels[competitor.id] !== null
               ? competitorBatteyLevels[competitor.id] + "%"
-              : "unknown") +
+              : banana.i18n("unknown")) +
             '"><i class="fa-solid fa-battery-' +
             batteryIconName(competitorBatteyLevels[competitor.id]) +
             ' fa-rotate-270"></i></span></div>'
@@ -2404,7 +2404,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023051900`)
+  return fetch(`${langFile}?v=2023060500`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

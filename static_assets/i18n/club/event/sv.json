@@ -42,5 +42,6 @@
     "crossing-count": "Antal korsningar",
     "highlight": "Markera",
     "location": "Läge",
-    "show-location": "Visa min läge"
+    "show-location": "Visa min läge",
+    "unknown": "Ej tillgängligt"
 }

@@ -308,3 +308,7 @@
   position: fixed;
   bottom: calc(55px + var(--ctrl-height));
 }
+
+.higher-z-index {
+  z-index: 10003;
+}
