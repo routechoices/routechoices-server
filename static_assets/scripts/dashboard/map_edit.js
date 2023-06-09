@@ -194,10 +194,21 @@ function project(matrix, x, y) {
   return [val[0] / val[2], val[1] / val[2]];
 }
 
+function disableBtnToPreview() {
+  u("#to-calibration-step-2-button").addClass("d-none");
+  u("#to-calibration-step-2-button-disabled").removeClass("d-none");
+}
+function enableBtnToPreview() {
+  u("#to-calibration-step-2-button").removeClass("d-none");
+  u("#to-calibration-step-2-button-disabled").addClass("d-none");
+}
+
 (function () {
   function openCalibrationHelper() {
     u("#main").addClass("d-none");
     u("#calibration-helper").removeClass("d-none");
+    u("#calibration-helper").nodes[0].scrollIntoView();
+    disableBtnToPreview();
     markersRaster = [];
     markersWorld = [];
     cornersLatLng = [];
@@ -333,9 +344,9 @@ function project(matrix, x, y) {
 
   function checkCalib() {
     if (markersWorld.length == 4 && markersRaster.length == 4) {
-      u("#to-calibration-step-2-button").removeClass("disabled");
+      enableBtnToPreview();
     } else {
-      u("#to-calibration-step-2-button").addClass("disabled");
+      disableBtnToPreview();
     }
   }
 
@@ -622,7 +633,7 @@ function project(matrix, x, y) {
     }
     markersRaster = [];
     L.DomUtil.addClass(rasterCalibMap._container, "crosshair-cursor");
-    u("#to-calibration-step-2-button").addClass("disabled");
+    disableBtnToPreview();
   });
 
   u("#reset-world-markers-button").on("click", function (e) {
@@ -632,7 +643,7 @@ function project(matrix, x, y) {
     }
     markersWorld = [];
     L.DomUtil.addClass(worldCalibMap._container, "crosshair-cursor");
-    u("#to-calibration-step-2-button").addClass("disabled");
+    disableBtnToPreview();
   });
 
   u("#to-calibration-step-2-button").on("click", function (e) {
@@ -641,6 +652,7 @@ function project(matrix, x, y) {
     u("#calibration-help-text").text(calibHelpTexts[1]);
     u("#calibration-step-1").addClass("d-none");
     u("#calibration-step-2").removeClass("d-none");
+    u("#calibration-helper").nodes[0].scrollIntoView();
     displayCalibPreviewMap();
   });
 
@@ -649,6 +661,7 @@ function project(matrix, x, y) {
     u("#calibration-help-text").text(calibHelpTexts[0]);
     u("#calibration-step-2").addClass("d-none");
     u("#calibration-step-1").removeClass("d-none");
+    u("#calibration-helper").nodes[0].scrollIntoView();
   });
 
   u("#validate-calibration-button").on("click", function (e) {

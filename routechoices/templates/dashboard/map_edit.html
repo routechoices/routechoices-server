@@ -73,7 +73,10 @@
         <div class="row">
             <div class="col-md-12 mb-1">
               <button id="close-calibration-button" class="btn btn-danger mb-1" role="button"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
-              <button id="to-calibration-step-2-button" class="btn btn-primary disabled mb-1" role="button"><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+              <button id="to-calibration-step-2-button" class="d-none btn btn-primary mb-1" role="button"><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+              <span id="to-calibration-step-2-button-disabled" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="First, select 4 distincts points on the raster map and on the world map!">
+                <button class="btn btn-primary disabled mb-1" type="button" disabled><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+              </span>
             </div>
         </div>
       </div>
@@ -107,6 +110,7 @@
 <script src="{% static '/vendor/leaflet-image-transform-2022.02.26/leaflet-image-transform.min.js' %}"></script>
 <script src="{% static '/vendor/pdfjs-3.3.122/pdf.js' %}"></script>
 <script src="{% static '/scripts/backdrop_maps.js' %}"></script>
+<script src="{% static '/scripts/dashboard/tooltips.js' %}"></script>
 <script src="{% static '/scripts/dashboard/map_edit.js' %}"></script>
 {% endcompress %}
 {% endblock %}
