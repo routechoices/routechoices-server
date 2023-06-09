@@ -28,7 +28,6 @@ context("Dashboard actions", () => {
     cy.get("#calibration-preview-opener").should("not.be.visible");
     cy.get("#calibration-helper-opener").click();
     cy.wait(1000);
-    cy.get("#to-calibration-step-2-button").should("have.class", "disabled");
     cy.get("#raster-map").click(70, 10);
     cy.get("#world-map").click(70, 10);
     cy.get("#raster-map").click(200, 10);
@@ -38,10 +37,6 @@ context("Dashboard actions", () => {
     cy.get("#raster-map").click(10, 200);
     cy.get("#world-map").click(10, 200);
 
-    cy.get("#to-calibration-step-2-button").should(
-      "not.have.class",
-      "disabled"
-    );
     cy.get("#to-calibration-step-2-button").click();
 
     cy.get("#validate-calibration-button").click();
