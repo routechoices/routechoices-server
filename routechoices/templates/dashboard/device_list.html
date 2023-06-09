@@ -18,6 +18,9 @@
         <p>You haven't added any devices.</p>
         {% endif %}
         <a href="{% url 'dashboard:device_add_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Add new device</a>
+        {% if devices %}
+        <br><br><a href="{% url 'dashboard:device_list_download'%}" class="btn btn-info mb-1"><i class="fa-solid fa-download"></i> Download device list</a>
+        {% endif %}
     </div>
     {% if devices %}
     {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}

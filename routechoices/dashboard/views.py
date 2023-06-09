@@ -3,6 +3,7 @@ import os
 import tempfile
 import zipfile
 from copy import deepcopy
+from io import StringIO
 
 import gpxpy
 import requests
@@ -43,6 +44,7 @@ from routechoices.core.models import (
     DeviceClubOwnership,
     Event,
     EventSet,
+    ImeiDevice,
     Map,
     Notice,
 )
@@ -61,8 +63,9 @@ from routechoices.dashboard.forms import (
     UploadMapGPXForm,
     UserForm,
 )
-from routechoices.lib.helpers import short_random_key
+from routechoices.lib.helpers import set_content_disposition, short_random_key
 from routechoices.lib.kmz import extract_ground_overlay_info
+from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
 DEFAULT_PAGE_SIZE = 25
 
@@ -1419,3 +1422,33 @@ def upgrade(request):
             "club": club,
         },
     )
+
+
+@login_required
+@requires_club_in_session
+def device_list_download(request):
+    club = request.club
+    out = StringIO()
+    out.write("Nickname;Device ID;IMEI\n")
+    devices_qs = (
+        DeviceClubOwnership.objects.filter(club_id=club.id)
+        .select_related("device")
+        .order_by("nickname")
+    )
+    devices = {
+        own.device.aid: {"nickname": own.nickname, "aid": own.device.aid}
+        for own in devices_qs
+    }
+    imeis = ImeiDevice.objects.filter(
+        device_id__in=[device.device.id for device in devices_qs]
+    )
+    for imei in imeis:
+        devices[imei.device.aid]["imei"] = imei.imei
+    for dev in devices.values():
+        out.write(f'{dev.get("nickname")};{dev.get("aid")};{dev.get("imei", "")}\n')
+    response = StreamingHttpRangeResponse(
+        request, out.getvalue().encode("utf-8"), content_type="text/csv"
+    )
+    filename = f"device_list_{club.slug}.csv"
+    response["Content-Disposition"] = set_content_disposition(filename)
+    return response

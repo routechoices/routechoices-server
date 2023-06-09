@@ -49,6 +49,7 @@ urlpatterns = [
     re_path(r"^clubs/new/?$", views.club_create_view, name="club_create_view"),
     re_path(r"^devices/?$", views.device_list_view, name="device_list_view"),
     re_path(r"^devices/new/?$", views.device_add_view, name="device_add_view"),
+    re_path(r"^devices.csv$", views.device_list_download, name="device_list_download"),
     re_path(r"^maps/?$", views.map_list_view, name="map_list_view"),
     re_path(r"^maps/new/?$", views.map_create_view, name="map_create_view"),
     re_path(
