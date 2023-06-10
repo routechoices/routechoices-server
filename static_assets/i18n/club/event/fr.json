@@ -8,10 +8,12 @@
     "hide-all": "Cacher tous",
     "show-all": "Afficher tous",
     "select-color-for": "Sélectionnez une nouvelle couleur pour $1",
-    "replay-mode": "Revoir",
+    "replay-mode": "Replay",
+    "switch-replay-mode": "Passer au rReplay",
     "live-mode": "Direct",
-    "mass-start": "Départ en masse",
-    "real-time": "Temps réél",
+    "return-live-mode": "Retour au Direct",
+    "mass-start": "Simultané",
+    "real-time": "Réel",
     "center-map": "Centrer la carte ici",
     "zoom-in": "Zoomer",
     "zoom-out": "Dezoomer",
@@ -43,5 +45,6 @@
     "highlight": "Souligner",
     "location": "Position",
     "show-location": "Afficher ma position",
-    "unknown": "Non disponible"
+    "unknown": "Non disponible",
+    "archived-event": "Événement archivé"
 }

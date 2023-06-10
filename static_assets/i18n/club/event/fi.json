@@ -9,9 +9,11 @@
     "show-all": "Näytä kaikki",
     "select-color-for": "Valitse uusi väri kilpailijalle \"$1\"",
     "replay-mode": "Replay",
+    "switch-replay-mode": "Vaihda Replayin",
     "live-mode": "Live",
-    "mass-start": "Yhteislähtö",
-    "real-time": "Reaaliaika",
+    "return-live-mode": "Paluu Liveen",
+    "mass-start": "Samanaikainen",
+    "real-time": "Totta",
     "center-map": "Keskitä kartta tähän",
     "zoom-in": "Zoomaa lähemmäs",
     "zoom-out": "Zoomaa kauemmas",
@@ -43,5 +45,6 @@
     "highlight": "Kohokohta",
     "location": "Sijainti",
     "show-location": "Näytä sijaintini",
-    "unknown": "Ei saatavilla"
+    "unknown": "Ei saatavilla",
+    "archived-event": "Arkistoitu tapahtuma"
 }

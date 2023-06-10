@@ -9,9 +9,11 @@
     "show-all": "Toon alles",
     "select-color-for": "Selecteer nieuwe kleur voor $1",
     "replay-mode": "Herhaling",
+    "switch-replay-mode": "Naar de Herhaling",
     "live-mode": "Rechtstreeks",
-    "mass-start": "Massastart",
-    "real-time": "Real time",
+    "return-live-mode": "Naar de Rechtstreeks",
+    "mass-start": "Gelijktijdig",
+    "real-time": "Waar",
     "center-map": "Centreer kaart hier",
     "zoom-in": "Zoom in",
     "zoom-out": "Zoom uit",
@@ -43,5 +45,6 @@
     "highlight": "Hoogtepunt",
     "location": "Lokaliteit",
     "show-location": "Toon mijn locatie",
-    "unknown": "Niet beschikbaar"
+    "unknown": "Niet beschikbaar",
+    "archived-event": "Gearchiveerd evenement"
 }

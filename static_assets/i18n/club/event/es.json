@@ -9,9 +9,11 @@
   "show-all": "Ver todo",
   "select-color-for": "Elige nuevo color para $1",
   "replay-mode": "Repetir",
+  "switch-replay-mode": "Cambiar a Repetir",
   "live-mode": "En vivo",
-  "mass-start": "Salida en masa",
-  "real-time": "En tiempo real",
+  "return-live-mode": "Volver al Vivo",
+  "mass-start": "Simultáneo",
+  "real-time": "Real",
   "center-map": "Centrar mapa aquí",
   "zoom-in": "Acercar",
   "zoom-out": "Alejar",
@@ -43,5 +45,6 @@
   "highlight": "Destacar",
   "location": "Ubicación",
   "show-location": "Mostrar mi ubicación",
-  "unknown": "No disponible"
+  "unknown": "No disponible",
+  "archived-event": "Evento archivado"
 }

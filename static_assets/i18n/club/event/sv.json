@@ -9,9 +9,11 @@
     "show-all": "Visa alla",
     "select-color-for": "Välj ny färg för $1",
     "replay-mode": "Repris",
+    "switch-replay-mode": "Byt till Repris",
     "live-mode": "Live",
-    "mass-start": "Masstart",
-    "real-time": "Realtid",
+    "return-live-mode": "Tillbaka till Live",
+    "mass-start": "Selijktijdig",
+    "real-time": "Sann",
     "center-map": "Centrera kartan här",
     "zoom-in": "Zooma in",
     "zoom-out": "Zooma ut",
@@ -43,5 +45,6 @@
     "highlight": "Markera",
     "location": "Läge",
     "show-location": "Visa min läge",
-    "unknown": "Ej tillgängligt"
+    "unknown": "Ej tillgängligt",
+    "archived-event": "Arkiverad händelse"
 }

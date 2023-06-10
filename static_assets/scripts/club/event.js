@@ -217,7 +217,7 @@
             .text(banana.i18n("live-mode"));
           u("#replay_button")
             .on("click", selectReplayMode)
-            .text(banana.i18n("replay-mode"));
+            .text(banana.i18n("switch-replay-mode"));
           u("#play_pause_button").on("click", pressPlayPauseButton);
           u("#next_button").on("click", function (e) {
             e.preventDefault();
@@ -227,32 +227,32 @@
             e.preventDefault();
             playbackRate = Math.max(1, playbackRate / 2);
           });
-          u("#real_time_button")
-            .on("click", function (e) {
-              e.preventDefault();
-              isRealTime = true;
-              if (resetMassStartContextMenuItem) {
-                map.contextmenu.removeItem(resetMassStartContextMenuItem);
-                resetMassStartContextMenuItem = null;
-              }
-              u("#real_time_button").addClass("active");
-              u("#mass_start_button").removeClass("active");
-            })
-            .text(banana.i18n("real-time"));
-          u("#mass_start_button")
-            .on("click", function (e) {
-              e.preventDefault();
-              onPressResetMassStart();
-            })
-            .text(banana.i18n("mass-start"));
+          u("#real_time_button").on("click", function (e) {
+            e.preventDefault();
+            isRealTime = true;
+            if (resetMassStartContextMenuItem) {
+              map.contextmenu.removeItem(resetMassStartContextMenuItem);
+              resetMassStartContextMenuItem = null;
+            }
+            u("#real_time_button").addClass("active");
+            u("#mass_start_button").removeClass("active");
+          });
+          u("#real_time_text").text(banana.i18n("real-time"));
+          u("#mass_start_button").on("click", function (e) {
+            e.preventDefault();
+            onPressResetMassStart();
+          });
+          u("#mass_start_text").text(banana.i18n("mass-start"));
           u("#options_show_button").on("click", displayOptions);
           u("#full_progress_bar").on("click", pressProgressBar);
           u("#share_button").on("click", shareUrl);
           if (endEvent > now) {
             isLiveEvent = true;
             eventStateControl.setLive();
+            u("#archived_event_button").remove();
           } else {
             eventStateControl.setReplay();
+            u("#archived_event_button").text(banana.i18n("archived-event"));
           }
           qrUrl = response.event.shortcut;
           liveUrl = window.local.dataUrl;

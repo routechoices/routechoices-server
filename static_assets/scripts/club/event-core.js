@@ -590,8 +590,11 @@ function selectLiveMode(e) {
     resetMassStartContextMenuItem = null;
   }
   u(".if-live").removeClass("d-none");
-  u("#live_button").addClass("active");
-  u("#replay_button").removeClass("active");
+  u("#live_button")
+    .addClass("active")
+    .addClass("fst-italic")
+    .text(banana.i18n("live-mode"));
+  u("#replay_button").removeClass("d-none");
   u("#real_time_button").removeClass("active");
   u("#mass_start_button").removeClass("active");
   u("#replay_mode_buttons").hide();
@@ -629,7 +632,7 @@ function selectReplayMode(e) {
   if (e !== undefined) {
     e.preventDefault();
   }
-  if (!isLiveMode && u("#replay_button").hasClass("active")) {
+  if (!isLiveMode && u("#replay_button").hasClass("d-none")) {
     return;
   }
 
@@ -639,8 +642,11 @@ function selectReplayMode(e) {
   u("#mass_start_button").removeClass("active");
 
   eventStateControl.setReplay();
-  u("#live_button").removeClass("active");
-  u("#replay_button").addClass("active");
+  u("#live_button")
+    .removeClass("active")
+    .removeClass("fst-italic")
+    .text(banana.i18n("return-live-mode"));
+  u("#replay_button").addClass("d-none");
   u("#replay_mode_buttons").css({ display: "" });
   u("#replay_control_buttons").css({ display: "" });
   onAppResize();
@@ -2404,7 +2410,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023060500`)
+  return fetch(`${langFile}?v=2023061000`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

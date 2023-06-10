@@ -1,6 +1,7 @@
 :root {
   —-app-height: 100%;
   --ctrl-height: 0px;
+  --sidebar-size: 30px;
 }
 
 .sub-header {
@@ -16,7 +17,7 @@
   z-index: 10001;
   display: block;
   padding: 5px;
-  padding-right: 24px;
+  padding-right: var(--sidebar-size);
   overflow-x: hidden;
   overflow-y: hidden; /* Scrollable contents if viewport is shorter than content. */
   background-color: #f5f5f5;
@@ -24,7 +25,7 @@
 }
 
 #permanent-sidebar {
-  width: 24px;
+  width: var(--sidebar-size);
   padding: 1px;
   position: fixed;
   top: 46px;
@@ -35,8 +36,8 @@
 }
 
 .main.no-sidebar {
-  right: 24px;
-  width: calc(100% - 24px);
+  right: var(--sidebar-size);
+  width: calc(100% - var(--sidebar-size));
   border-right: 1px solid rgba(0, 0, 0, 0.125);
 }
 
@@ -206,12 +207,12 @@
 #live_button {
   background-color: #8e1600;
   border-color: #8e1600;
-  text-transform: uppercase;
 }
 
 #live_button.active {
   background-color: #e50000;
   border-color: #e50000;
+  text-transform: uppercase;
 }
 
 .leaflet-control-zoom-out,

@@ -9,9 +9,11 @@
     "show-all": "Show all",
     "select-color-for": "Select new color for $1",
     "replay-mode": "Replay",
+    "switch-replay-mode": "Switch to Replay",
     "live-mode": "Live",
-    "mass-start": "Mass start",
-    "real-time": "Real Time",
+    "return-live-mode": "Back to Live",
+    "mass-start": "Synced",
+    "real-time": "Actual",
     "center-map": "Center map here",
     "zoom-in": "Zoom In",
     "zoom-out": "Zoom out",
@@ -43,5 +45,6 @@
     "highlight": "Highlight",
     "location": "Location",
     "show-location": "Show my location",
-    "unknown": "Not available"
+    "unknown": "Not available",
+    "archived-event": "Archived Event"
 }
