@@ -509,17 +509,21 @@ function onStart() {
   });
 }
 
-function getCompetitionStartDate() {
+function getCompetitionStartDate(nullIfNone = false) {
   var res = +clock.now();
+  var found = false;
   competitorList.forEach(function (c) {
     var route = competitorRoutes[c.id];
     if (route) {
-      res =
-        res > route.getByIndex(0).timestamp
-          ? route.getByIndex(0).timestamp
-          : res;
+      if (res > route.getByIndex(0).timestamp) {
+        res = route.getByIndex(0).timestamp;
+        found = true;
+      }
     }
   });
+  if (nullIfNone && !found) {
+    return null;
+  }
   return res;
 }
 
@@ -674,32 +678,36 @@ function selectReplayMode(e) {
       fetchCompetitorRoutes();
     }
     var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
+    if (getCompetitionStartDate(true) === null) {
+      currentTime = 0;
+      maxCTime = 0;
+    } else {
+      currentTime = Math.max(
+        getCompetitionStartDate(),
+        prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
+      );
+      var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
+      if (isCustomStart) {
+        maxCTime =
+          getCompetitionStartDate() +
+          getCompetitorsMinCustomOffset() +
+          getCompetitorsMaxDuration(true);
+      }
+      if (isRealTime) {
+        maxCTime =
+          getCompetitionStartDate() +
+          (Math.min(+clock.now(), getCompetitionEndDate()) -
+            getCompetitionStartDate());
+      }
+      currentTime = Math.min(+clock.now(), currentTime, maxCTime);
+      var liveTime =
+        +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3;
 
-    currentTime = Math.max(
-      getCompetitionStartDate(),
-      prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
-    );
-    var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
-    if (isCustomStart) {
-      maxCTime =
-        getCompetitionStartDate() +
-        getCompetitorsMinCustomOffset() +
-        getCompetitorsMaxDuration(true);
+      if (getCompetitionStartDate(true) !== null && currentTime > liveTime) {
+        selectLiveMode();
+        return;
+      }
     }
-    if (isRealTime) {
-      maxCTime =
-        getCompetitionStartDate() +
-        (Math.min(+clock.now(), getCompetitionEndDate()) -
-          getCompetitionStartDate());
-    }
-    currentTime = Math.min(+clock.now(), currentTime, maxCTime);
-    var liveTime =
-      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3;
-    if (currentTime > liveTime) {
-      selectLiveMode();
-      return;
-    }
-
     if (ts - prevDisplayRefresh > 100) {
       drawCompetitors();
       prevDisplayRefresh = ts;
@@ -1098,7 +1106,6 @@ function toggleHighlightCompetitor(c) {
     }
     c.highlighted = true;
     u("#highlightIcon-" + c.id).addClass("competitor-highlighted");
-    console.log("ddd");
   }
   if (c.nameMarker) {
     c.nameMarker.remove();
@@ -1633,10 +1640,16 @@ function getRelativeTime(currentTime) {
   return viewedTime;
 }
 
-function getProgressBarText(currentTime, bg = false) {
+function getProgressBarText(currentTime, bg = false, date = false) {
   var result = "";
+  if (bg && isLiveMode) {
+    return "";
+  }
   var viewedTime = currentTime;
   if (!isRealTime) {
+    if (currentTime === 0) {
+      return "00:00:00";
+    }
     if (isCustomStart) {
       viewedTime -= getCompetitorsMinCustomOffset() + getCompetitionStartDate();
     } else {
@@ -1654,11 +1667,8 @@ function getProgressBarText(currentTime, bg = false) {
     if (t === 0) {
       return "00:00:00";
     }
-    if (
-      dayjs(getCompetitionStartDate()).format("YYYY-MM-DD") !==
-        dayjs(getCompetitionEndDate()).format("YYYY-MM-DD") &&
-      !isLiveMode
-    ) {
+
+    if (date) {
       result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
       if (bg) {
         result = result.replace(" ", "<br/>");
@@ -1725,12 +1735,15 @@ function drawCompetitors() {
         100;
     }
     perc = Math.max(0, Math.min(100, perc));
+    if (getCompetitionStartDate(true) === null) {
+      perc = 100;
+    }
   }
   u("#progress_bar")
     .css({ width: perc + "%" })
     .attr("aria-valuenow", perc);
   u("#progress_bar_text").text(getProgressBarText(currentTime));
-  u("#big-clock").html(getProgressBarText(currentTime, true));
+  u("#big-clock").html(getProgressBarText(currentTime, true, true));
 
   if (isMapMoving) return;
 
