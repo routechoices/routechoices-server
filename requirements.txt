@@ -23,7 +23,7 @@ django==4.2.2
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.54.0
 django-appconf==1.0.5
-django-background-tasks @ git+https://github.com/rphlo/django-background-tasks.git
+django-background-tasks @ git+https://github.com/rphlo/django-background-tasks@124966ae34696c55a8721cb663c18fff56f160ae
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
 django-compressor==4.3.1
 django-cors-headers==4.0.0
