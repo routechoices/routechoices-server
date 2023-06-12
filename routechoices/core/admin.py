@@ -173,6 +173,7 @@ class ClubAdmin(admin.ModelAdmin):
         "slug",
         "admin_list",
         "event_count",
+        "upgraded",
         "domain",
     )
 
