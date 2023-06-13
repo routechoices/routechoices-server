@@ -18,7 +18,7 @@
             <input type="submit" value="Add" class="btn btn-primary mb-1">
         </form>
         <hr/>
-        <h1>Batch IMEI Import</h1>
+        <h1>Batch Device Import</h1>
         <form action="" id="importCSVImei">
             {% csrf_token %}
             <div class="mb-3">
@@ -28,10 +28,10 @@
                 <div id="importSuccess" class="valid-feedback"></div>
                 <div class="form-text">
                     Follow the following format for the CSV:<br>
-                    Column A - IMEI<br>
+                    Column A - IMEI or Device ID<br>
                     Column B - Device Nickname<br>
                     File must be UTF-8 encoded<br>
-                    <a href="https://s.routechoic.es/assets/imei_devices.csv">Download example file</a>
+                    <a href="{% static 'assets/imei_devices.csv' %}">Download example file</a>
                 </div>
             </div>
             <input type="submit" value="Import" class="btn btn-primary mb-1">
