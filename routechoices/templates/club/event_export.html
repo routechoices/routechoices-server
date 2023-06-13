@@ -13,7 +13,7 @@
       <div class="container content">
         <div class="row">
           {% if event.event_set %}<h2 class="padded-multiline"><span>{{ event.event_set.name }}</span></h2>{% endif %}
-          <h2><a href="{{event.club.nice_url}}{{event.slug}}">{{ event.name }}</a></h2>
+          <h2><a href="{{event.club.nice_url}}{{event.slug}}" class="fw-bold text-decoration-none">{{ event.name }}</a></h2>
           <h4>Export event data</h4>
         </div>
       </div>
