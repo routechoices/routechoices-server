@@ -13,7 +13,6 @@ It includes:
   - A public API
   - A TCP server for listening to dedicated trackers
   - A WMS server for serving events maps
-  - A SSE server to push data from tracker to clients without delay
   - A full-fledged admin interface for owners
 
 This project rely on the Django and the Tornado Web python frameworks.
