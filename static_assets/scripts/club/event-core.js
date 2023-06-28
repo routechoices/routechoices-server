@@ -320,13 +320,12 @@ function getContrastYIQ(hexcolor) {
   var g = parseInt(hexcolor.substr(2, 2), hexSize);
   var b = parseInt(hexcolor.substr(4, 2), hexSize);
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq <= 168 ? "dark" : "light";
+  return yiq <= 168;
 }
 
 function getRunnerIcon(color, faded = false, focused = false) {
   var iconSize = 16;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
-  //var isDark = getContrastYIQ(color) === "dark";
   var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
     focused ? 3 : 1
   }px" cx="8" cy="8" r="6"/></svg>`;
@@ -345,6 +344,7 @@ function getRunnerIcon(color, faded = false, focused = false) {
 function getRunnerNameMarker(
   name,
   color,
+  isDark,
   rightSide,
   faded = false,
   focused = false
@@ -363,7 +363,7 @@ function getRunnerNameMarker(
     "</span>";
   var iconClass =
     "runner-icon runner-icon-" +
-    getContrastYIQ(color) +
+    (isDark ? "dark" : "light") +
     (focused ? " icon-focused" : "");
   var ic2 =
     iconClass +
@@ -1132,13 +1132,18 @@ function displayCompetitorList(force) {
   );
   nbShown = 0;
   competitorList.forEach(function (competitor, ii) {
-    competitor.color = competitor.color || getColor(ii);
-
-    competitor.isShown =
-      typeof competitor.isShown === "undefined"
-        ? nbShown < maxParticipantsDisplayed
-        : competitor.isShown;
-    nbShown += competitor.isShown ? 1 : 0;
+    if (!competitor.color) {
+      competitor.color = getColor(ii);
+      competitor.isColorDark = getContrastYIQ(competitor.color);
+    }
+    if (typeof competitor.isShown === "undefined") {
+      if (nbShown < maxParticipantsDisplayed) {
+        competitor.isShown = true;
+        nbShown += 1;
+      } else {
+        competitor.isShown = false;
+      }
+    }
     var div = u('<div class="card-body px-1 pt-1 pb-0"/>');
     div.html(
       '<div><div class="text-nowrap text-truncate overflow-hidden" style="line-height: 18px"><span class="color-tag me-0" style="cursor: pointer"><i class="media-object fa-3x fa-solid fa-circle icon-sidebar" style="margin-left:1px;font-size:1em;color:' +
@@ -1233,6 +1238,7 @@ function displayCompetitorList(force) {
         colorModal.show();
         u("#save-color").on("click", function () {
           competitor.color = color;
+          competitor.isColorDark = getContrastYIQ(competitor.color);
           colorModal.hide();
           displayCompetitorList();
 
@@ -2003,6 +2009,7 @@ function drawCompetitors() {
             var runnerIcon = getRunnerNameMarker(
               competitor.short_name,
               competitor.color,
+              competitor.isColorDark,
               isOnRight,
               true,
               competitor.highlighted
@@ -2072,6 +2079,7 @@ function drawCompetitors() {
           var runnerIcon = getRunnerNameMarker(
             competitor.short_name,
             competitor.color,
+            competitor.isColorDark,
             isNameOnRight,
             false,
             competitor.highlighted
@@ -2197,6 +2205,7 @@ function drawCompetitors() {
         var clusterCenter = clusterCenters[d - 1];
         if (!cluster.color) {
           cluster.color = getColor(i);
+          cluster.isColorDark = getContrastYIQ(cluster.color);
         }
         var competitorInCluster = listCompWithMarker[i];
         ["mapMarker", "nameMarker"].forEach(function (layerName) {
@@ -2252,6 +2261,7 @@ function drawCompetitors() {
           var runnerIcon = getRunnerNameMarker(
             groupName,
             cluster.color,
+            cluster.isColorDark,
             isNameOnRight.value
           );
           cluster.nameMarker = L.marker(
