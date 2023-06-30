@@ -2115,11 +2115,10 @@ function drawCompetitors() {
         }
         competitor.tail = null;
       } else {
-        var tailLatLng = [];
-        tail.getArray().forEach(function (pos) {
-          if (!isNaN(pos.coords.latitude)) {
-            tailLatLng.push([pos.coords.latitude, pos.coords.longitude]);
-          }
+        var tailLatLng = tail.getArray().filter(function (pos) {
+          return !isNaN(pos.coords.latitude);
+        }).map(function (pos) {
+          return [pos.coords.latitude, pos.coords.longitude];
         });
         if (competitor.tail == undefined) {
           competitor.tail = L.polyline(tailLatLng, {
