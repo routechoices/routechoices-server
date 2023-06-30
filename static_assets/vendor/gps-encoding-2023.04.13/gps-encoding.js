@@ -138,10 +138,10 @@ var PositionArchive = function () {
       }
     };
   this.slice = function(start, end) {
-    return (new PositionArchive()).setData(position.slice(start, end))
+    return (new PositionArchive()).setData(positions.slice(start, end))
   }
   this.setData = function(d) {
-    position = d
+    positions = d
   }
   this.add = function (pos) {
     if (pos.timestamp === null) {
