@@ -137,6 +137,13 @@ var PositionArchive = function () {
         return _locationOf(element, start, pivot - 1);
       }
     };
+  this.slice = function(start, end) {
+    return (new PositionArchive()).setData(positions.slice(start, end))
+  }
+  this.setData = function(d) {
+    positions = d
+    return this
+  }
   this.add = function (pos) {
     if (pos.timestamp === null) {
       return;
@@ -212,7 +219,9 @@ var PositionArchive = function () {
     var index = _locationOf({ timestamp: t1 }),
       i1,
       i2,
-      result = new PositionArchive();
+      result,
+      i1B = false,
+      i2B = false;
     if (index === 0) {
       i1 = 0;
     } else if (index > positions.length - 1) {
@@ -220,9 +229,7 @@ var PositionArchive = function () {
     } else if (positions[index].timestamp === t1) {
       i1 = index;
     } else {
-      result.add(
-        positions[index - 1].positionTowardAtTimestamp(positions[index], t1)
-      );
+      i1B = true;
       i1 = index;
     }
     index = _locationOf({ timestamp: t2 });
@@ -233,13 +240,20 @@ var PositionArchive = function () {
     } else if (positions[index].timestamp === t2) {
       i2 = index;
     } else {
-      result.add(
-        positions[index - 1].positionTowardAtTimestamp(positions[index], t2)
-      );
+      i2B = true;
       i2 = index - 1;
     }
-    for (var i = i1; i <= i2; i++) {
-      result.add(positions[i]);
+    
+    result = this.slice(i1, i2);
+    if (i1B) {
+      result.add(
+        positions[i1 - 1].positionTowardAtTimestamp(positions[i1], t1)
+      );
+    }
+    if (i2B) {
+      result.add(
+        positions[i2].positionTowardAtTimestamp(positions[i2 + 1], t2)
+      );
     }
     return result;
   };
