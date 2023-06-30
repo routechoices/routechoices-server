@@ -142,6 +142,7 @@ var PositionArchive = function () {
   }
   this.setData = function(d) {
     positions = d
+    return this
   }
   this.add = function (pos) {
     if (pos.timestamp === null) {
