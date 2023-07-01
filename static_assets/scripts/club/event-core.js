@@ -512,7 +512,8 @@ function onStart() {
 function getCompetitionStartDate(nullIfNone = false) {
   var res = +clock.now();
   var found = false;
-  competitorList.forEach(function (c) {
+  for (var i = 0; i < competitorList.length; i++) {
+    var c = competitorList[i];
     var route = competitorRoutes[c.id];
     if (route) {
       if (res > route.getByIndex(0).timestamp) {
@@ -520,7 +521,7 @@ function getCompetitionStartDate(nullIfNone = false) {
         found = true;
       }
     }
-  });
+  }
   if (nullIfNone && !found) {
     return null;
   }
@@ -529,7 +530,8 @@ function getCompetitionStartDate(nullIfNone = false) {
 
 function getCompetitionEndDate() {
   var res = new Date(0);
-  competitorList.forEach(function (c) {
+  for (var i = 0; i < competitorList.length; i++) {
+    var c = competitorList[i];
     var route = competitorRoutes[c.id];
     if (route) {
       var idx = route.getPositionsCount() - 1;
@@ -538,7 +540,7 @@ function getCompetitionEndDate() {
           ? route.getByIndex(idx).timestamp
           : res;
     }
-  });
+  }
   return res;
 }
 
@@ -547,11 +549,11 @@ function getCompetitorsMaxDuration(customOffset) {
     customOffset = false;
   }
   var res = 0;
-  competitorList.forEach(function (c) {
+  for (var i = 0; i < competitorList.length; i++) {
+    var c = competitorList[i];
     var route = competitorRoutes[c.id];
     if (route) {
       var idx = route.getPositionsCount() - 1;
-
       var dur =
         route.getByIndex(idx).timestamp -
         ((customOffset
@@ -559,19 +561,20 @@ function getCompetitorsMaxDuration(customOffset) {
           : +new Date(c.start_time)) || getCompetitionStartDate());
       res = res < dur ? dur : res;
     }
-  });
+  }
   return res;
 }
 
 function getCompetitorsMinCustomOffset() {
   var res = 0;
-  competitorList.forEach(function (c) {
+  for (var i = 0; i < competitorList.length; i++) {
+    var c = competitorList[i];
     var route = competitorRoutes[c.id];
     if (route) {
       var off = c.custom_offset - c.start_time || 0;
       res = res < off ? off : res;
     }
-  });
+  }
   return res;
 }
 
@@ -931,7 +934,8 @@ function updateCompetitorList(newList) {
 }
 
 function setCustomStart(latlng) {
-  competitorList.forEach(function (c) {
+  for (var i = 0; i < competitorList.length; i++) {
+    var c = competitorList[i];
     var minDist = Infinity;
     var minDistT = null;
     var route = competitorRoutes[c.id];
@@ -948,7 +952,7 @@ function setCustomStart(latlng) {
       }
       c.custom_offset = minDistT;
     }
-  });
+  }
 }
 
 function updateCompetitor(newData) {
@@ -1131,7 +1135,8 @@ function displayCompetitorList(force) {
     '<div id="listCompetitor" style="overflow-y:auto;" class="mt-1"/>'
   );
   nbShown = 0;
-  competitorList.forEach(function (competitor, ii) {
+  for (var ii = 0; ii < competitorList.length; ii++) {
+    var competitor = competitorList[ii];
     if (!competitor.color) {
       competitor.color = getColor(ii);
       competitor.isColorDark = getContrastYIQ(competitor.color);
@@ -1285,8 +1290,13 @@ function displayCompetitorList(force) {
           competitor.mapMarker = null;
           competitor.nameMarker = null;
           competitor.tail = null;
-          u(e.target).parent().parent().find(".speedometer").text("");
-          u(e.target).parent().parent().find(".odometer").text("");
+          u(e.target)
+            .parent()
+            .parent()
+            .find(".speedometer")
+            .first().textContent = "";
+          u(e.target).parent().parent().find(".odometer").first().textContent =
+            "";
           updateCompetitor(competitor);
           nbShown -= 1;
         } else {
@@ -1341,9 +1351,9 @@ function displayCompetitorList(force) {
       listDiv.append(diva);
     }
     competitor.div = div;
-    competitor.speedometer = div.find(".speedometer");
-    competitor.odometer = div.find(".odometer");
-  });
+    competitor.speedometer = div.find(".speedometer").first();
+    competitor.odometer = div.find(".odometer").first();
+  }
   if (competitorList.length === 0) {
     var div = u('<div class="text-center"/>');
     var txt = banana.i18n("no-competitors");
@@ -1370,7 +1380,8 @@ function displayCompetitorList(force) {
     u(topDiv)
       .find("#hideAllCompetitorBtn")
       .on("click", function () {
-        competitorList.forEach(function (competitor) {
+        for (var i = 0; i < competitorList.length; i++) {
+          var competitor = competitorList[i];
           competitor.isShown = false;
           competitor.focused = false;
           competitor.highlighted = false;
@@ -1390,7 +1401,7 @@ function displayCompetitorList(force) {
           competitor.tail = null;
           updateCompetitor(competitor);
           nbShown = 0;
-        });
+        }
         displayCompetitorList();
       });
     u(topDiv)
@@ -1400,7 +1411,8 @@ function displayCompetitorList(force) {
           return v.isShown ? a + 1 : a;
         }, 0);
         var didNotShowAll = false;
-        competitorList.forEach(function (competitor, idx) {
+        for (var i = 0; i < competitorList.length; i++) {
+          var competitor = competitorList[i];
           if (nbShown >= maxParticipantsDisplayed && !competitor.isShown) {
             didNotShowAll = true;
           } else if (!competitor.isShown) {
@@ -1408,7 +1420,7 @@ function displayCompetitorList(force) {
             competitor.isShown = true;
           }
           updateCompetitor(competitor);
-        });
+        }
         if (didNotShowAll) {
           swal({
             title: banana.i18n("reached-max-runners", maxParticipantsDisplayed),
@@ -1696,6 +1708,9 @@ function formatSpeed(s) {
 }
 
 function checkVisible(elm) {
+  if (!sidebarShown) {
+    return false;
+  }
   var rect = elm.getBoundingClientRect();
   var viewHeight = Math.max(
     document.documentElement.clientHeight,
@@ -1755,7 +1770,9 @@ function drawCompetitors() {
 
   var oldFinishCrosses = finishLineCrosses.slice();
   finishLineCrosses = [];
-  competitorList.forEach(function (competitor) {
+
+  for (var i = 0; i < competitorList.length; i++) {
+    var competitor = competitorList[i];
     if (!competitor.isShown) {
       return;
     }
@@ -2115,11 +2132,14 @@ function drawCompetitors() {
         }
         competitor.tail = null;
       } else {
-        var tailLatLng = tail.getArray().filter(function (pos) {
-          return !isNaN(pos.coords.latitude);
-        }).map(function (pos) {
-          return [pos.coords.latitude, pos.coords.longitude];
-        });
+        var tailLatLng = tail
+          .getArray()
+          .filter(function (pos) {
+            return !isNaN(pos.coords.latitude);
+          })
+          .map(function (pos) {
+            return [pos.coords.latitude, pos.coords.longitude];
+          });
         if (competitor.tail == undefined) {
           competitor.tail = L.polyline(tailLatLng, {
             color: competitor.color,
@@ -2138,9 +2158,9 @@ function drawCompetitors() {
         viewedTime
       );
       if (!hasPointInTail) {
-        competitor.speedometer.text("--'--\"/km");
+        competitor.speedometer.textContent = "--'--\"/km";
       } else {
-        if (checkVisible(competitor.speedometer.nodes[0])) {
+        if (checkVisible(competitor.speedometer)) {
           var distance = 0;
           var prevPos = null;
           tail30s.getArray().forEach(function (pos) {
@@ -2150,21 +2170,23 @@ function drawCompetitors() {
             prevPos = pos;
           });
           var speed = (30 / distance) * 1000;
-          competitor.speedometer.text(formatSpeed(speed));
+          competitor.speedometer.textContent = formatSpeed(speed);
         }
       }
-      if (checkVisible(competitor.odometer.nodes[0])) {
+      if (checkVisible(competitor.odometer)) {
         var totalDistance = route.distanceUntil(viewedTime);
-        competitor.odometer.text((totalDistance / 1000).toFixed(1) + "km");
+        competitor.odometer.textContent =
+          (totalDistance / 1000).toFixed(1) + "km";
       }
     }
-  });
+  }
 
   // Create cluster
   if (showClusters) {
     var listCompWithMarker = [];
     var gpsPointData = [];
-    competitorList.forEach(function (competitor) {
+    for (var i = 0; i < competitorList.length; i++) {
+      var competitor = competitorList[i];
       if (competitor.mapMarker) {
         listCompWithMarker.push(competitor);
         var latLon = competitor.mapMarker.getLatLng();
@@ -2176,7 +2198,7 @@ function drawCompetitors() {
           },
         });
       }
-    });
+    }
     var dbscanner = jDBSCAN()
       .eps(0.015)
       .minPts(1)
