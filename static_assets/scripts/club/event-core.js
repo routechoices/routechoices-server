@@ -1716,16 +1716,24 @@ function formatSpeed(s) {
   return min + "'" + ("0" + sec).slice(-2) + '"/km';
 }
 
-function checkVisible(elm) {
+function checkVisible(elem) {
   if (!sidebarShown) {
     return false;
   }
-  var rect = elm.getBoundingClientRect();
-  var viewHeight = Math.max(
-    document.documentElement.clientHeight,
-    window.innerHeight
-  );
-  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+  var bcr = elem.getBoundingClientRect();
+  const elemCenter = {
+    x: bcr.left + elem.offsetWidth / 2,
+    y: bcr.top + elem.offsetHeight / 2,
+  };
+  if (elemCenter.y < 0) {
+    return false;
+  }
+  if (
+    elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 function drawCompetitors() {
