@@ -138,11 +138,11 @@ var PositionArchive = function () {
       }
     };
   this.slice = function(start, end) {
-    return (new PositionArchive()).setData(positions.slice(start, end))
+    return (new PositionArchive()).setData(positions.slice(start, end));
   }
   this.setData = function(d) {
-    positions = d
-    return this
+    positions = d;
+    return this;
   }
   this.add = function (pos) {
     if (pos.timestamp === null) {
@@ -243,7 +243,7 @@ var PositionArchive = function () {
       i2B = true;
       i2 = index - 1;
     }
-    
+
     result = this.slice(i1, i2);
     if (i1B) {
       result.add(
