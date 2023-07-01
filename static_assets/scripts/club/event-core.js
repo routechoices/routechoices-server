@@ -513,14 +513,15 @@ function getCompetitionStartDate(nullIfNone = false) {
   var res = +clock.now();
   var found = false;
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    var route = competitorRoutes[c.id];
-    if (route) {
-      if (res > route.getByIndex(0).timestamp) {
-        res = route.getByIndex(0).timestamp;
-        found = true;
+    (function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        if (res > route.getByIndex(0).timestamp) {
+          res = route.getByIndex(0).timestamp;
+          found = true;
+        }
       }
-    }
+    })(competitorList[i]);
   }
   if (nullIfNone && !found) {
     return null;
@@ -531,15 +532,16 @@ function getCompetitionStartDate(nullIfNone = false) {
 function getCompetitionEndDate() {
   var res = new Date(0);
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var idx = route.getPositionsCount() - 1;
-      res =
-        res < route.getByIndex(idx).timestamp
-          ? route.getByIndex(idx).timestamp
-          : res;
-    }
+    (function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var idx = route.getPositionsCount() - 1;
+        res =
+          res < route.getByIndex(idx).timestamp
+            ? route.getByIndex(idx).timestamp
+            : res;
+      }
+    })(competitorList[i]);
   }
   return res;
 }
@@ -550,17 +552,18 @@ function getCompetitorsMaxDuration(customOffset) {
   }
   var res = 0;
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var idx = route.getPositionsCount() - 1;
-      var dur =
-        route.getByIndex(idx).timestamp -
-        ((customOffset
-          ? +new Date(c.custom_offset)
-          : +new Date(c.start_time)) || getCompetitionStartDate());
-      res = res < dur ? dur : res;
-    }
+    (function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var idx = route.getPositionsCount() - 1;
+        var dur =
+          route.getByIndex(idx).timestamp -
+          ((customOffset
+            ? +new Date(competitor.custom_offset)
+            : +new Date(competitor.start_time)) || getCompetitionStartDate());
+        res = res < dur ? dur : res;
+      }
+    })(competitorList[i]);
   }
   return res;
 }
@@ -568,12 +571,13 @@ function getCompetitorsMaxDuration(customOffset) {
 function getCompetitorsMinCustomOffset() {
   var res = 0;
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var off = c.custom_offset - c.start_time || 0;
-      res = res < off ? off : res;
-    }
+    (function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var off = competitor.custom_offset - competitor.start_time || 0;
+        res = res < off ? off : res;
+      }
+    })(competitorList[i]);
   }
   return res;
 }
@@ -935,23 +939,24 @@ function updateCompetitorList(newList) {
 
 function setCustomStart(latlng) {
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    var minDist = Infinity;
-    var minDistT = null;
-    var route = competitorRoutes[c.id];
-    if (route) {
-      var length = route.getPositionsCount();
-      for (var i = 0; i < length; i++) {
-        dist = route.getByIndex(i).distance({
-          coords: { latitude: latlng.lat, longitude: latlng.lng },
-        });
-        if (dist < minDist) {
-          minDist = dist;
-          minDistT = route.getByIndex(i).timestamp;
+    (function (competitor) {
+      var minDist = Infinity;
+      var minDistT = null;
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var length = route.getPositionsCount();
+        for (var i = 0; i < length; i++) {
+          dist = route.getByIndex(i).distance({
+            coords: { latitude: latlng.lat, longitude: latlng.lng },
+          });
+          if (dist < minDist) {
+            minDist = dist;
+            minDistT = route.getByIndex(i).timestamp;
+          }
         }
+        competitor.custom_offset = minDistT;
       }
-      c.custom_offset = minDistT;
-    }
+    })(competitorList[i]);
   }
 }
 
@@ -1136,8 +1141,7 @@ function displayCompetitorList(force) {
   );
   nbShown = 0;
   for (var i = 0; i < competitorList.length; i++) {
-    var c = competitorList[i];
-    (function (competitor, ii) {
+    (function (competitor) {
       if (typeof competitor.isShown === "undefined") {
         if (nbShown < maxParticipantsDisplayed) {
           competitor.isShown = true;
@@ -1147,7 +1151,7 @@ function displayCompetitorList(force) {
         }
       }
       if (!competitor.color) {
-        competitor.color = getColor(ii);
+        competitor.color = getColor(i);
         competitor.isColorDark = getContrastYIQ(competitor.color);
       }
       var div = u('<div class="card-body px-1 pt-1 pb-0"/>');
@@ -1357,7 +1361,7 @@ function displayCompetitorList(force) {
       competitor.div = div;
       competitor.speedometer = div.find(".speedometer").first();
       competitor.odometer = div.find(".odometer").first();
-    })(c, i);
+    })(competitorList[i]);
   }
   if (competitorList.length === 0) {
     var div = u('<div class="text-center"/>');
@@ -1777,226 +1781,299 @@ function drawCompetitors() {
   finishLineCrosses = [];
 
   for (var i = 0; i < competitorList.length; i++) {
-    var competitor = competitorList[i];
-    if (!competitor.isShown) {
-      return;
-    }
-    var route = competitorRoutes[competitor.id];
-    if (route !== undefined) {
-      var viewedTime = currentTime;
-      if (
-        !isLiveMode &&
-        !isRealTime &&
-        !isCustomStart &&
-        competitor.start_time
-      ) {
-        viewedTime +=
-          new Date(competitor.start_time) - getCompetitionStartDate();
+    (function (competitor) {
+      if (!competitor.isShown) {
+        return;
       }
-      if (
-        !isLiveMode &&
-        !isRealTime &&
-        isCustomStart &&
-        competitor.custom_offset
-      ) {
-        viewedTime += Math.max(
-          0,
-          new Date(competitor.custom_offset) - getCompetitionStartDate()
-        );
-      }
-      if (finishLineSet) {
+      var route = competitorRoutes[competitor.id];
+      if (route !== undefined) {
+        var viewedTime = currentTime;
         if (
-          u("#crossing-time").nodes.length &&
-          oldCrossingForNTimes !== u("#crossing-time").val()
+          !isLiveMode &&
+          !isRealTime &&
+          !isCustomStart &&
+          competitor.start_time
         ) {
-          oldCrossingForNTimes = u("#crossing-time").val() || 1;
-          oldFinishCrosses = [];
-          finishLineCrosses = [];
+          viewedTime +=
+            new Date(competitor.start_time) - getCompetitionStartDate();
         }
-        var allPoints = route.getArray();
-        var oldCrossing = oldFinishCrosses.find(function (el) {
-          return el.competitor.id === competitor.id;
-        });
-        var useOldCrossing = false;
-        var crossCount = 0;
-        if (oldCrossing) {
-          var oldTs = allPoints[oldCrossing.idx].timestamp;
-          if (viewedTime >= oldTs) {
-            if (
-              L.LineUtil.segmentsIntersect(
-                map.project(finishLinePoints[0], intersectionCheckZoom),
-                map.project(finishLinePoints[1], intersectionCheckZoom),
-                map.project(
-                  L.latLng([
-                    allPoints[oldCrossing.idx].coords.latitude,
-                    allPoints[oldCrossing.idx].coords.longitude,
-                  ]),
-                  intersectionCheckZoom
-                ),
-                map.project(
-                  L.latLng([
-                    allPoints[oldCrossing.idx - 1].coords.latitude,
-                    allPoints[oldCrossing.idx - 1].coords.longitude,
-                  ]),
-                  intersectionCheckZoom
-                )
-              )
-            ) {
-              crossCount++;
-              if (crossCount == oldCrossingForNTimes) {
-                var competitorTime = allPoints[oldCrossing.idx].timestamp;
-                if (
-                  !isLiveMode &&
-                  !isRealTime &&
-                  !isCustomStart &&
-                  competitor.start_time
-                ) {
-                  competitorTime -=
-                    new Date(competitor.start_time) - getCompetitionStartDate();
-                }
-                if (
-                  !isLiveMode &&
-                  !isRealTime &&
-                  isCustomStart &&
-                  competitor.custom_offset
-                ) {
-                  competitorTime -= Math.max(
-                    0,
-                    new Date(competitor.custom_offset) -
-                      getCompetitionStartDate()
-                  );
-                }
-                if (getRelativeTime(competitorTime) > 0) {
-                  finishLineCrosses.push({
-                    competitor: competitor,
-                    time: competitorTime,
-                    idx: oldCrossing.idx,
-                  });
-                  useOldCrossing = true;
-                }
-              }
-            }
+        if (
+          !isLiveMode &&
+          !isRealTime &&
+          isCustomStart &&
+          competitor.custom_offset
+        ) {
+          viewedTime += Math.max(
+            0,
+            new Date(competitor.custom_offset) - getCompetitionStartDate()
+          );
+        }
+        if (finishLineSet) {
+          if (
+            u("#crossing-time").nodes.length &&
+            oldCrossingForNTimes !== u("#crossing-time").val()
+          ) {
+            oldCrossingForNTimes = u("#crossing-time").val() || 1;
+            oldFinishCrosses = [];
+            finishLineCrosses = [];
           }
-        }
-        if (!useOldCrossing) {
+          var allPoints = route.getArray();
+          var oldCrossing = oldFinishCrosses.find(function (el) {
+            return el.competitor.id === competitor.id;
+          });
+          var useOldCrossing = false;
           var crossCount = 0;
-          for (var i = 1; i < allPoints.length; i++) {
-            var tPoint = allPoints[i];
-            if (viewedTime < tPoint.timestamp) {
-              break;
-            }
-            if (
-              L.LineUtil.segmentsIntersect(
-                map.project(finishLinePoints[0], intersectionCheckZoom),
-                map.project(finishLinePoints[1], intersectionCheckZoom),
-                map.project(
-                  L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]),
-                  intersectionCheckZoom
-                ),
-                map.project(
-                  L.latLng([
-                    allPoints[i - 1].coords.latitude,
-                    allPoints[i - 1].coords.longitude,
-                  ]),
-                  intersectionCheckZoom
+          if (oldCrossing) {
+            var oldTs = allPoints[oldCrossing.idx].timestamp;
+            if (viewedTime >= oldTs) {
+              if (
+                L.LineUtil.segmentsIntersect(
+                  map.project(finishLinePoints[0], intersectionCheckZoom),
+                  map.project(finishLinePoints[1], intersectionCheckZoom),
+                  map.project(
+                    L.latLng([
+                      allPoints[oldCrossing.idx].coords.latitude,
+                      allPoints[oldCrossing.idx].coords.longitude,
+                    ]),
+                    intersectionCheckZoom
+                  ),
+                  map.project(
+                    L.latLng([
+                      allPoints[oldCrossing.idx - 1].coords.latitude,
+                      allPoints[oldCrossing.idx - 1].coords.longitude,
+                    ]),
+                    intersectionCheckZoom
+                  )
                 )
-              )
-            ) {
-              crossCount++;
-              if (crossCount == oldCrossingForNTimes) {
-                var competitorTime = tPoint.timestamp;
-                if (
-                  !isLiveMode &&
-                  !isRealTime &&
-                  !isCustomStart &&
-                  competitor.start_time
-                ) {
-                  competitorTime -=
-                    new Date(competitor.start_time) - getCompetitionStartDate();
+              ) {
+                crossCount++;
+                if (crossCount == oldCrossingForNTimes) {
+                  var competitorTime = allPoints[oldCrossing.idx].timestamp;
+                  if (
+                    !isLiveMode &&
+                    !isRealTime &&
+                    !isCustomStart &&
+                    competitor.start_time
+                  ) {
+                    competitorTime -=
+                      new Date(competitor.start_time) -
+                      getCompetitionStartDate();
+                  }
+                  if (
+                    !isLiveMode &&
+                    !isRealTime &&
+                    isCustomStart &&
+                    competitor.custom_offset
+                  ) {
+                    competitorTime -= Math.max(
+                      0,
+                      new Date(competitor.custom_offset) -
+                        getCompetitionStartDate()
+                    );
+                  }
+                  if (getRelativeTime(competitorTime) > 0) {
+                    finishLineCrosses.push({
+                      competitor: competitor,
+                      time: competitorTime,
+                      idx: oldCrossing.idx,
+                    });
+                    useOldCrossing = true;
+                  }
                 }
-                if (
-                  !isLiveMode &&
-                  !isRealTime &&
-                  isCustomStart &&
-                  competitor.custom_offset
-                ) {
-                  competitorTime -= Math.max(
-                    0,
-                    new Date(competitor.custom_offset) -
-                      getCompetitionStartDate()
-                  );
-                }
-                if (getRelativeTime(competitorTime) > 0) {
-                  finishLineCrosses.push({
-                    competitor: competitor,
-                    time: competitorTime,
-                    idx: i,
-                  });
-                  break;
+              }
+            }
+          }
+          if (!useOldCrossing) {
+            var crossCount = 0;
+            for (var i = 1; i < allPoints.length; i++) {
+              var tPoint = allPoints[i];
+              if (viewedTime < tPoint.timestamp) {
+                break;
+              }
+              if (
+                L.LineUtil.segmentsIntersect(
+                  map.project(finishLinePoints[0], intersectionCheckZoom),
+                  map.project(finishLinePoints[1], intersectionCheckZoom),
+                  map.project(
+                    L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]),
+                    intersectionCheckZoom
+                  ),
+                  map.project(
+                    L.latLng([
+                      allPoints[i - 1].coords.latitude,
+                      allPoints[i - 1].coords.longitude,
+                    ]),
+                    intersectionCheckZoom
+                  )
+                )
+              ) {
+                crossCount++;
+                if (crossCount == oldCrossingForNTimes) {
+                  var competitorTime = tPoint.timestamp;
+                  if (
+                    !isLiveMode &&
+                    !isRealTime &&
+                    !isCustomStart &&
+                    competitor.start_time
+                  ) {
+                    competitorTime -=
+                      new Date(competitor.start_time) -
+                      getCompetitionStartDate();
+                  }
+                  if (
+                    !isLiveMode &&
+                    !isRealTime &&
+                    isCustomStart &&
+                    competitor.custom_offset
+                  ) {
+                    competitorTime -= Math.max(
+                      0,
+                      new Date(competitor.custom_offset) -
+                        getCompetitionStartDate()
+                    );
+                  }
+                  if (getRelativeTime(competitorTime) > 0) {
+                    finishLineCrosses.push({
+                      competitor: competitor,
+                      time: competitorTime,
+                      idx: i,
+                    });
+                    break;
+                  }
                 }
               }
             }
           }
         }
-      }
-      var hasPointLast30sec = route.hasPointInInterval(
-        viewedTime - 30 * 1e3,
-        viewedTime
-      );
-      var loc = route.getByTime(viewedTime);
+        var hasPointLast30sec = route.hasPointInInterval(
+          viewedTime - 30 * 1e3,
+          viewedTime
+        );
+        var loc = route.getByTime(viewedTime);
 
-      if (competitor.focused) {
-        const mapSize = map.getSize();
-        const placeXY = map.latLngToContainerPoint([
-          loc.coords.latitude,
-          loc.coords.longitude,
-        ]);
-        if (
-          (placeXY.x < mapSize.x / 4 ||
-            placeXY.x > (mapSize.x * 3) / 4 ||
-            placeXY.y < mapSize.y / 4 ||
-            placeXY.y > (mapSize.y * 3) / 4) &&
-          mapSize.x > 0 &&
-          mapSize.y > 0
-        ) {
-          zoomOnCompetitor(competitor);
-        }
-      }
-
-      if (viewedTime < route.getByIndex(0).timestamp) {
-        ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-          if (competitor[layerName]) {
-            map.removeLayer(competitor[layerName]);
+        if (competitor.focused) {
+          const mapSize = map.getSize();
+          const placeXY = map.latLngToContainerPoint([
+            loc.coords.latitude,
+            loc.coords.longitude,
+          ]);
+          if (
+            (placeXY.x < mapSize.x / 4 ||
+              placeXY.x > (mapSize.x * 3) / 4 ||
+              placeXY.y < mapSize.y / 4 ||
+              placeXY.y > (mapSize.y * 3) / 4) &&
+            mapSize.x > 0 &&
+            mapSize.y > 0
+          ) {
+            zoomOnCompetitor(competitor);
           }
-          competitor[layerName] = null;
-        });
-      }
+        }
 
-      if (viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec) {
-        if (!competitor.idle) {
+        if (viewedTime < route.getByIndex(0).timestamp) {
           ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
             if (competitor[layerName]) {
               map.removeLayer(competitor[layerName]);
             }
             competitor[layerName] = null;
           });
-          competitor.idle = true;
         }
-        if (loc && !isNaN(loc.coords.latitude)) {
-          if (competitor.mapMarker == undefined) {
-            var idleColor = tinycolor(competitor.color).setAlpha(0.4);
-            var svgRect = `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="${idleColor.toRgbString()}" cx="4" cy="4" r="3"/></svg>`;
-            var pulseIcon = L.icon({
-              iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-              iconSize: [8, 8],
-              shadowSize: [8, 8],
-              iconAnchor: [4, 4],
-              shadowAnchor: [0, 0],
-              popupAnchor: [0, 0],
+
+        if (viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec) {
+          if (!competitor.idle) {
+            ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+              if (competitor[layerName]) {
+                map.removeLayer(competitor[layerName]);
+              }
+              competitor[layerName] = null;
             });
+            competitor.idle = true;
+          }
+          if (loc && !isNaN(loc.coords.latitude)) {
+            if (competitor.mapMarker == undefined) {
+              var idleColor = tinycolor(competitor.color).setAlpha(0.4);
+              var svgRect = `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="${idleColor.toRgbString()}" cx="4" cy="4" r="3"/></svg>`;
+              var pulseIcon = L.icon({
+                iconUrl: encodeURI("data:image/svg+xml," + svgRect),
+                iconSize: [8, 8],
+                shadowSize: [8, 8],
+                iconAnchor: [4, 4],
+                shadowAnchor: [0, 0],
+                popupAnchor: [0, 0],
+              });
+              competitor.mapMarker = L.marker(
+                [loc.coords.latitude, loc.coords.longitude],
+                { icon: pulseIcon }
+              );
+              competitor.mapMarker.addTo(map);
+            } else {
+              competitor.mapMarker.setLatLng([
+                loc.coords.latitude,
+                loc.coords.longitude,
+              ]);
+            }
+            var pointX = map.latLngToContainerPoint([
+              loc.coords.latitude,
+              loc.coords.longitude,
+            ]).x;
+            var mapMiddleX = map.getSize().x / 2;
+            if (
+              pointX > mapMiddleX &&
+              !competitor.isNameOnRight &&
+              competitor.nameMarker
+            ) {
+              map.removeLayer(competitor.nameMarker);
+              competitor.nameMarker = null;
+            } else if (
+              pointX <= mapMiddleX &&
+              competitor.isNameOnRight &&
+              competitor.nameMarker
+            ) {
+              map.removeLayer(competitor.nameMarker);
+              competitor.nameMarker = null;
+            }
+            if (competitor.nameMarker == undefined) {
+              var isOnRight = pointX > mapMiddleX;
+              competitor.isNameOnRight = isOnRight;
+              var runnerIcon = getRunnerNameMarker(
+                competitor.short_name,
+                competitor.color,
+                competitor.isColorDark,
+                isOnRight,
+                true,
+                competitor.highlighted
+              );
+              competitor.nameMarker = L.marker(
+                [loc.coords.latitude, loc.coords.longitude],
+                { icon: runnerIcon }
+              );
+              competitor.nameMarker.addTo(map);
+            } else {
+              competitor.nameMarker.setLatLng([
+                loc.coords.latitude,
+                loc.coords.longitude,
+              ]);
+            }
+          }
+        } else if (competitor.idle) {
+          ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+            if (competitor[layerName]) {
+              map.removeLayer(competitor[layerName]);
+            }
+            competitor[layerName] = null;
+          });
+          competitor.idle = false;
+        }
+
+        if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
+          if (!competitor.mapMarker) {
+            var runnerIcon = getRunnerIcon(
+              competitor.color,
+              false,
+              competitor.highlighted
+            );
             competitor.mapMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
-              { icon: pulseIcon }
+              { icon: runnerIcon }
             );
             competitor.mapMarker.addTo(map);
           } else {
@@ -2026,16 +2103,16 @@ function drawCompetitors() {
             competitor.nameMarker = null;
           }
           if (competitor.nameMarker == undefined) {
-            var isOnRight = pointX > mapMiddleX;
-            competitor.isNameOnRight = isOnRight;
+            var isNameOnRight = pointX > mapMiddleX;
             var runnerIcon = getRunnerNameMarker(
               competitor.short_name,
               competitor.color,
               competitor.isColorDark,
-              isOnRight,
-              true,
+              isNameOnRight,
+              false,
               competitor.highlighted
             );
+            competitor.isNameOnRight = isNameOnRight;
             competitor.nameMarker = L.marker(
               [loc.coords.latitude, loc.coords.longitude],
               { icon: runnerIcon }
@@ -2048,142 +2125,75 @@ function drawCompetitors() {
             ]);
           }
         }
-      } else if (competitor.idle) {
-        ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-          if (competitor[layerName]) {
-            map.removeLayer(competitor[layerName]);
+        var tail = null;
+        var hasPointInTail = false;
+        if (competitor.displayFullRoute) {
+          tail = route.extractInterval(-Infinity, viewedTime);
+          hasPointInTail = route.hasPointInInterval(-Infinity, viewedTime);
+        } else {
+          tail = route.extractInterval(
+            viewedTime - tailLength * 1e3,
+            viewedTime
+          );
+          hasPointInTail = route.hasPointInInterval(
+            viewedTime - tailLength * 1e3,
+            viewedTime
+          );
+        }
+        if (!hasPointInTail) {
+          if (competitor.tail) {
+            map.removeLayer(competitor.tail);
           }
-          competitor[layerName] = null;
-        });
-        competitor.idle = false;
-      }
-
-      if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
-        if (!competitor.mapMarker) {
-          var runnerIcon = getRunnerIcon(
-            competitor.color,
-            false,
-            competitor.highlighted
-          );
-          competitor.mapMarker = L.marker(
-            [loc.coords.latitude, loc.coords.longitude],
-            { icon: runnerIcon }
-          );
-          competitor.mapMarker.addTo(map);
+          competitor.tail = null;
         } else {
-          competitor.mapMarker.setLatLng([
-            loc.coords.latitude,
-            loc.coords.longitude,
-          ]);
+          var tailLatLng = tail
+            .getArray()
+            .filter(function (pos) {
+              return !isNaN(pos.coords.latitude);
+            })
+            .map(function (pos) {
+              return [pos.coords.latitude, pos.coords.longitude];
+            });
+          if (competitor.tail == undefined) {
+            competitor.tail = L.polyline(tailLatLng, {
+              color: competitor.color,
+              opacity: 0.75,
+              weight: 5,
+              smoothFactor: smoothFactor,
+              className: competitor.focused ? "icon-focused" : "",
+            }).addTo(map);
+          } else {
+            competitor.tail.setLatLngs(tailLatLng);
+          }
         }
-        var pointX = map.latLngToContainerPoint([
-          loc.coords.latitude,
-          loc.coords.longitude,
-        ]).x;
-        var mapMiddleX = map.getSize().x / 2;
-        if (
-          pointX > mapMiddleX &&
-          !competitor.isNameOnRight &&
-          competitor.nameMarker
-        ) {
-          map.removeLayer(competitor.nameMarker);
-          competitor.nameMarker = null;
-        } else if (
-          pointX <= mapMiddleX &&
-          competitor.isNameOnRight &&
-          competitor.nameMarker
-        ) {
-          map.removeLayer(competitor.nameMarker);
-          competitor.nameMarker = null;
-        }
-        if (competitor.nameMarker == undefined) {
-          var isNameOnRight = pointX > mapMiddleX;
-          var runnerIcon = getRunnerNameMarker(
-            competitor.short_name,
-            competitor.color,
-            competitor.isColorDark,
-            isNameOnRight,
-            false,
-            competitor.highlighted
-          );
-          competitor.isNameOnRight = isNameOnRight;
-          competitor.nameMarker = L.marker(
-            [loc.coords.latitude, loc.coords.longitude],
-            { icon: runnerIcon }
-          );
-          competitor.nameMarker.addTo(map);
-        } else {
-          competitor.nameMarker.setLatLng([
-            loc.coords.latitude,
-            loc.coords.longitude,
-          ]);
-        }
-      }
-      var tail = null;
-      var hasPointInTail = false;
-      if (competitor.displayFullRoute) {
-        tail = route.extractInterval(-Infinity, viewedTime);
-        hasPointInTail = route.hasPointInInterval(-Infinity, viewedTime);
-      } else {
-        tail = route.extractInterval(viewedTime - tailLength * 1e3, viewedTime);
-        hasPointInTail = route.hasPointInInterval(
-          viewedTime - tailLength * 1e3,
+        var tail30s = route.extractInterval(viewedTime - 30 * 1e3, viewedTime);
+        var hasPointInTail = route.hasPointInInterval(
+          viewedTime - 30 * 1e3,
           viewedTime
         );
-      }
-      if (!hasPointInTail) {
-        if (competitor.tail) {
-          map.removeLayer(competitor.tail);
-        }
-        competitor.tail = null;
-      } else {
-        var tailLatLng = tail
-          .getArray()
-          .filter(function (pos) {
-            return !isNaN(pos.coords.latitude);
-          })
-          .map(function (pos) {
-            return [pos.coords.latitude, pos.coords.longitude];
-          });
-        if (competitor.tail == undefined) {
-          competitor.tail = L.polyline(tailLatLng, {
-            color: competitor.color,
-            opacity: 0.75,
-            weight: 5,
-            smoothFactor: smoothFactor,
-            className: competitor.focused ? "icon-focused" : "",
-          }).addTo(map);
+        if (!hasPointInTail) {
+          competitor.speedometer.textContent = "--'--\"/km";
         } else {
-          competitor.tail.setLatLngs(tailLatLng);
+          if (checkVisible(competitor.speedometer)) {
+            var distance = 0;
+            var prevPos = null;
+            tail30s.getArray().forEach(function (pos) {
+              if (prevPos && !isNaN(pos.coords.latitude)) {
+                distance += pos.distance(prevPos);
+              }
+              prevPos = pos;
+            });
+            var speed = (30 / distance) * 1000;
+            competitor.speedometer.textContent = formatSpeed(speed);
+          }
+        }
+        if (checkVisible(competitor.odometer)) {
+          var totalDistance = route.distanceUntil(viewedTime);
+          competitor.odometer.textContent =
+            (totalDistance / 1000).toFixed(1) + "km";
         }
       }
-      var tail30s = route.extractInterval(viewedTime - 30 * 1e3, viewedTime);
-      var hasPointInTail = route.hasPointInInterval(
-        viewedTime - 30 * 1e3,
-        viewedTime
-      );
-      if (!hasPointInTail) {
-        competitor.speedometer.textContent = "--'--\"/km";
-      } else {
-        if (checkVisible(competitor.speedometer)) {
-          var distance = 0;
-          var prevPos = null;
-          tail30s.getArray().forEach(function (pos) {
-            if (prevPos && !isNaN(pos.coords.latitude)) {
-              distance += pos.distance(prevPos);
-            }
-            prevPos = pos;
-          });
-          var speed = (30 / distance) * 1000;
-          competitor.speedometer.textContent = formatSpeed(speed);
-        }
-      }
-      if (checkVisible(competitor.odometer)) {
-        var totalDistance = route.distanceUntil(viewedTime);
-        competitor.odometer.textContent =
-          (totalDistance / 1000).toFixed(1) + "km";
-      }
-    }
+    })(competitorList[i]);
   }
 
   // Create cluster
@@ -2191,18 +2201,19 @@ function drawCompetitors() {
     var listCompWithMarker = [];
     var gpsPointData = [];
     for (var i = 0; i < competitorList.length; i++) {
-      var competitor = competitorList[i];
-      if (competitor.mapMarker) {
-        listCompWithMarker.push(competitor);
-        var latLon = competitor.mapMarker.getLatLng();
-        gpsPointData.push({
-          location: {
-            accuracy: 0,
-            latitude: latLon.lat,
-            longitude: latLon.lng,
-          },
-        });
-      }
+      (function (competitor) {
+        if (competitor.mapMarker) {
+          listCompWithMarker.push(competitor);
+          var latLon = competitor.mapMarker.getLatLng();
+          gpsPointData.push({
+            location: {
+              accuracy: 0,
+              latitude: latLon.lat,
+              longitude: latLon.lng,
+            },
+          });
+        }
+      })(competitorList[i]);
     }
     var dbscanner = jDBSCAN()
       .eps(0.015)
