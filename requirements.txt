@@ -19,7 +19,7 @@ cryptography==41.0.1
 defusedxml==0.7.1
 deprecated==1.2.14
 diskcache==5.6.1
-django==4.2.2
+django==4.2.3
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.54.0
 django-appconf==1.0.5
