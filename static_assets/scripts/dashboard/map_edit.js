@@ -568,7 +568,7 @@ function enableBtnToPreview() {
   var cornersLatLng = [];
   var calibString = null;
   var calibHelpTexts = [
-    "Select 4 distincts points on the raster map and on the world map.",
+    "Select 4 distinct locations on the raster map and match their locations on the world map. The best is to select four points as much apart from each other as possible.",
     "Check that the raster map is aligned with the world map.",
   ];
 
