@@ -83,15 +83,8 @@ LOCATION_TIMESTAMP_INDEX = 0
 LOCATION_LATITUDE_INDEX = 1
 LOCATION_LONGITUDE_INDEX = 2
 
-if settings.DATABASES["default"]["ENGINE"] not in (
-    "django.db.backends.postgresql",
-    "django.db.backends.sqlite3",
-):
+if settings.DATABASES["default"]["ENGINE"] != "django.db.backends.postgresql":
     raise Exception("DB not supported")
-
-IS_DB_POSTGRES = (
-    settings.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql"
-)
 
 
 class Point:

@@ -37,7 +37,6 @@ from user_sessions.views import SessionDeleteOtherView
 from invitations.forms import InviteForm
 from routechoices.api.views import serve_from_s3
 from routechoices.core.models import (
-    IS_DB_POSTGRES,
     Club,
     Competitor,
     Device,
@@ -254,18 +253,7 @@ def device_list_view(request):
         .filter(device_id__in=devices_listed, start_time__lt=now())
         .order_by("device_id", "-start_time")
     )
-
-    if IS_DB_POSTGRES:
-        competitors = competitors.distinct("device_id")
-    else:
-        unique_devid = set()
-        unique_competitors = []
-        for c in competitors:
-            if c.device_id not in unique_devid:
-                unique_devid.add(c.device_id)
-                unique_competitors.append(c)
-        competitors = unique_competitors
-
+    competitors = competitors.distinct("device_id")
     last_usage = {}
     for competitor in competitors:
         last_usage[competitor.device_id] = f"{competitor.event} ({competitor})"
