@@ -111,6 +111,18 @@
                 </tr>
             {% endfor %}
             </table>
+            <div class="iof-upload">
+                <div id="iof-step-1">
+                  <label for="iof_input" class="form-label">Import competitors from IOF XML 3.0</label>
+                  <input type="file" name="iof_input" id="iof_input" class="form-control" accept="text/xml"/>
+                </div>
+                <div id="iof-step-2" class="d-none">
+                  <label for="iof_class_input" class="form-label">Select Class</label>
+                  <select type="select" name="iof_class_input" id="iof_class_input" class="form-control mb-1"></select>
+                  <button class="btn btn-info" id="iof-class-submit-btn">Import</button> <button class="btn btn-danger" id="iof-class-cancel-btn">Cancel</button>
+                </div>
+            </div>
+            <hr/>
             <div class="csv-upload">
                 <label for="csv_input" class="form-label">Import competitors from CSV</label>
                 <input type="file" name="csv_input" id="csv_input" class="form-control" accept="text/csv"/>
