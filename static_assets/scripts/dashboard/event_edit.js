@@ -364,10 +364,29 @@ function showLocalTime(el) {
         }
         u("#iof-step-1").addClass("d-none");
         u("#iof-step-2").removeClass("d-none");
+        u("#iof-class-cancel-btn").on("click", function (e) {
+          e.preventDefault();
+          u("#iof-step-2").addClass("d-none");
+          u("#iof-step-1").removeClass("d-none");
+          u("#iof_input").val("");
+        });
         u("#iof-class-submit-btn").on("click", function (e) {
           e.preventDefault();
           var classId = u("#iof_class_input").val();
           var suffix = isResultFile ? "Result" : "Start";
+
+          u(".formset_row").each(function (e) {
+            if (
+              u(e)
+                .find("input")
+                .filter(function (el) {
+                  return u(el).attr("type") != "hidden" && el.value != "";
+                }).length == 0
+            ) {
+              u(e).find(".delete-row").first().click();
+            }
+          });
+
           for (c of parsedXML.getElementsByTagName("Class" + suffix)) {
             if (
               c.getElementsByTagName("Class")[0].getElementsByTagName("Id")[0]
