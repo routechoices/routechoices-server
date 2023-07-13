@@ -79,6 +79,155 @@ function onAddedCompetitorRow(row) {
   });
 }
 
+function clearEmptyCompetitorRows() {
+  u(".formset_row").each(function (e) {
+    if (
+      u(e)
+        .find("input")
+        .filter(function (el) {
+          return u(el).attr("type") != "hidden" && el.value != "";
+        }).length == 0
+    ) {
+      u(e).find(".delete-row").first().click();
+    }
+  });
+}
+
+function addCompetitor(name, shortName, startTime, deviceId) {
+  u(".add-competitor-btn").first().click();
+  var inputs = u(u(".formset_row").last()).find("input").nodes;
+  if (startTime) {
+    inputs[5].value = dayjs(startTime).utc().format("YYYY-MM-DD HH:mm:ss");
+    u(inputs[5]).trigger("change");
+  }
+  inputs[2].value = name;
+  inputs[3].value = shortName;
+  if (deviceId) {
+    var myDeviceSelectInput = lastDeviceSelectInput;
+    reqwest({
+      url: window.local.apiBaseUrl + "search/device?q=" + deviceId,
+      method: "get",
+      type: "json",
+      withCredentials: true,
+      crossOrigin: true,
+      success: (function (line) {
+        return function (res) {
+          if (res.results.length == 1) {
+            var r = res.results[0];
+            myDeviceSelectInput.addOption(r);
+            myDeviceSelectInput.setValue(r[seletizeOptions.valueField]);
+          }
+        };
+      })(),
+    });
+  }
+}
+
+function onIofXMLLoaded(e) {
+  var file = e.target.files[0];
+  if (file) {
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      var txt = evt.target.result;
+      const parser = new DOMParser();
+      const parsedXML = parser.parseFromString(txt, "text/xml");
+      var isResultFile =
+        parsedXML.getElementsByTagName("ResultList").length == 1;
+      var isStartFile = parsedXML.getElementsByTagName("StartList").length == 1;
+      if (!isResultFile && !isStartFile) {
+        swal({
+          title: "Error!",
+          text: "Neither a start list or a result list",
+          type: "error",
+          confirmButtonText: "OK",
+        });
+        u("#iof_input").val("");
+        return;
+      }
+      var classes = [];
+      var selector = document.getElementById("iof_class_input");
+      selector.innerHTML = "";
+      for (c of parsedXML.getElementsByTagName("Class")) {
+        var id = c.getElementsByTagName("Id")[0].textContent;
+        var name = c.getElementsByTagName("Name")[0].textContent;
+        classes.push({ id, name });
+        var opt = document.createElement("option");
+        opt.value = id;
+        opt.appendChild(document.createTextNode(name));
+        selector.appendChild(opt);
+      }
+      u("#iof-step-1").addClass("d-none");
+      u("#iof-step-2").removeClass("d-none");
+      u("#iof-class-cancel-btn").on("click", function (e) {
+        e.preventDefault();
+        u("#iof-step-2").addClass("d-none");
+        u("#iof-step-1").removeClass("d-none");
+        u("#iof_input").val("");
+      });
+      u("#iof-class-submit-btn").off("click");
+      u("#iof-class-submit-btn").on("click", function (e) {
+        e.preventDefault();
+        var classId = u("#iof_class_input").val();
+        var suffix = isResultFile ? "Result" : "Start";
+
+        clearEmptyCompetitorRows();
+
+        for (c of parsedXML.getElementsByTagName("Class" + suffix)) {
+          if (
+            c.getElementsByTagName("Class")[0].getElementsByTagName("Id")[0]
+              .textContent === classId
+          ) {
+            for (p of c.getElementsByTagName("Person" + suffix)) {
+              var startTime = null;
+              var name = null;
+              var shortName = null;
+              try {
+                startTime = p
+                  .getElementsByTagName(suffix)[0]
+                  .getElementsByTagName("StartTime")[0].textContent;
+              } catch {}
+              try {
+                name =
+                  p
+                    .getElementsByTagName("Person")[0]
+                    .getElementsByTagName("Given")[0].textContent +
+                  " " +
+                  p
+                    .getElementsByTagName("Person")[0]
+                    .getElementsByTagName("Family")[0].textContent;
+                shortName =
+                  p
+                    .getElementsByTagName("Person")[0]
+                    .getElementsByTagName("Given")[0].textContent[0] +
+                  "." +
+                  p
+                    .getElementsByTagName("Person")[0]
+                    .getElementsByTagName("Family")[0].textContent;
+              } catch {}
+              if (name) {
+                addCompetitor(name, shortName, startTime);
+              }
+            }
+            u(".add-competitor-btn").first().click();
+          }
+        }
+        u("#iof-step-2").addClass("d-none");
+        u("#iof-step-1").removeClass("d-none");
+        u("#iof_input").val("");
+      });
+    };
+    reader.onerror = function () {
+      swal({
+        title: "Error!",
+        text: "Could not parse this file",
+        type: "error",
+        confirmButtonText: "OK",
+      });
+    };
+    reader.readAsText(file, "UTF-8");
+  }
+}
+
 function onCsvParsed(result) {
   u("#csv_input").val("");
   var errors = "";
@@ -112,47 +261,11 @@ function onCsvParsed(result) {
       confirmButtonText: "OK",
     });
     return;
-  } // clear empty lines
-  u(".formset_row").each(function (e) {
-    if (
-      u(e)
-        .find("input")
-        .filter(function (el) {
-          return u(el).attr("type") != "hidden" && el.value != "";
-        }).length == 0
-    ) {
-      u(e).find(".delete-row").first().click();
-    }
-  });
+  }
+  clearEmptyCompetitorRows();
   result.data.forEach(function (l) {
-    u(".add-competitor-btn").first().click();
     if (l.length != 1) {
-      var inputs = u(u(".formset_row").last()).find("input").nodes;
-      if (l.length > 3) {
-        var myDeviceSelectInput = lastDeviceSelectInput;
-        reqwest({
-          url: window.local.apiBaseUrl + "search/device?q=" + l[3],
-          method: "get",
-          type: "json",
-          withCredentials: true,
-          crossOrigin: true,
-          success: (function (line) {
-            return function (res) {
-              if (res.results.length == 1) {
-                var r = res.results[0];
-                myDeviceSelectInput.addOption(r);
-                myDeviceSelectInput.setValue(r[seletizeOptions.valueField]);
-              }
-            };
-          })(),
-        });
-      }
-      if (l[2]) {
-        inputs[5].value = dayjs(l[2]).utc().format("YYYY-MM-DD HH:mm:ss");
-        u(inputs[5]).trigger("change");
-      }
-      inputs[2].value = l[0];
-      inputs[3].value = l[1];
+      addCompetitor(l[0], l[1], l[2], l?.[3]);
     }
   });
   u(".add-competitor-btn").first().click();
@@ -328,119 +441,8 @@ function showLocalTime(el) {
   u("#csv_input").on("change", function (e) {
     Papa.parse(e.target.files[0], { complete: onCsvParsed });
   });
-  u("#iof_input").on("change", function (e) {
-    var file = e.target.files[0];
-    if (file) {
-      var reader = new FileReader();
-      reader.onload = function (evt) {
-        var txt = evt.target.result;
-        const parser = new DOMParser();
-        const parsedXML = parser.parseFromString(txt, "text/xml");
-        var isResultFile =
-          parsedXML.getElementsByTagName("ResultList").length == 1;
-        var isStartFile =
-          parsedXML.getElementsByTagName("StartList").length == 1;
-        if (!isResultFile && !isStartFile) {
-          swal({
-            title: "Error!",
-            text: "Neither a start list or a result list",
-            type: "error",
-            confirmButtonText: "OK",
-          });
-          u("#iof_input").val("");
-          return;
-        }
-        var classes = [];
-        var selector = document.getElementById("iof_class_input");
-        selector.innerHTML = "";
-        for (c of parsedXML.getElementsByTagName("Class")) {
-          var id = c.getElementsByTagName("Id")[0].textContent;
-          var name = c.getElementsByTagName("Name")[0].textContent;
-          classes.push({ id, name });
-          var opt = document.createElement("option");
-          opt.value = id;
-          opt.appendChild(document.createTextNode(name));
-          selector.appendChild(opt);
-        }
-        u("#iof-step-1").addClass("d-none");
-        u("#iof-step-2").removeClass("d-none");
-        u("#iof-class-cancel-btn").on("click", function (e) {
-          e.preventDefault();
-          u("#iof-step-2").addClass("d-none");
-          u("#iof-step-1").removeClass("d-none");
-          u("#iof_input").val("");
-        });
-        u("#iof-class-submit-btn").on("click", function (e) {
-          e.preventDefault();
-          var classId = u("#iof_class_input").val();
-          var suffix = isResultFile ? "Result" : "Start";
 
-          u(".formset_row").each(function (e) {
-            if (
-              u(e)
-                .find("input")
-                .filter(function (el) {
-                  return u(el).attr("type") != "hidden" && el.value != "";
-                }).length == 0
-            ) {
-              u(e).find(".delete-row").first().click();
-            }
-          });
-
-          for (c of parsedXML.getElementsByTagName("Class" + suffix)) {
-            if (
-              c.getElementsByTagName("Class")[0].getElementsByTagName("Id")[0]
-                .textContent === classId
-            ) {
-              for (p of c.getElementsByTagName("Person" + suffix)) {
-                u(".add-competitor-btn").first().click();
-                var inputs = u(u(".formset_row").last()).find("input").nodes;
-                try {
-                  var start = p
-                    .getElementsByTagName(suffix)[0]
-                    .getElementsByTagName("StartTime")[0].textContent;
-                  inputs[5].value = dayjs(start)
-                    .utc()
-                    .format("YYYY-MM-DD HH:mm:ss");
-                  u(inputs[5]).trigger("change");
-                } catch {}
-                try {
-                  inputs[2].value =
-                    p
-                      .getElementsByTagName("Person")[0]
-                      .getElementsByTagName("Given")[0].textContent +
-                    " " +
-                    p
-                      .getElementsByTagName("Person")[0]
-                      .getElementsByTagName("Family")[0].textContent;
-                  inputs[3].value =
-                    p
-                      .getElementsByTagName("Person")[0]
-                      .getElementsByTagName("Given")[0].textContent[0] +
-                    "." +
-                    p
-                      .getElementsByTagName("Person")[0]
-                      .getElementsByTagName("Family")[0].textContent;
-                } catch {}
-              }
-            }
-          }
-          u("#iof-step-2").addClass("d-none");
-          u("#iof-step-1").removeClass("d-none");
-          u("#iof_input").val("");
-        });
-      };
-      reader.onerror = function () {
-        swal({
-          title: "Error!",
-          text: "Could not parse this file",
-          type: "error",
-          confirmButtonText: "OK",
-        });
-      };
-      reader.readAsText(file, "UTF-8");
-    }
-  });
+  u("#iof_input").on("change", onIofXMLLoaded);
   u(".datetimepicker").each(function (el) {
     u(el).attr("autocomplete", "off");
 
