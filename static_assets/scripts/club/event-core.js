@@ -380,7 +380,7 @@ function getRunnerNameMarker(
     html: iconHtml,
     iconAnchor: [
       rightSide ? nameTagWidth + (focused ? 10 : 0) : focused ? -10 : 0,
-      0,
+      rightSide ? 0 : 30,
     ],
   });
   return runnerIcon;
