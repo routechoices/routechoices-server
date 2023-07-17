@@ -814,6 +814,12 @@ function refreshEventData() {
     crossOrigin: true,
     type: "json",
     success: function (response) {
+      if (response.error) {
+        if (response.error === "No event match this id") {
+          window.location.reload();
+        }
+        return;
+      }
       eventDataLastFetch = performance.now();
       endEvent = new Date(response.event.end_date);
 
