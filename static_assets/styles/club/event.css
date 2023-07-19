@@ -158,6 +158,10 @@
   white-space: nowrap;
 }
 
+.runner-icon.flags-polyfill span {
+  font-family: "Twemoji Country Flags", "Atkinson Hyperlegible", sans-serif;
+}
+
 .icon-focused {
   z-index: 10000000 !important;
 }

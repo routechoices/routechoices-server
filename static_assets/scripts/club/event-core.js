@@ -364,6 +364,7 @@ function getRunnerNameMarker(
   var iconClass =
     "runner-icon runner-icon-" +
     (isDark ? "dark" : "light") +
+    (needFlagsEmojiPolyfill ? " flags-polyfill" : "") +
     (focused ? " icon-focused" : "");
   var ic2 =
     iconClass +
