@@ -21,6 +21,14 @@
 }
 
 @font-face {
+  font-family: "Twemoji Country Flags";
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067,
+    U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
+  src: url("../fonts/twemoji-country-flags.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Atkinson Hyperlegible";
   font-style: normal;
   font-weight: 700;
@@ -98,6 +106,10 @@ body {
   height: 100%;
   padding-top: 0px;
   background-color: #f8f9fa;
+}
+
+.flags-polyfill {
+  font-family: "Twemoji Country Flags", var(--bs-body-font-family);
 }
 
 .site-name {
