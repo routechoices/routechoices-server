@@ -278,6 +278,8 @@ MARKDOWNIFY = {
             "p",
             "strong",
             "ul",
+            "br",
+            "code",
         ],
         "WHITELIST_ATTRS": [
             "href",
