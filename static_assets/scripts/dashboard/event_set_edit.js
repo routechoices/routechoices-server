@@ -4,10 +4,12 @@
       u("#id_slug").parent().show();
       u("#id_slug").attr("required", true);
       u("#id_list_secret_events").parent().show();
+      u("#id_description").parent().show();
     } else {
       u("#id_slug").parent().hide();
       u("#id_slug").attr("required", false);
       u("#id_list_secret_events").parent().hide();
+      u("#id_description").parent().hide();
     }
   });
 
@@ -53,5 +55,6 @@
     u("#id_slug").parent().hide();
     u("#id_slug").attr("required", false);
     u("#id_list_secret_events").parent().hide();
+    u("#id_description").parent().hide();
   }
 })();
