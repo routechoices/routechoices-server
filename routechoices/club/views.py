@@ -177,10 +177,26 @@ def event_view(request, slug, **kwargs):
         .first()
     )
     if not event:
-        club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}{slug}")
-        return render(request, "club/404_event.html", {"club": club}, status=404)
+        event_set = (
+            EventSet.objects.all()
+            .select_related("club")
+            .prefetch_related("events")
+            .filter(
+                club__slug__iexact=club_slug,
+                slug__iexact=slug,
+            )
+            .first()
+        )
+        if not event_set:
+            club = get_object_or_404(Club, slug__iexact=club_slug)
+            if club.domain and not request.use_cname:
+                return redirect(f"{club.nice_url}{slug}")
+            return render(request, "club/404_event.html", {"club": club}, status=404)
+        elif event_set.club.domain and not request.use_cname:
+            return redirect(f"{event_set.club.nice_url}{slug}")
+        return render(
+            request, "site/event_list.html", event_set.extract_event_lists(request)
+        )
     # If event is private, page needs to send ajax with cookies to prove identity,
     # cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
@@ -208,48 +224,6 @@ def event_view(request, slug, **kwargs):
     if event.privacy == PRIVACY_PRIVATE:
         response["Cache-Control"] = "private"
     return response
-
-
-def event_set_shortcut(request, slug, **kwargs):
-    bypass_resp = handle_legacy_request(
-        "event_set_shortcut", kwargs.get("club_slug"), slug=slug
-    )
-    if bypass_resp:
-        return bypass_resp
-    return redirect(f"/events/{slug}")
-
-
-@xframe_options_exempt
-@cache_page(5 if not settings.DEBUG else 0)
-def event_set_view(request, slug, **kwargs):
-    bypass_resp = handle_legacy_request(
-        "event_set_view", kwargs.get("club_slug"), slug=slug
-    )
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    if not club_slug:
-        club_slug = request.club_slug
-    event_set = (
-        EventSet.objects.all()
-        .select_related("club")
-        .prefetch_related("events")
-        .filter(
-            club__slug__iexact=club_slug,
-            slug__iexact=slug,
-        )
-        .first()
-    )
-    if not event_set:
-        club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}events/{slug}")
-        return render(request, "club/404_event_set.html", {"club": club}, status=404)
-    elif event_set.club.domain and not request.use_cname:
-        return redirect(f"{event_set.club.nice_url}events/{slug}")
-    return render(
-        request, "site/event_list.html", event_set.extract_event_lists(request)
-    )
 
 
 def event_export_view(request, slug, **kwargs):

@@ -1000,14 +1000,14 @@ class EventSet(models.Model):
     @property
     def url(self):
         if self.create_page:
-            return f"{self.club.nice_url}events/{self.slug}"
+            return f"{self.club.nice_url}{self.slug}"
         return ""
 
     @property
     def shortcut(self):
         shortcut_url = getattr(settings, "SHORTCUT_BASE_URL", None)
         if shortcut_url:
-            return f"{shortcut_url}{self.club.slug}/e/{self.slug}"
+            return f"{shortcut_url}{self.club.slug}/{self.slug}"
         return None
 
     @property
@@ -1037,6 +1037,10 @@ class EventSet(models.Model):
                 qs = qs.exclude(id=self.id)
             if qs.exists():
                 errors.append("Event Set with this Club and Slug already exists.")
+            elif Event.objects.filter(
+                club_id=self.club_id, slug__iexact=self.slug
+            ).exists():
+                errors.append("Event with this Club and Slug already exists.")
         if errors:
             raise ValidationError(errors)
         super().validate_unique(exclude)
@@ -1515,6 +1519,10 @@ class Event(models.Model):
             qs = qs.exclude(id=self.id)
         if qs.exists():
             errors.append("Event with this Club and Slug already exists.")
+        elif EventSet.objects.filter(
+            club_id=self.club_id, create_page=True, slug__iexact=self.slug
+        ).exists():
+            errors.append("Event Set with this Club and Slug already exists.")
         if errors:
             raise ValidationError(errors)
         super().validate_unique(exclude)
