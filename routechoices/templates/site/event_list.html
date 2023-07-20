@@ -73,11 +73,13 @@
     <h4 class="padded-multiline"><span>{{event_set.name}}</span></h4>
   </div>
     {%if event_set.description %}
-    <div class="mx-3 pb-2" style="background-color: #f4f4f4;padding-top: 40px;margin-top:-40px">
-      {{event_set.description|markdownify }}
-    </div>
-    <div class="mx-3 p-0" >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f4f4f4" class="p-0"><path d="M0 0 H1 V1"/></svg>
+    <div>
+      <div class="mx-2 pb-2 px-3" style="background-color: #f4f4f4;padding-top: 40px;margin-top:-40px">
+        {{event_set.description|markdownify }}
+      </div>
+      <div class="mx-2 p-0" >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f4f4f4" class="p-0"><path d="M0 0 H1 V1"/></svg>
+      </div>
     </div>
     {% endif %}
   {% endif %}
