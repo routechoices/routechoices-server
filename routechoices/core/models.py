@@ -983,6 +983,14 @@ class EventSet(models.Model):
         default=False,
         help_text="Whether the page lists the secret events of the event set",
     )
+    description = models.TextField(
+        blank=True,
+        default="",
+        help_text=(
+            "This text will be displayed on the event set page, "
+            "use markdown formatting"
+        ),
+    )
 
     def save(self, *args, **kwargs):
         if not self.create_page:
