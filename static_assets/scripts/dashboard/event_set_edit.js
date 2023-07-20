@@ -16,7 +16,7 @@
   var slugPrefix = u(
     '<br/><span id="id_slug-prefix" class="pe-2" style="color: #999">' +
       window.local.clubUrl +
-      "events/</span>"
+      "/</span>"
   );
   u("#id_slug").before(slugPrefix);
   var slugPrefixWidth = document

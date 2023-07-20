@@ -18,6 +18,7 @@ from routechoices.core.models import (
     DeviceArchiveReference,
     DeviceClubOwnership,
     Event,
+    EventSet,
     ImeiDevice,
     Map,
     MapAssignation,
@@ -163,6 +164,14 @@ class TimeStatusFilter(admin.SimpleListFilter):
             return queryset.filter(start_date__lte=now(), end_date__gte=now())
         else:
             return queryset.all()
+
+
+@admin.register(EventSet)
+class EventSetAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "slug",
+    )
 
 
 @admin.register(Club)
