@@ -1425,6 +1425,7 @@ class Event(models.Model):
                     events.append(
                         {
                             "name": event_set.name,
+                            "data": event_set,
                             "events": events_by_set[event_set.id],
                             "fake": False,
                         }
