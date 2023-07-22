@@ -91,6 +91,32 @@ var supportedLanguages = {
   sv: "Svenska",
 };
 
+var printTime = function (t) {
+  var prependZero = function (x) {
+    return ("0" + x).slice(-2);
+  };
+  t = Math.round(t);
+  var h = Math.floor(t / 3600),
+    m = Math.floor((t % 3600) / 60),
+    s = t % 60;
+  if (h === 0) {
+    var text = m + "min";
+    if (s === 0) {
+      return text;
+    }
+    return text + prependZero(s) + "s";
+  }
+  var text = h + "h";
+  if (m === 0 && s === 0) {
+    return text;
+  }
+  text += prependZero(m) + "min";
+  if (s === 0) {
+    return text;
+  }
+  return text + prependZero(s) + "s";
+};
+
 Array.prototype.findIndex =
   Array.prototype.findIndex ||
   function (callback) {
@@ -136,7 +162,13 @@ L.Control.EventState = L.Control.extend({
     this._div.innerHTML =
       '<div class="m-0 py-0 px-2 fst-italic" style="color: red;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("live-mode") +
-      '</div><div id="big-clock" class="py-0 px-2" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"></div>';
+      "</div>" +
+      '<div class="m-0 py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
+      banana.i18n("tails") +
+      '</span> <span id="tail-length-display" style="text-transform: none">' +
+      printTime(tailLength) +
+      "</span></div>" +
+      '<div id="big-clock" class="py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -151,7 +183,13 @@ L.Control.EventState = L.Control.extend({
     this._div.innerHTML =
       '<div class="m-0 py-0 px-2" style="color: #666;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
       banana.i18n("replay-mode") +
-      '</div><div id="big-clock" class="py-0 px-2" style="color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
+      "</div>" +
+      '<div class="m-0 py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
+      banana.i18n("tails") +
+      '</span> <span id="tail-length-display" style="text-transform: none">' +
+      printTime(tailLength) +
+      "</span></div>" +
+      '<div id="big-clock" class="py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
     u(this._div).css({
       display: "block",
       fontSize: "20px",
@@ -1619,6 +1657,7 @@ function displayOptions(ev) {
       u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
       u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
+      u("#tail-length-display").text(printTime(tailLength));
     });
   u(mainDiv)
     .find("#toggle-controls-switch")
@@ -2485,7 +2524,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023061100`)
+  return fetch(`${langFile}?v=2023072200`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);
