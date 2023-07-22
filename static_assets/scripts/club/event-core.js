@@ -100,9 +100,21 @@ var printTime = function (t) {
     m = Math.floor((t % 3600) / 60),
     s = t % 60;
   if (h === 0) {
-    return m + "m" + prependZero(s) + "s";
+    var text = m + "m";
+    if (s === 0) {
+      return text;
+    }
+    return text + prependZero(s) + "s";
   }
-  return h + "h" + prependZero(m) + "m" + prependZero(s) + "s";
+  var text = h + "h";
+  if (m === 0 && s === 0) {
+    return text;
+  }
+  text += prependZero(m) + "m";
+  if (s === 0) {
+    return text;
+  }
+  return text + prependZero(s) + "s";
 };
 
 Array.prototype.findIndex =
