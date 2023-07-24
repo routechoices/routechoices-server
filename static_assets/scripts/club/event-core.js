@@ -669,6 +669,7 @@ function selectLiveMode(e) {
     var isStillLive = endEvent >= clock.now();
     if (!isStillLive) {
       u("#live_button").hide();
+      u("#archived_event_button").show();
       selectReplayMode();
     }
     if (isLiveMode) {
@@ -764,10 +765,12 @@ function selectReplayMode(e) {
     var isBackLive = !isLiveEvent && endEvent >= clock.now();
     if (!isStillLive) {
       u("#live_button").hide();
+      u("#archived_event_button").show();
       isLiveEvent = false;
     }
     if (isBackLive) {
       u("#live_button").show();
+      u("#archived_event_button").hide();
       isLiveEvent = true;
     }
 
