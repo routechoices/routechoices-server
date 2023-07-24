@@ -622,23 +622,26 @@ class Map(models.Model):
                             pass
                         return cached, CACHED_BLANK_TILE
 
-            n_channels = 4 if img_mime != "image/jpeg" else 3
-            transparent_img = np.zeros(
-                (output_height, output_width, n_channels), dtype=np.uint8
-            )
-            extra_args = []
-            if img_mime == "image/webp":
-                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 10]
-            elif img_mime == "image/jpeg":
-                transparent_img[:, :] = (255, 255, 255)
-                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 10]
             if img_mime == "image/avif":
-                color_coverted = cv2.cvtColor(transparent_img, cv2.COLOR_RGBA2BGRA)
-                pil_image = Image.fromarray(color_coverted)
                 buffer = BytesIO()
+                pil_image = Image.new(
+                    mode="RGBA",
+                    size=(output_height, output_width),
+                    color=(255, 255, 255, 0),
+                )
                 pil_image.save(buffer, "AVIF", quality=10)
                 data_out = buffer.getvalue()
             else:
+                n_channels = 3 if img_mime == "image/jpeg" else 4
+                transparent_img = np.zeros(
+                    (output_height, output_width, n_channels), dtype=np.uint8
+                )
+                extra_args = []
+                if img_mime == "image/webp":
+                    extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 10]
+                elif img_mime == "image/jpeg":
+                    transparent_img[:, :] = (255, 255, 255)
+                    extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 10]
                 _, buffer = cv2.imencode(
                     f".{img_mime[6:]}",
                     transparent_img,
@@ -729,10 +732,6 @@ class Map(models.Model):
                 tile_img, (output_width, output_height), interpolation=cv2.INTER_AREA
             )
         extra_args = []
-        if img_mime == "image/webp":
-            extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
-        elif img_mime == "image/jpeg":
-            extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
         if img_mime == "image/avif":
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_coverted)
@@ -740,6 +739,10 @@ class Map(models.Model):
             pil_image.save(buffer, "AVIF", quality=80)
             data_out = buffer.getvalue()
         else:
+            if img_mime == "image/webp":
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
+            elif img_mime == "image/jpeg":
+                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
             data_out = BytesIO(buffer).getvalue()
 

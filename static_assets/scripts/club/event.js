@@ -249,7 +249,7 @@
           if (endEvent > now) {
             isLiveEvent = true;
             eventStateControl.setLive();
-            u("#archived_event_button").remove();
+            u("#archived_event_button").hide();
           } else {
             eventStateControl.setReplay();
             u("#archived_event_button").text(banana.i18n("archived-event"));
