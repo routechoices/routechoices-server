@@ -96,28 +96,24 @@
     {% for event in event_set.events %}
       <div class="card border-0 shadow mb-3">
         <div class="card-body">
-          <div class="d-flex flex-row bd-highlight justify-content-between">
+          <div class="bd-highlight">
             <div class="px-2 py-1 bd-highlight">
               <div>
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic" style="font-size: 1em;"><b><i>LIVE</i></b></span>
               </div>
-              <div style="color: grey; font-size:0.75em;line-height:0.8em">
-                <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                {% if event.open_registration and not event.ended %}<span> <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
-                {% if event.started and event.allow_route_upload %}<span>  <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
-              </div>
-            </div>
-            <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
-                <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Dropdown menu">
-                  <i class="fa-solid fa-bars"></i>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
-                  {% if event.allow_route_upload or event.open_registration and not event.ended  %}
-                  <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a></li>
+              <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
+                <span>{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
+                {% if event.open_registration %} <span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
+                {% if event.allow_route_upload %} <span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
+                <div class="mt-2">
+                  {% if event.open_registration %}
+                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
                   {% endif %}
-                  <li><a href="{{event.club.nice_url}}{{event.slug}}/export" class="dropdown-item"><i class="fa-solid fa-floppy-disk"></i> Export</a></li>
-                </ul>
+                  {% if event.allow_route_upload %}
+                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                  {% endif %}
+                  <a href="{{event.club.nice_url}}{{event.slug}}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                </div>
               </div>
             </div>
           </div>
@@ -146,7 +142,7 @@
     {% for event in event_set.events reversed %}
       <div class="card border-0 shadow mb-3">
         <div class="card-body">
-          <div class="d-flex flex-row bd-highlight justify-content-between">
+          <div class="bd-highlight">
             <div class="px-2 py-1 bd-highlight">
               <div>
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
@@ -154,24 +150,16 @@
               <div>
                 <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
               </div>
-              <div style="color: grey; font-size:0.75em;line-height:0.8em">
+              <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
                 <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                {% if event.open_registration and not event.ended %}<span> <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
-                {% if event.started and event.allow_route_upload %}<span>  <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
+                {% if event.open_registration %} <span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
+                {% if event.open_registration %}
+                <div class="mt-2">
+                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
+                </div>
+                {% endif %}
               </div>
             </div>
-            {% if event.open_registration and not event.ended  %}
-            <div class="p-2 bd-highlight justify-end">
-              <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
-                <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Dropdown menu">
-                  <i class="fa-solid fa-bars"></i>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
-                  <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor registration</a></li>
-                </ul>
-              </div>
-            </div>
-            {% endif %}
           </div>
         </div>
       </div>
@@ -220,7 +208,7 @@
     {% for event in event_set.events %}
     <div class="card border-0 shadow mb-3">
       <div class="card-body">
-        <div class="d-flex flex-row bd-highlight justify-content-between">
+        <div class="bd-highlight">
           <div class="px-2 py-1 bd-highlight">
             <div>
               <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
@@ -228,23 +216,15 @@
             <div>
               <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
             </div>
-            <div style="color: grey; font-size:0.75em;line-height:0.8em">
+            <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
               <span>{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-              {% if event.open_registration and not event.ended %}<span> <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
-              {% if event.started and event.allow_route_upload %}<span>  <i style="position: relative;z-index:11 !important" data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
-            </div>
-          </div>
-          <div class="p-2 bd-highlight justify-end">
-            <div class="dropdown" style="z-index: {{ forloop.parentloop.revcounter|mult:100000|add:forloop.revcounter }};">
-              <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink-{{event.aid}}" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Dropdown menu">
-                <i class="fa-solid fa-bars"></i>
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink-{{event.aid}}">
-                {% if event.started and event.allow_route_upload or event.open_registration and not event.ended  %}
-                <li><a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="dropdown-item"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a></li>
+              {% if event.allow_route_upload %} <span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
+              <div class="mt-2">
+                {% if event.allow_route_upload %}
+                <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
                 {% endif %}
-                <li><a href="{{event.club.nice_url}}{{event.slug}}/export" class="dropdown-item"><i class="fa-solid fa-floppy-disk"></i> Export</a></li>
-              </ul>
+                <a href="{{event.club.nice_url}}{{event.slug}}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+              </div>
             </div>
           </div>
         </div>
