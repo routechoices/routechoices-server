@@ -6,7 +6,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Exists, OuterRef
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
@@ -172,11 +172,11 @@ class EventSetAdmin(admin.ModelAdmin):
         "name",
         "slug",
         "club",
-        "shortcut_link",
+        "page",
     )
     list_filter = ("club",)
 
-    def shortcut_link(self, obj):
+    def page(self, obj):
         if not obj.create_page:
             return ""
         link = obj.url
@@ -185,6 +185,7 @@ class EventSetAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
+    ordering = ("-creation_date",)
     list_display = (
         "name",
         "creation_date",
@@ -411,6 +412,7 @@ class MapAdmin(admin.ModelAdmin):
         "rotation",
     )
     list_filter = ("club",)
+    list_select_related = ("club",)
 
 
 @admin.register(DeviceClubOwnership)
@@ -441,6 +443,7 @@ admin.site.unregister(UserModel)
 
 @admin.register(UserModel)
 class MyUserAdmin(UserAdmin):
+    ordering = ("-date_joined",)
     list_display = UserAdmin.list_display + (
         "date_joined",
         "has_verified_email",
@@ -455,17 +458,18 @@ class MyUserAdmin(UserAdmin):
             super()
             .get_queryset(request)
             .prefetch_related("club_set")
-            .prefetch_related(
-                Prefetch(
-                    "emailaddress_set",
-                    queryset=EmailAddress.objects.filter(verified=True),
+            .annotate(
+                has_verified_email=Exists(
+                    EmailAddress.objects.filter(user_id=OuterRef("pk"), verified=True)
                 )
             )
         )
 
     @admin.display(boolean=True)
     def has_verified_email(self, obj):
-        return obj.emailaddress_set.exists()
+        return obj.has_verified_email
+
+    has_verified_email.admin_order_field = "has_verified_email"
 
     def clubs(self, obj):
         return ", ".join((c.name for c in obj.club_set.all()))
