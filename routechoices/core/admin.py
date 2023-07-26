@@ -171,7 +171,16 @@ class EventSetAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "slug",
+        "club",
+        "shortcut_link",
     )
+    list_filter = ("club",)
+
+    def shortcut_link(self, obj):
+        if not obj.create_page:
+            return ""
+        link = obj.url
+        return mark_safe(f'<a href="{link}">{link}</a>')
 
 
 @admin.register(Club)
