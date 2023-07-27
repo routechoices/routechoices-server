@@ -169,7 +169,6 @@ function selectizeDeviceInput() {
   });
 
   if (u("#registration-form").nodes.length) {
-    u("#warning-if-open-registration").removeClass("d-none");
     u("#registration-form").on("submit", function (e) {
       e.preventDefault();
       var formData = new FormData(e.target);

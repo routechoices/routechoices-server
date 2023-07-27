@@ -1621,7 +1621,7 @@ function displayOptions(ev) {
           ? `<h4>${banana.i18n("qr-link")}</h4>
 <p class="text-center">
 <img class="p-2" src="${qrDataUrl}" alt="qr"><br/>
-<a class="small fw-bold" href="${qrUrl}">${qrUrl.replace(
+<a class="small fw-bold" style="word-break: break-all;" href="${qrUrl}">${qrUrl.replace(
               /^https?:\/\//,
               ""
             )}</a>

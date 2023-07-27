@@ -35,7 +35,7 @@
     {% if register_form %}
     <div class="col-12">
         <div class="row">
-            <h4 class="padded-multiline"><span>Add competitor</span></h4>
+            <h4 class="padded-multiline"><span>Enter competitor</span></h4>
             <div class="mb-3">
                 <form action="" method="post" id="registration-form">
                     {% csrf_token %}
@@ -50,12 +50,16 @@
     {% if upload_form %}
     <div class="col-12">
         <div class="row">
-            <h4 class="padded-multiline"><span>Competitors route upload</span></h2>
+            <h4 class="padded-multiline"><span>Route upload</span></h2>
             <div class="mb-3">
                 <form action="" method="post" id="upload-form">
                     {% csrf_token %}
                     {% bootstrap_form upload_form %}
-                    <p id="warning-if-open-registration" class="d-none"><i class="fa-solid fa-triangle-exclamation"></i> If you want to upload GPS data to a new competitor first use the "Add competitor form" then this this form.</p>
+                    {% if register_form %}
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> If you want to upload GPS data to a new competitor first use the "Enter competitor" form then this this form.</p>
+                    {% else %}
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> You can upload route of competitors that do not have yet any data uploaded.</p>
+                    {% endif %}
                     <input type="submit" value="Upload Route" class="btn btn-primary">
                 </form>
             </div>
