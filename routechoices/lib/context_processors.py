@@ -12,4 +12,5 @@ def site(request):
     return {
         "site": current_site,
         "enable_analytics": getattr(settings, "ENABLE_ANALYTICS", None),
+        "DEBUG": settings.DEBUG,
     }

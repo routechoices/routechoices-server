@@ -21,6 +21,8 @@ static/*
 htmlcov/*
 env/*
 var/*
+letsencrypt/*
+tmp/*
 log/*
 logs/*
 cache/*

@@ -5,6 +5,8 @@ static/*
 .github/*
 cypress/*
 log/*
+letsencrypt/*
+tmp/*
 logs/*
 .gitignore
 cypress.json

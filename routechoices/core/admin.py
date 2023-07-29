@@ -6,7 +6,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Case, Count, Exists, OuterRef, Value, When
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
@@ -249,6 +249,7 @@ class EventAdmin(admin.ModelAdmin):
         "event_set",
         "club",
         "start_date",
+        "is_live_db",
         "privacy",
         "competitor_count",
         "shortcut_link",
@@ -262,7 +263,24 @@ class EventAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .select_related("event_set")
             .annotate(competitor_count=Count("competitors"))
+            .annotate(
+                is_live_db=Case(
+                    When(
+                        start_date__lt=Value(now()),
+                        end_date__gt=Value(now()),
+                        then=Value(1),
+                    ),
+                    default=Value(0),
+                )
+            )
         )
+
+    @admin.display(boolean=True)
+    def is_live_db(self, obj):
+        return obj.is_live_db
+
+    is_live_db.admin_order_field = "is_live_db"
+    is_live_db.short_description = "Live"
 
     def shortcut_link(self, obj):
         link = obj.shortcut or obj.get_absolute_url()

@@ -321,8 +321,6 @@ SWAGGER_SETTINGS = {
 
 EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
 
-LIVESTREAM_INTERNAL_SECRET = "<change-me>"
-
 POST_LOCATION_SECRETS = ["<replace-me>"]
 
 XFF_TRUSTED_PROXY_DEPTH = 1
