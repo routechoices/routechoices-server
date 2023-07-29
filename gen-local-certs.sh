@@ -3,8 +3,8 @@ set -e
 NAME=routechoices
 DOMAIN=routechoices.dev # Use your own domain name
 
-mkdir -p nginx/certs
-cd nginx/certs
+mkdir -p "letsencrypt/live/${DOMAIN}/"
+cd "letsencrypt/live/${DOMAIN}/"
 
 ######################
 # Become a Certificate Authority
@@ -21,11 +21,11 @@ openssl req -x509 -new -nodes -key ${NAME}CA.key -sha256 \
 # Create CA-signed certs
 ######################
 # Generate a private key
-openssl genrsa -out ${DOMAIN}.key 2048
+openssl genrsa -out privkey.pem 2048
 # Create a certificate-signing request
 openssl req -new \
     -subj "/C=FI/ST=${NAME}/L=${NAME}/O=${NAME}/OU=${NAME}/CN=${DOMAIN}/emailAddress=root@${DOMAIN}" \
-    -key ${DOMAIN}.key -out ${DOMAIN}.csr
+    -key privkey.pem -out ${DOMAIN}.csr
 # Create a config file for the extensions
 >${DOMAIN}.ext cat <<-EOF
 authorityKeyIdentifier=keyid,issuer
@@ -38,7 +38,7 @@ DNS.2 = *.${DOMAIN} # Optionally, add additional domains (I've added a subdomain
 EOF
 # Create the signed certificate
 openssl x509 -req -in ${DOMAIN}.csr -CA ${NAME}CA.pem -CAkey ${NAME}CA.key -CAcreateserial \
-    -out ${DOMAIN}.crt -days 825 -sha256 -extfile ${DOMAIN}.ext
+    -out fullchain.pem -days 825 -sha256 -extfile ${DOMAIN}.ext
 
 rm -f ${NAME}CA.key ${NAME}CA.srl ${DOMAIN}.csr ${DOMAIN}.ext
 
