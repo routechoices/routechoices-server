@@ -28,9 +28,24 @@
          <div class="card-body p-4 p-sm-5">
           <div class="row">
             <div class="row justify-content-between mb-3">
-              <div class="col align-self-center text-center"><img height="150" width="150" alt="Smartphone app" src="{% static '/img/iphone_tracker.png' %}?v=20230509"/></div>
-              <div class="col align-self-center text-center"><img height="150" width="150" alt="Teltonika TMT250" src="{% static '/img/TMT250.png' %}?v=20230509"/></div>
-              <div class="col align-self-center text-center"><img height="150" width="150" alt="Queclink GL320MG" src="{% static '/img/gl320mg.png' %}?v=20230509"/></div>
+              <div class="col align-self-center text-center">
+                <picture>
+                  <source srcset="{% static 'img/iphone_tracker.webp'%}?v=20230731" type="image/webp"/>
+                  <img src="{% static 'img/iphone_tracker.png'%}?v=20230731" alt="Smartphone app" height="150" width="150"/>
+                </picture>
+              </div>
+              <div class="col align-self-center text-center">
+                <picture>
+                  <source srcset="{% static '/img/TMT250.webp'%}?v=20230731" type="image/webp"/>
+                  <img src="{% static '/img/TMT250.png'%}?v=20230731" alt="Teltonika TMT250" height="150" width="150">
+                </picture>
+              </div>
+              <div class="col align-self-center text-center">
+                <picture>
+                  <source srcset="{% static '/img/gl320mg.webp'%}?v=20230731" type="image/webp"/>
+                  <img src="{% static '/img/gl320mg.png'%}?v=20230731" alt="Queclink GL320MG" height="150" width="150"/>
+                </picture>
+              </div>
             </div>
           </div>
           <p>Upload of location to provide live GPS tracking can be done in two different way. Using a smartphone application or using a supported dedicated GPS tracker.</p>
