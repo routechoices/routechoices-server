@@ -11,8 +11,8 @@
           <p>You haven't created any map yet.</p>
           {% endif %}
           <a href="{% url 'dashboard:map_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-image"></i> Create from Image</a>
-          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary mb-1"><img alt="kmz" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from KMZ/KML</a>
-          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary mb-1"><img alt="kmz" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from GPX</a>
+          <a href="{% url 'dashboard:map_upload_kmz_view'%}" class="btn btn-secondary ms-1 mb-1"><img alt="kmz" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from KMZ/KML</a>
+          <a href="{% url 'dashboard:map_upload_gpx_view'%}" class="btn btn-secondary ms-1 mb-1"><img alt="kmz" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub"/> Create from GPX</a>
         </div>
         {% if maps %}
         {% if maps.paginator.num_pages > 1 %}{% bootstrap_pagination maps extra=request.GET.urlencode %}{% endif %}
@@ -25,7 +25,7 @@
                     <td>
                         {% if map.image %}
                         <a class="btn btn-sm btn-primary mb-1" href="{{map.image.url}}"><i class="fa-solid fa-download"></i> Image</a>
-                        <a class="btn btn-sm btn-primary mb-1" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa-solid fa-download"></i> KMZ</a>
+                        <a class="btn btn-sm btn-primary ms-1 mb-1" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa-solid fa-download"></i> KMZ</a>
                         {% endif %}
                     </td>
                 </tr>

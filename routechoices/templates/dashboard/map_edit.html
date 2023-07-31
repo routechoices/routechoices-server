@@ -14,90 +14,90 @@
 
 {% block sub_sub_content %}
 <div class="row">
-    <div id="main" class="col-12">
-        <h1>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h1>
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <p>
-              <span id="calibration_help" {% if context == 'create' %}class="d-none"{% endif %}>
-                <button id="calibration-helper-opener" class="btn btn-info mb-1"><i class="fa-solid fa-screwdriver-wrench"></i> Calibration Tool</button>
-              </span>
-              <span id="calibration_preview" {% if context == 'create' %}class="d-none"{% endif %}>
-                <button id="calibration-preview-opener" class="btn btn-info mb-1"><i class="fa-solid fa-magnifying-glass"></i> Calibration Check</button>
-              </span>
-            </p>
-            <button type="submit" class="btn btn-primary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-            {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> Delete</a>{% endif %}
-        </form>
-        {% if map %}
-        <hr/>
-        {% if used_in %}
-        <h4>Used in following events</h4>
-        <ul>
+  <div id="main" class="col-12">
+    <h1>{% if context == 'edit' %}Edit Map{% else %}New Map{% endif %}</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <p>
+        <span id="calibration_help" {% if context == 'create' %}class="d-none"{% endif %}>
+          <button id="calibration-helper-opener" class="btn btn-info mb-1"><i class="fa-solid fa-screwdriver-wrench"></i> Calibration Tool</button>
+        </span>
+        <span id="calibration_preview" {% if context == 'create' %}class="d-none"{% endif %}>
+          <button id="calibration-preview-opener" class="btn btn-info mb-1"><i class="fa-solid fa-magnifying-glass"></i> Calibration Check</button>
+        </span>
+      </p>
+      <button type="submit" class="btn btn-primary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+      {% if context == 'edit' %}<a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}" class="btn btn-danger ms-1"><i class="fa-solid fa-trash-can"></i> Delete</a>{% endif %}
+    </form>
+    {% if map %}
+    <hr/>
+    {% if used_in %}
+    <h4>Used in following events</h4>
+      <ul>
         {% for event in used_in %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{event.name}}</a></li>{% endfor %}
-        </ul>{% else %}
-        <h4>Not used in any events</h4>
-        {% endif %}
-        {% endif %}
+      </ul>{% else %}
+    <h4>Not used in any events</h4>
+    {% endif %}
+    {% endif %}
+  </div>
+  <div id="calibration-viewer" class="col-12 d-none">
+    <h1>Check Map Calibration</h1>
+    <div class="row">
+      <div class="col-md-12 mb-1">
+        <div id="preview-map" class="leaflet-map">
+        </div>
+      </div>
     </div>
-    <div id="calibration-viewer" class="col-12 d-none">
-      <h1>Check Map Calibration</h1>
+    <div class="row">
+      <div class="col-md-12 mb-1">
+        <button id="back-from-preview-button" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
+      </div>
+    </div>
+  </div>
+  <div id="calibration-helper" class="col-12 d-none">
+    <h1>Calibrate Map</h1>
+    <div class="alert alert-info" role="alert">
+      <span id="calibration-help-text"></span>
+    </div>
+    <div id="calibration-step-1">
+      <div class="row">
+        <div class="col-md-6 mb-1">
+          <div id="raster-map" class="leaflet-map mb-1">
+          </div>
+          <button id="reset-raster-markers-button" class="btn btn-success mb-1" role="button">Delete Image Map Reference Points</button>
+        </div>
+        <div class="col-md-6 mb-1">
+          <div id="world-map" class="leaflet-map mb-1">
+          </div>
+          <button id="reset-world-markers-button" class="btn btn-success mb-1" role="button">Delete World Map Reference Points</button>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-12 mb-1">
-          <div id="preview-map" class="leaflet-map"></div>
+          <button id="close-calibration-button" class="btn btn-danger mb-1" role="button"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
+          <button id="to-calibration-step-2-button" class="d-none btn btn-primary ms-1 mb-1" role="button"><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+          <span id="to-calibration-step-2-button-disabled" class="d-inline-block ms-1" tabindex="0" data-bs-toggle="tooltip" title="First, select 4 distincts points on the raster map and on the world map!">
+            <button class="btn btn-primary disabled mb-1" type="button" disabled><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div id="calibration-step-2" class="d-none">
+      <div class="row">
+        <div class="col-md-12 mb-1">
+          <div id="test-map" class="leaflet-map"></div>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12 mb-1">
-          <button id="back-from-preview-button" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
+          <button id="back-to-step-1-button" class="btn btn-danger"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
+          <button id="validate-calibration-button" class="btn btn-primary ms-1"><i class="fa-solid fa-circle-check"></i> Validate Calibration</button>
         </div>
       </div>
     </div>
-    <div id="calibration-helper" class="col-12 d-none">
-      <h1>Calibrate Map</h1>
-      <div class="alert alert-info" role="alert">
-        <span id="calibration-help-text"></span>
-      </div>
-      <div id="calibration-step-1">
-        <div class="row">
-          <div class="col-md-6 mb-1">
-            <div id="raster-map" class="leaflet-map mb-1"></div>
-            <button id="reset-raster-markers-button" class="btn btn-success mb-1" role="button">Delete Image Map Reference Points</button>
-          </div>
-          <div class="col-md-6 mb-1">
-            <div id="world-map" class="leaflet-map mb-1"></div>
-            <button id="reset-world-markers-button" class="btn btn-success mb-1" role="button">Delete World Map Reference Points</button>
-          </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 mb-1">
-              <button id="close-calibration-button" class="btn btn-danger mb-1" role="button"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
-              <button id="to-calibration-step-2-button" class="d-none btn btn-primary mb-1" role="button"><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
-              <span id="to-calibration-step-2-button-disabled" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="First, select 4 distincts points on the raster map and on the world map!">
-                <button class="btn btn-primary disabled mb-1" type="button" disabled><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
-              </span>
-            </div>
-        </div>
-      </div>
-      <div id="calibration-step-2" class="d-none">
-        <div class="row">
-          <div class="col-md-12 mb-1">
-            <div id="test-map" class="leaflet-map"></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12 mb-1">
-            <button id="back-to-step-1-button" class="btn btn-danger"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
-            <button id="validate-calibration-button" class="btn btn-primary"><i class="fa-solid fa-circle-check"></i> Validate Calibration</button>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
 </div>
-
-</div>
-
 {% endblock %}
 
 {% block extra_body %}

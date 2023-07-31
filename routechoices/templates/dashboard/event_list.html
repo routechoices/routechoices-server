@@ -19,7 +19,7 @@
             <p>You haven't created any events.</p>
             {%endif%}
             <a href="{% url 'dashboard:event_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event</a>
-            <a href="{% url 'dashboard:quick_event_view'%}" class="btn btn-secondary mb-1" data-bs-toggle="tooltip" data-bs-title="Single person GPS tracking without custom maps starting immediately"><i class="fa-solid fa-circle-plus"></i> Quick tracking</a>
+            <a href="{% url 'dashboard:quick_event_view'%}" class="btn btn-secondary ms-1 mb-1" data-bs-toggle="tooltip" data-bs-title="Single person GPS tracking without custom maps starting immediately"><i class="fa-solid fa-circle-plus"></i> Quick tracking</a>
         </div>
         {% if events %}
         {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode %}{% endif %}
