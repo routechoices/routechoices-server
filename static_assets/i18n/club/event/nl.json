@@ -9,9 +9,7 @@
     "show-all": "Toon alles",
     "select-color-for": "Selecteer nieuwe kleur voor $1",
     "replay-mode": "Replay",
-    "switch-replay-mode": "Switch naar Replay",
     "live-mode": "Live",
-    "return-live-mode": "Terug Live",
     "mass-start": "Gelijktijdig",
     "real-time": "Waar",
     "center-map": "Centreer kaart hier",
@@ -46,5 +44,7 @@
     "location": "Lokaliteit",
     "show-location": "Toon mijn locatie",
     "unknown": "Niet beschikbaar",
-    "archived-event": "Gearchiveerd evenement"
+    "archived-event": "Gearchiveerd evenement",
+    "switch-replay-mode": "Switch naar Replay",
+    "return-live-mode": "Terug Live"
 }

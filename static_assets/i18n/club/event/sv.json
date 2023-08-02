@@ -9,9 +9,7 @@
     "show-all": "Visa alla",
     "select-color-for": "Välj ny färg för $1",
     "replay-mode": "Repris",
-    "switch-replay-mode": "Byt till Repris",
     "live-mode": "Live",
-    "return-live-mode": "Tillbaka till Live",
     "mass-start": "Selijktijdig",
     "real-time": "Sann",
     "center-map": "Centrera kartan här",
@@ -46,5 +44,7 @@
     "location": "Läge",
     "show-location": "Visa min läge",
     "unknown": "Ej tillgängligt",
-    "archived-event": "Arkiverad händelse"
+    "archived-event": "Arkiverad händelse",
+    "switch-replay-mode": "Byt till Repris",
+    "return-live-mode": "Tillbaka till Live"
 }

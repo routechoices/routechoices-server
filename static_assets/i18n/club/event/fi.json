@@ -9,9 +9,7 @@
     "show-all": "Näytä kaikki",
     "select-color-for": "Valitse uusi väri kilpailijalle \"$1\"",
     "replay-mode": "Replay",
-    "switch-replay-mode": "Vaihda Replayin",
     "live-mode": "Live",
-    "return-live-mode": "Paluu Liveen",
     "mass-start": "Samanaikainen",
     "real-time": "Totta",
     "center-map": "Keskitä kartta tähän",
@@ -46,5 +44,7 @@
     "location": "Sijainti",
     "show-location": "Näytä sijaintini",
     "unknown": "Ei saatavilla",
-    "archived-event": "Arkistoitu tapahtuma"
+    "archived-event": "Arkistoitu tapahtuma",
+    "switch-replay-mode": "Vaihda Replayin",
+    "return-live-mode": "Paluu Liveen"
 }

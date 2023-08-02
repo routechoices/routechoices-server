@@ -9,9 +9,7 @@
   "show-all": "Ver todo",
   "select-color-for": "Elige nuevo color para $1",
   "replay-mode": "Repetir",
-  "switch-replay-mode": "Cambiar a Repetir",
   "live-mode": "En vivo",
-  "return-live-mode": "Volver al Vivo",
   "mass-start": "Simultáneo",
   "real-time": "Real",
   "center-map": "Centrar mapa aquí",
@@ -46,5 +44,7 @@
   "location": "Ubicación",
   "show-location": "Mostrar mi ubicación",
   "unknown": "No disponible",
-  "archived-event": "Evento archivado"
+  "archived-event": "Evento archivado",
+  "switch-replay-mode": "Cambiar a Repetir",
+  "return-live-mode": "Volver al Vivo"
 }
