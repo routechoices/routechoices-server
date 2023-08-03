@@ -58,7 +58,13 @@
         {% endif %}
         {% endblock %}
     {% endblock %}
-    <script src='https://js.sentry-cdn.com/90a1a7dd37134928b5a981eeb3a20293.min.js' crossorigin="anonymous" data-lazy="no"></script>
+    <script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js"
+      integrity="sha384-5Zu44WQLIjQtAmHoeW6zq6diH9kymV7kGUaYAV1PK5LPCSGURU7y840OHlpaU8NQ"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
+      data-site-version={{version}}
+    ></script>
     {% if enable_analytics %}
     <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
     {% endif %}

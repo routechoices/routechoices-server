@@ -25,6 +25,11 @@ from routechoices.lib.validators import validate_nice_slug
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
+def git_master_hash():
+    with open(os.path.join(settings.BASE_DIR, ".git", "refs", "heads", "master")) as fp:
+        return fp.read()[:7]
+
+
 def epoch_to_datetime(t):
     return datetime.utcfromtimestamp(int(t)).replace(tzinfo=UTC_TZ)
 
