@@ -103,8 +103,8 @@
               </div>
               <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
                 <span>{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                {% if event.open_registration %} <span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
-                {% if event.allow_route_upload %} <span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
+                {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="ms-1 fa-solid fa-user-plus"></i></span>{% endif %}
+                {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="ms-1 fa-solid fa-file-arrow-up"></i></span>{% endif %}
                 <div class="mt-2">
                   {% if event.open_registration %}
                   <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
@@ -152,7 +152,7 @@
               </div>
               <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
                 <span >{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                {% if event.open_registration %} <span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
+                {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="ms-1 fa-solid fa-user-plus"></i></span>{% endif %}
                 {% if event.open_registration %}
                 <div class="mt-2">
                   <a href="{{event.club.nice_url}}{{event.slug}}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
@@ -218,7 +218,7 @@
             </div>
             <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
               <span>{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
-              {% if event.allow_route_upload %} <span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
+              {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="ms-1 fa-solid fa-file-arrow-up"></i></span>{% endif %}
               <div class="mt-2">
                 {% if event.allow_route_upload %}
                 <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
