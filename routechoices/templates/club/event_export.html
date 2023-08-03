@@ -35,8 +35,8 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{% if event.map_title %}{{ event.map_title }}{% else %}Main map{% endif %}</h5>
-            <a href="{{event.club.nice_url}}{{event.slug}}/map/" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> Image</a>
-            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> KMZ</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/map/" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> Image</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> KMZ</a>
             {% if event.ended %}
             <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary mb-1 text-nowrap"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>
             {% endif %}
@@ -48,8 +48,8 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{ map.title }}</h5>
-            <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> Image</a>
-            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> KMZ</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> Image</a>
+            <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> KMZ</a>
             {% if event.ended %}
             <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}/{{forloop.counter|add:1}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary mb-1 text-nowrap"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>
             {% endif %}
@@ -68,7 +68,7 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{ competitor.name }}</h5>
-            <a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-sm btn-primary mb-1"><i class="fa-solid fa-download"></i> GPX</a>
+            <a href="{{ competitor.get_absolute_gpx_url }}" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> GPX</a>
             {% if event.map %}
             <a href="https://mapdump.com/new#title={{ event.name|urlencode }}%20-%20{{competitor.name|urlencode}}&kmz=https:{% host_url 'event_kmz_download' event_id=event.aid host 'api' %}&gpx=https:{% host_url 'competitor_gpx_download' competitor_id=competitor.aid host 'api' %}" class="btn btn-sm btn-primary mb-1" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> MapDump.com</a>
             {% endif %}

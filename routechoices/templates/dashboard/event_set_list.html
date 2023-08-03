@@ -14,7 +14,7 @@
             <a href="{% url 'dashboard:event_set_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event set</a>
         </div>
         {% if event_sets %}
-        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
+        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
         <table class="table table-striped mb-3">
             <thead>
                 <tr>
@@ -33,7 +33,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode %}{% endif %}
+        {% if event_sets.paginator.num_pages > 1 %}{% bootstrap_pagination event_sets extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
         {% endif %}
     </div>
 </div>

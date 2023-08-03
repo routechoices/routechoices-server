@@ -23,7 +23,7 @@
         {% endif %}
     </div>
     {% if devices %}
-    {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
+    {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
     <table class="table table-striped mb-3" style="vertical-align: middle;">
         <thead><tr><th>Device ID</th><th>Nickname</th><th>Last Seen</th><th>Battery&nbsp;%</th><th>Last Used By</th><th></th></tr></thead>
         <tbody>
@@ -41,7 +41,7 @@
         {% endfor %}
     </tbody>
     </table>
-    {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode %}{% endif %}
+    {% if devices.paginator.num_pages > 1 %}{% bootstrap_pagination devices extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
     {% endif %}
     </div>
 </div>

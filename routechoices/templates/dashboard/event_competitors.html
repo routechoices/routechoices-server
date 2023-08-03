@@ -28,7 +28,7 @@
             </div>
             </form>
         </div>
-        {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
+        {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
         <form action="" method="post">
             {% csrf_token %}
             <h3>Competitors</h3>
@@ -62,7 +62,7 @@
                 </tr>
             {% endfor %}
             </table>
-            {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode %}{% endif %}
+            {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
             <button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         </form>
     </div>
