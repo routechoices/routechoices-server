@@ -1,0 +1,4 @@
+#!/bin/sh
+./dc exec django pip install coverage
+./dc exec django coverage run ./manage.py test --parallel
+./dc exec django coverage xml

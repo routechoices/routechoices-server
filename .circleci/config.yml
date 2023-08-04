@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.4.0
+  codecov: codecov/codecov@3.2.5
 
 commands:
   setup-docker:
@@ -47,7 +48,9 @@ jobs:
     - run: ./dc restart nginx
     - run: ./dc restart django
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
-    - run: ./da test --parallel
+    - run: ./test
+    - codecov/upload:
+        file: coverage.xml
     - run: ./dc restart django
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev

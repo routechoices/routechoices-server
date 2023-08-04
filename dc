@@ -32,6 +32,9 @@ elif [ "$1" = 'pipinstall' ]; then
 elif [ "$1" = 'test' ]; then
     shift
     extra_args="run --rm django pytest"
+elif [ "$1" = 'testcov' ]; then
+    extra_args="run --rm django pytest"
+    exit 0
 fi
 
 export GROUPID=$(id -g) USERID=$(id -u)
