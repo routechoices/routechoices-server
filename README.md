@@ -1,4 +1,4 @@
-[![circleci](https://circleci.com/gh/routechoices/routechoices-server.svg?style=shield)](https://circleci.com/gh/routechoices/routechoices-server) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/routechoices/routechoices-server/master.svg)](https://results.pre-commit.ci/latest/github/routechoices/routechoices-server/master)
+[![circleci](https://circleci.com/gh/routechoices/routechoices-server.svg?style=shield)](https://circleci.com/gh/routechoices/routechoices-server) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/routechoices/routechoices-server/master.svg)](https://results.pre-commit.ci/latest/github/routechoices/routechoices-server/master) [![codecov](https://codecov.io/gh/routechoices/routechoices-server/branch/master/graph/badge.svg?token=OZLCAY280V)](https://codecov.io/gh/routechoices/routechoices-server)
 
 
 Routechoices server
