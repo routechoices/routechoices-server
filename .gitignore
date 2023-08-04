@@ -35,3 +35,4 @@ package.json
 nginx/certs/*
 .coverage*
 htmlcov/*
+coverage.xml

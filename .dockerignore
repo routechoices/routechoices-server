@@ -21,3 +21,5 @@ yarn.lock
 *.sqlite3
 yarn.lock
 .git/*
+.coverage
+coverage.xml
