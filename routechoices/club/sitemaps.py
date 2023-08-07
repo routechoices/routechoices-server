@@ -3,7 +3,7 @@ import re
 from django.contrib.sitemaps import Sitemap
 from django.utils.timezone import now
 
-from routechoices.core.models import PRIVACY_PUBLIC, Club, Event
+from routechoices.core.models import PRIVACY_PUBLIC, Club, Event, EventSet
 
 
 class DynamicViewSitemap(Sitemap):
@@ -19,8 +19,14 @@ class DynamicViewSitemap(Sitemap):
         club_root = re.sub(r"^https?://", "", club_root)
 
         events = Event.objects.filter(
-            club__slug=self.club_slug, privacy=PRIVACY_PUBLIC
-        ).select_related("club")
+            club__slug=self.club_slug,
+            privacy=PRIVACY_PUBLIC,
+        )
+        event_sets_with_page = EventSet.objects.filter(
+            club__slug=self.club_slug,
+            create_page=True,
+            list_secret_events=False,
+        )
 
         # below we compute the pages in event list
         event_list = events.filter(end_date__lt=now())
@@ -48,6 +54,8 @@ class DynamicViewSitemap(Sitemap):
         items = (club_root,)
         for p in range(1, page_count):
             items += (f"{club_root}?page={p+1}",)
+        for event_set in event_sets_with_page:
+            items += (f"{club_root}{event_set.slug}",)
         for event in events:
             items += (
                 f"{club_root}{event.slug}",
