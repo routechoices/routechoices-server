@@ -89,7 +89,7 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page %}</a>{% endif %}</h4>
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% endif %}
@@ -135,7 +135,7 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page %}</a>{% endif %}</h4>
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% endif%}
@@ -201,7 +201,7 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page %}</a>{% endif %}</h4>
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% endif %}
