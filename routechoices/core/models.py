@@ -1057,19 +1057,13 @@ class EventSet(models.Model):
         super().validate_unique(exclude)
 
     def extract_event_lists(self, request):
-        event_qs = self.events
+        event_qs = self.events.select_related("club", "event_set").prefetch_related(
+            "competitors"
+        )
         if self.list_secret_events:
-            event_qs = (
-                event_qs.exclude(privacy=PRIVACY_PRIVATE)
-                .select_related("club", "event_set")
-                .prefetch_related("competitors")
-            )
+            event_qs = event_qs.exclude(privacy=PRIVACY_PRIVATE)
         else:
-            event_qs = (
-                event_qs.filter(privacy=PRIVACY_PUBLIC)
-                .select_related("club", "event_set")
-                .prefetch_related("competitors")
-            )
+            event_qs = event_qs.filter(privacy=PRIVACY_PUBLIC)
         past_event_qs = event_qs.filter(end_date__lt=now())
         live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
         upcoming_events_qs = event_qs.filter(

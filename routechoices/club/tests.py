@@ -6,7 +6,7 @@ from django.core.files import File
 from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
-from routechoices.core.models import Club, Event
+from routechoices.core.models import Club, Event, EventSet
 
 
 class ClubViewsTestCase(EssentialApiBase):
@@ -42,6 +42,46 @@ class ClubViewsTestCase(EssentialApiBase):
             host_kwargs={"club_slug": "kiilat"},
             prefix="kiilat",
         )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_event_set_page_loads(self):
+        s = EventSet.objects.create(
+            club=self.club,
+            name="Killa Cup",
+        )
+        Event.objects.create(
+            name="Kiila Cup A",
+            slug="kiila-cup-A",
+            club=self.club,
+            start_date=arrow.now().shift(days=-11).datetime,
+            end_date=arrow.now().shift(days=-10).datetime,
+            event_set=s,
+        )
+        Event.objects.create(
+            name="Kiila Cup B",
+            slug="kiila-cup-B",
+            club=self.club,
+            start_date=arrow.now().shift(hours=-1).datetime,
+            end_date=arrow.now().shift(hours=1).datetime,
+            event_set=s,
+        )
+        client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
+        url = self.reverse_and_check(
+            "event_view",
+            "/kiila-cup",
+            host="clubs",
+            extra_kwargs={"slug": "kiila-cup"},
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        s.create_page = True
+        s.slug = "kiila-cup"
+        s.save()
+
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
 
