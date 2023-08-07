@@ -6,7 +6,7 @@ from django.core.files import File
 from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
-from routechoices.core.models import Club, Event, EventSet
+from routechoices.core.models import Club, Event, EventSet, Map
 
 
 class ClubViewsTestCase(EssentialApiBase):
@@ -83,6 +83,77 @@ class ClubViewsTestCase(EssentialApiBase):
         s.save()
 
         response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_event_map_loads(self):
+        client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
+        raster_map = Map.objects.create(
+            club=self.club,
+            name="Test map",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
+            width=1,
+            height=1,
+        )
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
+        raster_map.save()
+        event = Event.objects.create(
+            name="Kiila Cup 1",
+            slug="kiila-cup-1",
+            club=self.club,
+            start_date=arrow.now().shift(hours=-1).datetime,
+            end_date=arrow.now().shift(hours=1).datetime,
+        )
+        url = self.reverse_and_check(
+            "event_map_view",
+            "/kiila-cup-1/map/",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            extra_kwargs={"slug": "kiila-cup-1"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response["Location"])
+        self.assertEqual(response.status_code, 404)
+
+        event.map = raster_map
+        event.save()
+
+        # event image
+        response = client.get(url)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response["Location"])
+        self.assertEqual(response.status_code, 206)
+
+        # event kmz
+        url = self.reverse_and_check(
+            "event_kmz_view",
+            "/kiila-cup-1/kmz/",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            extra_kwargs={"slug": "kiila-cup-1"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response["Location"])
+        self.assertEqual(response.status_code, 200)
+
+        # event thumbnail
+        url = self.reverse_and_check(
+            "event_map_thumb_download",
+            f"/events/{event.aid}/map-thumb",
+            host="api",
+            extra_kwargs={"event_id": event.aid},
+        )
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_event_pages_loads(self):
