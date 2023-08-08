@@ -30,25 +30,10 @@ class DynamicViewSitemap(Sitemap):
 
         # below we compute the pages in event list
         event_list = events.filter(end_date__lt=now())
-        event_sets = []
-        event_sets_keys = {}
-        for event in event_list[::-1]:
-            key = event.event_set_id or f"e_{event.aid}"
-            if key not in event_sets_keys.keys():
-                event_sets_keys[key] = len(event_sets)
-                event_sets.append(
-                    {
-                        "name": event.event_set_id or event.name,
-                        "events": [
-                            event,
-                        ],
-                        "fake": event.event_set_id is None,
-                    }
-                )
-            else:
-                idx = event_sets_keys[key]
-                event_sets[idx]["events"].append(event)
-        page_count = max(0, (len(event_sets) - 1)) // 25 + 1
+        event_sets_keys = set()
+        for event in event_list:
+            event_sets_keys.add(event.event_set_id or f"e_{event.aid}")
+        page_count = max(0, (len(event_sets_keys) - 1)) // 25 + 1
 
         items = (club_root,)
         for p in range(1, page_count):
