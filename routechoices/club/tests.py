@@ -85,6 +85,48 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_sitemaps_loads(self):
+        client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
+        s = EventSet.objects.create(
+            club=self.club, name="Killa Cup", create_page=True, slug="kiila-cup"
+        )
+        Event.objects.create(
+            name="Kiila Cup A",
+            slug="kiila-cup-A",
+            club=self.club,
+            start_date=arrow.now().shift(days=-11).datetime,
+            end_date=arrow.now().shift(days=-10).datetime,
+            event_set=s,
+        )
+        Event.objects.create(
+            name="Kiila Cup B",
+            slug="kiila-cup-B",
+            club=self.club,
+            start_date=arrow.now().shift(hours=-1).datetime,
+            end_date=arrow.now().shift(hours=1).datetime,
+            event_set=s,
+        )
+        url = self.reverse_and_check(
+            "club_sitemap",
+            "/sitemap.xml",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = self.reverse_and_check(
+            "club_sitemap_sections",
+            "/sitemap-dynamic.xml",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            extra_kwargs={"section": "dynamic"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     def test_event_map_loads(self):
         client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
         raster_map = Map.objects.create(
