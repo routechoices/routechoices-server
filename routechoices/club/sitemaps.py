@@ -33,17 +33,16 @@ class DynamicViewSitemap(Sitemap):
         event_sets = []
         event_sets_keys = {}
         for event in event_list[::-1]:
-            key = event.event_set or f"{event.aid}_E"
-            name = event.event_set or event.name
+            key = event.event_set_id or f"e_{event.aid}"
             if key not in event_sets_keys.keys():
                 event_sets_keys[key] = len(event_sets)
                 event_sets.append(
                     {
-                        "name": name,
+                        "name": event.event_set_id or event.name,
                         "events": [
                             event,
                         ],
-                        "fake": event.event_set is None,
+                        "fake": event.event_set_id is None,
                     }
                 )
             else:
