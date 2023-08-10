@@ -17,7 +17,6 @@
     {
       attribution: "",
       tileSize: 512,
-      className: "wms512",
     }
   );
   banana = new Banana();
@@ -262,51 +261,14 @@
           if (response.maps.length) {
             var mapChoices = {};
             for (var i = 0; i < response.maps.length; i++) {
-              var m = response.maps[i];
-              if (m.default) {
-                m.title = m.title
-                  ? u("<span/>").text(m.title).html()
-                  : '<i class="fa-solid fa-star"></i> Main Map';
-                var bounds = [
-                  [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
-                  [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
-                  [
-                    m.coordinates.bottomRight.lat,
-                    m.coordinates.bottomRight.lon,
-                  ],
-                  [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-                ];
-                rasterMap = addRasterMap(
-                  bounds,
-                  m.hash,
-                  m.max_zoom,
-                  true,
-                  1,
-                  m
-                );
-                mapChoices[m.title] = rasterMap;
-              } else {
-                var bounds = [
-                  [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
-                  [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
-                  [
-                    m.coordinates.bottomRight.lat,
-                    m.coordinates.bottomRight.lon,
-                  ],
-                  [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-                ];
-                mapChoices[m.title] = L.tileLayer.wms(
-                  window.local.wmsServiceUrl + "?v=" + m.hash,
-                  {
-                    layers: window.local.eventId + "/" + (i + 1),
-                    bounds: bounds,
-                    tileSize: 512,
-                    noWrap: true,
-                    className: "wms512",
-                    maxNativeZoom: m.max_zoom,
-                  }
-                );
-                mapChoices[m.title].data = m;
+              var mapData = response.maps[i];
+              mapData.title = mapData.title
+                ? u("<span/>").text(mapData.title).text()
+                : '<i class="fa-solid fa-star"></i> Main Map';
+              var layer = addRasterMapLayer(mapData, i);
+              mapChoices[mapData.title] = layer;
+              if (mapData.default) {
+                setRasterMap(layer, true);
               }
             }
             if (response.maps.length > 1) {
@@ -314,12 +276,7 @@
                 collapsed: false,
               });
               mapSelectorLayer.addTo(map);
-              map.on("baselayerchange", function (e) {
-                map.setBearing(e.layer.data.rotation, { animate: false });
-                map.fitBounds(e.layer.options.bounds, { animate: false });
-                map.zoomIn(0.5, { animate: false });
-                rasterMap = e.layer;
-              });
+              map.on("baselayerchange", onLayerChange);
             }
           } else {
             zoomOnRunners = true;

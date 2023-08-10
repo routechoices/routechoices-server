@@ -48,26 +48,7 @@ function onAddedCompetitorRow(row) {
       lastDeviceSelectInput = new TomSelect(el, seletizeOptions);
     });
 
-  u(row)
-    .find('input[id$="-start_time"]')
-    .each(function (el) {
-      var localTimeDisplay = u(el).parent().find(".local_time");
-      localTimeDisplay.before(
-        '<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2 float-end"><i class="fa-solid fa-clock"></i> Set Now</button>'
-      );
-      u(el)
-        .parent()
-        .find(".set_time_now_btn")
-        .on("click", function (e) {
-          e.preventDefault();
-          var target = u(e.target)
-            .parent()
-            .parent()
-            .find('input[id$="-start_time"]');
-          target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
-          target.trigger("change");
-        });
-    });
+  u(row).find('input[id$="-start_time"]').each(makeFieldNowable);
 
   u(el).attr("autocomplete", "off");
   showLocalTime(el);
@@ -300,25 +281,7 @@ function showLocalTime(el) {
 
   var newSlug = u("#id_name").val() == "";
   var slugEdited = false;
-  u("#id_slug")
-    .parent()
-    .find(".form-text")
-    .text("")
-    .append(
-      '<button class="randomize_btn btn btn-info btn-sm float-end py-1 px-2"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
-    );
-  u(".randomize_btn").on("click", function (e) {
-    e.preventDefault();
-    var target = u(e.target).parent().parent().find(".form-control");
-    var result = "";
-    var characters = "23456789abcdefghijkmnpqrstuvwxyz";
-    var charactersLength = characters.length;
-    for (var i = 0; i < 6; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    target.val(result);
-    target.trigger("blur");
-  });
+  makeFieldRandomizable("#id_slug");
   u("#id_name").on("keyup", function (e) {
     if (!slugEdited) {
       var value = e.target.value;
@@ -445,21 +408,7 @@ function showLocalTime(el) {
   u("#iof_input").on("change", onIofXMLLoaded);
   u(".datetimepicker").each(function (el) {
     u(el).attr("autocomplete", "off");
-
-    var localTimeDisplay = u(el).parent().find(".local_time");
-    localTimeDisplay.before(
-      '<button class="set_time_now_btn btn btn-info btn-sm float-end py-1 px-2"><i class="fa-solid fa-clock"></i> Set Now</button>'
-    );
-    u(el)
-      .parent()
-      .find(".set_time_now_btn")
-      .on("click", function (e) {
-        e.preventDefault();
-        var target = u(e.target).parent().parent().find(".datetimepicker");
-        target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
-        target.trigger("change");
-      });
-
+    makeFieldNowable(el);
     showLocalTime(el);
     el.addEventListener(tempusDominus.Namespace.events.change, function (e) {
       var elId = u(e.target).attr("id");

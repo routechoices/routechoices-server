@@ -59,7 +59,6 @@
 {% endblock %}
 
 {% block extra_body %}
-{{ block.super }}
 <script src="{% static '/scripts/load-local-variables.js' %}"
     data-api-base-url="{% host_url 'api_doc' host 'api' %}"
     data-club-slug="{{ club.slug }}"

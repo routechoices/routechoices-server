@@ -32,12 +32,16 @@
 <h4>Not used in any events</h4>
 {% endif %}
 {% endif %}
+{% endblock %}
+
+{% block extra_body %}
 <script
   src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
   data-club-url="{{club.nice_url}}"></script>
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/slugify-1.6.5/slugify.js' %}"></script>
+<script src="{% static '/scripts/dashboard/common.js' %}"></script>
 <script src="{% static '/scripts/dashboard/event_set_edit.js' %}"></script>
 {% endcompress %}
 {% endblock %}

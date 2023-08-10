@@ -361,6 +361,13 @@ function getContrastYIQ(hexcolor) {
   return yiq <= 168;
 }
 
+function onLayerChange(event) {
+  map.setBearing(event.layer.data.rotation, { animate: false });
+  map.fitBounds(event.layer.options.bounds, { animate: false });
+  map.zoomIn(0.5, { animate: false });
+  rasterMap = event.layer;
+}
+
 function getRunnerIcon(color, faded = false, focused = false) {
   var iconSize = 16;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
@@ -387,33 +394,26 @@ function getRunnerNameMarker(
   faded = false,
   focused = false
 ) {
-  var iconHtml =
-    '<span style="' +
-    (focused
-      ? "padding-bottom: 0px;border-bottom: 4px solid " + color + ";"
-      : "") +
-    "opacity: " +
-    (faded ? 0.4 : 0.75) +
-    ";color: " +
-    color +
-    '">' +
-    u("<span/>").text(name).html() +
-    "</span>";
-  var iconClass =
-    "runner-icon runner-icon-" +
-    (isDark ? "dark" : "light") +
-    (needFlagsEmojiPolyfill ? " flags-polyfill" : "") +
-    (focused ? " icon-focused" : "");
-  var ic2 =
-    iconClass +
-    " leaflet-marker-icon leaflet-zoom-animated leaflet-interactive";
+  var iconStyle = `color: ${color};opacity: ${faded ? 0.4 : 0.75};${
+    focused ? `padding-bottom: 0px;border-bottom: 4px solid ${color};` : ""
+  }`;
+  var iconHtml = `<span style="${iconStyle}">${u("<span/>")
+    .text(name)
+    .text()}</span>`;
+  var iconClass = `runner-icon runner-icon-${isDark ? "dark" : "light"}${
+    needFlagsEmojiPolyfill ? " flags-polyfill" : ""
+  }${focused ? " icon-focused" : ""}`;
+
+  // mesure tagname width
+  var tmpIconClass = `${iconClass} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
   var nameTagEl = document.createElement("div");
-  nameTagEl.className = ic2;
+  nameTagEl.className = tmpIconClass;
   nameTagEl.innerHTML = iconHtml;
   var mapEl = document.getElementById("map");
   mapEl.appendChild(nameTagEl);
   var nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
   mapEl.removeChild(nameTagEl);
+
   var runnerIcon = L.divIcon({
     className: iconClass,
     html: iconHtml,
@@ -898,74 +898,45 @@ function refreshEventData() {
         JSON.stringify(response.maps) !== prevMapsJSONData
       ) {
         prevMapsJSONData = JSON.stringify(response.maps);
-        var currentMapNewData = response.maps.find(function (m) {
+        var currentMapUpdated = response.maps.find(function (m) {
           return (
             rasterMap &&
             m.id === rasterMap.data.id &&
             m.modification_date !== rasterMap.data.modification_date
           );
         });
-        var currentMapStillExists = response.maps.find(function (m) {
+        var currentMap = response.maps.find(function (m) {
           return rasterMap && m.id === rasterMap.data.id;
         });
-        if (rasterMap && (currentMapNewData || response.maps.length <= 1)) {
+        if (rasterMap && (currentMapUpdated || response.maps.length <= 1)) {
           rasterMap.remove();
-        }
-        if (mapSelectorLayer) {
-          mapSelectorLayer.remove();
         }
         if (response.maps.length) {
           var mapChoices = {};
           for (var i = 0; i < response.maps.length; i++) {
-            var m = response.maps[i];
+            var mapData = response.maps[i];
+            mapData.title =
+              !mapData.title && mapData.default
+                ? '<i class="fa-solid fa-star"></i> Main Map'
+                : u("<i/>").text(mapData.title).text();
+            var layer = addRasterMapLayer(mapData, i);
+            mapChoices[mapData.title] = layer;
+
+            var isSingleMap = response.maps.length === 1;
+            var isCurrentMap = currentMap?.id === mapData.id;
+            var isItNewDefaultWhenCurrentDeleted =
+              !currentMap && mapData.default;
             if (
-              (currentMapStillExists && m.id === currentMapStillExists.id) ||
-              (!currentMapStillExists && m.default) ||
-              response.maps.length === 1
+              isSingleMap ||
+              isCurrentMap ||
+              isItNewDefaultWhenCurrentDeleted
             ) {
-              m.title =
-                !m.title && m.default
-                  ? '<i class="fa-solid fa-star"></i> Main Map'
-                  : u("<span/>").text(m.title).html();
-              var bounds = [
-                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
-                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
-                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
-                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-              ];
-              rasterMap = addRasterMap(
-                bounds,
-                m.hash,
-                m.max_zoom,
-                currentMapNewData || response.maps.length === 1,
-                i + 1,
-                m
-              );
-              mapChoices[m.title] = rasterMap;
-            } else {
-              m.title =
-                !m.title && m.default
-                  ? '<i class="fa-solid fa-star"></i> Main Map'
-                  : u("<span/>").text(m.title).html();
-              var bounds = [
-                [m.coordinates.topLeft.lat, m.coordinates.topLeft.lon],
-                [m.coordinates.topRight.lat, m.coordinates.topRight.lon],
-                [m.coordinates.bottomRight.lat, m.coordinates.bottomRight.lon],
-                [m.coordinates.bottomLeft.lat, m.coordinates.bottomLeft.lon],
-              ];
-              mapChoices[m.title] = L.tileLayer.wms(
-                window.local.wmsServiceUrl + "?v=" + m.hash,
-                {
-                  layers: window.local.eventId + "/" + (i + 1),
-                  bounds: bounds,
-                  tileSize: 512,
-                  noWrap: true,
-                  className: "wms512",
-                  maxNativeZoom: m.max_zoom,
-                }
-              );
-              mapChoices[m.title].data = m;
+              setRasterMap(layer, currentMapUpdated || isSingleMap);
             }
+          }
+
+          if (mapSelectorLayer) {
+            mapSelectorLayer.remove();
           }
           if (response.maps.length > 1) {
             mapSelectorLayer = L.control.layers(mapChoices, null, {
@@ -974,6 +945,8 @@ function refreshEventData() {
             try {
               mapSelectorLayer.addTo(map);
             } catch (e) {}
+            map.off("baselayerchange", onLayerChange);
+            map.on("baselayerchange", onLayerChange);
           }
         }
       }
@@ -2389,26 +2362,35 @@ function getParameterByName(name) {
   }
 }
 
-function addRasterMap(bounds, hash, maxZoom, fit, idx = 0, data = null) {
-  if (fit === undefined) {
-    fit = false;
-  }
-  var _rasterMap = L.tileLayer.wms(window.local.wmsServiceUrl + "?v=" + hash, {
-    layers: window.local.eventId + (idx ? "/" + idx : ""),
-    bounds: bounds,
-    tileSize: 512,
-    noWrap: true,
-    className: "wms512",
-    maxNativeZoom: maxZoom,
-  });
-  _rasterMap.data = data;
-  _rasterMap.addTo(map);
+function addRasterMapLayer(mapData, indexEventMap) {
+  var bounds = ["topLeft", "topRight", "bottomRight", "bottomLeft"].map(
+    function (corner) {
+      var cornerCoords = mapData.coordinates[corner];
+      return [cornerCoords.lat, cornerCoords.lon];
+    }
+  );
+  var layer = L.tileLayer.wms(
+    `${window.local.wmsServiceUrl}?v=${mapData.hash}`,
+    {
+      layers: `${window.local.eventId}/${indexEventMap + 1}`,
+      bounds: bounds,
+      tileSize: 512,
+      noWrap: true,
+      maxNativeZoom: mapData.max_zoom,
+    }
+  );
+  layer.data = mapData;
+  return layer;
+}
+
+function setRasterMap(layer, fit) {
+  layer.addTo(map);
   if (fit) {
-    map.setBearing(data.rotation, { animate: false });
-    map.fitBounds(bounds, { animate: false });
+    map.setBearing(layer.data.rotation, { animate: false });
+    map.fitBounds(layer.options.bounds, { animate: false });
     map.zoomIn(0.5, { animate: false });
   }
-  return _rasterMap;
+  rasterMap = layer;
 }
 
 function centerMap(e) {
