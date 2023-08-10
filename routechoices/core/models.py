@@ -526,7 +526,7 @@ class Map(models.Model):
         ll_b = self.map_xy_to_wsg84(self.width, 0)
         ll_c = self.map_xy_to_wsg84(self.width, self.height)
         ll_d = self.map_xy_to_wsg84(0, self.height)
-        return (
+        resolution = (
             distance_xy(0, 0, 0, self.height)
             + distance_xy(0, self.height, self.width, self.height)
             + distance_xy(self.width, self.height, self.width, 0)
@@ -537,6 +537,7 @@ class Map(models.Model):
             + distance_latlon(ll_c, ll_d)
             + distance_latlon(ll_d, ll_a)
         )
+        return round(resolution, 3)
 
     @property
     def max_zoom(self):
