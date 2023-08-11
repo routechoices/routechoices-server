@@ -554,7 +554,7 @@ class Map(models.Model):
         tr = self.map_xy_to_spherical_mercator(self.width, 0)
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
-        return -(
+        rot = (
             (
                 math.atan2(tr[1] - tl[1], tr[0] - tl[0])
                 + math.atan2(br[1] - bl[1], br[0] - bl[0])
@@ -564,13 +564,14 @@ class Map(models.Model):
                 - math.pi
             )
         ) / 4 * 180 / math.pi
+        return round(-rot, 2)
 
     @property
     def north_rotation(self):
-        rot = self.rotation + 180
+        rot = 180 - self.rotation
         if rot > 45:
             rot = (rot - 45) % 90 - 45
-        return -round(rot, 2)
+        return round(rot, 2)
 
     def tile_cache_key(
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
