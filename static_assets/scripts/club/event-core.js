@@ -34,6 +34,7 @@ var fetchPositionInterval = 10;
 var playbackRate = 8;
 var playbackPaused = true;
 var prevDisplayRefresh = 0;
+var prevMeterDisplayRefresh = 0;
 var tailLength = 60;
 var isCurrentlyFetchingRoutes = false;
 var currentTime = 0;
@@ -74,7 +75,6 @@ var startEvent = null;
 var initialCompetitorDataLoaded = false;
 var maxParticipantsDisplayed = 500;
 var nbShown = 0;
-var smoothFactor = 1;
 var prevMapsJSONData = null;
 var mapSelectorLayer = null;
 var sidebarShown = true;
@@ -663,8 +663,12 @@ function selectLiveMode(e) {
     currentTime =
       +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
     if (ts - prevDisplayRefresh > 100) {
-      drawCompetitors();
+      var refreshMeters = ts - prevMeterDisplayRefresh > 500;
+      drawCompetitors(refreshMeters);
       prevDisplayRefresh = ts;
+      if (refreshMeters) {
+        prevMeterDisplayRefresh = ts;
+      }
     }
     var isStillLive = endEvent >= clock.now();
     if (!isStillLive) {
@@ -714,6 +718,7 @@ function selectReplayMode(e) {
   isLiveMode = false;
   playbackPaused = true;
   prevDisplayRefresh = performance.now();
+  prevMeterDisplayRefresh = performance.now();
   prevShownTime = getCompetitionStartDate();
   playbackRate = 8;
   function whileReplay(ts) {
@@ -756,7 +761,11 @@ function selectReplayMode(e) {
       }
     }
     if (ts - prevDisplayRefresh > 100) {
-      drawCompetitors();
+      var refreshMeters = ts - prevMeterDisplayRefresh > 500;
+      drawCompetitors(refreshMeters);
+      if (refreshMeters) {
+        prevMeterDisplayRefresh = ts;
+      }
       prevDisplayRefresh = ts;
       prevShownTime = currentTime;
     }
@@ -1122,6 +1131,89 @@ function toggleFocusCompetitor(c) {
     c.focused = true;
     u("#focusedIcon-" + c.id).addClass("route-focused");
     zoomOnCompetitor(c);
+  }
+}
+
+function redrawCompetitorMarker(competitor, location, faded) {
+  var coordinates = [location.coords.latitude, location.coords.longitude];
+  if (!competitor.mapMarker) {
+    var runnerIcon = getRunnerIcon(
+      competitor.color,
+      faded,
+      competitor.highlighted
+    );
+    competitor.mapMarker = L.marker(coordinates, { icon: runnerIcon });
+    competitor.mapMarker.addTo(map);
+  } else {
+    competitor.mapMarker.setLatLng(coordinates);
+  }
+}
+
+function redrawCompetitorNametag(competitor, location, faded) {
+  var coordinates = [location.coords.latitude, location.coords.longitude];
+  var pointX = map.latLngToContainerPoint(coordinates).x;
+  var mapMiddleX = map.getSize().x / 2;
+  var nametagOnRightSide = pointX > mapMiddleX;
+  var nametagChangeSide =
+    competitor.nameMarker &&
+    ((competitor.isNameOnRight && !nametagOnRightSide) ||
+      (!competitor.isNameOnRight && nametagOnRightSide));
+  if (nametagChangeSide) {
+    map.removeLayer(competitor.nameMarker);
+    competitor.nameMarker = null;
+  }
+  if (!competitor.nameMarker) {
+    competitor.isNameOnRight = nametagOnRightSide;
+    var runnerIcon = getRunnerNameMarker(
+      competitor.short_name,
+      competitor.color,
+      competitor.isColorDark,
+      nametagOnRightSide,
+      faded,
+      competitor.highlighted
+    );
+    competitor.nameMarker = L.marker(coordinates, { icon: runnerIcon });
+    competitor.nameMarker.addTo(map);
+  } else {
+    competitor.nameMarker.setLatLng(coordinates);
+  }
+}
+
+function redrawCompetitorTail(competitor, route, time) {
+  var tail = null;
+  var hasPointInTail = false;
+  if (competitor.displayFullRoute) {
+    tail = route.extractInterval(-Infinity, time);
+    hasPointInTail = route.hasPointInInterval(-Infinity, time);
+  } else {
+    tail = route.extractInterval(time - tailLength * 1e3, time);
+    hasPointInTail = route.hasPointInInterval(time - tailLength * 1e3, time);
+  }
+  if (!hasPointInTail) {
+    if (competitor.tail) {
+      map.removeLayer(competitor.tail);
+    }
+    competitor.tail = null;
+  } else {
+    var tailLatLng = tail
+      .getArray()
+      .filter(function (pos) {
+        return !isNaN(pos.coords.latitude);
+      })
+      .map(function (pos) {
+        return [pos.coords.latitude, pos.coords.longitude];
+      });
+
+    if (!competitor.tail) {
+      competitor.tail = L.polyline(tailLatLng, {
+        color: competitor.color,
+        opacity: 0.75,
+        weight: 5,
+        className: competitor.focused ? "icon-focused" : "",
+      }).addTo(map);
+    } else {
+      competitor.tail.setLatLngs(tailLatLng);
+    }
   }
 }
 
@@ -1677,6 +1769,22 @@ function displayOptions(ev) {
   u("#sidebar").append(mainDiv);
 }
 
+function keepFocusOnCompetitor(competitor, location) {
+  var coordinates = [location.coords.latitude, location.coords.longitude];
+  const mapSize = map.getSize();
+  const placeXY = map.latLngToContainerPoint(coordinates);
+  if (
+    (placeXY.x < mapSize.x / 4 ||
+      placeXY.x > (mapSize.x * 3) / 4 ||
+      placeXY.y < mapSize.y / 4 ||
+      placeXY.y > (mapSize.y * 3) / 4) &&
+    mapSize.x > 0 &&
+    mapSize.y > 0
+  ) {
+    zoomOnCompetitor(competitor);
+  }
+}
+
 function getRelativeTime(currentTime) {
   var viewedTime = currentTime;
   if (!isRealTime) {
@@ -1758,7 +1866,16 @@ function checkVisible(elem) {
   return true;
 }
 
-function drawCompetitors() {
+function clearCompetitorLayers(competitor) {
+  ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+    if (competitor[layerName]) {
+      map.removeLayer(competitor[layerName]);
+    }
+    competitor[layerName] = null;
+  });
+}
+
+function drawCompetitors(refreshMeters) {
   // play/pause button
   if (playbackPaused) {
     var html = '<i class="fa-solid fa-play fa-fw"></i> x' + playbackRate;
@@ -1826,8 +1943,7 @@ function drawCompetitors() {
         ) {
           viewedTime +=
             new Date(competitor.start_time) - getCompetitionStartDate();
-        }
-        if (
+        } else if (
           !isLiveMode &&
           !isRealTime &&
           isCustomStart &&
@@ -1838,389 +1954,204 @@ function drawCompetitors() {
             new Date(competitor.custom_offset) - getCompetitionStartDate()
           );
         }
-        if (finishLineSet) {
-          if (
-            u("#crossing-time").nodes.length &&
-            oldCrossingForNTimes !== u("#crossing-time").val()
-          ) {
-            oldCrossingForNTimes = u("#crossing-time").val() || 1;
-            oldFinishCrosses = [];
-            finishLineCrosses = [];
-          }
-          var allPoints = route.getArray();
-          var oldCrossing = oldFinishCrosses.find(function (el) {
-            return el.competitor.id === competitor.id;
-          });
-          var useOldCrossing = false;
-          var crossCount = 0;
-          if (oldCrossing) {
-            var oldTs = allPoints[oldCrossing.idx].timestamp;
-            if (viewedTime >= oldTs) {
-              if (
-                L.LineUtil.segmentsIntersect(
-                  map.project(finishLinePoints[0], intersectionCheckZoom),
-                  map.project(finishLinePoints[1], intersectionCheckZoom),
-                  map.project(
-                    L.latLng([
-                      allPoints[oldCrossing.idx].coords.latitude,
-                      allPoints[oldCrossing.idx].coords.longitude,
-                    ]),
-                    intersectionCheckZoom
-                  ),
-                  map.project(
-                    L.latLng([
-                      allPoints[oldCrossing.idx - 1].coords.latitude,
-                      allPoints[oldCrossing.idx - 1].coords.longitude,
-                    ]),
-                    intersectionCheckZoom
-                  )
-                )
-              ) {
-                crossCount++;
-                if (crossCount == oldCrossingForNTimes) {
-                  var competitorTime = allPoints[oldCrossing.idx].timestamp;
-                  if (
-                    !isLiveMode &&
-                    !isRealTime &&
-                    !isCustomStart &&
-                    competitor.start_time
-                  ) {
-                    competitorTime -=
-                      new Date(competitor.start_time) -
-                      getCompetitionStartDate();
-                  }
-                  if (
-                    !isLiveMode &&
-                    !isRealTime &&
-                    isCustomStart &&
-                    competitor.custom_offset
-                  ) {
-                    competitorTime -= Math.max(
-                      0,
-                      new Date(competitor.custom_offset) -
-                        getCompetitionStartDate()
-                    );
-                  }
-                  if (getRelativeTime(competitorTime) > 0) {
-                    finishLineCrosses.push({
-                      competitor: competitor,
-                      time: competitorTime,
-                      idx: oldCrossing.idx,
-                    });
-                    useOldCrossing = true;
-                  }
-                }
-              }
-            }
-          }
-          if (!useOldCrossing) {
-            var crossCount = 0;
-            for (var i = 1; i < allPoints.length; i++) {
-              var tPoint = allPoints[i];
-              if (viewedTime < tPoint.timestamp) {
-                break;
-              }
-              if (
-                L.LineUtil.segmentsIntersect(
-                  map.project(finishLinePoints[0], intersectionCheckZoom),
-                  map.project(finishLinePoints[1], intersectionCheckZoom),
-                  map.project(
-                    L.latLng([tPoint.coords.latitude, tPoint.coords.longitude]),
-                    intersectionCheckZoom
-                  ),
-                  map.project(
-                    L.latLng([
-                      allPoints[i - 1].coords.latitude,
-                      allPoints[i - 1].coords.longitude,
-                    ]),
-                    intersectionCheckZoom
-                  )
-                )
-              ) {
-                crossCount++;
-                if (crossCount == oldCrossingForNTimes) {
-                  var competitorTime = tPoint.timestamp;
-                  if (
-                    !isLiveMode &&
-                    !isRealTime &&
-                    !isCustomStart &&
-                    competitor.start_time
-                  ) {
-                    competitorTime -=
-                      new Date(competitor.start_time) -
-                      getCompetitionStartDate();
-                  }
-                  if (
-                    !isLiveMode &&
-                    !isRealTime &&
-                    isCustomStart &&
-                    competitor.custom_offset
-                  ) {
-                    competitorTime -= Math.max(
-                      0,
-                      new Date(competitor.custom_offset) -
-                        getCompetitionStartDate()
-                    );
-                  }
-                  if (getRelativeTime(competitorTime) > 0) {
-                    finishLineCrosses.push({
-                      competitor: competitor,
-                      time: competitorTime,
-                      idx: i,
-                    });
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
+        var loc = route.getByTime(viewedTime);
         var hasPointLast30sec = route.hasPointInInterval(
           viewedTime - 30 * 1e3,
           viewedTime
         );
-        var loc = route.getByTime(viewedTime);
-
         if (competitor.focused) {
-          const mapSize = map.getSize();
-          const placeXY = map.latLngToContainerPoint([
-            loc.coords.latitude,
-            loc.coords.longitude,
-          ]);
-          if (
-            (placeXY.x < mapSize.x / 4 ||
-              placeXY.x > (mapSize.x * 3) / 4 ||
-              placeXY.y < mapSize.y / 4 ||
-              placeXY.y > (mapSize.y * 3) / 4) &&
-            mapSize.x > 0 &&
-            mapSize.y > 0
-          ) {
-            zoomOnCompetitor(competitor);
-          }
+          keepFocusOnCompetitor(competitor, loc);
         }
 
-        if (viewedTime < route.getByIndex(0).timestamp) {
-          ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-            if (competitor[layerName]) {
-              map.removeLayer(competitor[layerName]);
-            }
-            competitor[layerName] = null;
-          });
+        var beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
+        if (beforeFirstPoint) {
+          clearCompetitorLayers(competitor);
         }
 
-        if (viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec) {
-          if (!competitor.idle) {
-            ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-              if (competitor[layerName]) {
-                map.removeLayer(competitor[layerName]);
-              }
-              competitor[layerName] = null;
-            });
-            competitor.idle = true;
-          }
-          if (loc && !isNaN(loc.coords.latitude)) {
-            if (competitor.mapMarker == undefined) {
-              var idleColor = tinycolor(competitor.color).setAlpha(0.4);
-              var svgRect = `<svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg"><circle fill="${idleColor.toRgbString()}" cx="4" cy="4" r="3"/></svg>`;
-              var pulseIcon = L.icon({
-                iconUrl: encodeURI("data:image/svg+xml," + svgRect),
-                iconSize: [8, 8],
-                shadowSize: [8, 8],
-                iconAnchor: [4, 4],
-                shadowAnchor: [0, 0],
-                popupAnchor: [0, 0],
+        var isIdle =
+          viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec;
+        if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
+          competitor.idle = isIdle;
+          clearCompetitorLayers(competitor);
+        }
+        if (loc && !isNaN(loc.coords.latitude)) {
+          redrawCompetitorMarker(competitor, loc, isIdle);
+          redrawCompetitorNametag(competitor, loc, isIdle);
+        }
+        redrawCompetitorTail(competitor, route, viewedTime);
+        if (refreshMeters) {
+          // odometer and spedometer
+          var hasPointInTail = route.hasPointInInterval(
+            viewedTime - 30 * 1e3,
+            viewedTime
+          );
+          if (!hasPointInTail) {
+            competitor.speedometer.textContent = "--'--\"/km";
+          } else {
+            if (checkVisible(competitor.speedometer)) {
+              var distance = 0;
+              var prevPos = null;
+              var tail30s = route.extractInterval(
+                viewedTime - 30 * 1e3,
+                viewedTime
+              );
+              tail30s.getArray().forEach(function (pos) {
+                if (prevPos && !isNaN(pos.coords.latitude)) {
+                  distance += pos.distance(prevPos);
+                }
+                prevPos = pos;
               });
-              competitor.mapMarker = L.marker(
-                [loc.coords.latitude, loc.coords.longitude],
-                { icon: pulseIcon }
-              );
-              competitor.mapMarker.addTo(map);
-            } else {
-              competitor.mapMarker.setLatLng([
-                loc.coords.latitude,
-                loc.coords.longitude,
-              ]);
-            }
-            var pointX = map.latLngToContainerPoint([
-              loc.coords.latitude,
-              loc.coords.longitude,
-            ]).x;
-            var mapMiddleX = map.getSize().x / 2;
-            if (
-              pointX > mapMiddleX &&
-              !competitor.isNameOnRight &&
-              competitor.nameMarker
-            ) {
-              map.removeLayer(competitor.nameMarker);
-              competitor.nameMarker = null;
-            } else if (
-              pointX <= mapMiddleX &&
-              competitor.isNameOnRight &&
-              competitor.nameMarker
-            ) {
-              map.removeLayer(competitor.nameMarker);
-              competitor.nameMarker = null;
-            }
-            if (competitor.nameMarker == undefined) {
-              var isOnRight = pointX > mapMiddleX;
-              competitor.isNameOnRight = isOnRight;
-              var runnerIcon = getRunnerNameMarker(
-                competitor.short_name,
-                competitor.color,
-                competitor.isColorDark,
-                isOnRight,
-                true,
-                competitor.highlighted
-              );
-              competitor.nameMarker = L.marker(
-                [loc.coords.latitude, loc.coords.longitude],
-                { icon: runnerIcon }
-              );
-              competitor.nameMarker.addTo(map);
-            } else {
-              competitor.nameMarker.setLatLng([
-                loc.coords.latitude,
-                loc.coords.longitude,
-              ]);
+              var speed = (30 / distance) * 1000;
+              competitor.speedometer.textContent = formatSpeed(speed);
             }
           }
-        } else if (competitor.idle) {
-          ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-            if (competitor[layerName]) {
-              map.removeLayer(competitor[layerName]);
-            }
-            competitor[layerName] = null;
-          });
-          competitor.idle = false;
-        }
+          if (checkVisible(competitor.odometer)) {
+            var totalDistance = route.distanceUntil(viewedTime);
+            competitor.odometer.textContent =
+              (totalDistance / 1000).toFixed(1) + "km";
+          }
 
-        if (loc && !isNaN(loc.coords.latitude) && hasPointLast30sec) {
-          if (!competitor.mapMarker) {
-            var runnerIcon = getRunnerIcon(
-              competitor.color,
-              false,
-              competitor.highlighted
-            );
-            competitor.mapMarker = L.marker(
-              [loc.coords.latitude, loc.coords.longitude],
-              { icon: runnerIcon }
-            );
-            competitor.mapMarker.addTo(map);
-          } else {
-            competitor.mapMarker.setLatLng([
-              loc.coords.latitude,
-              loc.coords.longitude,
-            ]);
-          }
-          var pointX = map.latLngToContainerPoint([
-            loc.coords.latitude,
-            loc.coords.longitude,
-          ]).x;
-          var mapMiddleX = map.getSize().x / 2;
-          if (
-            pointX > mapMiddleX &&
-            !competitor.isNameOnRight &&
-            competitor.nameMarker
-          ) {
-            map.removeLayer(competitor.nameMarker);
-            competitor.nameMarker = null;
-          } else if (
-            pointX <= mapMiddleX &&
-            competitor.isNameOnRight &&
-            competitor.nameMarker
-          ) {
-            map.removeLayer(competitor.nameMarker);
-            competitor.nameMarker = null;
-          }
-          if (competitor.nameMarker == undefined) {
-            var isNameOnRight = pointX > mapMiddleX;
-            var runnerIcon = getRunnerNameMarker(
-              competitor.short_name,
-              competitor.color,
-              competitor.isColorDark,
-              isNameOnRight,
-              false,
-              competitor.highlighted
-            );
-            competitor.isNameOnRight = isNameOnRight;
-            competitor.nameMarker = L.marker(
-              [loc.coords.latitude, loc.coords.longitude],
-              { icon: runnerIcon }
-            );
-            competitor.nameMarker.addTo(map);
-          } else {
-            competitor.nameMarker.setLatLng([
-              loc.coords.latitude,
-              loc.coords.longitude,
-            ]);
-          }
-        }
-        var tail = null;
-        var hasPointInTail = false;
-        if (competitor.displayFullRoute) {
-          tail = route.extractInterval(-Infinity, viewedTime);
-          hasPointInTail = route.hasPointInInterval(-Infinity, viewedTime);
-        } else {
-          tail = route.extractInterval(
-            viewedTime - tailLength * 1e3,
-            viewedTime
-          );
-          hasPointInTail = route.hasPointInInterval(
-            viewedTime - tailLength * 1e3,
-            viewedTime
-          );
-        }
-        if (!hasPointInTail) {
-          if (competitor.tail) {
-            map.removeLayer(competitor.tail);
-          }
-          competitor.tail = null;
-        } else {
-          var tailLatLng = tail
-            .getArray()
-            .filter(function (pos) {
-              return !isNaN(pos.coords.latitude);
-            })
-            .map(function (pos) {
-              return [pos.coords.latitude, pos.coords.longitude];
+          // Splitimes
+          if (finishLineSet) {
+            if (
+              u("#crossing-time").nodes.length &&
+              oldCrossingForNTimes !== u("#crossing-time").val()
+            ) {
+              oldCrossingForNTimes = u("#crossing-time").val() || 1;
+              oldFinishCrosses = [];
+              finishLineCrosses = [];
+            }
+            var allPoints = route.getArray();
+            var oldCrossing = oldFinishCrosses.find(function (el) {
+              return el.competitor.id === competitor.id;
             });
-          if (competitor.tail == undefined) {
-            competitor.tail = L.polyline(tailLatLng, {
-              color: competitor.color,
-              opacity: 0.75,
-              weight: 5,
-              smoothFactor: smoothFactor,
-              className: competitor.focused ? "icon-focused" : "",
-            }).addTo(map);
-          } else {
-            competitor.tail.setLatLngs(tailLatLng);
-          }
-        }
-        var tail30s = route.extractInterval(viewedTime - 30 * 1e3, viewedTime);
-        var hasPointInTail = route.hasPointInInterval(
-          viewedTime - 30 * 1e3,
-          viewedTime
-        );
-        if (!hasPointInTail) {
-          competitor.speedometer.textContent = "--'--\"/km";
-        } else {
-          if (checkVisible(competitor.speedometer)) {
-            var distance = 0;
-            var prevPos = null;
-            tail30s.getArray().forEach(function (pos) {
-              if (prevPos && !isNaN(pos.coords.latitude)) {
-                distance += pos.distance(prevPos);
+            var useOldCrossing = false;
+            var crossCount = 0;
+            if (oldCrossing) {
+              var oldTs = allPoints[oldCrossing.idx].timestamp;
+              if (viewedTime >= oldTs) {
+                if (
+                  L.LineUtil.segmentsIntersect(
+                    map.project(finishLinePoints[0], intersectionCheckZoom),
+                    map.project(finishLinePoints[1], intersectionCheckZoom),
+                    map.project(
+                      L.latLng([
+                        allPoints[oldCrossing.idx].coords.latitude,
+                        allPoints[oldCrossing.idx].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        allPoints[oldCrossing.idx - 1].coords.latitude,
+                        allPoints[oldCrossing.idx - 1].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    )
+                  )
+                ) {
+                  crossCount++;
+                  if (crossCount == oldCrossingForNTimes) {
+                    var competitorTime = allPoints[oldCrossing.idx].timestamp;
+                    if (
+                      !isLiveMode &&
+                      !isRealTime &&
+                      !isCustomStart &&
+                      competitor.start_time
+                    ) {
+                      competitorTime -=
+                        new Date(competitor.start_time) -
+                        getCompetitionStartDate();
+                    }
+                    if (
+                      !isLiveMode &&
+                      !isRealTime &&
+                      isCustomStart &&
+                      competitor.custom_offset
+                    ) {
+                      competitorTime -= Math.max(
+                        0,
+                        new Date(competitor.custom_offset) -
+                          getCompetitionStartDate()
+                      );
+                    }
+                    if (getRelativeTime(competitorTime) > 0) {
+                      finishLineCrosses.push({
+                        competitor: competitor,
+                        time: competitorTime,
+                        idx: oldCrossing.idx,
+                      });
+                      useOldCrossing = true;
+                    }
+                  }
+                }
               }
-              prevPos = pos;
-            });
-            var speed = (30 / distance) * 1000;
-            competitor.speedometer.textContent = formatSpeed(speed);
+            }
+            if (!useOldCrossing) {
+              var crossCount = 0;
+              for (var i = 1; i < allPoints.length; i++) {
+                var tPoint = allPoints[i];
+                if (viewedTime < tPoint.timestamp) {
+                  break;
+                }
+                if (
+                  L.LineUtil.segmentsIntersect(
+                    map.project(finishLinePoints[0], intersectionCheckZoom),
+                    map.project(finishLinePoints[1], intersectionCheckZoom),
+                    map.project(
+                      L.latLng([
+                        tPoint.coords.latitude,
+                        tPoint.coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        allPoints[i - 1].coords.latitude,
+                        allPoints[i - 1].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    )
+                  )
+                ) {
+                  crossCount++;
+                  if (crossCount == oldCrossingForNTimes) {
+                    var competitorTime = tPoint.timestamp;
+                    if (
+                      !isLiveMode &&
+                      !isRealTime &&
+                      !isCustomStart &&
+                      competitor.start_time
+                    ) {
+                      competitorTime -=
+                        new Date(competitor.start_time) -
+                        getCompetitionStartDate();
+                    }
+                    if (
+                      !isLiveMode &&
+                      !isRealTime &&
+                      isCustomStart &&
+                      competitor.custom_offset
+                    ) {
+                      competitorTime -= Math.max(
+                        0,
+                        new Date(competitor.custom_offset) -
+                          getCompetitionStartDate()
+                      );
+                    }
+                    if (getRelativeTime(competitorTime) > 0) {
+                      finishLineCrosses.push({
+                        competitor: competitor,
+                        time: competitorTime,
+                        idx: i,
+                      });
+                      break;
+                    }
+                  }
+                }
+              }
+            }
           }
-        }
-        if (checkVisible(competitor.odometer)) {
-          var totalDistance = route.distanceUntil(viewedTime);
-          competitor.odometer.textContent =
-            (totalDistance / 1000).toFixed(1) + "km";
         }
       }
     })(competitorList[i]);
@@ -2228,14 +2159,14 @@ function drawCompetitors() {
 
   // Create cluster
   if (showClusters) {
-    var listCompWithMarker = [];
-    var gpsPointData = [];
+    var competitorsWithMarker = [];
+    var competitorsLocations = [];
     for (var i = 0; i < competitorList.length; i++) {
       (function (competitor) {
         if (competitor.mapMarker) {
-          listCompWithMarker.push(competitor);
+          competitorsWithMarker.push(competitor);
           var latLon = competitor.mapMarker.getLatLng();
-          gpsPointData.push({
+          competitorsLocations.push({
             location: {
               accuracy: 0,
               latitude: latLon.lat,
@@ -2249,100 +2180,46 @@ function drawCompetitors() {
       .eps(0.015)
       .minPts(1)
       .distance("HAVERSINE")
-      .data(gpsPointData);
-    var gpsPointAssignmentResult = dbscanner();
-    var clusterCenters = dbscanner.getClusters();
+      .data(competitorsLocations);
+    var competitorClusters = dbscanner();
+    var clustersCenter = dbscanner.getClusters();
 
-    Object.keys(clusters).forEach(function (k) {
-      if (gpsPointAssignmentResult.indexOf(k) === -1) {
-        if (clusters[k].mapMarker) {
-          map.removeLayer(clusters[k].mapMarker);
-          clusters[k].mapMarker = null;
-        }
-        if (clusters[k].nameMarker) {
-          map.removeLayer(clusters[k].nameMarker);
-          clusters[k].nameMarker = null;
-        }
+    Object.keys(clusters).forEach(function (key) {
+      if (competitorClusters.indexOf(key) === -1) {
+        ["mapMarker", "nameMarker"].forEach(function (layerName) {
+          if (clusters[key][layerName]) {
+            map.removeLayer(clusters[key][layerName]);
+            clusters[key][layerName] = null;
+          }
+        });
       }
     });
 
-    gpsPointAssignmentResult.forEach(function (d, i) {
+    competitorClusters.forEach(function (d, i) {
       if (d != 0) {
         var cluster = clusters[d] || {};
-        var clusterCenter = clusterCenters[d - 1];
+        var clusterCenter = clustersCenter[d - 1];
         if (!cluster.color) {
-          cluster.color = getColor(i);
+          cluster.color = getColor(d - 1);
           cluster.isColorDark = getContrastYIQ(cluster.color);
         }
-        var competitorInCluster = listCompWithMarker[i];
+        var competitorInCluster = competitorsWithMarker[i];
         ["mapMarker", "nameMarker"].forEach(function (layerName) {
           if (competitorInCluster[layerName]) {
             map.removeLayer(competitorInCluster[layerName]);
           }
           competitorInCluster[layerName] = null;
         });
-        if (cluster.mapMarker) {
-          cluster.mapMarker.setLatLng([
-            clusterCenter.location.latitude,
-            clusterCenter.location.longitude,
-          ]);
-        } else {
-          var runnerIcon = getRunnerIcon(cluster.color);
-          cluster.mapMarker = L.marker(
-            [clusterCenter.location.latitude, clusterCenter.location.longitude],
-            { icon: runnerIcon }
-          );
-          cluster.mapMarker.addTo(map);
-        }
-
-        var pointX = map.latLngToContainerPoint([
-          clusterCenter.location.latitude,
-          clusterCenter.location.longitude,
-        ]).x;
-        var mapMiddleX = map.getSize().x / 2;
-        if (
-          pointX > mapMiddleX &&
-          !cluster.isNameOnRight &&
-          cluster.nameMarker
-        ) {
-          map.removeLayer(cluster.nameMarker);
-          cluster.nameMarker = null;
-        } else if (
-          pointX <= mapMiddleX &&
-          cluster.isNameOnRight &&
-          cluster.nameMarker
-        ) {
-          map.removeLayer(cluster.nameMarker);
-          cluster.nameMarker = null;
-        }
-
-        if (cluster.nameMarker) {
-          cluster.nameMarker.setLatLng([
-            clusterCenter.location.latitude,
-            clusterCenter.location.longitude,
-          ]);
-        } else {
-          var isNameOnRight = pointX > mapMiddleX;
-          cluster.isNameOnRight = isNameOnRight;
-          var groupName = banana.i18n("group") + " " + alphabetizeNumber(d - 1);
-          var runnerIcon = getRunnerNameMarker(
-            groupName,
-            cluster.color,
-            cluster.isColorDark,
-            isNameOnRight.value
-          );
-          cluster.nameMarker = L.marker(
-            [clusterCenter.location.latitude, clusterCenter.location.longitude],
-            { icon: runnerIcon }
-          );
-          cluster.nameMarker.addTo(map);
-        }
+        cluster.name = `${banana.i18n("group")} ${alphabetizeNumber(d - 1)}`;
+        cluster.short_name = cluster.name;
+        var clusterLoc = { coords: clusterCenter.location };
+        redrawCompetitorMarker(cluster, clusterLoc, false);
+        redrawCompetitorNametag(cluster, clusterLoc, false);
         clusters[d] = cluster;
-      } else {
       }
     });
 
-    groupControl.setValues(listCompWithMarker, clusterCenters);
+    groupControl.setValues(competitorsWithMarker, clustersCenter);
   }
   if (finishLineSet) {
     rankControl.setValues(finishLineCrosses);
