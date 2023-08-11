@@ -564,14 +564,14 @@ class Map(models.Model):
                 - math.pi
             )
         ) / 4 * 180 / math.pi
-        return round(-rot, 2)
+        return round(rot, 2)
 
     @property
     def north_rotation(self):
-        rot = 360 - self.rotation
+        rot = self.rotation + 180
         if rot > 45:
             rot = (rot - 45) % 90 - 45
-        return round(rot, 2)
+        return rot
 
     def tile_cache_key(
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
@@ -1570,7 +1570,7 @@ class Event(models.Model):
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
-            img = img.rotate(-round(self.map.rotation / 90) * 90)
+            img = img.rotate(round(self.map.rotation / 90) * 90)
             img_width, img_height = img.size
             is_portrait = img_height > img_width
             if is_portrait:
