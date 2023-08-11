@@ -39,7 +39,7 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
 from routechoices.lib import plausible
@@ -554,22 +554,23 @@ class Map(models.Model):
         tr = self.map_xy_to_spherical_mercator(self.width, 0)
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
-        rot = (
+        return -(
             (
                 math.atan2(tr[1] - tl[1], tr[0] - tl[0])
-                + math.atan2(br[1] - tr[1], br[0] - tr[0])
-                + math.atan2(bl[1] - br[1], bl[0] - br[0])
-                + math.atan2(tl[1] - bl[1], tl[0] - bl[0])
-                + math.pi
+                + math.atan2(br[1] - bl[1], br[0] - bl[0])
+            ) + (
+                math.atan2(tl[1] - bl[1], tl[0] - bl[0])
+                + math.atan2(tr[1] - br[1], tr[0] - br[0])
+                - math.pi
             )
-            / 4
-            * 180
-            / math.pi
-            + 360
-        ) % 360
+        ) / 4 * 180 / math.pi
+
+    @property
+    def north_rotation(self):
+        rot = self.rotation + 180
         if rot > 45:
             rot = (rot - 45) % 90 - 45
-        return round(rot, 2)
+        return -round(rot, 2)
 
     def tile_cache_key(
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
@@ -1550,56 +1551,60 @@ class Event(models.Model):
     def has_notice(self):
         return hasattr(self, "notice")
 
-    def thumbnail(self, msg=""):
+    def thumbnail(self, display_logo, mime="image/jpeg"):
         if self.start_date > now() or not self.map:
+            cache_key = f"map_thumb_blank_{display_logo}_{mime}"
+            cached = cache.get(cache_key)
+            if cached:
+                return cached
             img = Image.new("RGB", (1200, 630), "WHITE")
         else:
             raster_map = self.map
+            cache_key = f"map_thump_{self.aid}_{display_logo}_{self.map.hash}_{mime}"
+            cached = cache.get(cache_key)
+            if cached:
+                return cached
             orig = raster_map.image.open("rb").read()
             img = Image.open(BytesIO(orig)).convert("RGBA")
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
+            img = img.rotate(-round(self.map.rotation / 90) * 90)
+            img_width, img_height = img.size
+            is_portrait = img_height > img_width
+            if is_portrait:
+                w = int(img_width / 3)
+            else:
+                w = int(img_height / 3)
+            h = w * 21 / 40
             img = img.transform(
                 (1200, 630),
                 Image.QUAD,
                 (
-                    int(raster_map.width) / 2 - 300,
-                    int(raster_map.height) / 2 - 158,
-                    int(raster_map.width) / 2 - 300,
-                    int(raster_map.height) / 2 + 157,
-                    int(raster_map.width) / 2 + 300,
-                    int(raster_map.height) / 2 + 157,
-                    int(raster_map.width) / 2 + 300,
-                    int(raster_map.height) / 2 - 158,
+                    int(img_width / 2) - w,
+                    int(img_height / 2) - h,
+                    int(img_width / 2) - w,
+                    int(img_height / 2) + h,
+                    int(img_width / 2) + w,
+                    int(img_height / 2) + h,
+                    int(img_width / 2) + w,
+                    int(img_height / 2) - h,
                 ),
             )
-        font = ImageFont.truetype("routechoices/AtkinsonHyperlegible-Bold.ttf", 60)
-        draw = ImageDraw.Draw(img)
-        w, h = draw.textsize(msg, font=font)
-        x = int((1200 - w) / 2)
-        logo = None
-        y = int((630 - h) / 2)
-        if self.club.logo:
-            logo_b = self.club.logo.open("rb").read()
-            logo = Image.open(BytesIO(logo_b))
-        elif not self.club.domain:
-            logo = Image.open("routechoices/watermark.png")
-        if logo:
-            logo_f = logo.resize((250, 250), Image.ANTIALIAS)
-            img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
-            y = 480
-        color = "black"
-        shadow = "white"
-        if msg:
-            draw.text((x - 1, y - 1), msg, font=font, fill=shadow)
-            draw.text((x + 1, y - 1), msg, font=font, fill=shadow)
-            draw.text((x - 1, y + 1), msg, font=font, fill=shadow)
-            draw.text((x + 1, y + 1), msg, font=font, fill=shadow)
-            draw.text((x, y), msg, font=font, fill=color)
+        if display_logo:
+            logo = None
+            if self.club.logo:
+                logo_b = self.club.logo.open("rb").read()
+                logo = Image.open(BytesIO(logo_b))
+            elif not self.club.domain:
+                logo = Image.open("routechoices/watermark.png")
+            if logo:
+                logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+                img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-        img.save(buffer, "JPEG", quality=80)
+        img.save(buffer, mime[6:].upper(), quality=80)
         data_out = buffer.getvalue()
+        cache.set(cache_key, data_out, 31 * 24 * 3600)
         return data_out
 
 

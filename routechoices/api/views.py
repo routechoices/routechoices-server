@@ -597,7 +597,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": event.map_title,
                 "coordinates": event.map.bound,
-                "rotation": event.map.rotation,
+                "rotation": event.map.north_rotation,
                 "hash": event.map.hash,
                 "max_zoom": event.map.max_zoom,
                 "modification_date": event.map.modification_date,
@@ -616,7 +616,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": m.title,
                 "coordinates": m.map.bound,
-                "rotation": m.map.rotation,
+                "rotation": m.map.north_rotation,
                 "hash": m.map.hash,
                 "max_zoom": m.map.max_zoom,
                 "modification_date": m.map.modification_date,
@@ -1647,7 +1647,12 @@ def event_map_thumb_download(request, event_id):
             or not event.club.admins.filter(id=request.user.id).exists()
         ):
             raise PermissionDenied()
-    data_out = event.thumbnail()
+    display_logo = request.GET.get("no-logo", False) is False
+    http_accept = request.META.get("HTTP_ACCEPT", "")
+    mime = "image/jpeg"
+    if "image/webp" in http_accept.split(","):
+        mime = "image/webp"
+    data_out = event.thumbnail(display_logo, mime)
     headers = None
     if event.privacy == PRIVACY_PRIVATE:
         headers = {"Cache-Control": "Private"}
