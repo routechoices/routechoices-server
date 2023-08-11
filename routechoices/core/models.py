@@ -568,7 +568,7 @@ class Map(models.Model):
 
     @property
     def north_rotation(self):
-        rot = 180 - self.rotation
+        rot = 360 - self.rotation
         if rot > 45:
             rot = (rot - 45) % 90 - 45
         return round(rot, 2)
