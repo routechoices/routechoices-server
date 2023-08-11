@@ -597,7 +597,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": event.map_title,
                 "coordinates": event.map.bound,
-                "rotation": event.map.north_rotation,
+                "rotation": event.map.north_declination,
                 "hash": event.map.hash,
                 "max_zoom": event.map.max_zoom,
                 "modification_date": event.map.modification_date,
@@ -616,7 +616,7 @@ def event_detail(request, event_id):
             map_data = {
                 "title": m.title,
                 "coordinates": m.map.bound,
-                "rotation": m.map.north_rotation,
+                "rotation": m.map.north_declination,
                 "hash": m.map.hash,
                 "max_zoom": m.map.max_zoom,
                 "modification_date": m.map.modification_date,
