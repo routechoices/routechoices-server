@@ -2226,19 +2226,6 @@ function drawCompetitors(refreshMeters) {
   }
 }
 
-function getParameterByName(name) {
-  try {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-      results = regex.exec(location.search);
-    return results === null
-      ? ""
-      : decodeURIComponent(results[1].replace(/\+/g, " "));
-  } catch (err) {
-    return "";
-  }
-}
-
 function addRasterMapLayer(mapData, indexEventMap) {
   var bounds = ["topLeft", "topRight", "bottomRight", "bottomLeft"].map(
     function (corner) {
