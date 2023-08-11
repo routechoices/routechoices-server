@@ -571,7 +571,7 @@ class Map(models.Model):
         rot = self.rotation + 180
         if rot > 45:
             rot = (rot - 45) % 90 - 45
-        return rot
+        return round(rot, 2)
 
     def tile_cache_key(
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
