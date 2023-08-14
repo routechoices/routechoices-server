@@ -22,7 +22,6 @@ djangorestframework
 drf-orjson-renderer
 drf-yasg
 geoip2
-gitpython
 gps-data-codec
 gpxpy
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456

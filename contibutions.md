@@ -74,7 +74,6 @@ PyPi Packages:
     drf-orjson-renderer         MIT License
     drf-yasg                    BSD License
     geoip2                      Apache Software License
-    gitpython                   BSD License
     gps-data-codec              MIT
     gpxpy                       Apache License, Version 2.0
     kagi                        BSD-2-Clause license
