@@ -190,12 +190,14 @@ class ClubViewsTestCase(EssentialApiBase):
 
         # event thumbnail
         url = self.reverse_and_check(
-            "event_map_thumb_download",
-            f"/events/{event.aid}/map-thumb",
-            host="api",
-            extra_kwargs={"event_id": event.aid},
+            "event_map_thumbnail",
+            "/kiila-cup-1/thumbnail",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            extra_kwargs={"slug": "kiila-cup-1"},
+            prefix="kiilat",
         )
-        response = self.client.get(url)
+        response = client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_event_pages_loads(self):

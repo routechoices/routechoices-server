@@ -1074,7 +1074,7 @@ def event_data(request, event_id):
 
     cache_interval = EVENT_CACHE_INTERVAL
     live_cache_ts = int(t0 // cache_interval)
-    live_cache_key = f"live_event_data:{event_id}:{live_cache_ts}"
+    live_cache_key = f"event:{event_id}:data:{live_cache_ts}:live"
     if use_cache and cache.has_key(live_cache_key):
         cache_key_found = live_cache_key
         try:
@@ -1094,9 +1094,9 @@ def event_data(request, event_id):
         return Response(response)
 
     cache_ts = int(t0 // (cache_interval if event.is_live else 7 * 24 * 3600))
-    cache_prefix = "live" if event.is_live else "archived"
-    cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts}"
-    prev_cache_key = f"{cache_prefix}_event_data:{event_id}:{cache_ts - 1}"
+    cache_suffix = "live" if event.is_live else "archived"
+    cache_key = f"event:{event_id}:data:{cache_ts}:{cache_suffix}"
+    prev_cache_key = f"event:{event_id}:data:{cache_ts - 1}:{cache_suffix}"
     # then if we have a cache for that
     # return it if we do
     if use_cache and not event.is_live and cache.has_key(cache_key):
@@ -1629,35 +1629,6 @@ def event_map_download(request, event_id, map_index="1"):
         headers=headers,
         dl=False,
     )
-
-
-@swagger_auto_schema(
-    method="get",
-    auto_schema=None,
-)
-@api_view(["GET"])
-def event_map_thumb_download(request, event_id):
-    event = get_object_or_404(
-        Event.objects.all().select_related("club", "map"),
-        aid=event_id,
-    )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
-    display_logo = request.GET.get("no-logo", False) is False
-    http_accept = request.META.get("HTTP_ACCEPT", "")
-    mime = "image/jpeg"
-    if "image/webp" in http_accept.split(","):
-        mime = "image/webp"
-    data_out = event.thumbnail(display_logo, mime)
-    headers = None
-    if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
-
-    return StreamingHttpRangeResponse(request, data_out, headers=headers)
 
 
 @swagger_auto_schema(

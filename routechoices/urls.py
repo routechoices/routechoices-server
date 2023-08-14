@@ -20,6 +20,7 @@ from django.views.generic.base import RedirectView
 
 from routechoices.dashboard.views import (
     backup_codes,
+    dashboard_banner_download,
     dashboard_logo_download,
     dashboard_map_download,
 )
@@ -69,6 +70,12 @@ urlpatterns = [
         r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
         dashboard_logo_download,
         name="dashboard_logo_download",
+    ),
+    re_path(
+        r"^media/banners/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
+        r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        dashboard_banner_download,
+        name="dashboard_banner_download",
     ),
     path(
         "sitemap.xml",

@@ -11,10 +11,10 @@
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }}" />
 <meta property="og:url" content="{{ event.get_absolute_url }}" />
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:image" content="https:{% host_url 'event_map_thumb_download' event_id=event.aid host 'api' %}" />
+<meta property="og:image" content="{{event.club.nice_url}}{{event.slug}}/thumbnail" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-{% if request.is_secure %}<meta property="og:image:secure_url" content="https:{% host_url 'event_map_thumb_download' event_id=event.aid host 'api' %}" />{% endif %}
+{% if request.is_secure %}<meta property="og:image:secure_url" content="{{event.club.nice_url}}{{event.slug}}/thumbnail" />{% endif %}
 <link rel="canonical" href="{{ event.get_absolute_url }}">
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css' %}"/>

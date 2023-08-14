@@ -1274,6 +1274,27 @@ def dashboard_logo_download(request, club_id, *args, **kwargs):
 
 
 @login_required
+def dashboard_banner_download(request, club_id, *args, **kwargs):
+    if request.user.is_superuser:
+        club = get_object_or_404(Club, aid=club_id, banner__isnull=False)
+    else:
+        club = Club.objects.filter(
+            admins=request.user, aid=club_id, banner__isnull=False
+        ).first()
+    if not club:
+        raise Http404()
+    file_path = club.banner.name
+    return serve_from_s3(
+        settings.AWS_S3_BUCKET,
+        request,
+        file_path,
+        filename=f"{club.name}.webp",
+        mime="image/webp",
+        dl=False,
+    )
+
+
+@login_required
 @requires_club_in_session
 def event_route_upload_view(request, event_id):
     event = get_object_or_404(
