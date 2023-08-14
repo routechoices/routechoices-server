@@ -11,6 +11,7 @@ sitemaps = {
 urlpatterns = [
     re_path(r"^$", views.club_view, name="club_view"),
     re_path(r"^logo/?$", views.club_logo, name="club_logo"),
+    re_path(r"^banner/?$", views.club_banner, name="club_banner"),
     re_path(
         r"(?P<icon_name>favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png)",
         views.club_favicon,

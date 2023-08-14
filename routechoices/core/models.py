@@ -113,6 +113,16 @@ def logo_upload_path(instance=None, file_name=None):
     return os.path.join(*tmp_path)
 
 
+def banner_upload_path(instance=None, file_name=None):
+    tmp_path = ["banners"]
+    time_hash = time_base64()
+    basename = instance.aid + "_" + time_hash
+    tmp_path.append(basename[0])
+    tmp_path.append(basename[1])
+    tmp_path.append(basename)
+    return os.path.join(*tmp_path)
+
+
 class Club(models.Model):
     aid = models.CharField(
         default=random_key,
@@ -174,6 +184,13 @@ Follow our events live or replay them later.
         null=True,
         blank=True,
         help_text="Image of size greater or equal than 128x128 pixels",
+        storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
+    )
+    banner = models.ImageField(
+        upload_to=banner_upload_path,
+        null=True,
+        blank=True,
+        help_text="Image of size greater or equal than 600x315 pixels",
         storage=OverwriteImageStorage(aws_s3_bucket_name=settings.AWS_S3_BUCKET),
     )
     analytics_site = models.URLField(max_length=256, blank=True)
@@ -266,6 +283,10 @@ Follow our events live or replay them later.
     @property
     def logo_url(self):
         return f"{self.nice_url}logo{self.logo_last_mod}"
+
+    @property
+    def banner_url(self):
+        return f"{self.nice_url}banner?v={safe64encodedsha(self.banner.name)}"
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)

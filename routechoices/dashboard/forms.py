@@ -55,7 +55,7 @@ class UserForm(ModelForm):
 class ClubForm(ModelForm):
     class Meta:
         model = Club
-        fields = ["name", "slug", "admins", "website", "logo", "description"]
+        fields = ["name", "slug", "admins", "website", "logo", "banner", "description"]
 
     def clean_slug(self):
         slug = self.cleaned_data["slug"].lower()
@@ -89,9 +89,54 @@ class ClubForm(ModelForm):
             raise ValidationError("Domain prefix already registered.")
         return slug
 
+    def clean_banner(self):
+        banner = self.cleaned_data["banner"]
+        if not banner or "banner" not in self.changed_data:
+            return banner
+        w, h = get_image_dimensions(banner)
+        if w < 600 or h < 315:
+            raise ValidationError("The image is too small, minimum 1200x630 pixels")
+        fn = banner.name
+        with Image.open(banner.file) as image:
+            rgba_img = image.convert("RGBA")
+            r = 1200 / 630
+            if w < h * 1200 / 630:
+                target_w = min([1200, int(h * r)])
+                target_h = int(target_w / r)
+                resized_image = rgba_img.resize((target_w, int(h * target_w / w)))
+                required_loss = resized_image.size[1] - target_h
+                cropped_image = resized_image.crop(
+                    box=(
+                        0,
+                        required_loss / 2,
+                        1200,
+                        resized_image.size[1] - required_loss / 2,
+                    )
+                )
+            else:
+                target_h = min([630, int(w / r)])
+                target_w = int(target_h * r)
+                resized_image = rgba_img.resize((int(w * target_h / h), target_h))
+                required_loss = resized_image.size[0] - target_w
+                cropped_image = resized_image.crop(
+                    box=(
+                        required_loss / 2,
+                        0,
+                        resized_image.size[0] - required_loss / 2,
+                        630,
+                    )
+                )
+            out_buffer = BytesIO()
+            params = {
+                "dpi": (72, 72),
+            }
+            cropped_image.save(out_buffer, "WEBP", **params)
+            f_new = File(out_buffer, name=fn)
+            return f_new
+
     def clean_logo(self):
         logo = self.cleaned_data["logo"]
-        if not logo:
+        if not logo or "logo" not in self.changed_data:
             return logo
         w, h = get_image_dimensions(logo)
         minimum = 128
