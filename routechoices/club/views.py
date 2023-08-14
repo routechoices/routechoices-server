@@ -73,8 +73,8 @@ def club_logo(request, **kwargs):
     )
     if club.domain and not request.use_cname:
         return redirect(club.logo_url)
-    logo_key = f"club_logo:{club.aid}:{club.modification_date.timestamp()}"
-    logo_key_avif = f"club_logo_avif:{club.aid}:{club.modification_date.timestamp()}"
+    logo_key = f"club:{club.aid}:logo:{club.logo.path}"
+    logo_key_avif = f"{logo_key}:avif"
     headers = {}
     http_accept = request.META.get("HTTP_ACCEPT", "")
     serve_avif = "image/avif" in http_accept.split(",")
@@ -125,15 +125,13 @@ def club_banner(request, **kwargs):
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
-    club = get_object_or_404(
-        Club.objects.exclude(logo=""), slug__iexact=club_slug, banner__isnull=False
-    )
+    club = get_object_or_404(Club.objects.exclude(banner=""), slug__iexact=club_slug)
     if club.domain and not request.use_cname:
         return redirect(club.banner_url)
 
     http_accept = request.META.get("HTTP_ACCEPT", "")
     serve_avif = "image/avif" in http_accept.split(",")
-    logo_key = f"club_banner:{serve_avif}:{club.aid}:{club.banner.name}"
+    logo_key = f"club:{club.aid}:banner:{club.banner.path}:{serve_avif}"
 
     headers = {}
     logo = None
@@ -190,6 +188,23 @@ def club_favicon(request, icon_name, **kwargs):
     else:
         data = club.logo_scaled(icon_info["size"], icon_info["format"])
     return StreamingHttpRangeResponse(request, data, content_type=icon_info["mime"])
+
+
+def club_thumbnail(request, **kwargs):
+    bypass_resp = handle_legacy_request("event_club_thumbnail", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(
+        Club,
+        slug__iexact=club_slug,
+    )
+    http_accept = request.META.get("HTTP_ACCEPT", "")
+    mime = "image/jpeg"
+    if "image/webp" in http_accept.split(","):
+        mime = "image/webp"
+    data_out = club.thumbnail(mime)
+    return StreamingHttpRangeResponse(request, data_out)
 
 
 def club_live_event_feed(request, **kwargs):
@@ -440,6 +455,36 @@ def event_contribute_view(request, slug, **kwargs):
             "event_ended": event.end_date < now(),
         },
     )
+
+
+def event_map_thumbnail(request, slug, **kwargs):
+    bypass_resp = handle_legacy_request(
+        "event_map_thumbnail", kwargs.get("club_slug"), slug=slug
+    )
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    event = get_object_or_404(
+        Event.objects.all().select_related("club", "map"),
+        club__slug__iexact=club_slug,
+        slug__iexact=slug,
+    )
+    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
+        if (
+            not request.user.is_authenticated
+            or not event.club.admins.filter(id=request.user.id).exists()
+        ):
+            raise PermissionDenied()
+    display_logo = request.GET.get("no-logo", False) is False
+    http_accept = request.META.get("HTTP_ACCEPT", "")
+    mime = "image/jpeg"
+    if "image/webp" in http_accept.split(","):
+        mime = "image/webp"
+    data_out = event.thumbnail(display_logo, mime)
+    headers = None
+    if event.privacy == PRIVACY_PRIVATE:
+        headers = {"Cache-Control": "Private"}
+    return StreamingHttpRangeResponse(request, data_out, headers=headers)
 
 
 @x_robots_tag

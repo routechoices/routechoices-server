@@ -27,7 +27,7 @@
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="{{ site.name }}" />
 <meta name="twitter:card" content="summary_large_image">{% if not club %}
-<meta property="og:image" content="{% static '/img/og.jpg'%}?t=2022091500" />
+<meta property="og:image" content="{% if club %}{{club.nice_url}}/thumbnail{% else %}{% static '/img/og.jpg'%}?t=2022091500{% endif%}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />{% endif %}
 {% endblock %}
@@ -94,7 +94,7 @@
     </div>
     {% endif %}
     {% for event in event_set.events %}
-      <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{% host_url 'event_map_thumb_download' event_id=event.aid  host 'api'%}?no-logo=1');background-size: cover;background-position: center">
+      <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{event.club.nice_url}}{{event.slug}}/thumbnail?no-logo=1');background-size: cover;background-position: center">
         <div class="card-body">
           <div class="bd-highlight">
             <div class="px-2 py-1 bd-highlight">
@@ -208,7 +208,7 @@
     </div>
     {% endif %}
     {% for event in event_set.events %}
-    <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{% host_url 'event_map_thumb_download' event_id=event.aid  host 'api'%}?no-logo=1');background-size: cover;background-position: center">
+    <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{event.club.nice_url}}{{event.slug}}/thumbnail?no-logo=1');background-size: cover;background-position: center">
       <div class="card-body">
         <div class="bd-highlight">
           <div class="px-2 py-1 bd-highlight">

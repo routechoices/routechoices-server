@@ -288,6 +288,40 @@ Follow our events live or replay them later.
     def banner_url(self):
         return f"{self.nice_url}banner?v={safe64encodedsha(self.banner.name)}"
 
+    def thumbnail(self, mime="image/jpeg"):
+        cache_key = f"club:{self.aid}:thumbnail:{int(self.modification_date)}:{mime}"
+        if not self.banner:
+            cache_key = f"{cache_key}:blank"
+            cached = cache.get(cache_key)
+            if cached:
+                return cached
+            img = Image.new("RGB", (1200, 630), "WHITE")
+        else:
+            banner = self.banner
+
+            cached = cache.get(cache_key)
+            if cached:
+                return cached
+            orig = banner.open("rb").read()
+            img = Image.open(BytesIO(orig)).convert("RGBA")
+            white_bg_img = Image.new("RGBA", img.size, "WHITE")
+            white_bg_img.paste(img, (0, 0), img)
+            img = white_bg_img.convert("RGB")
+        logo = None
+        if self.logo:
+            logo_b = self.logo.open("rb").read()
+            logo = Image.open(BytesIO(logo_b))
+        elif not self.domain:
+            logo = Image.open("routechoices/watermark.png")
+        if logo:
+            logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+            img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
+        buffer = BytesIO()
+        img.save(buffer, mime[6:].upper(), quality=80)
+        data_out = buffer.getvalue()
+        cache.set(cache_key, data_out, 31 * 24 * 3600)
+        return data_out
+
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
         qs = Club.objects.filter(slug__iexact=self.slug)
@@ -365,7 +399,7 @@ class Map(models.Model):
 
     @property
     def data(self):
-        cache_key = f"img_data_{self.image.name}"
+        cache_key = f"map:{self.image.name}:data"
         cached = cache.get(cache_key)
         if cached:
             return cached
@@ -403,7 +437,7 @@ class Map(models.Model):
 
     @property
     def mime_type(self):
-        cache_key = f"img_mime_{self.image.name}"
+        cache_key = f"map:{self.image.name}:mime"
         cached = cache.get(cache_key)
         if cached:
             return cached
@@ -604,9 +638,9 @@ class Map(models.Model):
         self, output_width, output_height, img_mime, min_lon, max_lon, min_lat, max_lat
     ):
         return (
-            f"tiles_{self.aid}_{self.hash}_"
-            f"{output_width}_{output_height}_"
-            f"{min_lon}_{max_lon}_{min_lat}_{max_lat}_"
+            f"map:{self.aid}:{self.hash}:tile:"
+            f"{output_width}x{output_height}:"
+            f"{min_lon},{max_lon},{min_lat},{max_lat}:"
             f"{img_mime}"
         )
 
@@ -638,7 +672,7 @@ class Map(models.Model):
                     return cached, CACHED_TILE
 
         if not self.intersects_with_tile(min_x, max_x, min_y, max_y):
-            blank_cache_key = f"blank_tile_{output_width}_{output_height}_{img_mime}"
+            blank_cache_key = f"tile:blank:{output_width}x{output_height}:{img_mime}"
             if use_cache:
                 try:
                     cached = cache.get(blank_cache_key)
@@ -1566,13 +1600,13 @@ class Event(models.Model):
     def invalidate_cache(self):
         t0 = time.time()
         cache_interval = EVENT_CACHE_INTERVAL
-        for cache_prefix in ("live", "archived"):
+        for cache_suffix in ("live", "archived"):
             cache_ts = int(
-                t0 // (cache_interval if cache_prefix == "live" else 7 * 24 * 3600)
+                t0 // (cache_interval if cache_suffix == "live" else 7 * 24 * 3600)
             )
-            cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts}"
+            cache_key = f"event:{self.aid}:data:{cache_ts}:{cache_suffix}"
             cache.delete(cache_key)
-            cache_key = f"{cache_prefix}_event_data:{self.aid}:{cache_ts - 1}"
+            cache_key = f"event:{self.aid}:data:{cache_ts - 1}:{cache_suffix}"
             cache.delete(cache_key)
 
     @property
@@ -1580,15 +1614,25 @@ class Event(models.Model):
         return hasattr(self, "notice")
 
     def thumbnail(self, display_logo, mime="image/jpeg"):
+        cache_key = (
+            f"map:{self.aid}:{self.hash}:thumbnail:{display_logo}"
+            f":{self.club.modification_date}:{mime}"
+        )
         if self.start_date > now() or not self.map:
-            cache_key = f"map_thumb_blank_{display_logo}_{mime}"
+            cache_key = (
+                f"map:{self.aid}:blank:thumbnail:{display_logo}"
+                f":{self.club.modification_date}:{mime}"
+            )
             cached = cache.get(cache_key)
             if cached:
                 return cached
             img = Image.new("RGB", (1200, 630), "WHITE")
         else:
             raster_map = self.map
-            cache_key = f"map_thump_{self.aid}_{display_logo}_{self.map.hash}_{mime}"
+            cache_key = (
+                f"map:{self.aid}:{raster_map.hash}:thumbnail:{display_logo}"
+                f":{self.club.modification_date}:{mime}"
+            )
             cached = cache.get(cache_key)
             if cached:
                 return cached

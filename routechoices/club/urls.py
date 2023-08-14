@@ -17,6 +17,7 @@ urlpatterns = [
         views.club_favicon,
         name="club_favicon",
     ),
+    re_path(r"^thumbnail/?$", views.club_thumbnail, name="club_thumbnail"),
     path("manifest.json", views.manifest, name="manifest"),
     path("robots.txt", views.robots_txt, name="robots.txt"),
     path(
@@ -53,6 +54,11 @@ urlpatterns = [
         r"(?P<slug>[0-9a-zA-Z_-]+)/contribute/?$",
         views.event_contribute_view,
         name="event_contribute_view",
+    ),
+    re_path(
+        r"^(?P<slug>[0-9a-zA-Z_-]+)/thumbnail/?$",
+        views.event_map_thumbnail,
+        name="event_map_thumbnail",
     ),
     re_path(r"(?P<slug>[0-9a-zA-Z_-]+)/?$", views.event_view, name="event_view"),
 ]

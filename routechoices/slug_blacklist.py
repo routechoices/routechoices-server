@@ -735,6 +735,8 @@ SLUG_BLACKLIST = [
     "tile-proxy",
     "tiles",
     "tiles-proxy",
+    "thumbnail",
+    "thumbnails",
     "tmp",
     "today",
     "todo",
