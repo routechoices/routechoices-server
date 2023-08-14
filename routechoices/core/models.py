@@ -1614,10 +1614,6 @@ class Event(models.Model):
         return hasattr(self, "notice")
 
     def thumbnail(self, display_logo, mime="image/jpeg"):
-        cache_key = (
-            f"map:{self.aid}:{self.hash}:thumbnail:{display_logo}"
-            f":{self.club.modification_date}:{mime}"
-        )
         if self.start_date > now() or not self.map:
             cache_key = (
                 f"map:{self.aid}:blank:thumbnail:{display_logo}"
