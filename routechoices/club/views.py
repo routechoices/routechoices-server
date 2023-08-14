@@ -73,7 +73,7 @@ def club_logo(request, **kwargs):
     )
     if club.domain and not request.use_cname:
         return redirect(club.logo_url)
-    logo_key = f"club:{club.aid}:logo:{club.logo.path}"
+    logo_key = f"club:{club.aid}:logo:{club.logo.name}"
     logo_key_avif = f"{logo_key}:avif"
     headers = {}
     http_accept = request.META.get("HTTP_ACCEPT", "")
@@ -131,7 +131,7 @@ def club_banner(request, **kwargs):
 
     http_accept = request.META.get("HTTP_ACCEPT", "")
     serve_avif = "image/avif" in http_accept.split(",")
-    logo_key = f"club:{club.aid}:banner:{club.banner.path}:{serve_avif}"
+    logo_key = f"club:{club.aid}:banner:{club.banner.name}:{serve_avif}"
 
     headers = {}
     logo = None
