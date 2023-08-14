@@ -289,7 +289,7 @@ Follow our events live or replay them later.
         return f"{self.nice_url}banner?v={safe64encodedsha(self.banner.name)}"
 
     def thumbnail(self, mime="image/jpeg"):
-        cache_key = f"club:{self.aid}:thumbnail:{int(self.modification_date)}:{mime}"
+        cache_key = f"club:{self.aid}:thumbnail:{self.modification_date}:{mime}"
         if not self.banner:
             cache_key = f"{cache_key}:blank"
             cached = cache.get(cache_key)
