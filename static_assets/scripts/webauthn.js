@@ -39,7 +39,7 @@ const doWebAuthn = (formId, func) => {
     return null;
   }
 
-  const webAuthnButton = webAuthnForm.querySelector("button[type=submit]");
+  const webAuthnButton = webAuthnForm.querySelector("button[name=submit]");
   webAuthnButton.disabled = false;
 
   webAuthnForm.addEventListener("submit", async () => {

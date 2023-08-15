@@ -19,7 +19,7 @@
               {% csrf_token %}
               <div id="webauthn-error" style="color: red"></div>
               <div id="webauthn-feature" class="d-grid">
-                <button class="btn btn-primary" id="webauthn-auth-begin" type="submit">
+                <button class="btn btn-primary" id="webauthn-auth-begin" name="submit" type="submit">
                     {% trans "Tap here to log in with your WebAuthn key" %}
                 </button>
               </div>

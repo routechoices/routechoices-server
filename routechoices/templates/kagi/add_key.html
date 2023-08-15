@@ -12,7 +12,7 @@
 <form id="webauthn-provision-form" name="register" method="get">
     {% csrf_token %}
     {% bootstrap_form form %}
-    <button id="webauthn-provision-begin" type="submit" class="btn btn-primary">{% trans 'Add WebAuthn Key' %}</button>
+    <button id="webauthn-provision-begin" name="submit" class="btn btn-primary">{% trans 'Add WebAuthn Key' %}</button>
 </form>
 {% endblock %}
 
