@@ -101,7 +101,7 @@
               <div>
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic" style="font-size: 1em;"><b><i>LIVE</i></b></span>
               </div>
-              <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
+              <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
                 <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
                 {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="me-1 fa-solid fa-user-plus"></i></span>{% endif %}
                 {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="me-1 fa-solid fa-file-arrow-up"></i></span>{% endif %}
@@ -152,7 +152,7 @@
               <div>
                 <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
               </div>
-              <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
+              <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
                 <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
                 {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
                 {% if event.open_registration %}
@@ -218,7 +218,7 @@
             <div>
               <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
             </div>
-            <div style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
+            <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
               <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
               {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
               <div class="mt-2">
