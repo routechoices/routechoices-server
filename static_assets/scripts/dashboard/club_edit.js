@@ -1,6 +1,34 @@
 (function () {
   u("#id_slug").parent().find(".form-label").text("Domain Prefix");
 
+  var currentLogo = u(u("#id_logo").parent().find("div").find("div").first())
+    .find("a")
+    .attr("href");
+  if (currentLogo) {
+    u(u("#id_logo").parent().find("div").find("div").first())
+      .find("a")
+      .html(
+        '<br/><img alt="Current Logo" height="50" width="50" src="' +
+          currentLogo +
+          '"/>'
+      );
+  }
+
+  var currentBanner = u(
+    u("#id_banner").parent().find("div").find("div").first()
+  )
+    .find("a")
+    .attr("href");
+  if (currentBanner) {
+    u(u("#id_banner").parent().find("div").find("div").first())
+      .find("a")
+      .html(
+        '<br/><img alt="Current Logo" height="210" width="400" src="' +
+          currentBanner +
+          '"/>'
+      );
+  }
+
   var newSlug = u("#id_name").val() == "";
   var slugEdited = false;
   u("#id_name").on("keyup", function (e) {
