@@ -23,7 +23,7 @@
     u(u("#id_banner").parent().find("div").find("div").first())
       .find("a")
       .html(
-        '<br/><img alt="Current Logo" height="210" width="400" src="' +
+        '<br/><img alt="Current Banner" height="210" width="400" src="' +
           currentBanner +
           '"/>'
       );
