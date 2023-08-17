@@ -12,13 +12,6 @@
   locale = urlLanguage || storedLanguage || browserLanguage || "en";
   clock = ServerClock({ url: window.local.serverClockUrl, burstSize: 1 });
   setTimeout(clock.stopRefreshes, 1000);
-  backdropMaps["blank"] = L.tileLayer(
-    'data:image/svg+xml,<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect fill="rgb(256,256,256)" width="512" height="512"/></svg>',
-    {
-      attribution: "",
-      tileSize: 512,
-    }
-  );
   banana = new Banana();
   updateText().then(function () {
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
@@ -93,7 +86,6 @@
     u("#event-start-date-text").text(
       banana.i18n("event-start-date-text", startDateTxt)
     );
-
     map = L.map("map", {
       center: [15, 0],
       maxZoom: 18,
@@ -180,7 +172,11 @@
       crossOrigin: true,
       type: "json",
       success: function (response) {
-        backdropMaps[response.event.backdrop || "blank"].addTo(map);
+        if (response.event.backdrop === "blank") {
+          u("#map").css({ background: "#fff" });
+        } else {
+          backdropMaps[response.event.backdrop].addTo(map);
+        }
         var now = clock.now();
         startEvent = new Date(response.event.start_date);
         endEvent = new Date(response.event.end_date);
