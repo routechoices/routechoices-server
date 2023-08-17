@@ -42,10 +42,10 @@
           {% csrf_token %}
           <input id="email_radio_{{forloop.counter}}" type="hidden" name="email" value="{{emailaddress.email}}"/>
           {% if not emailaddress.primary and emailaddress.verified %}
-          <button class="secondaryAction btn btn-sm btn-primary mb-1" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
+          <button class="secondaryAction btn btn-sm btn-primary mb-1 me-1" type="submit" name="action_primary" >{% trans 'Make Primary' %}</button>
           {% endif %}
           {% if not emailaddress.verified %}
-          <button class="secondaryAction btn btn-sm btn-secondary mb-1" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
+          <button class="secondaryAction btn btn-sm btn-secondary mb-1 me-1" type="submit" name="action_send" >{% trans 'Re-send Verification' %}</button>
           {% endif %}
           {% if not emailaddress.primary and user.emailaddress_set.all.count > 1 %}
           <button class="primaryAction btn btn-sm btn-danger mb-1" type="submit" name="action_remove" ><i class="fa-solid fa-trash-can"></i> {% trans 'Remove' %}</button>

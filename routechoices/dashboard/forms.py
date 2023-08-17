@@ -240,8 +240,14 @@ class MapForm(ModelForm):
         model = Map
         fields = ["name", "image", "corners_coordinates"]
 
+    def clean_corners_coordinates(self):
+        cc = self.cleaned_data["corners_coordinates"]
+        return ",".join([f"{round(float(c), 5)}" for c in cc.split(",")])
+
     def clean_image(self):
         f_orig = self.cleaned_data["image"]
+        if "image" not in self.changed_data:
+            return f_orig
         fn = f_orig.name
         with Image.open(f_orig.file) as image:
             rgba_img = image.convert("RGBA")
