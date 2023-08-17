@@ -23,3 +23,9 @@ yarn.lock
 .git/*
 .coverage
 coverage.xml
+docker/*
+__pycache__/*
+.ruff_cache/*
+cache/*
+nginx/*
+var/*

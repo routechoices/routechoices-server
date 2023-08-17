@@ -18,16 +18,15 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.t
 
 
 # final stage
-FROM python:3.11
+FROM python:3.11-slim
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libglib2.0-0 && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
-
-
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends libgdal-dev libgl1 libpq5 && \
-    apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
 RUN pip install --no-cache /wheels/*
 
@@ -58,5 +57,5 @@ RUN DATABASE_URL=none python manage.py collectstatic --noinput
 # Start uWSGI
 # CMD ["/venv/bin/uwsgi", "--http-auto-chunked", "--http-keepalive"]
 
-ADD docker/wait-for-it.sh /wait-for-it.sh
+ADD wait-for-it.sh /wait-for-it.sh
 RUN chmod 755 /wait-for-it.sh

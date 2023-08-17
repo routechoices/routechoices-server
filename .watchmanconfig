@@ -1,3 +1,0 @@
-{
-  "ignore_dirs": [".git", ".idea", ".github", "bin", "cache", "cypress", "docker", "geoip", "log", "media", "nginx", "static", "static_assets", "node_modules"]
- }
