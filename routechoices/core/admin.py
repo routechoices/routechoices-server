@@ -186,7 +186,6 @@ class EventSetAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    ordering = ("-creation_date",)
     list_display = (
         "name",
         "creation_date",
@@ -197,6 +196,10 @@ class ClubAdmin(admin.ModelAdmin):
         "domain",
     )
 
+    def get_ordering(self, request):
+        if request.path.startswith("/admin/core/club"):
+            return ("-creation_date",)
+
     def get_queryset(self, request):
         return (
             super()
@@ -206,7 +209,10 @@ class ClubAdmin(admin.ModelAdmin):
         )
 
     def event_count(self, obj):
-        return obj.event_count
+        return mark_safe(
+            '<a href="/admin/core/event/?club__id__exact='
+            f'{obj.pk}">{obj.event_count}</a>'
+        )
 
     def admin_list(self, obj):
         return ", ".join((a.username for a in obj.admins.all()))
@@ -345,8 +351,7 @@ class DeviceAdmin(admin.ModelAdmin):
             ]
         )
 
-    def get_ordering(self, request):
-        return ["-modification_date", "aid"]
+    ordering = ["-modification_date", "aid"]
 
     def get_queryset(self, request):
         qs = (
