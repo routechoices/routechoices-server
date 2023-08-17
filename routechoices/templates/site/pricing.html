@@ -86,8 +86,10 @@
                     </div>
                     <div>
                         <p>You can become partner and join the following clubs that contribute to maintain the platform alive.</p>
+                        <p><a href="{% url "dashboard:upgrade" %}" class="btn btn-success">Become a Partner Club</a> <a href="https://routechoices.lemonsqueezy.com/checkout" class="btn btn-info">Become an Individual Partner</a></p>
                         <h4 id="partners">Partners</h4>
-                        <div class="row justify-content-between">
+                        <h5>Clubs</h5>
+                        <div class="row justify-content-between mb-3">
                             {% for club in partner_clubs %}
                             <div class="col align-self-center text-center">
                                 {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
@@ -97,6 +99,17 @@
                             </div>
                             {% endfor %}
                         </div>
+                        {% if individual_partners %}
+                        <h5>People</h5>
+                        <div class="row justify-content-between mb-3">
+                            {% for person in individual_partners %}
+                            <div class="col align-self-center text-center">
+                                <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{people.name}}'s avatar" />
+                                <span class="fw-bold">{{ person.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

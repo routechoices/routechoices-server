@@ -2319,3 +2319,14 @@ class TcpDeviceCommand(models.Model):
 
     def __str__(self):
         return f"Command for imei {self.target}"
+
+
+class IndividualDonator(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    upgraded = models.BooleanField(default=False)
+    upgraded_date = models.DateTimeField(blank=True, null=True)
+    order_id = models.CharField(max_length=200, blank=True, default="")
+
+    def __str__(self):
+        return self.name

@@ -51,6 +51,12 @@
             {% if club.website %}</a>{% endif %}
         </div>
         {% endfor %}
+        {% for people in individual_partners %}
+        <div class="col align-self-center text-center">
+            <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{people.name}}'s avatar" />
+            <span class="fw-bold">{{ people.name }}</span>
+        </div>
+        {% endfor %}
       </div>
     </div>
   </div>

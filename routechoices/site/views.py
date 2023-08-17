@@ -1,32 +1,36 @@
-import hashlib
-import hmac
-import json
-
 from allauth.account.forms import LoginForm
 from allauth.account.models import EmailAddress
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.mail import EmailMessage
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
-from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
 
-from routechoices.core.models import Club, Event
+from routechoices.core.models import Club, Event, IndividualDonator
 from routechoices.site.forms import ContactForm
 
 
 def home_page(request):
-    partners = Club.objects.filter(upgraded=True).order_by("name")
-    return render(request, "site/home.html", {"partner_clubs": partners})
+    club_partners = Club.objects.filter(upgraded=True).order_by("name")
+    indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
+    return render(
+        request,
+        "site/home.html",
+        {"partner_clubs": club_partners, "individual_partners": indi_partners},
+    )
 
 
 def pricing_page(request):
     partners = Club.objects.filter(upgraded=True).order_by("name")
-    return render(request, "site/pricing.html", {"partner_clubs": partners})
+    indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
+    return render(
+        request,
+        "site/pricing.html",
+        {"partner_clubs": partners, "individual_partners": indi_partners},
+    )
 
 
 def events_view(request):
@@ -116,54 +120,3 @@ class CustomLoginView(LoginView):
         )
         kwargs.update(self.kwargs.get("extra_context", {}))
         return kwargs
-
-
-@csrf_exempt
-def lemon_webhook(request):
-    digest = hmac.new(
-        settings.LEMONSQUEEZY_SIGNATURE.encode("utf-8"),
-        msg=request.body,
-        digestmod=hashlib.sha256,
-    ).hexdigest()
-
-    if request.META.get("HTTP_X_SIGNATURE") != digest:
-        raise Http404("Club not found")
-
-    data = json.loads(request.body, strict=False)
-
-    # Club upgrade
-    if "order_created" in request.META.get("HTTP_X_EVENT_NAME", ""):
-        club = None
-        try:
-            slug = str(data["meta"]["custom_data"]["club"])
-            club = get_object_or_404(Club, slug=slug)
-            print(f"Found club {club.slug}, upgrading club...")
-        except KeyError:
-            email = str(data["data"]["attributes"]["user_email"])
-            print(f"Found email address {email}...")
-
-        if club:
-            club.upgraded = True
-            club.upgraded_date = timezone.now()
-            club.order_id = data["data"]["id"]
-            club.save()
-            return HttpResponse(f"Upgraded {club}")
-
-    # Club downgrade
-    elif "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", ""):
-        club = None
-        try:
-            club = get_object_or_404(
-                Club, order_id=data["data"]["attributes"]["order_id"]
-            )
-            print("Found order_id, downgrading club...")
-            if club:
-                club.upgraded = False
-                club.upgraded_date = None
-                club.order_id = None
-                club.save()
-                return HttpResponse(f"Downgraded {club}")
-        except KeyError:
-            print("Could not find order_id")
-
-    return HttpResponse("Valid webhook call with no action taken")
