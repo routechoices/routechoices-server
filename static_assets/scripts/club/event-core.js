@@ -2221,7 +2221,7 @@ function drawCompetitors(refreshMeters) {
 
     groupControl.setValues(competitorsWithMarker, clustersCenter);
   }
-  if (finishLineSet) {
+  if (finishLineSet && refreshMeters) {
     rankControl.setValues(finishLineCrosses);
   }
 }

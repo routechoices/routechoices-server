@@ -26,9 +26,9 @@ from routechoices.dashboard.views import (
 )
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
-admin.site.site_header = "Routechoices.com Admin"
-admin.site.site_title = "Routechoices.com Admin Site"
-admin.site.index_title = "Welcome to Routechoices.com Administration Site"
+admin.site.site_header = "Admin"
+admin.site.site_title = "Admin Site"
+admin.site.index_title = "Welcome to the administration site"
 
 sitemaps = {
     "static": StaticViewSitemap,
