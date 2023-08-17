@@ -28,7 +28,7 @@ RUN apt-get update -qq && \
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
-RUN pip install --no-cache /wheels/*
+RUN pip install --no-cache /wheels/* && rm -rf /wheels
 
 # Copy in your requirements file
 WORKDIR /app/
