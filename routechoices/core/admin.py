@@ -259,7 +259,7 @@ class EventAdmin(admin.ModelAdmin):
         "is_live_db",
         "privacy",
         "competitor_count",
-        "shortcut_link",
+        "link",
     )
     list_filter = (TimeStatusFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
@@ -287,9 +287,9 @@ class EventAdmin(admin.ModelAdmin):
         return obj.is_live_db
 
     is_live_db.admin_order_field = "is_live_db"
-    is_live_db.short_description = "Live"
+    is_live_db.short_description = "Is Live"
 
-    def shortcut_link(self, obj):
+    def link(self, obj):
         link = obj.shortcut or obj.get_absolute_url()
         return mark_safe(f'<a href="{link}">{link}</a>')
 

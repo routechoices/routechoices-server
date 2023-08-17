@@ -180,6 +180,7 @@ SLUG_BLACKLIST = [
     "debug",
     "default",
     "delete",
+    "demo",
     "desc",
     "design",
     "dev",
