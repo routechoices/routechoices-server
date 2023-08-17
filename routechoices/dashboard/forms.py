@@ -127,10 +127,14 @@ class ClubForm(ModelForm):
                     )
                 )
             out_buffer = BytesIO()
+
+            white_bg_img = Image.new("RGBA", (1200, 630), "WHITE")
+            white_bg_img.paste(cropped_image, (0, 0), cropped_image)
+            img = white_bg_img.convert("RGB")
             params = {
                 "dpi": (72, 72),
             }
-            cropped_image.save(out_buffer, "WEBP", **params)
+            img.save(out_buffer, "WEBP", **params)
             f_new = File(out_buffer, name=fn)
             return f_new
 
