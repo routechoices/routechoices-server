@@ -21,6 +21,7 @@ from routechoices.core.models import (
     Event,
     EventSet,
     ImeiDevice,
+    IndividualDonator,
     Map,
     MapAssignation,
     Notice,
@@ -521,6 +522,11 @@ class TOTPDeviceAdmin(admin.ModelAdmin):
 
     def secret_base32(self, obj):
         return b32encode(obj.key).decode()
+
+
+@admin.register(IndividualDonator)
+class IndividualDonatorAdmin(admin.ModelAdmin):
+    list_display = ("name", "email")
 
 
 admin.site.unregister(WebAuthnKey)
