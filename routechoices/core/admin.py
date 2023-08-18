@@ -198,7 +198,7 @@ class ClubAdmin(admin.ModelAdmin):
     )
 
     def get_ordering(self, request):
-        if request.path.startswith("/admin/core/club"):
+        if request.resolver_match.url_name == "core_club_changelist":
             return ("-creation_date",)
 
     def get_queryset(self, request):
@@ -470,7 +470,6 @@ admin.site.unregister(Group)
 
 @admin.register(UserModel)
 class MyUserAdmin(UserAdmin):
-    ordering = ("-date_joined",)
     list_display = UserAdmin.list_display + (
         "date_joined",
         "has_verified_email",
@@ -479,6 +478,11 @@ class MyUserAdmin(UserAdmin):
     actions = [
         "clean_fake_users",
     ]
+
+    def get_ordering(self, request):
+        if request.resolver_match.url_name == "auth_user_changelist":
+            return ("-date_joined",)
+        return ("username",)
 
     def get_queryset(self, request):
         return (
