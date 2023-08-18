@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.db.models import Case, Count, Exists, OuterRef, Value, When
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
 
@@ -182,7 +182,7 @@ class EventSetAdmin(admin.ModelAdmin):
         if not obj.create_page:
             return ""
         link = obj.url
-        return mark_safe(f'<a href="{link}">{link}</a>')
+        return format_html('<a href="{}">Open</a>', link)
 
 
 @admin.register(Club)
@@ -210,9 +210,10 @@ class ClubAdmin(admin.ModelAdmin):
         )
 
     def event_count(self, obj):
-        return mark_safe(
-            '<a href="/admin/core/event/?club__id__exact='
-            f'{obj.pk}">{obj.event_count}</a>'
+        return format_html(
+            '<a href="/admin/core/event/?club__id__exact={}">{}</a>',
+            obj.pk,
+            obj.event_count,
         )
 
     def admin_list(self, obj):
@@ -292,7 +293,7 @@ class EventAdmin(admin.ModelAdmin):
 
     def link(self, obj):
         link = obj.shortcut or obj.get_absolute_url()
-        return mark_safe(f'<a href="{link}">{link}</a>')
+        return format_html('<a href="{}">Open</a>', link)
 
     def competitor_count(self, obj):
         return obj.competitor_count
@@ -307,7 +308,7 @@ class DeviceCompetitorInline(admin.TabularInline):
     ordering = ("-start_time",)
 
     def link(self, obj):
-        return mark_safe(f'<a href="{obj.event.get_absolute_url()}">View on Site</a>')
+        return format_html('<a href="{}">Open</a>', obj.event.get_absolute_url())
 
 
 class DeviceOwnershipInline(admin.TabularInline):
