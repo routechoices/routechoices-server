@@ -490,13 +490,6 @@ function removeFinishLine() {
     finishLineSet = false;
     map.contextmenu.removeItem(removeFinishLineContextMenuItem);
     removeFinishLineContextMenuItem = null;
-    setFinishLineContextMenuItem = map.contextmenu.insertItem(
-      {
-        text: banana.i18n("draw-finish-line"),
-        callback: drawFinishLine,
-      },
-      1
-    );
   }
 }
 
@@ -512,15 +505,15 @@ function drawFinishLineEnd(e) {
   map.addControl(rankControl);
   map.addLayer(finishLinePoly);
   finishLineSet = true;
-  map.contextmenu.removeItem(setFinishLineContextMenuItem);
-  setFinishLineContextMenuItem = null;
-  removeFinishLineContextMenuItem = map.contextmenu.insertItem(
-    {
-      text: banana.i18n("remove-finish-line"),
-      callback: removeFinishLine,
-    },
-    1
-  );
+  if (!removeFinishLineContextMenuItem) {
+    removeFinishLineContextMenuItem = map.contextmenu.insertItem(
+      {
+        text: banana.i18n("remove-finish-line"),
+        callback: removeFinishLine,
+      },
+      2
+    );
+  }
 }
 
 function drawFinishLineTmp(e) {
