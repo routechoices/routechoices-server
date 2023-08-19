@@ -9,4 +9,22 @@ if (needFlagsEmojiPolyfill) {
   document.body.classList.add("flags-polyfill");
 }
 
-console.log(`Version: ${window.local.siteVersion}`);
+console.log(`___________________________
+|                _____     |
+|              / ____  \\   |
+|             / /  _ \\  \\  |
+|    _____   | |  //  | |  |
+|  / ____  \\  \\ \\//_ / /   |
+| / /  _ \\  \\  \\  ___ /    |
+|| |  //  | |  //  _____   |
+| \\ \\//_ / /  // / ____  \\ |
+|  \\  ___ /  // / /  _ \\  \\|
+|  //       // | |  //  | ||
+| //       //   \\ \\//_ / / |
+|//       //     \\  ___ /  |
+|/       //      //        |
+|       //      //         |
+|__________________________|
+
+ROUTECHOICES.COM
+Version: ${window.local.siteVersion}`);
