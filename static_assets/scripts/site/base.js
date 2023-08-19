@@ -8,3 +8,5 @@ if (window.Sentry) {
 if (needFlagsEmojiPolyfill) {
   document.body.classList.add("flags-polyfill");
 }
+
+console.log(`Version: ${window.local.siteVersion}`);
