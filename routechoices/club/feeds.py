@@ -1,5 +1,4 @@
 from django.contrib.syndication.views import Feed
-from django.templatetags.static import static
 from django.utils.feedgenerator import Rss201rev2Feed
 from django.utils.timezone import now
 from django.utils.xmlutils import SimplerXMLGenerator
@@ -9,7 +8,7 @@ from routechoices.core.models import PRIVACY_PUBLIC, Club, Event
 
 class RssXslFeed(Rss201rev2Feed):
     content_type = "text/xml"
-    xsl_path = static("xsl/club-feed.xsl")
+    xsl_path = "/static/xsl/club-feed.xsl"
 
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding, short_empty_elements=True)
