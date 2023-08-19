@@ -100,12 +100,25 @@ var printTime = function (t) {
     m = Math.floor((t % 3600) / 60),
     s = t % 60;
   if (h === 0) {
-    var text = m + ":";
-    return text + prependZero(s);
+    var text = "";
+    if (m == 0) {
+      return s + "s";
+    }
+    text = m + "min";
+    if (s === 0) {
+      return text;
+    }
+    return text + prependZero(s) + "s";
   }
-  var text = h + ":";
-  text += prependZero(m) + ":";
-  return text + prependZero(s);
+  var text = h + "h";
+  if (m === 0 && s === 0) {
+    return text;
+  }
+  text += prependZero(m) + "min";
+  if (s === 0) {
+    return text;
+  }
+  return text + prependZero(s) + "s";
 };
 
 Array.prototype.findIndex =
