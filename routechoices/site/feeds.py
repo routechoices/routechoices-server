@@ -1,13 +1,21 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
+from django.templatetags.static import static
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
 
+from routechoices.club.feeds import RssXslFeed
 from routechoices.core.models import PRIVACY_PUBLIC, Event
 
 
+class SiteRssFeed(RssXslFeed):
+    xsl_path = static("xsl/site-feed.xsl")
+
+
 class LiveEventsFeed(Feed):
+    feed_type = SiteRssFeed
+
     def title(self):
         site = Site.objects.get(id=settings.SITE_ID)
         return f"GPS Tracking Events on {site.name}"

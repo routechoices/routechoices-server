@@ -11,7 +11,7 @@ urlpatterns = [
     re_path(r"^signup/?$", account_views.signup, name="account_signup"),
     re_path(r"^contact/?$", views.contact, name="contact_view"),
     re_path(r"^events/?$", views.events_view, name="events_view"),
-    re_path(r"^events/feed/?$", feeds.live_event_feed, name="events_feed"),
+    re_path(r"^feed/?$", feeds.live_event_feed, name="events_feed"),
     re_path(
         r"^tracker/?$",
         TemplateView.as_view(template_name="site/tracker.html"),
