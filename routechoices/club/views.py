@@ -49,119 +49,20 @@ def club_view(request, **kwargs):
         club_slug = kwargs.get("club_slug")
         if club_slug in ("api", "admin", "dashboard", "oauth"):
             return redirect(f"/{club_slug}/")
+
     bypass_resp = handle_legacy_request("club_view", kwargs.get("club_slug"))
     if bypass_resp:
         return bypass_resp
+
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug__iexact=club_slug)
+
     if club.domain and not request.use_cname:
         return redirect(club.nice_url)
 
     return render(
         request, "site/event_list.html", Event.extract_event_lists(request, club)
     )
-
-
-def club_logo(request, **kwargs):
-    bypass_resp = handle_legacy_request("club_logo", kwargs.get("club_slug"))
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    club = get_object_or_404(
-        Club.objects.exclude(logo=""), slug__iexact=club_slug, logo__isnull=False
-    )
-    if club.domain and not request.use_cname:
-        return redirect(club.logo_url)
-    logo_key = f"club:{club.aid}:logo:{club.logo.name}"
-    logo_key_avif = f"{logo_key}:avif"
-    headers = {}
-    http_accept = request.META.get("HTTP_ACCEPT", "")
-    serve_avif = "image/avif" in http_accept.split(",")
-    logo = None
-    if serve_avif:
-        if cache.has_key(logo_key_avif):
-            logo = cache.get(logo_key_avif)
-            headers["X-Cache-Hit"] = 1
-
-    if not logo:
-        if cache.has_key(logo_key):
-            logo_png = cache.get(logo_key)
-            if serve_avif:
-                headers["X-Cache-Hit"] = 0.5
-            else:
-                headers["X-Cache-Hit"] = 1
-        else:
-            file_path = club.logo.name
-            buf = BytesIO()
-            s3_client = get_s3_client()
-            s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
-            logo_png = buf.getvalue()
-            cache.set(logo_key, logo_png, 31 * 24 * 3600)
-
-        if serve_avif:
-            pil_image = Image.open(BytesIO(logo_png))
-            buf = BytesIO()
-            pil_image.save(buf, "AVIF", quality=80)
-            logo = buf.getvalue()
-            cache.set(logo_key_avif, logo, 31 * 24 * 3600)
-        else:
-            logo = logo_png
-
-    resp = StreamingHttpRangeResponse(
-        request,
-        logo,
-        content_type="image/avif" if serve_avif else "image/png",
-        headers=headers,
-    )
-    resp["Content-Disposition"] = set_content_disposition(
-        f"{club.name}.{'avif' if serve_avif else 'png'}", dl=False
-    )
-    return resp
-
-
-def club_banner(request, **kwargs):
-    bypass_resp = handle_legacy_request("club_banner", kwargs.get("club_slug"))
-    if bypass_resp:
-        return bypass_resp
-    club_slug = request.club_slug
-    club = get_object_or_404(Club.objects.exclude(banner=""), slug__iexact=club_slug)
-    if club.domain and not request.use_cname:
-        return redirect(club.banner_url)
-
-    http_accept = request.META.get("HTTP_ACCEPT", "")
-    serve_avif = "image/avif" in http_accept.split(",")
-    logo_key = f"club:{club.aid}:banner:{club.banner.name}:{serve_avif}"
-
-    headers = {}
-    logo = None
-    if cache.has_key(logo_key):
-        logo = cache.get(logo_key)
-        headers["X-Cache-Hit"] = 1
-    if not logo:
-        file_path = club.banner.name
-        buf = BytesIO()
-        s3_client = get_s3_client()
-        s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
-        logo_orig = buf.getvalue()
-        cache.set(logo_key, logo_orig, 31 * 24 * 3600)
-        pil_image = Image.open(BytesIO(logo_orig))
-        buf = BytesIO()
-        if serve_avif:
-            pil_image.save(buf, "AVIF", quality=80)
-        else:
-            pil_image.save(buf, "PNG")
-        logo = buf.getvalue()
-        cache.set(logo_key, logo, 31 * 24 * 3600)
-    resp = StreamingHttpRangeResponse(
-        request,
-        logo,
-        content_type="image/avif" if serve_avif else "image/png",
-        headers=headers,
-    )
-    resp["Content-Disposition"] = set_content_disposition(
-        f"{club.name}.{'avif' if serve_avif else 'png'}", dl=False
-    )
-    return resp
 
 
 def club_favicon(request, icon_name, **kwargs):
@@ -189,6 +90,105 @@ def club_favicon(request, icon_name, **kwargs):
     return StreamingHttpRangeResponse(request, data, content_type=icon_info["mime"])
 
 
+def club_logo(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_logo", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+
+    club_slug = request.club_slug
+    club = get_object_or_404(
+        Club.objects.exclude(logo=""), slug__iexact=club_slug, logo__isnull=False
+    )
+
+    if club.domain and not request.use_cname:
+        return redirect(club.logo_url)
+
+    http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
+
+    mime = "image/png"
+    if "image/avif" in http_accepts:
+        mime = "image/avif"
+    elif "image/webp" in http_accepts:
+        mime = "image/webp"
+
+    logo_key = f"club:{club.aid}:logo:{club.logo.name}:{mime}"
+    logo = None
+    headers = {}
+    if cache.has_key(logo_key):
+        logo = cache.get(logo_key)
+        headers["X-Cache-Hit"] = 1
+    else:
+        file_path = club.logo.name
+        buf = BytesIO()
+        s3_client = get_s3_client()
+        s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
+        img_stored = buf.getvalue()
+        pil_image = Image.open(BytesIO(img_stored))
+        buf = BytesIO()
+        pil_image.save(buf, mime[6:].upper(), quality=80)
+        logo = buf.getvalue()
+        cache.set(logo_key, logo, 31 * 24 * 3600)
+
+    resp = StreamingHttpRangeResponse(
+        request,
+        logo,
+        content_type=mime,
+        headers=headers,
+    )
+    resp["Content-Disposition"] = set_content_disposition(
+        f"{club.name}.{mime[6:]}", dl=False
+    )
+    return resp
+
+
+def club_banner(request, **kwargs):
+    bypass_resp = handle_legacy_request("club_banner", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    club = get_object_or_404(Club.objects.exclude(banner=""), slug__iexact=club_slug)
+    if club.domain and not request.use_cname:
+        return redirect(club.banner_url)
+
+    http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
+
+    mime = "image/png"
+    if "image/avif" in http_accepts:
+        mime = "image/avif"
+    elif "image/webp" in http_accepts:
+        mime = "image/webp"
+
+    logo_key = f"club:{club.aid}:banner:{club.banner.name}:{mime}"
+
+    headers = {}
+    logo = None
+    if cache.has_key(logo_key):
+        logo = cache.get(logo_key)
+        headers["X-Cache-Hit"] = 1
+    else:
+        file_path = club.banner.name
+        buf = BytesIO()
+        s3_client = get_s3_client()
+        s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, buf)
+        img_stored = buf.getvalue()
+        pil_image = Image.open(BytesIO(img_stored))
+        buf = BytesIO()
+        pil_image.save(buf, mime[6:].upper(), quality=80)
+        logo = buf.getvalue()
+        cache.set(logo_key, logo, 31 * 24 * 3600)
+
+    resp = StreamingHttpRangeResponse(
+        request,
+        logo,
+        content_type=mime,
+        headers=headers,
+    )
+    resp["Content-Disposition"] = set_content_disposition(
+        f"{club.name}.{mime[6:]}", dl=False
+    )
+    return resp
+
+
 def club_thumbnail(request, **kwargs):
     bypass_resp = handle_legacy_request("event_club_thumbnail", kwargs.get("club_slug"))
     if bypass_resp:
@@ -200,11 +200,16 @@ def club_thumbnail(request, **kwargs):
     )
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}thumbnail")
-    http_accept = request.META.get("HTTP_ACCEPT", "")
+
+    http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
     mime = "image/jpeg"
-    if "image/webp" in http_accept.split(","):
+    if "image/avif" in http_accepts:
+        mime = "image/avif"
+    elif "image/webp" in http_accepts:
         mime = "image/webp"
+
     data_out = club.thumbnail(mime)
+
     return StreamingHttpRangeResponse(request, data_out)
 
 
