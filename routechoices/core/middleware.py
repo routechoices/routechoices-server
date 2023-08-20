@@ -220,36 +220,6 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
             set_urlconf(current_urlconf)
 
 
-class HostsResponseMiddleware(HostsBaseMiddleware):
-    def process_response(self, request, response):
-        # Django resets the base urlconf when it starts to process
-        # the response, so we need to set this again, in case
-        # any of our middleware makes use of host, etc URLs.
-
-        # Find best match, falling back to settings.DEFAULT_HOST
-        host, kwargs = self.get_host(request.get_host())
-        # Hack for custom domains
-        default_domain = settings.PARENT_HOST
-        default_subdomain_suffix = f".{default_domain}"
-        raw_host = request.get_host()
-        if raw_host[-1] == ".":
-            raw_host = raw_host[:-1]
-        request.use_cname = False
-        if not raw_host.endswith(default_subdomain_suffix):
-            club = Club.objects.filter(domain__iexact=raw_host).first()
-            if not club:
-                return HttpResponse(status=444)
-            original_host = f"{club.slug.lower()}{default_subdomain_suffix}"
-            host, kwargs = self.get_host(original_host)
-            request.use_cname = True
-        # This is the main part of this middleware
-        request.urlconf = host.urlconf
-        request.host = host
-
-        set_urlconf(host.urlconf)
-        return response
-
-
 class CorsMiddleware(OrigCorsMiddleware):
     def is_enabled(self, request):
         return request.host.name == "api" and super().is_enabled(request)
