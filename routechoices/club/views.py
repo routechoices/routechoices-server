@@ -69,7 +69,9 @@ def serve_image_from_s3(
         pil_image = Image.open(BytesIO(s3_buffer.getvalue()))
         if img_mode and pil_image.mode != img_mode:
             pil_image = pil_image.convert("RGB")
-        pil_image.save(out_buffer, mime[6:].upper(), quality=80)
+        pil_image.save(
+            out_buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80)
+        )
         image = out_buffer.getvalue()
         cache.set(cache_key, image, 31 * 24 * 3600)
 

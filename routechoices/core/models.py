@@ -273,7 +273,7 @@ Follow our events live or replay them later.
         logo = Image.open(BytesIO(logo_b))
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
-        logo_s.save(buffer, ext, quality=10)
+        logo_s.save(buffer, ext, quality=(40 if ext == "AVIF" else 80))
         return buffer.getvalue()
 
     @property
@@ -317,7 +317,7 @@ Follow our events live or replay them later.
             logo_f = logo.resize((250, 250), Image.ANTIALIAS)
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-        img.save(buffer, mime[6:].upper(), quality=80)
+        img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
         return data_out
@@ -1637,8 +1637,8 @@ class Event(models.Model):
                 f":{self.club.modification_date}:{mime}"
             )
             cached = cache.get(cache_key)
-            if cached:
-                return cached
+            # if cached:
+            #    return cached
             orig = raster_map.image.open("rb").read()
             img = Image.open(BytesIO(orig)).convert("RGBA")
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
@@ -1677,7 +1677,7 @@ class Event(models.Model):
                 logo_f = logo.resize((250, 250), Image.ANTIALIAS)
                 img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-        img.save(buffer, mime[6:].upper(), quality=80)
+        img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
         return data_out
