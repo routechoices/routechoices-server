@@ -193,6 +193,7 @@ class ClubAdmin(admin.ModelAdmin):
         "slug",
         "admin_list",
         "event_count",
+        "map_count",
         "upgraded",
         "domain",
     )
@@ -206,7 +207,8 @@ class ClubAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .prefetch_related("admins")
-            .annotate(event_count=Count("events"))
+            .annotate(event_count=Count("events", distinct=True))
+            .annotate(map_count=Count("maps", distinct=True))
         )
 
     def event_count(self, obj):
@@ -216,10 +218,18 @@ class ClubAdmin(admin.ModelAdmin):
             obj.event_count,
         )
 
+    def map_count(self, obj):
+        return format_html(
+            '<a href="/admin/core/map/?club__id__exact={}">{}</a>',
+            obj.pk,
+            obj.map_count,
+        )
+
     def admin_list(self, obj):
         return ", ".join((a.username for a in obj.admins.all()))
 
     event_count.admin_order_field = "event_count"
+    map_count.admin_order_field = "map_count"
 
 
 class ExtraMapInline(admin.TabularInline):
