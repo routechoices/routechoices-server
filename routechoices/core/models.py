@@ -1301,6 +1301,17 @@ class Event(models.Model):
         self.invalidate_cache()
         super().save(*args, **kwargs)
 
+    def checkUserPermission(self, user):
+        if (
+            self.privacy == PRIVACY_PRIVATE
+            and not user.is_superuser
+            and (
+                not user.is_authenticated
+                or not self.club.admins.filter(id=user.id).exists()
+            )
+        ):
+            raise PermissionDenied
+
     @classmethod
     def get_public_map_at_index(cls, user, event_id, map_index, load_competitors=False):
         """map_index is 1 based"""
@@ -1342,12 +1353,8 @@ class Event(models.Model):
         ):
             raise Http404
 
-        if event.privacy == PRIVACY_PRIVATE and not user.is_superuser:
-            if (
-                not user.is_authenticated
-                or not event.club.admins.filter(id=user.id).exists()
-            ):
-                raise PermissionDenied()
+        event.checkUserPermission(user)
+
         if map_index == 0:
             raster_map = event.map
         else:

@@ -557,13 +557,7 @@ def event_detail(request, event_id):
         res = {"error": "No event match this id"}
         return Response(res)
 
-    is_user_club_admin = (
-        request.user.is_superuser
-        or event.club.admins.filter(id=request.user.id).exists()
-    )
-
-    if event.privacy == PRIVACY_PRIVATE and not is_user_club_admin:
-        raise PermissionDenied()
+    event.checkUserPermission(request.user)
 
     output = {
         "event": {
@@ -632,9 +626,10 @@ def event_detail(request, event_id):
             }
             output["maps"].append(map_data)
 
-    headers = None
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     return Response(output, headers=headers)
 
 
@@ -1126,12 +1121,7 @@ def event_data(request, event_id):
         except Exception:
             pass
 
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
+    event.checkUserPermission(request.user)
 
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
@@ -1613,9 +1603,10 @@ def event_map_download(request, event_id, map_index="1"):
     file_path = raster_map.path
     mime_type = raster_map.mime_type
 
-    headers = None
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     return serve_from_s3(
         settings.AWS_S3_BUCKET,
         request,
@@ -1640,9 +1631,10 @@ def event_kmz_download(request, event_id, map_index="1"):
     event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     kmz_data = raster_map.kmz
 
-    headers = None
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     response = StreamingHttpRangeResponse(
         request,
         kmz_data,
@@ -1693,16 +1685,15 @@ def competitor_gpx_download(request, competitor_id):
         start_time__lt=now(),
     )
     event = competitor.event
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
+
+    event.checkUserPermission(request.user)
+
     gpx_data = competitor.gpx
-    headers = None
+
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     response = StreamingHttpRangeResponse(
         request,
         gpx_data.encode(),
@@ -1778,9 +1769,10 @@ def two_d_rerun_race_status(request):
         response_raw = f"/**/{callback}({response_raw});"
         content_type = "text/javascript; charset=utf-8"
 
-    headers = None
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     return HttpResponse(response_raw, content_type=content_type, headers=headers)
 
 
@@ -1805,12 +1797,8 @@ def two_d_rerun_race_data(request):
         aid=event_id,
         start_date__lt=now(),
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
+
+    event.checkUserPermission(request.user)
 
     competitors = event.competitors.all()
     devices = (c.device_id for c in competitors if c.device_id)
@@ -1871,9 +1859,10 @@ def two_d_rerun_race_data(request):
         response_raw = f"/**/{callback}({response_raw});"
         content_type = "text/javascript; charset=utf-8"
 
-    headers = None
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     return HttpResponse(
         response_raw,
         content_type=content_type,

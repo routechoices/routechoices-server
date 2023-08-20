@@ -9,7 +9,6 @@ from django.contrib.sitemaps.views import (
 )
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
-from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -199,6 +198,8 @@ def club_thumbnail(request, **kwargs):
         Club,
         slug__iexact=club_slug,
     )
+    if club.domain and not request.use_cname:
+        return redirect(f"{club.nice_url}thumbnail")
     http_accept = request.META.get("HTTP_ACCEPT", "")
     mime = "image/jpeg"
     if "image/webp" in http_accept.split(","):
@@ -273,12 +274,9 @@ def event_view(request, slug, **kwargs):
             )
     elif event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}")
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied
+
+    event.checkUserPermission(request.user)
+
     resp_args = {
         "event": event,
     }
@@ -324,12 +322,8 @@ def event_export_view(request, slug, **kwargs):
             )
     elif event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/export")
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied
+
+    event.checkUserPermission(request.user)
 
     response = render(
         request,
@@ -469,21 +463,20 @@ def event_map_thumbnail(request, slug, **kwargs):
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
-    if event.privacy == PRIVACY_PRIVATE and not request.user.is_superuser:
-        if (
-            not request.user.is_authenticated
-            or not event.club.admins.filter(id=request.user.id).exists()
-        ):
-            raise PermissionDenied()
+
+    event.checkUserPermission(request.user)
+
     display_logo = request.GET.get("no-logo", False) is False
     http_accept = request.META.get("HTTP_ACCEPT", "")
     mime = "image/jpeg"
     if "image/webp" in http_accept.split(","):
         mime = "image/webp"
     data_out = event.thumbnail(display_logo, mime)
-    headers = None
+
+    headers = {}
     if event.privacy == PRIVACY_PRIVATE:
-        headers = {"Cache-Control": "Private"}
+        headers["Cache-Control"] = "Private"
+
     return StreamingHttpRangeResponse(request, data_out, headers=headers)
 
 
