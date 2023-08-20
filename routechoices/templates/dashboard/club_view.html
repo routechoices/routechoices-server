@@ -60,6 +60,7 @@
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
   data-api-base-url="{% host_url 'api_doc' host 'api' %}"
   data-club-slug="{{club.slug}}"
+  data-club-nice-url="{{club.nice_url}}"
   data-club-has-analytics="{% if club.analytics_site %}1{% endif %}">
 </script>
 {% compress js %}

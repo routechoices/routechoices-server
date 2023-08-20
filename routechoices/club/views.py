@@ -32,20 +32,19 @@ def handle_legacy_request(view_name, club_slug=None, **kwargs):
     if club_slug:
         if not Club.objects.filter(slug__iexact=club_slug).exists():
             raise Http404()
-        reverse_kwargs = kwargs
         return redirect(
             reverse(
                 view_name,
                 host="clubs",
                 host_kwargs={"club_slug": club_slug},
-                kwargs=reverse_kwargs,
+                kwargs=kwargs,
             )
         )
     return False
 
 
 def serve_image_from_s3(
-    request, image_field, output_filename, default_mime="image/png"
+    request, image_field, output_filename, default_mime="image/png", img_mode=None
 ):
     http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
     mime = default_mime
@@ -68,6 +67,8 @@ def serve_image_from_s3(
         s3_client = get_s3_client()
         s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, s3_buffer)
         pil_image = Image.open(BytesIO(s3_buffer.getvalue()))
+        if img_mode and pil_image.mode != img_mode:
+            pil_image = pil_image.convert("RGB")
         pil_image.save(out_buffer, mime[6:].upper(), quality=80)
         image = out_buffer.getvalue()
         cache.set(cache_key, image, 31 * 24 * 3600)
@@ -121,8 +122,7 @@ def club_favicon(request, icon_name, **kwargs):
         "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
         "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
     }.get(icon_name)
-    logo = club.logo
-    if not logo:
+    if not club.logo:
         with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
             data = fp.read()
     else:
@@ -158,7 +158,11 @@ def club_banner(request, **kwargs):
         return redirect(club.banner_url)
 
     return serve_image_from_s3(
-        request, club.banner, f"{club.name} Banner", default_mime="image/jpeg"
+        request,
+        club.banner,
+        f"{club.name} Banner",
+        default_mime="image/jpeg",
+        img_mode="RGB",
     )
 
 
@@ -394,11 +398,14 @@ def event_contribute_view(request, slug, **kwargs):
         )
         .first()
     )
+
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
             return redirect(f"{club.nice_url}{slug}/contribute")
         return render(request, "club/404_event.html", {"club": club}, status=404)
+    if event.club.domain and not request.use_cname:
+        return redirect(f"{event.club.nice_url}{event.slug}/contribute")
 
     if request.GET.get("competitor-added", None):
         messages.success(request, "Competitor Added!")

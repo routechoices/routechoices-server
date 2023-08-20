@@ -9,7 +9,8 @@ if (needFlagsEmojiPolyfill) {
   document.body.classList.add("flags-polyfill");
 }
 
-console.log(`___________________________
+console.log(`
+____________________________
 |                _____     |
 |              / ____  \\   |
 |             / /  _ \\  \\  |

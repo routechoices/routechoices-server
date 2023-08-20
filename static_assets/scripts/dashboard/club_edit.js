@@ -9,8 +9,8 @@
       .find("a")
       .html(
         '<br/><img alt="Current Logo" height="50" width="50" src="' +
-          currentLogo +
-          '"/>'
+          window.local.clubNiceUrl +
+          'logo"/>'
       );
   }
 
@@ -24,8 +24,8 @@
       .find("a")
       .html(
         '<br/><img alt="Current Banner" height="210" width="400" src="' +
-          currentBanner +
-          '"/>'
+          window.local.clubNiceUrl +
+          'banner"/>'
       );
   }
 

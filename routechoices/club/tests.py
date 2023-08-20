@@ -2,6 +2,7 @@ import base64
 from io import BytesIO
 
 import arrow
+from django.core.cache import cache
 from django.core.files import File
 from rest_framework.test import APIClient
 
@@ -16,17 +17,53 @@ class ClubViewsTestCase(EssentialApiBase):
         self.club.admins.set([self.user])
 
     def test_club_logo_load(self):
+        cache.clear()
         icon_bytes = base64.b64decode(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXN"
             "SR0IArs4c6QAAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
         )
+        base64.b64decode(
+            "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEB"
+            "QoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/wA"
+            "ALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAA"
+            "AAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q=="
+        )
         self.club.logo.save("logo.png", File(BytesIO(icon_bytes)))
+        self.club.banner.save("banner.png", File(BytesIO(icon_bytes)))
 
         client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
 
         url = self.reverse_and_check(
             "club_logo",
             "/logo",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.headers.get("X-Cache-Hit"))
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-Cache-Hit"], "1")
+
+        url = self.reverse_and_check(
+            "club_banner",
+            "/banner",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.headers.get("X-Cache-Hit"))
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-Cache-Hit"], "1")
+
+        url = self.reverse_and_check(
+            "club_thumbnail",
+            "/thumbnail",
             host="clubs",
             host_kwargs={"club_slug": "kiilat"},
             prefix="kiilat",

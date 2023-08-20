@@ -297,6 +297,7 @@ class EventApiTestCase(EssentialApiBase):
         self.assertIsNone(res.headers.get("X-Cache-Hit"))
 
     def test_live_event_data(self):
+        cache.clear()
         club = Club.objects.create(name="Test club", slug="club")
         event = Event.objects.create(
             club=club,
