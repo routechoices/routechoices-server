@@ -22,7 +22,7 @@ from PIL import Image
 
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
-from routechoices.lib.helpers import set_content_disposition
+from routechoices.lib.helpers import safe64encodedsha, set_content_disposition
 from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
@@ -81,6 +81,7 @@ def serve_image_from_s3(
         content_type=mime,
         headers=headers,
     )
+    resp["ETag"] = f'W/"{safe64encodedsha(image)}"'
     resp["Content-Disposition"] = set_content_disposition(
         f"{output_filename}.{mime[6:]}", dl=False
     )
@@ -188,7 +189,10 @@ def club_thumbnail(request, **kwargs):
         mime = "image/webp"
 
     data_out = club.thumbnail(mime)
-    return StreamingHttpRangeResponse(request, data_out)
+
+    resp = StreamingHttpRangeResponse(request, data_out)
+    resp["ETag"] = f'w/"{safe64encodedsha(data_out)}"'
+    return resp
 
 
 def club_live_event_feed(request, **kwargs):
@@ -461,7 +465,7 @@ def event_map_thumbnail(request, slug, **kwargs):
         mime = "image/webp"
 
     data_out = event.thumbnail(display_logo, mime)
-    headers = {}
+    headers = {"ETag": f'W/"{safe64encodedsha(data_out)}"'}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
     return StreamingHttpRangeResponse(request, data_out, headers=headers)

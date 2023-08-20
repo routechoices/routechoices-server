@@ -1637,8 +1637,8 @@ class Event(models.Model):
                 f":{self.club.modification_date}:{mime}"
             )
             cached = cache.get(cache_key)
-            # if cached:
-            #    return cached
+            if cached:
+                return cached
             orig = raster_map.image.open("rb").read()
             img = Image.open(BytesIO(orig)).convert("RGBA")
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
