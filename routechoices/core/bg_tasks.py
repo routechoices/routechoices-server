@@ -337,13 +337,18 @@ def import_single_event_from_gps_seuranta(event_id):
             f"{c_data[1]}"
             f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
         )
-        if len(start_time_raw) == 12:
-            start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+        start_time = None
+        try:
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+            else:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+        except Exception:
+            pass
         else:
-            start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
-        start_time = start_time.shift(
-            minutes=-int(event_data.get("TIMEZONE", 0))
-        ).datetime
+            start_time = start_time.shift(
+                minutes=-int(event_data.get("TIMEZONE", 0))
+            ).datetime
         Competitor.objects.create(
             name=c_data[3],
             short_name=c_data[4],
