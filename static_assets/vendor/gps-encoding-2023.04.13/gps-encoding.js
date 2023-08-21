@@ -125,7 +125,6 @@ var PositionArchive = function (k) {
   }
   this.setData = function(d) {
     positions = d;
-    positions.length = d.length;
     return this;
   }
   this.add = function (pos) {
@@ -234,7 +233,7 @@ var PositionArchive = function (k) {
       i2 = index - 1;
     }
 
-    result = this.slice(i1, i2);
+    result = this.slice(i1, i2 + 1);
     if (i1B) {
       result.add(
         positions[i1 - 1].positionTowardAtTimestamp(positions[i1], t1)
