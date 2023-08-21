@@ -52,6 +52,7 @@ from routechoices.lib.helpers import (
     epoch_to_datetime,
     initial_of_name,
     random_device_id,
+    safe64encodedsha,
     set_content_disposition,
     short_random_key,
     short_random_slug,
@@ -626,7 +627,7 @@ def event_detail(request, event_id):
             }
             output["maps"].append(map_data)
 
-    headers = {}
+    headers = {"ETag": f'W/"{safe64encodedsha(json.dumps(output))}"'}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
 
@@ -1181,7 +1182,7 @@ def event_data(request, event_id):
         "timestamp": time.time(),
     }
 
-    headers = {}
+    headers = {"ETag": f'W/"{safe64encodedsha(json.dumps(response))}"'}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
 

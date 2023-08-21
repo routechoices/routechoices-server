@@ -790,13 +790,8 @@ function selectReplayMode(e) {
 function fetchCompetitorRoutes(url, cb) {
   isCurrentlyFetchingRoutes = true;
   url = url || liveUrl;
-  var data = {
-    lastDataTs:
-      Math.round(lastDataTs / fetchPositionInterval) * fetchPositionInterval,
-  };
   reqwest({
     url: url,
-    data: data,
     crossOrigin: true,
     withCredentials: true,
     type: "json",
@@ -857,7 +852,6 @@ function fetchCompetitorRoutes(url, cb) {
 function refreshEventData() {
   reqwest({
     url: window.local.eventUrl,
-    data: { t: +new Date() },
     withCredentials: true,
     crossOrigin: true,
     type: "json",
