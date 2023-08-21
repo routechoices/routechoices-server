@@ -489,7 +489,7 @@ def import_single_event_from_tractrac(event_id):
 
     device_map = None
     mtb_url = event_data["parameters"].get("stored-uri")
-    if mtb_url and type(mtb_url) is dict:
+    if mtb_url and isinstance(mtb_url, dict):
         mtb_url = mtb_url.get("all")
     if mtb_url and not mtb_url.startswith("tcp:") and ".mtb" in mtb_url:
         data_url = mtb_url
