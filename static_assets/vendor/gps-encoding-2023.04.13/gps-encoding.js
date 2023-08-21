@@ -125,6 +125,7 @@ var PositionArchive = function (k) {
   }
   this.setData = function(d) {
     positions = d;
+    positions.length = d.length;
     return this;
   }
   this.add = function (pos) {
