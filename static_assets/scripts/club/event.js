@@ -293,7 +293,7 @@
           }
           onStart();
         }
-        setInterval(refreshEventData, 5 * 1e3);
+        setInterval(refreshEventData, 25 * 1e3);
       },
       error: function () {
         u("#eventLoadingModal").remove();
