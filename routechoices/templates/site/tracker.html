@@ -54,23 +54,21 @@
           <p>See below more detailed instructions for each type of device:</p>
           <ul class="nav nav-tabs my-3" role="tablist">
             <li class="nav-item" role="presentation">
-              <button role="button" class="nav-link active" id="android-tab-btn" data-bs-toggle="tab" data-bs-target="#android"><i class="fa-brands fa-android"></i> Android</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button role="button" class="nav-link" id="ios-tab-btn" data-bs-toggle="tab" data-bs-target="#ios"><i class="fa-brands fa-apple"></i> iOS</button>
+              <button role="button" class="nav-link active" id="android-tab-btn" data-bs-toggle="tab" data-bs-target="#android-ios"><i class="fa-brands fa-android"></i> Android &amp; <i class="fa-brands fa-apple"></i> iOS</button>
             </li>
             <li class="nav-item" role="presentation">
               <button role="button" class="nav-link" id="hardware-tab-btn" data-bs-toggle="tab" data-bs-target="#hardware"><i class="fa-solid fa-satellite-dish"></i> Dedicated GPS trackers</button>
             </li>
           </ul>
           <div class="tab-content">
-            <div id="android" class="tab-pane show active">
+            <div id="android-ios" class="tab-pane show active">
               <div>
                 <p>
-                  Install the Android app from Google Play app, Search "Routechoices Tracker", by Raphael Stefanini.
+                  Install the app from Google Play app or the Apple App Store, Search "Routechoices Tracker", by Raphael Stefanini.
                 </p>
                 <p>
-                  <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker'><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
+                  <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker' class="me-1"><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
+                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
                 </p>
                 <p>
                   Upon opening the app, it will display a device ID.
@@ -78,7 +76,7 @@
                 <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
                 <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
                 <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen goes to sleep.</b></p>
-                <p>Note: Google is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
+                <p>Note: Google and Apple are trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
                 <ul>
                   <li>
                     On recent versions of Android make sure that Routechoices Tracker has been added to battery optimization exceptions.
@@ -86,33 +84,13 @@
                   <li>
                     Some Android vendors have their own battery optimization in addition to standard Android system. Make sure those are disabled or the app is added to exceptions.</p>
                   </li>
+                  <li>
+                    On iOS, make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
+                  </li>
+                  <li>
+                    Also on iOS, ensure that the settings in "Settings > Privacy > Location Services > Routechoices Tracker" is set to "Always"
+                  </li>
                 </ul>
-                </p>
-              </div>
-            </div>
-            <div id="ios" class="tab-pane">
-              <div>
-                <p>
-                  Install the iOS app from Apple AppStore app, Search "Routechoices Tracker", by Raphael Stefanini.
-                </p>
-                <p>
-                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
-                </p>
-                <p>
-                  Upon opening the app, it will display a device ID.
-                  </p>
-                <p>Before starting a event, click the "Start live GPS" button to start sharing the location of the phone with us. And when the event is over, Turn off the app with the "Stop live GPS" button.</p>
-                <p>Once the GPS signal is good, the device ID turns green and the app starts uploading its locations.</p>
-                <p><i class="fa-solid fa-triangle-exclamation" style="color:red; font-size:1.2em"></i> <b>Ensure that GPS location provider with high accuracy is enabled in the system settings for the app and that GPS access is allowed all the time. If not, uploading GPS data will stop when screen goes to sleep.</b></p>
-                <p>Note: Apple is trying to restrict background processes to give user better battery life, but it affects application like Routechoices Tracker which require persistent background execution. Common issues to check for:
-                  <ul>
-                    <li>
-                      Make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
-                    </li>
-                    <li>
-                      Ensure that the settings in "Settings > Privacy > Location Services > Routechoices Tracker" is set to "Always"
-                    </li>
-                  </ul>
                 </p>
               </div>
             </div>

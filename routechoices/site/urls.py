@@ -13,11 +13,6 @@ urlpatterns = [
     re_path(r"^events/?$", views.events_view, name="events_view"),
     re_path(r"^feed/?$", feeds.live_event_feed, name="events_feed"),
     re_path(
-        r"^tracker/?$",
-        TemplateView.as_view(template_name="site/tracker.html"),
-        name="tracker_view",
-    ),
-    re_path(
         r"^trackers/?$",
         TemplateView.as_view(template_name="site/tracker.html"),
         name="trackers_view",
