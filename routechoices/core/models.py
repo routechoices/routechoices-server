@@ -2124,7 +2124,7 @@ class DeviceClubOwnership(models.Model):
     class Meta:
         unique_together = (("device", "club"),)
         verbose_name = "Device ownership"
-        verbose_name_plural = "Devices ownership"
+        verbose_name_plural = "Device ownerships"
 
 
 class Competitor(models.Model):

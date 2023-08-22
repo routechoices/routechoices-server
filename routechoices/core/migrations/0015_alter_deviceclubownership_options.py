@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="deviceclubownership",
             options={
                 "verbose_name": "Device ownership",
-                "verbose_name_plural": "Devices ownership",
+                "verbose_name_plural": "Device ownerships",
             },
         ),
     ]
