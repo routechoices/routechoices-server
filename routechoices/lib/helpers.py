@@ -11,7 +11,6 @@ import zoneinfo
 from datetime import datetime
 from math import cos, pi, sin
 
-import numpy
 import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
@@ -367,21 +366,6 @@ def check_cname_record(domain):
             return True
 
     return False
-
-
-def find_coeffs(pa, pb):
-    """
-    Find coefficients for perspective transformation.
-    From http://stackoverflow.com/a/14178717/4414003.
-    """
-    matrix = []
-    for p1, p2 in zip(pa, pb):
-        matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0] * p1[0], -p2[0] * p1[1]])
-        matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1] * p1[0], -p2[1] * p1[1]])
-    a = numpy.matrix(matrix, dtype=numpy.float)
-    b = numpy.array(pb).reshape(8)
-    res = numpy.dot(numpy.linalg.inv(a.T * a) * a.T, b)
-    return numpy.array(res).reshape(8)
 
 
 def delete_domain(domain):

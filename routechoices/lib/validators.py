@@ -101,19 +101,6 @@ def validate_domain_slug(slug):
         raise ValidationError(errors)
 
 
-def validate_image_data_uri(value):
-    if not value:
-        raise ValidationError(_("Data URI Can not be null"))
-    data_matched = re.match(
-        r"^data:image/(?P<format>jpeg|png|gif);base64,"
-        r"(?P<data_b64>(?:[A-Za-z0-9+/]{4})*"
-        r"(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$",
-        value,
-    )
-    if not data_matched:
-        raise ValidationError(_("Not a base 64 encoded data URI of an image"))
-
-
 def validate_corners_coordinates(val):
     cal_values = val.split(",")
     if len(cal_values) != 8:

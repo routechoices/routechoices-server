@@ -45,3 +45,22 @@ class SiteViewsTestCase(EssentialApiBase):
         url = self.reverse_and_check("site:events_view", "/events", host="www")
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_semi_static_pages_loads(self):
+        client = APIClient(HTTP_HOST="www.routechoices.dev")
+
+        url = self.reverse_and_check("site:home_view", "/", host="www")
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = self.reverse_and_check("site:trackers_view", "/trackers", host="www")
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = self.reverse_and_check("site:contact_view", "/contact", host="www")
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = self.reverse_and_check("site:pricing_view", "/pricing", host="www")
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)

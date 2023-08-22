@@ -1,5 +1,4 @@
 import secrets
-import string
 
 
 def generate_random_string(base_string_character, string_size=10):
@@ -15,27 +14,3 @@ def generate_random_string(base_string_character, string_size=10):
         # Append the selected character to the return string.
         ret_str += character
     return ret_str
-
-
-def generate_random_digit(str_len=10):
-    """
-    Generate random digit content string only.
-    """
-    ret = generate_random_string(string.digits, str_len)
-    return ret
-
-
-def generate_random_alphabet(str_len=10):
-    """
-    Generate random alphabet content string.
-    """
-    ret = generate_random_string(string.ascii_letters, str_len)
-    return ret
-
-
-def generate_random_alphabet_digit(str_len=10):
-    """
-    Generate random alphabet and digits content string.
-    """
-    ret = generate_random_string(string.digits + string.ascii_letters, str_len)
-    return ret
