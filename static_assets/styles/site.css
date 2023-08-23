@@ -188,7 +188,7 @@ body {
 }
 
 #myFooter h5 {
-  font-size: 18px;
+  font-size: 1.2rem;
   color: white;
   font-weight: bold;
   margin-top: 30px;
@@ -212,7 +212,7 @@ body {
 }
 
 #myFooter .second-bar a {
-  font-size: 22px;
+  font-size: 1.7rem;
   color: #9fa3a9;
   padding: 10px;
   transition: 0.2s;
@@ -264,7 +264,7 @@ body {
 
 #myFooter .second-bar .logo a {
   color: white;
-  font-size: 28px;
+  font-size: 1.7rem;
   float: left;
   font-weight: bold;
   line-height: 68px;
@@ -278,7 +278,7 @@ body {
 
 #myFooter .second-bar .logosmall a {
   color: white;
-  font-size: 17px;
+  font-size: 1.15rem;
   float: left;
   font-weight: bold;
   line-height: 35px;

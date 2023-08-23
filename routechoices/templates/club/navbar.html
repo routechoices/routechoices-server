@@ -13,7 +13,7 @@
     {% elif club.logo %}
     <span class="navbar-brand site-name d-inline-block"><img src="{{club.logo_url}}" alt="{{club.name}}'s logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;" class="rounded"></span>
     {% elif club.website %}
-    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-house-chimney fa-2x" style="font-size: 30px; vertical-align: -5px"></i></a></span>
+    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-house-chimney fa-2x" style="font-size: 1.7rem; vertical-align: -5px"></i></a></span>
     {% else %}
     <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span class="d-inline-block"><img src="{% static 'img/logo.png' %}" alt="Site logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span></a>
     {% endif %}
