@@ -1595,7 +1595,6 @@ function displayOptions(ev) {
   u("#options_show_button").addClass("active");
   optionDisplayed = true;
   searchText = null;
-  var mainDiv = u("<div/>");
   var optionsSidebar = u("<div/>");
   optionsSidebar.css({
     "overflow-y": "auto",
