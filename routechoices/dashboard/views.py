@@ -533,8 +533,8 @@ def map_gpx_upload_view(request):
             if not error:
                 has_points = False
                 segments = []
+                waypoints = []
 
-                points = []
                 prev_lon = None
                 offset_lon = 0
                 for point in gpx.waypoints:
@@ -545,10 +545,8 @@ def map_gpx_upload_view(request):
                         )
                         lon = point.longitude + offset_lon
                     prev_lon = lon
-                    points.append([round(point.latitude, 5), round(lon, 5)])
-                if len(points) > 1:
+                    waypoints.append([round(point.latitude, 5), round(lon, 5)])
                     has_points = True
-                    segments.append(points)
 
                 for route in gpx.routes:
                     points = []
@@ -587,7 +585,7 @@ def map_gpx_upload_view(request):
                     error = "Could not find points in this file"
                 else:
                     try:
-                        new_map = Map.from_points(segments)
+                        new_map = Map.from_points(segments, waypoints)
                     except Exception:
                         error = "Could not generate a map from this file"
                     else:
