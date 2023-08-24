@@ -45,17 +45,17 @@
   z-index: 10001;
 }
 
-.sidebar #listCompetitor {
+.sidebar #competitorList {
   max-height: calc(100vh - 149px);
   max-height: calc(var(--app-height) - 149px - var(--ctrl-height));
 }
 
-.sidebar #listCompetitor.with_search_bar {
+.sidebar #competitorList.with-search-bar {
   max-height: calc(100vh - 187px);
   max-height: calc(var(--app-height) - 187px - var(--ctrl-height));
 }
 
-.sidebar #listOptions {
+.sidebar #optionsSidebar {
   max-height: calc(100vh - 109px);
   max-height: calc(var(--app-height) - 109px - var(--ctrl-height));
 }
@@ -225,28 +225,14 @@
   -webkit-user-select: none;
 }
 
-.route-displayed .fa-crosshairs {
-  color: black;
-}
-
-.route-not-displayed .fa-crosshairs {
-  color: #aaa;
-}
-
-.route-not-displayed .fa-highlighter {
-  color: #aaa;
-}
-
-.route-not-displayed .fa-location-dot {
-  color: #aaa;
-}
-
-.route-displayed .fa-crosshairs.route-focused {
+.route-displayed .focused i,
+.route-displayed .highlighted i {
   color: #20c997;
 }
 
-.route-displayed .fa-highlighter.competitor-highlighted {
-  color: #20c997;
+.competitor-card button:disabled,
+.competitor-card button[disabled] {
+  border-color: transparent;
 }
 
 .btn-group-xs > .btn,

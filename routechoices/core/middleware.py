@@ -198,7 +198,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         else:
             club = Club.objects.filter(domain__iexact=raw_host).first()
             if not club:
-                return render(request, "404.html", status=404)
+                return render(request, "404-cname.html", status=404)
             original_host = f"{club.slug.lower()}{default_subdomain_suffix}"
             host, kwargs = self.get_host(original_host)
             request.use_cname = True

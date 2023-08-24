@@ -30,10 +30,7 @@ var makeFieldNowable = function (el) {
     .find(".set_time_now_btn")
     .on("click", function (e) {
       e.preventDefault();
-      var target = u(e.target)
-        .parent()
-        .parent()
-        .find('input');
+      var target = u(e.target).parent().parent().find("input");
       target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
       target.trigger("change");
     });

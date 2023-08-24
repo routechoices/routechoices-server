@@ -1065,16 +1065,16 @@ function toggleCompetitorList(e) {
   }
 }
 
-function toggleFullCompetitor(c) {
-  if (!c.isShown) {
+function toggleCompetitorFullRoute(competitor) {
+  if (!competitor.isShown) {
     return;
   }
-  if (c.displayFullRoute) {
-    c.displayFullRoute = null;
-    u("#fullRouteIcon-" + c.id).attr({ fill: null });
+  if (competitor.displayFullRoute) {
+    competitor.displayFullRoute = null;
+    competitor.sidebarCard?.find(".full-route-icon").attr({ fill: null });
   } else {
-    c.displayFullRoute = true;
-    u("#fullRouteIcon-" + c.id).attr({ fill: "#20c997" });
+    competitor.displayFullRoute = true;
+    competitor.sidebarCard?.find(".full-route-icon").attr({ fill: "#20c997" });
   }
 }
 
@@ -1103,27 +1103,6 @@ function zoomOnCompetitor(compr) {
   setTimeout(function () {
     compr.focusing = false;
   }, 250);
-}
-
-function toggleFocusCompetitor(c) {
-  const wasFocused = c.focused;
-  competitorList.map((comp) => {
-    if (comp.focused) {
-      comp.focused = false;
-      u("#focusedIcon-" + comp.id).removeClass("route-focused");
-    }
-  });
-  if (wasFocused) {
-    c.focused = false;
-    u("#focusedIcon-" + c.id).removeClass("route-focused");
-  } else {
-    if (!c.isShown) {
-      return;
-    }
-    c.focused = true;
-    u("#focusedIcon-" + c.id).addClass("route-focused");
-    zoomOnCompetitor(c);
-  }
 }
 
 function redrawCompetitorMarker(competitor, location, faded) {
@@ -1209,30 +1188,26 @@ function redrawCompetitorTail(competitor, route, time) {
   }
 }
 
-function toggleHighlightCompetitor(c) {
-  const wasHighlighted = c.highlighted;
+function toggleHighlightCompetitor(competitor) {
+  const wasHighlighted = competitor.highlighted;
   if (wasHighlighted) {
-    c.highlighted = false;
-    u("#highlightIcon-" + c.id).removeClass("competitor-highlighted");
+    competitor.highlighted = false;
+    competitor.sidebarCard
+      ?.find(".competitor-highlight-btn")
+      .removeClass("highlighted");
   } else {
-    if (!c.isShown) {
+    if (!competitor.isShown) {
       return;
     }
-    c.highlighted = true;
-    u("#highlightIcon-" + c.id).addClass("competitor-highlighted");
+    competitor.highlighted = true;
+    competitor.sidebarCard
+      ?.find(".competitor-highlight-btn")
+      .addClass("highlighted");
   }
-  if (c.nameMarker) {
-    c.nameMarker.remove();
-    c.nameMarker = null;
-  }
-  if (c.mapMarker) {
-    c.mapMarker.remove();
-    c.mapMarker = null;
-  }
-  if (c.tail) {
-    c.tail.remove();
-    c.tail = null;
-  }
+  ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+    competitor[layerName]?.remove();
+    competitor[layerName] = null;
+  });
 }
 
 function displayCompetitorList(force) {
@@ -1240,11 +1215,14 @@ function displayCompetitorList(force) {
     return;
   }
   optionDisplayed = false;
-  var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
-  var listDiv = u(
-    '<div id="listCompetitor" style="overflow-y:auto;" class="mt-1"/>'
-  );
+  var scrollTopDiv = u("#competitorList").first()?.scrollTop;
+  var listDiv = u("<div/>");
+  listDiv.addClass("mt-1");
+  listDiv.attr({ id: "competitorList" });
+  listDiv.css({ overflowY: "auto" });
+
   nbShown = 0;
+
   for (var i = 0; i < competitorList.length; i++) {
     (function (competitor) {
       if (typeof competitor.isShown === "undefined") {
@@ -1259,291 +1237,431 @@ function displayCompetitorList(force) {
         competitor.color = getColor(i);
         competitor.isColorDark = getContrastYIQ(competitor.color);
       }
-      var div = u('<div class="card-body px-1 pt-1 pb-0"/>');
-      div.html(
-        '<div><div class="text-nowrap text-truncate overflow-hidden" style="line-height: 18px"><span class="color-tag me-0" style="cursor: pointer"><i class="media-object fa-3x fa-solid fa-circle icon-sidebar" style="margin-left:1px;font-size:1em;color:' +
-          competitor.color +
-          '"></i></span>\
-          <span class="overflow-hidden ps-0 text-truncate"><b>' +
-          u("<div/>").text(competitor.name).html() +
-          '</b></span></div>\
-          <div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
-          (competitor.isShown ? "route-displayed" : "route-not-displayed") +
-          '">' +
-          // toggle on off
-          '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-5px;padding-top: 2px" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("toggle") +
-          '"><input style="box-shadow: none;" class="form-check-input competitor-switch" type="checkbox" id="switch-competitor-' +
-          competitor.id +
-          '"' +
-          (competitor.isShown ? " checked" : "") +
-          "></div>" +
-          // center on competitor
-          '<button type="button" class="center_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="focus" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("center") +
-          '"><i class="fa-solid fa-location-dot"></i></button>' +
-          // toggle follow competitor
-          '<button type="button" class="focus_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("follow") +
-          '">' +
-          '<i class="fa-solid fa-crosshairs' +
-          (competitor.focused ? " route-focused" : "") +
-          '" id="focusedIcon-' +
-          competitor.id +
-          '"></i></button>' +
-          // toggle highligh competitor
-          '<button type="button" class="highlight_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="highlight competitor" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("highlight") +
-          '">' +
-          '<i class="fa-solid fa-highlighter' +
-          (competitor.highlighted ? " competitor-highlighted" : "") +
-          '" id="highlightIcon-' +
-          competitor.id +
-          '"></i></button>' +
-          // toggle full route
-          '<button type="button" class="full_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="full route" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("full-route") +
-          '"><svg id="fullRouteIcon-' +
-          competitor.id +
-          '" ' +
-          (competitor.isShown
-            ? competitor.displayFullRoute
-              ? 'fill="#20c997"'
-              : ""
-            : 'fill="#aaa"') +
-          ' viewBox="0 0 48 48" width="16px" height="16px" style="vertical-align: text-bottom"><path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>' +
-          "</svg></button>" +
-          (competitorBatteyLevels.hasOwnProperty(competitor.id)
-            ? '<div class="float-end d-inline-block text-end if-live' +
-              (isLiveMode ? "" : " d-none") +
-              '">' +
-              '<span style="color: ' +
-              (competitorBatteyLevels[competitor.id] !== null
-                ? "grey"
-                : "lightgrey") +
-              '; cursor: pointer" class="battery_level" data-bs-toggle="tooltip" data-bs-custom-class="higher-z-index" data-bs-title="' +
-              (competitorBatteyLevels[competitor.id] !== null
-                ? competitorBatteyLevels[competitor.id] + "%"
-                : banana.i18n("unknown")) +
-              '"><i class="fa-solid fa-battery-' +
-              batteryIconName(competitorBatteyLevels[competitor.id]) +
-              ' fa-rotate-270"></i></span></div>'
-            : "") +
-          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>' +
-          "</div>"
-      );
-      var diva = u(
-        '<div class="card mb-1" style="background-color:transparent";/>'
-      ).append(div);
-      u(div)
-        .find(".color-tag")
-        .on("click", function () {
-          u("#colorModalLabel").text(
-            banana.i18n("select-color-for", competitor.name)
-          );
-          var color = competitor.color;
-          u("#color-picker").html("");
-          new iro.ColorPicker("#color-picker", {
-            color,
-            width: 150,
-            display: "inline-block",
-          }).on("color:change", function (c) {
-            color = c.hexString;
-          });
-          colorModal.show();
-          u("#save-color").on("click", function () {
-            competitor.color = color;
-            competitor.isColorDark = getContrastYIQ(competitor.color);
-            colorModal.hide();
-            displayCompetitorList();
+      var div = u("<div/>");
+      div.addClass("card-body", "px-1", "pt-1", "pb-0", "competitor-card");
+      {
+        var firstLine = u("<div/>")
+          .addClass("text-nowrap", "text-truncate", "overflow-hidden")
+          .css({ lineHeight: "1.13rem" });
 
-            if (competitor.mapMarker) {
-              map.removeLayer(competitor.mapMarker);
-            }
-            if (competitor.nameMarker) {
-              map.removeLayer(competitor.nameMarker);
-            }
-            if (competitor.tail) {
-              map.removeLayer(competitor.tail);
-            }
-            competitor.mapMarker = null;
-            competitor.nameMarker = null;
-            competitor.tail = null;
-
-            u("#save-color").off("click");
-          });
-        });
-      u(div)
-        .find(".competitor-switch")
-        .on("click", function (e) {
-          if (!e.target.checked) {
-            competitor.isShown = false;
-            competitor.focused = false;
-            competitor.highlighted = false;
-            u("#focusedIcon-" + competitor.id).removeClass("route-focused");
-            competitor.displayFullRoute = null;
-            u("#fullRouteIcon-" + competitor.id).attr({ fill: "#aaa" });
-            u(e.target)
-              .parent()
-              .parent()
-              .removeClass("route-displayed")
-              .addClass("route-not-displayed");
-            if (competitor.mapMarker) {
-              map.removeLayer(competitor.mapMarker);
-            }
-            if (competitor.nameMarker) {
-              map.removeLayer(competitor.nameMarker);
-            }
-            if (competitor.tail) {
-              map.removeLayer(competitor.tail);
-            }
-            competitor.mapMarker = null;
-            competitor.nameMarker = null;
-            competitor.tail = null;
-            u(e.target)
-              .parent()
-              .parent()
-              .find(".speedometer")
-              .first().textContent = "";
-            u(e.target)
-              .parent()
-              .parent()
-              .find(".odometer")
-              .first().textContent = "";
-            updateCompetitor(competitor);
-            nbShown -= 1;
-          } else {
-            if (nbShown >= maxParticipantsDisplayed) {
-              swal({
-                title: banana.i18n(
-                  "reached-max-runners",
-                  maxParticipantsDisplayed
-                ),
-                type: "error",
-                confirmButtonText: "OK",
+        var colorTag = u("<span/>")
+          .addClass("color-tag", "me-1")
+          .css({ cursor: "pointer" })
+          .on("click", function () {
+            var color = competitor.color;
+            u("#colorModalLabel").text(
+              banana.i18n("select-color-for", competitor.name)
+            );
+            u("#color-picker").html("");
+            new iro.ColorPicker("#color-picker", {
+              color,
+              width: 150,
+              display: "inline-block",
+            }).on("color:change", function (c) {
+              color = c.hexString;
+            });
+            colorModal.show();
+            u("#save-color").on("click", function () {
+              competitor.color = color;
+              competitor.isColorDark = getContrastYIQ(competitor.color);
+              colorModal.hide();
+              ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+                competitor[layerName]?.remove();
+                competitor[layerName] = null;
               });
-              return;
-            }
-            competitor.isShown = true;
-            u(e.target)
-              .parent()
-              .parent()
-              .removeClass("route-not-displayed")
-              .addClass("route-displayed");
+              displayCompetitorList();
+              u("#save-color").off("click");
+            });
+          });
 
-            u("#fullRouteIcon-" + competitor.id).attr({ fill: null });
-            updateCompetitor(competitor);
-            nbShown += 1;
-          }
-        });
-      u(div)
-        .find(".center_competitor_btn")
-        .on("click", function () {
-          zoomOnCompetitor(competitor);
-        });
-      u(div)
-        .find(".full_competitor_btn")
-        .on("click", function () {
-          toggleFullCompetitor(competitor);
-        });
-      u(div)
-        .find(".focus_competitor_btn")
-        .on("click", function () {
-          toggleFocusCompetitor(competitor);
-        });
-      u(div)
-        .find(".highlight_competitor_btn")
-        .on("click", function () {
-          toggleHighlightCompetitor(competitor);
-        });
+        var colorTagIcon = u("<i/>")
+          .addClass(
+            "media-object",
+            "fa-3x",
+            "fa-solid",
+            "fa-circle",
+            "icon-sidebar"
+          )
+          .css({
+            marginLeft: "1px",
+            fontSize: "1em",
+            color: competitor.color,
+          });
+
+        var nameDiv = u("<span/>")
+          .addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold")
+          .text(competitor.name);
+
+        colorTag.append(colorTagIcon);
+        firstLine.append(colorTag);
+        firstLine.append(nameDiv);
+        div.append(firstLine);
+      }
+      {
+        var secondLine = u("<div/>").addClass(
+          "text-nowrap",
+          "text-truncate",
+          "overflow-hidden",
+          "ps-0",
+          competitor.isShown ? "route-displayed" : "route-not-displayed"
+        );
+
+        {
+          var competitorSwitch = u("<div/>")
+            .addClass(
+              "form-check",
+              "form-switch",
+              "d-inline-block",
+              "align-middle"
+            )
+            .css({ marginRight: "-5px", paddingTop: "2px" })
+            .attr({
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("toggle"),
+            });
+
+          var competitorSwitchInput = u("<input/>")
+            .addClass("form-check-input", "competitor-switch")
+            .css({ boxShadow: "none" })
+            .attr({
+              type: "checkbox",
+              checked: !!competitor.isShown,
+            })
+            .on("click", function (e) {
+              var commonDiv = u(e.target).parent().parent();
+              if (!e.target.checked) {
+                competitor.isShown = false;
+                competitor.focused = false;
+                competitor.highlighted = false;
+                competitor.displayFullRoute = null;
+                commonDiv.find(".competitor-focus-btn").removeClass("focused");
+                commonDiv
+                  .find(".competitor-highlight-btn")
+                  .removeClass("highlighted");
+                commonDiv.find(".full-route-icon").attr({ fill: null });
+                commonDiv.find("button").attr({ disabled: true });
+                commonDiv
+                  .removeClass("route-displayed")
+                  .addClass("route-not-displayed");
+                ["mapMarker", "nameMarker", "tail"].forEach(function (
+                  layerName
+                ) {
+                  competitor[layerName]?.remove();
+                  competitor[layerName] = null;
+                });
+                commonDiv.find(".speedometer").text("");
+                commonDiv.find(".odometer").text("");
+                updateCompetitor(competitor);
+                nbShown -= 1;
+              } else {
+                if (nbShown >= maxParticipantsDisplayed) {
+                  swal({
+                    title: banana.i18n(
+                      "reached-max-runners",
+                      maxParticipantsDisplayed
+                    ),
+                    type: "error",
+                    confirmButtonText: "OK",
+                  });
+                  return;
+                }
+                competitor.isShown = true;
+                commonDiv
+                  .removeClass("route-not-displayed")
+                  .addClass("route-displayed");
+                commonDiv.find("button").attr({ disabled: false });
+                updateCompetitor(competitor);
+                nbShown += 1;
+              }
+            });
+
+          competitorSwitch.append(competitorSwitchInput);
+          secondLine.append(competitorSwitch);
+        }
+
+        {
+          var competitorCenterBtn = u("<button/>")
+            .addClass("btn", "btn-default", "btn-sm", "p-0", "ms-1", "me-0")
+            .attr({
+              "aria-label": "Center",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("center"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              zoomOnCompetitor(competitor);
+            });
+
+          var competitorCenterIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-location-dot"
+          );
+
+          competitorCenterBtn.append(competitorCenterIcon);
+          secondLine.append(competitorCenterBtn);
+        }
+
+        {
+          var competitorFollowBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-focus-btn",
+              competitor.focused ? "focused" : ""
+            )
+            .attr({
+              "aria-label": "Follow competitor",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("follow"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              const wasFocused = competitor.focused;
+              if (wasFocused) {
+                competitor.focused = false;
+                competitor.sidebarCard
+                  ?.find(".competitor-focus-btn")
+                  .removeClass("focused");
+              } else {
+                if (!competitor.isShown) {
+                  return;
+                }
+                competitorList.map((otherCompetitor) => {
+                  if (otherCompetitor.focused) {
+                    otherCompetitor.focused = false;
+                    otherCompetitor.sidebarCard
+                      ?.find(".competitor-focus-btn")
+                      .removeClass("focused");
+                  }
+                });
+                competitor.focused = true;
+                competitor.sidebarCard
+                  ?.find(".competitor-focus-btn")
+                  .addClass("focused");
+                zoomOnCompetitor(competitor);
+              }
+            });
+
+          var competitorFollowBtnIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-crosshairs"
+          );
+
+          competitorFollowBtn.append(competitorFollowBtnIcon);
+          secondLine.append(competitorFollowBtn);
+        }
+
+        {
+          var competitorHighlightBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-highlight-btn",
+              competitor.highlighted ? " highlighted" : ""
+            )
+            .attr({
+              "aria-label": "Highlight competitor",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("highlight"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              toggleHighlightCompetitor(competitor);
+            });
+
+          var competitorHighlightIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-highlighter"
+          );
+
+          competitorHighlightBtn.append(competitorHighlightIcon);
+          secondLine.append(competitorHighlightBtn);
+        }
+
+        {
+          var competitorFullRouteBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-full-route-btn",
+              competitor.displayFullRoute ? "full-route" : ""
+            )
+            .attr({
+              "aria-label": "Display competitor's full Route",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("full-route"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              toggleCompetitorFullRoute(competitor);
+            });
+
+          var competitorFullRouteBtnIcon = u("<svg/>")
+            .addClass("full-route-icon")
+            .attr({
+              fill: competitor.displayFullRoute ? "#20c997" : null,
+              viewBox: "0 0 48 48",
+              width: "16px",
+              height: "16px",
+              xmlns: "http://www.w3.org/2000/svg",
+            })
+            .css({ verticalAlign: "text-bottom" })
+            .html(
+              '<path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>'
+            );
+
+          competitorFullRouteBtn.append(competitorFullRouteBtnIcon);
+          secondLine.append(competitorFullRouteBtn);
+        }
+
+        if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
+          var batteryLevelDiv = u("<div/>").addClass(
+            "float-end",
+            "d-inline-blockv",
+            "text-end",
+            "if-live",
+            !isLiveMode ? "d-none" : ""
+          );
+
+          var batterySpan = u("<span/>").attr({
+            "data-bs-toggle": "tooltip",
+            "data-bs-custom-class": "higher-z-index",
+            "data-bs-title":
+              competitorBatteyLevels[competitor.id] !== null
+                ? competitorBatteyLevels[competitor.id] + "%"
+                : banana.i18n("unknown"),
+          });
+
+          var batteryIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-rotate-270",
+            `fa-battery-${batteryIconName(
+              competitorBatteyLevels[competitor.id]
+            )}`
+          );
+
+          batterySpan.append(batteryIcon);
+          batteryLevelDiv.append(batterySpan);
+          secondLine.append(batteryLevelDiv);
+        }
+
+        {
+          var metersDiv = u("<div/>")
+            .addClass("float-end d-inline-block text-end")
+            .css({ lineHeight: "10px" });
+          var spedometer = u("<span/>").addClass("speedometer");
+          var odometer = u("<span/>").addClass("odometer");
+          metersDiv.append(spedometer).append("<br/>").append(odometer);
+
+          secondLine.append(metersDiv);
+        }
+        div.append(secondLine);
+      }
+
+      competitor.sidebarCard = div;
+      competitor.speedometer = div.find(".speedometer").first();
+      competitor.odometer = div.find(".odometer").first();
+
       if (
         searchText === null ||
         searchText === "" ||
         competitor.name.toLowerCase().search(searchText) != -1
       ) {
-        listDiv.append(diva);
+        var divOneUp = u(
+          '<div class="card mb-1" style="background-color:transparent;"/>'
+        ).append(div);
+        listDiv.append(divOneUp);
       }
-      competitor.div = div;
-      competitor.speedometer = div.find(".speedometer").first();
-      competitor.odometer = div.find(".odometer").first();
     })(competitorList[i]);
   }
   if (competitorList.length === 0) {
     var div = u('<div class="text-center"/>');
-    var txt = banana.i18n("no-competitors");
-    div.html("<h3>" + txt + "</h3>");
+    div.append(u("<h3/>").text(banana.i18n("no-competitors")));
     listDiv.append(div);
   }
   if (!searchText) {
     var mainDiv = u('<div id="competitorSidebar" class="d-flex flex-column"/>');
     var topDiv = u("<div/>");
     if (competitorList.length) {
-      var hideAllTxt = banana.i18n("hide-all");
-      var showAllTxt = banana.i18n("show-all");
-      topDiv.append(
-        '<div class="text-center text-nowrap">' +
-          '<button id="showAllCompetitorBtn" class="btn btn-default"><i class="fa-solid fa-eye"></i> ' +
-          showAllTxt +
-          "</button>" +
-          '<button id="hideAllCompetitorBtn" class="btn btn-default"><i class="fa-solid fa-eye-slash"></i> ' +
-          hideAllTxt +
-          "</button>" +
-          "</div>"
-      );
+      var showHideAllDiv = u("<div/>")
+        .addClass("text-center", "text-nowrap")
+        .append(
+          u("<button/>")
+            .addClass("btn", "btn-default")
+            .on("click", function () {
+              nbShown = competitorList.reduce(function (a, v) {
+                return v.isShown ? a + 1 : a;
+              }, 0);
+              var didNotShowAll = false;
+              for (var i = 0; i < competitorList.length; i++) {
+                var competitor = competitorList[i];
+                if (
+                  nbShown >= maxParticipantsDisplayed &&
+                  !competitor.isShown
+                ) {
+                  didNotShowAll = true;
+                } else if (!competitor.isShown) {
+                  nbShown += 1;
+                  competitor.isShown = true;
+                }
+                updateCompetitor(competitor);
+              }
+              if (didNotShowAll) {
+                swal({
+                  title: banana.i18n(
+                    "reached-max-runners",
+                    maxParticipantsDisplayed
+                  ),
+                  type: "warning",
+                  confirmButtonText: "OK",
+                });
+              }
+              displayCompetitorList();
+            })
+            .append(u("<i/>").addClass("fa-solid", "fa-eye"))
+            .append(" ")
+            .append(banana.i18n("show-all"))
+        )
+        .append(
+          u("<button/>")
+            .addClass("btn", "btn-default")
+            .on("click", function () {
+              for (var i = 0; i < competitorList.length; i++) {
+                var competitor = competitorList[i];
+                competitor.isShown = false;
+                competitor.focused = false;
+                competitor.highlighted = false;
+                competitor.displayFullRoute = false;
+                ["mapMarker", "nameMarker", "tail"].forEach(function (
+                  layerName
+                ) {
+                  competitor[layerName]?.remove();
+                  competitor[layerName] = null;
+                });
+                updateCompetitor(competitor);
+                nbShown = 0;
+              }
+              displayCompetitorList();
+            })
+            .append(u("<i/>").addClass("fa-solid", "fa-eye-slash"))
+            .append(" ")
+            .append(banana.i18n("hide-all"))
+        );
+      topDiv.append(showHideAllDiv);
     }
-    u(topDiv)
-      .find("#hideAllCompetitorBtn")
-      .on("click", function () {
-        for (var i = 0; i < competitorList.length; i++) {
-          var competitor = competitorList[i];
-          competitor.isShown = false;
-          competitor.focused = false;
-          competitor.highlighted = false;
-          competitor.displayFullRoute = false;
 
-          if (competitor.mapMarker) {
-            map.removeLayer(competitor.mapMarker);
-          }
-          if (competitor.nameMarker) {
-            map.removeLayer(competitor.nameMarker);
-          }
-          if (competitor.tail) {
-            map.removeLayer(competitor.tail);
-          }
-          competitor.mapMarker = null;
-          competitor.nameMarker = null;
-          competitor.tail = null;
-          updateCompetitor(competitor);
-          nbShown = 0;
-        }
-        displayCompetitorList();
-      });
-    u(topDiv)
-      .find("#showAllCompetitorBtn")
-      .on("click", function () {
-        nbShown = competitorList.reduce(function (a, v) {
-          return v.isShown ? a + 1 : a;
-        }, 0);
-        var didNotShowAll = false;
-        for (var i = 0; i < competitorList.length; i++) {
-          var competitor = competitorList[i];
-          if (nbShown >= maxParticipantsDisplayed && !competitor.isShown) {
-            didNotShowAll = true;
-          } else if (!competitor.isShown) {
-            nbShown += 1;
-            competitor.isShown = true;
-          }
-          updateCompetitor(competitor);
-        }
-        if (didNotShowAll) {
-          swal({
-            title: banana.i18n("reached-max-runners", maxParticipantsDisplayed),
-            type: "warning",
-            confirmButtonText: "OK",
-          });
-        }
-        displayCompetitorList();
-      });
     if (competitorList.length > 10) {
       topDiv.append(
         u('<input class="form-control" type="search" val=""/>')
@@ -1556,12 +1674,12 @@ function displayCompetitorList(force) {
     u("#sidebar").html("");
     u("#sidebar").append(mainDiv);
   } else {
-    u("#listCompetitor").remove();
+    u("#competitorList").remove();
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
   }
   if (competitorList.length > 10) {
-    listDiv.addClass("with_search_bar");
+    listDiv.addClass("with-search-bar");
   }
   if (scrollTopDiv) {
     listDiv.nodes[0].scrollTop = scrollTopDiv;
@@ -1595,8 +1713,306 @@ function displayOptions(ev) {
   u("#options_show_button").addClass("active");
   optionDisplayed = true;
   searchText = null;
-  var mainDiv = u("<div/>");
-  var qrDataUrl = null;
+  var optionsSidebar = u("<div/>");
+  optionsSidebar.css({
+    "overflow-y": "auto",
+    "overflow-x": "hidden",
+  });
+  optionsSidebar.attr({ id: "optionsSidebar" });
+
+  {
+    var tailLenWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("tails"))
+      .addClass("text-nowrap");
+
+    var widgetContent = u("<div/>").addClass("form-group");
+
+    var tailLenLabel = u("<label/>").text(banana.i18n("length-in-seconds"));
+
+    var tailLenFormDiv = u("<div/>").addClass("row", "g-3");
+
+    var hourInput = u("<input/>")
+      .addClass("form-control", "tailLengthControl")
+      .css({ width: "90px" })
+      .attr({
+        type: "number",
+        min: "0",
+        max: "9999",
+        name: "hours",
+      })
+      .val(Math.floor(tailLength / 3600));
+
+    var hourDiv = u("<div/>").addClass("col-auto").append(hourInput);
+
+    var minuteInput = u("<input/>")
+      .addClass("form-control", "tailLengthControl")
+      .css({ width: "70px" })
+      .attr({
+        type: "number",
+        min: "0",
+        max: "59",
+        name: "minutes",
+      })
+      .val(Math.floor(tailLength / 60) % 60);
+
+    var minuteDiv = u("<div/>").addClass("col-auto").append(minuteInput);
+
+    var secondInput = u("<input/>")
+      .addClass("form-control", "tailLengthControl")
+      .css({ width: "70px" })
+      .attr({
+        type: "number",
+        min: "0",
+        max: "59",
+        name: "seconds",
+      })
+      .val(tailLength % 60);
+
+    var secondDiv = u("<div/>").addClass("col-auto").append(secondInput);
+
+    tailLenFormDiv.append(hourDiv).append(minuteDiv).append(secondDiv);
+
+    tailLenFormDiv.find(".tailLengthControl").on("input", function (e) {
+      var commonDiv = u(e.target).parent().parent();
+      var hourInput = commonDiv.find('input[name="hours"]');
+      var minInput = commonDiv.find('input[name="minutes"]');
+      var secInput = commonDiv.find('input[name="seconds"]');
+      var h = parseInt(hourInput.val() || 0);
+      var m = parseInt(minInput.val() || 0);
+      var s = parseInt(secInput.val() || 0);
+      var v = 3600 * h + 60 * m + s;
+      if (isNaN(v)) {
+        return;
+      }
+      tailLength = Math.max(0, v);
+      hourInput.val(Math.floor(tailLength / 3600));
+      minInput.val(Math.floor((tailLength / 60) % 60));
+      secInput.val(Math.floor(tailLength % 60));
+      u("#tail-length-display").text(printTime(tailLength));
+    });
+    widgetContent.append(tailLenLabel).append(tailLenFormDiv);
+
+    tailLenWidget.append(widgetTitle).append(widgetContent);
+
+    optionsSidebar.append(tailLenWidget);
+  }
+  {
+    var ctrlWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("groupings"))
+      .addClass("text-nowrap");
+
+    var widgetContent = u("<div/>").addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>")
+      .addClass("form-check-input")
+      .attr({
+        id: "toggleControlsSwitch",
+        type: "checkbox",
+        checked: !!showControls,
+      })
+      .on("click", function (e) {
+        if (!e.target.checked) {
+          showControls = false;
+          panControl.remove();
+          zoomControl.remove();
+          rotateControl.remove();
+        } else {
+          map.addControl(panControl);
+          map.addControl(zoomControl);
+          map.addControl(rotateControl);
+          showControls = true;
+        }
+      });
+    var widgetLabel = u("<label/>")
+      .addClass("form-check-label")
+      .attr({ for: "toggleControlsSwitch" })
+      .text(banana.i18n("show-map-controls"));
+
+    widgetContent.append(widgetInput).append(widgetLabel);
+
+    ctrlWidget.append(widgetTitle).append(widgetContent);
+
+    optionsSidebar.append(ctrlWidget);
+  }
+  {
+    var groupWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("groupings"))
+      .addClass("text-nowrap");
+
+    var widgetContent = u("<div/>").addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>")
+      .addClass("form-check-input")
+      .attr({
+        id: "toggleClusterSwitch",
+        type: "checkbox",
+        checked: !!showClusters,
+      })
+      .on("click", function (e) {
+        if (!e.target.checked) {
+          showClusters = false;
+          groupControl.remove();
+          for (var [key, cluster] of Object.entries(clusters)) {
+            ["mapMarker", "nameMarker"].forEach(function (layerName) {
+              if (cluster[layerName]) {
+                cluster[layerName]?.remove();
+                clusters[key][layerName] = null;
+              }
+            });
+          }
+          clusters = {};
+        } else {
+          groupControl = L.control.grouping({ position: "topright" });
+          map.addControl(groupControl);
+          showClusters = true;
+        }
+      });
+    var widgetLabel = u("<label/>")
+      .addClass("form-check-label")
+      .attr({ for: "toggleClusterSwitch" })
+      .text(banana.i18n("show-groupings"));
+
+    widgetContent.append(widgetInput).append(widgetLabel);
+
+    groupWidget.append(widgetTitle).append(widgetContent);
+
+    optionsSidebar.append(groupWidget);
+  }
+  {
+    var langWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .addClass("text-nowrap")
+      .html(`<i class="fa-solid fa-language"></i> ${banana.i18n("language")}`);
+
+    var langSelector = u("<select/>")
+      .addClass("form-select")
+      .attr({ ariaLabel: "Language" })
+      .on("change", function (e) {
+        window.localStorage.setItem("lang", e.target.value);
+        window.location.search = `lang=${e.target.value}`;
+      });
+
+    Object.keys(supportedLanguages).forEach(function (lang) {
+      var option = u("<option/>");
+      option.attr({ value: lang });
+      option.text(supportedLanguages[lang]);
+      if (locale === lang) {
+        option.attr({ selected: true });
+      }
+      langSelector.append(option);
+    });
+
+    langWidget.append(widgetTitle).append(langSelector);
+
+    optionsSidebar.append(langWidget);
+  }
+  {
+    var locWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("location"))
+      .addClass("text-nowrap");
+
+    var widgetContent = u("<div/>").addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>")
+      .addClass("form-check-input")
+      .attr({
+        id: "toggleLocationSwitch",
+        type: "checkbox",
+        checked: !!showUserLocation,
+      })
+      .on("click", function (e) {
+        showUserLocation = e.target.checked;
+        if (!showUserLocation) {
+          locateControl.stop();
+        } else {
+          locateControl.start();
+        }
+      });
+    var widgetLabel = u("<label/>")
+      .addClass("form-check-label")
+      .attr({ for: "toggleLocationSwitch" })
+      .text(banana.i18n("show-location"));
+
+    widgetContent.append(widgetInput).append(widgetLabel);
+
+    locWidget.append(widgetTitle).append(widgetContent);
+
+    optionsSidebar.append(locWidget);
+  }
+  {
+    var bgMapWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("background-map"))
+      .addClass("text-nowrap");
+
+    var mapSelector = u("<select/>")
+      .addClass("form-select")
+      .attr({ ariaLabel: "Background map" })
+      .on("change", function (e) {
+        if (backgroundLayer) {
+          backgroundLayer.remove();
+          backgroundLayer = null;
+        }
+        if (e.target.value === "blank") {
+          u("#map").css({ background: "#fff" });
+        } else {
+          u("#map").css({ background: "#ddd" });
+          var layer = backdropMaps[e.target.value];
+          layer.nickname = e.target.value;
+          layer.setZIndex(-1);
+          layer.addTo(map);
+          backgroundLayer = layer;
+        }
+      });
+
+    var blankOption = u("<option/>");
+    blankOption.attr({ value: "blank" });
+    blankOption.text("Blank");
+    if (!backgroundLayer) {
+      blankOption.attr({ selected: true });
+    }
+    mapSelector.append(blankOption);
+
+    Object.entries(backgroundMapTitles).forEach(function (kv) {
+      var option = u("<option/>");
+      option.attr({ value: kv[0] });
+      option.text(kv[1]);
+      if (backgroundLayer?.nickname === kv[0]) {
+        option.attr({ selected: true });
+      }
+      mapSelector.append(option);
+    });
+
+    bgMapWidget.append(widgetTitle).append(mapSelector);
+
+    optionsSidebar.append(bgMapWidget);
+  }
+
   if (qrUrl) {
     var qr = new QRious();
     qr.set({
@@ -1606,196 +2022,37 @@ function displayOptions(ev) {
       value: qrUrl,
       size: 138,
     });
-    qrDataUrl = qr.toDataURL();
+
+    var qrWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("qr-link"))
+      .addClass("text-nowrap");
+
+    qrWidget.append(widgetTitle);
+
+    var widgetContent = u("<p/>").addClass("text-center");
+
+    var qrImage = u("<img/>").attr({
+      src: qr.toDataURL(),
+      alt: "QR code for this event",
+    });
+
+    var qrText = u("<a/>")
+      .addClass("small", "fw-bold")
+      .css({ wordBreak: "break-all" })
+      .attr({ href: qrUrl })
+      .text(qrUrl.replace(/^https?:\/\//, ""));
+
+    widgetContent.append(qrImage).append(u("<br/>")).append(qrText);
+
+    qrWidget.append(widgetContent);
+
+    optionsSidebar.append(qrWidget);
   }
-  mainDiv.append(
-    u(
-      '<div id="listOptions" style="overflow-y:auto;overflow-x: hidden;" />'
-    ).html(
-      '<div class="mb-2"><h4>' +
-        banana.i18n("tails") +
-        "</h4>" +
-        '<div class="form-group">' +
-        '<label for="tailLengthInput">' +
-        banana.i18n("length-in-seconds") +
-        "</label>" +
-        '<div class="row g-3">' +
-        '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
-        Math.floor(tailLength / 3600) +
-        '" style="width:100px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
-        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
-        (Math.floor(tailLength / 60) % 60) +
-        '" style="width:70px"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
-        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
-        (tailLength % 60) +
-        '"style="width:70px" /></div>' +
-        "</div>" +
-        "</div>" +
-        '</div><div class="mb-2"><h4>' +
-        banana.i18n("map-controls") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-controls-switch"' +
-        (showControls ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-controls-switch">' +
-        banana.i18n("show-map-controls") +
-        "</label></div>" +
-        '</div><div class="mb-2"><h4>' +
-        banana.i18n("groupings") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-clusters-switch"' +
-        (showClusters ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-clusters-switch">' +
-        banana.i18n("show-groupings") +
-        "</label></div>" +
-        '</div><div class="mb-2"><h4 class="text-nowrap">' +
-        '<i class="fa-solid fa-language"></i> ' +
-        banana.i18n("language") +
-        "</h4>" +
-        '<select class="form-select mb-2" id="languageSelector">' +
-        Object.keys(supportedLanguages)
-          .map(function (l) {
-            return (
-              '<option value="' +
-              l +
-              '"' +
-              (locale === l ? " selected" : "") +
-              ">" +
-              supportedLanguages[l] +
-              "</option>"
-            );
-          })
-          .join("") +
-        "</select>" +
-        '<div class="mb-2"><h4>' +
-        banana.i18n("location") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-location-switch"' +
-        (showUserLocation ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-location-switch">' +
-        banana.i18n("show-location") +
-        "</label></div></div>" +
-        '<div class="mb-2"><h4>' +
-        banana.i18n("background-map") +
-        "</h4>" +
-        '<select class="form-select" aria-label="Background map" id="backgroundMapSelector">' +
-        '<option value="blank"' +
-        (!backgroundLayer ? " selected" : "") +
-        ">Blank</option>" +
-        Object.entries(backgroundMapTitles).map(function (kv) {
-          var isCurrent = backgroundLayer?.nickname === kv[0];
-          return (
-            '<option value="' +
-            kv[0] +
-            '"' +
-            (isCurrent ? " selected" : "") +
-            ">" +
-            kv[1] +
-            "</option>"
-          );
-        }) +
-        "</select></div>" +
-        (qrUrl
-          ? `<div class="mb-2"><h4>${banana.i18n("qr-link")}</h4>
-<p class="text-center">
-<img class="p-2" src="${qrDataUrl}" alt="qr"><br/>
-<a class="small fw-bold" style="word-break: break-all;" href="${qrUrl}">${qrUrl.replace(
-              /^https?:\/\//,
-              ""
-            )}</a>
-</p></div>`
-          : "")
-    )
-  );
-  u(mainDiv)
-    .find("#toggle-location-switch")
-    .on("click", function (e) {
-      showUserLocation = e.target.checked;
-      if (!showUserLocation) {
-        locateControl.stop();
-      } else {
-        locateControl.start();
-      }
-    });
-  u(mainDiv)
-    .find("#backgroundMapSelector")
-    .on("change", function (e) {
-      if (backgroundLayer) {
-        backgroundLayer.remove();
-        backgroundLayer = null;
-      }
-      if (e.target.value === "blank") {
-        u("#map").css({ background: "#fff" });
-      } else {
-        u("#map").css({ background: "#ddd" });
-        var layer = backdropMaps[e.target.value];
-        layer.nickname = e.target.value;
-        layer.setZIndex(-1);
-        layer.addTo(map);
-        backgroundLayer = layer;
-      }
-    });
-  u(mainDiv)
-    .find("#languageSelector")
-    .on("change", function (e) {
-      window.localStorage.setItem("lang", e.target.value);
-      window.location.search = `lang=${e.target.value}`;
-    });
-  u(mainDiv)
-    .find(".tailLengthControl")
-    .on("input", function (e) {
-      var h = parseInt(u("#tailLengthHoursInput").val() || 0);
-      var m = parseInt(u("#tailLengthMinutesInput").val() || 0);
-      var s = parseInt(u("#tailLengthSecondsInput").val() || 0);
-      var v = 3600 * h + 60 * m + s;
-      if (isNaN(v)) {
-        return;
-      }
-      tailLength = Math.max(0, v);
-      u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
-      u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
-      u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
-      u("#tail-length-display").text(printTime(tailLength));
-    });
-  u(mainDiv)
-    .find("#toggle-controls-switch")
-    .on("click", function (e) {
-      if (!e.target.checked) {
-        showControls = false;
-        map.removeControl(panControl);
-        map.removeControl(zoomControl);
-        map.removeControl(rotateControl);
-      } else {
-        map.addControl(panControl);
-        map.addControl(zoomControl);
-        map.addControl(rotateControl);
-        showControls = true;
-      }
-    });
-  u(mainDiv)
-    .find("#toggle-clusters-switch")
-    .on("click", function (e) {
-      if (!e.target.checked) {
-        showClusters = false;
-        map.removeControl(groupControl);
-        for (var [key, c] of Object.entries(clusters)) {
-          if (c.mapMarker) {
-            map.removeLayer(c.mapMarker);
-            clusters[key].mapMarker = null;
-          }
-          if (c.nameMarker) {
-            map.removeLayer(c.nameMarker);
-            clusters[key].nameMarker = null;
-          }
-        }
-        clusters = {};
-      } else {
-        groupControl = L.control.grouping({ position: "topright" });
-        map.addControl(groupControl);
-        showClusters = true;
-      }
-    });
+
   u("#sidebar").html("");
-  u("#sidebar").append(mainDiv);
+  u("#sidebar").append(optionsSidebar);
 }
 
 function keepFocusOnCompetitor(competitor, location) {
