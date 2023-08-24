@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ],
                 default="public",
                 help_text=(
-                    "Public: Listed on the front page of your clubs page | "
+                    "Public: Listed on your club's front page | "
                     "Secret: Can be opened with a link, however not listed on "
                     "frontpage | Private: Only a logged in admin of the club "
                     "can access the page"
