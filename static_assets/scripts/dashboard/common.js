@@ -33,7 +33,7 @@ var makeFieldNowable = function (el) {
       var target = u(e.target)
         .parent()
         .parent()
-        .find('input[id$="-start_time"]');
+        .find('input');
       target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
       target.trigger("change");
     });
