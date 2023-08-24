@@ -94,7 +94,7 @@ tornado==6.3.3
 typing-extensions==4.6.3
 uritemplate==4.1.1
 urllib3==1.26.16
-uwsgi==2.0.21
+uwsgi==2.0.22
 webauthn==1.8.1
 webencodings==0.5.1
 websocket-client==1.5.2
