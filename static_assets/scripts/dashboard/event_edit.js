@@ -104,7 +104,7 @@ function addCompetitor(name, shortName, startTime, deviceId) {
   }
 }
 
-function displayRoutechoicesListedOption (value, first) {
+function displayRoutechoicesListedOption(value, first) {
   if (value === "public") {
     u("#id_list_on_routechoices_com").parent().parent().show();
     if (!first) {
@@ -488,11 +488,8 @@ function showLocalTime(el) {
 
   u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
 
-  u("#id_privacy").on(
-    "change",
-    function(e){
-      displayRoutechoicesListedOption(e.target.value, false);
-    }
-  );
+  u("#id_privacy").on("change", function (e) {
+    displayRoutechoicesListedOption(e.target.value, false);
+  });
   displayRoutechoicesListedOption(u("#id_privacy").val(), true);
 })();
