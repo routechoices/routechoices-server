@@ -885,7 +885,9 @@ class Map(models.Model):
         min_lon = 180
         max_lon = -180
 
-        for pts in seg + waypoints:
+        for pts in seg + [
+            waypoints,
+        ]:
             lats_lons = list(zip(*pts))
             lats = lats_lons[0]
             lons = lats_lons[1]
@@ -901,7 +903,7 @@ class Map(models.Model):
 
         res_scale = 4
         MAX_SIZE = 4000
-        offset = 60
+        offset = 100
         width = tr_xy["x"] - tl_xy["x"] + offset * 2
         height = tr_xy["y"] - br_xy["y"] + offset * 2
 
@@ -942,13 +944,23 @@ class Map(models.Model):
             ]
             draw.line(map_pts, (255, 255, 255, 200), 22 * res_scale, joint="curve")
             draw.line(map_pts, (255, 0, 0, 160), 16 * res_scale, joint="curve")
-        for pts in waypoints:
-            map_pt = [
-                new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True) for pt in pts
-            ]
-            circle = (map_pt[0] - 40, map_pt[1] - 40, map_pt[0] + 40, map_pt[1] + 40)
-            draw.ellipse(circle, (255, 255, 255, 200), 22 * res_scale)
-            draw.ellipse(circle, (255, 0, 0, 160), 16 * res_scale)
+        for pt in waypoints:
+            map_pt = new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True)
+            widths = [66, 60, 48]
+            thicknesses = [7, 16, 6]
+            colors = [(255, 255, 255, 200), (255, 0, 0, 160), (255, 255, 255, 200)]
+            for i, w in enumerate(widths):
+                wr = w * res_scale
+                draw.ellipse(
+                    (
+                        map_pt[0] - wr,
+                        map_pt[1] - wr,
+                        map_pt[0] + wr,
+                        map_pt[1] + wr,
+                    ),
+                    outline=colors[i],
+                    width=int(thicknesses[i] * res_scale),
+                )
 
         im = im.resize(
             (int(width / scale), int(height / scale)), resample=Image.Resampling.BICUBIC
