@@ -31,6 +31,7 @@ class LiveEventsFeed(Feed):
             Event.objects.select_related("club")
             .filter(
                 privacy=PRIVACY_PUBLIC,
+                list_on_routechoices_com=True,
             )
             .filter(start_date__lte=now())
         )

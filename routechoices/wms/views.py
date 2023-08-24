@@ -174,7 +174,10 @@ def wms_service(request):
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": -89.9, "lon": -180})
 
         events = (
-            Event.objects.filter(privacy=PRIVACY_PUBLIC)
+            Event.objects.filter(
+                privacy=PRIVACY_PUBLIC,
+                list_on_routechoices_com=True,
+            )
             .filter(start_date__lte=now())
             .select_related("club", "map")
             .prefetch_related(

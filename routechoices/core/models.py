@@ -1213,10 +1213,14 @@ class Event(models.Model):
         choices=PRIVACY_CHOICES,
         default=PRIVACY_PUBLIC,
         help_text=(
-            "Public: Listed on the front page | "
+            "Public: Listed on the front page of your clubs page | "
             "Secret: Can be opened with a link, however not listed on frontpage | "
             "Private: Only a logged in admin of the club can access the page"
         ),
+    )
+    list_on_routechoices_com = models.BooleanField(
+        "List on Routechoices.com events page",
+        default=True,
     )
     backdrop_map = BackroundMapChoicesField()
     map = models.ForeignKey(
@@ -1373,7 +1377,9 @@ class Event(models.Model):
             .select_related("club", "event_set")
             .prefetch_related("competitors")
         )
-        if club is not None:
+        if club is None:
+            event_qs = event_qs.filter(list_on_routechoices_com=True)
+        else:
             event_qs = event_qs.filter(club=club)
 
         past_event_qs = event_qs.filter(end_date__lt=now())
@@ -1451,6 +1457,10 @@ class Event(models.Model):
                     .filter(event_set_id__in=events_set_ids, privacy=PRIVACY_PUBLIC)
                     .order_by("-start_date", "name")
                 )
+                if not club:
+                    all_events_w_set = all_events_w_set.filter(
+                        list_on_routechoices_com=True
+                    )
                 if type == "live":
                     all_events_w_set = all_events_w_set.filter(
                         start_date__lte=now(), end_date__gte=now()

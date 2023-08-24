@@ -304,6 +304,7 @@ class EventForm(ModelForm):
             "open_registration",
             "allow_route_upload",
             "privacy",
+            "list_on_routechoices_com",
             "send_interval",
             "tail_length",
             "emergency_contact",
