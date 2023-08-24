@@ -46,5 +46,6 @@
     "unknown": "Ej tillgängligt",
     "archived-event": "Arkiverad händelse",
     "switch-replay-mode": "Byt till Repris",
-    "return-live-mode": "Tillbaka till Live"
+    "return-live-mode": "Tillbaka till Live",
+    "background-map": "Bakgrundskarta"
 }

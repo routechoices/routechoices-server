@@ -46,5 +46,6 @@
     "unknown": "Non disponible",
     "archived-event": "Événement archivé",
     "switch-replay-mode": "Passer au Replay",
-    "return-live-mode": "Retour au Direct"
+    "return-live-mode": "Retour au Direct",
+    "background-map": "Carte de fond"
 }

@@ -17,6 +17,7 @@ var COLORS = [
   "#a9a9a9",
   "#000000",
 ];
+var backgroundLayer = null;
 var toast = null;
 var locale = null;
 var map = null;
@@ -1672,16 +1673,36 @@ function displayOptions(ev) {
         (showUserLocation ? " checked" : "") +
         '><label class="form-check-label" for="toggle-location-switch">' +
         banana.i18n("show-location") +
-        "</label></div><div>" +
+        "</label></div></div>" +
+        '<div class="mb-2"><h4>' +
+        banana.i18n("background-map") +
+        "</h4>" +
+        '<select class="form-select" aria-label="Background map" id="backgroundMapSelector">' +
+        '<option value="blank"' +
+        (!backgroundLayer ? " selected" : "") +
+        ">Blank</option>" +
+        Object.entries(backgroundMapTitles).map(function (kv) {
+          var isCurrent = backgroundLayer?.nickname === kv[0];
+          return (
+            '<option value="' +
+            kv[0] +
+            '"' +
+            (isCurrent ? " selected" : "") +
+            ">" +
+            kv[1] +
+            "</option>"
+          );
+        }) +
+        "</select></div>" +
         (qrUrl
-          ? `<h4>${banana.i18n("qr-link")}</h4>
+          ? `<div class="mb-2"><h4>${banana.i18n("qr-link")}</h4>
 <p class="text-center">
 <img class="p-2" src="${qrDataUrl}" alt="qr"><br/>
 <a class="small fw-bold" style="word-break: break-all;" href="${qrUrl}">${qrUrl.replace(
               /^https?:\/\//,
               ""
             )}</a>
-</p>`
+</p></div>`
           : "")
     )
   );
@@ -1695,7 +1716,24 @@ function displayOptions(ev) {
         locateControl.start();
       }
     });
-
+  u(mainDiv)
+    .find("#backgroundMapSelector")
+    .on("change", function (e) {
+      if (backgroundLayer) {
+        backgroundLayer.remove();
+        backgroundLayer = null;
+      }
+      if (e.target.value === "blank") {
+        u("#map").css({ background: "#fff" });
+      } else {
+        u("#map").css({ background: "#ddd" });
+        var layer = backdropMaps[e.target.value];
+        layer.nickname = e.target.value;
+        layer.setZIndex(-1);
+        layer.addTo(map);
+        backgroundLayer = layer;
+      }
+    });
   u(mainDiv)
     .find("#languageSelector")
     .on("change", function (e) {
@@ -2364,7 +2402,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023080200`)
+  return fetch(`${langFile}?v=2023082400`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

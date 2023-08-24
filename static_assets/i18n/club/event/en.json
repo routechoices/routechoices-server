@@ -46,5 +46,6 @@
     "unknown": "Not available",
     "archived-event": "Archived Event",
     "switch-replay-mode": "Switch to Replay",
-    "return-live-mode": "Back to Live"
+    "return-live-mode": "Back to Live",
+    "background-map": "Background map"
 }

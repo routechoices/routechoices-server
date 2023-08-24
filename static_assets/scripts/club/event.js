@@ -175,7 +175,10 @@
         if (response.event.backdrop === "blank") {
           u("#map").css({ background: "#fff" });
         } else {
-          backdropMaps[response.event.backdrop].addTo(map);
+          var layer = backdropMaps[response.event.backdrop];
+          layer.addTo(map);
+          layer.nickname = response.event.backdrop;
+          backgroundLayer = layer;
         }
         var now = clock.now();
         startEvent = new Date(response.event.start_date);

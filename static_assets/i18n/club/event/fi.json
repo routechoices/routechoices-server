@@ -46,5 +46,6 @@
     "unknown": "Ei saatavilla",
     "archived-event": "Arkistoitu tapahtuma",
     "switch-replay-mode": "Vaihda Replayin",
-    "return-live-mode": "Paluu Liveen"
+    "return-live-mode": "Paluu Liveen",
+    "background-map": "Taustakartta"
 }

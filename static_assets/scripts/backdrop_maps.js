@@ -181,22 +181,28 @@ function cloneLayer(layer) {
   throw "Unknown layer, cannot clone this layer. Leaflet-version: " + L.version;
 }
 
+var backgroundMapTitles = {
+  osm: "Open Street Map",
+  "gmap-street": "Google Map Street",
+  "gmap-hybrid": "Google Map Satellite",
+  "gmap-terrain": "Google Map Terrain",
+  "mapant-fi": "Mapant Finland",
+  "mapant-no": "Mapant Norway",
+  "mapant-es": "Mapant Spain",
+  "mapant-se": "Mapant Sweden",
+  "mapant-ch": "Mapant Switzerland",
+  "topo-fi": "Topo Finland",
+  "topo-fr": "Topo France",
+  "topo-no": "Topo Norway",
+  "topo-uk": "Topo UK",
+  "topo-world": "Topo World (OpenTopo)",
+  "topo-world-alt": "Topo World (ArcGIS)",
+};
+
 function getBaseLayers() {
-  return {
-    "Open Street Map": cloneLayer(backdropMaps["osm"]),
-    "Google Map Street": cloneLayer(backdropMaps["gmap-street"]),
-    "Google Map Satellite": cloneLayer(backdropMaps["gmap-hybrid"]),
-    "Google Map Terrain": cloneLayer(backdropMaps["gmap-terrain"]),
-    "Mapant Finland": cloneLayer(backdropMaps["mapant-fi"]),
-    "Mapant Norway": cloneLayer(backdropMaps["mapant-no"]),
-    "Mapant Spain": cloneLayer(backdropMaps["mapant-es"]),
-    "Mapant Sweden": cloneLayer(backdropMaps["mapant-se"]),
-    "Mapant Switzerland": cloneLayer(backdropMaps["mapant-ch"]),
-    "Topo Finland": cloneLayer(backdropMaps["topo-fi"]),
-    "Topo France": cloneLayer(backdropMaps["topo-fr"]),
-    "Topo Norway": cloneLayer(backdropMaps["topo-no"]),
-    "Topo UK": cloneLayer(backdropMaps["topo-uk"]),
-    "Topo World (OpenTopo)": cloneLayer(backdropMaps["topo-world"]),
-    "Topo World (ArcGIS)": cloneLayer(backdropMaps["topo-world-alt"]),
-  };
+  var entries = {};
+  for (var [key, value] of Object.entries(backgroundMapTitles)) {
+    entries[value] = cloneLayer(backdropMaps[key]);
+  }
+  return entries;
 }
