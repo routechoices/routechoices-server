@@ -1596,119 +1596,197 @@ function displayOptions(ev) {
   optionDisplayed = true;
   searchText = null;
   var mainDiv = u("<div/>");
-  var qrDataUrl = null;
-  if (qrUrl) {
-    var qr = new QRious();
-    qr.set({
-      background: "#f5f5f5",
-      foreground: "black",
-      level: "L",
-      value: qrUrl,
-      size: 138,
-    });
-    qrDataUrl = qr.toDataURL();
-  }
-  mainDiv.append(
-    u(
-      '<div id="listOptions" style="overflow-y:auto;overflow-x: hidden;" />'
-    ).html(
-      '<div class="mb-2"><h4>' +
-        banana.i18n("tails") +
-        "</h4>" +
-        '<div class="form-group">' +
-        '<label for="tailLengthInput">' +
-        banana.i18n("length-in-seconds") +
-        "</label>" +
-        '<div class="row g-3">' +
-        '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
-        Math.floor(tailLength / 3600) +
-        '" style="width:100px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
-        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
-        (Math.floor(tailLength / 60) % 60) +
-        '" style="width:70px"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
-        '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
-        (tailLength % 60) +
-        '"style="width:70px" /></div>' +
-        "</div>" +
-        "</div>" +
-        '</div><div class="mb-2"><h4>' +
-        banana.i18n("map-controls") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-controls-switch"' +
-        (showControls ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-controls-switch">' +
-        banana.i18n("show-map-controls") +
-        "</label></div>" +
-        '</div><div class="mb-2"><h4>' +
-        banana.i18n("groupings") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-clusters-switch"' +
-        (showClusters ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-clusters-switch">' +
-        banana.i18n("show-groupings") +
-        "</label></div>" +
-        '</div><div class="mb-2"><h4 class="text-nowrap">' +
-        '<i class="fa-solid fa-language"></i> ' +
-        banana.i18n("language") +
-        "</h4>" +
-        '<select class="form-select mb-2" id="languageSelector">' +
-        Object.keys(supportedLanguages)
-          .map(function (l) {
-            return (
-              '<option value="' +
-              l +
-              '"' +
-              (locale === l ? " selected" : "") +
-              ">" +
-              supportedLanguages[l] +
-              "</option>"
-            );
-          })
-          .join("") +
-        "</select>" +
-        '<div class="mb-2"><h4>' +
-        banana.i18n("location") +
-        "</h4>" +
-        '<div class="form-check form-switch d-inline-block ms-1"><input class="form-check-input" type="checkbox" id="toggle-location-switch"' +
-        (showUserLocation ? " checked" : "") +
-        '><label class="form-check-label" for="toggle-location-switch">' +
-        banana.i18n("show-location") +
-        "</label></div></div>" +
-        '<div class="mb-2"><h4>' +
-        banana.i18n("background-map") +
-        "</h4>" +
-        '<select class="form-select" aria-label="Background map" id="backgroundMapSelector">' +
-        '<option value="blank"' +
-        (!backgroundLayer ? " selected" : "") +
-        ">Blank</option>" +
-        Object.entries(backgroundMapTitles).map(function (kv) {
-          var isCurrent = backgroundLayer?.nickname === kv[0];
-          return (
-            '<option value="' +
-            kv[0] +
-            '"' +
-            (isCurrent ? " selected" : "") +
-            ">" +
-            kv[1] +
-            "</option>"
-          );
-        }) +
-        "</select></div>" +
-        (qrUrl
-          ? `<div class="mb-2"><h4>${banana.i18n("qr-link")}</h4>
-<p class="text-center">
-<img class="p-2" src="${qrDataUrl}" alt="qr"><br/>
-<a class="small fw-bold" style="word-break: break-all;" href="${qrUrl}">${qrUrl.replace(
-              /^https?:\/\//,
-              ""
-            )}</a>
-</p></div>`
-          : "")
-    )
+  var optionsSidebar = u("<div/>");
+  optionsSidebar.css({
+    "overflow-y": "auto",
+    "overflow-x": "hidden",
+  });
+  optionsSidebar.attr({ id: "optionsSidebar" });
+  optionsSidebar.html(
+    '<div class="mb-2"><h4>' +
+      banana.i18n("tails") +
+      "</h4>" +
+      '<div class="form-group">' +
+      '<label for="tailLengthInput">' +
+      banana.i18n("length-in-seconds") +
+      "</label>" +
+      '<div class="row g-3">' +
+      '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
+      Math.floor(tailLength / 3600) +
+      '" style="width:90px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
+      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
+      (Math.floor(tailLength / 60) % 60) +
+      '" style="width:70px"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
+      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
+      (tailLength % 60) +
+      '"style="width:70px" /></div>' +
+      "</div>" +
+      "</div>" +
+      "</div>"
   );
-  u(mainDiv)
-    .find("#toggle-location-switch")
-    .on("click", function (e) {
+  {
+    var ctrlWidget = u("<div/>");
+    ctrlWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("groupings"));
+    widgetTitle.addClass("text-nowrap");
+
+    var widgetContent = u("<div/>");
+    widgetContent.addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>");
+    widgetInput.addClass("form-check-input");
+    widgetInput.attr({
+      id: "toggleControlsSwitch",
+      type: "checkbox",
+      checked: !!showControls,
+    });
+    widgetInput.on("click", function (e) {
+      if (!e.target.checked) {
+        showControls = false;
+        panControl.remove();
+        zoomControl.remove();
+        rotateControl.remove();
+      } else {
+        map.addControl(panControl);
+        map.addControl(zoomControl);
+        map.addControl(rotateControl);
+        showControls = true;
+      }
+    });
+    var widgetLabel = u("<label/>");
+    widgetLabel.addClass("form-check-label");
+    widgetLabel.attr({ for: "toggleControlsSwitch" });
+    widgetLabel.text(banana.i18n("show-map-controls"));
+
+    widgetContent.append(widgetInput);
+    widgetContent.append(widgetLabel);
+
+    ctrlWidget.append(widgetTitle);
+    ctrlWidget.append(widgetContent);
+
+    optionsSidebar.append(ctrlWidget);
+  }
+  {
+    var groupWidget = u("<div/>");
+    groupWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("groupings"));
+    widgetTitle.addClass("text-nowrap");
+
+    var widgetContent = u("<div/>");
+    widgetContent.addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>");
+    widgetInput.addClass("form-check-input");
+    widgetInput.attr({
+      id: "toggleClusterSwitch",
+      type: "checkbox",
+      checked: !!showClusters,
+    });
+    widgetInput.on("click", function (e) {
+      if (!e.target.checked) {
+        showClusters = false;
+        groupControl.remove();
+        for (var [key, cluster] of Object.entries(clusters)) {
+          ["mapMarker", "nameMarker"].forEach(function (layerName) {
+            if (cluster[layerName]) {
+              cluster[layerName].remove();
+              clusters[key][layerName] = null;
+            }
+          });
+        }
+        clusters = {};
+      } else {
+        groupControl = L.control.grouping({ position: "topright" });
+        map.addControl(groupControl);
+        showClusters = true;
+      }
+    });
+    var widgetLabel = u("<label/>");
+    widgetLabel.addClass("form-check-label");
+    widgetLabel.attr({ for: "toggleClusterSwitch" });
+    widgetLabel.text(banana.i18n("show-groupings"));
+
+    widgetContent.append(widgetInput);
+    widgetContent.append(widgetLabel);
+
+    groupWidget.append(widgetTitle);
+    groupWidget.append(widgetContent);
+
+    optionsSidebar.append(groupWidget);
+  }
+  {
+    var langWidget = u("<div/>");
+    langWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.addClass("text-nowrap");
+    widgetTitle.html(
+      `<i class="fa-solid fa-language"></i> ${banana.i18n("language")}`
+    );
+
+    langWidget.append(widgetTitle);
+
+    var langSelector = u("<select/>");
+    langSelector.addClass("form-select");
+    langSelector.attr({ ariaLabel: "Language" });
+
+    Object.keys(supportedLanguages).forEach(function (lang) {
+      var option = u("<option/>");
+      option.attr({ value: lang });
+      option.text(supportedLanguages[lang]);
+      if (locale === lang) {
+        option.attr({ selected: true });
+      }
+      langSelector.append(option);
+    });
+
+    langSelector.on("change", function (e) {
+      window.localStorage.setItem("lang", e.target.value);
+      window.location.search = `lang=${e.target.value}`;
+    });
+
+    langWidget.append(langSelector);
+
+    optionsSidebar.append(langWidget);
+  }
+  {
+    var locWidget = u("<div/>");
+    locWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("location"));
+    widgetTitle.addClass("text-nowrap");
+
+    var widgetContent = u("<div/>");
+    widgetContent.addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>");
+    widgetInput.addClass("form-check-input");
+    widgetInput.attr({
+      id: "toggleLocationSwitch",
+      type: "checkbox",
+      checked: !!showUserLocation,
+    });
+    widgetInput.on("click", function (e) {
       showUserLocation = e.target.checked;
       if (!showUserLocation) {
         locateControl.stop();
@@ -1716,9 +1794,52 @@ function displayOptions(ev) {
         locateControl.start();
       }
     });
-  u(mainDiv)
-    .find("#backgroundMapSelector")
-    .on("change", function (e) {
+    var widgetLabel = u("<label/>");
+    widgetLabel.addClass("form-check-label");
+    widgetLabel.attr({ for: "toggleLocationSwitch" });
+    widgetLabel.text(banana.i18n("show-location"));
+
+    widgetContent.append(widgetInput);
+    widgetContent.append(widgetLabel);
+
+    locWidget.append(widgetTitle);
+    locWidget.append(widgetContent);
+
+    optionsSidebar.append(locWidget);
+  }
+  {
+    var bgMapWidget = u("<div/>");
+    bgMapWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("background-map"));
+    widgetTitle.addClass("text-nowrap");
+
+    bgMapWidget.append(widgetTitle);
+
+    var mapSelector = u("<select/>");
+    mapSelector.addClass("form-select");
+    mapSelector.attr({ ariaLabel: "Background map" });
+
+    var blankOption = u("<option/>");
+    blankOption.attr({ value: "blank" });
+    blankOption.text("Blank");
+    if (!backgroundLayer) {
+      blankOption.attr({ selected: true });
+    }
+    mapSelector.append(blankOption);
+
+    Object.entries(backgroundMapTitles).forEach(function (kv) {
+      var option = u("<option/>");
+      option.attr({ value: kv[0] });
+      option.text(kv[1]);
+      if (backgroundLayer?.nickname === kv[0]) {
+        option.attr({ selected: true });
+      }
+      mapSelector.append(option);
+    });
+
+    mapSelector.on("change", function (e) {
       if (backgroundLayer) {
         backgroundLayer.remove();
         backgroundLayer = null;
@@ -1734,13 +1855,52 @@ function displayOptions(ev) {
         backgroundLayer = layer;
       }
     });
-  u(mainDiv)
-    .find("#languageSelector")
-    .on("change", function (e) {
-      window.localStorage.setItem("lang", e.target.value);
-      window.location.search = `lang=${e.target.value}`;
+
+    bgMapWidget.append(mapSelector);
+
+    optionsSidebar.append(bgMapWidget);
+  }
+
+  if (qrUrl) {
+    var qr = new QRious();
+    qr.set({
+      background: "#f5f5f5",
+      foreground: "black",
+      level: "L",
+      value: qrUrl,
+      size: 138,
     });
-  u(mainDiv)
+
+    var qrWidget = u("<div/>");
+    qrWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("qr-link"));
+    widgetTitle.addClass("text-nowrap");
+
+    qrWidget.append(widgetTitle);
+
+    var widgetContent = u("<p/>");
+    widgetContent.addClass("text-center");
+
+    var qrImage = u("<img/>");
+    qrImage.attr({ src: qr.toDataURL(), alt: "QR code for this event" });
+
+    var qrText = u("<a/>");
+    qrText.addClass("small", "fw-bold");
+    qrText.css({ wordBreak: "break-all" });
+    qrText.attr({ href: qrUrl });
+    qrText.text(qrUrl.replace(/^https?:\/\//, ""));
+
+    widgetContent.append(qrImage);
+    widgetContent.append(u("<br/>"));
+    widgetContent.append(qrText);
+
+    qrWidget.append(widgetContent);
+    optionsSidebar.append(qrWidget);
+  }
+
+  u(optionsSidebar)
     .find(".tailLengthControl")
     .on("input", function (e) {
       var h = parseInt(u("#tailLengthHoursInput").val() || 0);
@@ -1756,46 +1916,8 @@ function displayOptions(ev) {
       u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
       u("#tail-length-display").text(printTime(tailLength));
     });
-  u(mainDiv)
-    .find("#toggle-controls-switch")
-    .on("click", function (e) {
-      if (!e.target.checked) {
-        showControls = false;
-        map.removeControl(panControl);
-        map.removeControl(zoomControl);
-        map.removeControl(rotateControl);
-      } else {
-        map.addControl(panControl);
-        map.addControl(zoomControl);
-        map.addControl(rotateControl);
-        showControls = true;
-      }
-    });
-  u(mainDiv)
-    .find("#toggle-clusters-switch")
-    .on("click", function (e) {
-      if (!e.target.checked) {
-        showClusters = false;
-        map.removeControl(groupControl);
-        for (var [key, c] of Object.entries(clusters)) {
-          if (c.mapMarker) {
-            map.removeLayer(c.mapMarker);
-            clusters[key].mapMarker = null;
-          }
-          if (c.nameMarker) {
-            map.removeLayer(c.nameMarker);
-            clusters[key].nameMarker = null;
-          }
-        }
-        clusters = {};
-      } else {
-        groupControl = L.control.grouping({ position: "topright" });
-        map.addControl(groupControl);
-        showClusters = true;
-      }
-    });
   u("#sidebar").html("");
-  u("#sidebar").append(mainDiv);
+  u("#sidebar").append(optionsSidebar);
 }
 
 function keepFocusOnCompetitor(competitor, location) {

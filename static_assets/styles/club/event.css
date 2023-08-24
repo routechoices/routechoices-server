@@ -55,7 +55,7 @@
   max-height: calc(var(--app-height) - 187px - var(--ctrl-height));
 }
 
-.sidebar #listOptions {
+.sidebar #optionsSidebar {
   max-height: calc(100vh - 109px);
   max-height: calc(var(--app-height) - 109px - var(--ctrl-height));
 }
