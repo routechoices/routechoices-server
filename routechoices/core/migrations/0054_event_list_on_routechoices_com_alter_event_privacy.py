@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             model_name="event",
             name="list_on_routechoices_com",
             field=models.BooleanField(
-                default=True, verbose_name="List on Routechoices.com events page"
+                default=True, verbose_name="Listed on Routechoices.com events page"
             ),
         ),
         migrations.AlterField(

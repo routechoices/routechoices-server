@@ -1219,7 +1219,7 @@ class Event(models.Model):
         ),
     )
     list_on_routechoices_com = models.BooleanField(
-        "List on Routechoices.com events page",
+        "Listed on Routechoices.com events page",
         default=True,
     )
     backdrop_map = BackroundMapChoicesField()
