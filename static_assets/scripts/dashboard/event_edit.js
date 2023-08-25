@@ -455,35 +455,70 @@ function showLocalTime(el) {
 
   var tailLength = u("#id_tail_length").addClass("d-none").val();
   u('[for="id_tail_length"]').text("Tail length (Hours, Minutes, Seconds)");
-  var tailLengthInput = u(
-    '<div class="row g-3">' +
-      '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
-      Math.floor(tailLength / 3600) +
-      '" style="width:100px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
-      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
-      (Math.floor(tailLength / 60) % 60) +
-      '" style="width:75px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
-      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
-      (tailLength % 60) +
-      '" style="width:75px"/></div>' +
-      "</div>"
-  );
-  u("#id_tail_length").after(tailLengthInput);
-  u(tailLengthInput)
+
+  var tailLenFormDiv = u("<div/>").addClass("row", "g-3");
+
+  var hourInput = u("<input/>")
+    .addClass("form-control", "tailLengthControl")
+    .css({ width: "90px" })
+    .attr({
+      type: "number",
+      min: "0",
+      max: "9999",
+      name: "hours",
+    })
+    .val(Math.floor(tailLength / 3600));
+
+  var hourDiv = u("<div/>").addClass("col-auto").append(hourInput);
+
+  var minuteInput = u("<input/>")
+    .addClass("form-control", "tailLengthControl")
+    .css({ width: "70px" })
+    .attr({
+      type: "number",
+      min: "0",
+      max: "59",
+      name: "minutes",
+    })
+    .val(Math.floor(tailLength / 60) % 60);
+
+  var minuteDiv = u("<div/>").addClass("col-auto").append(minuteInput);
+
+  var secondInput = u("<input/>")
+    .addClass("form-control", "tailLengthControl")
+    .css({ width: "70px" })
+    .attr({
+      type: "number",
+      min: "0",
+      max: "59",
+      name: "seconds",
+    })
+    .val(tailLength % 60);
+
+  var secondDiv = u("<div/>").addClass("col-auto").append(secondInput);
+
+  tailLenFormDiv.append(hourDiv).append(minuteDiv).append(secondDiv);
+
+  u("#id_tail_length").after(tailLenFormDiv);
+  u(tailLenFormDiv)
     .find(".tailLengthControl")
     .on("input", function (e) {
-      var h = parseInt(u("#tailLengthHoursInput").val() || 0);
-      var m = parseInt(u("#tailLengthMinutesInput").val() || 0);
-      var s = parseInt(u("#tailLengthSecondsInput").val() || 0);
+      var commonDiv = u(e.target).parent().parent();
+      var hourInput = commonDiv.find('input[name="hours"]');
+      var minInput = commonDiv.find('input[name="minutes"]');
+      var secInput = commonDiv.find('input[name="seconds"]');
+      var h = parseInt(hourInput.val() || 0);
+      var m = parseInt(minInput.val() || 0);
+      var s = parseInt(secInput.val() || 0);
       var v = 3600 * h + 60 * m + s;
       if (isNaN(v)) {
         return;
       }
-      tailLength = Math.max(0, v);
+      var tailLength = Math.max(0, v);
       u("#id_tail_length").val(tailLength);
-      u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
-      u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
-      u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
+      hourInput.val(Math.floor(tailLength / 3600));
+      minInput.val(Math.floor((tailLength / 60) % 60));
+      secInput.val(Math.floor(tailLength % 60));
     });
 
   u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
