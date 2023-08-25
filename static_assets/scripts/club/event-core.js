@@ -1387,7 +1387,8 @@ function displayCompetitorList(force) {
               batteryIconName(competitorBatteyLevels[competitor.id]) +
               ' fa-rotate-270"></i></span></div>'
             : "") +
-          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>'
+          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>' +
+          "</div>"
       );
       var divUpper = u(
         '<div class="card mb-1" style="background-color:transparent";/>'
