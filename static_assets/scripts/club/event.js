@@ -48,7 +48,7 @@
           !path.find(function (el) {
             return (
               el.matches &&
-              (el.matches("#listCompetitor") || el.matches("#optionsSidebar"))
+              (el.matches("#competitorList") || el.matches("#optionsSidebar"))
             );
           })
         ) {

@@ -1065,16 +1065,16 @@ function toggleCompetitorList(e) {
   }
 }
 
-function toggleFullCompetitor(c) {
-  if (!c.isShown) {
+function toggleCompetitorFullRoute(competitor) {
+  if (!competitor.isShown) {
     return;
   }
-  if (c.displayFullRoute) {
-    c.displayFullRoute = null;
-    u("#fullRouteIcon-" + c.id).attr({ fill: null });
+  if (competitor.displayFullRoute) {
+    competitor.displayFullRoute = null;
+    competitor.sidebarCard?.find(".full-route-icon").attr({ fill: null });
   } else {
-    c.displayFullRoute = true;
-    u("#fullRouteIcon-" + c.id).attr({ fill: "#20c997" });
+    competitor.displayFullRoute = true;
+    competitor.sidebarCard?.find(".full-route-icon").attr({ fill: "#20c997" });
   }
 }
 
@@ -1103,27 +1103,6 @@ function zoomOnCompetitor(compr) {
   setTimeout(function () {
     compr.focusing = false;
   }, 250);
-}
-
-function toggleFocusCompetitor(c) {
-  const wasFocused = c.focused;
-  competitorList.map((comp) => {
-    if (comp.focused) {
-      comp.focused = false;
-      u("#focusedIcon-" + comp.id).removeClass("route-focused");
-    }
-  });
-  if (wasFocused) {
-    c.focused = false;
-    u("#focusedIcon-" + c.id).removeClass("route-focused");
-  } else {
-    if (!c.isShown) {
-      return;
-    }
-    c.focused = true;
-    u("#focusedIcon-" + c.id).addClass("route-focused");
-    zoomOnCompetitor(c);
-  }
 }
 
 function redrawCompetitorMarker(competitor, location, faded) {
@@ -1209,30 +1188,26 @@ function redrawCompetitorTail(competitor, route, time) {
   }
 }
 
-function toggleHighlightCompetitor(c) {
-  const wasHighlighted = c.highlighted;
+function toggleHighlightCompetitor(competitor) {
+  const wasHighlighted = competitor.highlighted;
   if (wasHighlighted) {
-    c.highlighted = false;
-    u("#highlightIcon-" + c.id).removeClass("competitor-highlighted");
+    competitor.highlighted = false;
+    competitor.sidebarCard
+      ?.find(".competitor-highlight-btn")
+      .removeClass("highlighted");
   } else {
-    if (!c.isShown) {
+    if (!competitor.isShown) {
       return;
     }
-    c.highlighted = true;
-    u("#highlightIcon-" + c.id).addClass("competitor-highlighted");
+    competitor.highlighted = true;
+    competitor.sidebarCard
+      ?.find(".competitor-highlight-btn")
+      .addClass("highlighted");
   }
-  if (c.nameMarker) {
-    c.nameMarker.remove();
-    c.nameMarker = null;
-  }
-  if (c.mapMarker) {
-    c.mapMarker.remove();
-    c.mapMarker = null;
-  }
-  if (c.tail) {
-    c.tail.remove();
-    c.tail = null;
-  }
+  ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+    competitor[layerName]?.remove();
+    competitor[layerName] = null;
+  });
 }
 
 function displayCompetitorList(force) {
@@ -1263,7 +1238,7 @@ function displayCompetitorList(force) {
         competitor.isColorDark = getContrastYIQ(competitor.color);
       }
       var div = u("<div/>");
-      div.addClass("card-body", "px-1", "pt-1", "pb-0");
+      div.addClass("card-body", "px-1", "pt-1", "pb-0", "competitor-card");
       {
         var firstLine = u("<div/>");
         firstLine.addClass("text-nowrap", "text-truncate", "overflow-hidden");
@@ -1307,7 +1282,7 @@ function displayCompetitorList(force) {
             competitor.isColorDark = getContrastYIQ(competitor.color);
             colorModal.hide();
             ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-              competitor[layerName].remove();
+              competitor[layerName]?.remove();
               competitor[layerName] = null;
             });
             displayCompetitorList();
@@ -1324,167 +1299,297 @@ function displayCompetitorList(force) {
 
         div.append(firstLine);
       }
-      div.append(
-        '<div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
-          (competitor.isShown ? "route-displayed" : "route-not-displayed") +
-          '">' +
-          // toggle on off
-          '<div class="form-check form-switch d-inline-block align-middle" style="margin-right:-5px;padding-top: 2px" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("toggle") +
-          '"><input style="box-shadow: none;" class="form-check-input competitor-switch" type="checkbox" id="switch-competitor-' +
-          competitor.id +
-          '"' +
-          (competitor.isShown ? " checked" : "") +
-          "></div>" +
-          // center on competitor
-          '<button type="button" class="center_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="focus" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("center") +
-          '"><i class="fa-solid fa-location-dot"></i></button>' +
-          // toggle follow competitor
-          '<button type="button" class="focus_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="focus on competitor" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("follow") +
-          '">' +
-          '<i class="fa-solid fa-crosshairs' +
-          (competitor.focused ? " route-focused" : "") +
-          '" id="focusedIcon-' +
-          competitor.id +
-          '"></i></button>' +
-          // toggle highligh competitor
-          '<button type="button" class="highlight_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="highlight competitor" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("highlight") +
-          '">' +
-          '<i class="fa-solid fa-highlighter' +
-          (competitor.highlighted ? " competitor-highlighted" : "") +
-          '" id="highlightIcon-' +
-          competitor.id +
-          '"></i></button>' +
-          // toggle full route
-          '<button type="button" class="full_competitor_btn btn btn-default btn-sm p-0 ms-1 me-0" aria-label="full route" data-bs-toggle="tooltip" data-bs-title="' +
-          banana.i18n("full-route") +
-          '"><svg id="fullRouteIcon-' +
-          competitor.id +
-          '" ' +
-          (competitor.isShown
-            ? competitor.displayFullRoute
-              ? 'fill="#20c997"'
-              : ""
-            : 'fill="#aaa"') +
-          ' viewBox="0 0 48 48" width="16px" height="16px" style="vertical-align: text-bottom"><path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>' +
-          "</svg></button>" +
-          (competitorBatteyLevels.hasOwnProperty(competitor.id)
-            ? '<div class="float-end d-inline-block text-end if-live' +
-              (isLiveMode ? "" : " d-none") +
-              '">' +
-              '<span style="color: ' +
-              (competitorBatteyLevels[competitor.id] !== null
-                ? "grey"
-                : "lightgrey") +
-              '; cursor: pointer" class="battery_level" data-bs-toggle="tooltip" data-bs-custom-class="higher-z-index" data-bs-title="' +
-              (competitorBatteyLevels[competitor.id] !== null
-                ? competitorBatteyLevels[competitor.id] + "%"
-                : banana.i18n("unknown")) +
-              '"><i class="fa-solid fa-battery-' +
-              batteryIconName(competitorBatteyLevels[competitor.id]) +
-              ' fa-rotate-270"></i></span></div>'
-            : "") +
-          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>' +
-          "</div>"
-      );
-      var divUpper = u(
-        '<div class="card mb-1" style="background-color:transparent";/>'
-      ).append(div);
+      {
+        var secondLine = u("<div/>");
+        secondLine.addClass(
+          "text-nowrap",
+          "text-truncate",
+          "overflow-hidden",
+          "ps-0",
+          competitor.isShown ? "route-displayed" : "route-not-displayed"
+        );
 
-      u(div)
-        .find(".competitor-switch")
-        .on("click", function (e) {
-          if (!e.target.checked) {
-            competitor.isShown = false;
-            competitor.focused = false;
-            competitor.highlighted = false;
-            u("#focusedIcon-" + competitor.id).removeClass("route-focused");
-            competitor.displayFullRoute = null;
-            u("#fullRouteIcon-" + competitor.id).attr({ fill: "#aaa" });
-            u(e.target)
-              .parent()
-              .parent()
-              .removeClass("route-displayed")
-              .addClass("route-not-displayed");
-            if (competitor.mapMarker) {
-              map.removeLayer(competitor.mapMarker);
-            }
-            if (competitor.nameMarker) {
-              map.removeLayer(competitor.nameMarker);
-            }
-            if (competitor.tail) {
-              map.removeLayer(competitor.tail);
-            }
-            competitor.mapMarker = null;
-            competitor.nameMarker = null;
-            competitor.tail = null;
-            u(e.target)
-              .parent()
-              .parent()
-              .find(".speedometer")
-              .first().textContent = "";
-            u(e.target)
-              .parent()
-              .parent()
-              .find(".odometer")
-              .first().textContent = "";
-            updateCompetitor(competitor);
-            nbShown -= 1;
-          } else {
-            if (nbShown >= maxParticipantsDisplayed) {
-              swal({
-                title: banana.i18n(
-                  "reached-max-runners",
-                  maxParticipantsDisplayed
-                ),
-                type: "error",
-                confirmButtonText: "OK",
+        {
+          var competitorSwitch = u("<div/>");
+          competitorSwitch.addClass(
+            "form-check",
+            "form-switch",
+            "d-inline-block",
+            "align-middle"
+          );
+          competitorSwitch.css({ marginRight: "-5px", paddingTop: "2px" });
+          competitorSwitch.attr({
+            "data-bs-toggle": "tooltip",
+            "data-bs-title": banana.i18n("toggle"),
+          });
+
+          var competitorSwitchInput = u("<input/>");
+          competitorSwitchInput.addClass(
+            "form-check-input",
+            "competitor-switch"
+          );
+          competitorSwitchInput.css({ boxShadow: "none" });
+          competitorSwitchInput.attr({
+            type: "checkbox",
+            checked: !!competitor.isShown,
+          });
+          competitorSwitchInput.on("click", function (e) {
+            var commonDiv = u(e.target).parent().parent();
+            if (!e.target.checked) {
+              competitor.isShown = false;
+              competitor.focused = false;
+              competitor.highlighted = false;
+              competitor.displayFullRoute = null;
+              commonDiv.find(".competitor-focus-btn").removeClass("focused");
+              commonDiv
+                .find(".competitor-highlight-btn")
+                .removeClass("highlighted");
+              commonDiv.find(".full-route-icon").attr({ fill: null });
+              commonDiv.find("button").attr({ disabled: true });
+              commonDiv
+                .removeClass("route-displayed")
+                .addClass("route-not-displayed");
+              ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+                competitor[layerName]?.remove();
+                competitor[layerName] = null;
               });
-              return;
+              commonDiv.find(".speedometer").text("");
+              commonDiv.find(".odometer").text("");
+              updateCompetitor(competitor);
+              nbShown -= 1;
+            } else {
+              if (nbShown >= maxParticipantsDisplayed) {
+                swal({
+                  title: banana.i18n(
+                    "reached-max-runners",
+                    maxParticipantsDisplayed
+                  ),
+                  type: "error",
+                  confirmButtonText: "OK",
+                });
+                return;
+              }
+              competitor.isShown = true;
+              commonDiv
+                .removeClass("route-not-displayed")
+                .addClass("route-displayed");
+              commonDiv.find("button").attr({ disabled: false });
+              updateCompetitor(competitor);
+              nbShown += 1;
             }
-            competitor.isShown = true;
-            u(e.target)
-              .parent()
-              .parent()
-              .removeClass("route-not-displayed")
-              .addClass("route-displayed");
+          });
+          competitorSwitch.append(competitorSwitchInput);
 
-            u("#fullRouteIcon-" + competitor.id).attr({ fill: null });
-            updateCompetitor(competitor);
-            nbShown += 1;
-          }
-        });
-      u(div)
-        .find(".center_competitor_btn")
-        .on("click", function () {
-          zoomOnCompetitor(competitor);
-        });
-      u(div)
-        .find(".full_competitor_btn")
-        .on("click", function () {
-          toggleFullCompetitor(competitor);
-        });
-      u(div)
-        .find(".focus_competitor_btn")
-        .on("click", function () {
-          toggleFocusCompetitor(competitor);
-        });
-      u(div)
-        .find(".highlight_competitor_btn")
-        .on("click", function () {
-          toggleHighlightCompetitor(competitor);
-        });
+          secondLine.append(competitorSwitch);
+        }
+
+        {
+          var competitorCenterBtn = u("<button/>");
+          competitorCenterBtn.addClass(
+            "btn",
+            "btn-default",
+            "btn-sm",
+            "p-0",
+            "ms-1",
+            "me-0"
+          );
+          competitorCenterBtn.attr({
+            "aria-label": "Center",
+            "data-bs-toggle": "tooltip",
+            "data-bs-title": banana.i18n("center"),
+            disabled: !competitor.isShown,
+          });
+
+          var competitorCenterIcon = u("<i/>");
+          competitorCenterIcon.addClass("fa-solid", "fa-location-dot");
+
+          competitorCenterBtn.append(competitorCenterIcon);
+          competitorCenterBtn.on("click", function () {
+            zoomOnCompetitor(competitor);
+          });
+          secondLine.append(competitorCenterBtn);
+        }
+
+        {
+          var competitorFollowBtn = u("<button/>");
+          competitorFollowBtn.addClass(
+            "btn",
+            "btn-default",
+            "btn-sm",
+            "p-0",
+            "ms-1",
+            "me-0",
+            "competitor-focus-btn",
+            competitor.focused ? "focused" : ""
+          );
+          competitorFollowBtn.attr({
+            "aria-label": "Follow competitor",
+            "data-bs-toggle": "tooltip",
+            "data-bs-title": banana.i18n("follow"),
+            disabled: !competitor.isShown,
+          });
+
+          var competitorFollowBtnIcon = u("<i/>");
+          competitorFollowBtnIcon.addClass("fa-solid", "fa-crosshairs");
+
+          competitorFollowBtn.append(competitorFollowBtnIcon);
+          competitorFollowBtn.on("click", function () {
+            const wasFocused = competitor.focused;
+            if (wasFocused) {
+              competitor.focused = false;
+              competitor.sidebarCard
+                ?.find(".competitor-focus-btn")
+                .removeClass("focused");
+            } else {
+              if (!competitor.isShown) {
+                return;
+              }
+              competitorList.map((otherCompetitor) => {
+                if (otherCompetitor.focused) {
+                  otherCompetitor.focused = false;
+                  otherCompetitor.sidebarCard
+                    ?.find(".competitor-focus-btn")
+                    .removeClass("focused");
+                }
+              });
+              competitor.focused = true;
+              competitor.sidebarCard
+                ?.find(".competitor-focus-btn")
+                .addClass("focused");
+              zoomOnCompetitor(competitor);
+            }
+          });
+          secondLine.append(competitorFollowBtn);
+        }
+
+        {
+          var competitorHighlightBtn = u("<button/>");
+          competitorHighlightBtn.addClass(
+            "btn",
+            "btn-default",
+            "btn-sm",
+            "p-0",
+            "ms-1",
+            "me-0",
+            "competitor-highlight-btn",
+            competitor.highlighted ? " highlighted" : ""
+          );
+          competitorHighlightBtn.attr({
+            "aria-label": "Highlight competitor",
+            "data-bs-toggle": "tooltip",
+            "data-bs-title": banana.i18n("highlight"),
+            disabled: !competitor.isShown,
+          });
+
+          var competitorHighlightIcon = u("<i/>");
+          competitorHighlightIcon.addClass("fa-solid", "fa-highlighter");
+
+          competitorHighlightBtn.append(competitorHighlightIcon);
+          competitorHighlightBtn.on("click", function () {
+            toggleHighlightCompetitor(competitor);
+          });
+          secondLine.append(competitorHighlightBtn);
+        }
+
+        {
+          var competitorFullRouteBtn = u("<button/>");
+          competitorFullRouteBtn.addClass(
+            "btn",
+            "btn-default",
+            "btn-sm",
+            "p-0",
+            "ms-1",
+            "me-0",
+            "competitor-highlight-btn",
+            competitor.highlighted ? " highlighted" : ""
+          );
+          competitorFullRouteBtn.attr({
+            "aria-label": "Highlight competitor",
+            "data-bs-toggle": "tooltip",
+            "data-bs-title": banana.i18n("highlight"),
+            disabled: !competitor.isShown,
+          });
+
+          var competitorFullRouteBtnIcon = u("<svg/>");
+          competitorFullRouteBtnIcon.addClass("full-route-icon");
+          competitorFullRouteBtnIcon.attr({
+            fill: competitor.displayFullRoute ? "#20c997" : null,
+            viewBox: "0 0 48 48",
+            width: "16px",
+            height: "16px",
+          });
+          competitorFullRouteBtnIcon.css({ verticalAlign: "text-bottom" });
+          competitorFullRouteBtnIcon.html(
+            '<path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>'
+          );
+
+          competitorFullRouteBtn.append(competitorFullRouteBtnIcon);
+          competitorFullRouteBtn.on("click", function () {
+            toggleCompetitorFullRoute(competitor);
+          });
+          secondLine.append(competitorFullRouteBtn);
+        }
+
+        if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
+          var batteryLevelDiv = u("<div/>");
+          batteryLevelDiv.addClass(
+            "float-end",
+            "d-inline-blockv",
+            "text-end",
+            "if-live",
+            !isLiveMode ? "d-none" : ""
+          );
+
+          var batterySpan = u("<span/>");
+          batterySpan.attr({
+            "data-bs-toggle": "tooltip",
+            "data-bs-custom-class": "higher-z-index",
+            "data-bs-title":
+              competitorBatteyLevels[competitor.id] !== null
+                ? competitorBatteyLevels[competitor.id] + "%"
+                : banana.i18n("unknown"),
+          });
+
+          var batteryIcon = u("<i/>");
+          batteryIcon.addClass(
+            "fa-solid",
+            "fa-rotate-270",
+            `fa-battery-${batteryIconName(
+              competitorBatteyLevels[competitor.id]
+            )}`
+          );
+
+          batterySpan.append(batteryIcon);
+
+          batteryLevelDiv.append(batterySpan);
+
+          secondLine.append(batteryLevelDiv);
+        }
+
+        {
+          var metersDiv = u("<div/>");
+          metersDiv.addClass("float-end d-inline-block text-end");
+          metersDiv.css({ lineHeight: "10px" });
+          var spedometer = u("<span/>").addClass("speedometer");
+          var odometer = u("<span/>").addClass("odometer");
+          metersDiv.append(spedometer).append("<br/>").append(odometer);
+
+          secondLine.append(metersDiv);
+        }
+        div.append(secondLine);
+      }
+
       if (
         searchText === null ||
         searchText === "" ||
         competitor.name.toLowerCase().search(searchText) != -1
       ) {
-        listDiv.append(divUpper);
+        var divOneUp = u(
+          '<div class="card mb-1" style="background-color:transparent";/>'
+        ).append(div);
+        listDiv.append(divOneUp);
       }
-      competitor.div = div;
+      competitor.sidebarCard = div;
       competitor.speedometer = div.find(".speedometer").first();
       competitor.odometer = div.find(".odometer").first();
     })(competitorList[i]);
@@ -1521,19 +1626,10 @@ function displayCompetitorList(force) {
           competitor.focused = false;
           competitor.highlighted = false;
           competitor.displayFullRoute = false;
-
-          if (competitor.mapMarker) {
-            map.removeLayer(competitor.mapMarker);
-          }
-          if (competitor.nameMarker) {
-            map.removeLayer(competitor.nameMarker);
-          }
-          if (competitor.tail) {
-            map.removeLayer(competitor.tail);
-          }
-          competitor.mapMarker = null;
-          competitor.nameMarker = null;
-          competitor.tail = null;
+          ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+            competitor[layerName]?.remove();
+            competitor[layerName] = null;
+          });
           updateCompetitor(competitor);
           nbShown = 0;
         }
@@ -1577,12 +1673,12 @@ function displayCompetitorList(force) {
     u("#sidebar").html("");
     u("#sidebar").append(mainDiv);
   } else {
-    u("#listCompetitor").remove();
+    u("#competitorList").remove();
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
   }
   if (competitorList.length > 10) {
-    listDiv.addClass("with_search_bar");
+    listDiv.addClass("with-search-bar");
   }
   if (scrollTopDiv) {
     listDiv.nodes[0].scrollTop = scrollTopDiv;
@@ -1794,7 +1890,7 @@ function displayOptions(ev) {
         for (var [key, cluster] of Object.entries(clusters)) {
           ["mapMarker", "nameMarker"].forEach(function (layerName) {
             if (cluster[layerName]) {
-              cluster[layerName].remove();
+              cluster[layerName]?.remove();
               clusters[key][layerName] = null;
             }
           });
