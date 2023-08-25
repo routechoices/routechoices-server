@@ -45,12 +45,12 @@
   z-index: 10001;
 }
 
-.sidebar #listCompetitor {
+.sidebar #competitorList {
   max-height: calc(100vh - 149px);
   max-height: calc(var(--app-height) - 149px - var(--ctrl-height));
 }
 
-.sidebar #listCompetitor.with_search_bar {
+.sidebar #competitorList.withSearchBar {
   max-height: calc(100vh - 187px);
   max-height: calc(var(--app-height) - 187px - var(--ctrl-height));
 }

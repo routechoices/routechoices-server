@@ -1240,11 +1240,14 @@ function displayCompetitorList(force) {
     return;
   }
   optionDisplayed = false;
-  var scrollTopDiv = u("#listCompetitor").nodes?.[0]?.scrollTop;
-  var listDiv = u(
-    '<div id="listCompetitor" style="overflow-y:auto;" class="mt-1"/>'
-  );
+  var scrollTopDiv = u("#competitorList").first()?.scrollTop;
+  var listDiv = u("<div/>");
+  listDiv.addClass("mt-1");
+  listDiv.attr({ id: "competitorList" });
+  listDiv.css({ overflowY: "auto" });
+
   nbShown = 0;
+
   for (var i = 0; i < competitorList.length; i++) {
     (function (competitor) {
       if (typeof competitor.isShown === "undefined") {
@@ -1259,15 +1262,70 @@ function displayCompetitorList(force) {
         competitor.color = getColor(i);
         competitor.isColorDark = getContrastYIQ(competitor.color);
       }
-      var div = u('<div class="card-body px-1 pt-1 pb-0"/>');
-      div.html(
-        '<div><div class="text-nowrap text-truncate overflow-hidden" style="line-height: 18px"><span class="color-tag me-0" style="cursor: pointer"><i class="media-object fa-3x fa-solid fa-circle icon-sidebar" style="margin-left:1px;font-size:1em;color:' +
-          competitor.color +
-          '"></i></span>\
-          <span class="overflow-hidden ps-0 text-truncate"><b>' +
-          u("<div/>").text(competitor.name).html() +
-          '</b></span></div>\
-          <div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
+      var div = u("<div/>");
+      div.addClass("card-body", "px-1", "pt-1", "pb-0");
+      {
+        var firstLine = u("<div/>");
+        firstLine.addClass("text-nowrap", "text-truncate", "overflow-hidden");
+        firstLine.css({ lineHeight: "1.13rem" });
+
+        var colorTag = u("<span/>");
+        colorTag.addClass("color-tag", "me-1");
+        colorTag.css({ cursor: "pointer" });
+
+        var colorTagIcon = u("<i/>");
+        colorTagIcon.addClass(
+          "media-object",
+          "fa-3x",
+          "fa-solid",
+          "fa-circle",
+          "icon-sidebar"
+        );
+        colorTagIcon.css({
+          marginLeft: "1px",
+          fontSize: "1em",
+          color: competitor.color,
+        });
+        colorTag.append(colorTagIcon);
+
+        colorTag.on("click", function () {
+          var color = competitor.color;
+          u("#colorModalLabel").text(
+            banana.i18n("select-color-for", competitor.name)
+          );
+          u("#color-picker").html("");
+          new iro.ColorPicker("#color-picker", {
+            color,
+            width: 150,
+            display: "inline-block",
+          }).on("color:change", function (c) {
+            color = c.hexString;
+          });
+          colorModal.show();
+          u("#save-color").on("click", function () {
+            competitor.color = color;
+            competitor.isColorDark = getContrastYIQ(competitor.color);
+            colorModal.hide();
+            ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+              competitor[layerName].remove();
+              competitor[layerName] = null;
+            });
+            displayCompetitorList();
+            u("#save-color").off("click");
+          });
+        });
+
+        var nameDiv = u("<span/>");
+        nameDiv.addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold");
+        nameDiv.text(competitor.name);
+
+        firstLine.append(colorTag);
+        firstLine.append(nameDiv);
+
+        div.append(firstLine);
+      }
+      div.append(
+        '<div class="text-nowrap text-truncate overflow-hidden ps-0 ' +
           (competitor.isShown ? "route-displayed" : "route-not-displayed") +
           '">' +
           // toggle on off
@@ -1329,50 +1387,12 @@ function displayCompetitorList(force) {
               batteryIconName(competitorBatteyLevels[competitor.id]) +
               ' fa-rotate-270"></i></span></div>'
             : "") +
-          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>' +
-          "</div>"
+          '<div class="float-end d-inline-block text-end" style="line-height:10px;"><span class="speedometer"></span><br/><span class="odometer"></span></div>'
       );
-      var diva = u(
+      var divUpper = u(
         '<div class="card mb-1" style="background-color:transparent";/>'
       ).append(div);
-      u(div)
-        .find(".color-tag")
-        .on("click", function () {
-          u("#colorModalLabel").text(
-            banana.i18n("select-color-for", competitor.name)
-          );
-          var color = competitor.color;
-          u("#color-picker").html("");
-          new iro.ColorPicker("#color-picker", {
-            color,
-            width: 150,
-            display: "inline-block",
-          }).on("color:change", function (c) {
-            color = c.hexString;
-          });
-          colorModal.show();
-          u("#save-color").on("click", function () {
-            competitor.color = color;
-            competitor.isColorDark = getContrastYIQ(competitor.color);
-            colorModal.hide();
-            displayCompetitorList();
 
-            if (competitor.mapMarker) {
-              map.removeLayer(competitor.mapMarker);
-            }
-            if (competitor.nameMarker) {
-              map.removeLayer(competitor.nameMarker);
-            }
-            if (competitor.tail) {
-              map.removeLayer(competitor.tail);
-            }
-            competitor.mapMarker = null;
-            competitor.nameMarker = null;
-            competitor.tail = null;
-
-            u("#save-color").off("click");
-          });
-        });
       u(div)
         .find(".competitor-switch")
         .on("click", function (e) {
@@ -1461,7 +1481,7 @@ function displayCompetitorList(force) {
         searchText === "" ||
         competitor.name.toLowerCase().search(searchText) != -1
       ) {
-        listDiv.append(diva);
+        listDiv.append(divUpper);
       }
       competitor.div = div;
       competitor.speedometer = div.find(".speedometer").first();
@@ -1601,28 +1621,99 @@ function displayOptions(ev) {
     "overflow-x": "hidden",
   });
   optionsSidebar.attr({ id: "optionsSidebar" });
-  optionsSidebar.html(
-    '<div class="mb-2"><h4>' +
-      banana.i18n("tails") +
-      "</h4>" +
-      '<div class="form-group">' +
-      '<label for="tailLengthInput">' +
-      banana.i18n("length-in-seconds") +
-      "</label>" +
-      '<div class="row g-3">' +
-      '<div class="col-auto"><input type="number" min="0" max="9999" class="form-control tailLengthControl" id="tailLengthHoursInput" value="' +
-      Math.floor(tailLength / 3600) +
-      '" style="width:90px"/></div><div class="col-auto" style="vertical-align: bottom;margin:1.3em -.7em">:</div>' +
-      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthMinutesInput" value="' +
-      (Math.floor(tailLength / 60) % 60) +
-      '" style="width:70px"/></div><div class="col-auto" style="vertical-align: top;margin:1.3em -.7em">:</div>' +
-      '<div class="col-auto"><input type="number" min="0" max="59" class="form-control tailLengthControl" id="tailLengthSecondsInput" value="' +
-      (tailLength % 60) +
-      '"style="width:70px" /></div>' +
-      "</div>" +
-      "</div>" +
-      "</div>"
-  );
+
+  {
+    var tailLenWidget = u("<div/>");
+    tailLenWidget.addClass("mb-2");
+
+    var widgetTitle = u("<h4/>");
+    widgetTitle.text(banana.i18n("tails"));
+    widgetTitle.addClass("text-nowrap");
+
+    var widgetContent = u("<div/>");
+    widgetContent.addClass("form-group");
+
+    var tailLenLabel = u("<label/>");
+    tailLenLabel.text(banana.i18n("length-in-seconds"));
+
+    var tailLenFormDiv = u("<div/>");
+    tailLenFormDiv.addClass("row", "g-3");
+
+    var hourInput = u("<input/>");
+    hourInput.addClass("form-control", "tailLengthControl");
+    hourInput.css({ width: "90px" });
+    hourInput.attr({
+      type: "number",
+      min: "0",
+      max: "9999",
+      name: "hours",
+    });
+    hourInput.val(Math.floor(tailLength / 3600));
+
+    var hourDiv = u("<div/>");
+    hourDiv.addClass("col-auto");
+    hourDiv.append(hourInput);
+
+    var minuteInput = u("<input/>");
+    minuteInput.addClass("form-control", "tailLengthControl");
+    minuteInput.css({ width: "70px" });
+    minuteInput.attr({
+      type: "number",
+      min: "0",
+      max: "59",
+      name: "minutes",
+    });
+    minuteInput.val(Math.floor(tailLength / 60) % 60);
+
+    var minuteDiv = u("<div/>");
+    minuteDiv.addClass("col-auto");
+    minuteDiv.append(minuteInput);
+
+    var secondInput = u("<input/>");
+    secondInput.addClass("form-control", "tailLengthControl");
+    secondInput.css({ width: "70px" });
+    secondInput.attr({
+      type: "number",
+      min: "0",
+      max: "59",
+      name: "seconds",
+    });
+    secondInput.val(tailLength % 60);
+
+    var secondDiv = u("<div/>");
+    secondDiv.addClass("col-auto");
+    secondDiv.append(secondInput);
+
+    tailLenFormDiv.append(hourDiv);
+    tailLenFormDiv.append(minuteDiv);
+    tailLenFormDiv.append(secondDiv);
+
+    tailLenFormDiv.find(".tailLengthControl").on("input", function (e) {
+      var commonDiv = u(e.target).parent().parent();
+      var hourInput = commonDiv.find('input[name="hours"]');
+      var minInput = commonDiv.find('input[name="minutes"]');
+      var secInput = commonDiv.find('input[name="seconds"]');
+      var h = parseInt(hourInput.val() || 0);
+      var m = parseInt(minInput.val() || 0);
+      var s = parseInt(secInput.val() || 0);
+      var v = 3600 * h + 60 * m + s;
+      if (isNaN(v)) {
+        return;
+      }
+      tailLength = Math.max(0, v);
+      hourInput.val(Math.floor(tailLength / 3600));
+      minInput.val(Math.floor((tailLength / 60) % 60));
+      secInput.val(Math.floor(tailLength % 60));
+      u("#tail-length-display").text(printTime(tailLength));
+    });
+    widgetContent.append(tailLenLabel);
+    widgetContent.append(tailLenFormDiv);
+
+    tailLenWidget.append(widgetTitle);
+    tailLenWidget.append(widgetContent);
+
+    optionsSidebar.append(tailLenWidget);
+  }
   {
     var ctrlWidget = u("<div/>");
     ctrlWidget.addClass("mb-2");
@@ -1899,22 +1990,6 @@ function displayOptions(ev) {
     optionsSidebar.append(qrWidget);
   }
 
-  u(optionsSidebar)
-    .find(".tailLengthControl")
-    .on("input", function (e) {
-      var h = parseInt(u("#tailLengthHoursInput").val() || 0);
-      var m = parseInt(u("#tailLengthMinutesInput").val() || 0);
-      var s = parseInt(u("#tailLengthSecondsInput").val() || 0);
-      var v = 3600 * h + 60 * m + s;
-      if (isNaN(v)) {
-        return;
-      }
-      tailLength = Math.max(0, v);
-      u("#tailLengthHoursInput").val(Math.floor(tailLength / 3600));
-      u("#tailLengthMinutesInput").val(Math.floor((tailLength / 60) % 60));
-      u("#tailLengthSecondsInput").val(Math.floor(tailLength % 60));
-      u("#tail-length-display").text(printTime(tailLength));
-    });
   u("#sidebar").html("");
   u("#sidebar").append(optionsSidebar);
 }
