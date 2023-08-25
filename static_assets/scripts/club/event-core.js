@@ -1585,7 +1585,7 @@ function displayCompetitorList(force) {
         competitor.name.toLowerCase().search(searchText) != -1
       ) {
         var divOneUp = u(
-          '<div class="card mb-1" style="background-color:transparent";/>'
+          '<div class="card mb-1" style="background-color:transparent;"/>'
         ).append(div);
         listDiv.append(divOneUp);
       }
