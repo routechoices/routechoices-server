@@ -13,10 +13,10 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect, render
 from django.urls import get_urlconf, set_urlconf
-from django.utils.cache import get_conditional_response, patch_vary_headers
+from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
-from django.utils.http import http_date, parse_http_date_safe
+from django.utils.http import http_date
 from django_hosts.middleware import HostsBaseMiddleware
 from geoip2.errors import GeoIP2Error
 
@@ -27,35 +27,6 @@ if hasattr(settings, "XFF_EXEMPT_URLS"):
     XFF_EXEMPT_URLS = [compile(expr) for expr in settings.XFF_EXEMPT_URLS]
 
 logger = logging.getLogger(__name__)
-
-
-class EtagResponseMiddleware(MiddlewareMixin):
-    """
-    Handle conditional GET operations. If the response has an ETag or
-    Last-Modified header and the request has If-None-Match or If-Modified-Since,
-    replace the response with HttpNotModified.
-    """
-
-    def process_response(self, request, response):
-        # It's too late to prevent an unsafe request with a 412 response, and
-        # for a HEAD request, the response body is always empty so computing
-        # an accurate ETag isn't possible.
-        if request.method != "GET":
-            return response
-
-        etag = response.get("ETag")
-        last_modified = response.get("Last-Modified")
-        last_modified = last_modified and parse_http_date_safe(last_modified)
-
-        if etag or last_modified:
-            return get_conditional_response(
-                request,
-                etag=etag,
-                last_modified=last_modified,
-                response=response,
-            )
-
-        return response
 
 
 class XForwardedForMiddleware:
