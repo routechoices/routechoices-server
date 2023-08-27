@@ -47,5 +47,7 @@
     "archived-event": "Archived Event",
     "switch-replay-mode": "Switch to Replay",
     "return-live-mode": "Back to Live",
-    "background-map": "Background map"
+    "background-map": "Background map",
+    "map": "Map",
+    "hide-map": "Hide map"
 }

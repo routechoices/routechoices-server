@@ -47,5 +47,8 @@
     "archived-event": "Gearchiveerd evenement",
     "switch-replay-mode": "Switch naar Replay",
     "return-live-mode": "Terug Live",
-    "background-map": "Achtergrondkaart"
+    "background-map": "Achtergrondkaart",
+    "map": "Kaart",
+    "hide-map": "Kaart verbergen"
+
 }

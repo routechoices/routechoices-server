@@ -47,5 +47,7 @@
     "archived-event": "Arkistoitu tapahtuma",
     "switch-replay-mode": "Vaihda Replayin",
     "return-live-mode": "Paluu Liveen",
-    "background-map": "Taustakartta"
+    "background-map": "Taustakartta",
+    "map": "Kartta",
+    "hide-map": "Piilota kartta"
 }

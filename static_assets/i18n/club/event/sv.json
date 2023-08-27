@@ -47,5 +47,7 @@
     "archived-event": "Arkiverad händelse",
     "switch-replay-mode": "Byt till Repris",
     "return-live-mode": "Tillbaka till Live",
-    "background-map": "Bakgrundskarta"
+    "background-map": "Bakgrundskarta",
+    "map": "Karta",
+    "hide-map": "Göm kartan"
 }

@@ -83,6 +83,7 @@ var isMapMoving = false;
 var oldCrossingForNTimes = 1;
 var intersectionCheckZoom = 18;
 var showUserLocation = false;
+var mapOpacity = 1;
 var supportedLanguages = {
   en: "English",
   es: "Español",
@@ -371,6 +372,7 @@ function onLayerChange(event) {
   map.fitBounds(event.layer.options.bounds, { animate: false });
   map.zoomIn(0.5, { animate: false });
   rasterMap = event.layer;
+  rasterMap.setOpacity(mapOpacity);
 }
 
 function getRunnerIcon(color, faded = false, focused = false) {
@@ -949,6 +951,9 @@ function refreshEventData() {
             map.off("baselayerchange", onLayerChange);
             map.on("baselayerchange", onLayerChange);
           }
+        } else {
+          u("#toggleMapSwitch").parent().parent().hide();
+          mapOpacity = 1;
         }
       }
     },
@@ -1802,7 +1807,7 @@ function displayOptions(ev) {
     var ctrlWidget = u("<div/>").addClass("mb-2");
 
     var widgetTitle = u("<h4/>")
-      .text(banana.i18n("groupings"))
+      .text(banana.i18n("map-controls"))
       .addClass("text-nowrap");
 
     var widgetContent = u("<div/>").addClass(
@@ -1963,6 +1968,48 @@ function displayOptions(ev) {
 
     optionsSidebar.append(locWidget);
   }
+
+  if (rasterMap) {
+    var toggleMapWidget = u("<div/>").addClass("mb-2");
+
+    var widgetTitle = u("<h4/>")
+      .text(banana.i18n("map"))
+      .addClass("text-nowrap");
+
+    var widgetContent = u("<div/>").addClass(
+      "form-check",
+      "form-switch",
+      "d-inline-block",
+      "ms-1"
+    );
+
+    var widgetInput = u("<input/>")
+      .addClass("form-check-input")
+      .attr({
+        id: "toggleMapSwitch",
+        type: "checkbox",
+        checked: mapOpacity === 0,
+      })
+      .on("click", function (e) {
+        if (mapOpacity === 0) {
+          mapOpacity = 1;
+        } else {
+          mapOpacity = 0;
+        }
+        rasterMap?.setOpacity(mapOpacity);
+      });
+    var widgetLabel = u("<label/>")
+      .addClass("form-check-label")
+      .attr({ for: "toggleMapSwitch" })
+      .text(banana.i18n("hide-map"));
+
+    widgetContent.append(widgetInput).append(widgetLabel);
+
+    toggleMapWidget.append(widgetTitle).append(widgetContent);
+
+    optionsSidebar.append(toggleMapWidget);
+  }
+
   {
     var bgMapWidget = u("<div/>").addClass("mb-2");
 
@@ -2540,6 +2587,7 @@ function setRasterMap(layer, fit) {
     map.fitBounds(layer.options.bounds, { animate: false });
     map.zoomIn(0.5, { animate: false });
   }
+  layer.setOpacity(mapOpacity);
   rasterMap = layer;
 }
 
@@ -2591,13 +2639,6 @@ function zoomIn(e) {
 
 function zoomOut(e) {
   map.zoomOut();
-}
-
-function removeRasterMap() {
-  if (rasterMap) {
-    map.removeLayer(rasterMap);
-    rasterMap = null;
-  }
 }
 
 function pressPlayPauseButton(e) {
@@ -2659,7 +2700,7 @@ function shareUrl(e) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023082400`)
+  return fetch(`${langFile}?v=2023082700`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

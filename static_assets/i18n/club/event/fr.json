@@ -47,5 +47,7 @@
     "archived-event": "Événement archivé",
     "switch-replay-mode": "Passer au Replay",
     "return-live-mode": "Retour au Direct",
-    "background-map": "Carte de fond"
+    "background-map": "Carte de fond",
+    "map": "Carte",
+    "hide-map": "Masquer la carte"
 }
