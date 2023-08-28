@@ -51,7 +51,7 @@ jobs:
     - run: ./test
     - codecov/upload:
         file: coverage.xml
-        flag: unittests
+        flags: unittests
     - run: ./dc stop django
     - run: WSGI_FILE="wsgi-with-cov" NUM_PROCESSES=1 ./dc up -d
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
@@ -74,7 +74,7 @@ jobs:
     - run: ./dc exec django coverage xml
     - codecov/upload:
         file: coverage.xml
-        flag: e2e
+        flags: e2e
     - store_artifacts:
         path: cypress/videos
     - store_artifacts:
