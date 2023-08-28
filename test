@@ -1,4 +1,4 @@
 #!/bin/sh
-./dc exec django pip install coverage
+set -e
 ./dc exec django coverage run ./manage.py test
 ./dc exec django coverage xml

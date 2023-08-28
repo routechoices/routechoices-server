@@ -352,7 +352,10 @@ class ClubViewsTestCase(EssentialApiBase):
 
         response = client.get("/")
         self.assertEqual(response.status_code, 404)
-        self.assertIn("This page does not exist", response.content.decode())
+        self.assertIn(
+            "This domain has not been associated with a club...",
+            response.content.decode(),
+        )
 
         self.club.domain = "gpstracking.kiilat.com"
         self.club.save()

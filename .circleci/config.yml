@@ -51,7 +51,21 @@ jobs:
     - run: ./test
     - codecov/upload:
         file: coverage.xml
-    - run: ./dc restart django
+        flags: unittests
+    - run: rm -f .coverage coverage.xml
+    - run: ./dc stop django
+    - run:
+        command: ./dc up -d
+        environment:
+          WSGI_FILE: wsgi-with-cov
+          NUM_PROCESSES: 1
+    - run: ./dc pipinstall
+    - run:
+        command: ./dc restart django
+        environment:
+          WSGI_FILE: wsgi-with-cov
+          NUM_PROCESSES: 1
+    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev
     - browser-tools/install-chrome
@@ -67,6 +81,12 @@ jobs:
           ~/.yarn/bin/yarn add cypress@12 cypress-real-events
           ~/.yarn/bin/yarn cypress install
           TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
+    - run: docker kill --signal=HUP rc_django
+    - run: sleep 5
+    - run: ./dc exec django coverage xml
+    - codecov/upload:
+        file: coverage.xml
+        flags: e2e
     - store_artifacts:
         path: cypress/videos
     - store_artifacts:
