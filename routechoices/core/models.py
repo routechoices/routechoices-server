@@ -885,9 +885,15 @@ class Map(models.Model):
         min_lon = 180
         max_lon = -180
 
-        for pts in seg + [
-            waypoints,
-        ]:
+        line_color = (0xF5, 0x2F, 0xE4, 160)
+
+        all_segs = seg
+        if waypoints:
+            all_segs = seg + [
+                waypoints,
+            ]
+
+        for pts in all_segs:
             lats_lons = list(zip(*pts))
             lats = lats_lons[0]
             lons = lats_lons[1]
@@ -943,12 +949,13 @@ class Map(models.Model):
                 new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True) for pt in pts
             ]
             draw.line(map_pts, (255, 255, 255, 200), 22 * res_scale, joint="curve")
-            draw.line(map_pts, (255, 0, 0, 160), 16 * res_scale, joint="curve")
+            draw.line(map_pts, line_color, 16 * res_scale, joint="curve")
         for pt in waypoints:
             map_pt = new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True)
-            widths = [66, 60, 48]
-            thicknesses = [7, 16, 6]
-            colors = [(255, 255, 255, 200), (255, 0, 0, 160), (255, 255, 255, 200)]
+            widths = [66, 63]
+            thicknesses = [22, 16]
+
+            colors = [(255, 255, 255, 200), line_color]
             for i, w in enumerate(widths):
                 wr = w * res_scale
                 draw.ellipse(
