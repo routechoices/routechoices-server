@@ -9,6 +9,27 @@ context("Dashboard actions", () => {
     cy.wait(100);
   });
 
+  it("Map importers", function () {
+    cy.login();
+    cy.contains("Halden SK").click();
+    ["trk", "waypoint", "waypoint+trk"].forEach((gpxFileName) => {
+      cy.visit("/dashboard/maps/upload-gpx");
+      cy.get("#id_gpx_file").selectFile(
+        "cypress/fixtures/" + gpxFileName + ".gpx"
+      );
+      cy.get('input[type="submit"]').click();
+      cy.get("#django-messages").contains(
+        "The import of the map was successful"
+      );
+    });
+
+    cy.visit("/dashboard/maps/upload-kmz");
+    cy.get("#id_file").selectFile("cypress/fixtures/Jukola_1st_leg.kmz");
+    cy.get(".sa-confirm-button-container .confirm").click();
+    cy.get('input[type="submit"]').click();
+    cy.get("#django-messages").contains("The import of the map was successful");
+  });
+
   it("Create an Event", function () {
     cy.login();
     cy.url().should("match", /\/dashboard\/clubs\?next=\/dashboard\/$/);

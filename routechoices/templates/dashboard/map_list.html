@@ -24,7 +24,7 @@
                     <td><a href="{% url 'dashboard:map_edit_view' map_id=map.aid %}">{{ map.name }}</a></td>
                     <td>
                         {% if map.image %}
-                        <a class="btn btn-sm btn-primary me-1mb-1" href="{{map.image.url}}"><i class="fa-solid fa-download"></i> Image</a>
+                        <a class="btn btn-sm btn-primary me-1 mb-1" href="{{map.image.url}}"><i class="fa-solid fa-download"></i> Image</a>
                         <a class="btn btn-sm btn-primary mb-1" href="{% host_url 'map_kmz_download' map_id=map.aid host 'api' %}"><i class="fa-solid fa-download"></i> KMZ</a>
                         {% endif %}
                     </td>
