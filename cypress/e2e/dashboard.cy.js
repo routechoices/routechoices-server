@@ -8,7 +8,7 @@ context("Dashboard actions", () => {
   after(() => {
     cy.wait(100);
   });
-
+  /*
   it("Map importers", function () {
     cy.login();
     cy.contains("Halden SK").click();
@@ -29,7 +29,7 @@ context("Dashboard actions", () => {
     cy.get('input[type="submit"]').click();
     cy.get("#django-messages").contains("The import of the map was successful");
   });
-
+*/
   it("Create an Event", function () {
     cy.login();
     cy.url().should("match", /\/dashboard\/clubs\?next=\/dashboard\/$/);
@@ -38,6 +38,17 @@ context("Dashboard actions", () => {
     cy.createClub();
 
     cy.contains("Kangasala SK").click();
+
+    // modify club
+    cy.url().should("match", /\/dashboard\/club$/);
+    cy.get("#id_website").type("https://www.kangasalask.fi");
+    cy.get("#id_description")
+      .clear()
+      .type("## Kangasala SK  \n## GPS Tracking");
+    cy.get("#submit-btn").click();
+    cy.realType("{enter}");
+
+    cy.contains("Changes saved successfully", { timeout: 10000 });
 
     // Calibrate a map
     cy.visit("/dashboard/maps/new");

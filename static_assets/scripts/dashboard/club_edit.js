@@ -85,9 +85,9 @@
   if (inviteBtn) {
     u("#id_admins-ts-label").parent().after(inviteBtn);
   }
-  var submitForm = document.getElementById("change_form");
+  var submitForm = u("#change_form");
   if (submitForm) {
-    submitForm.addEventListener("submit", function confirmResetStats(e) {
+    submitForm.on("submit", function confirmResetStats(e) {
       if (
         window.local.clubSlug &&
         u("#id_slug").val() !== window.local.clubSlug
@@ -104,8 +104,8 @@
           },
           function (isConfirmed) {
             if (isConfirmed) {
-              submitForm.removeEventListener("submit", confirmResetStats);
-              submitForm.submit();
+              u(e.target).off("submit");
+              e.target.submit();
             } else {
               u("#id_slug").val(window.local.clubSlug);
             }
