@@ -53,9 +53,8 @@ jobs:
         file: coverage.xml
         flags: unittests
     - run: rm .coverage coverage.xml
-    - run: ./dc stop
     - run:
-        command: ./dc up -d
+        command: ./dc restart django
         environment:
           WSGI_FILE: wsgi-with-cov
           NUM_PROCESSES: 1
