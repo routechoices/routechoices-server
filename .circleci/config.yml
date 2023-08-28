@@ -52,7 +52,13 @@ jobs:
     - codecov/upload:
         file: coverage.xml
         flags: unittests
-    - run: WSGI_FILE="wsgi-with-cov" NUM_PROCESSES=1 ./dc restart django
+    - run: rm .coverage coverage.xml
+    - run: ./dc stop
+    - run:
+        command: ./dc up -d django
+        environment:
+          WSGI_FILE: wsgi-with-cov
+          NUM_PROCESSES: 1
     - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
     - run: sudo apt update
     - run: sudo apt install -y libgbm-dev
