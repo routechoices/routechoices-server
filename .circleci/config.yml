@@ -55,7 +55,7 @@ jobs:
     - run: rm .coverage coverage.xml
     - run: ./dc stop
     - run:
-        command: ./dc up -d django
+        command: ./dc up -d
         environment:
           WSGI_FILE: wsgi-with-cov
           NUM_PROCESSES: 1
