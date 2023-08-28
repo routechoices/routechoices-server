@@ -52,7 +52,7 @@ jobs:
     - codecov/upload:
         file: coverage.xml
         flags: unittests
-    - run: rm .coverage coverage.xml
+    - run: rm -f .coverage coverage.xml
     - run:
         command: ./dc restart django
         environment:
