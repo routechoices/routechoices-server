@@ -37,7 +37,7 @@ context("Dashboard actions", () => {
     // Create club
     cy.createClub();
 
-    cy.contains("Kangasala SK").click();
+    cy.contains("Kangasala SK");
 
     // modify club
     cy.url().should("match", /\/dashboard\/club$/);
