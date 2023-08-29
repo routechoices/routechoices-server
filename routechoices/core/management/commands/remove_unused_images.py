@@ -6,7 +6,7 @@ from routechoices.lib.s3 import get_s3_client, s3_delete_key
 
 
 class Command(BaseCommand):
-    help = "Remove old images files from db"
+    help = "Remove old images files from storage"
 
     def add_arguments(self, parser):
         parser.add_argument("--force", action="store_true", default=False)
@@ -37,7 +37,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"File {image_name} is used")
             self.n_image_keeped += 1
-            self.keeped.add(image_name)
 
     def handle(self, *args, **options):
         force = options["force"]
@@ -60,7 +59,6 @@ class Command(BaseCommand):
         )
 
         self.n_image_removed = 0
-        self.keeped = set()
         self.n_image_keeped = 0
         self.s3 = get_s3_client()
         for directory in ("maps", "logos", "banners"):
