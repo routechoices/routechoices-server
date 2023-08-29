@@ -95,7 +95,7 @@ class ClubForm(ModelForm):
             return banner
         w, h = get_image_dimensions(banner)
         if w < 600 or h < 315:
-            raise ValidationError("The image is too small, minimum 1200x630 pixels")
+            raise ValidationError("The image is too small, minimum 600x315 pixels")
         fn = banner.name
         with Image.open(banner.file) as image:
             rgba_img = image.convert("RGBA")
