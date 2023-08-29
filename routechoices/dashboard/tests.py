@@ -68,3 +68,14 @@ class TestEditClub(EssentialDashboardBase):
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertNotContains(res, "invalid-feedback")
+
+        Club.objects.create(name="Other Club", slug="mynewclubslug")
+
+        res = self.client.post(
+            url,
+            {"name": self.club.name, "admins": self.user.pk, "slug": "mynewclubslug"},
+            follow=True,
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, "invalid-feedback")
+        self.assertContains(res, "Domain prefix already registered.")
