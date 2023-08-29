@@ -172,7 +172,7 @@ class TestEditClub(EssentialDashboardBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertNotContains(res, "invalid-feedback")
 
-        image = Image.new("RGB", (700, 1200), (255, 0, 0))
+        image = Image.new("RGB", (800, 400), (255, 0, 0))
         buffer = BytesIO()
         image.save(buffer, "JPEG")
         banner = SimpleUploadedFile(
