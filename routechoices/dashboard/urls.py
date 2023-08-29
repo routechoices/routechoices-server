@@ -28,7 +28,7 @@ urlpatterns = [
     ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(
-        r"^club/(?P<club_id>[A-Za-z0-9_-]+)/$",
+        r"^club/(?P<club_id>[A-Za-z0-9_-]+)/?$",
         views.club_set_view,
         name="club_set_view",
     ),
