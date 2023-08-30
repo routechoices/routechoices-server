@@ -1249,7 +1249,7 @@ class Event(models.Model):
         "Listed on Routechoices.com events page",
         default=True,
     )
-    backdrop_map = BackroundMapChoicesField()
+    backdrop_map = BackroundMapChoicesField(verbose_name="Background map")
     map = models.ForeignKey(
         Map,
         related_name="+",
