@@ -920,25 +920,25 @@ class Map(models.Model):
         width = (tr_xy["x"] - tl_xy["x"]) / scale + 2 * offset
         height = (tr_xy["y"] - br_xy["y"]) / scale + 2 * offset
 
-        tl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
-            {"x": tl_xy["x"] - offset * scale, "y": tl_xy["y"] + offset * scale}
-        )
-        tr_latlon = GLOBAL_MERCATOR.meters_to_latlon(
-            {"x": tr_xy["x"] + offset * scale, "y": tr_xy["y"] + offset * scale}
-        )
-        br_latlon = GLOBAL_MERCATOR.meters_to_latlon(
-            {"x": br_xy["x"] + offset * scale, "y": br_xy["y"] - offset * scale}
-        )
-        bl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
-            {"x": bl_xy["x"] - offset * scale, "y": bl_xy["y"] - offset * scale}
+        corners = [
+            GLOBAL_MERCATOR.meters_to_latlon(
+                {"x": tl_xy["x"] - offset * scale, "y": tl_xy["y"] + offset * scale}
+            ),
+            GLOBAL_MERCATOR.meters_to_latlon(
+                {"x": tr_xy["x"] + offset * scale, "y": tr_xy["y"] + offset * scale}
+            ),
+            GLOBAL_MERCATOR.meters_to_latlon(
+                {"x": br_xy["x"] + offset * scale, "y": br_xy["y"] - offset * scale}
+            ),
+            GLOBAL_MERCATOR.meters_to_latlon(
+                {"x": bl_xy["x"] - offset * scale, "y": bl_xy["y"] - offset * scale}
+            ),
+        ]
+
+        new_map.corners_coordinates = ",".join(
+            f"{round(c['lat'], 5)},{round(c['lon'], 5)}" for c in corners
         )
 
-        new_map.corners_coordinates = (
-            f"{round(tl_latlon['lat'], 5)},{round(tl_latlon['lon'], 5)},"
-            f"{round(tr_latlon['lat'], 5)},{round(tr_latlon['lon'], 5)},"
-            f"{round(br_latlon['lat'], 5)},{round(br_latlon['lon'], 5)},"
-            f"{round(bl_latlon['lat'], 5)},{round(bl_latlon['lon'], 5)}"
-        )
         im = Image.new(
             "RGBA",
             (int(width * res_scale), int(height * res_scale)),
