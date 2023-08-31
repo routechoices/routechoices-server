@@ -910,12 +910,15 @@ class Map(models.Model):
         res_scale = 4
         MAX_SIZE = 4000
         offset = 100
-        width = tr_xy["x"] - tl_xy["x"] + offset * 2
-        height = tr_xy["y"] - br_xy["y"] + offset * 2
+        width = tr_xy["x"] - tl_xy["x"]
+        height = tr_xy["y"] - br_xy["y"]
 
         scale = 1
         if width > MAX_SIZE or height > MAX_SIZE:
             scale = max(width, height) / MAX_SIZE
+
+        width = (tr_xy["x"] - tl_xy["x"]) / scale + 2 * offset
+        height = (tr_xy["y"] - br_xy["y"]) / scale + 2 * offset
 
         tl_latlon = GLOBAL_MERCATOR.meters_to_latlon(
             {"x": tl_xy["x"] - offset * scale, "y": tl_xy["y"] + offset * scale}
@@ -938,11 +941,11 @@ class Map(models.Model):
         )
         im = Image.new(
             "RGBA",
-            (int(width / scale) * res_scale, int(height / scale) * res_scale),
+            (int(width * res_scale), int(height * res_scale)),
             (255, 255, 255, 0),
         )
-        new_map.width = int(width / scale) * res_scale
-        new_map.height = int(height / scale) * res_scale
+        new_map.width = int(width * res_scale)
+        new_map.height = int(height * res_scale)
         draw = ImageDraw.Draw(im)
         for pts in seg:
             map_pts = [
@@ -969,9 +972,7 @@ class Map(models.Model):
                     width=int(thicknesses[i] * res_scale),
                 )
 
-        im = im.resize(
-            (int(width / scale), int(height / scale)), resample=Image.Resampling.BICUBIC
-        )
+        im = im.resize((int(width), int(height)), resample=Image.Resampling.BICUBIC)
         out_buffer = BytesIO()
         im.save(out_buffer, "WEBP", dpi=(72, 72), quality=80)
         f_new = File(out_buffer)

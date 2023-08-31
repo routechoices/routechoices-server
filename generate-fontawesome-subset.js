@@ -84,6 +84,7 @@ fontawesomeSubset(
       "tag",
       "table-columns",
       "arrow-right-from-bracket",
+      "pencil",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"

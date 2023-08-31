@@ -705,6 +705,10 @@ readers do not read off random characters that represent icons */
   content: "\f08b";
 }
 
+.fa-pencil::before {
+  content: "\f303";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

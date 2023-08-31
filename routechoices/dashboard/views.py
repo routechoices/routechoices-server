@@ -611,6 +611,19 @@ def map_gpx_upload_view(request):
 
 @login_required
 @requires_club_in_session
+def map_draw_view(request):
+    club = request.club
+    return render(
+        request,
+        "dashboard/map_draw.html",
+        {
+            "club": club,
+        },
+    )
+
+
+@login_required
+@requires_club_in_session
 def map_kmz_upload_view(request):
     club = request.club
 
