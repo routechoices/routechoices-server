@@ -934,10 +934,10 @@ class Map(models.Model):
         )
 
         new_map.corners_coordinates = (
-            f"{tl_latlon['lat']},{tl_latlon['lon']},"
-            f"{tr_latlon['lat']},{tr_latlon['lon']},"
-            f"{br_latlon['lat']},{br_latlon['lon']},"
-            f"{bl_latlon['lat']},{bl_latlon['lon']}"
+            f"{round(tl_latlon['lat'], 5)},{round(tl_latlon['lon'], 5)},"
+            f"{round(tr_latlon['lat'], 5)},{round(tr_latlon['lon'], 5)},"
+            f"{round(br_latlon['lat'], 5)},{round(br_latlon['lon'], 5)},"
+            f"{round(bl_latlon['lat'], 5)},{round(bl_latlon['lon'], 5)}"
         )
         im = Image.new(
             "RGBA",
