@@ -107,7 +107,7 @@ context("Dashboard actions", () => {
 
     const gpxFileName = "Jukola_1st_leg.gpx";
     cy.get("#id_gpx_file").selectFile("cypress/fixtures/" + gpxFileName);
-    cy.get("input[value='Upload']").click();
+    cy.get("#submit-btn").click();
 
     cy.contains("The upload of the GPX file was successful");
 
