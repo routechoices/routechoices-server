@@ -530,11 +530,9 @@ function showLocalTime(el) {
 
   u("form").on("submit", function (e) {
     u("#submit-btn").attr({ disabled: true });
-    u("#submit-btn i")
-      .removeClass("fa-floppy-disk")
-      .addClass("fa-spinner fa-spin");
     u("button[name='save_continue']").addClass("disabled");
-    u("button[name='save_continue'] i")
+    u(e.submitter)
+      .find("i")
       .removeClass("fa-floppy-disk")
       .addClass("fa-spinner fa-spin");
   });
