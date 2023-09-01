@@ -85,6 +85,7 @@ fontawesomeSubset(
       "table-columns",
       "arrow-right-from-bracket",
       "pencil",
+      "spinner",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"

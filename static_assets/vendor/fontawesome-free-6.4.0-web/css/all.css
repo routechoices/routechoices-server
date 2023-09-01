@@ -709,6 +709,10 @@ readers do not read off random characters that represent icons */
   content: "\f303";
 }
 
+.fa-spinner::before {
+  content: "\f110";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

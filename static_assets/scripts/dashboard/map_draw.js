@@ -114,4 +114,10 @@
       }
     })
     .catch();
+
+  u("form").on("submit", function (e) {
+    u("#submit-btn")
+      .attr({ disabled: true })
+      .prepend('<i class="fa-solid fa-spinner fa-spin me-1"></i> ');
+  });
 })();
