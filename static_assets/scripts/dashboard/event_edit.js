@@ -527,4 +527,15 @@ function showLocalTime(el) {
     displayRoutechoicesListedOption(e.target.value, false);
   });
   displayRoutechoicesListedOption(u("#id_privacy").val(), true);
+
+  u("form").on("submit", function (e) {
+    u("#submit-btn").attr({ disabled: true });
+    u("#submit-btn i")
+      .removeClass("fa-floppy-disk")
+      .addClass("fa-spinner fa-spin");
+    u("#submit-btn-alt").attr({ disabled: true });
+    u("#submit-btn-alt i")
+      .removeClass("fa-floppy-disk")
+      .addClass("fa-spinner fa-spin");
+  });
 })();

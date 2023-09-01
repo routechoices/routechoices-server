@@ -138,7 +138,7 @@
             </div>
             <hr/>
             <button class="btn btn-primary mb-1 me-1 save" type="submit" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-            <button type="submit" name="save_continue" value="True" class="btn btn-secondary me-1 mb-1"><i class="fa-solid fa-floppy-disk"></i> Save and Continue Editing</button>
+            <button type="submit" name="save_continue" value="True" class="btn btn-secondary me-1 mb-1" id="submit-btn-alt"><i class="fa-solid fa-floppy-disk"></i> Save and Continue Editing</button>
             {% if context == 'edit' %}<a href="{% url 'dashboard:event_delete_view' event_id=event.aid %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>{% endif %}
         </form>
     </div>
