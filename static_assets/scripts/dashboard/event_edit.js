@@ -533,8 +533,8 @@ function showLocalTime(el) {
     u("#submit-btn i")
       .removeClass("fa-floppy-disk")
       .addClass("fa-spinner fa-spin");
-    u("#submit-btn-alt").attr({ disabled: true });
-    u("#submit-btn-alt i")
+    u("button[name='save_continue']").addClass("disabled");
+    u("button[name='save_continue'] i")
       .removeClass("fa-floppy-disk")
       .addClass("fa-spinner fa-spin");
   });

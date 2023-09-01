@@ -17,7 +17,7 @@ context("Dashboard actions", () => {
       cy.get("#id_gpx_file").selectFile(
         "cypress/fixtures/" + gpxFileName + ".gpx"
       );
-      cy.get('input[type="submit"]').click();
+      cy.get("#submit-btn").click();
       cy.get("#django-messages").contains(
         "The import of the map was successful"
       );
@@ -26,7 +26,7 @@ context("Dashboard actions", () => {
     cy.visit("/dashboard/maps/upload-kmz");
     cy.get("#id_file").selectFile("cypress/fixtures/Jukola_1st_leg.kmz");
     cy.get(".sa-confirm-button-container .confirm").click();
-    cy.get('input[type="submit"]').click();
+    cy.get("#submit-btn").click();
     cy.get("#django-messages").contains("The import of the map was successful");
   });
 
