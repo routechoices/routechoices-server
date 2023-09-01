@@ -4,7 +4,7 @@ var makeFieldRandomizable = function (id) {
     .find(".form-text")
     .text("")
     .append(
-      '<button class="randomize_btn btn btn-info btn-sm float-end py-1 px-2"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
+      '<button class="randomize_btn btn btn-info btn-sm float-end py-1 px-2" type="button"><i class="fa-solid fa-shuffle"></i> Randomize</button>'
     );
   u(".randomize_btn").on("click", function (e) {
     e.preventDefault();
@@ -23,7 +23,7 @@ var makeFieldRandomizable = function (id) {
 var makeFieldNowable = function (el) {
   var localTimeDisplay = u(el).parent().find(".local_time");
   localTimeDisplay.before(
-    '<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2 float-end"><i class="fa-solid fa-clock"></i> Set Now</button>'
+    '<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2 float-end" type="button"><i class="fa-solid fa-clock"></i> Set Now</button>'
   );
   u(el)
     .parent()
