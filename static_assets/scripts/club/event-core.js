@@ -2307,7 +2307,7 @@ function drawCompetitors(refreshMeters) {
           competitor.idle = isIdle;
           clearCompetitorLayers(competitor);
         }
-        if (loc && !isNaN(loc.coords.latitude)) {
+        if (!beforeFirstPoint && loc && !isNaN(loc.coords.latitude)) {
           redrawCompetitorMarker(competitor, loc, isIdle);
           redrawCompetitorNametag(competitor, loc, isIdle);
         }
