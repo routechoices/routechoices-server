@@ -456,11 +456,12 @@ function showLocalTime(el) {
   var tailLength = u("#id_tail_length").addClass("d-none").val();
   u('[for="id_tail_length"]').text("Tail length (Hours, Minutes, Seconds)");
 
-  var tailLenFormDiv = u("<div/>").addClass("row", "g-3");
+  var tailLenFormDiv = u("<div/>").addClass("row", "g-1");
 
   var hourInput = u("<input/>")
+    .addClass("d-inline-block")
     .addClass("form-control", "tailLengthControl")
-    .css({ width: "90px" })
+    .css({ width: "85px" })
     .attr({
       type: "number",
       min: "0",
@@ -469,11 +470,15 @@ function showLocalTime(el) {
     })
     .val(Math.floor(tailLength / 3600));
 
-  var hourDiv = u("<div/>").addClass("col-auto").append(hourInput);
+  var hourDiv = u("<div/>")
+    .addClass("col-auto")
+    .append(hourInput)
+    .append("<span> : </span>");
 
   var minuteInput = u("<input/>")
+    .addClass("d-inline-block")
     .addClass("form-control", "tailLengthControl")
-    .css({ width: "70px" })
+    .css({ width: "65px" })
     .attr({
       type: "number",
       min: "0",
@@ -482,11 +487,15 @@ function showLocalTime(el) {
     })
     .val(Math.floor(tailLength / 60) % 60);
 
-  var minuteDiv = u("<div/>").addClass("col-auto").append(minuteInput);
+  var minuteDiv = u("<div/>")
+    .addClass("col-auto")
+    .append(minuteInput)
+    .append("<span> : </span>");
 
   var secondInput = u("<input/>")
+    .addClass("d-inline-block")
     .addClass("form-control", "tailLengthControl")
-    .css({ width: "70px" })
+    .css({ width: "65px" })
     .attr({
       type: "number",
       min: "0",
