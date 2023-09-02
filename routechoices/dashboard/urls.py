@@ -28,11 +28,6 @@ urlpatterns = [
     ),
     re_path(r"^club/?$", views.club_view, name="club_view"),
     re_path(
-        r"^club/(?P<club_id>[A-Za-z0-9_-]+)/?$",
-        views.club_set_view,
-        name="club_set_view",
-    ),
-    re_path(
         r"^club/send-invite/?$", views.club_invite_add_view, name="club_invite_add_view"
     ),
     re_path(
@@ -44,6 +39,11 @@ urlpatterns = [
         r"^club/delete/?$",
         views.club_delete_view,
         name="club_delete_view",
+    ),
+    re_path(
+        r"^club/(?P<club_id>[A-Za-z0-9_-]+)/?$",
+        views.club_set_view,
+        name="club_set_view",
     ),
     re_path(r"^clubs/?$", views.club_select_view, name="club_select_view"),
     re_path(r"^clubs/new/?$", views.club_create_view, name="club_create_view"),
