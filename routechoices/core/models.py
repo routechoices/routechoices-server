@@ -314,7 +314,7 @@ Follow our events live or replay them later.
         elif not self.domain:
             logo = Image.open("routechoices/watermark.png")
         if logo:
-            logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+            logo_f = logo.resize((250, 250), Image.LANCZOS)
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
         img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
@@ -1712,7 +1712,7 @@ class Event(models.Model):
             elif not self.club.domain:
                 logo = Image.open("routechoices/watermark.png")
             if logo:
-                logo_f = logo.resize((250, 250), Image.ANTIALIAS)
+                logo_f = logo.resize((250, 250), Image.LANCZOS)
                 img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
         img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
