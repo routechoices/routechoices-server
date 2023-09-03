@@ -416,6 +416,7 @@ SLUG_BLACKLIST = [
     "manifest.json",
     "manual",
     "map",
+    "map-download",
     "maps",
     "marketing",
     "marketplace",
