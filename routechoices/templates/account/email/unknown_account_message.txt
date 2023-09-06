@@ -3,7 +3,7 @@
 {% blocktrans  with site_name=current_site.name site_domain=current_site.domain %}
 Hi!
 
-You're receiving this e-mail because you or someone else has requested a password reset for an account on {{ site_domain }}.
+You're receiving this e-mail because you or someone else has requested a password reset for an account on {{ site_name }}.
 However, your e-mail address "{{ email }}" is not in our database of registered users and therefore the attempted password reset has failed.
 
 If you are one of our users and were expecting this e-mail, please try again with an e-mail address you registered with our service, or you can sign up for an account using the link below.
