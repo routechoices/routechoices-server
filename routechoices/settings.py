@@ -218,7 +218,6 @@ ACCOUNT_USERNAME_BLACKLIST = SLUG_BLACKLIST
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = "2"
 ACCOUNT_USERNAME_VALIDATORS = "routechoices.lib.validators.custom_username_validators"
-ACCOUNT_FORMS = {"reset_password": "routechoices.site.forms.ResetPasswordForm"}
 
 EMAIL_HOST = "smtp"
 EMAIL_PORT = 1025

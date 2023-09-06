@@ -1,7 +1,3 @@
-from allauth.account.adapter import get_adapter
-from allauth.account.forms import ResetPasswordForm as OrigResetPasswordForm
-from allauth.account.utils import filter_users_by_email
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.validators import FileExtensionValidator
 from django.db.models import Q
 from django.forms import (
@@ -14,27 +10,6 @@ from django.forms import (
 )
 
 from routechoices.core.models import Competitor, Device
-
-
-class ResetPasswordForm(OrigResetPasswordForm):
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        email = get_adapter().clean_email(email)
-        self.users = filter_users_by_email(email, is_active=True)
-        return self.cleaned_data["email"]
-
-    def save(self, request, **kwargs):
-        email = super().save(request, **kwargs)
-        if len(self.users) == 0:
-            current_site = get_current_site(request)
-            context = {
-                "current_site": current_site,
-                "request": request,
-            }
-            get_adapter(request).send_mail(
-                "account/email/password_reset_nomatch", email, context
-            )
-        return self.cleaned_data["email"]
 
 
 class RegisterForm(Form):
