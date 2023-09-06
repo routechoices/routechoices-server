@@ -442,6 +442,7 @@ class MapAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "club",
+        "img_link",
         "creation_date",
         "resolution",
         "max_zoom",
@@ -449,6 +450,11 @@ class MapAdmin(admin.ModelAdmin):
     )
     list_filter = ("club",)
     list_select_related = ("club",)
+
+    def img_link(self, obj):
+        return format_html('<a href="{}">Image</a>', obj.image.url)
+
+    img_link.short_description = "Image"
 
 
 @admin.register(DeviceClubOwnership)
