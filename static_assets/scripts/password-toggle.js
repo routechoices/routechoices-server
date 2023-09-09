@@ -1,5 +1,12 @@
 (function () {
-  u("input[type='password']").wrap('<div class="input-group mb-3"></div>');
+  var feedback = u("input[type='password']").parent().find(".invalid-feedback");
+  u("input[type='password']").wrap(
+    `<div class="input-group mb-3${feedback ? " has-validation" : ""}"></div>`
+  );
+  if (feedback) {
+    u("input[type='password']").parent().append(feedback.first());
+    feedback.remove();
+  }
   u("input[type='password']").after(
     '<span class="input-group-text togglePassword" style="cursor: pointer"><i class="fa-regular fa-fw fa-eye"></i></span>'
   );

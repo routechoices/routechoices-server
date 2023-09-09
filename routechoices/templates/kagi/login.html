@@ -19,7 +19,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <div class="d-grid mb-3">
-              <button class="primaryAction btn btn-primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> {% trans "Login" %}</button>
+              <button class="primaryAction btn btn-primary" type="submit" id="submit-btn"><i class="fa-solid fa-right-to-bracket"></i> {% trans "Login" %}</button>
             </div>
             <div>
               <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
@@ -33,5 +33,6 @@
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/password-toggle.js' %}"></script>
+<script src="{% static '/scripts/account/login.js' %}"></script>
 {% endcompress %}
 {% endblock %}
