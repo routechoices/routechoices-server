@@ -19,7 +19,7 @@
               {% csrf_token %}
               <div id="webauthn-error" style="color: red"></div>
               <div id="webauthn-feature" class="d-grid">
-                <button class="btn btn-primary" id="webauthn-auth-begin" name="submit" type="submit">
+                <button class="btn btn-primary submit-btn" id="webauthn-auth-begin" name="submit" type="submit">
                     {% trans "Tap here to log in with your WebAuthn key" %}
                 </button>
               </div>
@@ -35,7 +35,7 @@
               {% csrf_token %}
               {% bootstrap_form forms.totp %}
               <div class="d-grid">
-                <button class="btn btn-primary" value="totp" name="type">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="totp" name="type">{% trans 'Submit' %}</button>
               </div>
             </form>
           </div>
@@ -50,7 +50,7 @@
               {% csrf_token %}
               {% bootstrap_form forms.backup %}
               <div class="d-grid">
-                <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="backup" name="type">{% trans 'Submit' %}</button>
               </div>
             </form>
           </div>
@@ -65,6 +65,8 @@
 {% block extra_body %}
 {{ block.super }}
 {% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/webauthn.js' %}?v=2"></script>
+<script src="{% static '/scripts/account/verify_second_factor.js' %}"></script>
 {% endcompress %}
 {% endblock %}

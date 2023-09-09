@@ -1,5 +1,6 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
+{% load compress %}
 {% load django_bootstrap5 %}
 
 {% block sub_content %}
@@ -25,4 +26,11 @@
 {% endblock %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_body %}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/dashboard/account_edit.js' %}"></script>
+{% endcompress %}
 {% endblock %}

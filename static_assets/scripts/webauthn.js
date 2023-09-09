@@ -12,6 +12,9 @@
  */
 
 const populateWebAuthnErrorList = (errors) => {
+  var btn = u("#webauthn-feature button");
+  btn.find("i").remove();
+  btn.removeClass("disabled");
   const errorList = document.getElementById("webauthn-errors");
   if (errorList === null) {
     return;
