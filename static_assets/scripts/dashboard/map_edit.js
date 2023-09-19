@@ -604,15 +604,20 @@ function enableBtnToPreview() {
       u("#calibration_help").removeClass("d-none");
       u("#id_corners_coordinates").trigger("change");
     } else {
-      u("#calibration_help").addClass("d-none");
-      u("#calibration_preview").addClass("d-none");
+      if (!u("#main-form").hasClass("edit-form")) {
+        u("#calibration_help").addClass("d-none");
+        u("#calibration_preview").addClass("d-none");
+      }
     }
   });
 
   u("#id_corners_coordinates").on("change", function (e) {
     var val = e.target.value;
     var found = isValidCalibString(val);
-    if (found && u("#id_image").val()) {
+    if (
+      found &&
+      (u("#id_image").val() || u("#main-form").hasClass("edit-form"))
+    ) {
       u("#calibration_preview").removeClass("d-none");
     } else {
       u("#calibration_preview").addClass("d-none");
