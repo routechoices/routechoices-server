@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends g++ libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libjxl-dev && \
+    apt-get install -y --no-install-recommends g++ gcc libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libjxl-dev && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 

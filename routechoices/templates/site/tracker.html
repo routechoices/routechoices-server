@@ -46,6 +46,12 @@
                   <img src="{% static '/img/gl320mg.png'%}?v=20230801" alt="Queclink GL320MG" height="150" width="150"/>
                 </picture>
               </div>
+              <div class="col align-self-center text-center">
+                <picture>
+                  <source srcset="{% static '/img/tracktape.webp'%}?v=20230801" type="image/webp"/>
+                  <img src="{% static '/img/tracktape.png'%}?v=20230801" alt="Tracktape" height="150"/>
+                </picture>
+              </div>
             </div>
           </div>
           <p>Upload of locations to provide live GPS tracking can be done in two different way. Using a smartphone application or using one of the supported dedicated GPS trackers.</p>
@@ -103,6 +109,7 @@
                     <li>Queclink GL3XX series</li>
                     <li>Queclink GL5XX series</li>
                     <li>Teltonika TMT250</li>
+                    <li>Tracktape</li>
                   </ul>
                 </p>
                 <p>
@@ -110,6 +117,7 @@
                   <ul>
                     <li>Teltonika devices: <code>port 2000</code></li>
                     <li>Queclink devices: <code>port 2002</code></li>
+                    <li>Tracktape devices <code>port 2003</code></li>
                   </ul>
                   The recommended data push interval is 5 seconds, and the recommended GPS data acquisition interval is 1 second, but feel free to adjust the settings depending on your usage as this settings affect the battery life.<br/>
                   <a target="_blank" href="https://github.com/routechoices/trackers-config" aria-label="Config file download page">Configuration file for most common devices</a>.
