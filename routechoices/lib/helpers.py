@@ -24,7 +24,7 @@ from routechoices.lib.validators import validate_nice_slug
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
-def get_better_image_mime(request, default=None):
+def get_best_image_mime(request, default=None):
     accepted_mimes = request.COOKIES.get(
         "accept-image", request.META.get("HTTP_ACCEPT", "")
     ).split(",")

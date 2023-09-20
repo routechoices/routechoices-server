@@ -12,7 +12,7 @@ from routechoices.core.models import (
     MapAssignation,
 )
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import get_better_image_mime, safe64encodedsha
+from routechoices.lib.helpers import get_best_image_mime, safe64encodedsha
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
 GLOBAL_MERCATOR = GlobalMercator()
@@ -29,7 +29,7 @@ def common_wms(function):
 
         if get_params.get("request", "").lower() == "getmap":
             asked_mime = get_params.get("format", "image/png").lower()
-            better_mime = get_better_image_mime(request)
+            better_mime = get_best_image_mime(request)
             if asked_mime in (
                 "image/apng",
                 "image/png",
