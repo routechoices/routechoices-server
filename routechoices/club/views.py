@@ -22,7 +22,11 @@ from PIL import Image
 
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
-from routechoices.lib.helpers import safe64encodedsha, set_content_disposition
+from routechoices.lib.helpers import (
+    get_better_image_mime,
+    safe64encodedsha,
+    set_content_disposition,
+)
 from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
@@ -46,17 +50,7 @@ def handle_legacy_request(view_name, club_slug=None, **kwargs):
 def serve_image_from_s3(
     request, image_field, output_filename, default_mime="image/png", img_mode=None
 ):
-    http_accepts = request.COOKIES.get("accept-image", "").split(
-        ","
-    ) or request.META.get("HTTP_ACCEPT", "").split(",")
-    mime = default_mime
-    if "image/jxl" in http_accepts:
-        mime = "image/jxl"
-    elif "image/avif" in http_accepts:
-        mime = "image/avif"
-    elif "image/webp" in http_accepts:
-        mime = "image/webp"
-
+    mime = get_better_image_mime(request, default_mime)
     cache_key = f"s3:image:{image_field.name}:{mime}"
 
     headers = {}
@@ -187,17 +181,7 @@ def club_thumbnail(request, **kwargs):
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}thumbnail")
 
-    http_accepts = request.COOKIES.get("accept-image", "").split(
-        ","
-    ) or request.META.get("HTTP_ACCEPT", "").split(",")
-    mime = "image/jpeg"
-    if "image/jxl" in http_accepts:
-        mime = "image/jxl"
-    elif "image/avif" in http_accepts:
-        mime = "image/avif"
-    elif "image/webp" in http_accepts:
-        mime = "image/webp"
-
+    mime = get_better_image_mime(request, "image/jpeg")
     data_out = club.thumbnail(mime)
 
     resp = StreamingHttpRangeResponse(request, data_out)
@@ -467,17 +451,7 @@ def event_map_thumbnail(request, slug, **kwargs):
     event.checkUserPermission(request.user)
 
     display_logo = request.GET.get("no-logo", False) is False
-    http_accepts = request.COOKIES.get("accept-image", "").split(
-        ","
-    ) or request.META.get("HTTP_ACCEPT", "").split(",")
-    mime = "image/jpeg"
-    if "image/jxl" in http_accepts:
-        mime = "image/jxl"
-    elif "image/avif" in http_accepts:
-        mime = "image/avif"
-    elif "image/webp" in http_accepts:
-        mime = "image/webp"
-
+    mime = get_better_image_mime(request, "image/jpeg")
     data_out = event.thumbnail(display_logo, mime)
     headers = {"ETag": f'W/"{safe64encodedsha(data_out)}"'}
     if event.privacy == PRIVACY_PRIVATE:

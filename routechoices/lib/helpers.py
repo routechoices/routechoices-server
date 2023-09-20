@@ -24,6 +24,16 @@ from routechoices.lib.validators import validate_nice_slug
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
+def get_better_image_mime(request, default=None):
+    accepted_mime = request.COOKIES.get(
+        "accept-image", request.META.get("HTTP_ACCEPT", "")
+    ).split(",")
+    for mime in ("image/jxl", "image/avif", "image/webp"):
+        if mime in accepted_mime:
+            return mime
+    return default
+
+
 def git_master_hash():
     with open(os.path.join(settings.BASE_DIR, ".git", "refs", "heads", "master")) as fp:
         return fp.read()[:7]

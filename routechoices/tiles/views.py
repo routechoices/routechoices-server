@@ -3,7 +3,7 @@ from django.views.decorators.http import condition
 
 from routechoices.core.models import PRIVACY_PRIVATE, Event
 from routechoices.lib.globalmaptiles import GlobalMercator
-from routechoices.lib.helpers import safe64encodedsha
+from routechoices.lib.helpers import get_better_image_mime, safe64encodedsha
 from routechoices.lib.slippy_tiles import tile_xy_to_north_west_latlon
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
@@ -16,18 +16,8 @@ def common_tile(function):
         for key in request.GET.keys():
             get_params[key.lower()] = request.GET[key]
 
-        http_accepts = request.COOKIES.get("accept-image", "").split(
-            ","
-        ) or request.META.get("HTTP_ACCEPT", "").split(",")
-        better_mime = None
-        if "image/jxl" in http_accepts:
-            better_mime = "image/jxl"
-        elif "image/avif" in http_accepts:
-            better_mime = "image/avif"
-        elif "image/webp" in http_accepts:
-            better_mime = "image/webp"
-
         asked_mime = get_params.get("format", "image/png").lower()
+        better_mime = get_better_image_mime(request)
         if asked_mime in (
             "image/apng",
             "image/png",
