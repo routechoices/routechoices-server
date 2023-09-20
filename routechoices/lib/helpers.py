@@ -25,11 +25,11 @@ UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
 def get_better_image_mime(request, default=None):
-    accepted_mime = request.COOKIES.get(
+    accepted_mimes = request.COOKIES.get(
         "accept-image", request.META.get("HTTP_ACCEPT", "")
     ).split(",")
     for mime in ("image/jxl", "image/avif", "image/webp"):
-        if mime in accepted_mime:
+        if mime in accepted_mimes:
             return mime
     return default
 
