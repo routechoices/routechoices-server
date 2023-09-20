@@ -23,9 +23,10 @@ function hasImgCookie() {
   var setFormat = function (height, format) {
     formatTested++;
     if (!formatSet && height == 2) {
-      var domain = "domain=" + document.domain.match(/[^\.]*\.[^.]*$/)[0] + ";";
+      var domain = document.domain.match(/[^\.]*\.[^.]*$/)[0] + ";";
+      console.log(domain);
       document.cookie =
-        "accept-image=image/" + format + ";path=/;domain=*." + domain;
+        "accept-image=image/" + format + ";path=/;domain=." + domain;
       formatSet = true;
       done();
     } else if (formatTested === 3) {
