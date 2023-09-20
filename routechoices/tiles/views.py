@@ -16,7 +16,9 @@ def common_tile(function):
         for key in request.GET.keys():
             get_params[key.lower()] = request.GET[key]
 
-        http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
+        http_accepts = request.COOKIES.get("accept-image") or request.META.get(
+            "HTTP_ACCEPT", ""
+        ).split(",")
         better_mime = None
         if "image/jxl" in http_accepts:
             better_mime = "image/jxl"

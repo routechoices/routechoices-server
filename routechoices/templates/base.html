@@ -31,6 +31,9 @@
     {% endblock %}
   </head>
   <body>
+    {% compress js %}
+    <script src="{% static '/scripts/site/img-detection.js' %}"></script>
+    {% endcompress %}
     {% block body %}
     <!-- Fixed navbar -->
     {% block navbar %}
