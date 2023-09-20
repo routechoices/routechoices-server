@@ -1,4 +1,7 @@
 function hasImgCookie() {
+  if (+new Date() > 1695207573653) {
+    return false;
+  }
   let name = "accept-image=";
   let decodedCookie = decodeURIComponent(document.cookie);
   let ca = decodedCookie.split(";");
@@ -15,22 +18,19 @@ function hasImgCookie() {
 }
 (function (document) {
   if (hasImgCookie()) {
-    done();
     return;
   }
-  var formatSet = false;
+  var accepted = [];
   var formatTested = 0;
   var setFormat = function (height, format) {
     formatTested++;
-    if (!formatSet && height == 2) {
+    if (height == 2) {
+      accepted.push("image/" + format);
+    }
+    if (formatTested === 3) {
       var domain = document.domain.match(/[^\.]*\.[^.]*$/)[0] + ";";
-      console.log(domain);
       document.cookie =
-        "accept-image=image/" + format + ";path=/;domain=." + domain;
-      formatSet = true;
-      done();
-    } else if (formatTested === 3) {
-      done();
+        "accept-image=" + accepted.join(",") + ";path=/;domain=." + domain;
     }
   };
   var JXL = new Image();
@@ -38,7 +38,7 @@ function hasImgCookie() {
     setFormat(JXL.height, "jxl");
   };
   JXL.src =
-    "data:image/jxl;base64,/woIELASCAgQAFwASxLFgkWAHL0xqnCBCV0qDp901Te/5QM=";
+    "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgAAFSqjjBu8nOv58kOHxbSN6wxttW1hSaLIODZJJ3BIEkkaoCUzGM6qJAE=";
 
   var AVIF = new Image();
   AVIF.onload = AVIF.onerror = function () {

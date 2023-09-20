@@ -46,9 +46,9 @@ def handle_legacy_request(view_name, club_slug=None, **kwargs):
 def serve_image_from_s3(
     request, image_field, output_filename, default_mime="image/png", img_mode=None
 ):
-    http_accepts = request.COOKIES.get("accept-image") or request.META.get(
-        "HTTP_ACCEPT", ""
-    ).split(",")
+    http_accepts = request.COOKIES.get("accept-image", "").split(
+        ","
+    ) or request.META.get("HTTP_ACCEPT", "").split(",")
     mime = default_mime
     if "image/jxl" in http_accepts:
         mime = "image/jxl"
@@ -187,9 +187,9 @@ def club_thumbnail(request, **kwargs):
     if club.domain and not request.use_cname:
         return redirect(f"{club.nice_url}thumbnail")
 
-    http_accepts = request.COOKIES.get("accept-image") or request.META.get(
-        "HTTP_ACCEPT", ""
-    ).split(",")
+    http_accepts = request.COOKIES.get("accept-image", "").split(
+        ","
+    ) or request.META.get("HTTP_ACCEPT", "").split(",")
     mime = "image/jpeg"
     if "image/jxl" in http_accepts:
         mime = "image/jxl"
@@ -467,9 +467,9 @@ def event_map_thumbnail(request, slug, **kwargs):
     event.checkUserPermission(request.user)
 
     display_logo = request.GET.get("no-logo", False) is False
-    http_accepts = request.COOKIES.get("accept-image") or request.META.get(
-        "HTTP_ACCEPT", ""
-    ).split(",")
+    http_accepts = request.COOKIES.get("accept-image", "").split(
+        ","
+    ) or request.META.get("HTTP_ACCEPT", "").split(",")
     mime = "image/jpeg"
     if "image/jxl" in http_accepts:
         mime = "image/jxl"
