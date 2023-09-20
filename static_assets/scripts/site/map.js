@@ -155,7 +155,9 @@
         let mime = "";
         if (extension === "jpg") {
           mime = "image/jpeg";
-        } else if (["png", "gif", "jpeg", "webp", "avif"].includes(extension)) {
+        } else if (
+          ["png", "gif", "jpeg", "webp", "avif", "jxl"].includes(extension)
+        ) {
           mime = "image/" + extension;
         }
         const imageDataURI =

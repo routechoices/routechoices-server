@@ -39,6 +39,7 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
+from jxlpy import JXLImagePlugin  # noqa: F401
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
@@ -273,7 +274,7 @@ Follow our events live or replay them later.
         logo = Image.open(BytesIO(logo_b))
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
-        logo_s.save(buffer, ext, quality=(40 if ext == "AVIF" else 80))
+        logo_s.save(buffer, ext, quality=(40 if ext in ("AVIF", "JXL") else 80))
         return buffer.getvalue()
 
     @property
@@ -317,7 +318,11 @@ Follow our events live or replay them later.
             logo_f = logo.resize((250, 250), Image.LANCZOS)
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-        img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
+        img.save(
+            buffer,
+            mime[6:].upper(),
+            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+        )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
         return data_out
@@ -686,14 +691,14 @@ class Map(models.Model):
                             pass
                         return cached, CACHED_BLANK_TILE
 
-            if img_mime == "image/avif":
+            if img_mime in ("image/avif", "image/jxl"):
                 buffer = BytesIO()
                 pil_image = Image.new(
                     mode="RGBA",
                     size=(output_height, output_width),
                     color=(255, 255, 255, 0),
                 )
-                pil_image.save(buffer, "AVIF", quality=10)
+                pil_image.save(buffer, img_mime[6:].upper(), quality=10)
                 data_out = buffer.getvalue()
             else:
                 n_channels = 3 if img_mime == "image/jpeg" else 4
@@ -796,11 +801,11 @@ class Map(models.Model):
                 tile_img, (output_width, output_height), interpolation=cv2.INTER_AREA
             )
         extra_args = []
-        if img_mime == "image/avif":
+        if img_mime in ("image/avif", "image/jxl"):
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_coverted)
             buffer = BytesIO()
-            pil_image.save(buffer, "AVIF", quality=80)
+            pil_image.save(buffer, img_mime[6:].upper(), quality=80)
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
@@ -1715,7 +1720,11 @@ class Event(models.Model):
                 logo_f = logo.resize((250, 250), Image.LANCZOS)
                 img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-        img.save(buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80))
+        img.save(
+            buffer,
+            mime[6:].upper(),
+            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+        )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
         return data_out

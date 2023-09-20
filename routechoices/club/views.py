@@ -48,7 +48,9 @@ def serve_image_from_s3(
 ):
     http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
     mime = default_mime
-    if "image/avif" in http_accepts:
+    if "image/jxl" in http_accepts:
+        mime = "image/jxl"
+    elif "image/avif" in http_accepts:
         mime = "image/avif"
     elif "image/webp" in http_accepts:
         mime = "image/webp"
@@ -70,7 +72,9 @@ def serve_image_from_s3(
         if img_mode and pil_image.mode != img_mode:
             pil_image = pil_image.convert("RGB")
         pil_image.save(
-            out_buffer, mime[6:].upper(), quality=(40 if mime == "image/avif" else 80)
+            out_buffer,
+            mime[6:].upper(),
+            quality=(40 if mime in ("image/avif", "imgae/jxl") else 80),
         )
         image = out_buffer.getvalue()
         cache.set(cache_key, image, 31 * 24 * 3600)
@@ -183,7 +187,9 @@ def club_thumbnail(request, **kwargs):
 
     http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
     mime = "image/jpeg"
-    if "image/avif" in http_accepts:
+    if "image/jxl" in http_accepts:
+        mime = "image/jxl"
+    elif "image/avif" in http_accepts:
         mime = "image/avif"
     elif "image/webp" in http_accepts:
         mime = "image/webp"
@@ -459,7 +465,9 @@ def event_map_thumbnail(request, slug, **kwargs):
     display_logo = request.GET.get("no-logo", False) is False
     http_accepts = request.META.get("HTTP_ACCEPT", "").split(",")
     mime = "image/jpeg"
-    if "image/avif" in http_accepts:
+    if "image/jxl" in http_accepts:
+        mime = "image/jxl"
+    elif "image/avif" in http_accepts:
         mime = "image/avif"
     elif "image/webp" in http_accepts:
         mime = "image/webp"

@@ -28,6 +28,7 @@
       <Format>image/jpeg</Format>
       <Format>image/png</Format>
       <Format>image/avif</Format>
+      <Format>image/jxl</Format>
       <Format>image/webp</Format>
       <DCPType>
         <HTTP>
