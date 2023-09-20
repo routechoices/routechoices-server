@@ -1,7 +1,4 @@
 function hasImgCookie() {
-  if (+new Date() > 1695207573653) {
-    return false;
-  }
   let name = "accept-image=";
   let decodedCookie = decodeURIComponent(document.cookie);
   let ca = decodedCookie.split(";");
