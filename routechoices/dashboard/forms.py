@@ -101,9 +101,10 @@ class ClubForm(ModelForm):
             rgba_img = image.convert("RGBA")
             r = 1200 / 630
             if w < h * 1200 / 630:
-                target_w = min([1200, int(h * r)])
+                target_w = 1200
+                r2 = w / target_w
                 target_h = int(target_w / r)
-                resized_image = rgba_img.resize((target_w, int(h * target_w / w)))
+                resized_image = rgba_img.resize((target_w, int(h / r2)))
                 required_loss = resized_image.size[1] - target_h
                 cropped_image = resized_image.crop(
                     box=(
@@ -114,9 +115,10 @@ class ClubForm(ModelForm):
                     )
                 )
             else:
-                target_h = min([630, int(w / r)])
+                target_h = 630
+                r2 = h / target_h
                 target_w = int(target_h * r)
-                resized_image = rgba_img.resize((int(w * target_h / h), target_h))
+                resized_image = rgba_img.resize((int(w / r2), target_h))
                 required_loss = resized_image.size[0] - target_w
                 cropped_image = resized_image.crop(
                     box=(
@@ -127,7 +129,7 @@ class ClubForm(ModelForm):
                     )
                 )
             out_buffer = BytesIO()
-
+            cropped_image.resize((1200, 630))
             white_bg_img = Image.new("RGBA", (1200, 630), "WHITE")
             white_bg_img.paste(cropped_image, (0, 0), cropped_image)
             img = white_bg_img.convert("RGB")
