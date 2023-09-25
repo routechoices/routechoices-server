@@ -100,7 +100,7 @@ class ClubForm(ModelForm):
         with Image.open(banner.file) as image:
             rgba_img = image.convert("RGBA")
             r = 1200 / 630
-            if w < h * 1200 / 630:
+            if w < h * r:
                 target_w = 1200
                 r2 = w / target_w
                 target_h = int(target_w / r)
