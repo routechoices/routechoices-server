@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-from django.db.models import Case, Count, Exists, OuterRef, Value, When
+from django.db.models import Case, Count, Exists, F, OuterRef, Value, When
 from django.utils.html import format_html
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
@@ -447,9 +447,26 @@ class MapAdmin(admin.ModelAdmin):
         "resolution",
         "max_zoom",
         "north_declination",
+        "event_count",
     )
     list_filter = ("club",)
     list_select_related = ("club",)
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                event_main_map_count=Count("events_main_map", distinct=True),
+                event_alt_map_count=Count("map_assignations", distinct=True),
+                event_count=F("event_main_map_count") + F("event_alt_map_count"),
+            )
+        )
+
+    def event_count(self, obj):
+        return obj.event_count
+
+    event_count.admin_order_field = "event_count"
 
     def img_link(self, obj):
         return format_html('<a href="{}">Image</a>', obj.image.url)

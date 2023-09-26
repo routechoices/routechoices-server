@@ -1258,7 +1258,7 @@ class Event(models.Model):
     backdrop_map = BackroundMapChoicesField(verbose_name="Background map")
     map = models.ForeignKey(
         Map,
-        related_name="+",
+        related_name="events_main_map",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
