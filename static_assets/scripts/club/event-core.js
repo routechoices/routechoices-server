@@ -369,7 +369,7 @@ function getContrastYIQ(hexcolor) {
 
 function onLayerChange(event) {
   map.setBearing(event.layer.data.rotation, { animate: false });
-  map.fitBounds(event.layer.options.bounds, { animate: false });
+  fitInnerBounds(event.layer.options.bounds);
   map.zoomIn(0.5, { animate: false });
   rasterMap = event.layer;
   rasterMap.setOpacity(mapOpacity);
@@ -2589,42 +2589,43 @@ function addRasterMapLayer(mapData, indexEventMap) {
   return layer;
 }
 
+function sortingFunction(a, b) {
+  return a - b;
+}
+
+function fitInnerBounds(bounds) {
+  var bLat = bounds.map((coord) => coord[0]).sort(sortingFunction);
+  var bLon = bounds.map((coord) => coord[1]).sort(sortingFunction);
+  var s = (bLat[0] + bLat[1]) / 2;
+  var n = (bLat[2] + bLat[3]) / 2;
+  var w = (bLon[0] + bLon[1]) / 2;
+  var e = (bLon[2] + bLon[3]) / 2;
+  var bounds1 = [
+    [(n + s) / 2, w],
+    [(n + s) / 2, e],
+    [(n + s) / 2, e],
+    [(n + s) / 2, w],
+  ];
+  var bounds2 = [
+    [n, (e + w) / 2],
+    [n, (e + w) / 2],
+    [s, (e + w) / 2],
+    [s, (e + w) / 2],
+  ];
+  var z1 = map.getBoundsZoom(bounds1);
+  var z2 = map.getBoundsZoom(bounds2);
+  if (z1 > z2) {
+    map.fitBounds(bounds1, { animate: false });
+  } else {
+    map.fitBounds(bounds2, { animate: false });
+  }
+}
+
 function setRasterMap(layer, fit) {
   layer.addTo(map);
   if (fit) {
     map.setBearing(layer.data.rotation, { animate: false });
-    var sortingFunction = function (a, b) {
-      return a - b;
-    };
-    var bLat = layer.options.bounds
-      .map((coord) => coord[0])
-      .sort(sortingFunction);
-    var bLon = layer.options.bounds
-      .map((coord) => coord[1])
-      .sort(sortingFunction);
-    var s = (bLat[0] + bLat[1]) / 2;
-    var n = (bLat[2] + bLat[3]) / 2;
-    var w = (bLon[0] + bLon[1]) / 2;
-    var e = (bLon[2] + bLon[3]) / 2;
-    var bound1 = [
-      [(n + s) / 2, w],
-      [(n + s) / 2, e],
-      [(n + s) / 2, e],
-      [(n + s) / 2, w],
-    ];
-    var bound2 = [
-      [n, (e + w) / 2],
-      [n, (e + w) / 2],
-      [s, (e + w) / 2],
-      [s, (e + w) / 2],
-    ];
-    var z1 = map.getBoundsZoom(bound1);
-    var z2 = map.getBoundsZoom(bound2);
-    if (z1 > z2) {
-      map.fitBounds(bound1, { animate: false });
-    } else {
-      map.fitBounds(bound2, { animate: false });
-    }
+    fitInnerBounds(layer.options.bounds);
   }
   layer.setOpacity(mapOpacity);
   rasterMap = layer;
