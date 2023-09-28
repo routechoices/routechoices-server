@@ -2593,8 +2593,32 @@ function setRasterMap(layer, fit) {
   layer.addTo(map);
   if (fit) {
     map.setBearing(layer.data.rotation, { animate: false });
-    map.fitBounds(layer.options.bounds, { animate: false });
-    map.zoomIn(0.5, { animate: false });
+    //console.log(
+    var bLat = layer.options.bounds.map((h) => h[0]).sort();
+    var bLon = layer.options.bounds.map((h) => h[1]).sort();
+    var s = (bLat[0] + bLat[1]) / 2;
+    var n = (bLat[2] + bLat[3]) / 2;
+    var w = (bLon[0] + bLon[1]) / 2;
+    var e = (bLon[2] + bLon[3]) / 2;
+    var bound1 = [
+      [(n + s) / 2, w],
+      [(n + s) / 2, e],
+      [(n + s) / 2, e],
+      [(n + s) / 2, w],
+    ];
+    var bound2 = [
+      [n, (e + w) / 2],
+      [n, (e + w) / 2],
+      [s, (e + w) / 2],
+      [s, (e + w) / 2],
+    ];
+    var z1 = map.getBoundsZoom(bound1);
+    var z2 = map.getBoundsZoom(bound2);
+    if (z1 > z2) {
+      map.fitBounds(bound1, { animate: false });
+    } else {
+      map.fitBounds(bound2, { animate: false });
+    }
   }
   layer.setOpacity(mapOpacity);
   rasterMap = layer;
