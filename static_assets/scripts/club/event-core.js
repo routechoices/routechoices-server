@@ -370,7 +370,6 @@ function getContrastYIQ(hexcolor) {
 function onLayerChange(event) {
   map.setBearing(event.layer.data.rotation, { animate: false });
   fitInnerBounds(event.layer.options.bounds);
-  map.zoomIn(0.5, { animate: false });
   rasterMap = event.layer;
   rasterMap.setOpacity(mapOpacity);
 }
