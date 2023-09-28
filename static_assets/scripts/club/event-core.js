@@ -2593,9 +2593,15 @@ function setRasterMap(layer, fit) {
   layer.addTo(map);
   if (fit) {
     map.setBearing(layer.data.rotation, { animate: false });
-    //console.log(
-    var bLat = layer.options.bounds.map((h) => h[0]).sort();
-    var bLon = layer.options.bounds.map((h) => h[1]).sort();
+    var sortingFunction = function (a, b) {
+      return a - b;
+    };
+    var bLat = layer.options.bounds
+      .map((coord) => coord[0])
+      .sort(sortingFunction);
+    var bLon = layer.options.bounds
+      .map((coord) => coord[1])
+      .sort(sortingFunction);
     var s = (bLat[0] + bLat[1]) / 2;
     var n = (bLat[2] + bLat[3]) / 2;
     var w = (bLon[0] + bLon[1]) / 2;
