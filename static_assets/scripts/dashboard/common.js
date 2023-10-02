@@ -40,7 +40,7 @@ var makeTextAreasAutoGrow = function () {
   u("textarea").wrap('<div class="grow-wrap"/>');
   u("textarea").each(function (el) {
     el.addEventListener("input", (e) => {
-      u(e.target).parent().first().dataset.replicatedValue = e.target.value;
+      e.target.parentNode.dataset.replicatedValue = e.target.value;
     });
     u(el).trigger("input");
   });
