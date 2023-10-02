@@ -7,6 +7,7 @@
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}"/>
 {% endcompress %}
 {%  endblock %}
 
@@ -68,6 +69,7 @@
 <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
 <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
 <script src="{% static '/vendor/slugify-1.6.5/slugify.js' %}"></script>
+<script src="{% static '/scripts/dashboard/common.js' %}"></script>
 <script src="{% static '/scripts/dashboard/club_edit.js' %}"></script>
 {% endcompress %}
 {% endif %}

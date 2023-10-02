@@ -47,4 +47,6 @@
       .removeClass("fa-floppy-disk")
       .addClass("fa-spinner fa-spin");
   });
+
+  makeTextAreasAutoGrow();
 })();

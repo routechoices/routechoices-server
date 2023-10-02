@@ -5,6 +5,13 @@
 {% load qr_code %}
 {% load compress %}
 
+{%  block extra_head %}
+{{ block.super }}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}"/>
+{% endcompress %}
+{%  endblock %}
+
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
