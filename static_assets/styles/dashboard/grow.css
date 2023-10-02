@@ -1,5 +1,6 @@
 .grow-wrap {
   display: grid;
+  line-break: anywhere;
 }
 .grow-wrap::after {
   content: attr(data-replicated-value) " ";
