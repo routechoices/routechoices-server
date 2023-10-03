@@ -1,15 +1,17 @@
 (function () {
+  makeTextAreasAutoGrow();
+
   u("#id_create_page").on("change", function (e) {
     if (e.target.checked) {
       u("#id_slug").parent().show();
       u("#id_slug").attr("required", true);
       u("#id_list_secret_events").parent().show();
-      u("#id_description").parent().show();
+      u("#id_description").parent().parent().show();
     } else {
       u("#id_slug").parent().hide();
       u("#id_slug").attr("required", false);
       u("#id_list_secret_events").parent().hide();
-      u("#id_description").parent().hide();
+      u("#id_description").parent().parent().hide();
     }
   });
 
@@ -38,7 +40,7 @@
     u("#id_slug").parent().hide();
     u("#id_slug").attr("required", false);
     u("#id_list_secret_events").parent().hide();
-    u("#id_description").parent().hide();
+    u("#id_description").parent().parent().hide();
   }
 
   u("form").on("submit", function (e) {
@@ -47,6 +49,4 @@
       .removeClass("fa-floppy-disk")
       .addClass("fa-spinner fa-spin");
   });
-
-  makeTextAreasAutoGrow();
 })();
