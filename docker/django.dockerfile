@@ -1,4 +1,4 @@
-FROM python:3.11 as builder
+FROM python:3.12 as builder
 
 WORKDIR /app
 
@@ -18,12 +18,15 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.t
 
 
 # final stage
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends gcc g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libglib2.0-0 libjxl-dev && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
+
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:$PATH"
 
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
