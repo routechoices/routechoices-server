@@ -2310,7 +2310,7 @@ function drawCompetitors(refreshMeters) {
         }
 
         var isIdle =
-          viewedTime >= route.getByIndex(0).timestamp && !hasPointLast30sec;
+          viewedTime > route.getByIndex(0).timestamp && !hasPointLast30sec;
         if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
           competitor.idle = isIdle;
           clearCompetitorLayers(competitor);
