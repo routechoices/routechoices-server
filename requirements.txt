@@ -42,7 +42,7 @@ flake8==6.1.0
 flake8-pyproject==1.2.3
 frozenlist==1.4.0
 geoip2==4.7.0
-gps-data-codec==1.5.8
+gps-data-codec==1.5.9
 gpxpy==1.5.0
 idna==3.4
 inflection==0.5.1

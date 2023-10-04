@@ -21,9 +21,8 @@ from django_hosts.resolvers import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import renderers, status
-from rest_framework.decorators import api_view, renderer_classes, throttle_classes
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
@@ -540,7 +539,6 @@ def club_list(request):
     },
 )
 @api_view(["GET"])
-@renderer_classes([JSONRenderer])
 def event_detail(request, event_id):
     event = (
         Event.objects.select_related("club", "notice", "map")
@@ -1065,8 +1063,6 @@ def event_data(request, event_id):
     event = None
 
     use_cache = getattr(settings, "CACHE_EVENT_DATA", False)
-    if not use_cache:
-        return None
 
     cache_interval = EVENT_CACHE_INTERVAL
     live_cache_ts = int(t0 // cache_interval)
