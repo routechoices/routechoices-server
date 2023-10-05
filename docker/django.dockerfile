@@ -1,4 +1,4 @@
-FROM python:3.12 as builder
+FROM python:3.11 as builder
 
 WORKDIR /app
 
@@ -16,12 +16,11 @@ ENV PATH="/root/.cargo/bin:$PATH"
 COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
-
 # final stage
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends gcc g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libglib2.0-0 libjxl-dev && \
+    apt-get install -y --no-install-recommends curl gcc g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libglib2.0-0 libjxl-dev && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
@@ -31,7 +30,7 @@ ENV PATH="/root/.cargo/bin:$PATH"
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
-RUN pip install -r ./requirements.txt -f /wheels && rm -rf /wheels && rm -rf /root/.cache/pip/*
+RUN pip install -r ./requirements.txt --find-links /wheels && rm -rf /wheels && rm -rf /root/.cache/pip/*
 
 # Copy in your requirements file
 WORKDIR /app/
