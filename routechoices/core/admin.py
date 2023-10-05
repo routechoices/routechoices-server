@@ -39,12 +39,12 @@ class EventDateRangeFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return [
             ("today", "Today"),
-            ("last_7_days", "This 7 days"),
-            ("last_30_days", "This 30 days"),
+            ("last_7_days", "Last 7 days"),
+            ("last_30_days", "Last 30 days"),
             ("this_month", "Month to date"),
             ("last_month", "Last month"),
             ("this_year", "Year to date"),
-            ("last_year", "Last yeat"),
+            ("last_year", "Last year"),
         ]
 
     def queryset(self, request, queryset):
