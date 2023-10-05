@@ -1153,13 +1153,12 @@ def event_data(request, event_id):
         if next_competitor_start_time:
             end_date = min(next_competitor_start_time, end_date)
         end_date = min(event.end_date, end_date)
-        nb_pts = 0
         encoded_data = ""
         if competitor.device_id:
-            encoded_data, np_pts = competitor.device.get_locations_between_dates(
+            encoded_data, nb_pts = competitor.device.get_locations_between_dates(
                 from_date, end_date, encode=True
             )
-        total_nb_pts += nb_pts
+            total_nb_pts += nb_pts
         competitor_data = {
             "id": competitor.aid,
             "encoded_data": encoded_data,
