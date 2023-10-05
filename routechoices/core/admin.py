@@ -63,12 +63,12 @@ class EventDateRangeFilter(admin.SimpleListFilter):
             )
         elif self.value() == "last_30_days":
             return queryset.filter(
-                end_date__date__gte=now.shift(days=-30).floor("day").date(),
+                end_date__date__gte=time_now.shift(days=-30).floor("day").date(),
                 start_date__lte=time_now.datetime,
             )
         elif self.value() == "this_month":
             return queryset.filter(
-                end_date__date__gte=now.floor("month").date(),
+                end_date__date__gte=time_now.floor("month").date(),
                 start_date__lte=time_now.datetime,
             )
         elif self.value() == "last_month":
