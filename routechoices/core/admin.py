@@ -98,14 +98,19 @@ class EventDateRangeFilter(admin.SimpleListFilter):
 
 
 class ModifiedDateFilter(admin.SimpleListFilter):
-    title = "when was it modified"
+    title = "when was it last modified"
     parameter_name = "modified"
 
     def lookups(self, request, model_admin):
         return [
-            ("whenever", "All"),
+            ("all", "All"),
             (None, "Today"),
-            ("last_week", "This Week"),
+            ("last_7_days", "Last 7 days"),
+            ("last_30_days", "Last 30 days"),
+            ("this_month", "Month to date"),
+            ("last_month", "Last month"),
+            ("this_year", "Year to date"),
+            ("last_year", "Last year"),
         ]
 
     def choices(self, cl):
@@ -122,13 +127,45 @@ class ModifiedDateFilter(admin.SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        from_date = arrow.utcnow().shift(days=-1).datetime
-        if self.value() == "last_week":
-            from_date = arrow.utcnow().shift(weeks=-1).datetime
-            return queryset.filter(modification_date__gte=from_date)
-        elif self.value():
+        time_now = arrow.utcnow()
+        if self.value() == "all":
             return queryset.all()
-        return queryset.filter(modification_date__gte=from_date)
+        elif self.value() == "last_7_days":
+            return queryset.filter(
+                modification_date__date__gte=time_now.shift(days=-7).date()
+            )
+        elif self.value() == "last_30_days":
+            return queryset.filter(
+                modification_date__date__gte=time_now.shift(days=-7).date()
+            )
+        elif self.value() == "this_month":
+            return queryset.filter(
+                modification_date__date__gte=time_now.floor("month").date()
+            )
+        elif self.value() == "last_month":
+            return queryset.filter(
+                modification_date__date__gte=time_now.shift(months=-1)
+                .floor("month")
+                .date(),
+                modification_date__date__lte=time_now.shift(months=-1)
+                .ceil("month")
+                .date(),
+            )
+        elif self.value() == "this_year":
+            return queryset.filter(
+                modification_date__date__gte=time_now.floor("year").date()
+            )
+        elif self.value() == "last_year":
+            return queryset.filter(
+                modification_date__date__gte=time_now.shift(years=-1)
+                .floor("year")
+                .date(),
+                modification_date__date__lte=time_now.shift(years=-1)
+                .ceil("year")
+                .date(),
+            )
+        else:
+            return queryset.filter(modification_date__date=time_now.floor("day").date())
 
 
 class HasLocationFilter(admin.SimpleListFilter):
