@@ -340,7 +340,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "battery_level",
         "competitor_count",
     )
-    readonly_fields = ("last_hundred_locations", "imei")
+    readonly_fields = ("locations_sample", "imei")
     actions = ["clean_positions"]
     search_fields = ("aid",)
     inlines = [
@@ -355,11 +355,28 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     show_full_result_count = False
 
-    def last_hundred_locations(self, obj):
-        return "\n".join(
+    def locations_sample(self, obj):
+        if obj.location_count < 50:
+            return "\n".join(
+                [
+                    f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
+                    for x in obj.locations_series
+                ]
+            )
+        return "\n.\n.\n.\n".join(
             [
-                f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
-                for x in obj.locations_series[-100:]
+                "\n".join(
+                    [
+                        f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
+                        for x in obj.locations_series[:10]
+                    ]
+                ),
+                "\n".join(
+                    [
+                        f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
+                        for x in obj.locations_series[-40:]
+                    ]
+                ),
             ]
         )
 
