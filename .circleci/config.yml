@@ -62,10 +62,10 @@ jobs:
     steps:
       - run: ./dc stop django
       - run:
-        command: ./dc up -d
-        environment:
-          WSGI_FILE: wsgi-with-cov
-          NUM_PROCESSES: 1
+          command: ./dc up -d
+          environment:
+            WSGI_FILE: wsgi-with-cov
+            NUM_PROCESSES: 1
       - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
       - run: sudo apt update
       - run: sudo apt install -y libgbm-dev
@@ -98,11 +98,11 @@ jobs:
         image: ubuntu-2204:current
         docker_layer_caching: false
     steps:
-    - run:
-        name: Deploy
-        command: |
-          export DEPLOY_CMD="sudo -u apps /apps/routechoices-server/bin/deploy $CIRCLE_SHA1"
-          ssh rphlo@routechoices.com $DEPLOY_CMD
+      - run:
+          name: Deploy
+          command: |
+            export DEPLOY_CMD="sudo -u apps /apps/routechoices-server/bin/deploy $CIRCLE_SHA1"
+            ssh rphlo@routechoices.com $DEPLOY_CMD
 
   build-docker:
     machine:
