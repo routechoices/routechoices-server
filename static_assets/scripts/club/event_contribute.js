@@ -225,6 +225,11 @@ function selectizeDeviceInput() {
         }
       });
     }
+    if (u("#upload-form").nodes.length) {
+      u("#id_device_id-ts-label").text(
+        "Device ID (Leave blank if you want to upload a GPX File)"
+      );
+    }
   }
 
   if (u("#id_gpx_file").nodes.length) {
