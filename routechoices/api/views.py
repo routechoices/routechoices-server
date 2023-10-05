@@ -985,6 +985,7 @@ def competitor_route_upload(request, competitor_id):
         raise ValidationError("Minimum amount of locations is 2")
 
     loc_array = []
+    start_time = None
     for i in range(len(times)):
         if times[i] and lats[i] and lons[i]:
             lat = lats[i]
@@ -1003,6 +1004,8 @@ def competitor_route_upload(request, competitor_id):
             except Exception:
                 raise ValidationError("Invalid time value")
             if event.start_date.timestamp() <= tim <= event.end_date.timestamp():
+                if not start_time or tim < start_time:
+                    start_time = int(tim)
                 loc_array.append((int(tim), lat, lon))
 
     device = None
@@ -1014,6 +1017,7 @@ def competitor_route_upload(request, competitor_id):
         )
         device.add_locations(loc_array)
         competitor.device = device
+        competitor.start_time = epoch_to_datetime(start_time)
         competitor.save()
 
     if len(loc_array) == 0:
