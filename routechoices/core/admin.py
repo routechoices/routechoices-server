@@ -356,7 +356,7 @@ class DeviceAdmin(admin.ModelAdmin):
     show_full_result_count = False
 
     def locations_sample(self, obj):
-        if obj.location_count < 50:
+        if obj.location_count <= 50:
             return "\n".join(
                 [
                     f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
