@@ -38,14 +38,15 @@ class EventDateRangeFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
+            ("now", "Now"),
             ("today", "Today"),
+            ("future", "Future"),
             ("last_7_days", "Last 7 days"),
             ("last_30_days", "Last 30 days"),
             ("this_month", "Month to date"),
             ("last_month", "Last month"),
             ("this_year", "Year to date"),
             ("last_year", "Last year"),
-            ("future", "Future"),
         ]
 
     def queryset(self, request, queryset):
@@ -87,6 +88,11 @@ class EventDateRangeFilter(admin.SimpleListFilter):
             )
         elif self.value() == "future":
             return queryset.filter(start_date__gt=time_now.datetime)
+        elif self.value() == "now":
+            return queryset.filter(
+                start_date__lte=time_now.datetime,
+                end_date__gte=time_now.datetime,
+            )
         elif self.value():
             return queryset
 
