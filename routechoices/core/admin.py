@@ -39,6 +39,7 @@ class EventDateRangeFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return [
             ("today", "Today"),
+            ("future", "Future"),
             ("last_7_days", "Last 7 days"),
             ("last_30_days", "Last 30 days"),
             ("this_month", "Month to date"),
@@ -84,6 +85,8 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 end_date__date__gte=now.shift(years=-1).floor("year").date(),
                 start_date__date__lte=now.shift(years=-1).ceil("year").date(),
             )
+        elif self.value() == "future":
+            return queryset.filter(start_date__gt=now())
         elif self.value():
             return queryset
 
@@ -186,42 +189,6 @@ class IsGPXFilter(admin.SimpleListFilter):
         elif self.value():
             return queryset.all()
         return queryset.filter(is_gpx=False)
-
-
-class TimeStatusFilter(admin.SimpleListFilter):
-    title = "when it is"
-    parameter_name = "when"
-
-    def lookups(self, request, model_admin):
-        return [
-            (None, "All"),
-            ("future", "Future"),
-            ("live", "Live"),
-            ("past", "Past"),
-        ]
-
-    def choices(self, cl):
-        for lookup, title in self.lookup_choices:
-            yield {
-                "selected": self.value() == lookup,
-                "query_string": cl.get_query_string(
-                    {
-                        self.parameter_name: lookup,
-                    },
-                    [],
-                ),
-                "display": title,
-            }
-
-    def queryset(self, request, queryset):
-        if self.value() == "past":
-            return queryset.filter(end_date__lt=now())
-        elif self.value() == "future":
-            return queryset.filter(start_date__gt=now())
-        elif self.value() == "live":
-            return queryset.filter(start_date__lte=now(), end_date__gte=now())
-        else:
-            return queryset.all()
 
 
 @admin.register(EventSet)
@@ -329,7 +296,7 @@ class EventAdmin(admin.ModelAdmin):
         "competitor_count",
         "link",
     )
-    list_filter = (EventDateRangeFilter, TimeStatusFilter, "privacy", "club")
+    list_filter = (EventDateRangeFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
 
     def get_queryset(self, request):
