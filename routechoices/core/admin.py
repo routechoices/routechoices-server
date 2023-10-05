@@ -49,44 +49,44 @@ class EventDateRangeFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        now = arrow.utcnow()
+        time_now = arrow.utcnow()
         if self.value() == "today":
             return queryset.filter(
-                end_date__date__gte=now.floor("day").date(),
-                start_date__date__lte=now.ceil("day").date(),
+                end_date__date__gte=time_now.floor("day").date(),
+                start_date__date__lte=time_now.ceil("day").date(),
             )
         elif self.value() == "last_7_days":
             return queryset.filter(
-                end_date__date__gte=now.shift(days=-7).floor("day").date(),
-                start_date__lte=now.datetime,
+                end_date__date__gte=time_now.shift(days=-7).floor("day").date(),
+                start_date__lte=time_now.datetime,
             )
         elif self.value() == "last_30_days":
             return queryset.filter(
                 end_date__date__gte=now.shift(days=-30).floor("day").date(),
-                start_date__lte=now.datetime,
+                start_date__lte=time_now.datetime,
             )
         elif self.value() == "this_month":
             return queryset.filter(
                 end_date__date__gte=now.floor("month").date(),
-                start_date__lte=now.datetime,
+                start_date__lte=time_now.datetime,
             )
         elif self.value() == "last_month":
             return queryset.filter(
-                end_date__date__gte=now.shift(months=-1).floor("month").date(),
-                start_date__date__lte=now.shift(months=-1).ceil("month").date(),
+                end_date__date__gte=time_now.shift(months=-1).floor("month").date(),
+                start_date__date__lte=time_now.shift(months=-1).ceil("month").date(),
             )
         elif self.value() == "this_year":
             return queryset.filter(
-                end_date__date__gte=now.floor("year").date(),
-                start_date__lte=now.datetime,
+                end_date__date__gte=time_now.floor("year").date(),
+                start_date__lte=time_now.datetime,
             )
         elif self.value() == "last_year":
             return queryset.filter(
-                end_date__date__gte=now.shift(years=-1).floor("year").date(),
-                start_date__date__lte=now.shift(years=-1).ceil("year").date(),
+                end_date__date__gte=time_now.shift(years=-1).floor("year").date(),
+                start_date__date__lte=time_now.shift(years=-1).ceil("year").date(),
             )
         elif self.value() == "future":
-            return queryset.filter(start_date__gt=now())
+            return queryset.filter(start_date__gt=time_now.datetime)
         elif self.value():
             return queryset
 
