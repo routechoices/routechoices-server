@@ -4,6 +4,20 @@ orbs:
   codecov: codecov/codecov@3.2.5
 
 commands:
+  prepare-docker:
+    steps:
+      - checkout
+      - run: ./gen-local-certs.sh
+      - run: chmod -R 755 ./letsencrypt/live/routechoices.dev/
+      - run: echo "127.0.0.1 routechoices.dev api.routechoices.dev www.routechoices.dev halden-sk.routechoices.dev kangasala-sk.routechoices.dev" | sudo tee -a /etc/hosts
+      - run: mkdir -p media/routechoices/maps/
+      - run: ./dc up -d
+      - run: ./dc pipinstall
+      - run: ./da migrate
+      - run: ./da collectstatic
+      - run: ./da compress
+      - run: ./dc restart nginx
+
   setup-docker:
     steps:
       - run:
@@ -26,71 +40,58 @@ commands:
             docker buildx inspect --bootstrap
 
 jobs:
-  build-and-test:
-    # to speed up Dockers builds turn on layer caching
-    # which is a paid CircleCI feature
-    # https://circleci.com/docs/2.0/docker-layer-caching/
+  build-and-python-tests:
     machine:
       image: ubuntu-2204:current
       docker_layer_caching: false
     resource_class: large
     steps:
-    - checkout
-    - run: ./gen-local-certs.sh
-    - run: chmod -R 755 ./letsencrypt/live/routechoices.dev/
-    - run: echo "127.0.0.1 routechoices.dev api.routechoices.dev www.routechoices.dev halden-sk.routechoices.dev kangasala-sk.routechoices.dev" | sudo tee -a /etc/hosts
-    - run: mkdir -p media/routechoices/maps/
-    - run: ./dc up -d
-    - run: ./dc pipinstall
-    - run: ./da migrate
-    - run: ./da collectstatic
-    - run: ./da compress
-    - run: ./dc restart nginx
-    - run: ./dc restart django
-    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
-    - run: ./test
-    - codecov/upload:
-        file: coverage.xml
-        flags: unittests
-    - run: rm -f .coverage coverage.xml
-    - run: ./dc stop django
-    - run:
+      - prepare-docker
+      - run: ./dc restart django
+      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
+      - run: ./test
+      - codecov/upload:
+          file: coverage.xml
+          flags: unittests
+
+  build-and-e2e-tests:
+    machine:
+      image: ubuntu-2204:current
+      docker_layer_caching: false
+    resource_class: large
+    steps:
+      - run: ./dc stop django
+      - run:
         command: ./dc up -d
         environment:
           WSGI_FILE: wsgi-with-cov
           NUM_PROCESSES: 1
-    - run: ./dc pipinstall
-    - run:
-        command: ./dc restart django
-        environment:
-          WSGI_FILE: wsgi-with-cov
-          NUM_PROCESSES: 1
-    - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
-    - run: sudo apt update
-    - run: sudo apt install -y libgbm-dev
-    - browser-tools/install-chrome
-    - run:
-        name: Install Node.js and run cypress
-        # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
-        command: |
-          export NVM_DIR="/opt/circleci/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          nvm install v18 && nvm use v18 && nvm alias default v18
-          node -v
-          curl -o- -L https://yarnpkg.com/install.sh | bash
-          ~/.yarn/bin/yarn add cypress@12 cypress-real-events
-          ~/.yarn/bin/yarn cypress install
-          TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
-    - run: docker kill --signal=HUP rc_django
-    - run: sleep 5
-    - run: ./dc exec django coverage xml
-    - codecov/upload:
-        file: coverage.xml
-        flags: e2e
-    - store_artifacts:
-        path: cypress/videos
-    - store_artifacts:
-        path: cypress/screenshots
+      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
+      - run: sudo apt update
+      - run: sudo apt install -y libgbm-dev
+      - browser-tools/install-chrome
+      - run:
+          name: Install Node.js and run cypress
+          # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
+          command: |
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            nvm install v18 && nvm use v18 && nvm alias default v18
+            node -v
+            curl -o- -L https://yarnpkg.com/install.sh | bash
+            ~/.yarn/bin/yarn add cypress@12 cypress-real-events
+            ~/.yarn/bin/yarn cypress install
+            TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
+      - run: docker kill --signal=HUP rc_django
+      - run: sleep 5
+      - run: ./dc exec django coverage xml
+      - codecov/upload:
+          file: coverage.xml
+          flags: e2e
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
 
   deploy:
     machine:
@@ -121,12 +122,14 @@ jobs:
 
 workflows:
   version: 2
-  build_test_and_deploy:
+  test-and-deploy:
     jobs:
-      - build-and-test
+      - build-and-python-tests
+      - build-and-e2e-tests
       - deploy:
           requires:
-            - build-and-test
+            - build-and-python-tests
+            - build-and-e2e-tests
           filters:
             branches:
               only:
