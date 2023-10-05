@@ -32,6 +32,62 @@ from routechoices.core.models import (
 from routechoices.lib.helpers import epoch_to_datetime, get_device_name
 
 
+class EventDateRangeFilter(admin.SimpleListFilter):
+    title = "when"
+    parameter_name = "when"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("today", "Today"),
+            ("last_7_days", "This 7 days"),
+            ("last_30_days", "This 30 days"),
+            ("this_month", "Month to date"),
+            ("last_month", "Last month"),
+            ("this_year", "Year to date"),
+            ("last_year", "Last yeat"),
+        ]
+
+    def queryset(self, request, queryset):
+        now = arrow.utcnow()
+        if self.value() == "today":
+            return queryset.filter(
+                end_date__date__gte=now.floor("day").date(),
+                start_date__date__lte=now.ceil("day").date(),
+            )
+        elif self.value() == "last_7_days":
+            return queryset.filter(
+                end_date__date__gte=now.shift(days=-7).floor("day").date(),
+                start_date__lte=now.datetime,
+            )
+        elif self.value() == "last_30_days":
+            return queryset.filter(
+                end_date__date__gte=now.shift(days=-30).floor("day").date(),
+                start_date__lte=now.datetime,
+            )
+        elif self.value() == "this_month":
+            return queryset.filter(
+                end_date__date__gte=now.floor("month").date(),
+                start_date__lte=now.datetime,
+            )
+        elif self.value() == "last_month":
+            return queryset.filter(
+                end_date__date__gte=now.shift(months=-1).floor("month").date(),
+                start_date__date__lte=now.shift(months=-1).ceil("month").date(),
+            )
+        elif self.value() == "this_year":
+            return queryset.filter(
+                end_date__date__gte=now.floor("year").date(),
+                start_date__lte=now.datetime,
+            )
+        elif self.value() == "last_year":
+            return queryset.filter(
+                end_date__date__gte=now.shift(years=-1).floor("year").date(),
+                start_date__date__lte=now.shift(years=-1).ceil("year").date(),
+            )
+        elif self.value():
+            return queryset
+
+
 class ModifiedDateFilter(admin.SimpleListFilter):
     title = "when was it modified"
     parameter_name = "modified"
@@ -273,7 +329,7 @@ class EventAdmin(admin.ModelAdmin):
         "competitor_count",
         "link",
     )
-    list_filter = (TimeStatusFilter, "privacy", "club")
+    list_filter = (EventDateRangeFilter, TimeStatusFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
 
     def get_queryset(self, request):
