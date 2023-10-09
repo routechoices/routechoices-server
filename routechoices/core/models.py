@@ -2087,7 +2087,7 @@ class Device(models.Model):
         lat = None
         lon = None
 
-        competitors = self.get_competitors_at_date(now(), load_event=True)
+        competitors = self.get_competitors_at_date(now(), load_events=True)
 
         if self.last_location:
             _, lat, lon = self.last_location
