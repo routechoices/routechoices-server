@@ -40,6 +40,7 @@ class EventDateRangeFilter(admin.SimpleListFilter):
         return [
             ("now", "Now"),
             ("today", "Today"),
+            ("yesterday", "Yesterday"),
             ("future", "Future"),
             ("last_7_days", "Last 7 days"),
             ("last_30_days", "Last 30 days"),
@@ -55,6 +56,11 @@ class EventDateRangeFilter(admin.SimpleListFilter):
             return queryset.filter(
                 end_date__date__gte=time_now.floor("day").date(),
                 start_date__date__lte=time_now.ceil("day").date(),
+            )
+        elif self.value() == "yesterday":
+            return queryset.filter(
+                end_date__date__gte=time_now.shift(days=-1).floor("day").date(),
+                start_date__lte=time_now.shift(days=-1).ceil("day").date(),
             )
         elif self.value() == "last_7_days":
             return queryset.filter(
@@ -105,6 +111,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
         return [
             ("all", "All"),
             (None, "Today"),
+            ("yesterday", "Yesterday"),
             ("last_7_days", "Last 7 days"),
             ("last_30_days", "Last 30 days"),
             ("this_month", "Month to date"),
@@ -130,6 +137,10 @@ class ModifiedDateFilter(admin.SimpleListFilter):
         time_now = arrow.utcnow()
         if self.value() == "all":
             return queryset.all()
+        elif self.value() == "yesterday":
+            return queryset.filter(
+                modification_date__date=time_now.shift(days=-1).date(),
+            )
         elif self.value() == "last_7_days":
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(days=-7).date()
@@ -165,7 +176,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
                 .date(),
             )
         else:
-            return queryset.filter(modification_date__date=time_now.floor("day").date())
+            return queryset.filter(modification_date__date=time_now.date())
 
 
 class HasLocationFilter(admin.SimpleListFilter):
