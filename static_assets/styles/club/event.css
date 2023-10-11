@@ -2,6 +2,7 @@
   —-app-height: 100%;
   --ctrl-height: 0px;
   --sidebar-size: 30px;
+  --footer-size: 45px;
 }
 
 .sub-header {
@@ -12,7 +13,7 @@
 .sidebar {
   position: fixed;
   top: 46px;
-  bottom: calc(55px + var(--ctrl-height));
+  bottom: calc(var(--footer-size) + var(--ctrl-height));
   left: 0;
   z-index: 10001;
   display: block;
@@ -29,7 +30,7 @@
   padding: 1px;
   position: fixed;
   top: 46px;
-  bottom: calc(55px + var(--ctrl-height));
+  bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0;
   z-index: 10002;
   background-color: #f5f5f5;
@@ -46,18 +47,24 @@
 }
 
 .sidebar #competitorList {
-  max-height: calc(100vh - 149px);
-  max-height: calc(var(--app-height) - 149px - var(--ctrl-height));
+  max-height: calc(100vh - 94px - var(--footer-size));
+  max-height: calc(
+    var(--app-height) - 94px - var(--footer-size) - var(--ctrl-height)
+  );
 }
 
 .sidebar #competitorList.with-search-bar {
-  max-height: calc(100vh - 187px);
-  max-height: calc(var(--app-height) - 187px - var(--ctrl-height));
+  max-height: calc(100vh - 132px - var(--footer-size));
+  max-height: calc(
+    var(--app-height) - 132px - var(--footer-size) - var(--ctrl-height)
+  );
 }
 
 .sidebar #optionsSidebar {
-  max-height: calc(100vh - 109px);
-  max-height: calc(var(--app-height) - 109px - var(--ctrl-height));
+  max-height: calc(100vh - 54px - var(--footer-size));
+  max-height: calc(
+    var(--app-height) - 54px - var(--footer-size) - var(--ctrl-height)
+  );
 }
 
 .time_bar {
@@ -65,7 +72,7 @@
   padding-top: 5px;
   bottom: 0px;
   left: 0px;
-  height: calc(55px + var(--ctrl-height));
+  height: calc(var(--footer-size) + var(--ctrl-height));
   background-color: #e5e5e5;
 }
 
@@ -94,7 +101,7 @@
 .main {
   position: fixed;
   top: 46px;
-  bottom: calc(55px + var(--ctrl-height));
+  bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0px;
   left: 0px;
 }
@@ -102,7 +109,7 @@
 .sidebar.loading,
 #permanent-sidebar.loading,
 .main.loading {
-  bottom: 46px;
+  bottom: calc(var(--footer-size) - 11px);
 }
 
 #permanent-sidebar {
@@ -297,7 +304,7 @@
 
 #permanent-sidebar .bottom-btn {
   position: fixed;
-  bottom: calc(55px + var(--ctrl-height));
+  bottom: calc(var(--footer-size) + var(--ctrl-height));
 }
 
 .higher-z-index {
