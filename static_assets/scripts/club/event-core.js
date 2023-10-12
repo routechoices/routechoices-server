@@ -1355,6 +1355,8 @@ function displayCompetitorList(force) {
                 });
                 commonDiv.find(".speedometer").text("");
                 commonDiv.find(".odometer").text("");
+                competitor.speedometerValue = "";
+                competitor.odometerValue = "";
                 updateCompetitor(competitor);
                 nbShown -= 1;
               } else {
@@ -1565,9 +1567,13 @@ function displayCompetitorList(force) {
           var metersDiv = u("<div/>")
             .addClass("float-end d-inline-block text-end")
             .css({ lineHeight: "10px" });
-          var spedometer = u("<span/>").addClass("speedometer");
-          var odometer = u("<span/>").addClass("odometer");
-          metersDiv.append(spedometer).append("<br/>").append(odometer);
+          var speedometer = u("<span/>")
+            .addClass("speedometer")
+            .text(competitor.speedometerValue || "");
+          var odometer = u("<span/>")
+            .addClass("odometer")
+            .text(competitor.odometerValue || "");
+          metersDiv.append(speedometer).append("<br/>").append(odometer);
 
           secondLine.append(metersDiv);
         }
@@ -2321,13 +2327,14 @@ function drawCompetitors(refreshMeters) {
         }
         redrawCompetitorTail(competitor, route, viewedTime);
         if (refreshMeters) {
-          // odometer and spedometer
+          // odometer and speedometer
           var hasPointInTail = route.hasPointInInterval(
             viewedTime - 30 * 1e3,
             viewedTime
           );
           if (!hasPointInTail) {
-            competitor.speedometer.textContent = "--'--\"/km";
+            competitor.speedometerValue = "--'--\"/km";
+            competitor.speedometer.textContent = competitor.speedometerValue;
           } else {
             if (checkVisible(competitor.speedometer)) {
               var distance = 0;
@@ -2343,13 +2350,14 @@ function drawCompetitors(refreshMeters) {
                 prevPos = pos;
               });
               var speed = (30 / distance) * 1000;
-              competitor.speedometer.textContent = formatSpeed(speed);
+              competitor.speedometerValue = formatSpeed(speed);
+              competitor.speedometer.textContent = competitor.speedometerValue;
             }
           }
           if (checkVisible(competitor.odometer)) {
             var totalDistance = route.distanceUntil(viewedTime);
-            competitor.odometer.textContent =
-              (totalDistance / 1000).toFixed(1) + "km";
+            competitor.odometerValue = (totalDistance / 1000).toFixed(1) + "km";
+            competitor.odometer.textContent = competitor.odometerValue;
           }
 
           // Splitimes
