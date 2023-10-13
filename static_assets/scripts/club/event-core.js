@@ -84,6 +84,7 @@ var oldCrossingForNTimes = 1;
 var intersectionCheckZoom = 18;
 var showUserLocation = false;
 var mapOpacity = 1;
+var showAll = true;
 var supportedLanguages = {
   en: "English",
   es: "Español",
@@ -1625,88 +1626,95 @@ function displayCompetitorList(force) {
     })(competitorList[i]);
   }
   if (competitorList.length === 0) {
-    var div = u('<div class="text-center"/>');
-    div.append(u("<h3/>").text(banana.i18n("no-competitors")));
+    var div = u(
+      '<div class="no-competitor-warning text-center d-flex justify-content-center align-items-center"/>'
+    );
+    div.append(
+      u("<h3/>").html(
+        '<i class="fa-solid fa-triangle-exclamation"></i><br/>' +
+          banana.i18n("no-competitors")
+      )
+    );
     listDiv.append(div);
   }
   if (!searchText) {
     var mainDiv = u('<div id="competitorSidebar" class="d-flex flex-column"/>');
     var topDiv = u("<div/>");
+    var searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
     if (competitorList.length) {
-      var showHideAllDiv = u("<div/>")
-        .addClass("text-center", "text-nowrap")
-        .append(
-          u("<button/>")
-            .addClass("btn", "btn-default")
-            .on("click", function () {
-              nbShown = competitorList.reduce(function (a, v) {
-                return v.isShown ? a + 1 : a;
-              }, 0);
-              var didNotShowAll = false;
-              for (var i = 0; i < competitorList.length; i++) {
-                var competitor = competitorList[i];
-                var colorTag = competitor.sidebarCard.find(".color-tag");
-                if (
-                  nbShown >= maxParticipantsDisplayed &&
-                  !competitor.isShown
-                ) {
-                  didNotShowAll = true;
-                } else if (!competitor.isShown) {
-                  nbShown += 1;
-                  competitor.isShown = true;
-                }
-                updateCompetitor(competitor);
-              }
-              if (didNotShowAll) {
-                swal({
-                  title: banana.i18n(
-                    "reached-max-runners",
-                    maxParticipantsDisplayed
-                  ),
-                  type: "warning",
-                  confirmButtonText: "OK",
-                });
-              }
-              displayCompetitorList();
-            })
-            .append(u("<i/>").addClass("fa-solid", "fa-eye"))
-            .append(" ")
-            .append(banana.i18n("show-all"))
-        )
-        .append(
-          u("<button/>")
-            .addClass("btn", "btn-default")
-            .on("click", function () {
-              for (var i = 0; i < competitorList.length; i++) {
-                var competitor = competitorList[i];
-                competitor.isShown = false;
-                competitor.focused = false;
-                competitor.highlighted = false;
-                competitor.displayFullRoute = false;
-                ["mapMarker", "nameMarker", "tail"].forEach(function (
-                  layerName
-                ) {
-                  competitor[layerName]?.remove();
-                  competitor[layerName] = null;
-                });
-                updateCompetitor(competitor);
-                nbShown = 0;
-              }
-              displayCompetitorList();
-            })
-            .append(u("<i/>").addClass("fa-solid", "fa-eye-slash"))
-            .append(" ")
-            .append(banana.i18n("hide-all"))
-        );
-      topDiv.append(showHideAllDiv);
-    }
-
-    if (competitorList.length > 10) {
-      topDiv.append(
-        u('<input class="form-control" type="search" val=""/>')
-          .on("input", filterCompetitorList)
-          .attr("placeholder", banana.i18n("search-competitors"))
+      var toggleAllContent = u("<div/>").addClass(
+        "form-group",
+        "form-check",
+        "form-switch",
+        "d-inline-block",
+        "ms-1",
+        "col-auto",
+        "pt-2",
+        "me-0",
+        "pe-0"
       );
+      var toggleAllInput = u("<input/>")
+        .addClass("form-check-input")
+        .attr({
+          id: "toggleAllSwitch",
+          type: "checkbox",
+          checked: !!showAll,
+        })
+        .on("click", function (e) {
+          showAll = !!e.target.checked;
+          if (showAll) {
+            nbShown = competitorList.reduce(function (a, v) {
+              return v.isShown ? a + 1 : a;
+            }, 0);
+            var didNotShowAll = false;
+            for (var i = 0; i < competitorList.length; i++) {
+              var competitor = competitorList[i];
+              if (nbShown >= maxParticipantsDisplayed && !competitor.isShown) {
+                didNotShowAll = true;
+              } else if (!competitor.isShown) {
+                nbShown += 1;
+                competitor.isShown = true;
+              }
+              updateCompetitor(competitor);
+            }
+            if (didNotShowAll) {
+              swal({
+                title: banana.i18n(
+                  "reached-max-runners",
+                  maxParticipantsDisplayed
+                ),
+                type: "warning",
+                confirmButtonText: "OK",
+              });
+            }
+          } else {
+            for (var i = 0; i < competitorList.length; i++) {
+              var competitor = competitorList[i];
+              competitor.isShown = false;
+              competitor.focused = false;
+              competitor.highlighted = false;
+              competitor.displayFullRoute = false;
+              ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+                competitor[layerName]?.remove();
+                competitor[layerName] = null;
+              });
+              updateCompetitor(competitor);
+              nbShown = 0;
+            }
+          }
+          displayCompetitorList();
+        });
+      searchBar.append(toggleAllContent.append(toggleAllInput));
+      searchBar.append(
+        u("<div>")
+          .addClass("col-auto flex-fill ms-0 ps-0")
+          .append(
+            u('<input class="form-control" type="search" val=""/>')
+              .on("input", filterCompetitorList)
+              .attr("placeholder", banana.i18n("search-competitors"))
+          )
+      );
+      topDiv.append(searchBar);
     }
     mainDiv.append(topDiv);
     mainDiv.append(listDiv);
@@ -1717,8 +1725,8 @@ function displayCompetitorList(force) {
     var mainDiv = u("#competitorSidebar");
     mainDiv.append(listDiv);
   }
-  if (competitorList.length > 10) {
-    listDiv.addClass("with-search-bar");
+  if (competitorList.length == 0) {
+    listDiv.addClass("without-competitor");
   }
   if (scrollTopDiv) {
     listDiv.nodes[0].scrollTop = scrollTopDiv;

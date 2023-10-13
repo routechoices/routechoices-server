@@ -45,23 +45,22 @@
 .tooltip {
   z-index: 10001;
 }
-
+.no-competitor-warning {
+  height: calc(100vh - 59px - var(--footer-size) - var(--ctrl-height));
+}
 .sidebar #competitorList {
-  max-height: calc(100vh - 94px - var(--footer-size));
   max-height: calc(
-    var(--app-height) - 94px - var(--footer-size) - var(--ctrl-height)
+    var(--app-height) - 93px - var(--footer-size) - var(--ctrl-height)
   );
 }
 
-.sidebar #competitorList.with-search-bar {
-  max-height: calc(100vh - 132px - var(--footer-size));
+.sidebar #competitorList.without-competitor {
   max-height: calc(
-    var(--app-height) - 132px - var(--footer-size) - var(--ctrl-height)
+    var(--app-height) - 59px - var(--footer-size) - var(--ctrl-height)
   );
 }
 
 .sidebar #optionsSidebar {
-  max-height: calc(100vh - 54px - var(--footer-size));
   max-height: calc(
     var(--app-height) - 54px - var(--footer-size) - var(--ctrl-height)
   );
