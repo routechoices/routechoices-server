@@ -350,7 +350,7 @@ class EventAdmin(admin.ModelAdmin):
         "competitor_count",
         "link",
     )
-    list_filter = (EventDateRangeFilter, "privacy", "club")
+    list_filter = (EventDateRangeFilter, HasCompetitorFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
 
     def get_queryset(self, request):
