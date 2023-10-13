@@ -68,5 +68,5 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
             FileWrapper(fileIO), content_type=content_type, **kwargs
         )
         resp["Content-Length"] = str(size)
-    resp["Accept-Ranges"] = "bytes"
+        resp["Accept-Ranges"] = "bytes"
     return resp
