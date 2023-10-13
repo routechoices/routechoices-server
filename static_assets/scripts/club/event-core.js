@@ -543,8 +543,8 @@ function onStart() {
     u(".sidebar").removeClass("loading");
     u(".time_bar").removeClass("loading");
     u("#permanent-sidebar").removeClass("loading");
-    map.invalidateSize();
     onAppResize();
+    map.invalidateSize();
   });
 }
 
