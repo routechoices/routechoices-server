@@ -1213,6 +1213,30 @@ function toggleHighlightCompetitor(competitor) {
     competitor[layerName] = null;
   });
 }
+function onChangeCompetitorColor(competitor) {
+  var color = competitor.color;
+  u("#colorModalLabel").text(banana.i18n("select-color-for", competitor.name));
+  u("#color-picker").html("");
+  new iro.ColorPicker("#color-picker", {
+    color,
+    width: 150,
+    display: "inline-block",
+  }).on("color:change", function (c) {
+    color = c.hexString;
+  });
+  colorModal.show();
+  u("#save-color").on("click", function () {
+    competitor.color = color;
+    competitor.isColorDark = getContrastYIQ(competitor.color);
+    colorModal.hide();
+    ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
+      competitor[layerName]?.remove();
+      competitor[layerName] = null;
+    });
+    displayCompetitorList();
+    u("#save-color").off("click");
+  });
+}
 
 function displayCompetitorList(force) {
   if (!force && optionDisplayed) {
@@ -1250,33 +1274,13 @@ function displayCompetitorList(force) {
 
         var colorTag = u("<span/>")
           .addClass("color-tag", "me-1")
-          .css({ cursor: "pointer" })
-          .on("click", function () {
-            var color = competitor.color;
-            u("#colorModalLabel").text(
-              banana.i18n("select-color-for", competitor.name)
-            );
-            u("#color-picker").html("");
-            new iro.ColorPicker("#color-picker", {
-              color,
-              width: 150,
-              display: "inline-block",
-            }).on("color:change", function (c) {
-              color = c.hexString;
-            });
-            colorModal.show();
-            u("#save-color").on("click", function () {
-              competitor.color = color;
-              competitor.isColorDark = getContrastYIQ(competitor.color);
-              colorModal.hide();
-              ["mapMarker", "nameMarker", "tail"].forEach(function (layerName) {
-                competitor[layerName]?.remove();
-                competitor[layerName] = null;
-              });
-              displayCompetitorList();
-              u("#save-color").off("click");
-            });
+          .css({ cursor: "pointer" });
+
+        if (competitor.isShown) {
+          colorTag.on("click", function () {
+            onChangeCompetitorColor(competitor);
           });
+        }
 
         var colorTagIcon = u("<i/>")
           .addClass(
@@ -1291,6 +1295,16 @@ function displayCompetitorList(force) {
             fontSize: "1em",
             color: competitor.color,
           });
+
+        if (competitor.isShown) {
+          colorTagIcon.css({
+            color: competitor.color,
+          });
+        } else {
+          colorTagIcon.css({
+            color: "rgba(250, 250, 250, 0.9)",
+          });
+        }
 
         var nameDiv = u("<span/>")
           .addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold")
@@ -1347,6 +1361,13 @@ function displayCompetitorList(force) {
                 commonDiv
                   .removeClass("route-displayed")
                   .addClass("route-not-displayed");
+
+                var colorTag = commonDiv.parent().find(".color-tag");
+                colorTag
+                  .find("i.fa-circle")
+                  .css({ color: "rgba(250, 250, 250, 0.9)" });
+                colorTag.off("click");
+
                 ["mapMarker", "nameMarker", "tail"].forEach(function (
                   layerName
                 ) {
@@ -1376,6 +1397,13 @@ function displayCompetitorList(force) {
                   .removeClass("route-not-displayed")
                   .addClass("route-displayed");
                 commonDiv.find("button").attr({ disabled: false });
+
+                var colorTag = commonDiv.parent().find(".color-tag");
+                colorTag.find("i.fa-circle").css({ color: competitor.color });
+                colorTag.on("click", function () {
+                  onChangeCompetitorColor(competitor);
+                });
+
                 updateCompetitor(competitor);
                 nbShown += 1;
               }
@@ -1569,10 +1597,10 @@ function displayCompetitorList(force) {
             .css({ lineHeight: "10px" });
           var speedometer = u("<span/>")
             .addClass("speedometer")
-            .text(competitor.speedometerValue || "");
+            .text(!competitor.isShown ? "" : competitor.speedometerValue || "");
           var odometer = u("<span/>")
             .addClass("odometer")
-            .text(competitor.odometerValue || "");
+            .text(!competitor.isShown ? "" : competitor.odometerValue || "");
           metersDiv.append(speedometer).append("<br/>").append(odometer);
 
           secondLine.append(metersDiv);
@@ -1617,6 +1645,7 @@ function displayCompetitorList(force) {
               var didNotShowAll = false;
               for (var i = 0; i < competitorList.length; i++) {
                 var competitor = competitorList[i];
+                var colorTag = competitor.sidebarCard.find(".color-tag");
                 if (
                   nbShown >= maxParticipantsDisplayed &&
                   !competitor.isShown
