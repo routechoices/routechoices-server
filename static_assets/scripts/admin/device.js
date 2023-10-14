@@ -11,20 +11,18 @@ document.addEventListener("DOMContentLoaded", function () {
     <name></name>
     <desc></desc>
     <trkseg>`;
-    result += posArray
-      .map(
-        (point) => `
+    posArray.forEach(function (point) {
+      result += `
       <trkpt lat="${point.coords.latitude}" lon="${
-          point.coords.longitude
-        }"><time>${new Date(point.timestamp).toISOString()}</time></trkpt>`
-      )
-      .join("");
+        point.coords.longitude
+      }"><time>${new Date(point.timestamp).toISOString()}</time></trkpt>`;
+    });
     result += `
     </trkseg>
   </trk>
 </gpx>`;
 
-    var url = "data:text/json;charset=utf-8," + result;
+    var url = "data:text/xml;charset=utf-8," + result;
     var link = document.createElement("a");
     link.download = `device_data.gpx`;
     link.href = url;
