@@ -9,6 +9,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.db.models import Case, Count, Exists, F, OuterRef, Value, When
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
 
@@ -406,6 +407,13 @@ class DeviceOwnershipInline(admin.TabularInline):
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
+    class Media:
+        js = [
+            "/static/vendor/bn-5.2.1/bn.min.js",
+            "/static/vendor/gps-encoding-2023.04.13/gps-encoding.js",
+            "/static/scripts/admin/device.js",
+        ]
+
     list_display = (
         "aid",
         "device_name",
@@ -417,7 +425,7 @@ class DeviceAdmin(admin.ModelAdmin):
         "battery_level",
         "competitor_count",
     )
-    readonly_fields = ("locations_sample", "imei")
+    readonly_fields = ("locations_sample", "download_gpx", "imei")
     actions = ["clean_positions"]
     search_fields = ("aid",)
     inlines = [
@@ -432,8 +440,14 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     show_full_result_count = False
 
+    def download_gpx(self, obj):
+        return mark_safe(
+            '<input value="Download GPX File" '
+            'name="_download_gpx_button" type="button">'
+        )
+
     def locations_sample(self, obj):
-        if obj.location_count <= 50:
+        if obj.location_count <= 30:
             return "\n".join(
                 [
                     f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
@@ -445,13 +459,13 @@ class DeviceAdmin(admin.ModelAdmin):
                 "\n".join(
                     [
                         f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
-                        for x in obj.locations_series[:10]
+                        for x in obj.locations_series[:15]
                     ]
                 ),
                 "\n".join(
                     [
                         f"time: {epoch_to_datetime(x[0])}, latlon: {x[1]}, {x[2]}"
-                        for x in obj.locations_series[-40:]
+                        for x in obj.locations_series[-15:]
                     ]
                 ),
             ]
