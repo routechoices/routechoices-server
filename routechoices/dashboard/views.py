@@ -1332,7 +1332,9 @@ def event_route_upload_view(request, event_id):
                     error = "Couldn't parse file"
             if not error:
                 device = Device.objects.create(
-                    aid=f"{short_random_key()}_GPX", is_gpx=True
+                    aid=f"{short_random_key()}_GPX",
+                    user_agent=request.session.user_agent[:200],
+                    is_gpx=True,
                 )
                 start_time = None
                 end_time = None
