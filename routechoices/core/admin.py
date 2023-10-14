@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-from django.db.models import Case, Count, Exists, F, OuterRef, Value, When
+from django.db.models import Case, Count, Exists, F, OuterRef, Prefetch, Value, When
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -31,6 +31,23 @@ from routechoices.core.models import (
     TcpDeviceCommand,
 )
 from routechoices.lib.helpers import epoch_to_datetime, get_device_name
+
+
+class ImeiDeviceClubFilter(admin.SimpleListFilter):
+    title = "which club owns it"
+    parameter_name = "club"
+
+    def lookups(self, request, model_admin):
+        qs = DeviceClubOwnership.objects.all().select_related("club")
+        qs = qs.distinct("club__name").order_by("club__name")
+        for club_dev in qs:
+            yield (club_dev.club_id, club_dev.club.name)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(device__club_ownerships__club_id=self.value())
+        else:
+            return queryset
 
 
 class EventDateRangeFilter(admin.SimpleListFilter):
@@ -527,8 +544,27 @@ class ImeiDeviceAdmin(admin.ModelAdmin):
         "imei",
         "device",
         "creation_date",
+        "clubs",
     )
+
+    list_filter = (ImeiDeviceClubFilter,)
+
     search_fields = ("imei", "device__aid")
+
+    def clubs(self, obj):
+        return ", ".join(c.club.name for c in obj.device.club_ownerships.all())
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                Prefetch(
+                    "device__club_ownerships",
+                    queryset=DeviceClubOwnership.objects.select_related("club"),
+                )
+            )
+        )
 
 
 @admin.register(SpotDevice)
