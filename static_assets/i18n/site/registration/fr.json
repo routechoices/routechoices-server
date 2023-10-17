@@ -12,5 +12,6 @@
     "registration-info": "Vous pouvez diffuser vos données GPS à un seul concurrent à la fois. Si vous vous inscrivez maintenant, votre flux de données GPS sera immédiatement transféré à ce concurrent.",
     "registration-info-time": "Vous pouvez diffuser vos données GPS à un seul concurrent à la fois. Si vous vous inscrivez maintenant, votre flux de données GPS sera basculé vers ce concurrent au plus tard le $1",
     "error": "Quelque chose s'est mal passé.",
-    "register": "Inscription à un événement"
+    "register": "Inscription à un événement",
+    "no-device-id": "Identifiant de l'appareil introuvable"
 }

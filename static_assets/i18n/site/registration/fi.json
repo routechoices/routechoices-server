@@ -12,5 +12,6 @@
     "registration-info": "Voit suoratoistaa GPS-tietosi vain yhdelle kilpailijalle kerrallaan. Jos rekisteröidyt nyt, GPS-tietovirtasi siirretään välittömästi tälle kilpailijalle.",
     "registration-info-time": "Voit suoratoistaa GPS-tietosi vain yhdelle kilpailijalle kerrallaan. Jos rekisteröidyt nyt, GPS-tietovirtasi vaihdetaan tälle kilpailijalle viimeistään $1",
     "error": "Jotain meni pieleen.",
-    "register": "Ilmoittaudu tapahtumaan"
+    "register": "Ilmoittaudu tapahtumaan",
+    "no-device-id": "Laitetunnusta ei löydy"
 }

@@ -21,7 +21,7 @@ function updateText() {
     window.local.staticRoot +
     "i18n/site/registration/" +
     locale +
-    ".json?v=2022082600";
+    ".json?v=2023101700";
   return fetch(langFile)
     .then((response) => response.json())
     .then((messages) => {
@@ -81,8 +81,21 @@ window.onload = function () {
   });
   document.getElementById("events").addEventListener("change", onEventSelect);
 };
-document.getElementById("form1").onsubmit = function (ev) {
+document.getElementById("form1").onsubmit = async function (ev) {
   ev.preventDefault();
+  var deviceIdRaw = document.getElementById("devid").value;
+  var resp = await fetch(window.local.apiRoot + "device/" + deviceIdRaw, {
+    method: "GET",
+    credentials: "omit",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  var content = await resp.json();
+  if (content.error) {
+    swal(banana.i18n("no-device-id"));
+    return;
+  }
   userInfo = {};
   userInfo.name = document.getElementById("name").value;
   userInfo.short_name = document.getElementById("sname").value;

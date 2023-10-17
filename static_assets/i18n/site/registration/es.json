@@ -12,5 +12,6 @@
     "registration-info": "Puede transmitir sus datos GPS a un solo competidor a la vez. Si se registra ahora, su flujo de datos GPS se cambiará a este competidor inmediatamente.",
     "registration-info-time": "Puede transmitir sus datos GPS a un solo competidor a la vez. Si se registra ahora, su flujo de datos GPS se cambiará a este competidor a más tardar en $1",
     "error": "Algo salió mal",
-    "register": "Registrarse en el evento"
+    "register": "Registrarse en el evento",
+    "no-device-id": "ID del dispositivo no encontrado"
 }

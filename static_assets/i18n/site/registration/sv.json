@@ -12,5 +12,6 @@
     "registration-info": "Du kan sända GPS-data till endast en person åt gången. Om du registrerar dig nu kommer din GPS-data omedelbart att bytas till denna person/tävlande.",
     "registration-info-time": "Du kan sända din GPS-data till endast en person åt gången. Om du registrerar dig nu kommer din GPS-data att bytas till denna person senast $1",
     "error": "Något gick fel",
-    "register": "Registrera till ett evenemang"
+    "register": "Registrera till ett evenemang",
+    "no-device-id": "Enhets-ID hittades inte"
 }

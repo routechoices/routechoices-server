@@ -12,5 +12,6 @@
     "registration-info": "Je kan je GPS data streamen naar 1 atleet per sessie. Als je nu registreert, zal je GPS data stream verandert worden naar een andere atleet.",
     "registration-info-time": "Je kan je GPS data streamen naar 1 atleet per sessie. Als je nu registreert,zal je GPS data stream verandert worden naar deze atleet ten laatste op",
     "error": "Er ging iets verkeerd",
-    "register": "Registreer voor event"
+    "register": "Registreer voor event",
+    "no-device-id": "Toestel ID niet gevonden"
 }
