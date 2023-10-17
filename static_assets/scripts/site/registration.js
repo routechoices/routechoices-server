@@ -69,14 +69,17 @@ window.onload = function () {
           ")" +
           " - " +
           userInfo.devid;
+        document.getElementById("p0").classList.remove("d-none");
         fetchEvents();
       } catch (e) {
         document.getElementById("p2").classList.add("d-none");
         document.getElementById("p1").classList.remove("d-none");
+        document.getElementById("p0").classList.add("d-none");
       }
     } else {
       document.getElementById("p2").classList.add("d-none");
       document.getElementById("p1").classList.remove("d-none");
+      document.getElementById("p0").classList.add("d-none");
     }
   });
   document.getElementById("events").addEventListener("change", onEventSelect);
@@ -104,6 +107,7 @@ document.getElementById("form1").onsubmit = async function (ev) {
   document.getElementById("p1").classList.add("d-none");
   document.getElementById("user-summary").textContent =
     userInfo.name + " (" + userInfo.short_name + ")" + " - " + userInfo.devid;
+  document.getElementById("p0").classList.remove("d-none");
   fetchEvents();
 };
 document.getElementById("form2").onsubmit = function (ev) {
@@ -153,6 +157,7 @@ Array.from(document.getElementsByClassName("user-setting-btn")).map(function (
     document.getElementById("p2").classList.add("d-none");
     document.getElementById("p3").classList.add("d-none");
     document.getElementById("p4").classList.add("d-none");
+    document.getElementById("p0").classList.add("d-none");
     document.getElementById("p1").classList.remove("d-none");
   });
 });
