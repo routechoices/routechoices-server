@@ -1584,7 +1584,8 @@ function displayCompetitorList(force) {
             "fa-rotate-270",
             `fa-battery-${batteryIconName(
               competitorBatteyLevels[competitor.id]
-            )}`
+            )}`,
+            !competitorBatteyLevels[competitor.id] ? "text-muted" : ""
           );
 
           batterySpan.append(batteryIcon);
