@@ -8,7 +8,7 @@ var makeFieldRandomizable = function (id) {
     );
   u(".randomize_btn").on("click", function (e) {
     e.preventDefault();
-    var target = u(e.target).parent().parent().find(".form-control");
+    var target = u(this).parent().parent().find(".form-control");
     var result = "";
     var characters = "23456789abcdefghijkmnpqrstuvwxyz";
     var charactersLength = characters.length;
@@ -30,7 +30,7 @@ var makeFieldNowable = function (el) {
     .find(".set_time_now_btn")
     .on("click", function (e) {
       e.preventDefault();
-      var target = u(e.target).parent().parent().find("input");
+      var target = u(this).parent().parent().find("input");
       target.val(dayjs().utc().format("YYYY-MM-DD HH:mm:ss"));
       target.trigger("change");
     });

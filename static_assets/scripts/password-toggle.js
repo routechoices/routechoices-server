@@ -11,9 +11,8 @@
     '<span class="input-group-text togglePassword" style="cursor: pointer"><i class="fa-regular fa-fw fa-eye"></i></span>'
   );
   u(".togglePassword").on("click", function (e) {
-    u(e.target).parent().find("i").toggleClass("fa-eye-slash, fa-eye");
-    u(e.target)
-      .parent()
+    u(this).find("i").toggleClass("fa-eye-slash, fa-eye");
+    u(this)
       .parent()
       .find("input")
       .each(function (el) {

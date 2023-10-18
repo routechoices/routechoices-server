@@ -1347,7 +1347,7 @@ function displayCompetitorList(force) {
               checked: !!competitor.isShown,
             })
             .on("click", function (e) {
-              var commonDiv = u(e.target).parent().parent();
+              var commonDiv = u(this).parent().parent();
               if (!e.target.checked) {
                 competitor.isShown = false;
                 competitor.focused = false;
