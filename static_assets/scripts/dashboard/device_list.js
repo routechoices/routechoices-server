@@ -50,7 +50,7 @@
     u('input[placeholder="Nickname"]').attr("maxlength", 12);
   });
   u(".remove-btn").on("click", function (ev) {
-    var devId = u(ev.target).attr("data-dev-id");
+    var devId = u(this).attr("data-dev-id");
     swal(
       {
         title: "Confirm removal",
