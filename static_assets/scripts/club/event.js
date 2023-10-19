@@ -250,8 +250,8 @@
             u("#archived_event_button").hide();
           } else {
             eventStateControl.setReplay();
-            u("#archived_event_button").text(banana.i18n("archived-event"));
           }
+          u("#archived_event_button").text(banana.i18n("archived-event"));
           qrUrl = response.event.shortcut;
           liveUrl = window.local.dataUrl;
           sendInterval = response.event.send_interval;
