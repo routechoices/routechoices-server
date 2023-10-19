@@ -628,6 +628,8 @@ function selectLiveMode(e) {
   if (isLiveMode) {
     return;
   }
+  isLiveMode = true;
+  isRealTime = true;
   u("#full_progress_bar").addClass("d-none");
 
   eventStateControl.setLive();
@@ -651,8 +653,6 @@ function selectLiveMode(e) {
   u("#replay_control_buttons").hide();
   onAppResize();
 
-  isLiveMode = true;
-  isRealTime = true;
   function whileLive(ts) {
     if (
       ts - routesLastFetched > fetchPositionInterval * 1e3 &&
@@ -1379,6 +1379,10 @@ function displayCompetitorList(force) {
                 commonDiv.find(".odometer").text("");
                 competitor.speedometerValue = "";
                 competitor.odometerValue = "";
+                commonDiv
+                  .find(".battery-indicator")
+                  .addClass("d-none")
+                  .removeClass("if-live");
                 updateCompetitor(competitor);
                 nbShown -= 1;
               } else {
@@ -1398,6 +1402,12 @@ function displayCompetitorList(force) {
                   .removeClass("route-not-displayed")
                   .addClass("route-displayed");
                 commonDiv.find("button").attr({ disabled: false });
+                if (isLiveMode) {
+                  commonDiv
+                    .find(".battery-indicator")
+                    .removeClass("d-none")
+                    .addClass("if-live");
+                }
 
                 var colorTag = commonDiv.parent().find(".color-tag");
                 colorTag.find("i.fa-circle").css({ color: competitor.color });
@@ -1562,12 +1572,14 @@ function displayCompetitorList(force) {
         }
 
         if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
+          console.log(competitor.name, !isLiveMode, !competitor.isShown);
           var batteryLevelDiv = u("<div/>").addClass(
             "float-end",
             "d-inline-blockv",
             "text-end",
-            "if-live",
-            !isLiveMode ? "d-none" : ""
+            competitor.isShown ? "if-live" : "",
+            "battery-indicator",
+            !isLiveMode || !competitor.isShown ? "d-none" : ""
           );
 
           var batterySpan = u("<span/>").attr({
