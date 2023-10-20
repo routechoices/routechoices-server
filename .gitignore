@@ -3,6 +3,7 @@ build
 dist
 MANIFEST
 .coverage
+.env
 .DS_Store
 *.pyc
 *.egg-info
