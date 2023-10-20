@@ -1572,7 +1572,6 @@ function displayCompetitorList(force) {
         }
 
         if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
-          console.log(competitor.name, !isLiveMode, !competitor.isShown);
           var batteryLevelDiv = u("<div/>").addClass(
             "float-end",
             "d-inline-blockv",

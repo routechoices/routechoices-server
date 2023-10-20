@@ -15,7 +15,6 @@ function onCsvParsed(result) {
   if (result.errors.length > 0) {
     errors = "No lines found";
   }
-  console.log(result.errors);
   if (!errors) {
     result.data.forEach(function (l) {
       var empty = false;

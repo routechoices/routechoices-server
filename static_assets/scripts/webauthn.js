@@ -215,7 +215,6 @@ const ProvisionWebAuthn = () => {
         window.location.replace(Kagi.keys_list);
       })
       .catch((error) => {
-        console.log(error);
         populateWebAuthnErrorList([error.message]);
         return;
       });
