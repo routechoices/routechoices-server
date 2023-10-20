@@ -363,6 +363,9 @@ ANALYTICS_API_URL = env.str("ANALYTICS_API_URL")
 
 LEMONSQUEEZY_SIGNATURE = env.str("LEMONSQUEEZY_SIGNATURE")
 
+RELYING_PARTY_ID = env.str("RELYING_PARTY_ID")
+RELYING_PARTY_NAME = env.str("RELYING_PARTY_NAME")
+
 try:
     from .settings_overrides import *  # noqa: F403, F401
 except ImportError:
