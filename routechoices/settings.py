@@ -16,317 +16,12 @@ import environ
 
 from routechoices.slug_blacklist import SLUG_BLACKLIST
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-DEBUG = False
-
-ALLOWED_HOSTS = ["*"]
-
-AUTHENTICATION_BACKENDS = (
-    # Needed to login by username in Django admin, regardless of `allauth`
-    "django.contrib.auth.backends.ModelBackend",
-    # `allauth` specific authentication methods, such as login by e-mail
-    "allauth.account.auth_backends.AuthenticationBackend",
-)
-
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-# Application definition
-
-INSTALLED_APPS = [
-    "routechoices",
-    "routechoices.core",
-    "routechoices.site",
-    "routechoices.lib",
-    "django_bootstrap5",
-    "django_hosts",
-    "corsheaders",
-    "user_sessions",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "invitations",
-    "background_task",
-    "admincommand",
-    "oauth2_provider",
-    "rest_framework",
-    "drf_yasg",
-    "markdownify.apps.MarkdownifyConfig",
-    "django_s3_storage",
-    "qr_code",
-    "kagi",
-    "compressor",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sites",
-    "django.contrib.sitemaps",
-]
-
-MIDDLEWARE = [
-    "routechoices.core.middleware.SessionMiddleware",
-    "routechoices.core.middleware.HostsRequestMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    "routechoices.core.middleware.XForwardedForMiddleware",
-    "routechoices.core.middleware.FilterCountriesIPsMiddleware",
-    "routechoices.core.middleware.CorsMiddleware",
-    "csp.middleware.CSPMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "routechoices.core.middleware.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_minify_html.middleware.MinifyHtmlMiddleware",
-    "django.middleware.http.ConditionalGetMiddleware",
-]
-
-
-SESSION_ENGINE = "user_sessions.backends.db"
-
-ROOT_URLCONF = "routechoices.urls"
-ROOT_HOSTCONF = "routechoices.hosts"
-DEFAULT_HOST = "www"
-
-
-TEMPLATES_LOADERS = [
-    (
-        "django.template.loaders.cached.Loader",
-        [
-            "django.template.loaders.filesystem.Loader",
-            "django.template.loaders.app_directories.Loader",
-        ],
-    ),
-]
-TEMPLATES_CONTEXT_PROCESSORS = [
-    "django.template.context_processors.request",
-    "django.contrib.auth.context_processors.auth",
-    "django.contrib.messages.context_processors.messages",
-    "routechoices.lib.context_processors.site",
-]
-if DEBUG:
-    TEMPLATES_LOADERS = [
-        "django.template.loaders.filesystem.Loader",
-        "django.template.loaders.app_directories.Loader",
-    ]
-    TEMPLATES_CONTEXT_PROCESSORS = [
-        "django.template.context_processors.debug",
-        "django.template.context_processors.request",
-        "django.contrib.auth.context_processors.auth",
-        "django.contrib.messages.context_processors.messages",
-        "routechoices.lib.context_processors.site",
-    ]
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "OPTIONS": {
-            "loaders": TEMPLATES_LOADERS,
-            "context_processors": TEMPLATES_CONTEXT_PROCESSORS,
-        },
-    },
-]
-
-
-WSGI_APPLICATION = "routechoices.wsgi.application"
-
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-        ),
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
-
-TIME_ZONE = "UTC"
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
-SITE_ID = 1
-
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static_assets"),
-]
-STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
-]
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
-
-LOGIN_REDIRECT_URL = "/dashboard"
-LOGOUT_REDIRECT_URL = "/"
-
-SESSION_COOKIE_SAMESITE = None
-
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
-REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": [
-        "drf_orjson_renderer.renderers.ORJSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 20,
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-    ),
-}
-
-ACCOUNT_ADAPTER = "routechoices.lib.account_adapters.SiteAccountAdapter"
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-ACCOUNT_USERNAME_BLACKLIST = SLUG_BLACKLIST
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_USERNAME_MIN_LENGTH = "2"
-ACCOUNT_USERNAME_VALIDATORS = "routechoices.lib.validators.custom_username_validators"
-
-CACHES = {
-    "default": {
-        "BACKEND": "diskcache.DjangoCache",
-        "LOCATION": os.path.join(BASE_DIR, "cache"),
-        "TIMEOUT": 300,
-        # ^-- Django setting for default timeout of each key.
-        "SHARDS": 4,
-        "DATABASE_TIMEOUT": 0.10,  # 10 milliseconds
-        # ^-- Timeout for each DjangoCache database transaction.
-        "OPTIONS": {"size_limit": 2**30},  # 1 gigabyte
-    },
-}
-
-CACHE_TILES = True
-CACHE_THUMBS = True
-CACHE_EVENT_DATA = True
-
-# The AWS access key to use.
-# The AWS secret access key to use.
-# The optional AWS session token to use.
-AWS_SESSION_TOKEN = ""
-AWS_S3_BUCKET = "routechoices"
-
-GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
-
-SILENCED_SYSTEM_CHECKS = ["admin.E410"]
-
-MARKDOWNIFY = {
-    "default": {
-        "WHITELIST_TAGS": [
-            "h1",
-            "h2",
-            "h3",
-            "h4",
-            "img",
-            "a",
-            "abbr",
-            "acronym",
-            "b",
-            "blockquote",
-            "em",
-            "i",
-            "li",
-            "ol",
-            "p",
-            "strong",
-            "ul",
-            "br",
-            "code",
-        ],
-        "WHITELIST_ATTRS": [
-            "href",
-            "src",
-            "alt",
-            "style",
-        ],
-        "WHITELIST_STYLES": [
-            "color",
-            "width",
-            "height",
-            "font-weight",
-        ],
-    }
-}
-
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-OAUTH2_PROVIDER = {
-    # this is the list of available scopes
-    "SCOPES": {"all": "Read and Write data"}
-}
-
-SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {
-        "Basic": {"type": "basic"},
-        "OAuth2": {
-            "type": "oauth2",
-            "authorizationUrl": "/oauth2/authorize/",
-            "tokenUrl": "/oauth2/token/",
-            "flow": "accessCode",
-            "scopes": {
-                "full": "Read and Write data",
-            },
-        },
-    }
-}
-
-XFF_TRUSTED_PROXY_DEPTH = 1
-CSP_IMG_SRC = (
-    "'self'",
-    "*",
-    "data:",
-    "blob:",
-)
-CSP_WORKER_SRC = ("'self'", "blob:")
-CSP_CHILD_SRC = ("'self'", "blob:")
-
-CSRF_USE_SESSIONS = True
-
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
-
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_SSL_REDIRECT = True
-
-MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
-
 # Environment dependent
-
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+DEBUG = env.bool("DEBUG")
 
 SECRET_KEY = env.str("SECRET_KEY")
 
@@ -368,6 +63,253 @@ LEMONSQUEEZY_SIGNATURE = env.str("LEMONSQUEEZY_SIGNATURE")
 
 RELYING_PARTY_ID = env.str("RELYING_PARTY_ID")
 RELYING_PARTY_NAME = env.str("RELYING_PARTY_NAME")
+
+# Leave content below as it is
+ALLOWED_HOSTS = ["*"]
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+INSTALLED_APPS = [
+    "routechoices",
+    "routechoices.core",
+    "routechoices.site",
+    "routechoices.lib",
+    "django_bootstrap5",
+    "django_hosts",
+    "corsheaders",
+    "user_sessions",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "invitations",
+    "background_task",
+    "admincommand",
+    "oauth2_provider",
+    "rest_framework",
+    "drf_yasg",
+    "markdownify.apps.MarkdownifyConfig",
+    "django_s3_storage",
+    "qr_code",
+    "kagi",
+    "compressor",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
+]
+MIDDLEWARE = [
+    "routechoices.core.middleware.SessionMiddleware",
+    "routechoices.core.middleware.HostsRequestMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "routechoices.core.middleware.XForwardedForMiddleware",
+    "routechoices.core.middleware.FilterCountriesIPsMiddleware",
+    "routechoices.core.middleware.CorsMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "routechoices.core.middleware.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
+    "django.middleware.http.ConditionalGetMiddleware",
+]
+SESSION_ENGINE = "user_sessions.backends.db"
+ROOT_URLCONF = "routechoices.urls"
+ROOT_HOSTCONF = "routechoices.hosts"
+DEFAULT_HOST = "www"
+TEMPLATES_LOADERS = [
+    (
+        "django.template.loaders.cached.Loader",
+        [
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        ],
+    ),
+]
+TEMPLATES_CONTEXT_PROCESSORS = [
+    "django.template.context_processors.request",
+    "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+    "routechoices.lib.context_processors.site",
+]
+if DEBUG:
+    TEMPLATES_LOADERS = [
+        "django.template.loaders.filesystem.Loader",
+        "django.template.loaders.app_directories.Loader",
+    ]
+    TEMPLATES_CONTEXT_PROCESSORS = [
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
+        "routechoices.lib.context_processors.site",
+    ]
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "OPTIONS": {
+            "loaders": TEMPLATES_LOADERS,
+            "context_processors": TEMPLATES_CONTEXT_PROCESSORS,
+        },
+    },
+]
+WSGI_APPLICATION = "routechoices.wsgi.application"
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        ),
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
+TIME_ZONE = "UTC"
+USE_TZ = True
+SITE_ID = 1
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_assets"),
+]
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+LOGIN_REDIRECT_URL = "/dashboard"
+LOGOUT_REDIRECT_URL = "/"
+SESSION_COOKIE_SAMESITE = None
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "drf_orjson_renderer.renderers.ORJSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+}
+ACCOUNT_ADAPTER = "routechoices.lib.account_adapters.SiteAccountAdapter"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+ACCOUNT_USERNAME_BLACKLIST = SLUG_BLACKLIST
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USERNAME_MIN_LENGTH = "2"
+ACCOUNT_USERNAME_VALIDATORS = "routechoices.lib.validators.custom_username_validators"
+CACHES = {
+    "default": {
+        "BACKEND": "diskcache.DjangoCache",
+        "LOCATION": os.path.join(BASE_DIR, "cache"),
+        "TIMEOUT": 300,
+        # ^-- Django setting for default timeout of each key.
+        "SHARDS": 4,
+        "DATABASE_TIMEOUT": 0.10,  # 10 milliseconds
+        # ^-- Timeout for each DjangoCache database transaction.
+        "OPTIONS": {"size_limit": 2**30},  # 1 gigabyte
+    },
+}
+CACHE_TILES = True
+CACHE_THUMBS = True
+CACHE_EVENT_DATA = True
+AWS_SESSION_TOKEN = ""
+AWS_S3_BUCKET = "routechoices"
+GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
+SILENCED_SYSTEM_CHECKS = ["admin.E410"]
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "img",
+            "a",
+            "abbr",
+            "acronym",
+            "b",
+            "blockquote",
+            "em",
+            "i",
+            "li",
+            "ol",
+            "p",
+            "strong",
+            "ul",
+            "br",
+            "code",
+        ],
+        "WHITELIST_ATTRS": [
+            "href",
+            "src",
+            "alt",
+            "style",
+        ],
+        "WHITELIST_STYLES": [
+            "color",
+            "width",
+            "height",
+            "font-weight",
+        ],
+    }
+}
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    "SCOPES": {"all": "Read and Write data"}
+}
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Basic": {"type": "basic"},
+        "OAuth2": {
+            "type": "oauth2",
+            "authorizationUrl": "/oauth2/authorize/",
+            "tokenUrl": "/oauth2/token/",
+            "flow": "accessCode",
+            "scopes": {
+                "full": "Read and Write data",
+            },
+        },
+    }
+}
+XFF_TRUSTED_PROXY_DEPTH = 1
+CSP_IMG_SRC = (
+    "'self'",
+    "*",
+    "data:",
+    "blob:",
+)
+CSP_WORKER_SRC = ("'self'", "blob:")
+CSP_CHILD_SRC = ("'self'", "blob:")
+CSRF_USE_SESSIONS = True
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 try:
     from .settings_overrides import *  # noqa: F403, F401
