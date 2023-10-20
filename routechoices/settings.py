@@ -306,6 +306,7 @@ CSP_IMG_SRC = (
     "data:",
     "blob:",
 )
+CSP_WORKER_SRC = ("'self'", "blob:")
 CSP_CHILD_SRC = ("'self'", "blob:")
 
 CSRF_USE_SESSIONS = True
