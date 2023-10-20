@@ -322,6 +322,8 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 # Environment dependent
 
 env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
 SECRET_KEY = env.str("SECRET_KEY")
 
 PARENT_HOST = env.str("PARENT_HOST")
