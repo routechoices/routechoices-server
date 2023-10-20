@@ -133,7 +133,6 @@
               latlons.push([pt.lat, pt.lon]);
             }
             var p = L.polyline(latlons);
-            console.log(latlons);
             p.addTo(map);
           }
         });
@@ -210,12 +209,10 @@
         }
         return maps;
       } catch (e) {
-        console.log(e);
         alert("Error parsing your KMZ file!");
         return;
       }
     } else {
-      console.log(e);
       alert("Error parsing your KMZ file!");
       return;
     }
