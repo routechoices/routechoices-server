@@ -300,7 +300,12 @@ SWAGGER_SETTINGS = {
 }
 
 XFF_TRUSTED_PROXY_DEPTH = 1
-
+CSP_IMG_SRC = (
+    "'self'",
+    "*",
+    "data:",
+    "blob:",
+)
 CSP_CHILD_SRC = ("'self'", "blob:")
 
 CSRF_USE_SESSIONS = True
