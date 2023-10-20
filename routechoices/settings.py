@@ -12,23 +12,16 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+import environ
+
 from routechoices.slug_blacklist import SLUG_BLACKLIST
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "your-secret-key"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
-
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -96,44 +89,48 @@ SESSION_ENGINE = "user_sessions.backends.db"
 ROOT_URLCONF = "routechoices.urls"
 ROOT_HOSTCONF = "routechoices.hosts"
 DEFAULT_HOST = "www"
-PARENT_HOST = "routechoices.dev"
+
+
+TEMPLATES_LOADERS = [
+    (
+        "django.template.loaders.cached.Loader",
+        [
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        ],
+    ),
+]
+TEMPLATES_CONTEXT_PROCESSORS = [
+    "django.template.context_processors.request",
+    "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
+    "routechoices.lib.context_processors.site",
+]
+if DEBUG:
+    TEMPLATES_LOADERS = [
+        "django.template.loaders.filesystem.Loader",
+        "django.template.loaders.app_directories.Loader",
+    ]
+    TEMPLATES_CONTEXT_PROCESSORS = [
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
+        "routechoices.lib.context_processors.site",
+    ]
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "OPTIONS": {
-            "loaders": [
-                "django.template.loaders.filesystem.Loader",
-                "django.template.loaders.app_directories.Loader",
-            ],
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "routechoices.lib.context_processors.site",
-            ],
+            "loaders": TEMPLATES_LOADERS,
+            "context_processors": TEMPLATES_CONTEXT_PROCESSORS,
         },
     },
 ]
 
+
 WSGI_APPLICATION = "routechoices.wsgi.application"
-
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "app_db",
-        "USER": "app_user",
-        "PASSWORD": "changeme",
-        "HOST": "db",
-        "PORT": "",
-        "OPTIONS": {
-            "server_side_binding": True,
-        },
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -169,8 +166,6 @@ USE_TZ = True
 
 SITE_ID = 1
 
-STATIC_URL = "/static/"
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static_assets"),
@@ -181,15 +176,12 @@ STATICFILES_FINDERS = [
     "compressor.finders.CompressorFinder",
 ]
 
-MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
-LOGIN_URL = "https://routechoices.dev/login"
-REDIRECT_ALLOWED_DOMAINS = ["api.routechoices.dev", "www.routechoices.dev"]
 LOGIN_REDIRECT_URL = "/dashboard"
 LOGOUT_REDIRECT_URL = "/"
 
-SESSION_COOKIE_DOMAIN = ".routechoices.dev"
 SESSION_COOKIE_SAMESITE = None
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -219,9 +211,6 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = "2"
 ACCOUNT_USERNAME_VALIDATORS = "routechoices.lib.validators.custom_username_validators"
 
-EMAIL_HOST = "smtp"
-EMAIL_PORT = 1025
-
 CACHES = {
     "default": {
         "BACKEND": "diskcache.DjangoCache",
@@ -239,25 +228,15 @@ CACHE_TILES = True
 CACHE_THUMBS = True
 CACHE_EVENT_DATA = True
 
-TMT250_PORT = 2000
-MICTRACK_PORT = 2001
-QUECLINK_PORT = 2002
-TRACKTAPE_PORT = 2003
-
 # The AWS access key to use.
-AWS_ACCESS_KEY_ID = "minio"
 # The AWS secret access key to use.
-AWS_SECRET_ACCESS_KEY = "minio123"
 # The optional AWS session token to use.
 AWS_SESSION_TOKEN = ""
-AWS_S3_ENDPOINT_URL = "http://minio:9000"
 AWS_S3_BUCKET = "routechoices"
 
 GEOIP_PATH = os.path.join(BASE_DIR, "geoip")
 
 SILENCED_SYSTEM_CHECKS = ["admin.E410"]
-
-PATREON_CREATOR_ID = "xRJAgEV1zma3MfnaVGg9SRTYet-EUTKqn4O2Llz6_lk"
 
 MARKDOWNIFY = {
     "default": {
@@ -320,23 +299,7 @@ SWAGGER_SETTINGS = {
     }
 }
 
-EMAIL_CUSTOMER_SERVICE = "support@routechoices.dev"
-
-POST_LOCATION_SECRETS = ["<replace-me>"]
-
 XFF_TRUSTED_PROXY_DEPTH = 1
-
-CSP_DEFAULT_SRC = (
-    "'self'",
-    "www.routechoices.dev",
-    "api.routechoices.dev",
-    "data.routechoices.dev",
-    "www.routechoices.com",
-    "api.routechoices.com",
-    "nominatim.openstreetmap.org",
-    "data:",
-)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = (
     "'self'",
     "*",
@@ -346,23 +309,67 @@ CSP_IMG_SRC = (
 CSP_WORKER_SRC = ("'self'", "blob:")
 CSP_CHILD_SRC = ("'self'", "blob:")
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.routechoices.dev",
-]
 CSRF_USE_SESSIONS = True
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 
-ANALYTICS_API_KEY = ""
-ANALYTICS_API_URL = "https://analytics.routechoices.com/api/v1"
-
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
-RELYING_PARTY_ID = "routechoices.dev"
-RELYING_PARTY_NAME = "Routechoices.dev"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
+
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+
+# Environment dependent
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+SECRET_KEY = env.str("SECRET_KEY")
+
+PARENT_HOST = env.str("PARENT_HOST")
+LOGIN_URL = env.str("LOGIN_URL")
+REDIRECT_ALLOWED_DOMAINS = env.list("REDIRECT_ALLOWED_DOMAINS")
+SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN")
+STATIC_URL = env.str("STATIC_URL")
+
+CSP_DEFAULT_SRC = env.list("CSP_DEFAULT_SRC")
+CSP_STYLE_SRC = env.list("CSP_STYLE_SRC")
+
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
+
+POST_LOCATION_SECRETS = env.list("POST_LOCATION_SECRETS")
+
+BANNED_COUNTRIES = env.list("BANNED_COUNTRIES")
+
+DATABASES = {"default": env.db()}
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
+
+SHORTCUT_BASE_URL = env.str("SHORTCUT_BASE_URL", None)
+
+AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL")
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY")
+
+EMAIL_CONFIG = env.email()
+vars().update(EMAIL_CONFIG)
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = env.str("SERVER_EMAIL")
+EMAIL_CUSTOMER_SERVICE = env.str("EMAIL_CUSTOMER_SERVICE")
+
+ENABLE_ANALYTICS = env.bool("ENABLE_ANALYTICS")
+ANALYTICS_API_KEY = env.str("ANALYTICS_API_KEY")
+ANALYTICS_API_URL = env.str("ANALYTICS_API_URL")
+
+LEMONSQUEEZY_SIGNATURE = env.str("LEMONSQUEEZY_SIGNATURE")
+
+RELYING_PARTY_ID = env.str("RELYING_PARTY_ID")
+RELYING_PARTY_NAME = env.str("RELYING_PARTY_NAME")
 
 try:
-    from .local_settings import *  # noqa: F403, F401
+    from .settings_overrides import *  # noqa: F403, F401
 except ImportError:
     pass

@@ -3,6 +3,7 @@ build
 dist
 MANIFEST
 .coverage
+.env
 .DS_Store
 *.pyc
 *.egg-info
@@ -26,7 +27,7 @@ tmp/*
 log/*
 logs/*
 cache/*
-routechoices/local_settings.py
+routechoices/settings_overrides.py
 cypress/screenshots/*
 cypress/videos/*
 node_modules/*

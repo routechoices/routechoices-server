@@ -12,6 +12,7 @@ django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
 django-compressor
 django-cors-headers
 django-csp
+django-environ
 django-hosts
 django-markdownify
 django-minify-html

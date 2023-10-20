@@ -84,9 +84,6 @@ LOCATION_TIMESTAMP_INDEX = 0
 LOCATION_LATITUDE_INDEX = 1
 LOCATION_LONGITUDE_INDEX = 2
 
-if settings.DATABASES["default"]["ENGINE"] != "django.db.backends.postgresql":
-    raise Exception("DB not supported")
-
 
 class Point:
     def __init__(self, x, y=None):
