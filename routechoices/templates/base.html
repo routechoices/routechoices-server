@@ -68,7 +68,7 @@
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
       data-site-version={{version}}
     ></script>
-    {% if enable_analytics %}
+    {% if analytics_enabled %}
     <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
     {% endif %}
     {% compress js %}

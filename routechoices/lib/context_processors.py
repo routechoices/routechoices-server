@@ -17,7 +17,7 @@ def site(request):
 
     return {
         "site": current_site,
-        "enable_analytics": getattr(settings, "ENABLE_ANALYTICS", None),
+        "analytics_enabled": bool(getattr(settings, "ANALYTICS_API_KEY")),
         "DEBUG": settings.DEBUG,
         "version": version,
     }
