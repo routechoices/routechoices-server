@@ -15,6 +15,7 @@ then
   source ~/.cargo/env
   pip install -U -r requirements.txt
 fi
+doppler secrets download --no-file --format=env 1> ".env"
 ./manage.py collectstatic --noinput
 ./manage.py compress
 ./manage.py migrate --noinput
