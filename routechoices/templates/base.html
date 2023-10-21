@@ -69,7 +69,7 @@
       data-site-version={{version}}
     ></script>
     {% if analytics_enabled %}
-    <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="routechoices.com" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
+    <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="{{site.domain}}" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
     {% endif %}
     {% compress js %}
     <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
