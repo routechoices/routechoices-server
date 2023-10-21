@@ -1,10 +1,10 @@
 import arrow
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 from routechoices.core.models import Club, Device, Event
-from routechoices.lib.helpers import get_current_site
 
 
 class Command(BaseCommand):
@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         call_command("flush", "--noinput")
         call_command("migrate", "--noinput")
-        s = get_current_site()
+        s = Site.objects.all().first()
         s.domain = "routechoices.dev"
         s.name = "Routechoices.com"
         s.save()
