@@ -24,6 +24,15 @@ from routechoices.lib.validators import validate_nice_slug
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
+class MySite:
+    domain = settings.RELYING_PARTY_ID
+    name = settings.RELYING_PARTY_NAME
+
+
+def get_current_site():
+    return MySite()
+
+
 def get_best_image_mime(request, default=None):
     accepted_mimes = request.COOKIES.get(
         "accept-image", request.META.get("HTTP_ACCEPT", "")

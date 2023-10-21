@@ -7,7 +7,6 @@ from django.contrib.sitemaps.views import (
     _get_latest_lastmod,
     x_robots_tag,
 )
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404, HttpResponse
@@ -24,6 +23,7 @@ from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
 from routechoices.lib.helpers import (
     get_best_image_mime,
+    get_current_site,
     safe64encodedsha,
     set_content_disposition,
 )
@@ -559,7 +559,7 @@ def sitemap(
 ):
     club_slug = request.club_slug
     req_protocol = request.scheme
-    req_site = get_current_site(request)
+    req_site = get_current_site()
 
     if section is not None:
         if section not in sitemaps:

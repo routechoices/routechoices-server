@@ -1,15 +1,14 @@
 from functools import cache
 
 from django.conf import settings
-from django.contrib.sites.models import Site
 
-from routechoices.lib.helpers import git_master_hash
+from routechoices.lib.helpers import get_current_site, git_master_hash
 
 
 def site(request):
     @cache
     def current_site():
-        return Site.objects.get_current()
+        return get_current_site()
 
     @cache
     def version():

@@ -20,7 +20,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.files import File
 from django.core.paginator import Paginator
 from django.db.models import Case, Q, Value, When
@@ -62,7 +61,11 @@ from routechoices.dashboard.forms import (
     UploadMapGPXForm,
     UserForm,
 )
-from routechoices.lib.helpers import set_content_disposition, short_random_key
+from routechoices.lib.helpers import (
+    get_current_site,
+    set_content_disposition,
+    short_random_key,
+)
 from routechoices.lib.kmz import extract_ground_overlay_info
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
@@ -188,7 +191,7 @@ def account_delete_view(request):
             )
         else:
             temp_key = token_generator.make_token(user)
-            current_site = get_current_site(request)
+            current_site = get_current_site()
             url = build_absolute_uri(request, reverse("dashboard:account_delete_view"))
             context = {
                 "current_site": current_site,

@@ -21,7 +21,6 @@ from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import LinearRing, Polygon
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.core.files.base import ContentFile, File
@@ -52,6 +51,7 @@ from routechoices.lib.helpers import (
     distance_xy,
     epoch_to_datetime,
     general_2d_projection,
+    get_current_site,
     project,
     random_device_id,
     random_key,
@@ -2287,7 +2287,7 @@ class Competitor(models.Model):
 
     @property
     def gpx(self):
-        current_site = get_current_site(None)
+        current_site = get_current_site()
         gpx = gpxpy.gpx.GPX()
         gpx.creator = current_site.name
         gpx_track = gpxpy.gpx.GPXTrack()

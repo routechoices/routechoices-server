@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.sites.shortcuts import get_current_site
+from routechoices.lib.helpers import get_current_site
 
 try:
     from django.urls import reverse
@@ -46,7 +46,7 @@ class Invitation(AbstractBaseInvitation):
         return expiration_date <= timezone.now()
 
     def send_invitation(self, request, **kwargs):
-        current_site = get_current_site(request)
+        current_site = get_current_site()
         invite_url = reverse(app_settings.CONFIRMATION_URL_NAME, args=[self.key])
         invite_url = request.build_absolute_uri(invite_url)
         ctx = kwargs
