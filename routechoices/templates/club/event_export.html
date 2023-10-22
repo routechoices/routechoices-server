@@ -37,7 +37,7 @@
             <h5 class="card-title">{% if event.map_title %}{{ event.map_title }}{% else %}Main map{% endif %}</h5>
             <a href="{{event.club.nice_url}}{{event.slug}}/map/" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> Image</a>
             <a href="{{event.club.nice_url}}{{event.slug}}/kmz/" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> KMZ</a>
-            {% if event.ended %}
+            {% if event.ended and event.privacy != "private" %}
             <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary mb-1 text-nowrap"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>
             {% endif %}
           </div>
@@ -50,7 +50,7 @@
             <h5 class="card-title">{{ map.title }}</h5>
             <a href="{{event.club.nice_url}}{{event.slug}}/map/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> Image</a>
             <a href="{{event.club.nice_url}}{{event.slug}}/kmz/{{forloop.counter|add:1}}" class="btn btn-sm btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> KMZ</a>
-            {% if event.ended  and event.privacy != "private" %}
+            {% if event.ended and event.privacy != "private" %}
             <a href="http://3drerun.worldofo.com/2d/?server={{ site.domain }}/api/woo&eventid={{event.aid}}/{{forloop.counter|add:1}}&liveid=-" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary mb-1 text-nowrap"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 2DRerun</a>
             {% endif %}
           </div>
