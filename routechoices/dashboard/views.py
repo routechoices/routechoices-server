@@ -84,18 +84,12 @@ def requires_club_in_session(function):
             obj = get_object_or_404(EventSet, aid=obj_aid)
         if obj:
             club_id = obj.club_id
-            if request.user.is_superuser:
-                club = Club.objects.filter(id=club_id).first()
-            else:
-                club = Club.objects.filter(admins=request.user, id=club_id).first()
+            club = Club.objects.filter(admins=request.user, id=club_id).first()
         elif "dashboard_club" in request.session:
             session_club_aid = request.session["dashboard_club"]
-            if request.user.is_superuser:
-                club = Club.objects.filter(aid=session_club_aid).first()
-            else:
-                club = Club.objects.filter(
-                    admins=request.user, aid=session_club_aid
-                ).first()
+            club = Club.objects.filter(
+                admins=request.user, aid=session_club_aid
+            ).first()
         if not club:
             return redirect(
                 reverse("dashboard:club_select_view") + "?next=" + request.path
@@ -136,10 +130,7 @@ def club_invite_add_view(request):
 
 @login_required
 def club_select_view(request):
-    if request.user.is_superuser:
-        club_list = Club.objects.all()
-    else:
-        club_list = Club.objects.filter(admins=request.user)
+    club_list = Club.objects.filter(admins=request.user)
 
     paginator = Paginator(club_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")
@@ -328,13 +319,7 @@ def club_create_view(request):
 
 @login_required
 def club_set_view(request, club_id):
-    if request.user.is_superuser:
-        club = get_object_or_404(
-            Club,
-            aid=club_id,
-        )
-    else:
-        club = get_object_or_404(Club, aid=club_id, admins=request.user)
+    club = get_object_or_404(Club, aid=club_id, admins=request.user)
     request.session["dashboard_club"] = club.aid
     next_page = request.GET.get("next")
     if next_page:

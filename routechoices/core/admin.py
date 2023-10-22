@@ -11,6 +11,7 @@ from django.db.models import Case, Count, Exists, F, OuterRef, Prefetch, Value, 
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+from hijack.contrib.admin import HijackUserAdminMixin
 from kagi.models import BackupCode, TOTPDevice, WebAuthnKey
 
 from routechoices.core.models import (
@@ -646,7 +647,7 @@ admin.site.unregister(Group)
 
 
 @admin.register(UserModel)
-class MyUserAdmin(UserAdmin):
+class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
     list_display = UserAdmin.list_display + (
         "date_joined",
         "has_verified_email",
@@ -655,6 +656,9 @@ class MyUserAdmin(UserAdmin):
     actions = [
         "clean_fake_users",
     ]
+
+    def get_hijack_user(self, obj):
+        return obj
 
     def get_ordering(self, request):
         if request.resolver_match.url_name == "auth_user_changelist":

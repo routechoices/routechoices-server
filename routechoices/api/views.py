@@ -139,9 +139,7 @@ def event_set_creation(request):
     name = request.data.get("name")
     if not name or not club:
         raise ValidationError("Missing parameter")
-    is_user_event_admin = (
-        request.user.is_superuser or club.admins.filter(id=request.user.id).exists()
-    )
+    is_user_event_admin = club.admins.filter(id=request.user.id).exists()
     if not is_user_event_admin:
         raise PermissionDenied("not club admin")
     event_set, created = EventSet.objects.get_or_create(club=club, name=name)
@@ -286,12 +284,7 @@ def event_list(request):
         club_slug = request.data.get("club_slug")
         if not club_slug:
             raise ValidationError("club_slug is required")
-        if request.user.is_superuser:
-            club = Club.objects.filter(slug__iexact=club_slug).first()
-        else:
-            club = Club.objects.filter(
-                admins=request.user, slug__iexact=club_slug
-            ).first()
+        club = Club.objects.filter(admins=request.user, slug__iexact=club_slug).first()
         if not club:
             raise ValidationError("club not found")
 
@@ -388,10 +381,7 @@ def event_list(request):
         privacy_arg = {"privacy": PRIVACY_PUBLIC}
 
     if request.user.is_authenticated:
-        if request.user.is_superuser:
-            clubs = Club.objects.all()
-        else:
-            clubs = Club.objects.filter(admins=request.user)
+        clubs = Club.objects.filter(admins=request.user)
         events = Event.objects.filter(
             Q(**privacy_arg) | Q(club__in=clubs)
         ).select_related("club")
@@ -460,12 +450,10 @@ def club_list(request):
     only_yours = request.GET.get("mine")
     clubs = Club.objects.all()
     owned_clubs = Club.objects.none()
-    if request.user.is_superuser:
-        owned_clubs = clubs
-    elif request.user.is_authenticated:
+    if request.user.is_authenticated:
         owned_clubs = clubs.filter(admins=request.user)
 
-    if only_yours and not request.user.is_superuser:
+    if only_yours:
         clubs = clubs.filter(admins=request.user)
 
     output = []
@@ -475,7 +463,7 @@ def club_list(request):
             "name": club.name,
             "slug": club.slug,
             "url": club.nice_url,
-            "owned": only_yours or request.user.is_superuser or (club in owned_clubs),
+            "owned": only_yours or (club in owned_clubs),
         }
         if not only_yours or data["owned"]:
             output.append(data)
@@ -690,8 +678,7 @@ def event_register(request, event_id):
 
     if not event.open_registration:
         if not request.user.is_authenticated or (
-            not request.user.is_superuser
-            and request.user not in event.club.admins.all()
+            request.user not in event.club.admins.all()
         ):
             raise PermissionDenied()
 
@@ -882,10 +869,7 @@ def competitor_api(request, competitor_id):
 
     event = competitor.event
 
-    is_user_event_admin = (
-        request.user.is_superuser
-        or event.club.admins.filter(id=request.user.id).exists()
-    )
+    is_user_event_admin = event.club.admins.filter(id=request.user.id).exists()
     if not is_user_event_admin:
         raise PermissionDenied()
 
@@ -954,7 +938,7 @@ def competitor_route_upload(request, competitor_id):
     is_user_event_admin = (
         request.user.is_authenticated
         and event.club.admins.filter(id=request.user.id).exists()
-    ) or request.user.is_superuser
+    )
 
     if not event.allow_route_upload:
         raise PermissionDenied()
@@ -1499,11 +1483,7 @@ def user_search(request):
 @login_required
 def user_view(request):
     user = request.user
-    if user.is_superuser:
-        clubs = Club.objects.all()
-    else:
-        clubs = Club.objects.filter(admins=user)
-
+    clubs = Club.objects.filter(admins=user)
     output = {
         "username": user.username,
         "clubs": [{"name": c.name, "slug": c.slug} for c in clubs],
@@ -1571,10 +1551,7 @@ def device_registrations(request, device_id):
 @api_view(["PATCH", "DELETE"])
 @login_required
 def device_ownership_api_view(request, club_id, device_id):
-    if not request.user.is_superuser:
-        club = get_object_or_404(Club, admins=request.user, aid=club_id)
-    else:
-        club = get_object_or_404(Club, aid=club_id)
+    club = get_object_or_404(Club, aid=club_id)
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
 
     ownership, _created = DeviceClubOwnership.objects.get_or_create(
@@ -1653,14 +1630,8 @@ def event_kmz_download(request, event_id, map_index="1"):
 @api_view(["GET"])
 @login_required
 def map_kmz_download(request, map_id, *args, **kwargs):
-    if request.user.is_superuser:
-        raster_map = get_object_or_404(
-            Map,
-            aid=map_id,
-        )
-    else:
-        club_list = Club.objects.filter(admins=request.user)
-        raster_map = get_object_or_404(Map, aid=map_id, club__in=club_list)
+    club_list = Club.objects.filter(admins=request.user)
+    raster_map = get_object_or_404(Map, aid=map_id, club__in=club_list)
     kmz_data = raster_map.kmz
     response = StreamingHttpRangeResponse(
         request,

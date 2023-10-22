@@ -1336,13 +1336,9 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     def checkUserPermission(self, user):
-        if (
-            self.privacy == PRIVACY_PRIVATE
-            and not user.is_superuser
-            and (
-                not user.is_authenticated
-                or not self.club.admins.filter(id=user.id).exists()
-            )
+        if self.privacy == PRIVACY_PRIVATE and (
+            not user.is_authenticated
+            or not self.club.admins.filter(id=user.id).exists()
         ):
             raise PermissionDenied
 

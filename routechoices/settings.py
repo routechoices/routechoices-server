@@ -92,6 +92,8 @@ INSTALLED_APPS = [
     "qr_code",
     "kagi",
     "compressor",
+    "hijack",
+    "hijack.contrib.admin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -115,6 +117,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_minify_html.middleware.MinifyHtmlMiddleware",
     "django.middleware.http.ConditionalGetMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
 ]
 SESSION_ENGINE = "user_sessions.backends.db"
 ROOT_URLCONF = "routechoices.urls"

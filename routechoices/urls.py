@@ -59,6 +59,7 @@ urlpatterns = [
         "webhooks/",
         include(("routechoices.webhooks.urls", "webhooks"), namespace="webhooks"),
     ),
+    path("hijack/", include("hijack.urls")),
     re_path(
         r"^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
         r"(?P<map_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
