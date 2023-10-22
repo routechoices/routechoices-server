@@ -1726,6 +1726,9 @@ def two_d_rerun_race_status(request):
     event, raster_map = Event.get_public_map_at_index(
         request.user, event_id, map_idx, load_competitors=True
     )
+
+    event.checkUserPermission(request.user)
+
     response_json = {
         "status": "OK",
         "racename": event.name,
