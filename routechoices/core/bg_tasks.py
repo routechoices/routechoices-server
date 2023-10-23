@@ -12,7 +12,14 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from PIL import Image, ImageDraw
 
-from routechoices.core.models import Club, Competitor, Device, Event, Map
+from routechoices.core.models import (
+    PRIVACY_SECRET,
+    Club,
+    Competitor,
+    Device,
+    Event,
+    Map,
+)
 from routechoices.lib.helpers import (
     compute_corners_from_kml_latlonbox,
     epoch_to_datetime,
@@ -311,6 +318,7 @@ def import_single_event_from_gps_seuranta(event_id):
             "name": event_data["RACENAME"],
             "start_date": epoch_to_datetime(event_start_date),
             "end_date": epoch_to_datetime(event_end_date),
+            "privacy": PRIVACY_SECRET,
         },
     )
     if not created:
@@ -413,6 +421,7 @@ def import_single_event_from_loggator(event_id):
             "name": event_data["event"]["name"],
             "start_date": arrow.get(event_data["event"]["start_date"]).datetime,
             "end_date": arrow.get(event_data["event"]["end_date"]).datetime,
+            "privacy": PRIVACY_SECRET,
         },
     )
     if not created:
@@ -474,6 +483,7 @@ def import_single_event_from_tractrac(event_id):
             "name": event_name,
             "start_date": arrow.get(event_data["raceTrackingStartTime"]).datetime,
             "end_date": arrow.get(event_data["raceTrackingEndTime"]).datetime,
+            "privacy": PRIVACY_SECRET,
         },
     )
     if not created:
@@ -569,6 +579,7 @@ def import_single_event_from_sportrec(event_id):
             "name": event_name,
             "start_date": arrow.get(event_data["competition"]["time_start"]).datetime,
             "end_date": arrow.get(event_data["competition"]["time_finish"]).datetime,
+            "privacy": PRIVACY_SECRET,
         },
     )
     if not created:
@@ -655,6 +666,7 @@ def import_single_event_from_otracker(event_id):
                 event_data["event"]["replay_time"]["from_ts"]
             ).datetime,
             "end_date": arrow.get(event_data["event"]["replay_time"]["to_ts"]).datetime,
+            "privacy": PRIVACY_SECRET,
         },
     )
     if not created:
@@ -949,6 +961,7 @@ def import_single_event_from_livelox(class_id, relay_legs=None):
             "start_date": event_start,
             "end_date": event_end,
             "map": map_model,
+            "privacy": PRIVACY_SECRET,
         },
     )
 
