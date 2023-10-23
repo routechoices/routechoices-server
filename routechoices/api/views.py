@@ -1651,7 +1651,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
 @api_view(["GET"])
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
-        Competitor.objects.all().select_related("event", "event__club", "device"),
+        Competitor.objects.select_related("event", "event__club", "device"),
         aid=competitor_id,
         start_time__lt=now(),
     )
@@ -1760,7 +1760,7 @@ def two_d_rerun_race_data(request):
     if not event_id:
         raise Http404()
     event = get_object_or_404(
-        Event.objects.all().prefetch_related(
+        Event.objects.prefetch_related(
             Prefetch(
                 "competitors",
                 queryset=Competitor.objects.select_related("device").order_by(

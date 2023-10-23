@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         force = options["force"]
-        self.image_paths = set(Map.objects.all().values_list("image", flat=True))
+        self.image_paths = set(Map.objects.values_list("image", flat=True))
         self.image_paths.update(
             set(
                 Club.objects.all()

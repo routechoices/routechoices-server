@@ -443,7 +443,7 @@ def event_map_thumbnail(request, slug, **kwargs):
         return bypass_resp
     club_slug = request.club_slug
     event = get_object_or_404(
-        Event.objects.all().select_related("club", "map"),
+        Event.objects.select_related("club", "map"),
         club__slug__iexact=club_slug,
         slug__iexact=slug,
     )
@@ -464,9 +464,7 @@ def acme_challenge(request, challenge):
     if not request.use_cname:
         raise Http404()
     club_slug = request.club_slug
-    club = get_object_or_404(
-        Club.objects.all().exclude(domain=""), slug__iexact=club_slug
-    )
+    club = get_object_or_404(Club.objects.exclude(domain=""), slug__iexact=club_slug)
     if challenge == club.acme_challenge.partition(".")[0]:
         return HttpResponse(club.acme_challenge)
     else:

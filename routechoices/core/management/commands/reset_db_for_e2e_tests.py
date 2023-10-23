@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         call_command("flush", "--noinput")
         call_command("migrate", "--noinput")
-        s = Site.objects.all().first()
+        s = Site.objects.first()
         s.domain = "routechoices.dev"
         s.name = "Routechoices.com"
         s.save()

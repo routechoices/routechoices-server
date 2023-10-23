@@ -77,19 +77,19 @@ def requires_club_in_session(function):
         obj = None
         if obj_aid := kwargs.get("event_id"):
             obj = get_object_or_404(
-                Event.select_related("club"),
+                Event.objects.select_related("club"),
                 aid=obj_aid,
                 club__admins=request.user,
             )
         elif obj_aid := kwargs.get("map_id"):
             obj = get_object_or_404(
-                Map.select_related("club"),
+                Map.objects.select_related("club"),
                 aid=obj_aid,
                 club__admins=request.user,
             )
         elif obj_aid := kwargs.get("event_set_id"):
             obj = get_object_or_404(
-                EventSet.select_related("club"),
+                EventSet.objects.select_related("club"),
                 aid=obj_aid,
                 club__admins=request.user,
             )
@@ -797,7 +797,7 @@ def event_set_create_view(request):
 def event_set_edit_view(request, event_set_id):
     club = request.club
     event_set = get_object_or_404(
-        EventSet.objects.all().prefetch_related("events"),
+        EventSet.objects.prefetch_related("events"),
         aid=event_set_id,
     )
 
@@ -965,7 +965,7 @@ MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
 def event_edit_view(request, event_id):
     club = request.club
     event = get_object_or_404(
-        Event.objects.all().prefetch_related("notice", "competitors"),
+        Event.objects.prefetch_related("notice", "competitors"),
         aid=event_id,
     )
 
@@ -1109,7 +1109,7 @@ COMPETITORS_PAGE_SIZE = 50
 def event_competitors_view(request, event_id):
     club = request.club
     event = get_object_or_404(
-        Event.objects.all().prefetch_related("notice", "competitors"),
+        Event.objects.prefetch_related("notice", "competitors"),
         aid=event_id,
     )
 
@@ -1195,9 +1195,7 @@ def event_competitors_view(request, event_id):
 def event_competitors_printer_view(request, event_id):
     club = request.club
     event = get_object_or_404(
-        Event.objects.all().prefetch_related(
-            "notice", "competitors", "competitors__device"
-        ),
+        Event.objects.prefetch_related("notice", "competitors", "competitors__device"),
         aid=event_id,
     )
 

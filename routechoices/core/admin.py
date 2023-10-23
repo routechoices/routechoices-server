@@ -39,7 +39,7 @@ class ImeiDeviceClubFilter(admin.SimpleListFilter):
     parameter_name = "club"
 
     def lookups(self, request, model_admin):
-        qs = DeviceClubOwnership.objects.all().select_related("club")
+        qs = DeviceClubOwnership.objects.select_related("club")
         qs = qs.distinct("club__name").order_by("club__name")
         for club_dev in qs:
             yield (club_dev.club_id, club_dev.club.name)
