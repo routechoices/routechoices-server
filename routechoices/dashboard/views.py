@@ -74,26 +74,37 @@ DEFAULT_PAGE_SIZE = 25
 
 def requires_club_in_session(function):
     def wrap(request, *args, **kwargs):
-        club = None
         obj = None
         if obj_aid := kwargs.get("event_id"):
-            obj = get_object_or_404(Event, aid=obj_aid)
+            obj = get_object_or_404(
+                Event.select_related("club"),
+                aid=obj_aid,
+                club__admins=request.user,
+            )
         elif obj_aid := kwargs.get("map_id"):
-            obj = get_object_or_404(Map, aid=obj_aid)
+            obj = get_object_or_404(
+                Map.select_related("club"),
+                aid=obj_aid,
+                club__admins=request.user,
+            )
         elif obj_aid := kwargs.get("event_set_id"):
-            obj = get_object_or_404(EventSet, aid=obj_aid)
+            obj = get_object_or_404(
+                EventSet.select_related("club"),
+                aid=obj_aid,
+                club__admins=request.user,
+            )
+        club = None
         if obj:
-            club_id = obj.club_id
-            club = Club.objects.filter(admins=request.user, id=club_id).first()
+            club = obj.club
         elif "dashboard_club" in request.session:
             session_club_aid = request.session["dashboard_club"]
             club = Club.objects.filter(
-                admins=request.user, aid=session_club_aid
+                aid=session_club_aid,
+                admins=request.user,
             ).first()
-        if not club:
-            return redirect(
-                reverse("dashboard:club_select_view") + "?next=" + request.path
-            )
+        if club is None:
+            club_select_page = reverse("dashboard:club_select_view")
+            return redirect(f"{club_select_page}?next={request.path}")
         request.session["dashboard_club"] = club.aid
         request.club = club
         return function(request, *args, **kwargs)
