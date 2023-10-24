@@ -597,8 +597,12 @@ class Map(models.Model):
         return round(resolution, 3)
 
     @property
+    def center(self):
+        return self.map_xy_to_wsg84(self.width / 2, self.height / 2)
+
+    @property
     def max_zoom(self):
-        center_latitude = self.map_xy_to_wsg84(self.width / 2, self.height / 2)["lat"]
+        center_latitude = self.center["lat"]
         meters_per_pixel_at_zoom_18 = (
             40_075_016.686 * math.cos(center_latitude * math.pi / 180) / (2 ** (18 + 8))
         )

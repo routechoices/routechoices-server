@@ -587,8 +587,9 @@ class MapAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "club",
-        "img_link",
         "creation_date",
+        "img_link",
+        "center_link",
         "resolution",
         "max_zoom",
         "north_declination",
@@ -607,6 +608,20 @@ class MapAdmin(admin.ModelAdmin):
                 event_count=F("event_main_map_count") + F("event_alt_map_count"),
             )
         )
+
+    def center_link(self, obj):
+        center = obj.center
+        lat = round(center["lat"], 5)
+        lon = round(center["lon"], 5)
+        return format_html(
+            '<a href="http://www.openstreetmap.org/?mlat={}&mlon={}">{}, {}</a>',
+            lat,
+            lon,
+            lat,
+            lon,
+        )
+
+    center_link.short_description = "Center"
 
     def event_count(self, obj):
         return obj.event_count
