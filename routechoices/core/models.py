@@ -989,6 +989,23 @@ class Map(models.Model):
         )
         return new_map
 
+    @property
+    def area(self):
+        # Area in km^2
+        ll_a = self.map_xy_to_wsg84(0, 0)
+        ll_b = self.map_xy_to_wsg84(self.width, 0)
+        ll_c = self.map_xy_to_wsg84(self.width, self.height)
+        ll_d = self.map_xy_to_wsg84(0, self.height)
+        return round(
+            (distance_latlon(ll_a, ll_b) + distance_latlon(ll_c, ll_d))
+            / 2
+            * (+distance_latlon(ll_a, ll_c) + distance_latlon(ll_b, ll_d))
+            / 2
+            / 1000
+            / 1000,
+            3,
+        )
+
 
 PRIVACY_PUBLIC = "public"
 PRIVACY_SECRET = "secret"

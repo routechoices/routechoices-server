@@ -624,6 +624,7 @@ class MapAdmin(admin.ModelAdmin):
         "resolution",
         "max_zoom",
         "north_declination",
+        "area",
         "event_count",
     )
     list_filter = (
