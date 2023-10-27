@@ -199,7 +199,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
 
 
 class HasLocationFilter(admin.SimpleListFilter):
-    title = "Whether it has locations"
+    title = "whether it has locations"
     parameter_name = "has_locations"
 
     def lookups(self, request, model_admin):
@@ -216,7 +216,7 @@ class HasLocationFilter(admin.SimpleListFilter):
 
 
 class HasCompetitorFilter(admin.SimpleListFilter):
-    title = "Whether it has competitors associated with"
+    title = "whether it has competitors associated with"
     parameter_name = "has_competitors"
 
     def lookups(self, request, model_admin):
@@ -232,8 +232,25 @@ class HasCompetitorFilter(admin.SimpleListFilter):
             return queryset.filter(competitor_count__gt=0)
 
 
+class HasEventsFilter(admin.SimpleListFilter):
+    title = "whether any events use it"
+    parameter_name = "has_events"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("true", "With events"),
+            ("false", "Without events"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "false":
+            return queryset.filter(event_count=0)
+        elif self.value():
+            return queryset.filter(event_count__gt=0)
+
+
 class IsGPXFilter(admin.SimpleListFilter):
-    title = "Whether it is an actual device"
+    title = "whether it is an actual device"
     parameter_name = "device_type"
 
     def lookups(self, request, model_admin):
@@ -270,9 +287,23 @@ class EventSetAdmin(admin.ModelAdmin):
         "name",
         "slug",
         "club",
+        "creation_date",
+        "event_count",
         "page",
     )
-    list_filter = ("club",)
+    list_filter = (
+        HasEventsFilter,
+        "club",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(event_count=Count("events", distinct=True))
+
+    def event_count(self, obj):
+        return obj.event_count
+
+    event_count.admin_order_field = "event_count"
 
     def page(self, obj):
         if not obj.create_page:
@@ -595,7 +626,10 @@ class MapAdmin(admin.ModelAdmin):
         "north_declination",
         "event_count",
     )
-    list_filter = ("club",)
+    list_filter = (
+        HasEventsFilter,
+        "club",
+    )
     list_select_related = ("club",)
 
     def get_queryset(self, request):

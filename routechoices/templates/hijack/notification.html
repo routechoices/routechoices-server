@@ -1,0 +1,28 @@
+{% load i18n static hosts compress %}
+
+{% block content %}
+  <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack.min.css' %}" media="screen">
+  <style>.djhj{z-index:1000000}</style>
+  <div class="djhj" id="djhj">
+    <div class="djhj-notification">
+      <div class="djhj-message">
+        {% blocktrans trimmed with user=request.user %}
+          You are currently working on behalf of <em>{{ user }}</em>.
+        {% endblocktrans %}
+      </div>
+      <form action="https:{% host_url 'hijack:release' host 'www' %}" method="POST" class="djhj-actions">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button class="djhj-button" id="djhj-hide-btn" type="button">
+          {% trans 'hide' %}
+        </button>
+        <button class="djhj-button" id="djhj-hide-btn" type="submit">
+          {% trans 'release' %}
+        </button>
+      </form>
+    </div>
+  </div>
+  {% compress js %}
+  <script src="{% static '/scripts/hijack.js' %}"></script>
+  {% endcompress %}
+{% endblock content %}
