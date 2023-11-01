@@ -70,7 +70,6 @@ class MtbDecoder:
             elif t == 6:
                 self.read_race_sequence_type()
             elif not t:
-                print("done")
                 break
             else:
                 raise Exception("Bad Format")

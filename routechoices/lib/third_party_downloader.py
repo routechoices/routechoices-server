@@ -1,3 +1,5 @@
+import tempfile
+
 import arrow
 import requests
 from django.contrib.auth.models import User
@@ -12,12 +14,15 @@ from routechoices.core.models import (
     Device,
     Event,
     Map,
+    MapAssignation,
 )
 from routechoices.lib.helpers import (
     epoch_to_datetime,
     safe64encodedsha,
     three_point_calibration_to_corners,
 )
+from routechoices.lib.mtb_decoder import MtbDecoder
+from routechoices.lib.tractrac_ws_decoder import TracTracWSReader
 
 
 class EventImportError(Exception):
@@ -142,7 +147,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             corners = three_point_calibration_to_corners(
                 calibration_string, width, height
             )
-            coordinates = ",".join([str(x) for x in corners])
+            coordinates = ",".join([str(round(x, 5)) for x in corners])
 
             map_obj.image.save("imported_image", map_file, save=False)
             map_obj.corners_coordinates = coordinates
@@ -371,4 +376,169 @@ class Loggator(ThirdPartyTrackingSolution):
                 device.save()
                 competitor.device = device
             competitors.append(competitor)
+        return competitors
+
+
+class Tractrac(ThirdPartyTrackingSolution):
+    name = "TracTrac"
+    slug = "tractrac"
+
+    def get_or_create_event(self, uid):
+        r = requests.get(uid, verify=False)
+        if r.status_code != 200:
+            raise EventImportError("API returned error code")
+        self.init_data = r.json()
+        event_name = f'{self.init_data["eventName"]} - {self.init_data["raceName"]}'
+        slug = safe64encodedsha(self.init_data["raceId"])[:50]
+        event, _ = Event.objects.get_or_create(
+            club=self.club,
+            slug=slug,
+            defaults={
+                "name": event_name,
+                "start_date": arrow.get(
+                    self.init_data["raceTrackingStartTime"]
+                ).datetime,
+                "end_date": arrow.get(self.init_data["raceTrackingEndTime"]).datetime,
+                "privacy": PRIVACY_SECRET,
+            },
+        )
+
+        maps = self.get_or_create_event_maps(event, uid)
+        if maps:
+            event.map = maps[0]
+            for xtra_map in maps[1:]:
+                MapAssignation.object.get_or_create(
+                    name=xtra_map.name,
+                    map=xtra_map,
+                    event=event,
+                )
+
+        start_date = None
+        end_date = None
+        competitors = self.get_or_create_event_competitors(event, uid)
+        for competitor in competitors:
+            competitor.save()
+            if competitor.device.location_count > 0:
+                locations = competitor.device.locations_series
+                from_date = locations[0][0]
+                to_date = locations[-1][0]
+                if not start_date or start_date > from_date:
+                    start_date = from_date
+                if not end_date or end_date < to_date:
+                    end_date = to_date
+
+        event.start_date = epoch_to_datetime(start_date)
+        event.end_date = epoch_to_datetime(end_date)
+        event.save()
+        return event
+
+    def get_or_create_event_maps(self, event, uid):
+        maps = []
+        for map_data in self.init_data["maps"]:
+            map_obj, _ = Map.objects.get_or_create(
+                name=map_data.get("name"),
+                club=self.club,
+            )
+            map_url = map_data.get("location")
+            if map_url.startswith("//"):
+                map_url = f"http:{map_url}"
+            r = requests.get(map_url, verify=False)
+            if r.status_code != 200:
+                map_obj.delete()
+                raise MapsImportError("API returned error code")
+            try:
+                map_file = ContentFile(r.content)
+                with Image.open(map_file) as img:
+                    width, height = img.size
+                calibration_string = "|".join(
+                    str(x)
+                    for x in [
+                        map_data["long1"],
+                        map_data["lat1"],
+                        map_data["x1"],
+                        map_data["y1"],
+                        map_data["long2"],
+                        map_data["lat2"],
+                        map_data["x2"],
+                        map_data["y2"],
+                        map_data["long3"],
+                        map_data["lat3"],
+                        map_data["x3"],
+                        map_data["y3"],
+                    ]
+                )
+                corners = three_point_calibration_to_corners(
+                    calibration_string,
+                    width,
+                    height,
+                )
+                coordinates = ",".join([str(round(x, 5)) for x in corners])
+                map_obj.image.save("imported_image", map_file, save=False)
+                map_obj.corners_coordinates = coordinates
+                map_obj.save()
+            except Exception:
+                map_obj.delete()
+                raise MapsImportError("Error importing a map")
+            else:
+                map_obj.is_main = map_data.get("is_default_loaded")
+                maps.append(map_obj)
+        sorted_maps = list(sorted(maps, key=lambda obj: (not obj.is_main, obj.name)))
+        return sorted_maps
+
+    def get_or_create_event_competitors(self, event, uid):
+        device_map = None
+        mtb_url = self.init_data["parameters"].get("stored-uri")
+        if mtb_url and isinstance(mtb_url, dict):
+            mtb_url = mtb_url.get("all")
+        if mtb_url and not mtb_url.startswith("tcp:") and ".mtb" in mtb_url:
+            data_url = mtb_url
+            if not data_url.startswith("http"):
+                data_url = f"http:{data_url}"
+            response = requests.get(data_url, stream=True, verify=False)
+            if response.status_code == 200:
+                with tempfile.TemporaryFile() as lf:
+                    for block in response.iter_content(1024 * 8):
+                        if not block:
+                            break
+                        lf.write(block)
+                    lf.flush()
+                    lf.seek(0)
+                    try:
+                        device_map = MtbDecoder(lf).decode()
+                    except Exception:
+                        if not self.init_data["parameters"].get("ws-uri"):
+                            raise CompetitorsImportError("Could not decode mtb")
+        if self.init_data["parameters"].get("ws-uri") and not device_map:
+            try:
+                url = f'{self.init_data["parameters"].get("ws-uri")}/{self.init_data["eventType"]}?snapping=false'
+                device_map = TracTracWSReader().read_data(url)
+            except Exception:
+                raise CompetitorsImportError("Could not decode ws data")
+        if not device_map:
+            raise CompetitorsImportError("Did not figure out how to get data")
+
+        competitors = []
+        for c_data in self.init_data["competitors"].values():
+            st = c_data.get("startTime")
+            if not st:
+                st = self.init_data["raceTrackingStartTime"]
+            dev_id = c_data["uuid"]
+            dev_obj = None
+            dev_data = device_map.get(dev_id)
+            c, _ = Competitor.objects.get_or_create(
+                name=c_data["name"],
+                short_name=c_data["nameShort"],
+                start_time=arrow.get(st).datetime,
+                event=event,
+            )
+            if dev_data:
+                dev_obj, _ = Device.objects.get_or_create(
+                    aid=safe64encodedsha(f"{dev_id}:{uid}")[:8] + "_TRC",
+                    defaults={
+                        "is_gpx": True,
+                    },
+                )
+                dev_obj.add_locations(dev_data)
+                c.device = dev_obj
+            competitors.append(c)
         return competitors

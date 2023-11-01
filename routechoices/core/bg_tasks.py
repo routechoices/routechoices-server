@@ -28,11 +28,8 @@ from routechoices.lib.helpers import (
     project,
     safe32encode,
     short_random_key,
-    three_point_calibration_to_corners,
 )
-from routechoices.lib.mtb_decoder import MtbDecoder
-from routechoices.lib.third_party_downloader import GpsSeurantaNet, Loggator
-from routechoices.lib.tractrac_ws_decoder import TracTracWSReader
+from routechoices.lib.third_party_downloader import GpsSeurantaNet, Loggator, Tractrac
 
 
 class EventImportError(Exception):
@@ -63,6 +60,16 @@ def import_single_event_from_loggator(event_id):
     ):
         event_id = match.group("uid")
     solution = Loggator()
+    event = solution.get_or_create_event(event_id)
+    return event
+
+
+@background(schedule=0)
+def import_single_event_from_tractrac(event_id):
+    prefix = "https://live.tractrac.com/viewer/index.html?target="
+    if event_id.startswith(prefix):
+        event_id = event_id[len(prefix) :]
+    solution = Tractrac()
     event = solution.get_or_create_event(event_id)
     return event
 
@@ -100,17 +107,6 @@ def get_otracker_club():
     return club
 
 
-def get_tractrac_club():
-    admins = User.objects.filter(is_superuser=True)
-    club, created = Club.objects.get_or_create(
-        slug="tractrac", defaults={"name": "TracTrac"}
-    )
-    if created:
-        club.admins.set(admins)
-        club.save()
-    return club
-
-
 def import_map_from_sportrec(club, event_id, map_data, name):
     map_url = f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/map&id={event_id}"
     r = requests.get(map_url)
@@ -132,33 +128,6 @@ def import_map_from_sportrec(club, event_id, map_data, name):
     corners_coords = f"{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}"
     map_model.image.save("imported_image", map_file, save=False)
     map_model.corners_coordinates = corners_coords
-    map_model.save()
-    return map_model
-
-
-def import_map_from_tractrac(club, map_info, name):
-    map_url = map_info.get("location")
-    r = requests.get(map_url, verify=False)
-
-    if r.status_code != 200:
-        raise MapImportError("API returned error code")
-    map_file = ContentFile(r.content)
-    with Image.open(map_file) as img:
-        width, height = img.size
-    corners = three_point_calibration_to_corners(
-        f"{map_info['long1']}|{map_info['lat1']}|{map_info['x1']}|{map_info['y1']}|{map_info['long2']}|{map_info['lat2']}|{map_info['x2']}|{map_info['y2']}|{map_info['long3']}|{map_info['lat3']}|{map_info['x3']}|{map_info['y3']}",
-        width,
-        height,
-    )
-    coordinates = ",".join([str(x) for x in corners])
-    map_model, created = Map.objects.get_or_create(
-        name=name,
-        club=club,
-    )
-    if not created:
-        return map_model
-    map_model.image.save("imported_image", map_file, save=False)
-    map_model.corners_coordinates = coordinates
     map_model.save()
     return map_model
 
@@ -185,100 +154,6 @@ def import_map_from_otracker(club, map_data, name):
     map_model.corners_coordinates = coordinates
     map_model.save()
     return map_model
-
-
-@background(schedule=0)
-def import_single_event_from_tractrac(event_id):
-    club = get_tractrac_club()
-    r = requests.get(event_id, verify=False)
-    if r.status_code != 200:
-        raise EventImportError("API returned error code")
-    event_data = r.json()
-    event_name = event_data["eventName"] + " - " + event_data["raceName"]
-    slug = safe32encode(UUID(hex=event_data["raceId"]).bytes)
-    event, created = Event.objects.get_or_create(
-        club=club,
-        slug=slug,
-        defaults={
-            "name": event_name,
-            "start_date": arrow.get(event_data["raceTrackingStartTime"]).datetime,
-            "end_date": arrow.get(event_data["raceTrackingEndTime"]).datetime,
-            "privacy": PRIVACY_SECRET,
-        },
-    )
-    if not created:
-        return
-    maps = [m for m in event_data["maps"] if m.get("is_default_loaded")]
-    map_model = None
-    if maps:
-        map_info = maps[0]
-        map_model = import_map_from_tractrac(club, map_info, event_name)
-    if map_model:
-        event.map = map_model
-        event.save()
-
-    device_map = None
-    mtb_url = event_data["parameters"].get("stored-uri")
-    if mtb_url and isinstance(mtb_url, dict):
-        mtb_url = mtb_url.get("all")
-    if mtb_url and not mtb_url.startswith("tcp:") and ".mtb" in mtb_url:
-        data_url = mtb_url
-        if not data_url.startswith("http"):
-            data_url = f"http:{data_url}"
-        response = requests.get(data_url, stream=True, verify=False)
-        if response.status_code == 200:
-            print(f"mtb {data_url}")
-            with tempfile.TemporaryFile() as lf:
-                for block in response.iter_content(1024 * 8):
-                    if not block:
-                        break
-                    lf.write(block)
-                lf.flush()
-                lf.seek(0)
-                try:
-                    device_map = MtbDecoder(lf).decode()
-                except Exception:
-                    if not event_data["parameters"].get("ws-uri"):
-                        event.delete()
-                        raise EventImportError("Could not decode mtb")
-
-    if event_data["parameters"].get("ws-uri") and not device_map:
-        try:
-            url = (
-                event_data["parameters"].get("ws-uri")
-                + "/"
-                + event_data["eventType"]
-                + "?snapping=false"
-            )
-            print("ws")
-            device_map = TracTracWSReader().read_data(url)
-        except Exception:
-            event.delete()
-            raise EventImportError("Could not decode ws data")
-
-    if not device_map:
-        event.delete()
-        raise EventImportError("Did not figure out how to get data")
-    for c_data in event_data["competitors"].values():
-        st = c_data.get("startTime")
-        if not st:
-            st = event_data["raceTrackingStartTime"]
-        dev = device_map.get(c_data["uuid"])
-        dev_model = None
-        if dev:
-            dev_model = Device.objects.create(
-                aid=short_random_key() + "_TRC",
-                is_gpx=True,
-            )
-            dev_model.add_locations(dev)
-        Competitor.objects.create(
-            name=c_data["name"],
-            short_name=c_data["nameShort"],
-            start_time=arrow.get(st).datetime,
-            device=dev_model,
-            event=event,
-        )
-        print(c_data["name"])
 
 
 @background(schedule=0)
