@@ -1,13 +1,11 @@
 from django.core.management.base import BaseCommand
 
-from routechoices.core.bg_tasks import (
-    EventImportError,
-    import_single_event_from_gps_seuranta,
-)
+from routechoices.core.bg_tasks import import_single_event_from_gps_seuranta
+from routechoices.lib.third_party_downloader import EventImportError
 
 
 class Command(BaseCommand):
-    help = "Import race from GPS Seuranta"
+    help = "Import race from tulospalvelu.fi/gps"
 
     def add_arguments(self, parser):
         parser.add_argument("event_ids", nargs="+", type=str)
@@ -24,5 +22,3 @@ class Command(BaseCommand):
             except EventImportError:
                 self.stderr.write(f"Could not import event {event_id}")
                 continue
-        else:
-            self.stderr.write("No events")
