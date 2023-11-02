@@ -3,12 +3,10 @@ import math
 import re
 import tempfile
 from io import BytesIO
-from uuid import UUID
 
 import arrow
 import requests
 from background_task import background
-from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from PIL import Image, ImageDraw
@@ -26,10 +24,14 @@ from routechoices.lib.helpers import (
     epoch_to_datetime,
     initial_of_name,
     project,
-    safe32encode,
     short_random_key,
 )
-from routechoices.lib.third_party_downloader import GpsSeurantaNet, Loggator, Tractrac
+from routechoices.lib.third_party_downloader import (
+    GpsSeurantaNet,
+    Loggator,
+    OTracker,
+    Tractrac,
+)
 
 
 class EventImportError(Exception):
@@ -48,7 +50,7 @@ def import_single_event_from_gps_seuranta(event_id):
     ):
         event_id = match.group("uid")
     solution = GpsSeurantaNet()
-    event = solution.get_or_create_event(event_id)
+    event = solution.import_event(event_id)
     return event
 
 
@@ -60,7 +62,7 @@ def import_single_event_from_loggator(event_id):
     ):
         event_id = match.group("uid")
     solution = Loggator()
-    event = solution.get_or_create_event(event_id)
+    event = solution.import_event(event_id)
     return event
 
 
@@ -70,7 +72,17 @@ def import_single_event_from_tractrac(event_id):
     if event_id.startswith(prefix):
         event_id = event_id[len(prefix) :]
     solution = Tractrac()
-    event = solution.get_or_create_event(event_id)
+    event = solution.import_event(event_id)
+    return event
+
+
+@background(schedule=0)
+def import_single_event_from_otracker(event_id):
+    prefix = "https://otracker.lt/events/"
+    if event_id.startswith(prefix):
+        event_id = event_id[len(prefix) :]
+    solution = OTracker()
+    event = solution.import_event(event_id)
     return event
 
 
@@ -89,17 +101,6 @@ def get_sportrec_club():
     admins = User.objects.filter(is_superuser=True)
     club, created = Club.objects.get_or_create(
         slug="sportrec", defaults={"name": "SportRec"}
-    )
-    if created:
-        club.admins.set(admins)
-        club.save()
-    return club
-
-
-def get_otracker_club():
-    admins = User.objects.filter(is_superuser=True)
-    club, created = Club.objects.get_or_create(
-        slug="otracker", defaults={"name": "OTracker"}
     )
     if created:
         club.admins.set(admins)
@@ -128,30 +129,6 @@ def import_map_from_sportrec(club, event_id, map_data, name):
     corners_coords = f"{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}"
     map_model.image.save("imported_image", map_file, save=False)
     map_model.corners_coordinates = corners_coords
-    map_model.save()
-    return map_model
-
-
-def import_map_from_otracker(club, map_data, name):
-    map_url = map_data["url"]
-    r = requests.get(map_url)
-    if r.status_code != 200:
-        raise MapImportError("API returned error code")
-    map_file = ContentFile(r.content)
-    coordinates = (
-        f"{map_data['options']['tl']['lat']},{map_data['options']['tl']['lon']},"
-        f"{map_data['options']['tr']['lat']},{map_data['options']['tr']['lon']},"
-        f"{map_data['options']['br']['lat']},{map_data['options']['br']['lon']},"
-        f"{map_data['options']['bl']['lat']},{map_data['options']['bl']['lon']}"
-    )
-    map_model, created = Map.objects.get_or_create(
-        name=name,
-        club=club,
-    )
-    if not created:
-        return map_model
-    map_model.image.save("imported_image", map_file, save=False)
-    map_model.corners_coordinates = coordinates
     map_model.save()
     return map_model
 
@@ -232,91 +209,6 @@ def import_single_event_from_sportrec(event_id):
         Competitor.objects.create(
             name=c_data["fullname"],
             short_name=c_data["shortname"],
-            start_time=arrow.get(st).datetime,
-            device=dev_model,
-            event=event,
-        )
-
-
-@background(schedule=0)
-def import_single_event_from_otracker(event_id):
-    club = get_otracker_club()
-    rp = requests.get(f"https://otracker.lt/events/{event_id}")
-    if rp.status_code != 200:
-        raise EventImportError("API returned error code")
-    soup = BeautifulSoup(rp.text, "html.parser")
-    event_name = soup.find("title").string[:-13]
-    r = requests.get(f"https://otracker.lt/data/events/{event_id}")
-    if r.status_code != 200:
-        raise EventImportError("API returned error code")
-    event_data = r.json()
-    ft = event_data["event"]["replay_time"]["from_ts"]
-    slug = safe32encode(UUID(hex=event_id).bytes)
-    event, created = Event.objects.get_or_create(
-        club=club,
-        slug=slug,
-        defaults={
-            "name": event_name,
-            "start_date": arrow.get(
-                event_data["event"]["replay_time"]["from_ts"]
-            ).datetime,
-            "end_date": arrow.get(event_data["event"]["replay_time"]["to_ts"]).datetime,
-            "privacy": PRIVACY_SECRET,
-        },
-    )
-    if not created:
-        return
-    map_model = None
-    map_model = import_map_from_otracker(
-        club, event_data["event"]["map_image"], event_name
-    )
-    if map_model:
-        event.map = map_model
-        event.save()
-
-    data_url = (
-        f"https://otracker.lt/data/locations/history/{event_id}?map_type=tileimage"
-    )
-    response = requests.get(data_url, stream=True)
-    if response.status_code != 200:
-        event.delete()
-        raise EventImportError("API returned error code")
-    with tempfile.TemporaryFile() as lf:
-        for block in response.iter_content(1024 * 8):
-            if not block:
-                break
-            lf.write(block)
-        lf.flush()
-        lf.seek(0)
-        device_map = {}
-        try:
-            orig_device_map = json.load(lf)
-        except Exception:
-            event.delete()
-            raise EventImportError("Invalid JSON")
-        try:
-            for d in orig_device_map:
-                device_map[d] = [
-                    (int(x["fix_time"] + ft), x["lat"], x["lon"])
-                    for x in orig_device_map[d]
-                ]
-        except Exception:
-            event.delete()
-            raise EventImportError("Unexpected data structure")
-
-    for c_data in event_data["competitors"].values():
-        st = c_data.get("sync_offset") + ft
-        dev = device_map.get(str(c_data["id"]))
-        dev_model = None
-        if dev:
-            dev_model = Device.objects.create(
-                aid=short_random_key() + "_OTR",
-                is_gpx=True,
-            )
-            dev_model.add_locations(dev)
-        Competitor.objects.create(
-            name=c_data["name"],
-            short_name=c_data["short_name"],
             start_time=arrow.get(st).datetime,
             device=dev_model,
             event=event,
