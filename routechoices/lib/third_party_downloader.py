@@ -1,4 +1,5 @@
 import json
+import re
 import tempfile
 
 import arrow
@@ -19,7 +20,6 @@ from routechoices.core.models import (
     MapAssignation,
 )
 from routechoices.lib.helpers import (
-    compute_corners_from_kml_latlonbox,
     epoch_to_datetime,
     safe64encodedsha,
     three_point_calibration_to_corners,
@@ -86,7 +86,7 @@ class ThirdPartyTrackingSolution:
         start_date = None
         end_date = None
         for competitor in competitors:
-            if competitor.device.location_count > 0:
+            if competitor.device and competitor.device.location_count > 0:
                 locations = competitor.device.locations_series
                 from_date = locations[0][0]
                 to_date = locations[-1][0]
@@ -94,8 +94,9 @@ class ThirdPartyTrackingSolution:
                     start_date = from_date
                 if not end_date or end_date < to_date:
                     end_date = to_date
-        event.start_date = epoch_to_datetime(start_date)
-        event.end_date = epoch_to_datetime(end_date)
+        if start_date and end_date:
+            event.start_date = epoch_to_datetime(start_date)
+            event.end_date = epoch_to_datetime(end_date)
         return event
 
     def import_event(self, uid):
@@ -114,12 +115,19 @@ class SportRec(ThirdPartyTrackingSolution):
     name = "SportRec"
 
     def parse_init_data(self, uid):
-        r = requests.get(
-            f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/competition&id={uid}"
-        )
+        r = requests.get(f"https://sportrec.eu/gps/{uid}")
         if r.status_code != 200:
             raise EventImportError("API returned error code")
+        page = r.text
+        if match := re.search(r"'competitioninfo/(?P<id>[^'?]+)", page):
+            event_id = match.group("id")
+        else:
+            raise EventImportError("Cannot determine event id")
+        r = requests.get(f"https://sportrec.eu/gps/competitioninfo/{event_id}")
+        if r.status_code != 200:
+            raise EventImportError("Cannot fetch event data")
         self.init_data = r.json()
+        self.init_data["uid"] = event_id
 
     def get_or_create_event(self, uid):
         event_name = self.init_data["competition"]["title"]
@@ -142,7 +150,7 @@ class SportRec(ThirdPartyTrackingSolution):
     def get_or_create_event_maps(self, event, uid):
         if not self.init_data["hasMap"]:
             return []
-        map_url = f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/map&id={uid}"
+        map_url = f"https://sportrec.eu/gps/map/{self.init_data['uid']}/{self.init_data['competition']['id']}.png"
         map_obj, created = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
@@ -153,17 +161,10 @@ class SportRec(ThirdPartyTrackingSolution):
             raise MapsImportError("API returned error code")
         try:
             map_file = ContentFile(r.content)
-            map_data = self.init_data["track"]
-            coords = map_data["map_box"]
-            n, e, s, w = [
-                float(x) for x in coords.replace("(", "").replace(")", "").split(",")
-            ]
-            corners_latlon = compute_corners_from_kml_latlonbox(
-                n, e, s, w, -float(map_data["map_angle"])
-            )
+            corners_latlon = self.init_data["competition"]["bounds"].values()
             corners_coords = []
             for corner in corners_latlon:
-                corners_coords += [corner[0], corner[1]]
+                corners_coords += corner
             calib_string = ",".join(str(round(x, 5)) for x in corners_coords)
             map_obj.image.save("imported_image", map_file, save=False)
             map_obj.corners_coordinates = calib_string
@@ -175,12 +176,12 @@ class SportRec(ThirdPartyTrackingSolution):
             return [map_obj]
 
     def get_or_create_event_competitors(self, event, uid):
-        data_url = (
-            f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/history&id={uid}"
-        )
+        data_url = f"https://sportrec.eu/gps/competitionhistory2/{self.init_data['uid']}?live=0"
         response = requests.get(data_url, stream=True)
         if response.status_code != 200:
-            raise CompetitorsImportError("API returned error code")
+            raise CompetitorsImportError(
+                f"API returned error code {response.status_code}"
+            )
 
         device_map = {}
         with tempfile.TemporaryFile() as lf:
@@ -195,16 +196,18 @@ class SportRec(ThirdPartyTrackingSolution):
             except Exception:
                 raise CompetitorsImportError("Invalid JSON")
         try:
-            for d in device_data["locations"]:
-                device_map[d["device_id"]] = [
-                    (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
-                    for x in d["locations"]
-                ]
+            for dev_id in device_data.keys():
+                locations = []
+                for time in device_data[dev_id].keys():
+                    pos = device_data[dev_id][time]["p"]
+                    locations.append(
+                        (int(float(time) / 1e3), float(pos[0]), float(pos[1]))
+                    )
+                device_map[dev_id] = locations
         except Exception:
             raise CompetitorsImportError("Unexpected data structure")
-
         competitors = []
-        for c_data in self.init_data["participants"]:
+        for c_data in self.init_data["participants"].values():
             competitor, _ = Competitor.objects.get_or_create(
                 name=c_data["fullname"],
                 short_name=c_data["shortname"],
@@ -215,7 +218,8 @@ class SportRec(ThirdPartyTrackingSolution):
             dev_obj = None
             if dev_data:
                 dev_obj, created = Device.objects.get_or_create(
-                    aid="SPR_" + safe64encodedsha("{dev_id}:{uid}"),
+                    aid="SPR_"
+                    + safe64encodedsha(f"{dev_id}:{self.init_data['uid']}")[:8],
                     defaults={
                         "is_gpx": True,
                     },
@@ -226,7 +230,7 @@ class SportRec(ThirdPartyTrackingSolution):
                 dev_obj.save()
                 competitor.device = dev_obj
             if start_time := c_data.get("time_start"):
-                start_time = arrow.get(start_time).datetime
+                competitor.start_time = arrow.get(start_time).datetime
             competitor.save()
             competitors.append(competitor)
         return competitors
