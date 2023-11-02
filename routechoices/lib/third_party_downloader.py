@@ -1,6 +1,9 @@
 import json
+import math
 import re
 import tempfile
+import urllib.parse
+from io import BytesIO
 
 import arrow
 import requests
@@ -8,7 +11,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from routechoices.core.models import (
     PRIVACY_SECRET,
@@ -21,6 +24,8 @@ from routechoices.core.models import (
 )
 from routechoices.lib.helpers import (
     epoch_to_datetime,
+    initial_of_name,
+    project,
     safe64encodedsha,
     three_point_calibration_to_corners,
 )
@@ -108,6 +113,315 @@ class ThirdPartyTrackingSolution:
         event = self.assign_competitors_to_event(event, competitors)
         event.save()
         return event
+
+
+class Livelox(ThirdPartyTrackingSolution):
+    slug = "livelox"
+    name = "Livelox"
+    HEADERS = {
+        "content-type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+
+    def parse_init_data(self, uid):
+        details = dict(urllib.parse.parse_qsl(uid))
+
+        class_ids = []
+        class_id = details.get("classId")
+        if class_id:
+            class_ids = [int(class_id)]
+
+        relay_legs = []
+        relay_leg = details.get("relayLeg")
+        if relay_leg:
+            relay_legs = [int(relay_leg)]
+
+        post_data = json.dumps(
+            {
+                "classIds": class_ids,
+                "courseIds": [],
+                "relayLegs": relay_legs,
+                "relayLegGroupIds": [],
+            }
+        )
+        r = requests.post(
+            "https://www.livelox.com/Data/ClassInfo",
+            data=post_data,
+            headers=self.HEADERS,
+        )
+        if r.status_code != 200:
+            raise EventImportError(f"Can not fetch class info data {r.status_code}")
+        self.init_data = r.json().get("general", {})
+        blob_url = self.init_data.get("classBlobUrl")
+        if not blob_url or not blob_url.startswith(
+            "https://livelox.blob.core.windows.net"
+        ):
+            raise EventImportError(f"Can not fetch data: bad url ({blob_url})")
+        r = requests.get(blob_url, headers=self.HEADERS)
+        if r.status_code != 200:
+            raise EventImportError("Can not fetch class blob data")
+        self.init_data["xtra"] = r.json()
+        self.init_data["relay_leg"] = int(relay_leg)
+        self.init_data["class_id"] = int(class_id)
+
+    def get_or_create_event(self, uid):
+        event_name = (
+            f"{self.init_data['class']['event']['name']} - "
+            f"{self.init_data['class']['name']}"
+        )
+        relay_leg = self.init_data["relay_leg"]
+        if relay_leg:
+            name = ""
+            for leg in self.init_data["class"]["relayLegs"]:
+                if leg.get("leg") == relay_leg:
+                    name = leg["name"]
+                    break
+            else:
+                name = f"#{relay_leg}"
+            event_name += f" - {name}"
+
+        event_start = arrow.get(
+            self.init_data["class"]["event"]["timeInterval"]["start"]
+        ).datetime
+        event_end = arrow.get(
+            self.init_data["class"]["event"]["timeInterval"]["end"]
+        ).datetime
+        slug = str(self.init_data["class_id"])
+        if relay_leg:
+            slug += f"-{relay_leg}"
+        event, _ = Event.objects.get_or_create(
+            club=self.club,
+            slug=slug,
+            defaults={
+                "name": event_name,
+                "start_date": event_start,
+                "end_date": event_end,
+                "privacy": PRIVACY_SECRET,
+            },
+        )
+        return event
+
+    def get_or_create_event_maps(self, event, uid):
+        try:
+            map_data = self.init_data["xtra"]["map"]
+            map_bounds = map_data["boundingQuadrilateral"]["vertices"]
+            map_url = map_data["url"]
+            map_resolution = map_data["resolution"]
+        except Exception:
+            raise MapsImportError("Could not extract basic map info")
+        courses = []
+        # first determine the course for this leg if is relay
+        relay_leg = self.init_data["relay_leg"]
+        if relay_leg:
+            course_ids = []
+            groups = self.init_data["class"]["relayLegGroups"]
+            for group in groups:
+                if relay_leg in group["relayLegs"]:
+                    course_ids += [c["id"] for c in group["courses"]]
+            for course in self.init_data["xtra"]["courses"]:
+                if course["id"] in course_ids:
+                    courses.append(course)
+        else:
+            courses = self.init_data["xtra"]["courses"]
+
+        map_obj, _ = Map.objects.get_or_create(
+            name=event.name,
+            club=self.club,
+        )
+        upscale = 4
+
+        r = requests.get(map_url)
+        if r.status_code != 200:
+            raise MapsImportError("Could not download image")
+        img_blob = ContentFile(r.content)
+        map_obj.image.save("imported_image", img_blob)
+        with Image.open(img_blob).convert("RGBA") as img:
+            map_drawing = Image.new(
+                "RGBA",
+                (img.size[0] * upscale, img.size[1] * upscale),
+                (255, 255, 255, 0),
+            )
+        coordinates = [f"{b['latitude']},{b['longitude']}" for b in map_bounds[::-1]]
+        map_obj.corners_coordinates = ",".join(coordinates)
+
+        draw = ImageDraw.Draw(map_drawing)
+        circle_size = int(40 * map_resolution) * upscale
+        line_width = int(8 * map_resolution) * upscale
+        line_color = (128, 0, 128, 180)
+
+        routes = [c["controls"] for c in courses]
+        for route in routes:
+            ctrls = [
+                map_obj.wsg84_to_map_xy(
+                    c["control"]["position"]["latitude"],
+                    c["control"]["position"]["longitude"],
+                )
+                for c in route
+            ]
+            for i in range(len(ctrls) - 1):
+                if ctrls[i][0] == ctrls[i + 1][0]:
+                    ctrls[i][0] -= 0.0001
+                start_from_a = ctrls[i][0] < ctrls[i + 1][0]
+                pt_a = ctrls[i] if start_from_a else ctrls[i + 1]
+                pt_b = ctrls[i] if not start_from_a else ctrls[i + 1]
+                angle = math.atan((pt_b[1] - pt_a[1]) / (pt_b[0] - pt_a[0]))
+                if i == 0:
+                    # draw start triangle
+                    pt_s = pt_a if start_from_a else pt_b
+                    draw.line(
+                        [
+                            int(
+                                pt_s[0] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.cos(angle)
+                            ),
+                            int(
+                                pt_s[1] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.sin(angle)
+                            ),
+                            int(
+                                pt_s[0] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.cos(angle + 2 * math.pi / 3)
+                            ),
+                            int(
+                                pt_s[1] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.sin(angle + 2 * math.pi / 3)
+                            ),
+                            int(
+                                pt_s[0] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.cos(angle - 2 * math.pi / 3)
+                            ),
+                            int(
+                                pt_s[1] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.sin(angle - 2 * math.pi / 3)
+                            ),
+                            int(
+                                pt_s[0] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.cos(angle)
+                            ),
+                            int(
+                                pt_s[1] * upscale
+                                - (-1 if start_from_a else 1)
+                                * circle_size
+                                * math.sin(angle)
+                            ),
+                        ],
+                        fill=line_color,
+                        width=line_width,
+                        joint="curve",
+                    )
+                # draw line between controls
+                draw.line(
+                    [
+                        int(pt_a[0] * upscale + circle_size * math.cos(angle)),
+                        int(pt_a[1] * upscale + circle_size * math.sin(angle)),
+                        int(pt_b[0] * upscale - circle_size * math.cos(angle)),
+                        int(pt_b[1] * upscale - circle_size * math.sin(angle)),
+                    ],
+                    fill=line_color,
+                    width=line_width,
+                )
+                # draw controls
+                pt_o = pt_b if start_from_a else pt_a
+                draw.ellipse(
+                    [
+                        int(pt_o[0] * upscale - circle_size),
+                        int(pt_o[1] * upscale - circle_size),
+                        int(pt_o[0] * upscale + circle_size),
+                        int(pt_o[1] * upscale + circle_size),
+                    ],
+                    outline=line_color,
+                    width=line_width,
+                )
+                # draw finnish
+                if i == (len(ctrls) - 2):
+                    inner_circle_size = int(30 * map_resolution) * upscale
+                    draw.ellipse(
+                        [
+                            int(pt_o[0] * upscale - inner_circle_size),
+                            int(pt_o[1] * upscale - inner_circle_size),
+                            int(pt_o[0] * upscale + inner_circle_size),
+                            int(pt_o[1] * upscale + inner_circle_size),
+                        ],
+                        outline=line_color,
+                        width=line_width,
+                    )
+        out_buffer = BytesIO()
+        params = {
+            "dpi": (72, 72),
+        }
+        map_drawing = map_drawing.resize(img.size, resample=Image.Resampling.BICUBIC)
+        out = Image.alpha_composite(img, map_drawing)
+        out.save(out_buffer, "PNG", **params)
+        out_buffer.seek(0)
+        f_new = ContentFile(out_buffer.read())
+        map_obj.image.save("imported_image", f_new)
+        return [map_obj]
+
+    def get_or_create_event_competitors(self, event, uid):
+        participant_data = [
+            d for d in self.init_data["xtra"]["participants"] if d.get("routeData")
+        ]
+        time_offset = 22089888e5
+        map_projection = self.init_data["xtra"]["map"].get("projection")
+        if map_projection:
+            matrix = (
+                map_projection["matrix"][0]
+                + map_projection["matrix"][1]
+                + map_projection["matrix"][2]
+            )
+        competitors = []
+        for p in participant_data:
+            c_name = f"{p.get('firstName')} {p.get('lastName')}"
+            c_sname = initial_of_name(c_name)
+            competitor, _ = Competitor.objects.get_or_create(
+                name=c_name,
+                short_name=c_sname,
+                event=event,
+            )
+            lat = 0
+            lon = 0
+            t = -time_offset
+            pts = []
+            if not p.get("routeData"):
+                continue
+            p_data = p["routeData"][1:]
+            for i in range((len(p_data) - 1) // 3):
+                t += p_data[3 * i]
+                lon += p_data[3 * i + 1]
+                lat += p_data[3 * i + 2]
+                if map_projection:
+                    px, py = project(matrix, lon / 10, lat / 10)
+                    latlon = event.map.map_xy_to_wsg84(px, py)
+                    pts.append((int(t / 1e3), latlon["lat"], latlon["lon"]))
+                else:
+                    pts.append((int(t / 1e3), lat / 1e6, lon / 1e6))
+
+            dev_obj, created = Device.objects.get_or_create(
+                aid="LLX_" + safe64encodedsha(f"{p['id']}:{uid}")[:8], is_gpx=True
+            )
+            if not created:
+                dev_obj.location_series = []
+            if pts:
+                dev_obj.add_locations(pts)
+                dev_obj.save()
+                competitor.device = dev_obj
+            competitor.save()
+            competitors.append(competitor)
+        return competitors
 
 
 class SportRec(ThirdPartyTrackingSolution):
