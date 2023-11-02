@@ -295,6 +295,7 @@ class EventSetAdmin(admin.ModelAdmin):
         HasEventsFilter,
         "club",
     )
+    show_facets = False
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -324,6 +325,7 @@ class ClubAdmin(admin.ModelAdmin):
         "upgraded",
         "domain",
     )
+    show_facets = False
 
     def get_ordering(self, request):
         if request.resolver_match.url_name == "core_club_changelist":
@@ -402,6 +404,7 @@ class EventAdmin(admin.ModelAdmin):
     )
     list_filter = (EventDateRangeFilter, HasCompetitorFilter, "privacy", "club")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
+    show_facets = False
 
     def get_queryset(self, request):
         return (
@@ -521,6 +524,7 @@ class DeviceAdmin(admin.ModelAdmin):
         )
 
     ordering = ["-modification_date", "aid"]
+    show_facets = False
 
     def get_queryset(self, request):
         qs = (
@@ -632,6 +636,7 @@ class MapAdmin(admin.ModelAdmin):
         "club",
     )
     list_select_related = ("club",)
+    show_facets = False
 
     def get_queryset(self, request):
         return (
@@ -706,6 +711,7 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
     actions = [
         "clean_fake_users",
     ]
+    show_facets = False
 
     def get_hijack_user(self, obj):
         return obj
