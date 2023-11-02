@@ -224,17 +224,17 @@ class Livelox(ThirdPartyTrackingSolution):
         else:
             courses = self.init_data["xtra"]["courses"]
 
+        r = requests.get(map_url)
+        if r.status_code != 200:
+            raise MapsImportError("Could not download image")
+
         map_obj, _ = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
         )
-        upscale = 4
-
-        r = requests.get(map_url)
-        if r.status_code != 200:
-            raise MapsImportError("Could not download image")
         img_blob = ContentFile(r.content)
         map_obj.image.save("imported_image", img_blob)
+        upscale = 4
         with Image.open(img_blob).convert("RGBA") as img:
             map_drawing = Image.new(
                 "RGBA",
