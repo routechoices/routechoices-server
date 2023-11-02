@@ -1,9 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from routechoices.core.bg_tasks import (
-    EventImportError,
-    import_single_event_from_sportrec,
-)
+from routechoices.core.bg_tasks import import_single_event_from_sportrec
+from routechoices.lib.third_party_downloader import EventImportError
 
 
 class Command(BaseCommand):
@@ -16,9 +14,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for event_id in options["event_ids"]:
             try:
-                prefix = "https://sportrec.eu/ui/#"
-                if event_id.startswith(prefix):
-                    event_id = event_id[len(prefix) :]
                 self.stdout.write(f"Importing event {event_id}")
                 if options["task"]:
                     import_single_event_from_sportrec(event_id)

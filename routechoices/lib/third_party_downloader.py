@@ -19,6 +19,7 @@ from routechoices.core.models import (
     MapAssignation,
 )
 from routechoices.lib.helpers import (
+    compute_corners_from_kml_latlonbox,
     epoch_to_datetime,
     safe64encodedsha,
     three_point_calibration_to_corners,
@@ -106,6 +107,129 @@ class ThirdPartyTrackingSolution:
         event = self.assign_competitors_to_event(event, competitors)
         event.save()
         return event
+
+
+class SportRec(ThirdPartyTrackingSolution):
+    slug = "sportrec"
+    name = "SportRec"
+
+    def parse_init_data(self, uid):
+        r = requests.get(
+            f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/competition&id={uid}"
+        )
+        if r.status_code != 200:
+            raise EventImportError("API returned error code")
+        self.init_data = r.json()
+
+    def get_or_create_event(self, uid):
+        event_name = self.init_data["competition"]["title"]
+        event, _ = Event.objects.get_or_create(
+            club=self.club,
+            slug=uid,
+            defaults={
+                "name": event_name[:255],
+                "privacy": PRIVACY_SECRET,
+                "start_date": arrow.get(
+                    self.init_data["competition"]["time_start"]
+                ).datetime,
+                "end_date": arrow.get(
+                    self.init_data["competition"]["time_finish"]
+                ).datetime,
+            },
+        )
+        return event
+
+    def get_or_create_event_maps(self, event, uid):
+        if not self.init_data["hasMap"]:
+            return []
+        map_url = f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/map&id={uid}"
+        map_obj, created = Map.objects.get_or_create(
+            name=event.name,
+            club=self.club,
+        )
+        r = requests.get(map_url)
+        if r.status_code != 200:
+            map_obj.delete()
+            raise MapsImportError("API returned error code")
+        try:
+            map_file = ContentFile(r.content)
+            map_data = self.init_data["track"]
+            coords = map_data["map_box"]
+            n, e, s, w = [
+                float(x) for x in coords.replace("(", "").replace(")", "").split(",")
+            ]
+            corners_latlon = compute_corners_from_kml_latlonbox(
+                n, e, s, w, -float(map_data["map_angle"])
+            )
+            corners_coords = []
+            for corner in corners_latlon:
+                corners_coords += [corner[0], corner[1]]
+            calib_string = ",".join(str(round(x, 5)) for x in corners_coords)
+            map_obj.image.save("imported_image", map_file, save=False)
+            map_obj.corners_coordinates = calib_string
+            map_obj.save()
+        except Exception:
+            map_obj.delete()
+            raise MapsImportError("Error importing map")
+        else:
+            return [map_obj]
+
+    def get_or_create_event_competitors(self, event, uid):
+        data_url = (
+            f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/history&id={uid}"
+        )
+        response = requests.get(data_url, stream=True)
+        if response.status_code != 200:
+            raise CompetitorsImportError("API returned error code")
+
+        device_map = {}
+        with tempfile.TemporaryFile() as lf:
+            for block in response.iter_content(1024 * 8):
+                if not block:
+                    break
+                lf.write(block)
+            lf.flush()
+            lf.seek(0)
+            try:
+                device_data = json.load(lf)
+            except Exception:
+                raise CompetitorsImportError("Invalid JSON")
+        try:
+            for d in device_data["locations"]:
+                device_map[d["device_id"]] = [
+                    (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
+                    for x in d["locations"]
+                ]
+        except Exception:
+            raise CompetitorsImportError("Unexpected data structure")
+
+        competitors = []
+        for c_data in self.init_data["participants"]:
+            competitor, _ = Competitor.objects.get_or_create(
+                name=c_data["fullname"],
+                short_name=c_data["shortname"],
+                event=event,
+            )
+            dev_id = c_data["device_id"]
+            dev_data = device_map.get(dev_id)
+            dev_obj = None
+            if dev_data:
+                dev_obj, created = Device.objects.get_or_create(
+                    aid="SPR_" + safe64encodedsha("{dev_id}:{uid}"),
+                    defaults={
+                        "is_gpx": True,
+                    },
+                )
+                if not created:
+                    dev_obj.locations_series = []
+                dev_obj.add_locations(dev_data)
+                dev_obj.save()
+                competitor.device = dev_obj
+            if start_time := c_data.get("time_start"):
+                start_time = arrow.get(start_time).datetime
+            competitor.save()
+            competitors.append(competitor)
+        return competitors
 
 
 class OTracker(ThirdPartyTrackingSolution):

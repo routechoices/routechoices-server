@@ -1,7 +1,6 @@
 import json
 import math
 import re
-import tempfile
 from io import BytesIO
 
 import arrow
@@ -20,7 +19,6 @@ from routechoices.core.models import (
     Map,
 )
 from routechoices.lib.helpers import (
-    compute_corners_from_kml_latlonbox,
     epoch_to_datetime,
     initial_of_name,
     project,
@@ -30,6 +28,7 @@ from routechoices.lib.third_party_downloader import (
     GpsSeurantaNet,
     Loggator,
     OTracker,
+    SportRec,
     Tractrac,
 )
 
@@ -86,6 +85,16 @@ def import_single_event_from_otracker(event_id):
     return event
 
 
+@background(schedule=0)
+def import_single_event_from_sportrec(event_id):
+    prefix = "https://sportrec.eu/gps/"
+    if event_id.startswith(prefix):
+        event_id = event_id[len(prefix) :]
+    solution = SportRec()
+    event = solution.import_event(event_id)
+    return event
+
+
 def get_livelox_club():
     admins = User.objects.filter(is_superuser=True)
     club, created = Club.objects.get_or_create(
@@ -95,124 +104,6 @@ def get_livelox_club():
         club.admins.set(admins)
         club.save()
     return club
-
-
-def get_sportrec_club():
-    admins = User.objects.filter(is_superuser=True)
-    club, created = Club.objects.get_or_create(
-        slug="sportrec", defaults={"name": "SportRec"}
-    )
-    if created:
-        club.admins.set(admins)
-        club.save()
-    return club
-
-
-def import_map_from_sportrec(club, event_id, map_data, name):
-    map_url = f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/map&id={event_id}"
-    r = requests.get(map_url)
-    map_file = ContentFile(r.content)
-    if r.status_code != 200:
-        raise MapImportError("API returned error code")
-    map_model, created = Map.objects.get_or_create(
-        name=name,
-        club=club,
-    )
-    if not created:
-        return map_model
-    coords = map_data["map_box"]
-    n, e, s, w = [float(x) for x in coords.replace("(", "").replace(")", "").split(",")]
-
-    nw, ne, se, sw = compute_corners_from_kml_latlonbox(
-        n, e, s, w, -float(map_data["map_angle"])
-    )
-    corners_coords = f"{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}"
-    map_model.image.save("imported_image", map_file, save=False)
-    map_model.corners_coordinates = corners_coords
-    map_model.save()
-    return map_model
-
-
-@background(schedule=0)
-def import_single_event_from_sportrec(event_id):
-    club = get_sportrec_club()
-    r = requests.get(
-        f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/competition&id={event_id}"
-    )
-    if r.status_code != 200:
-        raise EventImportError("API returned error code")
-    event_data = r.json()
-    event_name = event_data["competition"]["title"]
-    slug = event_id
-    event, created = Event.objects.get_or_create(
-        club=club,
-        slug=slug,
-        defaults={
-            "name": event_name,
-            "start_date": arrow.get(event_data["competition"]["time_start"]).datetime,
-            "end_date": arrow.get(event_data["competition"]["time_finish"]).datetime,
-            "privacy": PRIVACY_SECRET,
-        },
-    )
-    if not created:
-        return
-    map_model = None
-    if event_data["hasMap"]:
-        map_model = import_map_from_sportrec(
-            club, event_id, event_data["track"], event_name
-        )
-    if map_model:
-        event.map = map_model
-        event.save()
-    data_url = (
-        f"https://sportrec.eu/ui/nsport_admin/index.php?r=api/history&id={event_id}"
-    )
-    response = requests.get(data_url, stream=True)
-    if response.status_code != 200:
-        event.delete()
-        raise EventImportError("API returned error code")
-    with tempfile.TemporaryFile() as lf:
-        for block in response.iter_content(1024 * 8):
-            if not block:
-                break
-            lf.write(block)
-        lf.flush()
-        lf.seek(0)
-        device_map = {}
-        try:
-            device_data = json.load(lf)
-        except Exception:
-            event.delete()
-            raise EventImportError("Invalid JSON")
-        try:
-            for d in device_data["locations"]:
-                device_map[d["device_id"]] = [
-                    (int(float(x["aq"]) / 1e3), float(x["lat"]), float(x["lon"]))
-                    for x in d["locations"]
-                ]
-        except Exception:
-            event.delete()
-            raise EventImportError("Unexpected data structure")
-
-    for c_data in event_data["participants"]:
-        st = c_data.get("time_start")
-        if not st:
-            st = event_data["competition"]["time_start"]
-        dev = device_map.get(c_data["device_id"])
-        dev_model = None
-        if dev:
-            dev_model = Device.objects.create(
-                aid=short_random_key() + "_SPR",
-                is_gpx=True,
-            )
-            dev_model.add_locations(dev)
-        Competitor.objects.create(
-            name=c_data["fullname"],
-            short_name=c_data["shortname"],
-            start_time=arrow.get(st).datetime,
-            device=dev_model,
-            event=event,
-        )
 
 
 def draw_livelox_route(name, club, url, bound, routes, res):
