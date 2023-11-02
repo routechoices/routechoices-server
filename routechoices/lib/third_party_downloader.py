@@ -127,7 +127,6 @@ class SportRec(ThirdPartyTrackingSolution):
         if r.status_code != 200:
             raise EventImportError("Cannot fetch event data")
         self.init_data = r.json()
-        self.init_data["uid"] = event_id
 
     def get_or_create_event(self, uid):
         event_name = self.init_data["competition"]["title"]
@@ -150,7 +149,7 @@ class SportRec(ThirdPartyTrackingSolution):
     def get_or_create_event_maps(self, event, uid):
         if not self.init_data["hasMap"]:
             return []
-        map_url = f"https://sportrec.eu/gps/map/{self.init_data['uid']}/{self.init_data['competition']['id']}.png"
+        map_url = f"https://sportrec.eu/gps/map/{self.init_data['competition']['hashlink']}/{self.init_data['competition']['id']}.png"
         map_obj, created = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
@@ -176,7 +175,7 @@ class SportRec(ThirdPartyTrackingSolution):
             return [map_obj]
 
     def get_or_create_event_competitors(self, event, uid):
-        data_url = f"https://sportrec.eu/gps/competitionhistory2/{self.init_data['uid']}?live=0"
+        data_url = f"https://sportrec.eu/gps/competitionhistory2/{self.init_data['competition']['hashlink']}?live=0"
         response = requests.get(data_url, stream=True)
         if response.status_code != 200:
             raise CompetitorsImportError(
@@ -219,7 +218,9 @@ class SportRec(ThirdPartyTrackingSolution):
             if dev_data:
                 dev_obj, created = Device.objects.get_or_create(
                     aid="SPR_"
-                    + safe64encodedsha(f"{dev_id}:{self.init_data['uid']}")[:8],
+                    + safe64encodedsha(
+                        f"{dev_id}:{self.init_data['competition']['hashlink']}"
+                    )[:8],
                     defaults={
                         "is_gpx": True,
                     },
