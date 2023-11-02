@@ -1,7 +1,10 @@
 (function () {
   var feedback = u("input[type='password']").parent().find(".invalid-feedback");
+  console.log("ff", feedback);
   u("input[type='password']").wrap(
-    `<div class="input-group mb-3${feedback ? " has-validation" : ""}"></div>`
+    `<div class="input-group mb-3${
+      feedback.nodes.length !== 0 ? " has-validation" : ""
+    }"></div>`
   );
   if (feedback) {
     u("input[type='password']").parent().append(feedback.first());
