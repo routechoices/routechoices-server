@@ -161,11 +161,13 @@ body {
 
 .frontpage_text {
   font-family: "Atkinson Hyperlegible", sans-serif;
+  font-size: 18.5pt;
 }
 
 .frontpage_text_bold {
   font-family: "Atkinson Hyperlegible", sans-serif;
   font-weight: 700;
+  font-size: 30pt;
 }
 
 #myFooter {
