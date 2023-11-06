@@ -221,6 +221,14 @@ function enableBtnToPreview() {
     u("#main").removeClass("d-none");
   }
 
+  function show3pointsWarning() {
+    u("#three-points-helper").removeClass("d-none");
+  }
+
+  function hide3pointsWarning() {
+    u("#three-points-helper").addClass("d-none");
+  }
+
   function closePreview() {
     u("#calibration-viewer").addClass("d-none");
     u("#main").removeClass("d-none");
@@ -343,7 +351,16 @@ function enableBtnToPreview() {
   }
 
   function checkCalib() {
-    if (markersWorld.length == 4 && markersRaster.length == 4) {
+    if (
+      markersWorld.length >= 3 &&
+      markersRaster.length >= 3 &&
+      !(markersWorld.length == 4 && markersRaster.length == 4)
+    ) {
+      show3pointsWarning();
+    } else {
+      hide3pointsWarning();
+    }
+    if (markersWorld.length >= 3 && markersRaster.length >= 3) {
       enableBtnToPreview();
     } else {
       disableBtnToPreview();
@@ -518,35 +535,109 @@ function enableBtnToPreview() {
     calibString = parts.join(",");
   }
 
+  function solveAffineMatrix(r1, s1, t1, r2, s2, t2, r3, s3, t3) {
+    const a =
+      ((t2 - t3) * (s1 - s2) - (t1 - t2) * (s2 - s3)) /
+      ((r2 - r3) * (s1 - s2) - (r1 - r2) * (s2 - s3));
+    const b =
+      ((t2 - t3) * (r1 - r2) - (t1 - t2) * (r2 - r3)) /
+      ((s2 - s3) * (r1 - r2) - (s1 - s2) * (r2 - r3));
+    const c = t1 - r1 * a - s1 * b;
+    return [a, b, c];
+  }
+
+  function deriveAffineTransform(a, b, c) {
+    const e = 1e-15;
+    a.xy.x -= e;
+    a.xy.y += e;
+    b.xy.x += e;
+    b.xy.y -= e;
+    c.xy.x += e;
+    c.xy.y += e;
+    x = solveAffineMatrix(
+      a.xy.x,
+      a.xy.y,
+      a.latLonMeters.x,
+      b.xy.x,
+      b.xy.y,
+      b.latLonMeters.x,
+      c.xy.x,
+      c.xy.y,
+      c.latLonMeters.x
+    );
+    y = solveAffineMatrix(
+      a.xy.x,
+      a.xy.y,
+      a.latLonMeters.y,
+      b.xy.x,
+      b.xy.y,
+      b.latLonMeters.y,
+      c.xy.x,
+      c.xy.y,
+      c.latLonMeters.y
+    );
+    return x.concat(y);
+  }
+
   function computeCalibString() {
     const rasterXY = [];
     const worldXY = [];
     var proj = new SpheroidProjection();
-    for (var i = 0; i < 4; i++) {
-      rasterXY[i] = rasterCalibMap.project(markersRaster[i].getLatLng(), 0);
-      worldXY[i] = proj.latlngToMeters(markersWorld[i].getLatLng());
-    }
-    var matrix3d = general2DProjection(
-      rasterXY[0],
-      worldXY[0],
-      rasterXY[1],
-      worldXY[1],
-      rasterXY[2],
-      worldXY[2],
-      rasterXY[3],
-      worldXY[3]
-    );
-    var cornersXY = [
-      project(matrix3d, 0, 0),
-      project(matrix3d, rasterMapImage.width, 0),
-      project(matrix3d, rasterMapImage.width, rasterMapImage.height),
-      project(matrix3d, 0, rasterMapImage.height),
-    ];
-    for (var i = 0; i < cornersXY.length; i++) {
-      cornersLatLng[i] = proj.metersToLatLng({
-        x: cornersXY[i][0],
-        y: cornersXY[i][1],
-      });
+    if (markersRaster.length === 4 && markersWorld.length === 4) {
+      for (var i = 0; i < 4; i++) {
+        rasterXY[i] = rasterCalibMap.project(markersRaster[i].getLatLng(), 0);
+        worldXY[i] = proj.latlngToMeters(markersWorld[i].getLatLng());
+      }
+      var matrix3d = general2DProjection(
+        rasterXY[0],
+        worldXY[0],
+        rasterXY[1],
+        worldXY[1],
+        rasterXY[2],
+        worldXY[2],
+        rasterXY[3],
+        worldXY[3]
+      );
+      var cornersXY = [
+        project(matrix3d, 0, 0),
+        project(matrix3d, rasterMapImage.width, 0),
+        project(matrix3d, rasterMapImage.width, rasterMapImage.height),
+        project(matrix3d, 0, rasterMapImage.height),
+      ];
+      for (var i = 0; i < cornersXY.length; i++) {
+        cornersLatLng[i] = proj.metersToLatLng({
+          x: cornersXY[i][0],
+          y: cornersXY[i][1],
+        });
+      }
+    } else if (markersRaster.length >= 3 && markersWorld.length >= 3) {
+      const calPts = [];
+      for (var i = 0; i < 3; i++) {
+        rasterXY[i] = rasterCalibMap.project(markersRaster[i].getLatLng(), 0);
+        worldXY[i] = proj.latlngToMeters(markersWorld[i].getLatLng());
+        calPts.push({
+          latLonMeters: worldXY[i],
+          xy: rasterXY[i],
+        });
+      }
+      const xyToLatLngMetersCoeffs = deriveAffineTransform(...calPts);
+      function mapXYtoLatLng(xy) {
+        const x =
+          xy.x * xyToLatLngMetersCoeffs[0] +
+          xy.y * xyToLatLngMetersCoeffs[1] +
+          xyToLatLngMetersCoeffs[2];
+        const y =
+          xy.x * xyToLatLngMetersCoeffs[3] +
+          xy.y * xyToLatLngMetersCoeffs[4] +
+          xyToLatLngMetersCoeffs[5];
+        return proj.metersToLatLng(new Point(x, y));
+      }
+      cornersLatLng = [
+        mapXYtoLatLng(new Point(0, 0)),
+        mapXYtoLatLng(new Point(rasterMapImage.width, 0)),
+        mapXYtoLatLng(new Point(rasterMapImage.width, rasterMapImage.height)),
+        mapXYtoLatLng(new Point(0, rasterMapImage.height)),
+      ];
     }
     buildCalibString(cornersLatLng);
   }
