@@ -7,7 +7,7 @@ diskcache
 django>=4.2
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.55.2
-django-background-tasks @ git+https://github.com/rphlo/django-background-tasks
+django-background-tasks @ git+https://github.com/rphlo/django-background-tasks@de9ea5f984faff8fe0b860a3a15474ff0d5dff91
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
 django-compressor
 django-cors-headers
