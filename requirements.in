@@ -25,14 +25,14 @@ djangorestframework
 drf-orjson-renderer
 drf-yasg
 geoip2
-gps-data-codec
+gps-data-codec @ git+https://github.com/routechoices/gps-data-codec.git
 gpxpy
 jxlpy
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 numpy
 opencv-python
 orjson
-pillow-heif
+pillow-heif @ git+https://github.com/rphlo/jxlpy
 pillow
 psycopg
 python-magic
