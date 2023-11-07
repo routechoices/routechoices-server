@@ -50,7 +50,7 @@ idna==3.4
 inflection==0.5.1
 jmespath==1.0.1
 jwcrypto==1.5.0
-jxlpy @ git+https://github.com/olokelo/jxlpy
+jxlpy @ git+https://github.com/rphlo/jxlpy
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 markdown==3.4.4
 maxminddb==2.4.0
@@ -62,8 +62,8 @@ oauthlib==3.2.2
 opencv-python==4.8.0.76
 orjson==3.9.5
 packaging==23.1
-pillow==10.0.1
-pillow-heif==0.13.0
+pillow==10.1.0
+pillow-heif==0.13.1
 psycopg==3.1.10
 pycodestyle==2.11.0
 pycparser==2.21
@@ -94,7 +94,7 @@ tornado==6.3.3
 typing-extensions==4.7.1
 uritemplate==4.1.1
 urllib3==1.26.18
-uwsgi==2.0.22
+uwsgi==2.0.23
 webauthn==1.10.1
 webencodings==0.5.1
 websocket-client==1.6.2
