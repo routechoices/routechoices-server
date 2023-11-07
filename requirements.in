@@ -6,7 +6,7 @@ defusedxml
 diskcache
 django>=4.2
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
-django-allauth
+django-allauth==0.55.2
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git
 django-compressor
@@ -25,18 +25,19 @@ djangorestframework
 drf-orjson-renderer
 drf-yasg
 geoip2
-gps-data-codec @ git+https://github.com/routechoices/gps-data-codec.git
+gps-data-codec @ git+https://github.com/routechoices/gps-data-codec
 gpxpy
-jxlpy
+jxlpy @ git+https://github.com/rphlo/jxlpy
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 numpy
 opencv-python
 orjson
-pillow-heif @ git+https://github.com/rphlo/jxlpy
+pillow-heif
 pillow
 psycopg
 python-magic
 requests
+sentry-sdk
 sewer==0.8.4
 tornado
 uwsgi
