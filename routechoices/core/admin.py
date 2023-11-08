@@ -249,6 +249,23 @@ class HasEventsFilter(admin.SimpleListFilter):
             return queryset.filter(event_count__gt=0)
 
 
+class HasClubsFilter(admin.SimpleListFilter):
+    title = "whether it admins a club"
+    parameter_name = "has_club"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("true", "With clubs"),
+            ("false", "Without clubs"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "false":
+            return queryset.filter(club_count=0)
+        elif self.value():
+            return queryset.filter(club_count__gt=0)
+
+
 class IsGPXFilter(admin.SimpleListFilter):
     title = "whether it is an actual device"
     parameter_name = "device_type"
@@ -713,6 +730,9 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
     ]
     show_facets = False
 
+    def get_list_filter(self, request):
+        return super().get_list_filter(request) + (HasClubsFilter,)
+
     def get_hijack_user(self, obj):
         return obj
 
@@ -727,9 +747,10 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
             .get_queryset(request)
             .prefetch_related("club_set")
             .annotate(
+                club_count=Count("club"),
                 has_verified_email=Exists(
                     EmailAddress.objects.filter(user_id=OuterRef("pk"), verified=True)
-                )
+                ),
             )
         )
 
