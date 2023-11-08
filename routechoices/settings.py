@@ -111,6 +111,7 @@ MIDDLEWARE = [
     "routechoices.core.middleware.FilterCountriesIPsMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.middleware.common.CommonMiddleware",
     "routechoices.core.middleware.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
