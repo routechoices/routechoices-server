@@ -1696,7 +1696,7 @@ class Event(models.Model):
             cached = cache.get(cache_key)
             if cached:
                 return cached
-            orig = raster_map.image.open("rb").read()
+            orig = raster_map.data
             img = Image.open(BytesIO(orig)).convert("RGBA")
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
