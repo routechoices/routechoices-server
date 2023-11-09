@@ -249,6 +249,23 @@ class HasEventsFilter(admin.SimpleListFilter):
             return queryset.filter(event_count__gt=0)
 
 
+class HasMapsFilter(admin.SimpleListFilter):
+    title = "whether it use maps"
+    parameter_name = "has_maps"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("true", "With maps"),
+            ("false", "Without maps"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "false":
+            return queryset.filter(map_count=0)
+        elif self.value():
+            return queryset.filter(map_count__gt=0)
+
+
 class HasClubsFilter(admin.SimpleListFilter):
     title = "whether it admins a club"
     parameter_name = "has_club"
@@ -417,9 +434,16 @@ class EventAdmin(admin.ModelAdmin):
         "is_live_db",
         "privacy",
         "competitor_count",
+        "map_count",
         "link",
     )
-    list_filter = (EventDateRangeFilter, HasCompetitorFilter, "privacy", "club")
+    list_filter = (
+        EventDateRangeFilter,
+        HasCompetitorFilter,
+        HasMapsFilter,
+        "privacy",
+        "club",
+    )
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
     show_facets = False
 
@@ -428,8 +452,15 @@ class EventAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .select_related("event_set")
-            .annotate(competitor_count=Count("competitors"))
             .annotate(
+                competitor_count=Count("competitors", distinct=True),
+                main_map_count=Case(
+                    When(map_id__isnull=True, then=Value(0)),
+                    When(map_id__exact=None, then=Value(0)),
+                    default=Value(1),
+                ),
+                alt_map_count=Count("map_assignations", distinct=True),
+                map_count=F("main_map_count") + F("alt_map_count"),
                 is_live_db=Case(
                     When(
                         start_date__lt=Value(now()),
@@ -437,7 +468,7 @@ class EventAdmin(admin.ModelAdmin):
                         then=Value(1),
                     ),
                     default=Value(0),
-                )
+                ),
             )
         )
 
@@ -447,6 +478,11 @@ class EventAdmin(admin.ModelAdmin):
 
     is_live_db.admin_order_field = "is_live_db"
     is_live_db.short_description = "Is Live"
+
+    def map_count(self, obj):
+        return obj.map_count
+
+    is_live_db.admin_order_field = "map_count"
 
     def link(self, obj):
         link = obj.shortcut or obj.get_absolute_url()
