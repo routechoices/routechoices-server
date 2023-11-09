@@ -456,7 +456,6 @@ class EventAdmin(admin.ModelAdmin):
                 competitor_count=Count("competitors", distinct=True),
                 main_map_count=Case(
                     When(map_id__isnull=True, then=Value(0)),
-                    When(map_id__exact=None, then=Value(0)),
                     default=Value(1),
                 ),
                 alt_map_count=Count("map_assignations", distinct=True),
@@ -482,7 +481,7 @@ class EventAdmin(admin.ModelAdmin):
     def map_count(self, obj):
         return obj.map_count
 
-    is_live_db.admin_order_field = "map_count"
+    map_count.admin_order_field = "map_count"
 
     def link(self, obj):
         link = obj.shortcut or obj.get_absolute_url()
