@@ -661,7 +661,7 @@ function selectLiveMode(e) {
       fetchCompetitorRoutes();
     }
     currentTime =
-      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec)
+      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec) + GPS UTC offset
     if (ts - prevDisplayRefresh > 100) {
       var refreshMeters = ts - prevMeterDisplayRefresh > 500;
       drawCompetitors(refreshMeters);

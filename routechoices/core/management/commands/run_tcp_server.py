@@ -236,9 +236,7 @@ class TMT250Connection:
         else:
             loc_array = []
             for r in decoded.get("records", []):
-                loc_array.append(
-                    (int(r["timestamp"]) + 18, r["latlon"][0], r["latlon"][1])
-                )
+                loc_array.append((int(r["timestamp"]), r["latlon"][0], r["latlon"][1]))
             if not self.db_device.user_agent:
                 self.db_device.user_agent = "Teltonika"
             if self.decoder.battery_level:
