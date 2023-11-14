@@ -68,14 +68,15 @@ def lemonsqueezy_webhook(request):
             raise BadRequest("Missing order id")
 
         club = Club.objects.filter(order_id=order_id).first()
-        individual = IndividualDonator.filter(order_id=order_id).first()
-        obj = club or individual
-        if obj:
-            obj.upgraded = False
-            obj.upgraded_date = None
-            obj.order_id = None
-            obj.save()
+        individual = IndividualDonator.objects.filter(order_id=order_id).first()
+        if club:
+            club.upgraded = False
+            club.upgraded_date = None
+            club.order_id = None
+            club.save()
             return HttpResponse(f"Downgraded {obj}")
+        elif individual:
+            individual.delete()
         else:
             raise Http404()
     return HttpResponse("Valid webhook call with no action taken")

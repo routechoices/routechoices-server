@@ -1,4 +1,5 @@
 {% extends "dashboard/home.html" %}
+{% load compress static %}
 
 {% block sub_content %}
 <content>
@@ -13,12 +14,12 @@
     </p>
     <p>
         <b>
-            Support the platform for 4.99€ per month <small style="font-size: 0.7rem; color: grey;">(or 49.99€ per year)</small> + VAT.
+            Support the platform starting at 4.99€ per month <small style="font-size: 0.7rem; color: grey;">(or 59.88€ per year)</small> + VAT.
         </b>
     </p>
 
     <p>
-        <a href="https://routechoices.lemonsqueezy.com/checkout/buy/ef3824b6-1792-4a80-b217-e5f90dd50874?checkout[custom][club]={{club.slug}}" class="btn btn-primary" role="button">Become Partner</a>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contributeModal" role="button">Become Partner</button>
     </p>
     <hr>
     <h4>Need convincing?</h4>
@@ -39,8 +40,45 @@
         <br>
         Most importantly, you'll be supporting the small, fast internet, and a live GPS tracking platform built to last forever.
     </p>
+
+<div class="modal fade" id="contributeModal" tabindex="-1" aria-labelledby="contributeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="contributeModalLabel">Become an partner club</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/pricing">
+        <div class="modal-body">
+            <h6>Please enter how much you want to contribute per month.</h6>
+            <div class="input-group mb-3">
+                <span class="input-group-text">€</span>
+                <input type="text" min="4.99" value="4.99" name="price-per-month" id="price-per-month" class="form-control" aria-label="Amount (with dot and two decimal places)" />
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="per-year" name="per-year">
+                <label class="form-check-label" for="per-year"> One payment per year <span id="price-per-year"></span></label>
+            </div>
+            <input type="hidden" value="{{club.slug}}" name="club">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Proceed to payment</button>
+        </div>
+        {% csrf_token %}
+      </form>
+    </div>
+  </div>
+</div>
     {% else %}
     <h4>You are already a {{ site.name }}'s Partner. We thank you sincerly!</h4>
     {% endif %}
 </content>
+{% endblock %}
+
+{% block extra_body %}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/site/pricing.js' %}"></script>
+{% endcompress %}
 {% endblock %}
