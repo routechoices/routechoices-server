@@ -257,9 +257,15 @@ Follow our events live or replay them later.
     def nice_url(self):
         if self.domain:
             return f"{self.url_protocol}://{self.domain}/"
-        path = reverse(
-            "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
-        )
+        if getattr(settings, "USE_CUSTOM_DOMAIN_PREFIX", True):
+            path = reverse(
+                "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
+            )
+        else:
+            path = reverse(
+                "site:club:club_view", kwargs={"club_slug": self.slug.lower()}
+            )
+            path = f"{path}"
         return f"{self.url_protocol}:{path}"
 
     def logo_scaled(self, width, ext="PNG"):

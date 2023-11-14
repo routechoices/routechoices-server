@@ -32,8 +32,10 @@ from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
-def handle_legacy_request(view_name, club_slug=None, **kwargs):
-    if club_slug:
+def handle_legacy_request(request, view_name, club_slug=None, **kwargs):
+    use_custom_domain = getattr(settings, "USE_CUSTOM_DOMAIN_PREFIX", True)
+
+    if use_custom_domain and club_slug:
         if not Club.objects.filter(slug__iexact=club_slug).exists():
             raise Http404()
         return redirect(
@@ -44,6 +46,21 @@ def handle_legacy_request(view_name, club_slug=None, **kwargs):
                 kwargs=kwargs,
             )
         )
+    elif not use_custom_domain and getattr(request, "club_slug", None) is not None:
+        kwargs.update({"club_slug": request.club_slug})
+        return redirect(
+            reverse(
+                f"site:club:{view_name}",
+                host="www",
+                kwargs=kwargs,
+            )
+        )
+    elif (
+        not use_custom_domain
+        and getattr(request, "club_slug", None) is None
+        and club_slug
+    ):
+        request.club_slug = club_slug
     return False
 
 
@@ -94,7 +111,7 @@ def club_view(request, **kwargs):
         if club_slug in ("api", "admin", "dashboard", "oauth"):
             return redirect(f"/{club_slug}/")
 
-    bypass_resp = handle_legacy_request("club_view", kwargs.get("club_slug"))
+    bypass_resp = handle_legacy_request(request, "club_view", kwargs.get("club_slug"))
     if bypass_resp:
         return bypass_resp
 
@@ -111,7 +128,7 @@ def club_view(request, **kwargs):
 
 def club_favicon(request, icon_name, **kwargs):
     bypass_resp = handle_legacy_request(
-        "club_favicon", kwargs.get("club_slug"), icon_name=icon_name
+        request, "club_favicon", kwargs.get("club_slug"), icon_name=icon_name
     )
     if bypass_resp:
         return bypass_resp
@@ -134,7 +151,7 @@ def club_favicon(request, icon_name, **kwargs):
 
 
 def club_logo(request, **kwargs):
-    bypass_resp = handle_legacy_request("club_logo", kwargs.get("club_slug"))
+    bypass_resp = handle_legacy_request(request, "club_logo", kwargs.get("club_slug"))
     if bypass_resp:
         return bypass_resp
 
@@ -150,7 +167,7 @@ def club_logo(request, **kwargs):
 
 
 def club_banner(request, **kwargs):
-    bypass_resp = handle_legacy_request("club_banner", kwargs.get("club_slug"))
+    bypass_resp = handle_legacy_request(request, "club_banner", kwargs.get("club_slug"))
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
@@ -170,7 +187,9 @@ def club_banner(request, **kwargs):
 
 
 def club_thumbnail(request, **kwargs):
-    bypass_resp = handle_legacy_request("event_club_thumbnail", kwargs.get("club_slug"))
+    bypass_resp = handle_legacy_request(
+        request, "event_club_thumbnail", kwargs.get("club_slug")
+    )
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
@@ -190,7 +209,7 @@ def club_thumbnail(request, **kwargs):
 
 
 def club_live_event_feed(request, **kwargs):
-    bypass_resp = handle_legacy_request("club_feed", kwargs.get("club_slug"))
+    bypass_resp = handle_legacy_request(request, "club_feed", kwargs.get("club_slug"))
     if bypass_resp:
         return bypass_resp
     club_slug = request.club_slug
@@ -204,7 +223,7 @@ def club_live_event_feed(request, **kwargs):
 @cache_page(5 if not settings.DEBUG else 0)
 def event_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_view", kwargs.get("club_slug"), slug=slug
+        request, "event_view", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
@@ -269,7 +288,7 @@ def event_view(request, slug, **kwargs):
 
 def event_export_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_export_view", kwargs.get("club_slug"), slug=slug
+        request, "event_export_view", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
@@ -320,7 +339,7 @@ def event_export_view(request, slug, **kwargs):
 
 def event_map_view(request, slug, index="1", **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_map_view", kwargs.get("club_slug"), slug=slug, index=index
+        request, "event_map_view", kwargs.get("club_slug"), slug=slug, index=index
     )
     if bypass_resp:
         return bypass_resp
@@ -352,7 +371,7 @@ def event_map_view(request, slug, index="1", **kwargs):
 
 def event_kmz_view(request, slug, index="1", **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_kmz_view", kwargs.get("club_slug"), slug=slug, index=index
+        request, "event_kmz_view", kwargs.get("club_slug"), slug=slug, index=index
     )
     if bypass_resp:
         return bypass_resp
@@ -384,7 +403,7 @@ def event_kmz_view(request, slug, index="1", **kwargs):
 
 def event_contribute_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_contribute_view", kwargs.get("club_slug"), slug=slug
+        request, "event_contribute_view", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
@@ -437,7 +456,7 @@ def event_contribute_view(request, slug, **kwargs):
 
 def event_map_thumbnail(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
-        "event_map_thumbnail", kwargs.get("club_slug"), slug=slug
+        request, "event_map_thumbnail", kwargs.get("club_slug"), slug=slug
     )
     if bypass_resp:
         return bypass_resp
