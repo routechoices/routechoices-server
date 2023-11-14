@@ -1,0 +1,11 @@
+{% extends "account/email/base_message.html" %}
+
+{% block main %}
+<p>You're receiving this e-mail because you or someone else has given yours as an e-mail address to connect their account.</p>
+<p>To confirm this is correct, click the link below:</p>
+<p><a href="{{ activate_url }}">{{ activate_url }}</a></p>
+{% endblock %}
+
+{% block greeting %}
+<p>Welcome to {{ current_site.name }}!</p>
+{% endblock %}

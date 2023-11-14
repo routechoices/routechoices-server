@@ -1,0 +1,14 @@
+{% extends "account/email/base_message.html" %}
+
+{% block main %}
+<p>You're receiving this email because you requested your user account at {{ current_site.name }} to be deleted.</p>
+<p>Please go to the following page to confirm your wish:</p>
+{% block reset_link %}
+<p><a href="{{ account_deletion_url }}">{{ account_deletion_url }}</a></p>
+{% endblock %}
+<p>Sad to see you go!</p>
+{% endblock %}
+
+{% block greeting %}
+<p>The {{ current_site.name }} team</p>
+{% endblock %}

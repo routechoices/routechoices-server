@@ -1,0 +1,17 @@
+{% extends "account/email/base_message.html" %}
+
+{% block main %}
+<p>Hi!</p>
+<p>
+    You're receiving this e-mail because you or someone else has requested a password reset for an account on {{current_site.name}}.<br/>
+    However, your e-mail address "{{ email }}" is not in our database of registered users and therefore the attempted password reset has failed.
+</p>
+<p>
+    If you are one of our users and were expecting this e-mail, please try again with an e-mail address you registered with our service, or you can sign up for an account using the link below.
+</p>
+<p><a href="{{ signup_url }}">{{ signup_url }}</a></p>
+{% endblock %}
+
+{% block greeting %}
+<p>Kind regards from {{current_site.name}}</p>
+{% endblock %}

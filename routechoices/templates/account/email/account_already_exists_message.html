@@ -1,0 +1,14 @@
+{% extends "account/email/base_message.html" %}
+
+{% block main %}
+<p>You are receiving this email because you or someone else tried to signup for an
+account using email address:</p>
+
+<p>{{ email }}</p>
+
+<p>However, an account using that email address already exists.  In case you have
+forgotten about this, please use the password forgotten procedure to recover
+your account:</p>
+
+<p><a href="{{ password_reset_url }}">{{ password_reset_url }}</p>
+{% endblock %}
