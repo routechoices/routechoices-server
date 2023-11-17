@@ -124,7 +124,7 @@
     <h2 class="header-multiline"><span>Upcoming Events</span></h2>
     <h6>Starting in next 24 hours</h6>
   </div>
-  {% for event_set in upcoming_events reversed %}
+  {% for event_set in upcoming_events %}
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
@@ -132,7 +132,7 @@
       {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="{{event_set.events.0.club.name}}'s logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
     </div>
     {% endif%}
-    {% for event in event_set.events reversed %}
+    {% for event in event_set.events %}
       <div class="card border-0 shadow mb-3">
         <div class="card-body">
           <div class="bd-highlight d-flex">

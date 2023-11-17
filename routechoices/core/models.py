@@ -1201,7 +1201,7 @@ class EventSet(models.Model):
                 all_events_w_set = all_events_w_set.filter(
                     start_date__gt=now(),
                     start_date__lte=now() + timedelta(hours=24),
-                )
+                ).order_by("start_date", "name")
             else:
                 all_events_w_set = all_events_w_set.filter(end_date__lt=now())
             if not all_events_w_set.exists():
@@ -1522,7 +1522,7 @@ class Event(models.Model):
                     all_events_w_set = all_events_w_set.filter(
                         start_date__gt=now(),
                         start_date__lte=now() + timedelta(hours=24),
-                    )
+                    ).order_by("start_date", "name")
                 else:
                     all_events_w_set = all_events_w_set.filter(end_date__lt=now())
                     if selected_year:
