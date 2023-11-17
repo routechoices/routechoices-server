@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
-{% load define_action %}
+{% load static define_action %}
 
 {% block favicon %}{% if event.club %}{% define event.club as club %}{% endif %}
 <link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png{{club.logo_last_mod}}">

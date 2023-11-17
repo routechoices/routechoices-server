@@ -1,12 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-{% load hosts %}
-{% load markdownify %}
-{% load index %}
-{% load math %}
-{% load compress %}
-{% load define_action %}
+{% load static django_bootstrap5 hosts markdownify index math compress define_action %}
 
 {% block favicon %}{% if club %}<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png{{club.logo_last_mod}}">
 <link rel="icon" sizes="32x32" href="{{club.nice_url}}favicon.ico{{club.logo_last_mod}}">

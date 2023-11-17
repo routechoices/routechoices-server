@@ -1,9 +1,6 @@
 {% extends "dashboard/club_view.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-{% load hosts %}
-{% load qr_code %}
-{% load compress %}
+{% load static django_bootstrap5 hosts qr_code compress %}
+
 {% block extra_head %}
 {{ block.super }}
 {% compress css %}

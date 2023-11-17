@@ -1,8 +1,6 @@
 {% extends "dashboard/home.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-{% load hosts %}
-{% load compress %}
+{% load static django_bootstrap5 hosts compress %}
+
 {%  block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />

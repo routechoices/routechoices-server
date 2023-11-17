@@ -1,4 +1,5 @@
-{% extends "club/base.html" %}{% load static %}{% load django_bootstrap5 %}{% load hosts %}{% load compress %}
+{% extends "club/base.html" %}
+{% load static django_bootstrap5 hosts compress %}
 
 {% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
 {% block head_description %}GPS Tracking of {{ event.name }} by {{ event.club.name }}{% endblock %}

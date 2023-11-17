@@ -1,7 +1,5 @@
 {% extends "club/base.html" %}
-{% load static %}
-{% load hosts %}
-{% load compress %}
+{% load static hosts compress %}
 
 {% block head_title %}{{ event.name }} data export | Powered by {{ site.name }}{% endblock %}
 {% block head_description %}{{ event.name }} by {{ event.club.name }} data export page{% endblock %}
