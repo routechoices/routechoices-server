@@ -360,6 +360,7 @@ class ClubAdmin(admin.ModelAdmin):
         "domain",
     )
     show_facets = False
+    search_fields = ("name",)
 
     def get_ordering(self, request):
         if request.resolver_match.url_name == "core_club_changelist":
@@ -444,6 +445,7 @@ class EventAdmin(admin.ModelAdmin):
         "privacy",
         "club",
     )
+    search_fields = ("name", "event_set__name", "club__name")
     inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
     show_facets = False
 
@@ -689,6 +691,8 @@ class MapAdmin(admin.ModelAdmin):
     )
     list_select_related = ("club",)
     show_facets = False
+
+    search_fields = ("name", "club__name")
 
     def get_queryset(self, request):
         return (
