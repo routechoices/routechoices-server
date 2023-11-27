@@ -72,7 +72,9 @@ AUTHENTICATION_BACKENDS = (
 )
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 INSTALLED_APPS = [
+    "routechoices",
     "routechoices.core",
+    "routechoices.lib",
     "django_bootstrap5",
     "django_hosts",
     "corsheaders",
