@@ -34,7 +34,7 @@
 {% if club %}
 <div class="container-fluid p-0">
   <div class="row m-0">
-    <div class="w-100" style="{% if club.banner %}min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url({{club.banner_url}});background-size: cover;background-position: center;{% else %}background-color: #fff;{% endif %}">
+    <div class="w-100" style="{% if club.banner %}min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{club.banner_url}});background-size: cover;background-position: center;{% else %}background-color: #fff;{% endif %}">
       <div class="container content" style="min-height: 100px">
         <div class="row">
           {{club.description|markdownify }}
