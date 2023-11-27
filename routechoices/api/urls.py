@@ -24,6 +24,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     re_path(r"^oauth2/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     re_path(r"^$", schema_view.with_ui("redoc", cache_timeout=0), name="api_doc"),
+    re_path(r"^version/?$", views.get_version, name="version"),
     re_path(r"^device_id/?$", views.get_device_id, name="device_id_api"),  # deprecated
     re_path(r"^device/?$", views.create_device_id, name="device_api"),
     re_path(r"^locations/?$", views.locations_api_gw, name="locations_api_gw"),

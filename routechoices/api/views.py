@@ -49,6 +49,7 @@ from routechoices.core.models import (
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     epoch_to_datetime,
+    git_master_hash,
     initial_of_name,
     random_device_id,
     safe64encodedsha,
@@ -1337,6 +1338,15 @@ class DataRenderer(renderers.BaseRenderer):
 
     def render(self, data, media_type=None, renderer_context=None):
         return data
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_view(["GET"])
+def get_version(request):
+    return Response({"v": git_master_hash()})
 
 
 @swagger_auto_schema(
