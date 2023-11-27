@@ -9,6 +9,18 @@ if (needFlagsEmojiPolyfill) {
   document.body.classList.add("flags-polyfill");
 }
 
+async function checkVersion() {
+  var resp = await fetch(`${window.local.apiRoot}/version`).then((r) =>
+    r.json()
+  );
+  if (resp.v !== window.local.siteVersion) {
+    window.local.siteVersion = resp.v;
+    console.log("New Version Available!");
+  }
+}
+setInterval(checkVersion, 20e3);
+checkVersion();
+
 console.log(`
 ____________________________
 |                _____     |
