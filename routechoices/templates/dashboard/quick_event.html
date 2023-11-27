@@ -57,7 +57,7 @@
 {% endblock %}
 
 {% block extra_body %}
-<script src="{% static '/scripts/load-local-variables.js' %}"
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
     data-api-base-url="{% host_url 'api_doc' host 'api' %}"
     data-club-slug="{{ club.slug }}"
     data-username="{{ request.user.username }}"

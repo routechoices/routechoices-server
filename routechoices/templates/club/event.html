@@ -141,7 +141,7 @@
 
 {% endblock %}
 {% block extra_body %}{{ block.super }}
-<script src="{% static '/scripts/load-local-variables.js' %}?_=2022072900"
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
   data-club-name="{{ event.club.name }}"
   data-csrf-token="{{ csrf_token }}"
   data-data-url="{% host_url 'event_data' event_id=event.aid host 'api' %}"

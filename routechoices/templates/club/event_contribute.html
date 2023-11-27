@@ -72,7 +72,7 @@
 
 {% block extra_body %}
 {{ block.super }}
-<script src="{% static '/scripts/load-local-variables.js' %}"
+<script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
     data-api-base-url="{% host_url 'api_doc' host 'api' %}"
     data-event-id="{{ event.aid }}"
     data-csrf-token="{{ csrf_token }}"
