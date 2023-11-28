@@ -10,13 +10,15 @@ if (needFlagsEmojiPolyfill) {
 }
 
 async function checkVersion() {
-  var resp = await fetch(`${window.local.apiRoot}/version`).then((r) =>
-    r.json()
-  );
-  if (resp.v !== window.local.siteVersion) {
-    window.local.siteVersion = resp.v;
-    console.log("New Version Available!");
-  }
+  try {
+    var resp = await fetch(`${window.local.apiRoot}version`).then((r) =>
+      r.json()
+    );
+    if (resp.v !== window.local.siteVersion) {
+      window.local.siteVersion = resp.v;
+      console.log("New Version Available!");
+    }
+  } catch {}
 }
 setInterval(checkVersion, 20e3);
 checkVersion();
