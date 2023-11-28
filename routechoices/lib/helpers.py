@@ -45,7 +45,7 @@ def get_best_image_mime(request, default=None):
 
 def git_master_hash():
     with open(os.path.join(settings.BASE_DIR, ".git", "refs", "heads", "master")) as fp:
-        return fp.read()[:7]
+        return fp.read(8)
 
 
 def epoch_to_datetime(t):
