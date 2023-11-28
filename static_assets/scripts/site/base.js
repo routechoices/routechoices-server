@@ -17,6 +17,7 @@ async function checkVersion() {
     if (resp.v !== window.local.siteVersion) {
       window.local.siteVersion = resp.v;
       console.log("New Version Available! " + resp.v);
+      /*
       var alertEl = document.createElement("div");
       alertEl.classList.add(
         "alert",
@@ -28,6 +29,7 @@ async function checkVersion() {
       alertEl.innerHTML =
         'A new version of Routechoices.com is available! Refresh the page to load.</button><button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>';
       document.getElementById("django-messages").appendChild(alertEl);
+      */
     }
   } catch {}
 }
