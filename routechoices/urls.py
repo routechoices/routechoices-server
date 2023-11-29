@@ -23,6 +23,7 @@ from routechoices.dashboard.views import (
     dashboard_banner_download,
     dashboard_logo_download,
     dashboard_map_download,
+    site_favicon,
 )
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
@@ -53,6 +54,11 @@ urlpatterns = [
     path(
         "dashboard/",
         include(("routechoices.dashboard.urls", "dashboard"), namespace="dashboard"),
+    ),
+    re_path(
+        r"(?P<icon_name>favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png)",
+        site_favicon,
+        name="site_favicon",
     ),
     path("invitations/", include("invitations.urls", namespace="invitations")),
     path(
