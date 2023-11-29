@@ -350,10 +350,10 @@ class EventForm(ModelForm):
             for i in range(start_count_maps, start_count_maps + num_maps):
                 if (
                     self.data.get(f"map_assignations-{i}-map")
+                    and self.data.get(f"map_assignations-{i}-DELETE") != "on"
                     and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
                 ):
                     raise ValidationError("Map assigned more than once in this event")
-
         return raster_map
 
     def clean_map_title(self):
@@ -363,6 +363,7 @@ class EventForm(ModelForm):
         for i in range(start_count_maps, start_count_maps + num_maps):
             if (
                 self.data.get(f"map_assignations-{i}-title")
+                and self.data.get(f"map_assignations-{i}-DELETE") != "on"
                 and self.data.get(f"map_assignations-{i}-title") == map_title
             ):
                 raise ValidationError("Map title given more than once in this event")
@@ -394,16 +395,13 @@ class ExtraMapForm(ModelForm):
 
         num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
         start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
-        map_with_same_id = 0
         for i in range(start_count_maps, start_count_maps + num_maps):
             if (
                 self.data.get(f"map_assignations-{i}-map")
-                and int(self.data.get(f"map_assignations-{i}-map"))
-                == self.cleaned_data.get("map").id
+                and self.data.get(f"map_assignations-{i}-DELETE") != "on"
+                and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
             ):
-                map_with_same_id += 1
-                if map_with_same_id > 1:
-                    raise ValidationError("Map assigned more than once in this event")
+                raise ValidationError("Map assigned more than once in this event")
         return raster_map
 
     def clean_title(self):
@@ -414,17 +412,13 @@ class ExtraMapForm(ModelForm):
 
         num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
         start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
-        map_with_same_title = 0
         for i in range(start_count_maps, start_count_maps + num_maps):
             if (
                 self.data.get(f"map_assignations-{i}-title")
+                and self.data.get(f"map_assignations-{i}-DELETE") != "on"
                 and self.data.get(f"map_assignations-{i}-title") == map_title
             ):
-                map_with_same_title += 1
-                if map_with_same_title > 1:
-                    raise ValidationError(
-                        "Map title given more than once in this event"
-                    )
+                raise ValidationError("Map title given more than once in this event")
         return map_title
 
 
