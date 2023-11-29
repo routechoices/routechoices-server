@@ -40,7 +40,7 @@
                 <td><span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret'%}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
                 <td>{% if event.is_live %}<i style="color:green" class="fa-solid fa-circle-check"></i>{% else %}<i style="color:red" class="fa-solid fa-circle-xmark"></i>{% endif %}</a></td>
                 <td>
-                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> View</a>
+                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
                     {% if not event.hidden %}
                     <a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-floppy-disk"></i> Export</a>
                     {% endif %}
