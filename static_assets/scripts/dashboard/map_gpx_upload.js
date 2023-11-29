@@ -12,11 +12,4 @@
       this.value = "";
     }
   });
-
-  u("form").on("submit", function (e) {
-    u("#submit-btn").attr({ disabled: true });
-    u("#submit-btn i")
-      .removeClass("fa-file-arrow-up")
-      .addClass("fa-spinner fa-spin");
-  });
 })();

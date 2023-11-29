@@ -64,10 +64,11 @@
     data-csrf-token="{{ csrf_token }}"
 ></script>
 {% compress js %}
-<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
+<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/quick_event.js' %}"></script>
+<script src="{% static '/scripts/submit_form_common.js' %}"></script>
 {% endcompress %}
 {% endblock %}

@@ -86,6 +86,7 @@ fontawesomeSubset(
       "arrow-right-from-bracket",
       "pencil",
       "spinner",
+      "paper-plane",
     ],
   },
   "static_assets/vendor/fontawesome-free-6.4.0-web/webfonts"

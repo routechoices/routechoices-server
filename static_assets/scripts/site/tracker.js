@@ -1,8 +1,11 @@
 (function () {
   u(".error-message").hide();
-
   u("#imeiForm").on("submit", function (e) {
     e.preventDefault();
+
+    var submitBtn = u("#submit-btn");
+    submitBtn.attr({ disabled: true });
+
     u("#imeiRes").text(u("#IMEI").val());
     reqwest({
       url: "/api/device/",
@@ -42,6 +45,9 @@
               u("<div/>").text(JSON.parse(req.responseText)[0]).text()
           );
         } catch {}
+      },
+      complete: function () {
+        submitBtn.attr({ disabled: false });
       },
     });
   });

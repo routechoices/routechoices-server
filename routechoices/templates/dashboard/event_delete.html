@@ -9,8 +9,15 @@
       <p>There is no way to recover your data if you confirm this step.</p>
       <form action="" method="post">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this event data!</button>
+          <button type="submit" class="btn btn-danger mb-1" id="submit-btn"><i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this event data!</button>
       </form>
   </div>
 </div>
 {% endblock %}
+
+{%  block extra_body %}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/submit_form_common.js' %}"></script>
+{% endcompress %}
+{%  endblock %}

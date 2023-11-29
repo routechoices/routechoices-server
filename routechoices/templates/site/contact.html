@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static django_bootstrap5 %}
+{% load static django_bootstrap5 compress %}
 
 {% block head_title %}Contact | {{site.name}} | Live GPS tracking for orienteering{% endblock %}
 
@@ -27,7 +27,7 @@
               {% csrf_token %}
               {% bootstrap_form form %}
               <div class="d-grid">
-              <input type="submit" value="Send" class="btn btn-primary">
+              <button id="submit-btn" type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Send</button>
               </div>
             </form>
           </p>
@@ -38,3 +38,10 @@
   </div>
 </div>
 {% endblock %}
+
+{% block extra_body %}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/submit_form_common.js' %}"></script>
+{% endcompress %}
+{%  endblock %}

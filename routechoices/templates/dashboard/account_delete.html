@@ -16,7 +16,7 @@
       <p>Note that deleting your account does NOT delete your clubs, clubs maps, or clubs events.</p>
       <p>To ensure your identity we will send you an email with a confirmation link.</p>
       <p><form method="post" action="">
-          <input type="submit" class="btn btn-danger" value="Send verification link" />
+          <button id="submit-btn" type="submit" class="btn btn-danger"><i class="fa-solid fa-paper-plane"></i> Send verification link</button>
           {% csrf_token %}
       </form></p>
   </div>

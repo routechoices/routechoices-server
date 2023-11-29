@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static account %}
+{% load static account compress %}
 
 {% block head_title %}Confirm Account Deletion{% endblock %}
 
@@ -18,7 +18,7 @@
               {% csrf_token %}
               <input type="hidden" name="confirmation_key" value="{{confirmation_key}}" />
               <div class="d-grid">
-                  <button class="primaryAction btn btn-danger" type="submit">Confirm</button>
+                  <button id="submit-btn" class="primaryAction btn btn-danger" type="submit">Confirm</button>
               </div>
           </form>
           {% else %}
@@ -31,3 +31,10 @@
   </div>
 </div>
 {% endblock %}
+
+{% block extra_body %}
+{% compress js %}
+<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+<script src="{% static '/scripts/submit_form_common.js' %}"></script>
+{% endcompress %}
+{%  endblock %}
