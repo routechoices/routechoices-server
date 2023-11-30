@@ -4,9 +4,9 @@
 {% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'styles/site/tracker.css' %}?_=2022022600" />
-{% endblock %}
+{% endblock extra_head %}
 
-{% block head_title %}Trackers | {{site.name}} | Live GPS tracking for orienteering{% endblock %}
+{% block head_title %}Trackers | {{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}
 
 {% block contentup %}
 <div class="container-fluid p-0">
@@ -30,26 +30,26 @@
             <div class="row justify-content-between mb-3">
               <div class="col align-self-center text-center">
                 <picture>
-                  <source srcset="{% static 'img/iphone_tracker.webp'%}?v=20230811" type="image/webp"/>
-                  <img src="{% static 'img/iphone_tracker.png'%}?v=20230811" alt="Smart Phone" height="150" width="150"/>
+                  <source srcset="{% static 'img/iphone_tracker.webp' %}?v=20230811" type="image/webp"/>
+                  <img src="{% static 'img/iphone_tracker.png' %}?v=20230811" alt="Smart Phone" height="150" width="150"/>
                 </picture>
               </div>
               <div class="col align-self-center text-center">
                 <picture>
-                  <source srcset="{% static '/img/TMT250.webp'%}?v=20230801" type="image/webp"/>
-                  <img src="{% static '/img/TMT250.png'%}?v=20230801" alt="Teltonika TMT250" height="150" width="150">
+                  <source srcset="{% static '/img/TMT250.webp' %}?v=20230801" type="image/webp"/>
+                  <img src="{% static '/img/TMT250.png' %}?v=20230801" alt="Teltonika TMT250" height="150" width="150">
                 </picture>
               </div>
               <div class="col align-self-center text-center">
                 <picture>
-                  <source srcset="{% static '/img/gl320mg.webp'%}?v=20230801" type="image/webp"/>
-                  <img src="{% static '/img/gl320mg.png'%}?v=20230801" alt="Queclink GL320MG" height="150" width="150"/>
+                  <source srcset="{% static '/img/gl320mg.webp' %}?v=20230801" type="image/webp"/>
+                  <img src="{% static '/img/gl320mg.png' %}?v=20230801" alt="Queclink GL320MG" height="150" width="150"/>
                 </picture>
               </div>
               <div class="col align-self-center text-center">
                 <picture>
-                  <source srcset="{% static '/img/tracktape.webp'%}?v=20230801" type="image/webp"/>
-                  <img src="{% static '/img/tracktape.png'%}?v=20230801" alt="Tracktape" height="150"/>
+                  <source srcset="{% static '/img/tracktape.webp' %}?v=20230801" type="image/webp"/>
+                  <img src="{% static '/img/tracktape.png' %}?v=20230801" alt="Tracktape" height="150"/>
                 </picture>
               </div>
             </div>
@@ -73,8 +73,8 @@
                   Install the app from Google Play app or the Apple App Store, Search "Routechoices Tracker", by Raphael Stefanini.
                 </p>
                 <p>
-                  <a href='https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker' class="me-1"><img alt='Get it on Google Play' height="60" src='{% static "img/google-play-badge.svg" %}'/></a>
-                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt='Get it on Apple App Store' height="60" src='{% static "img/apple-app-store-badge.svg" %}'/></a>
+                  <a href="https://play.google.com/store/apps/details?id=com.routechoices.routechoicestracker" class="me-1"><img alt="Get it on Google Play" height="60" src="{% static "img/google-play-badge.svg" %}"/></a>
+                  <a href="https://apps.apple.com/us/app/routechoices-tracker/id1570437272?itsct=apps_box_link&itscg=30200"><img alt="Get it on Apple App Store" height="60" src="{% static "img/apple-app-store-badge.svg" %}"/></a>
                 </p>
                 <p>
                   Upon opening the app, it will display a device ID.
@@ -94,10 +94,9 @@
                     On iOS, make sure that in settings background execution is allowed and Routechoices Tracker has permission to always access location services.
                   </li>
                   <li>
-                    Also on iOS, ensure that the settings in "Settings > Privacy > Location Services > Routechoices Tracker" is set to "Always"
+                    Also on iOS, ensure that the settings in "Settings &gt; Privacy &gt; Location Services &gt; Routechoices Tracker" is set to "Always"
                   </li>
                 </ul>
-                </p>
               </div>
             </div>
             <div id="hardware" class="tab-pane">
@@ -130,7 +129,7 @@
                   <div class="form-group">
                     <label for="IMEI">IMEI</label>
                     <input type="text" class="form-control" id="IMEI" aria-describedby="IMEIHelp" placeholder="Enter IMEI" required>
-                    <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{site.name}} platform.</small>
+                    <small id="IMEIHelp" class="form-text text-muted">This is used to link the physical device with the {{ site.name }} platform.</small>
                     <div id="imeiErrorMsg" class="invalid-feedback d-none mb-1">
                       <i class="fa-solid fa-triangle-exclamation"></i> Invalid IMEI
                     </div>
@@ -149,7 +148,7 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock contentup %}
 
 {% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-csrf-token="{{ csrf_token }}"></script>
@@ -158,4 +157,4 @@
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/site/tracker.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

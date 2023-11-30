@@ -3,28 +3,28 @@
 
 {% block content %}
   <video class="bg_video" playsinline autoplay muted loop>
-    <source src="{% static 'background.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
-    <source src="{% static 'background.mp4'%}" type="video/mp4">
-    <source src="{% static 'background.webm'%}" type="video/webm">
+    <source src="{% static 'background.av1.mp4' %}" type="video/mp4; codecs=av01.0.05M.08"/>
+    <source src="{% static 'background.mp4' %}" type="video/mp4">
+    <source src="{% static 'background.webm' %}" type="video/webm">
   </video>
   <div class="video_cover"></div>
   <div class="row text-center">
     <h1 class="video_text_overlay frontpage_text mb-0" style="font-size: 11pt">Presenting</h1>
-    <h1 class="video_text_overlay frontpage_text_bold mb-0">{{site.name}}</h1>
+    <h1 class="video_text_overlay frontpage_text_bold mb-0">{{ site.name }}</h1>
     <h1 class="video_text_overlay frontpage_text" style="margin-bottom: -9pt">Live GPS tracking for orienteering events</h1>
     <p>
       <picture>
         <source
           type="image/avif"
-          srcset="{% static 'img/iphone.avif'%}?v=2022091500"
+          srcset="{% static 'img/iphone.avif' %}?v=2022091500"
         />
         <source
           type="image/webp"
-          srcset="{% static 'img/iphone.webp'%}?v=2022091500"
+          srcset="{% static 'img/iphone.webp' %}?v=2022091500"
         />
         <img
           type="image/png"
-          src="{% static 'img/iphone.png'%}?v=2022091500"
+          src="{% static 'img/iphone.png' %}?v=2022091500"
           width="600px"
           height="600px"
           style="max-width:100%;max-height:600px;width: auto;height: auto;"
@@ -34,7 +34,7 @@
     </p>
     <h3 class="frontpage_text mb-3"><a class="px-4 py-2 text-decoration-none" style="font-size: 1em;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'site:events_view' %}"><i class="fa-solid fa-person-running"></i> Event list</a></h3>
   </div>
-</div>
+</div> {# not orphan comes from above content #}
 <div class="container-fluid p-0 m-0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#fff"><path d="M0 0 V1 H1"/></svg></div>
 <div class="container-fluid frontpage_text px-2 py-5" style="background-color: #fff;">
   <div class="container">
@@ -47,14 +47,14 @@
         {% for club in partner_clubs %}
         <div class="col align-self-center text-center">
             {% if club.website %}<a href="{{ club.website }}" target="_blank" class="d-inline-block text-decoration-none dark-link">{% endif %}
-            <img src="{% if club.logo %}{{club.logo_url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{club.name}}'s logo" />
+            <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
             <span class="fw-bold">{{ club.name }}</span>
             {% if club.website %}</a>{% endif %}
         </div>
         {% endfor %}
         {% for people in individual_partners %}
         <div class="col align-self-center text-center">
-            <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{people.name}}'s avatar" />
+            <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ people.name }}'s avatar" />
             <span class="fw-bold">{{ people.name }}</span>
         </div>
         {% endfor %}
@@ -62,7 +62,7 @@
     </div>
   </div>
 </div>
-<div class="container-fluid frontpage_text image-banner2">
+<div class="container-fluid frontpage_text image-banner2"> {# not orphan comes from above content #}
   <div style="background: rgba(0, 0, 0, 0.5);">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#fff" style="position: relative; top: 0"><path d="M0 0 H1 V1"/></svg>
     <div class="container" style="margin-top:40px">
@@ -78,9 +78,9 @@
         {% if user.is_authenticated %}
         <h3 class="frontpage_text mb-3"><a class="px-4 py-2 text-decoration-none" style="font-size: 1em;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a></h3>
         {% else %}
-        <h3 class="frontpage_text mb-3"><a class="px-4 py-2 text-decoration-none" style="font-size: 1em;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% host_url 'site:account_signup' host 'www'%}"><i class="fa-solid fa-compass"></i> Join now</a></h3>
+        <h3 class="frontpage_text mb-3"><a class="px-4 py-2 text-decoration-none" style="font-size: 1em;background: rgb(0,0,0,0.2);border-radius: 5px;" href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a></h3>
         {% endif %}
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

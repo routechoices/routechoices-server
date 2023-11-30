@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load static django_bootstrap5 compress %}
 
-{% block head_title %}Pricing | {{site.name}} | Live GPS tracking for orienteering{% endblock %}
+{% block head_title %}Pricing | {{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}
 
 {% block extra_head %}
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
 {% endcompress %}
-{% endblock %}
+{% endblock extra_head %}
 
 {% block contentup %}
 <div class="container-fluid p-0">
@@ -71,7 +71,7 @@
                                     <!--//FEATURE LIST END-->
                                     <!--BUTTON START-->
                                     <div class="generic_price_btn clearfix">
-                                        <a class="" href="{% url 'site:account_signup'%}">Sign up</a>
+                                        <a href="{% url 'site:account_signup' %}">Sign up</a>
                                     </div>
                                     <!--//BUTTON END-->
                                 </div>
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div>
-                        <p>{{site.name}} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
+                        <p>{{ site.name }} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
                         <p>We will never display ads, and your data is not sold to third party.</p>
                     </div>
                     <div>
@@ -94,7 +94,7 @@
                             {% for club in partner_clubs %}
                             <div class="col align-self-center text-center">
                                 {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
-                                <img src="{% if club.logo %}{{club.logo_url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{club.name}}'s logo" />
+                                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
                                 <span class="fw-bold">{{ club.name }}</span>
                                 {% if club.website %}</a>{% endif %}
                             </div>
@@ -105,7 +105,7 @@
                         <div class="row justify-content-between mb-3">
                             {% for person in individual_partners %}
                             <div class="col align-self-center text-center">
-                                <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{people.name}}'s avatar" />
+                                <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ people.name }}'s avatar" />
                                 <span class="fw-bold">{{ person.name }}</span>
                             </div>
                             {% endfor %}
@@ -125,7 +125,7 @@
         <h5 class="modal-title" id="contributeModalLabel">Become an individual partner</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="POST">
+      <form method="post">
         <div class="modal-body">
             <h6>Please enter how much you want to contribute per month.</h6>
             <div class="input-group mb-3">
@@ -146,11 +146,11 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock contentup %}
 
 {% block extra_body %}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/site/pricing.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

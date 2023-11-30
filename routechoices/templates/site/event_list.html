@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 {% load static django_bootstrap5 hosts markdownify index math compress define_action %}
 
-{% block favicon %}{% if club %}<link rel="apple-touch-icon" href="{{club.nice_url}}apple-touch-icon.png{{club.logo_last_mod}}">
-<link rel="icon" sizes="32x32" href="{{club.nice_url}}favicon.ico{{club.logo_last_mod}}">
-<link rel="manifest" href="{{club.nice_url}}manifest.json{{club.logo_last_mod}}">{% else %}
+{% block favicon %}{% if club %}<link rel="apple-touch-icon" href="{{ club.nice_url }}apple-touch-icon.png{{ club.logo_last_mod }}">
+<link rel="icon" sizes="32x32" href="{{ club.nice_url }}favicon.ico{{ club.logo_last_mod }}">
+<link rel="manifest" href="{{ club.nice_url }}manifest.json{{ club.logo_last_mod }}">{% else %}
 <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}?v=2023e">
 <link rel="icon" sizes="32x32" href="{% static 'favicon.ico' %}?v=2023e">
 <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">{% endif %}
-{% endblock %}
+{% endblock favicon %}
 
-{% block head_title %}GPS Tracking of Events{%if event_set_page%} {{event_set.name}}{% endif %}{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}{% endblock %}
-{% block head_description %}List of events{%if event_set_page%} {{event_set.name}}{% endif %}{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}{% endblock %}
+{% block head_title %}GPS Tracking of Events{% if event_set_page %} {{ event_set.name }}{% endif %}{% if club %} by {{ club.name }} | Powered by {{ site.name }}{% else %} on {{ site.name }}{% endif %}{% endblock head_title %}
+{% block head_description %}List of events{% if event_set_page %} {{ event_set.name }}{% endif %}{% if club %} by {{ club.name }}{% else %} on {{ site.name }}, a free and open source live GPS tracking solution for orienteering events.{% endif %}{% endblock head_description %}
 
 {% block extra_head %}
-<link rel="alternate" type="application/rss+xml" title="{% if club %}{{club.name}} {% else %}{% endif%}GPS Tracking Event Feed" href="{% if club %}{{event.club.nice_url}}feed{% else %}{% url 'site:events_feed' %}{% endif%}" />
-<meta property="og:title" content="GPS Tracking of Events{% if club %} by {{club.name}} | Powered by {{site.name}}{% else %} on {{site.name}}{% endif %}" />
-<meta property="og:description" content="List of public events{% if club %} by {{club.name}}{% else %} on {{site.name}}, a free and open source live GPS tracking solution for orienteering events.{% endif %}" />
+<link rel="alternate" type="application/rss+xml" title="{% if club %}{{ club.name }} {% else %}{% endif %}GPS Tracking Event Feed" href="{% if club %}{{ event.club.nice_url }}feed{% else %}{% url 'site:events_feed' %}{% endif %}" />
+<meta property="og:title" content="GPS Tracking of Events{% if club %} by {{ club.name }} | Powered by {{ site.name }}{% else %} on {{ site.name }}{% endif %}" />
+<meta property="og:description" content="List of public events{% if club %} by {{ club.name }}{% else %} on {{ site.name }}, a free and open source live GPS tracking solution for orienteering events.{% endif %}" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="{{ site.name }}" />
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:image" content="{% if club %}{{club.nice_url}}thumbnail{% else %}{% static '/img/og.jpg'%}?t=2022091500{% endif%}" />
+<meta property="og:image" content="{% if club %}{{ club.nice_url }}thumbnail{% else %}{% static '/img/og.jpg' %}?t=2022091500{% endif %}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 {% endblock %}
@@ -34,10 +34,10 @@
 {% if club %}
 <div class="container-fluid p-0">
   <div class="row m-0">
-    <div class="w-100" style="{% if club.banner %}min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{club.banner_url}});background-size: cover;background-position: center;{% else %}background-color: #fff;{% endif %}">
+    <div class="w-100" style="{% if club.banner %}min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }});background-size: cover;background-position: center;{% else %}background-color: #fff;{% endif %}">
       <div class="container content" style="min-height: 100px">
         <div class="row">
-          {{club.description|markdownify }}
+          {{ club.description|markdownify }}
         </div>
       </div>
     </div>
@@ -50,9 +50,9 @@
 <div class="row m-0">
   <div class="w-100 text-center" style="background-color: #000;">
     <picture>
-      <source srcset="{% static 'img/banner.avif'%}" type="image/avif">
-      <source srcset="{% static 'img/banner.webp'%}" type="image/webp">
-      <img src="{% static 'img/banner.jpg'%}?v=20230113" alt="Banner" style="width: 100%; max-width: 1024px">
+      <source srcset="{% static 'img/banner.avif' %}" type="image/avif">
+      <source srcset="{% static 'img/banner.webp' %}" type="image/webp">
+      <img src="{% static 'img/banner.jpg' %}?v=20230113" alt="Banner" style="width: 100%; max-width: 1024px">
     </picture>
   </div>
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 0 V1 H1"/></svg>
@@ -61,14 +61,14 @@
 <div class="container content">
 {% endif %}
 <div class="row">
-  {%if event_set_page %}
+  {% if event_set_page %}
   <div class="row" style="z-index: 1">
-    <h4 class="padded-multiline"><span>{{event_set.name}}</span></h4>
+    <h4 class="padded-multiline"><span>{{ event_set.name }}</span></h4>
   </div>
-    {%if event_set.description %}
+    {% if event_set.description %}
     <div>
       <div class="mx-2 pb-2 px-3" style="background-color: #f4f4f4;padding-top: 40px;margin-top:-40px">
-        {{event_set.description|markdownify }}
+        {{ event_set.description|markdownify }}
       </div>
       <div class="mx-2 p-0" >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f4f4f4" class="p-0"><path d="M0 0 H1 V1"/></svg>
@@ -82,12 +82,12 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
-      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="{{event_set.events.0.club.name}}'s logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{ event_set.name }}{% else %}Event{% endif %}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{ event_set.events.0.club.logo_url }}" width="25px" height="25px" alt="{{ event_set.events.0.club.name }}'s logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif %}
     </div>
     {% endif %}
     {% for event in event_set.events %}
-      <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{event.club.nice_url}}{{event.slug}}/thumbnail?no-logo=1');background-size: cover;background-position: center">
+      <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1');background-size: cover;background-position: center">
         <div class="card-body">
           <div class="bd-highlight">
             <div class="px-2 py-1 bd-highlight">
@@ -95,17 +95,17 @@
                 <a class="link-primary stretched-link text-decoration-none" href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic" style="font-size: 1em;"><b><i>LIVE</i></b></span>
               </div>
               <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
-                <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
+                <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
                 {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="me-1 fa-solid fa-user-plus"></i></span>{% endif %}
                 {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="me-1 fa-solid fa-file-arrow-up"></i></span>{% endif %}
                 <div class="mt-2">
                   {% if event.open_registration %}
-                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
+                  <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute" class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
                   {% endif %}
                   {% if event.allow_route_upload %}
-                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                  <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
                   {% endif %}
-                  <a href="{{event.club.nice_url}}{{event.slug}}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                  <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
                 </div>
               </div>
             </div>
@@ -117,8 +117,8 @@
   {% endfor %}
     {% if upcoming_events or events %}
     <hr/>
-    {% endif%}
-  {% endif%}
+    {% endif %}
+  {% endif %}
   {% if upcoming_events %}
   <div class="mb-3">
     <h2 class="header-multiline"><span>Upcoming Events</span></h2>
@@ -128,10 +128,10 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
-      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="{{event_set.events.0.club.name}}'s logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{ event_set.name }}{% else %}Event{% endif %}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{ event_set.events.0.club.logo_url }}" width="25px" height="25px" alt="{{ event_set.events.0.club.name }}'s logo" style="vertical-align: bottom"> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif %}
     </div>
-    {% endif%}
+    {% endif %}
     {% for event in event_set.events %}
       <div class="card border-0 shadow mb-3">
         <div class="card-body">
@@ -146,11 +146,11 @@
                 <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
               </div>
               <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
-                <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
+                <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
                 {% if event.open_registration %}<span><i data-bs-toggle="tooltip" data-bs-title="Competitor registration enabled" class="fa-solid fa-user-plus"></i></span>{% endif %}
                 {% if event.open_registration %}
                 <div class="mt-2">
-                  <a href="{{event.club.nice_url}}{{event.slug}}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
+                  <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
                 </div>
                 {% endif %}
               </div>
@@ -163,28 +163,28 @@
   {% endfor %}
   {% if years or search_text or event_set_page and events %}
   <hr/>
-  {% endif%}
-  {% endif%}
+  {% endif %}
+  {% endif %}
   <div class="mb-3">
   {% if years or search_text or event_set_page and events %}
-  <div {% if not event_set_page %}class="mb-3"{% endif%}>
-    <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif%}"><span>Archived Events</span></h2>
+  <div {% if not event_set_page %}class="mb-3"{% endif %}>
+    <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif %}"><span>Archived Events</span></h2>
       {% if home_url and not event_set_page %}
-        <form class="mb-3 row" method="GET">
+        <form class="mb-3 row" method="get">
           <div class="col-auto">
-            <input class="form-control" type="search" placeholder="Search" name="q" value="{{search_text}}">
+            <input class="form-control" type="search" placeholder="Search" name="q" value="{{ search_text }}">
           </div>
           <div class="col-auto">
             <input class="btn btn-primary" type="submit" value="Search">
           </div>
         </form>
         {% if search_text %}
-        Results for search: "<i>{{search_text}}</i>"
+        Results for search: "<i>{{ search_text }}</i>"
         {% endif %}
         {% if years %}
-        <div>{% if year %}<a href="{{home_url}}{% if search_text %}?q={{search_text|urlencode}}{% endif %}">All</a>{% else %}All{% endif%}{% for y in years %}&nbsp;{% if year == y %}{{ y }}{% else %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{ y }}">{{ y }}</a>{% endif %}{% endfor%}</div>
+        <div>{% if year %}<a href="{{ home_url }}{% if search_text %}?q={{ search_text|urlencode }}{% endif %}">All</a>{% else %}All{% endif %}{% for y in years %}&nbsp;{% if year == y %}{{ y }}{% else %}<a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ y }}">{{ y }}</a>{% endif %}{% endfor %}</div>
         {% if year %}
-        <div>{% if month %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{year}}">All</a>{% else %}All{% endif%}{% for m in months %}&nbsp;{% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{home_url}}?{% if search_text %}q={{search_text|urlencode}}&{% endif %}year={{ year }}&month={{m}}">{{ month_names|index:m }}</a>{% endif %}{% endfor%}</div>
+        <div>{% if month %}<a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}">All</a>{% else %}All{% endif %}{% for m in months %}&nbsp;{% if month == m %}{{ month_names|index:m }}{% else %}<a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}&month={{ m }}">{{ month_names|index:m }}</a>{% endif %}{% endfor %}</div>
         {% endif %}
         {% endif %}
       {% endif %}
@@ -196,12 +196,12 @@
     <div class="mb-4">
     {% if not event_set_page %}
     <div class="row">
-      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{event_set.name}}{%else%}Event{% endif%}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
-      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{event_set.events.0.club.logo_url}}" width="25px" height="25px" alt="{{event_set.events.0.club.name}}'s logo" style="vertical-align: bottom"/> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif%}
+      <h4 class="padded-multiline">{% if event_set.data.create_page and not event_set.data.list_secret_events %}<a href="{{ event_set.data.url }}" class="text-decoration-none">{% endif %}<span>{% if not event_set.fake %}{{ event_set.name }}{% else %}Event{% endif %}{% if event_set.data.create_page and not event_set.data.list_secret_events %} <i style="font-size: 1rem;color: var(--bs-link-color)" class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>{% endif %}</span>{% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}</h4>
+      {% if not club %}<div class="mb-2" style="font-size: 0.8em; margin-left: 25px;max-width: calc(100% - 25px)">By <a class="link-primary" href="{{ event_set.events.0.club.get_absolute_url }}">{% if event_set.events.0.club.logo %}<img src="{{ event_set.events.0.club.logo_url }}" width="25px" height="25px" alt="{{ event_set.events.0.club.name }}'s logo" style="vertical-align: bottom"> {% endif %}{{ event_set.events.0.club.name }}</a></div>{% endif %}
     </div>
     {% endif %}
     {% for event in event_set.events %}
-    <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{event.club.nice_url}}{{event.slug}}/thumbnail?no-logo=1');background-size: cover;background-position: center">
+    <div class="card border-0 shadow mb-3" style="background:linear-gradient(to right, white, rgba(255,255,255,0.3)), url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1');background-size: cover;background-position: center">
       <div class="card-body">
         <div class="bd-highlight">
           <div class="px-2 py-1 bd-highlight">
@@ -212,13 +212,13 @@
               <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
             </div>
             <div class="d-inline-block" style="color:grey;font-size:0.75em;line-height:0.8em;position:relative;z-index:11">
-              <span class="me-1">{{ event.competitors.count}} participant{{ event.competitors.count|pluralize:"s" }}</span>
+              <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
               {% if event.allow_route_upload %}<span><i data-bs-toggle="tooltip" data-bs-title="GPS upload enabled" class="fa-solid fa-file-arrow-up"></i></span>{% endif %}
               <div class="mt-2">
                 {% if event.allow_route_upload %}
-                <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute" class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
                 {% endif %}
-                <a href="{{event.club.nice_url}}{{event.slug}}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
               </div>
             </div>
           </div>
@@ -239,7 +239,8 @@
   {% endif %}
 </div>
 </div>
-{% endblock %}
+</div>
+{% endblock contentup %}
 
 {% block extra_body %}
 {% compress js %}
@@ -247,4 +248,4 @@
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
 <script src="{% static '/scripts/site/event_list.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

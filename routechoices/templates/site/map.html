@@ -1,19 +1,18 @@
 {% load static compress hosts static %}
 <!DOCTYPE html>
 <html lang="en-us">
-
 <head>
     <title>Map | Routechoices.com</title>
-    <link rel="shortcut icon" href="{% static 'favicon.ico'%}?v=2023e">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}?v=2023e">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% compress css %}
     <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css'%}" />
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css'%}" />
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-locate-control-0.79.0/L.Control.Locate.min.css'%}" />
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.css'%}" />
-    <link rel="stylesheet" href="{% static '/styles/site.css'%}" />
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css' %}" />
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css' %}" />
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-locate-control-0.79.0/L.Control.Locate.min.css' %}" />
+    <link rel="stylesheet" href="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.css' %}" />
+    <link rel="stylesheet" href="{% static '/styles/site.css' %}" />
     <style>
     #map {
         height: calc(100% - 33px);
@@ -32,10 +31,7 @@
     <footer id="myFooter" class="position-absolute w-100 bottom-0" style="z-index: 110002;">
         <div class="second-bar">
             <div class="container-fluid">
-                <h2 class="logosmall site-name my-0 py-0"><a target="_blank"
-                        href="{% host_url 'site:home_view' host 'www'%}" style="line-height: 30px;"><img
-                            src="{% static 'img/logo.svg' %}" alt="Site logo" height="30" style="vertical-align: top;">
-                        Powered by {{site.name}}</a></h2>
+                <h2 class="logosmall site-name my-0 py-0"><a target="_blank" href="{% host_url 'site:home_view' host 'www' %}" style="line-height: 30px;"><img src="{% static 'img/logo.svg' %}" alt="Site logo" height="30" style="vertical-align: top;"> Powered by {{ site.name }}</a></h2>
             </div>
         </div>
     </footer>
@@ -51,5 +47,4 @@
     <script src="{% static '/scripts/site/map.js'%}"></script>
     {% endcompress %}
 </body>
-
 </html>

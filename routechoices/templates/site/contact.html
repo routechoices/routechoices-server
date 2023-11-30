@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static django_bootstrap5 compress %}
 
-{% block head_title %}Contact | {{site.name}} | Live GPS tracking for orienteering{% endblock %}
+{% block head_title %}Contact | {{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}
 
 {% block contentup %}
 <div class="container-fluid p-0">
@@ -37,11 +37,11 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock contentup %}
 
 {% block extra_body %}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{%  endblock %}
+{% endblock extra_body %}
