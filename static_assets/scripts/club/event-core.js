@@ -1428,6 +1428,7 @@ function displayCompetitorList(force) {
           var competitorCenterBtn = u("<button/>")
             .addClass("btn", "btn-default", "btn-sm", "p-0", "ms-1", "me-0")
             .attr({
+              type: "button",
               "aria-label": "Center",
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("center"),
@@ -1459,6 +1460,7 @@ function displayCompetitorList(force) {
               competitor.focused ? "focused" : ""
             )
             .attr({
+              type: "button",
               "aria-label": "Follow competitor",
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("follow"),
@@ -1513,6 +1515,7 @@ function displayCompetitorList(force) {
               competitor.highlighted ? " highlighted" : ""
             )
             .attr({
+              type: "button",
               "aria-label": "Highlight competitor",
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("highlight"),
@@ -1544,6 +1547,7 @@ function displayCompetitorList(force) {
               competitor.displayFullRoute ? "full-route" : ""
             )
             .attr({
+              type: "button",
               "aria-label": "Display competitor's full Route",
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("full-route"),

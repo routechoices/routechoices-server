@@ -23,6 +23,6 @@
   {% csrf_token %}
   {% bootstrap_form form %}
   <input type="hidden" name="base32_key" value="{{ base32_key }}">
-  <button class="btn btn-primary" value="backup" name="type">{% trans 'Submit' %}</button>
+  <button class="btn btn-primary" value="backup" name="type" type="submit">{% trans 'Submit' %}</button>
 </form>
 {% endblock %}

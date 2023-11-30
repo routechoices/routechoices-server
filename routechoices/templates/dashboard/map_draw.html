@@ -23,7 +23,7 @@
         <div id="map" class="mb-3"></div>
         <form enctype="multipart/form-data" method="post" action="{% url 'dashboard:map_upload_gpx_view' %}?from=drawing">
         <input type="file" class="d-none" id="id_gpx_file" name="gpx_file">
-        <button id="submit-btn" class="btn btn-primary mb-1"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button id="submit-btn" class="btn btn-primary mb-1" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         {% csrf_token %}
         </form>
     </div>

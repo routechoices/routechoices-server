@@ -32,7 +32,7 @@
               {% csrf_token %}
               {% bootstrap_form forms.totp %}
               <div class="d-grid">
-                <button class="btn btn-primary submit-btn" value="totp" name="type">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="totp" name="type" type="submit">{% trans 'Submit' %}</button>
               </div>
             </form>
           </div>
@@ -47,7 +47,7 @@
               {% csrf_token %}
               {% bootstrap_form forms.backup %}
               <div class="d-grid">
-                <button class="btn btn-primary submit-btn" value="backup" name="type">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="backup" name="type" type="submit">{% trans 'Submit' %}</button>
               </div>
             </form>
           </div>
