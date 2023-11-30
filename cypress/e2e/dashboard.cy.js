@@ -26,7 +26,7 @@ context("Dashboard actions", () => {
     cy.visit("/dashboard/maps/upload-kmz");
     cy.get("#id_file").selectFile("cypress/fixtures/Jukola_1st_leg.kmz");
     cy.get(".sa-confirm-button-container .confirm").click();
-    cy.get("form button:not([type]),form button[type=submit]").click();
+    cy.get("button:not([type]),button[type=submit]").click();
     cy.get("#django-messages").contains("The import of the map was successful");
   });
 
@@ -93,9 +93,8 @@ context("Dashboard actions", () => {
     cy.get("#id_end_date").focus().realType("2019-06-16 10:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg");
 
-    cy.get(
-      "button:not([value]):not([type]),button[type=submit]:not([value])"
-    ).click();
+    cy.get("button:not([type]),button[type=submit]").first().click();
+
     cy.url().should("match", /\/dashboard\/events$/);
 
     cy.get("a").contains("Jukola 2019 - 1st Leg").click();
@@ -137,9 +136,7 @@ context("Dashboard actions", () => {
       .realType("2019-06-15 20:00:10");
 
     cy.intercept("POST", "/dashboard/events/new").as("eventSubmit");
-    cy.get(
-      "button:not([type]):not([value]),button[type=submit]:not([value])"
-    ).click();
+    cy.get("button:not([type]),button[type=submit]").first().click();
     cy.wait("@eventSubmit").then(({ request, response }) => {
       expect(response.statusCode).to.eq(302);
       expect(request.body).to.contain("&competitors-0-device=2&");
@@ -164,9 +161,7 @@ context("Dashboard actions", () => {
     cy.get("#id_competitors-0-start_time")
       .focus()
       .realType("2019-06-16 20:00:10");
-    cy.get(
-      "button:not([type]):not([value]),button[type=submit]:not([value])"
-    ).click();
+    cy.get("button:not([type]),button[type=submit]").first().click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
     cy.contains("Event with this Club, Event Set, and Name already exists.");

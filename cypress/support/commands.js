@@ -37,7 +37,7 @@ Cypress.Commands.add(
 Cypress.Commands.add("createClub", (name = "Kangasala SK") => {
   cy.visit("/dashboard/clubs/new");
   cy.get("#id_name").type(name);
-  cy.get("form button:not([type]),form button[type=submit]").click();
+  cy.get("button:not([type]),button[type=submit]").click();
   cy.contains("successfully");
 });
 
