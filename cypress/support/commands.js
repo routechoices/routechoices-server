@@ -63,7 +63,7 @@ Cypress.Commands.add("createMap", () => {
   const mapFileName =
     "Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg";
   cy.get("#id_image").selectFile("cypress/fixtures/" + mapFileName);
-  cy.get("form button:not([type]),form button[type=submit]").click();
+  cy.get("#submit-btn").click();
   cy.url().should("match", /\/dashboard\/maps$/);
 });
 
