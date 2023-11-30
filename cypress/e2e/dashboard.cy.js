@@ -26,7 +26,7 @@ context("Dashboard actions", () => {
     cy.visit("/dashboard/maps/upload-kmz");
     cy.get("#id_file").selectFile("cypress/fixtures/Jukola_1st_leg.kmz");
     cy.get(".sa-confirm-button-container .confirm").click();
-    cy.get("button:not([type]),button[type=submit]").click();
+    cy.get("form button:not([type]),form button[type=submit]").click();
     cy.get("#django-messages").contains("The import of the map was successful");
   });
 
