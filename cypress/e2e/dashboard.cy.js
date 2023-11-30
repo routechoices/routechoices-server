@@ -109,7 +109,7 @@ context("Dashboard actions", () => {
 
     const gpxFileName = "Jukola_1st_leg.gpx";
     cy.get("#id_gpx_file").selectFile("cypress/fixtures/" + gpxFileName);
-    cy.get("#submit-btn").click();
+    cy.get("button:not([type]),button[type=submit]").click();
 
     cy.contains("The upload of the GPX file was successful");
 
@@ -137,7 +137,9 @@ context("Dashboard actions", () => {
       .realType("2019-06-15 20:00:10");
 
     cy.intercept("POST", "/dashboard/events/new").as("eventSubmit");
-    cy.get("#submit-btn").click();
+    cy.get(
+      "button:not([type]):not([value]),button[type=submit]:not([value])"
+    ).click();
     cy.wait("@eventSubmit").then(({ request, response }) => {
       expect(response.statusCode).to.eq(302);
       expect(request.body).to.contain("&competitors-0-device=2&");
@@ -162,7 +164,9 @@ context("Dashboard actions", () => {
     cy.get("#id_competitors-0-start_time")
       .focus()
       .realType("2019-06-16 20:00:10");
-    cy.get("#submit-btn").click();
+    cy.get(
+      "button:not([type]:not([value])),button[type=submit]:not([value])"
+    ).click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
     cy.contains("Event with this Club, Event Set, and Name already exists.");
