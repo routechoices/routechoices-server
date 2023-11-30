@@ -140,14 +140,16 @@ function onIofXMLLoaded(e) {
       var classes = [];
       var selector = document.getElementById("iof_class_input");
       selector.innerHTML = "";
+      var ii = 1;
       for (c of parsedXML.getElementsByTagName("Class")) {
-        var id = c.getElementsByTagName("Id")[0].textContent;
+        var id = ii;
         var name = c.getElementsByTagName("Name")[0].textContent;
         classes.push({ id, name });
         var opt = document.createElement("option");
         opt.value = id;
         opt.appendChild(document.createTextNode(name));
         selector.appendChild(opt);
+        ii++;
       }
       u("#iof-step-1").addClass("d-none");
       u("#iof-step-2").removeClass("d-none");
@@ -164,12 +166,9 @@ function onIofXMLLoaded(e) {
         var suffix = isResultFile ? "Result" : "Start";
 
         clearEmptyCompetitorRows();
-
+        var ii = 1;
         for (c of parsedXML.getElementsByTagName("Class" + suffix)) {
-          if (
-            c.getElementsByTagName("Class")[0].getElementsByTagName("Id")[0]
-              .textContent === classId
-          ) {
+          if (ii === parseInt(classId, 10)) {
             for (p of c.getElementsByTagName("Person" + suffix)) {
               var startTime = null;
               var name = null;
@@ -178,7 +177,9 @@ function onIofXMLLoaded(e) {
                 startTime = p
                   .getElementsByTagName(suffix)[0]
                   .getElementsByTagName("StartTime")[0].textContent;
-              } catch {}
+              } catch (e) {
+                console.log(e);
+              }
               try {
                 name =
                   p
@@ -196,13 +197,16 @@ function onIofXMLLoaded(e) {
                   p
                     .getElementsByTagName("Person")[0]
                     .getElementsByTagName("Family")[0].textContent;
-              } catch {}
+              } catch (e) {
+                console.log(e);
+              }
               if (name) {
                 addCompetitor(name, shortName, startTime);
               }
             }
             u(".add-competitor-btn").first().click();
           }
+          ii++;
         }
         u("#iof-step-2").addClass("d-none");
         u("#iof-step-1").removeClass("d-none");
@@ -377,16 +381,16 @@ function showLocalTime(el) {
   $(".formset_row").formset({
     addText: '<i class="fa-solid fa-circle-plus"></i> Add Competitor',
     addCssClass: "btn btn-info add-competitor-btn",
-    deleteText:
-      '<button class="btn btn-danger"><i class="fa-solid fa-xmark"></i></button>',
+    deleteCssClass: "btn btn-danger delete-row",
+    deleteText: '<i class="fa-solid fa-xmark"></i>',
     prefix: "competitors",
     added: onAddedCompetitorRow,
   });
   $(".extra_map_formset_row").formset({
     addText: '<i class="fa-solid fa-circle-plus"></i> Add Map',
     addCssClass: "btn btn-info add-map-btn",
-    deleteText:
-      '<button class="btn btn-danger"><i class="fa-solid fa-xmark"></i></button>',
+    deleteCssClass: "btn btn-danger delete-row",
+    deleteText: '<i class="fa-solid fa-xmark"></i>',
     prefix: "map_assignations",
     formCssClass: "extra_map_formset_row",
   });

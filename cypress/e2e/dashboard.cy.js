@@ -17,7 +17,7 @@ context("Dashboard actions", () => {
       cy.get("#id_gpx_file").selectFile(
         "cypress/fixtures/" + gpxFileName + ".gpx"
       );
-      cy.get("#submit-btn").click();
+      cy.get("button:not([type]),button[type=submit]").click();
       cy.get("#django-messages").contains(
         "The import of the map was successful"
       );
@@ -26,7 +26,7 @@ context("Dashboard actions", () => {
     cy.visit("/dashboard/maps/upload-kmz");
     cy.get("#id_file").selectFile("cypress/fixtures/Jukola_1st_leg.kmz");
     cy.get(".sa-confirm-button-container .confirm").click();
-    cy.get("#submit-btn").click();
+    cy.get("button:not([type]),button[type=submit]").click();
     cy.get("#django-messages").contains("The import of the map was successful");
   });
 
@@ -45,7 +45,7 @@ context("Dashboard actions", () => {
     cy.get("#id_description")
       .clear()
       .type("## Kangasala SK  \n## GPS Tracking");
-    cy.get("#submit-btn").click();
+    cy.get("button:not([type]),button[type=submit]").click();
 
     cy.contains("Changes saved successfully", { timeout: 10000 });
 
@@ -93,7 +93,9 @@ context("Dashboard actions", () => {
     cy.get("#id_end_date").focus().realType("2019-06-16 10:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg");
 
-    cy.get("#submit-btn").click();
+    cy.get(
+      "button:not([value]):not([type]),button[type=submit]:not([value])"
+    ).click();
     cy.url().should("match", /\/dashboard\/events$/);
 
     cy.get("a").contains("Jukola 2019 - 1st Leg").click();
