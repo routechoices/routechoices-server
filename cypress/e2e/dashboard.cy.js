@@ -165,7 +165,7 @@ context("Dashboard actions", () => {
       .focus()
       .realType("2019-06-16 20:00:10");
     cy.get(
-      "button:not([type]:not([value])),button[type=submit]:not([value])"
+      "button:not([type]):not([value]),button[type=submit]:not([value])"
     ).click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
