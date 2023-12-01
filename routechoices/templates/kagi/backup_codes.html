@@ -1,28 +1,21 @@
 
 
 {% extends "kagi/base.html" %}
-{% load i18n %}
 
 {% block sub_sub_content %}
 <h3>Backup Codes</h3>
-
 {% if object_list %}
 <p>
   {% for code in object_list %}
   <span class="badge bg-secondary fs-6 mb-1 font-monospace">{{ code.code }}</span>
-  {% if forloop.counter|divisibleby:3 %}
-  <br/>
-  {% endif %}
+  {% if forloop.counter|divisibleby:3 %}<br/>{% endif %}
   {% endfor %}
 </p>
 {% else %}
-<p>
-  <i class="fa-solid fa-triangle-exclamation"></i> You do not have any backup codes!
-</p>
+<p><i class="fa-solid fa-triangle-exclamation"></i> You do not have any backup codes!</p>
 {% endif %}
-
-<form method="POST">
+<form method="post">
   {% csrf_token %}
-  <input type="submit" class="btn btn-primary" value="{% trans 'Create new backup codes' %}">
+  <input type="submit" class="btn btn-primary" value="Create new backup codes">
 </form>
-{% endblock %}
+{% endblock sub_sub_content %}

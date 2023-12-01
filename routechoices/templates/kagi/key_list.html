@@ -1,18 +1,17 @@
 
 
 {% extends "kagi/base.html" %}
-{% load i18n static compress %}
+{% load static compress %}
 
 {% block sub_sub_content %}
 <h3>WebAuthn Keys</h3>
-
 {% if object_list %}
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>{% trans 'Key name' %}</th>
-      <th>{% trans 'Added on' %}</th>
-      <th>{% trans 'Last used on' %}</th>
+      <th>Key name</th>
+      <th>Added on</th>
+      <th>Last used on</th>
       <th>Delete</th>
     </tr>
   </thead>
@@ -21,7 +20,7 @@
     <tr>
       <td>{{ key.key_name }}</td>
       <td>{{ key.created_at }}</td>
-      <td>{% if key.last_used_at %}<span class="date-utc" data-date="{{key.last_used_at|date:'c'}}">{{ key.last_used_at }} UTC</span>{% else %}Never{% endif %}</td>
+      <td>{% if key.last_used_at %}<span class="date-utc" data-date="{{ key.last_used_at|date:'c' }}">{{ key.last_used_at }} UTC</span>{% else %}Never{% endif %}</td>
       <td>
         <form method="post">{% csrf_token %}
           <input name="key_id" type="hidden" value="{{ key.pk }}">
@@ -33,14 +32,12 @@
   </tbody>
 </table>
 {% else %}
-<p>
-  <i class="fa-solid fa-triangle-exclamation	"></i> You do not have any key!
-</p>
+<p><i class="fa-solid fa-triangle-exclamation	"></i> You do not have any key!</p>
 {% endif %}
 <div id="webauthn-feature">
   <a class="btn btn-primary" href="{% url 'kagi:add-webauthn-key' %}">Add a key</a>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 {{ block.super }}
@@ -50,4 +47,4 @@
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/date_to_local.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

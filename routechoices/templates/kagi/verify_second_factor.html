@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load i18n static django_bootstrap5 compress %}
+{% load static django_bootstrap5 compress %}
 
 {% block content %}
 <div class="container">
@@ -8,17 +8,13 @@
       <div class="card border-0 shadow rounded-3 my-5">
         <div class="card-body p-4 p-sm-5">
           <h3 class="card-title text-center mb-5">2FA Verification</h3>
-          <p>
-            {% trans 'Please verify one of the authentication methods below.' %}
-          </p>
+          <p>Please verify one of the authentication methods below.</p>
           {% if forms.webauthn %}
           <form id="webauthn-auth-form">
               {% csrf_token %}
               <div id="webauthn-error" style="color: red"></div>
               <div id="webauthn-feature" class="d-grid">
-                <button class="btn btn-primary submit-btn" id="webauthn-auth-begin" name="submit" type="submit">
-                    {% trans "Tap here to log in with your WebAuthn key" %}
-                </button>
+                <button class="btn btn-primary submit-btn" id="webauthn-auth-begin" name="submit" type="submit">Tap here to log in with your WebAuthn key</button>
               </div>
           </form>
           {% endif %}
@@ -26,13 +22,13 @@
           {% if forms.totp %}
           {% if forms.webauthn %}<hr/>{% endif %}
           <div class="method totp">
-            <p>{% trans 'Enter an Authenticator (TOTP) Token:' %}</p>
+            <p>Enter an Authenticator (TOTP) Token:</p>
 
             <form method="post">
               {% csrf_token %}
               {% bootstrap_form forms.totp %}
               <div class="d-grid">
-                <button class="btn btn-primary submit-btn" value="totp" name="type" type="submit">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="totp" name="type" type="submit">Submit</button>
               </div>
             </form>
           </div>
@@ -41,13 +37,13 @@
           {% if forms.backup %}
           {% if forms.webauthn or forms.totp %}<hr/>{% endif %}
           <div class="method backup">
-            <p>{% trans 'Use a backup code:' %}</p>
+            <p>Use a backup code:</p>
 
-            <form method="POST">
+            <form method="post">
               {% csrf_token %}
               {% bootstrap_form forms.backup %}
               <div class="d-grid">
-                <button class="btn btn-primary submit-btn" value="backup" name="type" type="submit">{% trans 'Submit' %}</button>
+                <button class="btn btn-primary submit-btn" value="backup" name="type" type="submit">Submit</button>
               </div>
             </form>
           </div>
@@ -57,7 +53,7 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock content %}
 
 {% block extra_body %}
 {{ block.super }}
@@ -66,4 +62,4 @@
 <script src="{% static '/scripts/webauthn.js' %}?v=2"></script>
 <script src="{% static '/scripts/account/verify_second_factor.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

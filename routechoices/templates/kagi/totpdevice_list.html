@@ -1,14 +1,14 @@
 {% extends "kagi/base.html" %}
-{% load i18n static compress %}
+{% load static compress %}
 
 {% block sub_sub_content %}
-<h1>{% trans "TOTP (Authenticator) Devices" %}</h1>
+<h1>TOTP (Authenticator) Devices</h1>
 {% if object_list %}
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>{% trans 'Added on' %}</th>
-      <th>{% trans 'Last used on' %}</th>
+      <th>Added on</th>
+      <th>Last used on</th>
       <th>Delete</th>
     </tr>
   </thead>
@@ -16,7 +16,7 @@
     {% for device in object_list %}
     <tr>
       <td>{{ device.created_at }}</td>
-      <td>{% if device.last_used_at %}<span class="date-utc" data-date="{{device.last_used_at|date:'c'}}">{{ device.last_used_at }} UTC</span>{% else %}Never{% endif %}</td>
+      <td>{% if device.last_used_at %}<span class="date-utc" data-date="{{ device.last_used_at|date:'c' }}">{{ device.last_used_at }} UTC</span>{% else %}Never{% endif %}</td>
       <td>
         <form method="post">{% csrf_token %}
           <input name="device_id" type="hidden" value="{{ device.pk }}">
@@ -28,12 +28,10 @@
   </tbody>
 </table>
 {% else %}
-<p>
-  <i class="fa-solid fa-triangle-exclamation	"></i> You do not have any TOTP (Authenticator) device!
-</p>
+<p><i class="fa-solid fa-triangle-exclamation	"></i> You do not have any TOTP (Authenticator) device!</p>
 {% endif %}
-<a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">{% trans 'Add a TOTP (Authenticator) Device' %}</a>
-{% endblock %}
+<a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">Add a TOTP (Authenticator) Device</a>
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 {{ block.super }}
@@ -42,4 +40,4 @@
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/date_to_local.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

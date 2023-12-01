@@ -34,7 +34,7 @@
 {% if club %}
 <div class="container-fluid p-0">
   <div class="row m-0">
-    <div class="w-100" style="{% if club.banner %}min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }});background-size: cover;background-position: center;{% else %}background-color: #fff;{% endif %}">
+    <div class="w-100" {% if club.banner %}style="min-height: 300px;background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }});background-size: cover;background-position: center;{% else %}background-color: #fff;"{% endif %}>
       <div class="container content" style="min-height: 100px">
         <div class="row">
           {{ club.description|markdownify }}
@@ -52,7 +52,7 @@
     <picture>
       <source srcset="{% static 'img/banner.avif' %}" type="image/avif">
       <source srcset="{% static 'img/banner.webp' %}" type="image/webp">
-      {# djlint:off #}<img src="{% static 'img/banner.jpg' %}?v=20230113" alt="Banner" style="width: 100%; max-width: 1024px">{# djlint:on #}
+      {# djlint:off H006 #}<img src="{% static 'img/banner.jpg' %}?v=20230113" alt="Banner" style="width: 100%; max-width: 1024px">{# djlint:on #}
     </picture>
   </div>
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 0 V1 H1"/></svg>

@@ -1,5 +1,5 @@
 {% extends "dashboard/account_edit.html" %}
-{% load static i18n compress %}
+{% load static compress %}
 
 {% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
@@ -15,9 +15,7 @@
 {% endcompress %}
 {{ block.super }}
 <div id="webauthn-undefined-error" style="display: none">
-    {% blocktrans %}
     This browser is not among the <a href="https://caniuse.com/webauthn" target="_blank">
     list of browsers that support WebAuthn security keys.</a>
-    {% endblocktrans %}
 </div>
-{% endblock %}
+{% endblock extra_body %}

@@ -1,9 +1,7 @@
 {% extends "rest_framework/base.html" %}
 
-{% block title %}{% if name %}{{ name }} – {% endif %}{{site.name}} API{% endblock %}
+{% block title %}{% if name %}{{ name }} – {% endif %}{{ site.name }} API{% endblock title %}
 
 {% block branding %}
-  <a class='navbar-brand' rel="nofollow" href='https://{{site.domain}}'>
-    {{site.name}} API
-  </a>
-{% endblock %}
+<a class="navbar-brand" rel="nofollow" href="https://{{ site.domain }}">{{ site.name }} API</a>
+{% endblock branding %}
