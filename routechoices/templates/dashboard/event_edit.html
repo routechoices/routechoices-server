@@ -52,7 +52,7 @@
             <h4>Extra Maps</h4>
             <div class="form-text">Extra maps can be used for example if the route is split in multiple parts</div>
             {% bootstrap_formset_errors extra_map_formset %}
-            <table class="table">
+            <table class="table map_table">
                 {{ extra_map_formset.management_form }}
                 {% for form in extra_map_formset %}
                 {% if forloop.first %}

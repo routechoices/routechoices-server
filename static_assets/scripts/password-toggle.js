@@ -1,15 +1,8 @@
 (function () {
-  var feedback = u("input[type='password']").parent().find(".invalid-feedback");
-  console.log("ff", feedback);
+  var feedback = u("input[type='password']").hasClass("is-invalid");
   u("input[type='password']").wrap(
-    `<div class="input-group mb-3${
-      feedback.nodes.length !== 0 ? " has-validation" : ""
-    }"></div>`
+    `<div class="input-group${feedback ? " is-invalid" : ""}">`
   );
-  if (feedback) {
-    u("input[type='password']").parent().append(feedback.first());
-    feedback.remove();
-  }
   u("input[type='password']").after(
     '<span class="input-group-text togglePassword" style="cursor: pointer"><i class="fa-regular fa-fw fa-eye"></i></span>'
   );

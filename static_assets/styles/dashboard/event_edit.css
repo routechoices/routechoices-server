@@ -81,7 +81,89 @@
   .competitor_table td:nth-of-type(4):before {
     content: "Start time (UTC)";
   }
+  .competitor_table td:nth-of-type(4) {
+    height: 5.5em;
+  }
   .competitor_table td:nth-of-type(5):before {
+    content: "Delete";
+  }
+}
+
+.map_table > thead > tr > th:nth-child(2) {
+  min-width: 150px;
+}
+.map_table > thead > tr > th:nth-child(3) {
+  min-width: 150px;
+}
+
+@media only screen and (max-width: 1024px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
+  /* Force table to not be like tables anymore */
+  table.map_table,
+  .map_table thead,
+  .map_table tbody,
+  .map_table th,
+  .map_table td,
+  .map_table tr {
+    display: block;
+  }
+
+  /* Hide table headers (but not display: none;, for accessibility) */
+  .map_table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .map_table tr {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 5px;
+  }
+
+  .map_table td {
+    /* Behave  like a "row" */
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 70px;
+  }
+
+  .map_table td:before {
+    /* Now like a table header */
+    position: absolute;
+    /* Top/left values mimic padding */
+    top: 6px;
+    left: 6px;
+    width: 65px;
+    padding-right: 10px;
+    white-space: nowrap;
+  }
+
+  .map_table tr:last-of-type {
+    border: none;
+  }
+
+  .map_table tr:last-of-type td {
+    padding-left: 0px;
+  }
+
+  .map_table tr:last-of-type td:before {
+    width: 0px;
+  }
+
+  /*
+  Label the data
+  */
+  .map_table tr:not(:last-child) td:nth-of-type(1):before {
+    content: "Map";
+    font-weight: bold;
+  }
+  .map_table td:nth-of-type(2):before {
+    content: "Title";
+    font-weight: bold;
+  }
+  .map_table td:nth-of-type(3):before {
     content: "Delete";
   }
 }

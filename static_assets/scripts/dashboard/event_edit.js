@@ -535,7 +535,6 @@ function showLocalTime(el) {
     });
 
   u("#id_backdrop_map").parent().before("<hr/><h3>Maps</h3>");
-
   u("#id_privacy").on("change", function (e) {
     displayRoutechoicesListedOption(e.target.value, false);
   });
