@@ -1,12 +1,12 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 hosts qr_code compress %}
 
-{%  block extra_head %}
+{% block extra_head %}
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}"/>
 {% endcompress %}
-{%  endblock %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
@@ -15,7 +15,7 @@
         <div  class="text-center d-flex">
             <div><p>{% qr_from_text event_set.shortcut size="t" image_format="png" error_correction="l" %}<br><small><a class="small qrUrlText fw-bold" href="{{ event_set.shortcut }}">{{ event_set.shortcut_text }}</a></small></p></div>
         </div>
-        {% endif%}
+        {% endif %}
         <h1>{% if context == 'edit' %}Edit Event Set{% else %}New Event Set{% endif %}</h1>
         <form action="" method="post">
             {% csrf_token %}
@@ -30,12 +30,12 @@
 {% if event_set.events.all %}
 <h4>Contains following events</h4>
 <ul>
-{% for event in event_set.events.all %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{event.name}}</a></li>{% endfor %}
+{% for event in event_set.events.all %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></li>{% endfor %}
 </ul>{% else %}
 <h4>Not used in any events</h4>
 {% endif %}
 {% endif %}
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 <script
@@ -48,4 +48,4 @@
 <script src="{% static '/scripts/dashboard/event_set_edit.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

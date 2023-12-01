@@ -1,10 +1,10 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 hosts compress %}
 
-{%  block extra_head %}
+{% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
-{%  endblock %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
@@ -36,7 +36,7 @@
         </form>
     </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
@@ -51,5 +51,4 @@
 <script src="{% static '/vendor/papaparse-5.3.2/papaparse.min.js' %}"></script>
 <script src="{% static '/scripts/dashboard/device_add.js' %}"></script>
 {% endcompress %}
-
-{%  endblock %}
+{% endblock extra_body %}

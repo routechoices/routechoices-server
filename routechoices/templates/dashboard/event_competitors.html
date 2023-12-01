@@ -1,29 +1,29 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 hosts compress %}
 
-{%  block extra_head %}
+{% block extra_head %}
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 <link rel="stylesheet" href="{% static '/vendor/tempus-dominus-6-custom-2/css/tempus-dominus.css' %}"/>
 <link rel="stylesheet" href="{% static 'styles/dashboard/event_edit.css' %}"/>
 {% endcompress %}
-{%  endblock %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
     <div class="col-12">
         <h1>Edit competitors <small><span class="utc-offset"></span></small></h1>
-        <h3>{{event.name}}</h3>
+        <h3>{{ event.name }}</h3>
         <hr/>
         <div class="mb-3">
-            <form method="GET" class="row">
-            <div class="col-auto">
-                <input class="form-control" type="search" value="{{search_query}}" name="q" placeholder="Search term"/>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-            </div>
+            <form method="get" class="row">
+                <div class="col-auto">
+                    <input class="form-control" type="search" value="{{ search_query }}" name="q" placeholder="Search term"/>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </div>
             </form>
         </div>
         {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
@@ -61,13 +61,13 @@
             {% endfor %}
             </table>
             {% if competitors.paginator.num_pages > 1 %}{% bootstrap_pagination competitors extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
-            <button class="btn btn-primary mb-1" type="submit" class="save btn btn-secondary" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button type="submit" class="save btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         </form>
     </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
-{%  block extra_body %}
+{% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
 {% compress js %}
 <script src="{% static '/vendor/jquery-3.6.3/jquery.min.js' %}"></script>
@@ -81,4 +81,4 @@
 <script src="{% static '/scripts/dashboard/event_competitors.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{%  endblock %}
+{% endblock extra_body %}

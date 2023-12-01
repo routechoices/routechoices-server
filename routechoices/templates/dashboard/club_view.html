@@ -1,24 +1,24 @@
 {% extends "dashboard/home.html" %}
 {% load static django_bootstrap5 hosts compress %}
 
-{%  block extra_head %}
+{% block extra_head %}
 {{ block.super }}
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}"/>
 {% endcompress %}
-{%  endblock %}
+{% endblock extra_head %}
 
 {% block sub_content %}
 <div class="row">
     <div class="col-12">
-        <h1><img src="{% if club.logo %}{{club.logo_url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80px" height="80px" alt="Club {{ club.name }} Logo" class="rounded"> {{ club.name }}</h1>
+        <h1><img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80px" height="80px" alt="Club {{ club.name }} Logo" class="rounded"> {{ club.name }}</h1>
     </div>
 </div>
 <a class="btn btn-success btn-sm mb-3" href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
 {% if not club.upgraded %}
 <p class="p-1 text-center" style="background: linear-gradient(120deg, #98d6a699 0%, #98cdd699 100%);">
-  Support the platform, <a href="{% url 'dashboard:upgrade'%}">Become Partner!</a>
+  Support the platform, <a href="{% url 'dashboard:upgrade' %}">Become Partner!</a>
 </p>
 {% endif %}
 <ul class="nav nav-tabs mb-3">
@@ -31,14 +31,14 @@
 {% block sub_sub_content %}
 <p>Club page hosted at <a href="{{ club.nice_url }}">{{ club.nice_url }}</a> </p>
 <p>
-  <a class="btn btn-info mb-1 me-1" href="{% url 'dashboard:club_custom_domain_view'%}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
+  <a class="btn btn-info mb-1 me-1" href="{% url 'dashboard:club_custom_domain_view' %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
   {% if club.analytics_site %}
   <a href="{{ club.analytics_site }}" class="btn btn-info mb-1"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a>
   {% endif %}
 </p>
 <hr/>
 <h3>Edit info</h3>
-<p id="invite-btn"><a class="btn btn-info mb-1" href="{% url 'dashboard:club_invite_add_view'%}"><i class="fa-solid fa-user-plus"></i> Invite more people</a></p>
+<p id="invite-btn"><a class="btn btn-info mb-1" href="{% url 'dashboard:club_invite_add_view' %}"><i class="fa-solid fa-user-plus"></i> Invite more people</a></p>
 <form action="" method="post" enctype="multipart/form-data" id="change_form">
   {% csrf_token %}
   {% bootstrap_form form %}
@@ -51,8 +51,8 @@
   Thank you for being a partner! You can manage your subscription on <a href="https://store.routechoices.com/billing" target="_blank">LemonSqueezy</a>.
 </p>
 {% endif %}
-{% endblock %}
-{% endblock %}
+{% endblock sub_sub_content %}
+{% endblock sub_content %}
 
 {% block extra_body %}
 {% if request.resolver_match.view_name == 'dashboard:club_view' %}
@@ -72,4 +72,4 @@
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
 {% endif %}
-{% endblock %}
+{% endblock extra_body %}

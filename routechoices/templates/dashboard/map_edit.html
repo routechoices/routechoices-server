@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css' %}" />
 <link rel="stylesheet" href="{% static 'styles/dashboard/map_edit.css' %}" />
 {% endcompress %}
-{% endblock %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
@@ -33,7 +33,7 @@
     {% if used_in %}
     <h4>Used in following events</h4>
       <ul>
-        {% for event in used_in %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{event.name}}</a></li>{% endfor %}
+        {% for event in used_in %}<li><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></li>{% endfor %}
       </ul>{% else %}
     <h4>Not used in any events</h4>
     {% endif %}
@@ -79,7 +79,7 @@
           <button type="button" id="close-calibration-button" class="btn btn-danger mb-1 me-1" role="button"><i class="fa-solid fa-circle-arrow-left"></i> Back</button>
           <button type="button" id="to-calibration-step-2-button" class="d-none btn btn-primary me-1 mb-1" role="button"><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
           <span id="to-calibration-step-2-button-disabled" class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="First, select 4 distincts points on the raster map and on the world map!">
-            <button type="button"class="btn btn-primary disabled mb-1" type="button" disabled><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
+            <button type="button"class="btn btn-primary disabled mb-1" disabled><i class="fa-solid fa-magnifying-glass"></i> Preview Map</button>
           </span>
         </div>
       </div>
@@ -99,7 +99,7 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 {% compress js %}
@@ -114,4 +114,4 @@
 <script src="{% static '/scripts/dashboard/map_edit.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

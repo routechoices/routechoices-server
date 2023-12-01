@@ -1,30 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" style="font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', Avenir, 'Nimbus Sans L', Roboto, 'Noto Sans', 'Segoe UI', Arial, Helvetica, 'Helvetica Neue', sans-serif;scroll-behavior: smooth;">
+{# djlint:off H030,H031 #}<html lang="en" style="font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', Avenir, 'Nimbus Sans L', Roboto, 'Noto Sans', 'Segoe UI', Arial, Helvetica, 'Helvetica Neue', sans-serif;scroll-behavior: smooth;">{# djlint:on #}
 <head>
-	<title></title>
+  <title>Email</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="margin:0; padding: 0;color: #212121;background-color: #fff;font-size: 1.15rem;line-height: 1.5;display: grid;grid-template-columns: 1fr min(45rem, 90%) 1fr;margin: 0;">
     <header style="grid-column: 2;background-color: #000; color: #fff; text-align: center;padding: 0 0.5rem 2rem 0.5rem;grid-column: 1 / -1;">
     {% block header %}
-    <h1 style="margin-block-start: 2rem;max-width: 1200px;margin: 1rem auto;font-size: 3rem;overflow-wrap: break-word;"><img style="height: 75px; vertical-align: -18px;" src="https://cdn.routechoic.es/img/logo.png"/> {{ current_site.name }}</h1>
+    <h1 style="margin-block-start: 2rem;max-width: 1200px;margin: 1rem auto;font-size: 3rem;overflow-wrap: break-word;"><img width="75" height="75" alt="{{ site.name }}'s logo" style="vertical-align: -18px;" src="https://cdn.routechoic.es/img/logo.png"/> {{ current_site.name }}</h1>
     <p style="margin-block-start: 2rem;max-width: 40rem;margin: 1rem auto;overflow-wrap: break-word;">A quick message from {{ current_site.domain }}</p>
-    {% endblock %}
+    {% endblock header %}
   </header>
 
   <main style="grid-column: 2;padding-top: 1.5rem;">
     {% block main %}
-    {% endblock %}
+    {% endblock main %}
     {% block greeting %}
     <p style="margin: 1.5rem 0;overflow-wrap: break-word;">Thank you for using {{ current_site.name }}!</p>
-    {% endblock %}
+    {% endblock greeting %}
   </main>
 
   <footer style="grid-column: 2;margin-top: 4rem;padding: 2rem 1rem 1.5rem 1rem;color: #585858;font-size: 0.9rem;text-align: center; border-top: 1px solid #898EA4;">
     {% block footer %}
-    <p style="margin: 1.5rem 0;overflow-wrap: break-word;">{{current_site.domain}}</p>
-    {% endblock %}
+    <p style="margin: 1.5rem 0;overflow-wrap: break-word;">{{ current_site.domain }}</p>
+    {% endblock footer %}
   </footer>
 </body>
 </html>

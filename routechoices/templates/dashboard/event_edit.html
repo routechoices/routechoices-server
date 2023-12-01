@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static '/vendor/tempus-dominus-6-custom-2/css/tempus-dominus.css' %}" />
 <link rel="stylesheet" href="{% static 'styles/dashboard/event_edit.css' %}" />
 {% endcompress %}
-{% endblock %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
@@ -23,16 +23,16 @@
                 </p>
             </div>
         </div>
-        {% endif%}
+        {% endif %}
         <div>
             <div class="mb-2">
                 <h6>Links for all</h6>
                 <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1 me-1"><i class="fa-solid fa-right-to-bracket"></i> Event Page</a>
                 {% if not event.hidden %}
-                <a href="{{event.club.nice_url}}{{event.slug}}/export" class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-floppy-disk"></i> Export Page</a>
+                <a href="{{ event.club.nice_url }}{{ event.slug }}/export" class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-floppy-disk"></i> Export Page</a>
                 {% endif %}
                 {% if event.started and event.allow_route_upload or event.open_registration and not event.ended %}
-                <a href="{{event.club.nice_url}}{{event.slug}}/contribute" class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
+                <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute" class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
                 {% endif %}
             </div>
             <div class="mb-2">
@@ -44,7 +44,7 @@
             </div>
         </div>
         <hr />
-        {% endif%}
+        {% endif %}
         <h1>{% if context == 'edit' %}Edit Event{% else %}New Event{% endif %} <small><span class="utc-offset"></span></small></h1>
         <form action="" method="post">
             {% csrf_token %}
@@ -125,7 +125,7 @@
                 <div id="iof-step-2" class="d-none">
                     <label for="iof_class_input" class="form-label">Select Class</label>
                     <select type="select" name="iof_class_input" id="iof_class_input" class="form-control mb-1"></select>
-                    <a class="btn btn-info me-1" id="iof-class-submit-btn" href="javascript:void(0)">Import</a><a class="btn btn-danger" id="iof-class-cancel-btn" href="javascript:void(0)">Cancel</a>
+                    <button class="btn btn-info me-1" id="iof-class-submit-btn" type="button">Import</button><button class="btn btn-danger" id="iof-class-cancel-btn" type="button">Cancel</button>
                 </div>
             </div>
             <hr />
@@ -149,7 +149,7 @@
         </form>
     </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
@@ -168,4 +168,4 @@
 <script src="{% static '/scripts/dashboard/common.js' %}"></script>
 <script src="{% static '/scripts/dashboard/event_edit.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

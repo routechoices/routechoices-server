@@ -1,4 +1,1 @@
-{% load i18n %}
-{% autoescape off %}
-{% blocktrans %}An invalid invitation key was submitted.{% endblocktrans %}
-{% endautoescape %}
+An invalid invitation key was submitted.

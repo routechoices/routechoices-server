@@ -1,8 +1,7 @@
 {% extends "account/base.html" %}
-{% load i18n account %}
+{% load account %}
 
-{% block head_title %}{% trans "Confirm E-mail Address" %}{% endblock %}
-
+{% block head_title %}Confirm E-mail Address{% endblock head_title %}
 
 {% block content %}
 <div class="container">
@@ -10,23 +9,23 @@
       <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
         <div class="card border-0 shadow rounded-3 my-5">
           <div class="card-body p-4 p-sm-5">
-            <h3 class="card-title text-center mb-5">{% trans "Confirm E-mail Address" %}</h3>
+            <h3 class="card-title text-center mb-5">Confirm E-mail Address</h3>
             {% if confirmation %}
             {% user_display confirmation.email_address.user as user_display %}
-            <p>{% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endblocktrans %}</p>
+            <p>Please confirm that <a href="mailto:{{ confirmation.email_address.email }}">{{ confirmation.email_address.email }}</a> is an e-mail address for user {{ user_display }}.</p>
             <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
                 {% csrf_token %}
                 <div class="d-grid">
-                    <button class="primaryAction btn btn-primary" type="submit">{% trans 'Confirm' %}</button>
+                    <button class="primaryAction btn btn-primary" type="submit">Confirm</button>
                 </div>
             </form>
             {% else %}
             {% url 'dashboard:account_emails' as email_url %}
-            <p>{% blocktrans %}This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.{% endblocktrans %}</p>
+            <p>This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.</p>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

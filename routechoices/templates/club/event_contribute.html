@@ -1,13 +1,13 @@
 {% extends "club/base.html" %}
 {% load static hosts django_bootstrap5 compress %}
 
-{%  block extra_head %}
+{% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
-{%  endblock %}
+{% endblock extra_head %}
 
-{% block head_title %}{{ event.name }} contribution page | Powered by {{ site.name }}{% endblock %}
-{% block head_description %}{{ event.name }} by {{ event.club.name }} contribution page{% endblock %}
+{% block head_title %}{{ event.name }} contribution page | Powered by {{ site.name }}{% endblock head_title %}
+{% block head_description %}{{ event.name }} by {{ event.club.name }} contribution page{% endblock head_description %}
 
 {% block contentup %}
 <div class="container-fluid p-0">
@@ -16,10 +16,10 @@
       <div class="container content">
         <div class="row">
           {% if event.event_set %}<h2 class="padded-multiline"><span>{{ event.event_set.name }}</span></h2>{% endif %}
-          <h2><a href="{{event.club.nice_url}}{{event.slug}}" class="fw-bold text-decoration-none">{{ event.name }}</a></h2>
+          <h2><a href="{{ event.club.nice_url }}{{ event.slug }}" class="fw-bold text-decoration-none">{{ event.name }}</a></h2>
           <h4>Contribute</h4>
           <p>
-            Event {% if not event.hidden %}started {{event.start_date|timesince}} ago{% else %}starts on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}{% if event.ended %}, ended {{event.start_date|timesince}} ago{% endif %}.
+            Event {% if not event.hidden %}started {{ event.start_date|timesince }} ago{% else %}starts on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>{% endif %}{% if event.ended %}, ended {{ event.start_date|timesince }} ago{% endif %}.
           </p>
         </div>
       </div>
@@ -36,7 +36,7 @@
         <form action="" method="post" id="registration-form">
           {% csrf_token %}
           {% bootstrap_form register_form %}
-          <p id="warning-if-device-id" class="d-none"><i class="fa-solid fa-triangle-exclamation"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{event.start_date|date:'c'}}">{{ event.start_date }} UTC</span>{% endif %}.</p>
+          <p id="warning-if-device-id" class="d-none"><i class="fa-solid fa-triangle-exclamation"></i> You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream from this device will be switched to this event competitor {% if not event.hidden %}immediately{% else %}at latest on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>{% endif %}.</p>
           <input type="submit" value="Add competitor" class="btn btn-primary">
         </form>
       </div>
@@ -68,7 +68,7 @@
   </div>
   {% endif %}
 </div>
-{% endblock %}
+{% endblock contentup %}
 
 {% block extra_body %}
 {{ block.super }}
@@ -85,4 +85,4 @@
 <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
 <script src="{% static '/scripts/club/event_contribute.js' %}" ></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

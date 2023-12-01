@@ -5,7 +5,7 @@
 {% compress css %}
 <link rel="stylesheet" href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
 {% endcompress %}
-{% endblock %}
+{% endblock extra_head %}
 
 {% block content %}
   <div class="row">
@@ -20,7 +20,7 @@
             <div class="row">
               <div class="col-12">
                 {% block sub_content %}
-                {% endblock %}
+                {% endblock sub_content %}
               </div>
             </div><!--/.col-12.col-sm-9-->
           </div>
@@ -28,4 +28,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}

@@ -18,12 +18,10 @@
               </div>
           </form>
           {% endif %}
-
           {% if forms.totp %}
           {% if forms.webauthn %}<hr/>{% endif %}
           <div class="method totp">
             <p>Enter an Authenticator (TOTP) Token:</p>
-
             <form method="post">
               {% csrf_token %}
               {% bootstrap_form forms.totp %}
@@ -33,12 +31,10 @@
             </form>
           </div>
           {% endif %}
-
           {% if forms.backup %}
           {% if forms.webauthn or forms.totp %}<hr/>{% endif %}
           <div class="method backup">
             <p>Use a backup code:</p>
-
             <form method="post">
               {% csrf_token %}
               {% bootstrap_form forms.backup %}

@@ -21,14 +21,14 @@
         <button type="submit" class="btn btn-primary mb-1 me-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         <a href="{% url 'dashboard:account_delete_view' %}" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete account</a>
     </form>
-{% endblock %}
+{% endblock sub_sub_content %}
     </div>
 </div>
-{% endblock %}
+{% endblock sub_content %}
 
 {% block extra_body %}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

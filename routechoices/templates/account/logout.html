@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load compress static i18n %}
 
-{% block head_title %}{% trans "Logout" %}{% endblock %}
+{% block head_title %}{% trans "Logout" %}{% endblock head_title %}
 
 {% block content %}
 <div class="container">
@@ -16,7 +16,7 @@
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
             {% endif %}
             <div class="d-grid">
-              <button class="btn btn-danger" type="submit" id="submit-btn">{% trans 'Logout' %} <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+              <button class="btn btn-danger" type="submit" id="submit-btn">{% trans "Logout" %} <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
             </div>
           </form>
         </div>
@@ -24,8 +24,11 @@
     </div>
   </div>
 </div>
+{% endblock content %}
+
+{% block extra_body %}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

@@ -1,8 +1,8 @@
 {% extends "club/base.html" %}
 {% load static django_bootstrap5 hosts compress %}
 
-{% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock %}
-{% block head_description %}GPS Tracking of {{ event.name }} by {{ event.club.name }}{% endblock %}
+{% block head_title %}{{ event.name }} | Powered by {{ site.name }}{% endblock head_title %}
+{% block head_description %}GPS Tracking of {{ event.name }} by {{ event.club.name }}{% endblock head_description %}
 
 {% block extra_head %}
 <meta property="og:title" content="{{ event.name }}" />
@@ -12,10 +12,10 @@
 <meta property="og:description" content="Live GPS Tracking of {{ event.name }} by {{ event.club.name }}" />
 <meta property="og:url" content="{{ event.get_absolute_url }}" />
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:image" content="{{event.club.nice_url}}{{event.slug}}/thumbnail" />
+<meta property="og:image" content="{{ event.club.nice_url }}{{ event.slug }}/thumbnail" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-{% if request.is_secure %}<meta property="og:image:secure_url" content="{{event.club.nice_url}}{{event.slug}}/thumbnail" />{% endif %}
+{% if request.is_secure %}<meta property="og:image:secure_url" content="{{ event.club.nice_url }}{{ event.slug }}/thumbnail" />{% endif %}
 <link rel="canonical" href="{{ event.get_absolute_url }}">
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css' %}"/>
@@ -24,8 +24,7 @@
 <link rel="stylesheet" href="{% static '/vendor/leaflet-mapcentercoord-0.7/L.Control.MapCenterCoord.min.css' %}" />
 <link rel="stylesheet" href="{% static 'styles/club/event.css' %}" />
 {% endcompress %}
-{% endblock %}
-
+{% endblock extra_head %}
 
 {% block body %}
 <!-- Fixed navbar -->
@@ -103,7 +102,7 @@
       </div>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="1em" preserveAspectRatio="none" fill="#fff" style="margin-top: -1em;" class="p-0"><path d="M0 0 V1 H1"></path></svg>
       <div class="modal-body text-center">
-        <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{event.start_date}} UTC</span></h4>
+        <h4 id="event-start-date-text">Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span></h4>
       </div>
     </div>
   </div>
@@ -114,14 +113,14 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="colorModalLabel"></span></h5>
+        <h5 class="modal-title" id="colorModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div id="color-picker" class="text-center"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id=""><i class="fa-solid fa-xmark"></i> <span class="cancel-text">Cancel</span></button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> <span class="cancel-text">Cancel</span></button>
         <button type="button" class="btn btn-primary" id="save-color"><i class="fa-solid fa-floppy-disk"></i> <span class="save-text">Save</span></button>
       </div>
     </div>
@@ -138,7 +137,7 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock body %}
 
 {% block extra_body %}{{ block.super }}
 <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
@@ -174,4 +173,4 @@
 <script src="{% static '/scripts/club/event-core.js' %}"></script>
 <script src="{% static '/scripts/club/event.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

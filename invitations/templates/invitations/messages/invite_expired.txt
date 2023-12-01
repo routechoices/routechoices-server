@@ -1,4 +1,1 @@
-{% load i18n %}
-{% autoescape off %}
-{% blocktrans %}The invitation to {{ club }} for {{ email }} has expired.{% endblocktrans %}
-{% endautoescape %}
+The invitation to {{ club }} for {{ email }} has expired.

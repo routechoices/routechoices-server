@@ -6,7 +6,8 @@
 <style>
   .club-card:hover{box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;}
 </style>
-{% endblock %}
+{% endblock extra_head %}
+
 {% block sub_content %}
 <div class="row">
   <div class="col-12">
@@ -15,24 +16,24 @@
       <h3>Welcome to your dashboard.</h3>
       <p>It seems you don't have a club yet! No worries...</p>
       <p>
-        You can: <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+        You can: <a href="{% url 'dashboard:club_create_view' %}" class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
       </p>
-      <p>Or request another user to add your username "{{request.user.username }}" to the list of admins of theirs.</p>
+      <p>Or request another user to add your username "{{ request.user.username }}" to the list of admins of theirs.</p>
     </div>
     {% else %}
     <h3>Select one of your club</h3>
-    <a href="{% url 'dashboard:club_create_view'%}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+    <a href="{% url 'dashboard:club_create_view' %}" class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
     {% if clubs.paginator.num_pages > 1 %}{% bootstrap_pagination clubs extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
     {% for club in clubs %}
     <div class="card flex-row flex-no-wrap club-card mb-3">
       <div class="border-0">
-        <img class="card-img-left" style="border-radius: 0.375rem 0 0 0.375rem;" src="{% if club.logo %}{{club.logo_url}}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" width="80px" alt="Club {{ club.name }} Logo">
+        <img class="card-img-left" style="border-radius: 0.375rem 0 0 0.375rem;" src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" width="80px" alt="Club {{ club.name }} Logo">
       </div>
       <div class="card-body px-2" style="word-break: break-all">
         <div class="d-flex flex-row bd-highlight justify-content-between">
           <div class="p-2 bd-highlight">
             <div>
-              <a class="link-primary stretched-link text-decoration-none fw-bold" style="font-size: 1.2rem" href="{% url 'dashboard:club_set_view' club_id=club.aid %}?next={{next}}">{{ club.name }}</a>
+              <a class="link-primary stretched-link text-decoration-none fw-bold" style="font-size: 1.2rem" href="{% url 'dashboard:club_set_view' club_id=club.aid %}?next={{ next }}">{{ club.name }}</a>
             </div>
           </div>
         </div>
@@ -43,4 +44,4 @@
   {% endif %}
   </div>
 </div>
-{% endblock %}
+{% endblock sub_content %}

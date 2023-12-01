@@ -1,4 +1,1 @@
-{% load i18n %}
-{% autoescape off %}
-{% blocktrans %}The invitation to {{ club }} for {{ email }} was already accepted.{% endblocktrans %}
-{% endautoescape %}
+The invitation to {{ club }} for {{ email }} was already accepted.

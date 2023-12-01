@@ -1,12 +1,13 @@
 {% load static django_bootstrap5 compress %}<!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Competitors of {{event.name}}</title>
+<meta name="description" content="Competitor listing">
+<meta name="keywords" content="competitor,startlist,list,starts" />
+<title>Competitors of {{ event.name }}</title>
 {% compress css %}
 <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}"/>
-{% endcompress %}
 <style>
     @media print {
         body {
@@ -14,12 +15,13 @@
         }
     }
 </style>
+{% endcompress %}
 </head>
 <body>
 <div class="container">
 <div class="row">
     <div class="col-12">
-        <h3>Competitors of {{event.name}} <button id="print-btn" class="btn btn-success d-print-none mb-1" type="button">Print</button></h3>
+        <h3>Competitors of {{ event.name }} <button id="print-btn" class="btn btn-success d-print-none mb-1" type="button">Print</button></h3>
         <table class="table competitor_table">
             <thead>
                 <tr>
@@ -31,13 +33,13 @@
             {% for competitor in competitors %}
                 <tr class="competitor">
                     <td>
-                        {{competitor.name}}
+                        {{ competitor.name }}
                     </td>
                     <td >
-                        {{competitor.device_display_str}}
+                        {{ competitor.device_display_str }}
                     </td>
                     <td>
-                        <span class="date-utc text-nowrap" data-date="{{competitor.start_time|date:"c"}}">{{competitor.start_time|date:'Y-m-d H:i:s'}} UTC</span>
+                        <span class="date-utc text-nowrap" data-date="{{ competitor.start_time|date:"c" }}">{{ competitor.start_time|date:'Y-m-d H:i:s' }} UTC</span>
                     </td>
                 </tr>
             {% endfor %}

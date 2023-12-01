@@ -1,20 +1,20 @@
 {% extends "dashboard/club_view.html" %}
 {% load static compress %}
 
-{%block extra_head%}
+{% block extra_head %}
 {% compress css %}
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css'%}"/>
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css'%}"/>
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-locate-control-0.79.0/L.Control.Locate.min.css'%}"/>
-    <link rel="stylesheet" href="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.css'%}"/>
-{% endcompress %}
+<link rel="stylesheet" href="{% static '/vendor/leaflet-1.9.4/leaflet.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-control-geocoder-2.4.0/Control.Geocoder.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-locate-control-0.79.0/L.Control.Locate.min.css' %}"/>
+<link rel="stylesheet" href="{% static '/vendor/leaflet-draw-1.0.4/leaflet.draw.css' %}"/>
 <style>
-    #map {
-        width: 100%;
-        height: 500px;
-    }
+#map {
+    width: 100%;
+    height: 500px;
+}
 </style>
-{% endblock %}
+{% endcompress %}
+{% endblock extra_head %}
 
 {% block sub_sub_content %}
 <div class="row">
@@ -28,7 +28,7 @@
         </form>
     </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 {% compress js %}
@@ -41,4 +41,4 @@
 <script src="{% static '/scripts/dashboard/map_draw.js'%}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

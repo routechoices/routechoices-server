@@ -13,7 +13,6 @@
         </form>
     </div>
 </div>
-
 <div class="modal fade" id="howToKMZModal" tabindex="-1" role="dialog" aria-labelledby="howToKMZModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -23,9 +22,9 @@
         </div>
         <div class="modal-body">
             <video playsinline autoplay muted loop width="100%">
-              <source src="{% static 'img/export_kmz.av1.mp4'%}" type="video/mp4; codecs=av01.0.05M.08"/>
-              <source src="{% static 'img/export_kmz.webm'%}" type="video/webm">
-              <img src="{% static "img/export_kmz.gif"%}" loading="lazy"/>
+              <source src="{% static 'img/export_kmz.av1.mp4' %}" type="video/mp4; codecs=av01.0.05M.08"/>
+              <source src="{% static 'img/export_kmz.webm' %}" type="video/webm">
+              {# djlint:off H006 #}<img src="{% static "img/export_kmz.gif" %}" alt="how to export a kmz file from ocad" loading="lazy"/>{# djlint:on #}
             </video>
         </div>
         <div class="modal-footer">
@@ -34,7 +33,7 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock sub_sub_content %}
 
 {% block extra_body %}
 {% compress js %}
@@ -43,4 +42,4 @@
 <script src="{% static '/scripts/dashboard/map_kmz_upload.js' %}"></script>
 <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

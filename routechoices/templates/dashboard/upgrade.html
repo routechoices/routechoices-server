@@ -10,7 +10,7 @@
         <br>
         <br>
         To keep the servers running we offer you the opportunity to become partner.<br>
-        You'll get your club's name featured both on the <a href="/#partners">front page</a> and a <a href="/pricing#partners">dedicated space</a>. You'll ensure the sustainability of the site in the long term.
+        You'll get your club's name featured both on the <a href="{% url 'site:home_view' %}#partners">front page</a> and a <a href="{% url 'site:pricing_view' %}#partners">dedicated space</a>. You'll ensure the sustainability of the site in the long term.
     </p>
     <p>
         <b>
@@ -48,7 +48,7 @@
         <h5 class="modal-title" id="contributeModalLabel">Become an partner club</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="POST" action="/pricing">
+      <form method="post" action="{% url 'site:pricing_view' %}">
         <div class="modal-body">
             <h6>Please enter how much you want to contribute per month.</h6>
             <div class="input-group mb-3">
@@ -59,7 +59,7 @@
                 <input class="form-check-input" type="checkbox" id="per-year" name="per-year">
                 <label class="form-check-label" for="per-year"> One payment per year <span id="price-per-year"></span></label>
             </div>
-            <input type="hidden" value="{{club.slug}}" name="club">
+            <input type="hidden" value="{{ club.slug }}" name="club">
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -74,11 +74,11 @@
     <h4>You are already a {{ site.name }}'s Partner. We thank you sincerly!</h4>
     {% endif %}
 </content>
-{% endblock %}
+{% endblock sub_content %}
 
 {% block extra_body %}
 {% compress js %}
 <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
 <script src="{% static '/scripts/site/pricing.js' %}"></script>
 {% endcompress %}
-{% endblock %}
+{% endblock extra_body %}

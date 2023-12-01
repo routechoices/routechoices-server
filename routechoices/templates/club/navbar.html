@@ -7,16 +7,16 @@
 <header class="navbar navbar-expand-md navbar-dark bg-primary" style="z-index: 110001;padding: 3px 0;color: #fff;background-color: #111 !important">
   <div class="container">
     {% if club.logo and club.website %}
-    <a class="navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span class="d-inline-block"><img src="{{club.logo_url}}" alt="{{club.name}}'s logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;" class="rounded"></span></a>
+    <a class="navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span class="d-inline-block"><img src="{{ club.logo_url }}" alt="{{ club.name }}'s logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;" class="rounded"></span></a>
     {% elif club.logo %}
-    <span class="navbar-brand site-name d-inline-block"><img src="{{club.logo_url}}" alt="{{club.name}}'s logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;" class="rounded"></span>
+    <span class="navbar-brand site-name d-inline-block"><img src="{{ club.logo_url }}" alt="{{ club.name }}'s logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;" class="rounded"></span>
     {% elif club.website %}
-    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-house-chimney fa-2x" style="font-size: 1.7rem; vertical-align: -5px"></i></a></span>
+    <a class="navbarchimey navbar-brand site-name" href="{{ club.website }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-house-chimney fa-2x" style="font-size: 1.7rem; vertical-align: -5px"></i></a>
     {% else %}
-    <a class="navbar-brand site-name" href="{% if club %}{{club.nice_url}}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span class="d-inline-block"><img src="{% static 'img/logo.png' %}" alt="Site logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span></a>
+    <a class="navbar-brand site-name" href="{% if club %}{{ club.nice_url }}{% else %}/{% endif %}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><span class="d-inline-block"><img src="{% static 'img/logo.png' %}" alt="Site logo" height="40" width="40" style="margin-top: -10px; margin-bottom: -7px;"></span></a>
     {% endif %}
     {% if club %}
-    <span class="text-nowrap overflow-hidden d-inline-block text-truncate" style="max-width: calc(100% - 120px);" title="{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}">{% if is_event_page %}{{event.name}}{% else %}{{club.name}}{% endif %}</span>
+    <span class="text-nowrap overflow-hidden d-inline-block text-truncate" style="max-width: calc(100% - 120px);" title="{% if is_event_page %}{{ event.name }}{% else %}{{ club.name }}{% endif %}">{% if is_event_page %}{{ event.name }}{% else %}{{ club.name }}{% endif %}</span>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -28,7 +28,7 @@
           <a class="nav-link text-nowrap" href="{{ club.get_absolute_url }}" {% if is_event_page %}target="_blank"{% endif %} rel="noopener noreferrer"><i class="fa-solid fa-compass"></i> <span id="club-events-link-text">Events by {{ club.name }}</span></a>
         </li>{% if is_event_page %}
         <li class="nav-item" id="export-nav-item">
-          <a class="nav-link text-nowrap" href="{{ club.get_absolute_url }}{{event.slug}}/export" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="export-text">Export</span></a>
+          <a class="nav-link text-nowrap" href="{{ club.get_absolute_url }}{{ event.slug }}/export" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="export-text">Export</span></a>
         </li>
         {% endif %}
       </ul>
