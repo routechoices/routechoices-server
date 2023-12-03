@@ -661,7 +661,7 @@ function selectLiveMode(e) {
       fetchCompetitorRoutes();
     }
     currentTime =
-      +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec) + GPS UTC offset
+      +clock.now() - (fetchPositionInterval + 5 + sendInterval + 5) * 1e3; // Delay by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec) + smoothness delay
     if (ts - prevDisplayRefresh > 100) {
       var refreshMeters = ts - prevMeterDisplayRefresh > 500;
       drawCompetitors(refreshMeters);
@@ -753,7 +753,7 @@ function selectReplayMode(e) {
       }
       currentTime = Math.min(+clock.now(), currentTime, maxCTime);
       var liveTime =
-        +clock.now() - (fetchPositionInterval + 5 + sendInterval) * 1e3;
+        +clock.now() - (fetchPositionInterval + 5 + sendInterval + 5) * 1e3;
 
       if (getCompetitionStartDate(true) !== null && currentTime > liveTime) {
         selectLiveMode();

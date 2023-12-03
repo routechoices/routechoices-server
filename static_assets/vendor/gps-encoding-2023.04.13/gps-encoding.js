@@ -89,7 +89,7 @@ var Position = function (t, lat, lon) {
       pc = p.coords,
       r = (timestamp - $t.timestamp) / (p.timestamp - $t.timestamp),
       r_ = 1 - r;
-    return new Position(timestamp, pc.latitude * r + r_ * $tc.latitude, pc.longitude * r + r_ * $tc.longitude);
+    return new Position(timestamp, Math.round((pc.latitude * r + r_ * $tc.latitude) * 1e6) / 1e6, Math.round((pc.longitude * r + r_ * $tc.longitude) * 1e6) / 1e6);
   };
 };
 
