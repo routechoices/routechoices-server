@@ -2355,8 +2355,8 @@ function drawCompetitors(refreshMeters) {
           );
         }
         var loc = route.getByTime(viewedTime);
-        var hasPointLast30sec = route.hasPointInInterval(
-          viewedTime - 30 * 1e3,
+        var hasRecentPoints = route.hasPointInInterval(
+          viewedTime - (sendInterval * 4 + fetchPositionInterval) * 1e3, //kayak
           viewedTime
         );
         if (competitor.focused) {
@@ -2369,7 +2369,7 @@ function drawCompetitors(refreshMeters) {
         }
 
         var isIdle =
-          viewedTime > route.getByIndex(0).timestamp && !hasPointLast30sec;
+          viewedTime > route.getByIndex(0).timestamp && !hasRecentPoints;
         if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
           competitor.idle = isIdle;
           clearCompetitorLayers(competitor);
