@@ -1112,36 +1112,42 @@ def event_data(request, event_id):
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
-    devices = (
+    competitors_id = (c.id for c in competitors)
+
+    # We need this to determine the end time of each of this event's competitors
+    # For each devices used in the event we fetch all the competitors that starts during this event's span
+    # We order the device's competitors by their start time
+    # We then pick and for each of this event competitor the other competitor that comes after its own start time
+    max_end_date = min(event.end_date, now())
+    devices_used = (
         competitor.device_id for competitor in competitors if competitor.device_id
     )
-
-    # we need this to determine the end time of the competitor device stream
-    all_devices_competitors = (
+    competitors_for_devices_during_event = (
         Competitor.objects.filter(
-            start_time__gte=event.start_date, device_id__in=devices
+            start_time__gte=event.start_date,
+            start_time__lte=max_end_date,
+            device_id__in=devices_used,
         )
+        .exclude(id__in=competitors_id)
         .only("device_id", "start_time")
         .order_by("start_time")
     )
     start_times_by_device = {}
-    for competitor in all_devices_competitors:
+    for competitor in competitors_for_devices_during_event:
         start_times_by_device.setdefault(competitor.device_id, [])
         start_times_by_device[competitor.device_id].append(competitor.start_time)
+
     total_nb_pts = 0
     competitors_data = []
+
     for competitor in competitors:
         from_date = competitor.start_time
-        next_competitor_start_time = None
+        end_date = max_end_date
         if competitor.device_id:
             for start_time in start_times_by_device.get(competitor.device_id, []):
-                if start_time > competitor.start_time:
-                    next_competitor_start_time = start_time
+                if from_date < start_time < end_date:
+                    end_date = start_time
                     break
-        end_date = now()
-        if next_competitor_start_time:
-            end_date = min(next_competitor_start_time, end_date)
-        end_date = min(event.end_date, end_date)
         encoded_data = ""
         if competitor.device_id:
             encoded_data, nb_pts = competitor.device.get_locations_between_dates(
