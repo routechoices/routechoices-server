@@ -332,36 +332,42 @@
                             </form>
                             {% if search_text %}Results for search: "<i>{{ search_text }}</i>"{% endif %}
                             {% if years %}
-                                <div>
-                                    {% if year %}
-                                        <a href="{{ home_url }}{% if search_text %}?q={{ search_text|urlencode }}{% endif %}">All</a>
-                                    {% else %}
-                                        All
-                                    {% endif %}
-                                    {% for y in years %}
-                                        &nbsp;
-                                        {% if year == y %}
-                                            {{ y }}
+                                <div class="row" style="text-wrap: balance">
+                                    <p class="mb-1">
+                                        {% if year %}
+                                            <a class="me-1"
+                                               href="{{ home_url }}{% if search_text %}?q={{ search_text|urlencode }}{% endif %}">All</a>
                                         {% else %}
-                                            <a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ y }}">{{ y }}</a>
+                                            <span class="me-1">All</span>
                                         {% endif %}
-                                    {% endfor %}
-                                </div>
-                                {% if year %}
-                                    <div>
-                                        {% if month %}
-                                            <a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}">All</a>
-                                        {% else %}
-                                            All
-                                        {% endif %}
-                                        {% for m in months %}
-                                            &nbsp;
-                                            {% if month == m %}
-                                                {{ month_names|index:m }}
+                                        {% for y in years %}
+                                            {% if year == y %}
+                                                <span class="me-1">{{ y }}</span>
                                             {% else %}
-                                                <a href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}&month={{ m }}">{{ month_names|index:m }}</a>
+                                                <a class="me-1"
+                                                   href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ y }}">{{ y }}</a>
                                             {% endif %}
                                         {% endfor %}
+                                    </p>
+                                </div>
+                                {% if year %}
+                                    <div class="row" style="text-wrap: balance">
+                                        <p class="mb-1">
+                                            {% if month %}
+                                                <a class="me-1"
+                                                   href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}">All</a>
+                                            {% else %}
+                                                <span class="me-1">All</span>
+                                            {% endif %}
+                                            {% for m in months %}
+                                                {% if month == m %}
+                                                    <span class="me-1">{{ month_names|index:m }}</span>
+                                                {% else %}
+                                                    <a class="me-1"
+                                                       href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}&month={{ m }}">{{ month_names|index:m }}</a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </p>
                                     </div>
                                 {% endif %}
                             {% endif %}
