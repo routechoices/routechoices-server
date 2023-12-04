@@ -1,74 +1,72 @@
 {% extends "dashboard/club_view.html" %}
 {% load static hosts compress %}
-
 {% block extra_head %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 {% endblock extra_head %}
-
 {% block sub_sub_content %}
-<div class="row">
-    <div class="col-12">
-        <h1>Create Quick Tracking</h1>
-        <p>Single person GPS tracking without custom maps starting immediately</p>
-        <form action="" id="quick-creation-form">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label fw-bold" required>Person's Name</label>
-                <input type="text" name="name" id="id_name" class="form-control"/>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold" required>Device ID</label>
-                <select name="device_id" id="id_device_id" class="form-select">
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold" required>Background Map</label>
-                <select name="backdrop" id="id_backdrop" class="form-select">
-                    <option value="osm">Open Street Map</option>
-                    <option value="gmap-street">Google Map Street</option>
-                    <option value="gmap-hybrid">Google Map Satellite</option>
-                    <option value="gmap-terrain">Google Map Terrain</option>
-                    <option value="mapant-fi">Mapant Finland</option>
-                    <option value="mapant-no">Mapant Norway</option>
-                    <option value="mapant-es">Mapant Spain</option>
-                    <option value="mapant-se">Mapant Sweden</option>
-                    <option value="mapant-ch">Mapant Switzerland</option>
-                    <option value="topo-fi">Topo Finland</option>
-                    <option value="topo-fr">Topo Finland</option>
-                    <option value="topo-no">Topo Norway</option>
-                    <option value="topo-uk">Topo UK</option>
-                    <option value="topo-world">Topo World (OpenTopo)</option>
-                    <option value="topo-world-alt">Topo World (ArcGIS)</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold">Duration</label>
-                <select name="duration" id="id_duration" class="form-select">
-                    <option value="60">1 hour</option>
-                    <option value="180">3 hours</option>
-                    <option value="300">5 hours</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-circle-plus"></i> Create Quick Tracking</button>
-        </form>
+    <div class="row">
+        <div class="col-12">
+            <h1>Create Quick Tracking</h1>
+            <p>Single person GPS tracking without custom maps starting immediately</p>
+            <form action="" id="quick-creation-form">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold" required>Person's Name</label>
+                    <input type="text" name="name" id="id_name" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" required>Device ID</label>
+                    <select name="device_id" id="id_device_id" class="form-select"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold" required>Background Map</label>
+                    <select name="backdrop" id="id_backdrop" class="form-select">
+                        <option value="osm">Open Street Map</option>
+                        <option value="gmap-street">Google Map Street</option>
+                        <option value="gmap-hybrid">Google Map Satellite</option>
+                        <option value="gmap-terrain">Google Map Terrain</option>
+                        <option value="mapant-fi">Mapant Finland</option>
+                        <option value="mapant-no">Mapant Norway</option>
+                        <option value="mapant-es">Mapant Spain</option>
+                        <option value="mapant-se">Mapant Sweden</option>
+                        <option value="mapant-ch">Mapant Switzerland</option>
+                        <option value="topo-fi">Topo Finland</option>
+                        <option value="topo-fr">Topo Finland</option>
+                        <option value="topo-no">Topo Norway</option>
+                        <option value="topo-uk">Topo UK</option>
+                        <option value="topo-world">Topo World (OpenTopo)</option>
+                        <option value="topo-world-alt">Topo World (ArcGIS)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Duration</label>
+                    <select name="duration" id="id_duration" class="form-select">
+                        <option value="60">1 hour</option>
+                        <option value="180">3 hours</option>
+                        <option value="300">5 hours</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mb-1" id="submit-btn">
+                    <i class="fa-solid fa-circle-plus"></i> Create Quick Tracking
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock sub_sub_content %}
-
 {% block extra_body %}
-<script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-    data-api-base-url="{% host_url 'api_doc' host 'api' %}"
-    data-club-slug="{{ club.slug }}"
-    data-username="{{ request.user.username }}"
-    data-csrf-token="{{ csrf_token }}"
-></script>
-{% compress js %}
-<script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
-<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/quick_event.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
+            data-api-base-url="{% host_url 'api_doc' host 'api' %}"
+            data-club-slug="{{ club.slug }}"
+            data-username="{{ request.user.username }}"
+            data-csrf-token="{{ csrf_token }}"></script>
+    {% compress js %}
+        <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
+        <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+        <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/quick_event.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

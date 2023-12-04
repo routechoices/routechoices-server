@@ -1,156 +1,203 @@
 {% extends "base.html" %}
 {% load static django_bootstrap5 compress %}
-
-{% block head_title %}Pricing | {{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}
-
+{% block head_title %}
+    Pricing | {{ site.name }} | Live GPS tracking for orienteering
+{% endblock head_title %}
 {% block extra_head %}
-{{ block.super }}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
-{% endcompress %}
+    {{ block.super }}
+    {% compress css %}
+        <link rel="stylesheet"
+              href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
+    {% endcompress %}
 {% endblock extra_head %}
-
 {% block contentup %}
-<div class="container-fluid p-0">
-  <div class="row m-0">
-    <div class="w-100" style="background: linear-gradient(120deg, #98cdd6 0%, #98d6a6 100%)">
-      <div class="container content" style="min-height: 100px">
-        <div class="row text-center font-weight-bold">
-          <h2 style="font-family: Atkinson Hyperlegible, sans-serif;font-weight: 700;">Pricing</h2>
+    <div class="container-fluid p-0">
+        <div class="row m-0">
+            <div class="w-100"
+                 style="background: linear-gradient(120deg, #98cdd6 0%, #98d6a6 100%)">
+                <div class="container content" style="min-height: 100px">
+                    <div class="row text-center font-weight-bold">
+                        <h2 style="font-family: Atkinson Hyperlegible, sans-serif;
+                                   font-weight: 700">Pricing</h2>
+                    </div>
+                </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 1 1"
+                 width="100%"
+                 height="2em"
+                 preserveAspectRatio="none"
+                 fill="#f8f9fa"
+                 style="margin-top: -2em"
+                 class="p-0">
+                <path d="M0 0 V1 H1" />
+            </svg>
         </div>
-      </div>
     </div>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 0 V1 H1"/></svg>
-  </div>
-</div>
-<div class="container content">
-    <div class="row text-center">
-        <div class="col-12 mx-auto">
-            <div class="card border-0 shadow rounded-3 my-3">
-                <div class="card-body p-4 p-sm-5">
-                    <div id="generic_price_table" class="mb-4">
-                        <!--BLOCK ROW START-->
-                        <div class="row d-grid justify-content-center">
-                            <div style="width: 320px;">
-                                <!--PRICE CONTENT START-->
-                                <div class="generic_content active clearfix rounded-5">
-                                    <!--HEAD PRICE DETAIL START-->
-                                    <div class="generic_head_price clearfix">
-                                    <!--HEAD CONTENT START-->
-                                    <div class="generic_head_content clearfix">
-                                        <!--HEAD START-->
-                                        <div class="head_bg">
+    <div class="container content">
+        <div class="row text-center">
+            <div class="col-12 mx-auto">
+                <div class="card border-0 shadow rounded-3 my-3">
+                    <div class="card-body p-4 p-sm-5">
+                        <div id="generic_price_table" class="mb-4">
+                            <!--BLOCK ROW START-->
+                            <div class="row d-grid justify-content-center">
+                                <div style="width: 320px;">
+                                    <!--PRICE CONTENT START-->
+                                    <div class="generic_content active clearfix rounded-5">
+                                        <!--HEAD PRICE DETAIL START-->
+                                        <div class="generic_head_price clearfix">
+                                            <!--HEAD CONTENT START-->
+                                            <div class="generic_head_content clearfix">
+                                                <!--HEAD START-->
+                                                <div class="head_bg"></div>
+                                                <div class="head">
+                                                    <span>Free</span>
+                                                </div>
+                                                <!--//HEAD END-->
+                                            </div>
+                                            <!--//HEAD CONTENT END-->
+                                            <!--PRICE START-->
+                                            <div class="generic_price_tag clearfix">
+                                                <span class="price">
+                                                    <span class="currency">0</span>
+                                                    <span class="cent">.00</span>
+                                                    <span class="sign">€</span>
+                                                </span>
+                                            </div>
+                                            <!--//PRICE END-->
                                         </div>
-                                        <div class="head">
-                                        <span>Free</span>
+                                        <!--//HEAD PRICE DETAIL END-->
+                                        <!--FEATURE LIST START-->
+                                        <div class="generic_feature_list">
+                                            <ul>
+                                                <li>
+                                                    <span>Unlimited Events</span>
+                                                </li>
+                                                <li>
+                                                    <span>Public, Secret and Private Events</span>
+                                                </li>
+                                                <li>
+                                                    <span>Own Maps</span>
+                                                </li>
+                                                <li>
+                                                    <span>Custom Domains</span>
+                                                </li>
+                                                <li>
+                                                    <span>Unlimited Team Members</span>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <!--//HEAD END-->
+                                        <!--//FEATURE LIST END-->
+                                        <!--BUTTON START-->
+                                        <div class="generic_price_btn clearfix">
+                                            <a href="{% url 'site:account_signup' %}">Sign up</a>
+                                        </div>
+                                        <!--//BUTTON END-->
                                     </div>
-                                    <!--//HEAD CONTENT END-->
-                                    <!--PRICE START-->
-                                    <div class="generic_price_tag clearfix">
-                                        <span class="price">
-                                        <span class="currency">0</span>
-                                        <span class="cent">.00</span>
-                                        <span class="sign">€</span>
-                                        </span>
-                                    </div>
-                                    <!--//PRICE END-->
-                                    </div>
-                                    <!--//HEAD PRICE DETAIL END-->
-                                    <!--FEATURE LIST START-->
-                                    <div class="generic_feature_list">
-                                    <ul>
-                                        <li><span>Unlimited Events</span></li>
-                                        <li><span>Public, Secret and Private Events</span></li>
-                                        <li><span>Own Maps</span></li>
-                                        <li><span>Custom Domains</span></li>
-                                        <li><span>Unlimited Team Members</span></li>
-                                    </ul>
-                                    </div>
-                                    <!--//FEATURE LIST END-->
-                                    <!--BUTTON START-->
-                                    <div class="generic_price_btn clearfix">
-                                        <a href="{% url 'site:account_signup' %}">Sign up</a>
-                                    </div>
-                                    <!--//BUTTON END-->
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <p>{{ site.name }} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
-                        <p>We will never display ads, and your data is not sold to third party.</p>
-                    </div>
-                    <div>
-                        <p>You can become partner and join the following clubs and individuals that contribute to maintain the platform alive.</p>
-                        <p>
-                            <a href="{% url "dashboard:upgrade" %}" class="btn btn-success mb-1">Become a Partner Club</a><br/>
-                            <button id="become-ind-partner-btn" data-bs-toggle="modal" data-bs-target="#contributeModal" class="btn btn-info mb-1" type="button">Become an Individual Partner</button>
-                        </p>
-                        <h4 id="partners">Partners</h4>
-                        <h5>Clubs</h5>
-                        <div class="row justify-content-between mb-3">
-                            {% for club in partner_clubs %}
-                            <div class="col align-self-center text-center">
-                                {% if club.website %}<a href="{{ club.website }}" target="_blank" class="text-decoration-none dark-link">{% endif %}
-                                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
-                                <span class="fw-bold">{{ club.name }}</span>
-                                {% if club.website %}</a>{% endif %}
-                            </div>
-                            {% endfor %}
+                        <div>
+                            <p>{{ site.name }} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
+                            <p>We will never display ads, and your data is not sold to third party.</p>
                         </div>
-                        {% if individual_partners %}
-                        <h5>People</h5>
-                        <div class="row justify-content-between mb-3">
-                            {% for person in individual_partners %}
-                            <div class="col align-self-center text-center">
-                                <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ people.name }}'s avatar" />
-                                <span class="fw-bold">{{ person.name }}</span>
+                        <div>
+                            <p>
+                                You can become partner and join the following clubs and individuals that contribute to maintain the platform alive.
+                            </p>
+                            <p>
+                                <a href="{% url "dashboard:upgrade" %}" class="btn btn-success mb-1">Become a Partner Club</a>
+                                <br />
+                                <button id="become-ind-partner-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#contributeModal"
+                                        class="btn btn-info mb-1"
+                                        type="button">Become an Individual Partner</button>
+                            </p>
+                            <h4 id="partners">Partners</h4>
+                            <h5>Clubs</h5>
+                            <div class="row justify-content-between mb-3">
+                                {% for club in partner_clubs %}
+                                    <div class="col align-self-center text-center">
+                                        {% if club.website %}
+                                            <a href="{{ club.website }}"
+                                               target="_blank"
+                                               class="text-decoration-none dark-link">
+                                            {% endif %}
+                                            <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
+                                            <span class="fw-bold">{{ club.name }}</span>
+                                            {% if club.website %}</a>{% endif %}
+                                    </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
+                            {% if individual_partners %}
+                                <h5>People</h5>
+                                <div class="row justify-content-between mb-3">
+                                    {% for person in individual_partners %}
+                                        <div class="col align-self-center text-center">
+                                            <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ people.name }}'s avatar" />
+                                            <span class="fw-bold">{{ person.name }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="modal fade" id="contributeModal" tabindex="-1" aria-labelledby="contributeModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="contributeModalLabel">Become an individual partner</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form method="post">
-        <div class="modal-body">
-            <h6>Please enter how much you want to contribute per month.</h6>
-            <div class="input-group mb-3">
-                <span class="input-group-text">€</span>
-                <input type="text" min="4.99" value="4.99" name="price-per-month" id="price-per-month" class="form-control" aria-label="Amount (with dot and two decimal places)" />
-            </div>
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="per-year" name="per-year">
-                <label class="form-check-label" for="per-year"> One payment per year <span id="price-per-year"></span></label>
+    <div class="modal fade"
+         id="contributeModal"
+         tabindex="-1"
+         aria-labelledby="contributeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contributeModalLabel">Become an individual partner</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <form method="post">
+                    <div class="modal-body">
+                        <h6>Please enter how much you want to contribute per month.</h6>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">€</span>
+                            <input type="text"
+                                   min="4.99"
+                                   value="4.99"
+                                   name="price-per-month"
+                                   id="price-per-month"
+                                   class="form-control"
+                                   aria-label="Amount (with dot and two decimal places)" />
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="per-year"
+                                   name="per-year">
+                            <label class="form-check-label" for="per-year">
+                                One payment per year <span id="price-per-year"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Proceed to payment</button>
+                    </div>
+                    {% csrf_token %}
+                </form>
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Proceed to payment</button>
-        </div>
-        {% csrf_token %}
-      </form>
     </div>
-  </div>
-</div>
 {% endblock contentup %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/site/pricing.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/site/pricing.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

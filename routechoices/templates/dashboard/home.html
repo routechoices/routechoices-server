@@ -1,31 +1,38 @@
 {% extends "base.html" %}
 {% load static compress %}
-
 {% block extra_head %}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
-{% endcompress %}
+    {% compress css %}
+        <link rel="stylesheet"
+              href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
+    {% endcompress %}
 {% endblock extra_head %}
-
 {% block content %}
-  <div class="row">
-    <div class="col-12 mx-auto">
-      <div class="card border-0 shadow rounded-3 my-5">
-        <div class="card-body p-4 p-sm-5">
-          <ul class="nav nav-tabs mb-3">
-            <li><a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:":18" == 'dashboard:account_' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}" href="{% url 'dashboard:account_edit_view' %}"><i class="fa-solid fa-circle-user"></i> Account</a></li>
-            <li><a class="flex-sm-fill text-sm-center nav-link {% if not request.resolver_match.view_name|slice:":18" == 'dashboard:account_' and request.resolver_match.view_name not in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}" href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club</a></li>
-          </ul>
-          <div class="col-12">
-            <div class="row">
-              <div class="col-12">
-                {% block sub_content %}
-                {% endblock sub_content %}
-              </div>
-            </div><!--/.col-12.col-sm-9-->
-          </div>
-        </div><!--/row-->
-      </div>
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <div class="card border-0 shadow rounded-3 my-5">
+                <div class="card-body p-4 p-sm-5">
+                    <ul class="nav nav-tabs mb-3">
+                        <li>
+                            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:":18" == 'dashboard:account_' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
+                               href="{% url 'dashboard:account_edit_view' %}"><i class="fa-solid fa-circle-user"></i> Account</a>
+                        </li>
+                        <li>
+                            <a class="flex-sm-fill text-sm-center nav-link {% if not request.resolver_match.view_name|slice:":18" == 'dashboard:account_' and request.resolver_match.view_name not in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
+                               href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club</a>
+                        </li>
+                    </ul>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12">
+                                {% block sub_content %}
+                                {% endblock sub_content %}
+                            </div>
+                        </div>
+                        <!--/.col-12.col-sm-9-->
+                    </div>
+                </div>
+                <!--/row-->
+            </div>
+        </div>
     </div>
-  </div>
 {% endblock content %}

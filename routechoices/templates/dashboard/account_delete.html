@@ -1,25 +1,28 @@
 {% extends "dashboard/home.html" %}
 {% load static django_bootstrap5 %}
-
 {% block sub_content %}
-{% if sent %}
-<div class="row">
-  <div class="col-12">
-    <h4>Account deletion confirmation sent</h4>
-    <p>An email with a confirmation link to delete your account has been sent to your primary address.</p>
-  </div>
-</div>
-{% else %}
-<div class="row">
-  <div class="col-12">
-      <h4>Delete your account?</h4>
-      <p>Note that deleting your account does NOT delete your clubs, clubs maps, or clubs events.</p>
-      <p>To ensure your identity we will send you an email with a confirmation link.</p>
-      <p><form method="post" action="">
-          <button id="submit-btn" type="submit" class="btn btn-danger"><i class="fa-solid fa-paper-plane"></i> Send verification link</button>
-          {% csrf_token %}
-      </form></p>
-  </div>
-</div>
-{% endif %}
+    {% if sent %}
+        <div class="row">
+            <div class="col-12">
+                <h4>Account deletion confirmation sent</h4>
+                <p>An email with a confirmation link to delete your account has been sent to your primary address.</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <h4>Delete your account?</h4>
+                <p>Note that deleting your account does NOT delete your clubs, clubs maps, or clubs events.</p>
+                <p>To ensure your identity we will send you an email with a confirmation link.</p>
+                <p>
+                    <form method="post" action="">
+                        <button id="submit-btn" type="submit" class="btn btn-danger">
+                            <i class="fa-solid fa-paper-plane"></i> Send verification link
+                        </button>
+                        {% csrf_token %}
+                    </form>
+                </p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock sub_content %}

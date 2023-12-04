@@ -1,40 +1,43 @@
 {% extends "dashboard/home.html" %}
 {% load static account compress %}
-
-{% block head_title %}Confirm Account Deletion{% endblock head_title %}
-
+{% block head_title %}
+    Confirm Account Deletion
+{% endblock head_title %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
-      <div class="card border-0 shadow rounded-3 my-5">
-        <div class="card-body p-4 p-sm-5">
-          <h3 class="card-title text-center mb-5">Confirm Account Deletion</h3>
-          {% if confirmation_valid %}
-          {% user_display request.user as user_display %}
-          <p>Please confirm that you want to delete your account {{ user_display }}.</p>
-          <p>This is definitive and cannot be reversed.</p>
-          <form method="post" action="">
-              {% csrf_token %}
-              <input type="hidden" name="confirmation_key" value="{{ confirmation_key }}" />
-              <div class="d-grid">
-                  <button id="submit-btn" class="primaryAction btn btn-danger" type="submit">Confirm</button>
-              </div>
-          </form>
-          {% else %}
-          <p>This account deletion confirmation link is either expired, invalid or not destinated for account {{ request.user }}.</p>
-          <p>Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.</p>
-          {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+                <div class="card border-0 shadow rounded-3 my-5">
+                    <div class="card-body p-4 p-sm-5">
+                        <h3 class="card-title text-center mb-5">Confirm Account Deletion</h3>
+                        {% if confirmation_valid %}
+                            {% user_display request.user as user_display %}
+                            <p>Please confirm that you want to delete your account {{ user_display }}.</p>
+                            <p>This is definitive and cannot be reversed.</p>
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <input type="hidden" name="confirmation_key" value="{{ confirmation_key }}" />
+                                <div class="d-grid">
+                                    <button id="submit-btn" class="primaryAction btn btn-danger" type="submit">Confirm</button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <p>
+                                This account deletion confirmation link is either expired, invalid or not destinated for account {{ request.user }}.
+                            </p>
+                            <p>
+                                Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 {% endblock content %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

@@ -1,68 +1,100 @@
 {% extends "dashboard/club_view.html" %}
 {% load static hosts django_bootstrap5 compress %}
-
 {% block extra_head %}
-{{ block.super }}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'styles/dashboard/event_list.css' %}"/>
-{% endcompress %}
+    {{ block.super }}
+    {% compress css %}
+        <link rel="stylesheet"
+              href="{% static 'styles/dashboard/event_list.css' %}" />
+    {% endcompress %}
 {% endblock extra_head %}
-
 {% block sub_sub_content %}
-<div class="row">
-    <div class="col-12">
-        <div class="mb-3">
-            {% if not events %}
-            <p>You haven't created any events.</p>
+    <div class="row">
+        <div class="col-12">
+            <div class="mb-3">
+                {% if not events %}<p>You haven't created any events.</p>{% endif %}
+                <a href="{% url 'dashboard:event_create_view' %}"
+                   class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new event</a>
+                <a href="{% url 'dashboard:quick_event_view' %}"
+                   class="btn btn-secondary mb-1"
+                   data-bs-toggle="tooltip"
+                   data-bs-title="Single person GPS tracking without custom maps starting immediately"><i class="fa-solid fa-circle-plus"></i> Quick tracking</a>
+            </div>
+            {% if events %}
+                {% if events.paginator.num_pages > 1 %}
+                    {% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}
+                {% endif %}
+                <table class="table table-striped mb-3">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Set</th>
+                            <th class="text-nowrap">Start Date</th>
+                            <th>Privacy</th>
+                            <th class="text-nowrap">Is Live</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr class="collapsable">
+                                <td>
+                                    <a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a>
+                                </td>
+                                <td>
+                                    {% if event.event_set %}
+                                        {{ event.event_set }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="date-utc text-nowrap"
+                                          data-date="{{ event.start_date|date:'c' }}"
+                                          style="font-variant-numeric: tabular-nums">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span>
+                                </td>
+                                <td>
+                                    <span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span>
+                                </td>
+                                <td>
+                                    {% if event.is_live %}
+                                        <i style="color:green" class="fa-solid fa-circle-check"></i>
+                                    {% else %}
+                                        <i style="color:red" class="fa-solid fa-circle-xmark"></i>
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ event.get_absolute_url }}"
+                                   class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
+                                {% if not event.hidden %}
+                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/export"
+                                       class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                                {% endif %}
+                                {% if event.started and event.allow_route_upload or event.open_registration and not event.ended %}
+                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
+                                       class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor
+                                        {% if event.open_registration and not event.ended %}registration{% endif %}
+                                        {% if event.open_registration and event.allow_route_upload and event.started and not event.ended %}or{% endif %}
+                                        {% if event.started and event.allow_route_upload %}route upload{% endif %}
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if events.paginator.num_pages > 1 %}
+                {% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}
             {% endif %}
-            <a href="{% url 'dashboard:event_create_view' %}" class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new event</a>
-            <a href="{% url 'dashboard:quick_event_view' %}" class="btn btn-secondary mb-1" data-bs-toggle="tooltip" data-bs-title="Single person GPS tracking without custom maps starting immediately"><i class="fa-solid fa-circle-plus"></i> Quick tracking</a>
-        </div>
-        {% if events %}
-        {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
-        <table class="table table-striped mb-3">
-          <thead>
-            <tr>
-                <th>Name</th>
-                <th>Set</th>
-                <th class="text-nowrap">Start Date</th>
-                <th>Privacy</th>
-                <th class="text-nowrap">Is Live</th>
-                <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for event in events %}
-            <tr class="collapsable">
-                <td><a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a></td>
-                <td>{% if event.event_set %}{{ event.event_set }}{% else %}-{% endif %}</td>
-                <td><span class="date-utc text-nowrap" data-date="{{ event.start_date|date:'c' }}" style="font-variant-numeric: tabular-nums;">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span></td>
-                <td><span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span></td>
-                <td>{% if event.is_live %}<i style="color:green" class="fa-solid fa-circle-check"></i>{% else %}<i style="color:red" class="fa-solid fa-circle-xmark"></i>{% endif %}</a></td>
-                <td>
-                    <a href="{{ event.get_absolute_url }}" class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
-                    {% if not event.hidden %}
-                    <a href="{{ event.club.nice_url }}{{ event.slug }}/export" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-floppy-disk"></i> Export</a>
-                    {% endif %}
-                    {% if event.started and event.allow_route_upload or event.open_registration and not event.ended %}
-                    <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute" class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor{% if event.open_registration and not event.ended %} registration{% endif %}{% if event.open_registration and event.allow_route_upload and event.started and not event.ended %} or{% endif %}{% if event.started and event.allow_route_upload %} route upload{% endif %}</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% if events.paginator.num_pages > 1 %}{% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}{% endif %}
         {% endif %}
     </div>
 </div>
 {% endblock sub_sub_content %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/date_to_local.js' %}"></script>
-<script src="{% static '/scripts/dashboard/tooltips.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/date_to_local.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/tooltips.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

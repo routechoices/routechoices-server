@@ -1,9 +1,20 @@
 {% load static hosts %}
-
-<footer id="myFooter" {% if is_event_page %}class="position-absolute w-100 bottom-0" style="z-index: 110002;{% endif %}">
+<footer id="myFooter"
+        {% if is_event_page %}class="position-absolute w-100 bottom-0" style="z-index: 110002;{% endif %}
+        ">
     <div class="second-bar">
         <div class="container{% if is_event_page %}-fluid{% endif %}">
-            <h2 class="logosmall site-name my-0 py-0"><a {% if is_event_page %}target="_blank"{% endif %} href="{% host_url 'site:home_view' host 'www' %}" style="line-height: 30px;" ><img src="{% static 'img/logo.svg' %}" alt="Site logo" height="30" width="42" style="vertical-align: top;"> Powered by {{ site.name }}</a></h2>
+            <h2 class="logosmall site-name my-0 py-0">
+                <a {% if is_event_page %}target="_blank"{% endif %}
+                   href="{% host_url 'site:home_view' host 'www' %}"
+                   style="line-height: 30px">
+                    <img src="{% static 'img/logo.svg' %}"
+                         alt="Site logo"
+                         height="30"
+                         width="42"
+                         style="vertical-align: top">
+                Powered by {{ site.name }}</a>
+            </h2>
         </div>
     </div>
 </footer>

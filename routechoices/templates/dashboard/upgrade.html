@@ -1,84 +1,105 @@
 {% extends "dashboard/home.html" %}
 {% load compress static %}
-
 {% block sub_content %}
-<content>
-    {% if not club.upgraded %}
-    <h4>Hey {{ club.name }}!</h4>
-    <p>
-        {{ site.name }} will never sell your data, or display ads.
-        <br>
-        <br>
-        To keep the servers running we offer you the opportunity to become partner.<br>
-        You'll get your club's name featured both on the <a href="{% url 'site:home_view' %}#partners">front page</a> and a <a href="{% url 'site:pricing_view' %}#partners">dedicated space</a>. You'll ensure the sustainability of the site in the long term.
-    </p>
-    <p>
-        <b>
-            Support the platform starting at 4.99€ per month <small style="font-size: 0.7rem; color: grey;">(or 59.88€ per year)</small> + VAT.
-        </b>
-    </p>
-
-    <p>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contributeModal" role="button" type="button">Become Partner</button>
-    </p>
-    <hr>
-    <h4>Need convincing?</h4>
-    <p>
-        {{ site.name }}'s relative value is great when compared to stringing together disparate services.
-        <br>
-        <br>
-        We offer a bundle that together includes:<br>
-        Continuously updated web application, HTTP Server, TCP Server for GPS trackers, image hosting, privacy respecting analytics, custom domain, SSL certificates...<br>
-        Overall a custom equivalent setup can cost upwards of 30€/month.
-        <br>
-        <br>
-        {{ site.name }} integrates all of these services for free.
-        <br>
-        <br>
-        When compared to other live GPS platforms, {{ site.name }} comes in as being faster and more affordable.
-        <br>
-        <br>
-        Most importantly, you'll be supporting the small, fast internet, and a live GPS tracking platform built to last forever.
-    </p>
-
-<div class="modal fade" id="contributeModal" tabindex="-1" aria-labelledby="contributeModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="contributeModalLabel">Become an partner club</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form method="post" action="{% url 'site:pricing_view' %}">
-        <div class="modal-body">
-            <h6>Please enter how much you want to contribute per month.</h6>
-            <div class="input-group mb-3">
-                <span class="input-group-text">€</span>
-                <input type="text" min="4.99" value="4.99" name="price-per-month" id="price-per-month" class="form-control" aria-label="Amount (with dot and two decimal places)" />
+    <content>
+        {% if not club.upgraded %}
+            <h4>Hey {{ club.name }}!</h4>
+            <p>
+                {{ site.name }} will never sell your data, or display ads.
+                <br>
+                <br>
+                To keep the servers running we offer you the opportunity to become partner.
+                <br>
+                You'll get your club's name featured both on the <a href="{% url 'site:home_view' %}#partners">front page</a> and a <a href="{% url 'site:pricing_view' %}#partners">dedicated space</a>. You'll ensure the sustainability of the site in the long term.
+            </p>
+            <p>
+                <b>
+                    Support the platform starting at 4.99€ per month <small style="font-size: 0.7rem; color: grey;">(or 59.88€ per year)</small> + VAT.
+                </b>
+            </p>
+            <p>
+                <button class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#contributeModal"
+                        role="button"
+                        type="button">Become Partner</button>
+            </p>
+            <hr>
+            <h4>Need convincing?</h4>
+            <p>
+                {{ site.name }}'s relative value is great when compared to stringing together disparate services.
+                <br>
+                <br>
+                We offer a bundle that together includes:
+                <br>
+                Continuously updated web application, HTTP Server, TCP Server for GPS trackers, image hosting, privacy respecting analytics, custom domain, SSL certificates...
+                <br>
+                Overall a custom equivalent setup can cost upwards of 30€/month.
+                <br>
+                <br>
+                {{ site.name }} integrates all of these services for free.
+                <br>
+                <br>
+                When compared to other live GPS platforms, {{ site.name }} comes in as being faster and more affordable.
+                <br>
+                <br>
+                Most importantly, you'll be supporting the small, fast internet, and a live GPS tracking platform built to last forever.
+            </p>
+            <div class="modal fade"
+                 id="contributeModal"
+                 tabindex="-1"
+                 aria-labelledby="contributeModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="contributeModalLabel">Become an partner club</h5>
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <form method="post" action="{% url 'site:pricing_view' %}">
+                            <div class="modal-body">
+                                <h6>Please enter how much you want to contribute per month.</h6>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">€</span>
+                                    <input type="text"
+                                           min="4.99"
+                                           value="4.99"
+                                           name="price-per-month"
+                                           id="price-per-month"
+                                           class="form-control"
+                                           aria-label="Amount (with dot and two decimal places)" />
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="per-year"
+                                           name="per-year">
+                                    <label class="form-check-label" for="per-year">
+                                        One payment per year <span id="price-per-year"></span>
+                                    </label>
+                                </div>
+                                <input type="hidden" value="{{ club.slug }}" name="club">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Proceed to payment</button>
+                            </div>
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="per-year" name="per-year">
-                <label class="form-check-label" for="per-year"> One payment per year <span id="price-per-year"></span></label>
-            </div>
-            <input type="hidden" value="{{ club.slug }}" name="club">
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Proceed to payment</button>
-        </div>
-        {% csrf_token %}
-      </form>
-    </div>
-  </div>
-</div>
-    {% else %}
-    <h4>You are already a {{ site.name }}'s Partner. We thank you sincerly!</h4>
-    {% endif %}
-</content>
+        {% else %}
+            <h4>You are already a {{ site.name }}'s Partner. We thank you sincerly!</h4>
+        {% endif %}
+    </content>
 {% endblock sub_content %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/site/pricing.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/site/pricing.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

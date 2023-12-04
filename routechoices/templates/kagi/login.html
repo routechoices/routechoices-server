@@ -1,31 +1,37 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 compress static %}
-
-{% block head_title %}Login{% endblock head_title %}
-
+{% block head_title %}
+    Login
+{% endblock head_title %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
-      <div class="card border-0 shadow rounded-3 my-5">
-        <div class="card-body p-4 p-sm-5">
-          <h3 class="card-title text-center mb-5"><i class="fa-solid fa-right-to-bracket"></i> Login</h3>
-          <p>No account yet, <a href="{{ signup_url }}">sign up</a> first.</p>
-          <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <div class="d-grid mb-3">
-              <button class="primaryAction btn btn-primary" type="submit" id="submit-btn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+                <div class="card border-0 shadow rounded-3 my-5">
+                    <div class="card-body p-4 p-sm-5">
+                        <h3 class="card-title text-center mb-5">
+                            <i class="fa-solid fa-right-to-bracket"></i> Login
+                        </h3>
+                        <p>
+                            No account yet, <a href="{{ signup_url }}">sign up</a> first.
+                        </p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            <div class="d-grid mb-3">
+                                <button class="primaryAction btn btn-primary" type="submit" id="submit-btn">
+                                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </form>
         </div>
-      </div>
     </div>
-  </div>
-</div>
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/password-toggle.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/password-toggle.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock content %}

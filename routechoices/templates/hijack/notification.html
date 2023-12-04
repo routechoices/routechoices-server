@@ -1,24 +1,28 @@
 {% load static hosts compress %}
-
 {% block content %}
-  {% compress css %}
-  <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack.min.css' %}" media="screen">
-  <style>.djhj{z-index:1000000}</style>
-  {% endcompress %}
-  <div class="djhj" id="djhj">
-    <div class="djhj-notification">
-      <div class="djhj-message">
-          You are currently working on behalf of <em>{{ request.user }}</em>.
-      </div>
-      <form action="{% host_url 'hijack:release' host 'www' %}" method="post" class="djhj-actions">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.path }}">
-        <button class="djhj-button" id="djhj-hide-btn" type="button">hide</button>
-        <button class="djhj-button" id="djhj-release-btn" type="submit">release</button>
-      </form>
+    {% compress css %}
+        <link rel="stylesheet"
+              type="text/css"
+              href="{% static 'hijack/hijack.min.css' %}"
+              media="screen">
+        <style>.djhj{z-index:1000000}</style>
+    {% endcompress %}
+    <div class="djhj" id="djhj">
+        <div class="djhj-notification">
+            <div class="djhj-message">
+                You are currently working on behalf of <em>{{ request.user }}</em>.
+            </div>
+            <form action="{% host_url 'hijack:release' host 'www' %}"
+                  method="post"
+                  class="djhj-actions">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="djhj-button" id="djhj-hide-btn" type="button">hide</button>
+                <button class="djhj-button" id="djhj-release-btn" type="submit">release</button>
+            </form>
+        </div>
     </div>
-  </div>
-  {% compress js %}
-  <script src="{% static '/scripts/hijack.js' %}"></script>
-  {% endcompress %}
+    {% compress js %}
+        <script src="{% static '/scripts/hijack.js' %}"></script>
+    {% endcompress %}
 {% endblock content %}

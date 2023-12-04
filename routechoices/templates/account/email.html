@@ -1,72 +1,83 @@
 {% extends "dashboard/account_edit.html" %}
 {% load i18n static django_bootstrap5 compress %}
-
 {% block extra_head %}
-{{ block.super }}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'styles/account/email.css' %}"/>
-{% endcompress %}
+    {{ block.super }}
+    {% compress css %}
+        <link rel="stylesheet" href="{% static 'styles/account/email.css' %}" />
+    {% endcompress %}
 {% endblock extra_head %}
-
 {% block sub_sub_content %}
-{% if user_emailaddresses %}
-<p>{% trans "The following e-mail addresses are associated with this account:" %}</p>
-<table class="table table-striped mb-3">
-  <thead>
-    <tr>
-      <th>Email</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for emailaddress in user_emailaddresses %}
-    <tr class="collapsable">
-      <td>{{ emailaddress.email }}</td>
-      <td>
-        {% if emailaddress.verified %}
-        <span class="verified badge bg-success">{% trans "Verified" %}</span>
-        {% else %}
-        <span class="unverified badge bg-danger">{% trans "Unverified" %}</span>
-        {% endif %}
-        {% if emailaddress.primary %}
-        <span class="primary badge bg-primary">{% trans "Primary" %}</span>
-        {% endif %}
-      </td>
-      <td {% if emailaddress.primary %}class="collapsed-none"{% endif %}>
-        <form action="{% url 'dashboard:account_emails' %}"  method="post">
-          {% csrf_token %}
-          <input id="email_radio_{{ forloop.counter }}" type="hidden" name="email" value="{{ emailaddress.email }}"/>
-          {% if not emailaddress.primary and emailaddress.verified %}
-          <button class="secondaryAction btn btn-sm btn-primary mb-1 me-1" type="submit" name="action_primary" >{% trans "Make Primary" %}</button>
-          {% endif %}
-          {% if not emailaddress.verified %}
-          <button class="secondaryAction btn btn-sm btn-secondary mb-1 me-1" type="submit" name="action_send" >Re-send Verification</button>
-          {% endif %}
-          {% if not emailaddress.primary and user.emailaddress_set.all.count > 1 %}
-          <button class="primaryAction btn btn-sm btn-danger mb-1" type="submit" name="action_remove" ><i class="fa-solid fa-trash-can"></i> {% trans "Remove" %}</button>
-          {% endif %}
-        </form>
-      </td>
-
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p><strong>{% trans "Warning:" %}</strong> {% trans "No e-mail address set up. Add an e-mail address to receive notifications, reset password, etc." %}</p>
-{% endif %}
-<br/>
-<h3>{% trans "Add E-mail Address" %}</h3>
-<form method="post" action="{% url 'dashboard:account_emails' %}" class="add_email">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button name="action_add" class="btn btn-primary mb-1" type="submit">{% trans "Add E-mail" %}</button>
-</form>
+    {% if user_emailaddresses %}
+        <p>{% trans "The following e-mail addresses are associated with this account:" %}</p>
+        <table class="table table-striped mb-3">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emailaddress in user_emailaddresses %}
+                    <tr class="collapsable">
+                        <td>{{ emailaddress.email }}</td>
+                        <td>
+                            {% if emailaddress.verified %}
+                                <span class="verified badge bg-success">{% trans "Verified" %}</span>
+                            {% else %}
+                                <span class="unverified badge bg-danger">{% trans "Unverified" %}</span>
+                            {% endif %}
+                            {% if emailaddress.primary %}
+                                <span class="primary badge bg-primary">{% trans "Primary" %}</span>
+                            {% endif %}
+                        </td>
+                        <td {% if emailaddress.primary %}class="collapsed-none"{% endif %}>
+                            <form action="{% url 'dashboard:account_emails' %}"  method="post">
+                                {% csrf_token %}
+                                <input id="email_radio_{{ forloop.counter }}"
+                                       type="hidden"
+                                       name="email"
+                                       value="{{ emailaddress.email }}" />
+                                {% if not emailaddress.primary and emailaddress.verified %}
+                                    <button class="secondaryAction btn btn-sm btn-primary mb-1 me-1"
+                                            type="submit"
+                                            name="action_primary">{% trans "Make Primary" %}</button>
+                                {% endif %}
+                                {% if not emailaddress.verified %}
+                                    <button class="secondaryAction btn btn-sm btn-secondary mb-1 me-1"
+                                            type="submit"
+                                            name="action_send">Re-send Verification</button>
+                                {% endif %}
+                                {% if not emailaddress.primary and user.emailaddress_set.all.count > 1 %}
+                                    <button class="primaryAction btn btn-sm btn-danger mb-1"
+                                            type="submit"
+                                            name="action_remove">
+                                        <i class="fa-solid fa-trash-can"></i> {% trans "Remove" %}
+                                    </button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>
+            <strong>{% trans "Warning:" %}</strong> {% trans "No e-mail address set up. Add an e-mail address to receive notifications, reset password, etc." %}
+        </p>
+    {% endif %}
+    <br />
+    <h3>{% trans "Add E-mail Address" %}</h3>
+    <form method="post"
+          action="{% url 'dashboard:account_emails' %}"
+          class="add_email">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button name="action_add" class="btn btn-primary mb-1" type="submit">{% trans "Add E-mail" %}</button>
+    </form>
 {% endblock sub_sub_content %}
-
 {% block extra_body %}
-{% compress js %}
-<script type="text/javascript" src="{% static '/scripts/account/email.js' %}""></script>
-{% endcompress %}
+    {% compress js %}
+        <script type="text/javascript" src="{% static '/scripts/account/email.js' %}""></script>
+    {% endcompress %}
 {% endblock extra_body %}
