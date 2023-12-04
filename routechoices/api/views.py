@@ -1113,8 +1113,6 @@ def event_data(request, event_id):
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
     )
-    competitors_id = (c.id for c in competitors)
-
     # We need this to determine the end time of each of this event's competitors
     # For each devices used in the event we fetch all the competitors that starts during this event's span
     # We order the device's competitors by their start time
@@ -1129,7 +1127,6 @@ def event_data(request, event_id):
             start_time__lte=max_end_date,
             device_id__in=devices_used,
         )
-        .exclude(id__in=competitors_id)
         .only("device_id", "start_time")
         .order_by("start_time")
     )
