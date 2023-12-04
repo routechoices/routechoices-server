@@ -57,15 +57,22 @@ Label the data
     content: "Start Date";
     font-weight: bold;
   }
+  td:nth-of-type(4) {
+    text-align: initial !important;
+  }
   td:nth-of-type(4):before {
-    content: "Privacy";
+    content: "Duration";
     font-weight: bold;
   }
   td:nth-of-type(5):before {
-    content: "Is Live";
+    content: "Privacy";
     font-weight: bold;
   }
   td:nth-of-type(6):before {
+    content: "Is Live";
+    font-weight: bold;
+  }
+  td:nth-of-type(7):before {
     content: "Actions";
     font-weight: bold;
   }

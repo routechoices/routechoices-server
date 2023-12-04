@@ -1265,6 +1265,11 @@ class Event(models.Model):
     end_date = models.DateTimeField(
         verbose_name="End Date (UTC)",
     )
+    duration = models.GeneratedField(
+        expression=F("end_date") - F("start_date"),
+        output_field=models.DurationField(),
+        db_persist=True,
+    )
     privacy = models.CharField(
         max_length=8,
         choices=PRIVACY_CHOICES,
