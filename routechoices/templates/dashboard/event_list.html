@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static hosts django_bootstrap5 compress %}
+{% load static hosts django_bootstrap5 compress datetime_duration %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -29,6 +29,7 @@
                             <th>Name</th>
                             <th>Set</th>
                             <th class="text-nowrap">Start Date</th>
+                            <th>Duration</th>
                             <th>Privacy</th>
                             <th class="text-nowrap">Is Live</th>
                             <th>Actions</th>
@@ -51,6 +52,9 @@
                                     <span class="date-utc text-nowrap"
                                           data-date="{{ event.start_date|date:'c' }}"
                                           style="font-variant-numeric: tabular-nums">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-nowrap" style="font-variant-numeric: tabular-nums;">{{ event.duration|duration }}</span>
                                 </td>
                                 <td>
                                     <span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span>

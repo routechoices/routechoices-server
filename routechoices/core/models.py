@@ -127,6 +127,7 @@ class Club(models.Model):
         max_length=12,
         editable=False,
         unique=True,
+        db_index=True,
     )
     creator = models.ForeignKey(
         User,
@@ -367,6 +368,7 @@ class Map(models.Model):
         max_length=12,
         editable=False,
         unique=True,
+        db_index=True,
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
@@ -1080,6 +1082,7 @@ class EventSet(models.Model):
         max_length=12,
         editable=False,
         unique=True,
+        db_index=True,
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
@@ -1246,6 +1249,7 @@ class Event(models.Model):
         max_length=12,
         editable=False,
         unique=True,
+        db_index=True,
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
@@ -1264,6 +1268,11 @@ class Event(models.Model):
     start_date = models.DateTimeField(verbose_name="Start Date (UTC)")
     end_date = models.DateTimeField(
         verbose_name="End Date (UTC)",
+    )
+    duration = models.GeneratedField(
+        expression=F("end_date") - F("start_date"),
+        output_field=models.DurationField(),
+        db_persist=True,
     )
     privacy = models.CharField(
         max_length=8,
@@ -1784,6 +1793,7 @@ class Device(models.Model):
         default=random_device_id,
         max_length=12,
         unique=True,
+        db_index=True,
         validators=[
             validate_slug,
         ],
@@ -2200,6 +2210,7 @@ class Competitor(models.Model):
         max_length=12,
         editable=False,
         unique=True,
+        db_index=True,
     )
     event = models.ForeignKey(
         Event,
