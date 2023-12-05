@@ -1269,11 +1269,6 @@ class Event(models.Model):
     end_date = models.DateTimeField(
         verbose_name="End Date (UTC)",
     )
-    duration = models.GeneratedField(
-        expression=F("end_date") - F("start_date"),
-        output_field=models.DurationField(),
-        db_persist=True,
-    )
     privacy = models.CharField(
         max_length=8,
         choices=PRIVACY_CHOICES,
@@ -1622,6 +1617,10 @@ class Event(models.Model):
 
     def get_absolute_export_url(self):
         return f"{self.club.nice_url}{self.slug}/export"
+
+    @property
+    def duration(self):
+        return self.end_date - self.start_date
 
     @property
     def shortcut(self):
