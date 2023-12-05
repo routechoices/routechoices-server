@@ -1,47 +1,64 @@
 {% extends "base.html" %}
 {% load static django_bootstrap5 compress %}
-
-{% block head_title %}Contact | {{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}
-
+{% block head_title %}
+    Contact | {{ site.name }} | Live GPS tracking for orienteering
+{% endblock head_title %}
 {% block contentup %}
-<div class="container-fluid p-0">
-  <div class="row m-0">
-    <div class="w-100" style="background: linear-gradient(120deg, #db9b95 0%, #dbda95 100%)">
-      <div class="container content" style="min-height: 100px">
-        <div class="row text-center font-weight-bold">
-          <h2 style="font-family: Atkinson Hyperlegible, sans-serif;font-weight: 700;">Contact</h2>
+    <div class="container-fluid p-0">
+        <div class="row m-0">
+            <div class="w-100"
+                 style="background: linear-gradient(120deg, #db9b95 0%, #dbda95 100%)">
+                <div class="container content" style="min-height: 100px">
+                    <div class="row text-center font-weight-bold">
+                        <h2 style="font-family: Atkinson Hyperlegible, sans-serif;
+                                   font-weight: 700">Contact</h2>
+                    </div>
+                </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 1 1"
+                 width="100%"
+                 height="2em"
+                 preserveAspectRatio="none"
+                 fill="#f8f9fa"
+                 style="margin-top: -2em"
+                 class="p-0">
+                <path d="M0 0 V1 H1" />
+            </svg>
         </div>
-      </div>
     </div>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" width="100%" height="2em" preserveAspectRatio="none" fill="#f8f9fa" style="margin-top: -2em;" class="p-0"><path d="M0 0 V1 H1"/></svg>
-  </div>
-</div>
-<div class="container content">
-  <div class="row">
-    <div class="col-12 mx-auto">
-      <div class="card border-0 shadow rounded-3 my-3">
-        <div class="card-body p-4 p-sm-5">
-          <p>Any questions?</p><p>Drop an email at <a href="mailto:info@routechoices.com?Subject=Hello" target="_top">info@routechoices.com</a>{% if request.user.is_authenticated %} or use the form below</p>
-          <p>
-            <form action="" method="post">
-              {% csrf_token %}
-              {% bootstrap_form form %}
-              <div class="d-grid">
-              <button id="submit-btn" type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Send</button>
-              </div>
-            </form>
-          </p>
-          {% endif %}
+    <div class="container content">
+        <div class="row">
+            <div class="col-12 mx-auto">
+                <div class="card border-0 shadow rounded-3 my-3">
+                    <div class="card-body p-4 p-sm-5">
+                        <p>Any questions?</p>
+                        <p>
+                            Drop an email at <a href="mailto:info@routechoices.com?Subject=Hello" target="_top">info@routechoices.com</a>
+                            {% if request.user.is_authenticated %}
+                                or use the form below
+                            </p>
+                            <p>
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    {% bootstrap_form form %}
+                                    <div class="d-grid">
+                                        <button id="submit-btn" type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-paper-plane"></i> Send
+                                        </button>
+                                    </div>
+                                </form>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 {% endblock contentup %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

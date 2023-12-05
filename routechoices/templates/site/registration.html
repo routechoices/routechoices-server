@@ -1,73 +1,116 @@
-{% load static hosts compress %}<!DOCTYPE html>
+{% load static hosts compress %}
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Events Registration | Routechoices.com</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" href="{% static 'favicon.ico' %}?v=2023e" />
+        <meta name="description"
+              content="A tool to register to public events on {{ site.name }}">
+        <meta name="keywords" content="signup,enter,registration" />
         {% compress css %}
-        <link rel="stylesheet" href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}"/>
-        <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}"/>
-        <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
+            <link rel="stylesheet"
+                  href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}" />
         {% endcompress %}
     </head>
     <body>
-    <div class="container">
-        <div style="text-align: center"><img src="{% static 'logo.png' %}" alt="Site logo" width="256">
-            <h1>Routechoices.com</h1>
-            <h3 id="register-title">Register to an event</h3>
-            <hr/>
-        <div id="p1" class="d-none">
-            <h3 class="settings-text">Settings</h3>
-            <form id="form1">
-                <label for="name" class="form-label" id="name-label">Name</label>
-                <input class="form-control" type="text" id="name" name="name" required/>
-                <label for="sname" class="form-label" id="sname-label">Short name</label>
-                <input class="form-control" type="text" id="sname" name="sname" required/>
-                <label for="devid" class="form-label" id="dev-id-label">Device ID</label>
-                <input class="form-control" type="text" id="devid" name="devid" required/>
-                <input style="margin-top:15px" class="form-control btn btn-primary" id="save-btn" type="submit" value="Save" />
-            </form>
+        <div class="container">
+            <div style="text-align: center">
+                <img src="{% static 'logo.png' %}"
+                     alt="Site logo"
+                     width="256"
+                     height="256">
+                <h1>Routechoices.com</h1>
+                <h3 id="register-title">Register to an event</h3>
+                <hr />
+                <div id="p1" class="d-none">
+                    <h3 class="settings-text">Settings</h3>
+                    <form id="form1">
+                        <label for="name" class="form-label" id="name-label">Name</label>
+                        <input class="form-control" type="text" id="name" name="name" required />
+                        <label for="sname" class="form-label" id="sname-label">Short name</label>
+                        <input class="form-control" type="text" id="sname" name="sname" required />
+                        <label for="devid" class="form-label" id="dev-id-label">Device ID</label>
+                        <input class="form-control" type="text" id="devid" name="devid" required />
+                        <input style="margin-top:15px"
+                               class="form-control btn btn-primary"
+                               id="save-btn"
+                               type="submit"
+                               value="Save" />
+                    </form>
+                </div>
+                <div id="p0" class="d-none mb-3">
+                    <i class="fa-solid fa-user"></i> <span id="user-summary"></span>
+                </div>
+                <div id="p2" class="d-none">
+                    <div>
+                        <button class="btn user-setting-btn btn-secondary me-1" type="button">
+                            <i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span>
+                        </button>
+                        <button class="btn refresh-btn btn-success" type="button">
+                            <i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span>
+                        </button>
+                    </div>
+                    <form id="form2">
+                        <label for="events" class="form-label" id="event-label">Event</label>
+                        <select class="form-select" id="events" name="events"></select>
+                        <p id="warningA" class="d-none">
+                            <i class="fa-solid fa-triangle-exclamation"></i> <span id="registration-info">You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor immediately.</span>
+                        </p>
+                        <p id="warningB" class="d-none">
+                            <i class="fa-solid fa-triangle-exclamation"></i> <span id="event_start_notice"></span>
+                        </p>
+                        <input style="margin-top:15px"
+                               class="form-control btn btn-primary"
+                               type="submit"
+                               id="register-btn"
+                               value="Register for event" />
+                    </form>
+                </div>
+                <div id="p3" class="d-none">
+                    <div>
+                        <button class="btn user-setting-btn btn-secondary me-1" type="button">
+                            <i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span>
+                        </button>
+                        <button class="btn refresh-btn btn-success" type="button">
+                            <i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span>
+                        </button>
+                    </div>
+                    <h1>
+                        <i class="fa-solid fa-triangle-exclamation" style="color:crimson"></i> <span id="no-events">No events to register.</span>
+                    </h1>
+                </div>
+                <div id="p4" class="d-none">
+                    <div>
+                        <button class="btn user-setting-btn btn-secondary me-1" type="button">
+                            <i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span>
+                        </button>
+                        <button class="btn refresh-btn btn-success" type="button">
+                            <i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span>
+                        </button>
+                    </div>
+                    <h1>
+                        <i class="fa-solid fa-thumbs-up"></i> <span id="registered">You have been registered.</span>
+                    </h1>
+                </div>
+            </div>
         </div>
-        <div id="p0" class="d-none mb-3"><i class="fa-solid fa-user"></i> <span id="user-summary"></span></div>
-        <div id="p2" class="d-none">
-            <div><button class="btn user-setting-btn btn-secondary me-1" type="button"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button><button class="btn refresh-btn btn-success" type="button"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
-            <form id="form2">
-                <label for="events" class="form-label" id="event-label">Event</label>
-                <select class="form-select" id="events" name="events"></select>
-                <p id="warningA" class="d-none">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="registration-info">You can stream your GPS data to only one competitor at a time. If you register now, your GPS data stream will be switched to this competitor immediately.</span>
-                </p>
-                <p id="warningB" class="d-none">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="event_start_notice"></span>
-                </p>
-                <input style="margin-top:15px" class="form-control btn btn-primary" type="submit" id="register-btn" value="Register for event" />
-            </form>
-
-        </div>
-        <div id="p3" class="d-none">
-            <div><button class="btn user-setting-btn btn-secondary me-1" type="button"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success" type="button"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
-            <h1><i class="fa-solid fa-triangle-exclamation" style="color:crimson"></i> <span id="no-events">No events to register.</span></h1>
-        </div>
-        <div id="p4" class="d-none">
-            <div><button class="btn user-setting-btn btn-secondary me-1" type="button"><i class="fa-solid fa-gear"></i> <span class="settings-text">Settings</span></button> <button class="btn refresh-btn btn-success" type="button"><i class="fa-solid fa-arrows-rotate"></i> <span class="refresh-text">Refresh</span></button></div>
-            <h1><i class="fa-solid fa-thumbs-up"></i> <span id="registered">You have been registered.</span></h1>
-        </div>
-    </div>
-    </div>
-    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-        data-static-root="{% static '' %}"
-        data-api-root="{% host_url 'api_doc' host 'api' %}"
-    ></script>
-    {% compress js %}
-    <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
-    <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
-    <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
-    <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
-    <script src="{% static '/scripts/site/registration.js' %}"></script>
-    {% endcompress %}
-    <script>
-    </script>
-</body>
+        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
+                data-static-root="{% static '' %}"
+                data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
+        {% compress js %}
+            <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
+            <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"></script>
+            <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
+            <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
+            <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
+            <script src="{% static '/scripts/site/registration.js' %}"></script>
+        {% endcompress %}
+        <script></script>
+    </body>
 </html>

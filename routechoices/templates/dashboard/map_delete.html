@@ -1,16 +1,19 @@
 {% extends "dashboard/home.html" %}
 {% load static %}
-
 {% block sub_content %}
-<div class="row">
-    <div class="col-12">
-        <h1><i class="fa-solid fa-triangle-exclamation"></i> Delete map {{ map.name }}?</h1>
-        <p>This will delete the map and its calibration data.</p>
-        <p>There is no way to recover your data if you confirm this step.</p>
-        <form action="" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this map data!</button>
-        </form>
+    <div class="row">
+        <div class="col-12">
+            <h1>
+                <i class="fa-solid fa-triangle-exclamation"></i> Delete map {{ map.name }}?
+            </h1>
+            <p>This will delete the map and its calibration data.</p>
+            <p>There is no way to recover your data if you confirm this step.</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger mb-1">
+                    <i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this map data!
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock sub_content %}

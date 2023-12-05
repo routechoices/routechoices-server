@@ -1,85 +1,98 @@
-{% load static django_bootstrap5 compress hosts %}<!DOCTYPE html>
+{% load static django_bootstrap5 compress hosts %}
+<!DOCTYPE html>
 <html lang="en-US">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block favicon %}<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}?v=2023e">
-    <link rel="icon" sizes="32x32" href="{% static 'favicon.ico' %}?v=2023e">
-    <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">{% endblock favicon %}
-    <meta name="apple-mobile-web-app-title" content="{{ site.name }}">
-    <meta name="application-name" content="{{ site.name }}">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="{% block head_description %}{{ site.name }} is a free and open source live GPS tracking solution for orienteering events. View the competitors locations in the forest on computer or phone screens.{% endblock head_description %}">
-    <meta name="keywords" content="{% block head_keywords %}gps,tracking,tracker,trackers,orienteering,orienteer,live,replay{% endblock head_keywords %}" />
-    <title>{% block head_title %}{{ site.name }} | Live GPS tracking for orienteering{% endblock head_title %}</title>
-    {% compress css %}
-    <link rel="stylesheet" href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}"/>
-    <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
-    <link rel="stylesheet" href="{% static '/styles/site.css' %}" />
-    {% endcompress %}
-    {% block extra_head %}
-    <meta property="og:title" content="{{ site.name }} | Live GPS tracking for orienteering" />
-    <meta property="og:description" content="{{ site.name }} is a free and open source live GPS tracking solution for orienteering events. View the competitors locations in the forest on computer or phone screens." />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:site_name" content="{{ site.name }}" />
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="og:image" content="{% static '/img/og.jpg' %}?t=2022091500" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    {% endblock extra_head %}
-  </head>
-  <body>
-    {% compress js %}
-    <script src="{% static '/scripts/site/img-detection.js' %}"></script>
-    {% endcompress %}
-    {% block body %}
-    <!-- Fixed navbar -->
-    {% block navbar %}
-    {% if request.club_slug %}
-    {% include "club/navbar.html" %}
-    {% else %}
-    {% include "navbar.html" %}
-    {% endif %}
-    {% endblock navbar %}
-    <div id="django-messages">
-    {% bootstrap_messages %}
-    </div>
-    <div class="notifications top-right"></div>
-    {% block contentup %}
-    <div class="container content">
-    {% block content %}
-    {% endblock content %}
-    </div>
-    {% endblock contentup %}
-    {% block footer %}
-        {% if request.club_slug %}
-        {% include "club/footer.html" %}
-        {% else %}
-        {% include "footer.html" %}
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% block favicon %}
+            <link rel="apple-touch-icon"
+                  href="{% static 'apple-touch-icon.png' %}?v=2023e">
+            <link rel="icon" sizes="32x32" href="{% static 'favicon.ico' %}?v=2023e">
+            <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">
+        {% endblock favicon %}
+        <meta name="apple-mobile-web-app-title" content="{{ site.name }}">
+        <meta name="application-name" content="{{ site.name }}">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="description"
+              content="{% block head_description %}{{ site.name }} is a free and open source live GPS tracking solution for orienteering events. View the competitors locations in the forest on computer or phone screens.{% endblock head_description %}">
+        <meta name="keywords"
+              content="{% block head_keywords %}gps,tracking,tracker,trackers,orienteering,orienteer,live,replay{% endblock head_keywords %}" />
+        <title>
+            {% block head_title %}
+                {{ site.name }} | Live GPS tracking for orienteering
+            {% endblock head_title %}
+        </title>
+        {% compress css %}
+            <link rel="stylesheet"
+                  href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}" />
+            <link rel="stylesheet" href="{% static '/styles/site.css' %}" />
+        {% endcompress %}
+        {% block extra_head %}
+            <meta property="og:title"
+                  content="{{ site.name }} | Live GPS tracking for orienteering" />
+            <meta property="og:description"
+                  content="{{ site.name }} is a free and open source live GPS tracking solution for orienteering events. View the competitors locations in the forest on computer or phone screens." />
+            <meta property="og:type" content="website" />
+            <meta property="og:locale" content="en_US" />
+            <meta property="og:site_name" content="{{ site.name }}" />
+            <meta name="twitter:card" content="summary_large_image">
+            <meta property="og:image" content="{% static '/img/og.jpg' %}?t=2022091500" />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+        {% endblock extra_head %}
+    </head>
+    <body>
+        {% compress js %}
+            <script src="{% static '/scripts/site/img-detection.js' %}"></script>
+        {% endcompress %}
+        {% block body %}
+            <!-- Fixed navbar -->
+            {% block navbar %}
+                {% if request.club_slug %}
+                    {% include "club/navbar.html" %}
+                {% else %}
+                    {% include "navbar.html" %}
+                {% endif %}
+            {% endblock navbar %}
+            <div id="django-messages">{% bootstrap_messages %}</div>
+            <div class="notifications top-right"></div>
+            {% block contentup %}
+                <div class="container content">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+            {% endblock contentup %}
+            {% block footer %}
+                {% if request.club_slug %}
+                    {% include "club/footer.html" %}
+                {% else %}
+                    {% include "footer.html" %}
+                {% endif %}
+            {% endblock footer %}
+        {% endblock body %}
+        <script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js"
+                integrity="sha384-5Zu44WQLIjQtAmHoeW6zq6diH9kymV7kGUaYAV1PK5LPCSGURU7y840OHlpaU8NQ"
+                crossorigin="anonymous"></script>
+        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-site-version={{version}} data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
+        {% if analytics_enabled %}
+            <script defer
+                    {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %}
+                    data-domain="{{site.domain}}"
+                    data-api="https://www.routechoices.com/api/ping"
+                    src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
         {% endif %}
-    {% endblock footer %}
-    {% endblock body %}
-    <script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js"
-      integrity="sha384-5Zu44WQLIjQtAmHoeW6zq6diH9kymV7kGUaYAV1PK5LPCSGURU7y840OHlpaU8NQ"
-      crossorigin="anonymous"
-    ></script>
-    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-      data-site-version={{version}}
-      data-api-root="{% host_url 'api_doc' host 'api' %}"
-    ></script>
-    {% if analytics_enabled %}
-    <script defer {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %} data-domain="{{site.domain}}" data-api="https://www.routechoices.com/api/ping" src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
-    {% endif %}
-    {% compress js %}
-    <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
-    <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
-    <script src="{% static '/vendor/emoji-supported-1.0.0/emoji-supported.min.js' %}"></script>
-    <script src="{% static '/scripts/site/base.js' %}"></script>
-    {% endcompress %}
-    {% block extra_body %}
-    {% endblock extra_body %}
-  </body>
+        {% compress js %}
+            <script src="{% static '/vendor/popper-2.11.6/popper.min.js' %}"></script>
+            <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"></script>
+            <script src="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.min.js' %}"></script>
+            <script src="{% static '/vendor/emoji-supported-1.0.0/emoji-supported.min.js' %}"></script>
+            <script src="{% static '/scripts/site/base.js' %}"></script>
+        {% endcompress %}
+        {% block extra_body %}
+        {% endblock extra_body %}
+    </body>
 </html>

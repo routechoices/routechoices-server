@@ -1,23 +1,23 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 compress %}
-
 {% block sub_sub_content %}
-<div class="row">
-    <div class="col-12">
-        <h1>Upload GPX</h1>
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button id="submit-btn" type="submit" class="btn btn-primary mb-1"><i class="fa-solid fa-file-arrow-up"></i> Upload</button>
-        </form>
+    <div class="row">
+        <div class="col-12">
+            <h1>Upload GPX</h1>
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button id="submit-btn" type="submit" class="btn btn-primary mb-1">
+                    <i class="fa-solid fa-file-arrow-up"></i> Upload
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock sub_sub_content %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/map_gpx_upload.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/map_gpx_upload.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

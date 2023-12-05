@@ -1,41 +1,50 @@
-{% load static django_bootstrap5 hosts compress %}<!DOCTYPE html>
+{% load static django_bootstrap5 hosts compress %}
+<!DOCTYPE html>
 <html lang="en-US">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}?v=2023e">
-    <link rel="icon" sizes="any" href="{% static 'favicon.ico' %}?v=2023e">
-    <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">
-    <meta name="apple-mobile-web-app-title" content="{{ site.name }}">
-    <meta name="application-name" content="{{ site.name }}">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="OAuth page for {{ site.name }}">
-    <meta name="keywords" content="oauth,login" />
-    <title>{% block head_title %}{{ site.name }}{% endblock head_title %}</title>
-    {% compress css %}
-    <link rel="stylesheet" href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}"/>
-    <link rel="stylesheet" href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}"/>
-    <link rel="stylesheet" href="{% static 'styles/site.css' %}" />
-    {% endcompress %}
-    {% block extra_head %}
-    {% endblock extra_head %}
-  </head>
-  <body>
-    {% block body %}
-    <!-- Fixed navbar -->
-    {% block navbar %}
-    {% include "oauth2_provider/navbar.html" %}
-    {% endblock navbar %}
-    <div class="container content">
-    {% block content %}
-    {% endblock content %}
-    </div>
-    {% endblock body %}
-    {% compress js %}
-    <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}"/></script>
-    {% endcompress %}
-    {% block extra_body %}
-    {% endblock extra_body %}
-  </body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon"
+              href="{% static 'apple-touch-icon.png' %}?v=2023e">
+        <link rel="icon" sizes="any" href="{% static 'favicon.ico' %}?v=2023e">
+        <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">
+        <meta name="apple-mobile-web-app-title" content="{{ site.name }}">
+        <meta name="application-name" content="{{ site.name }}">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="description" content="OAuth page for {{ site.name }}">
+        <meta name="keywords" content="oauth,login" />
+        <title>
+            {% block head_title %}
+                {{ site.name }}
+            {% endblock head_title %}
+        </title>
+        {% compress css %}
+            <link rel="stylesheet"
+                  href="{% static '/vendor/fontawesome-free-6.4.0-web/css/all.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap-5.2.3/bootstrap.min.css' %}" />
+            <link rel="stylesheet"
+                  href="{% static '/vendor/bootstrap_sweetalert-1.0.1/sweetalert.css' %}" />
+            <link rel="stylesheet" href="{% static 'styles/site.css' %}" />
+        {% endcompress %}
+        {% block extra_head %}
+        {% endblock extra_head %}
+    </head>
+    <body>
+        {% block body %}
+            <!-- Fixed navbar -->
+            {% block navbar %}
+                {% include "oauth2_provider/navbar.html" %}
+            {% endblock navbar %}
+            <div class="container content">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        {% endblock body %}
+        {% compress js %}
+            <script src="{% static '/vendor/bootstrap-5.2.3/bootstrap.bundle.min.js' %}" /></script>
+        {% endcompress %}
+        {% block extra_body %}
+        {% endblock extra_body %}
+    </body>
 </html>

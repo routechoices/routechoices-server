@@ -1,23 +1,25 @@
 {% extends "dashboard/home.html" %}
 {% load static compress %}
-
 {% block sub_content %}
-<div class="row">
-  <div class="col-12">
-      <h1><i class="fa-solid fa-triangle-exclamation"></i> Delete event {{ event.name }}?</h1>
-      <p>This will delete all data under this event.</p>
-      <p>There is no way to recover your data if you confirm this step.</p>
-      <form action="" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger mb-1" id="submit-btn"><i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this event data!</button>
-      </form>
-  </div>
-</div>
+    <div class="row">
+        <div class="col-12">
+            <h1>
+                <i class="fa-solid fa-triangle-exclamation"></i> Delete event {{ event.name }}?
+            </h1>
+            <p>This will delete all data under this event.</p>
+            <p>There is no way to recover your data if you confirm this step.</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger mb-1" id="submit-btn">
+                    <i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this event data!
+                </button>
+            </form>
+        </div>
+    </div>
 {% endblock sub_content %}
-
 {% block extra_body %}
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/scripts/submit-form-commons.js' %}"></script>
-{% endcompress %}
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

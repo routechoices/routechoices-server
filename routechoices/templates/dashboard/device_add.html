@@ -1,54 +1,58 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 hosts compress %}
-
 {% block extra_head %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 {% endblock extra_head %}
-
 {% block sub_sub_content %}
-<div class="row">
-    <div class="col-12">
-        <h1>Add your device</h1>
-        <form action="" method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <input type="submit" value="Add" class="btn btn-primary mb-1">
-        </form>
-        <hr/>
-        <h1>Batch Device Import</h1>
-        <form action="" id="importCSVImei">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="csv_input" class="form-label">CSV File</label>
-                <input type="file" name="csv_input" id="csv_input" class="form-control" accept="text/csv" required>
-                <div id="importErrors" class="invalid-feedback"></div>
-                <div id="importSuccess" class="valid-feedback"></div>
-                <div class="form-text">
-                    Follow the following format for the CSV:<br>
-                    Column A - IMEI or Device ID<br>
-                    Column B - Device Nickname<br>
-                    File must be UTF-8 encoded<br>
-                    <a href="{% static 'assets/imei_devices.csv' %}">Download example file</a>
+    <div class="row">
+        <div class="col-12">
+            <h1>Add your device</h1>
+            <form action="" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <input type="submit" value="Add" class="btn btn-primary mb-1">
+            </form>
+            <hr />
+            <h1>Batch Device Import</h1>
+            <form action="" id="importCSVImei">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="csv_input" class="form-label">CSV File</label>
+                    <input type="file"
+                           name="csv_input"
+                           id="csv_input"
+                           class="form-control"
+                           accept="text/csv"
+                           required>
+                    <div id="importErrors" class="invalid-feedback"></div>
+                    <div id="importSuccess" class="valid-feedback"></div>
+                    <div class="form-text">
+                        Follow the following format for the CSV:
+                        <br>
+                        Column A - IMEI or Device ID
+                        <br>
+                        Column B - Device Nickname
+                        <br>
+                        File must be UTF-8 encoded
+                        <br>
+                        <a href="{% static 'assets/imei_devices.csv' %}">Download example file</a>
+                    </div>
                 </div>
-            </div>
-            <input type="submit" value="Import" class="btn btn-primary mb-1">
-        </form>
+                <input type="submit" value="Import" class="btn btn-primary mb-1">
+            </form>
+        </div>
     </div>
-</div>
 {% endblock sub_sub_content %}
-
 {% block extra_body %}
-<script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-  data-api-base-url="{% host_url 'api_doc' host 'api' %}"
-  data-club-id="{{club.aid}}"
-  data-csrf-token="{{ csrf_token }}">
-</script>
-{% compress js %}
-<script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-<script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
-<script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
-<script src="{% static '/vendor/papaparse-5.3.2/papaparse.min.js' %}"></script>
-<script src="{% static '/scripts/dashboard/device_add.js' %}"></script>
-{% endcompress %}
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-id="{{club.aid}}" data-csrf-token="{{ csrf_token }}">
+    </script>
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
+        <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+        <script src="{% static '/vendor/papaparse-5.3.2/papaparse.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/device_add.js' %}"></script>
+    {% endcompress %}
 {% endblock extra_body %}

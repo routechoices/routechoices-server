@@ -1,51 +1,75 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 %}
-
 {% block sub_sub_content %}
-<h3>Custom domain</h3>
-{% if club.domain %}
-<p>Your club's pages are accessible at your custom domain <a href="{{ club.nice_url }}">{{ club.nice_url }}</a></p>
-{% if not club.use_https %}<p>{{ site.name }} is in process of issuing you a SSL certificate, it might take a couple of minutes.</p>{% endif %}
-<form method="post" class="post-form">
-    {% csrf_token %}
-    <input type="hidden" name="domain" maxlength="128" class="form-control" id="id_domain"></input>
-<button type="submit" class="save btn btn-secondary"><i class="fa-solid fa-xmark"></i> Unset</button>
-</form>
+    <h3>Custom domain</h3>
+    {% if club.domain %}
+        <p>
+            Your club's pages are accessible at your custom domain <a href="{{ club.nice_url }}">{{ club.nice_url }}</a>
+        </p>
+        {% if not club.use_https %}
+            <p>{{ site.name }} is in process of issuing you a SSL certificate, it might take a couple of minutes.</p>
+        {% endif %}
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            <input type="hidden"
+                   name="domain"
+                   maxlength="128"
+                   class="form-control"
+                   id="id_domain">
+        </input>
+        <button type="submit" class="save btn btn-secondary">
+            <i class="fa-solid fa-xmark"></i> Unset
+        </button>
+    </form>
 {% else %}
-<p>If you don't have a domain of your own, you can get one <a href="https://gandi.link/f/1a96fb21" target="_blank" rel="noopener noreferrer">here</a></p>
-<h4>Set the following DNS record</h4>
-<table class="table">
-<tr>
-<th>Type</th>
-<th>Name</th>
-<th>Content</th>
-<th>TTL</th>
-</tr>
-<tr>
-<td>CNAME</td>
-<td><small>{your domain}</small></td>
-<td><small>cname.routechoices.com</small></td>
-<td>3600</td>
-</tr>
-<tr>
-<td>TXT</td>
-<td><small>{your domain}</small></td>
-<td><small>full-speed-no-mistakes</small></td>
-<td>3600</td>
-</tr>
-</table>
-<h4>Then add your domain below</h4>
-<form method="post" class="post-form">
-{% csrf_token %}
-{% bootstrap_form form %}
-<button type="submit" class="save btn btn-primary mb-1" id="submit-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-</form>
-<p>
-<small>
-It may take some time for the DNS records to propagate.
-<br>
-{{ site.name }} automatically set up SSL certificates for your custom domains.
-</small>
-</p>
+    <p>
+        If you don't have a domain of your own, you can get one <a href="https://gandi.link/f/1a96fb21"
+    target="_blank"
+    rel="noopener noreferrer">here</a>
+    </p>
+    <h4>Set the following DNS record</h4>
+    <table class="table">
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Content</th>
+            <th>TTL</th>
+        </tr>
+        <tr>
+            <td>CNAME</td>
+            <td>
+                <small>{your domain}</small>
+            </td>
+            <td>
+                <small>cname.routechoices.com</small>
+            </td>
+            <td>3600</td>
+        </tr>
+        <tr>
+            <td>TXT</td>
+            <td>
+                <small>{your domain}</small>
+            </td>
+            <td>
+                <small>full-speed-no-mistakes</small>
+            </td>
+            <td>3600</td>
+        </tr>
+    </table>
+    <h4>Then add your domain below</h4>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="save btn btn-primary mb-1" id="submit-btn">
+            <i class="fa-solid fa-floppy-disk"></i> Save
+        </button>
+    </form>
+    <p>
+        <small>
+            It may take some time for the DNS records to propagate.
+            <br>
+            {{ site.name }} automatically set up SSL certificates for your custom domains.
+        </small>
+    </p>
 {% endif %}
 {% endblock sub_sub_content %}
