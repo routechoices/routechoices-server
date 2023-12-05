@@ -432,7 +432,8 @@ class EventAdmin(admin.ModelAdmin):
         "event_set",
         "club",
         "start_date",
-        "is_live_db",
+        "db_duration",
+        "db_is_live",
         "privacy",
         "competitor_count",
         "map_count",
@@ -455,6 +456,7 @@ class EventAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .select_related("event_set")
             .annotate(
+                db_duration=F("end_date") - F("start_date"),
                 competitor_count=Count("competitors", distinct=True),
                 main_map_count=Case(
                     When(map_id__isnull=True, then=Value(0)),
@@ -462,7 +464,7 @@ class EventAdmin(admin.ModelAdmin):
                 ),
                 alt_map_count=Count("map_assignations", distinct=True),
                 map_count=F("main_map_count") + F("alt_map_count"),
-                is_live_db=Case(
+                db_is_live=Case(
                     When(
                         start_date__lt=Value(now()),
                         end_date__gt=Value(now()),
@@ -473,12 +475,18 @@ class EventAdmin(admin.ModelAdmin):
             )
         )
 
-    @admin.display(boolean=True)
-    def is_live_db(self, obj):
-        return obj.is_live_db
+    def db_duration(self, obj):
+        return obj.db_duration
 
-    is_live_db.admin_order_field = "is_live_db"
-    is_live_db.short_description = "Is Live"
+    db_duration.admin_order_field = "db_duration"
+    db_duration.short_description = "Duration"
+
+    @admin.display(boolean=True)
+    def db_is_live(self, obj):
+        return obj.db_is_live
+
+    db_is_live.admin_order_field = "db_is_live"
+    db_is_live.short_description = "Is Live"
 
     def map_count(self, obj):
         return obj.map_count

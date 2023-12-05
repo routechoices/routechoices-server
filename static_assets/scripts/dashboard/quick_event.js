@@ -35,12 +35,14 @@
 
   u("#quick-creation-form").on("submit", function (e) {
     e.preventDefault();
+    var now = dayjs();
     var formData = new FormData(e.target);
     var data = {
       name: "Quick tracking " + dayjs().local().format("YYYY-MM-DD HH:mm:ss"),
       club_slug: window.local.clubSlug,
       backdrop: formData.get("backdrop"),
-      end_date: dayjs()
+      start_date: now.toISOString(),
+      end_date: now
         .add(parseInt(formData.get("duration"), 10), "m")
         .toISOString(),
     };
