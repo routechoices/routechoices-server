@@ -2300,16 +2300,17 @@ class Competitor(models.Model):
         if self.start_time:
             from_date = self.start_time
 
+        to_date = min(now(), self.event.end_date)
         next_competitor_start_time = (
-            self.device.competitor_set.filter(start_time__gt=from_date)
+            self.device.competitor_set.filter(
+                start_time__gt=from_date, start_time__lt=to_date
+            )
             .order_by("start_time")
             .values_list("start_time", flat=True)
             .first()
         )
-
-        to_date = min(now(), self.event.end_date)
         if next_competitor_start_time:
-            to_date = min(next_competitor_start_time, to_date)
+            to_date = next_competitor_start_time
         locs, _ = self.device.get_locations_between_dates(from_date, to_date)
         return locs
 
