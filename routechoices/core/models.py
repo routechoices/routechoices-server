@@ -2240,78 +2240,85 @@ class Competitor(models.Model):
     def save(self, *args, **kwargs):
         if not self.start_time:
             self.start_time = self.event.start_date
-        next_event = self.event
-        next_event.invalidate_cache()
+        new_event = self.event
+        new_event.invalidate_cache()
         current_self = None
         if self.pk:
             current_self = Competitor.objects.get(id=self.id)
-            next_device = self.device
-            next_start = self.start_time
-            prev_device = current_self.device
-            prev_start = current_self.start_time
-            prev_event = current_self.event
+            new_device = self.device
+            new_start = self.start_time
+            old_device = current_self.device
+            old_start = current_self.start_time
+            old_event = current_self.event
             # We proceed the future device before save so we can properly fetch
             # data as they are before update
-            if next_device and next_device != prev_device:
-                if prev_start != next_start:
-                    events_between_prev_and_next_starts = (
-                        next_device.get_events_between_dates(
-                            min(prev_start, next_start),
-                            max(prev_start, next_start),
-                        )
+            if new_device and new_device != old_device:
+                if new_start != old_start:
+                    from_time = min(old_start, new_start)
+                    to_time = max(old_start, new_start)
+                    events_between_old_and_new_starts = (
+                        new_device.get_events_between_dates(from_time, to_time)
                     )
-                    for event_in_range in events_between_prev_and_next_starts:
+                    for event_in_range in events_between_old_and_new_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = next_device.get_events_at_date(next_start)
+                    events_at_start = new_device.get_events_at_date(new_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
         super().save(*args, **kwargs)
         if current_self:
-            if prev_event != next_event:
-                prev_event.invalidate_cache()
+            if old_event != new_event:
+                old_event.invalidate_cache()
             # We proceed the old device after save so we can properly fetch
             # data as they are after update
-            if prev_device:
-                if prev_start != next_start:
-                    events_between_prev_and_next_starts = (
-                        prev_device.get_events_between_dates(
-                            min(prev_start, next_start),
-                            max(prev_start, next_start),
-                        )
+            if old_device:
+                if new_start != old_start:
+                    from_time = min(old_start, new_start)
+                    to_time = max(old_start, new_start)
+                    events_between_old_and_new_starts = (
+                        old_device.get_events_between_dates(from_time, to_time)
                     )
-                    for event_in_range in events_between_prev_and_next_starts:
+                    for event_in_range in events_between_old_and_new_starts:
                         event_in_range.invalidate_cache()
                 else:
-                    events_at_start = prev_device.get_events_at_date(next_start)
+                    events_at_start = old_device.get_events_at_date(new_start)
                     for event_then in events_at_start:
                         event_then.invalidate_cache()
 
     @property
-    def started(self):
-        return self.start_time > now()
-
-    @cached_property
-    def locations(self):
-        if not self.device:
-            return []
-
+    def start_datetime(self):
         from_date = self.event.start_date
         if self.start_time:
             from_date = self.start_time
+        return from_date
 
-        to_date = min(now(), self.event.end_date)
+    @property
+    def started(self):
+        return self.start_datetime > now()
+
+    @property
+    def end_datetime(self):
+        from_date = self.start_datetime
+        end_time = min(now(), self.event.end_date)
         next_competitor_start_time = (
             self.device.competitor_set.filter(
-                start_time__gt=from_date, start_time__lt=to_date
+                start_time__gt=from_date, start_time__lt=end_time
             )
             .order_by("start_time")
             .values_list("start_time", flat=True)
             .first()
         )
         if next_competitor_start_time:
-            to_date = next_competitor_start_time
-        locs, _ = self.device.get_locations_between_dates(from_date, to_date)
+            end_time = next_competitor_start_time
+        return end_time
+
+    @cached_property
+    def locations(self):
+        if not self.device:
+            return []
+        locs, _ = self.device.get_locations_between_dates(
+            self.start_datetime, self.end_datetime
+        )
         return locs
 
     @property
