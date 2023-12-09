@@ -390,9 +390,11 @@ class ExtraMapForm(ModelForm):
             raise ValidationError(
                 "Extra maps can be set only if the main map field is set first"
             )
+
         if int(self.data.get("map")) == self.cleaned_data.get("map").id:
             raise ValidationError("Map assigned more than once in this event")
 
+        map_occurence = 0
         num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
         start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
         for i in range(start_count_maps, start_count_maps + num_maps):
@@ -401,7 +403,9 @@ class ExtraMapForm(ModelForm):
                 and self.data.get(f"map_assignations-{i}-DELETE") != "on"
                 and int(self.data.get(f"map_assignations-{i}-map")) == raster_map.id
             ):
-                raise ValidationError("Map assigned more than once in this event")
+                map_occurence += 1
+                if map_occurence > 1:
+                    raise ValidationError("Map assigned more than once in this event")
         return raster_map
 
     def clean_title(self):
@@ -410,6 +414,7 @@ class ExtraMapForm(ModelForm):
         if main_map_title and main_map_title == map_title:
             raise ValidationError("Map title given more than once in this event")
 
+        title_occurence = 0
         num_maps = int(self.data.get("map_assignations-TOTAL_FORMS"))
         start_count_maps = int(self.data.get("map_assignations-MIN_NUM_FORMS"))
         for i in range(start_count_maps, start_count_maps + num_maps):
@@ -418,7 +423,11 @@ class ExtraMapForm(ModelForm):
                 and self.data.get(f"map_assignations-{i}-DELETE") != "on"
                 and self.data.get(f"map_assignations-{i}-title") == map_title
             ):
-                raise ValidationError("Map title given more than once in this event")
+                title_occurence += 1
+                if title_occurence > 1:
+                    raise ValidationError(
+                        "Map title given more than once in this event"
+                    )
         return map_title
 
 
