@@ -51,6 +51,9 @@
           content="{% if club %}{{ club.nice_url }}thumbnail{% else %}{% static '/img/og.jpg' %}?t=2022091500{% endif %}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    {% compress css %}
+        <link rel="stylesheet" href="{% static 'styles/site/event_list.css' %}" />
+    {% endcompress %}
 {% endblock extra_head %}
 {% block contentup %}
     {% if club %}
@@ -92,12 +95,13 @@
                         <picture>
                             <source srcset="{% static 'img/banner.avif' %}" type="image/avif">
                             <source srcset="{% static 'img/banner.webp' %}" type="image/webp">
-                            {# djlint:off H006 #}
                             <img src="{% static 'img/banner.jpg' %}?v=20230113"
+                                 width="2047"
+                                 height="768"
                                  alt="Banner"
                                  style="width: 100%;
-                                        max-width: 1024px">
-                            {# djlint:on #}
+                                        max-width: 1024px;
+                                        height: auto">
                         </picture>
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg"

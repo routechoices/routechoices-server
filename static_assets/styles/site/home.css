@@ -1,0 +1,102 @@
+.bg_video {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transition: 1s opacity;
+  object-fit: contain;
+  vertical-align: baseline;
+  background: transparent url("../../background.jpg") 50% 50% / cover no-repeat;
+}
+
+.video_cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  background: rgb(20, 30, 50, 0.5);
+}
+
+.video_text_overlay {
+  color: #eee;
+}
+
+.frontpage_text {
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-size: 18.5pt;
+}
+
+.frontpage_text_bold {
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-weight: 700;
+  font-size: 30pt;
+}
+
+.image-banner {
+  background-image: url("../img/banner2.jpg"); /* fallback for non image-set browser */
+  background-image: -webkit-image-set(
+    url("../../img/banner2.avif") 1x /* type("image/avif") */,
+    url("../../img/banner2.webp") 1x /* type("image/webp") */,
+    url("../../img/banner2.jpg") 1x /* type("image/png") */
+  );
+  background-image: image-set(
+    url("../../img/banner2.avif") 1x,
+    url("../../img/banner2.webp") 1x,
+    url("../../img/banner2.jpg") 1x
+  );
+  margin: 0;
+  padding: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.image-banner > div {
+  background: rgba(0, 0, 0, 0.5);
+}
+.image-banner .container {
+  margin-top: 40px;
+}
+
+.image-banner h3 {
+  color: #fff;
+}
+.image-banner svg {
+  position: relative;
+  top: 0;
+}
+
+.intro-prefix {
+  font-size: 11pt;
+}
+
+.intro-bottom {
+  margin-bottom: -9pt;
+}
+
+.image-hero {
+  max-width: 100%;
+  max-height: 600px;
+  width: auto;
+  height: auto;
+}
+
+.engage-link {
+  font-size: 1em;
+  background: rgb(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.sponsors-block {
+  background-color: #fff;
+}

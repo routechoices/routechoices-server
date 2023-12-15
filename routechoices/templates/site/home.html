@@ -1,5 +1,11 @@
 {% extends "base.html" %}
-{% load static hosts %}
+{% load static hosts compress %}
+{% block extra_head %}
+    {{ block.super }}
+    {% compress css %}
+        <link rel="stylesheet" href="{% static 'styles/site/home.css' %}" />
+    {% endcompress %}
+{% endblock extra_head %}
 {% block contentup %}
     <div class="container content">
         <video class="bg_video" playsinline autoplay muted loop>
@@ -10,12 +16,9 @@
         </video>
         <div class="video_cover"></div>
         <div class="row text-center">
-            <h1 class="video_text_overlay frontpage_text mb-0"
-                style="font-size: 11pt">Presenting</h1>
-            <h1 class="video_text_overlay frontpage_text_bold mb-0">{{ site.name }}</h1>
-            <h1 class="video_text_overlay frontpage_text" style="margin-bottom: -9pt">
-                Live GPS tracking for orienteering events
-            </h1>
+            <h1 class="video_text_overlay frontpage_text mb-0 intro-prefix">Presenting</h1>
+            <h1 class="video_text_overlay frontpage_text_bold mb-0 intro">{{ site.name }}</h1>
+            <h1 class="video_text_overlay frontpage_text intro-bottom">Live GPS tracking for orienteering events</h1>
             <p>
                 <picture>
                     <source type="image/avif"
@@ -26,18 +29,12 @@
                          src="{% static 'img/iphone.png' %}?v=2022091500"
                          width="600px"
                          height="600px"
-                         style="max-width:100%;
-                                max-height:600px;
-                                width: auto;
-                                height: auto"
+                         class="image-hero"
                          alt="Website browsed on phone" />
                 </picture>
             </p>
             <h3 class="frontpage_text mb-3">
-                <a class="px-4 py-2 text-decoration-none"
-                   style="font-size: 1em;
-                          background: rgb(0,0,0,0.2);
-                          border-radius: 5px"
+                <a class="px-4 py-2 text-decoration-none engage-link"
                    href="{% url 'site:events_view' %}"><i class="fa-solid fa-person-running"></i> Event list</a>
             </h3>
         </div>
@@ -52,8 +49,7 @@
             <path d="M0 0 V1 H1" />
         </svg>
     </div>
-    <div class="container-fluid frontpage_text px-2 py-5"
-         style="background-color: #fff">
+    <div class="container-fluid frontpage_text px-2 py-5 sponsors-block">
         <div class="container">
             <div class="text-center">
                 <div class="mb-5">
@@ -85,50 +81,42 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid frontpage_text image-banner2">
-        <div style="background: rgba(0, 0, 0, 0.5);">
+    <div class="container-fluid frontpage_text image-banner">
+        <div>
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 1 1"
                  width="100%"
                  height="2em"
                  preserveAspectRatio="none"
-                 fill="#fff"
-                 style="position: relative;
-                        top: 0">
+                 fill="#fff">
                 <path d="M0 0 H1 V1" />
             </svg>
-            <div class="container" style="margin-top:40px">
+            <div class="container">
                 <div class="row text-center">
                     <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
                     {% if user.is_authenticated %}
-                        <h3 style="color:#fff" class="frontpage_text mb-3">
+                        <h3 class="frontpage_text mb-3">
                             A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
                         </h3>
                     {% else %}
-                        <h3 style="color:#fff" class="frontpage_text mb-3">
+                        <h3 class="frontpage_text mb-3">
                             Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
                         </h3>
                     {% endif %}
-                    <h3 style="color:#fff" class="frontpage_text mb-3">
+                    <h3 class="frontpage_text mb-3">
                         You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a dedicated GPS trackers or a smartphone running our app. Purpose being entertainment, fast analysis, or safety.
                     </h3>
-                    <h3 style="color:#fff" class="frontpage_text mb-4">
+                    <h3 class="frontpage_text mb-4">
                         After the event you can replay what happened as many time as you want for deeper analysis.
                     </h3>
                     {% if user.is_authenticated %}
                         <h3 class="frontpage_text mb-3">
-                            <a class="px-4 py-2 text-decoration-none"
-                               style="font-size: 1em;
-                                      background: rgb(0,0,0,0.2);
-                                      border-radius: 5px"
+                            <a class="px-4 py-2 text-decoration-none engage-link"
                                href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
                         </h3>
                     {% else %}
                         <h3 class="frontpage_text mb-3">
-                            <a class="px-4 py-2 text-decoration-none"
-                               style="font-size: 1em;
-                                      background: rgb(0,0,0,0.2);
-                                      border-radius: 5px"
+                            <a class="px-4 py-2 text-decoration-none engage-link"
                                href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
                         </h3>
                     {% endif %}
