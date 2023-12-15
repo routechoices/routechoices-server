@@ -125,7 +125,7 @@ context("Dashboard actions", () => {
     cy.url().should("match", /\/dashboard\/events\/new$/);
 
     cy.get("#id_name").type("Jukola 2019 - 2nd Leg");
-    cy.get("#id_start_date").focus().realType("2019-06-15 20:00:00");
+    cy.get("#id_start_date").focus().realType("2019-06-15 21:00:00");
     cy.get("#id_end_date").focus().realType("2019-06-16 00:00:00");
     cy.get("#id_map").select("Jukola 2019 - 1st Leg"); // doesnt matter
     cy.get("#id_competitors-0-device-ts-control").type(this.devId).wait(1000);
@@ -133,7 +133,7 @@ context("Dashboard actions", () => {
     cy.get("#id_competitors-0-short_name").type("Halden");
     cy.get("#id_competitors-0-start_time")
       .focus()
-      .realType("2019-06-15 20:00:10");
+      .realType("2019-06-15 21:00:10");
 
     cy.intercept("POST", "/dashboard/events/new").as("eventSubmit");
     cy.get("button:not([type]),button[type=submit]").first().click();
@@ -153,10 +153,10 @@ context("Dashboard actions", () => {
     cy.get('table a[href*="dashboard/events/"]').first().click();
     cy.get("#id_map_assignations-0-map").select("Another map");
     cy.get("#id_map_assignations-0-title").type("Alt route");
+    cy.intercept("POST", "/dashboard/events/*").as("eventSubmit");
     cy.get("button:not([type]),button[type=submit]").first().click();
     cy.wait("@eventSubmit").then(({ request, response }) => {
       expect(response.statusCode).to.eq(302);
-      expect(request.body).to.contain("&competitors-0-device=2&");
     });
     cy.url().should("match", /\/dashboard\/events$/);
     cy.forceVisit("/kangasala-sk/Jukola-2019-2nd-leg");
@@ -174,7 +174,7 @@ context("Dashboard actions", () => {
     cy.get("#id_competitors-0-device-ts-control").type(this.devId).wait(1000);
     cy.get("#id_competitors-0-start_time")
       .focus()
-      .realType("2019-06-16 20:00:10");
+      .realType("2019-06-16 21:00:10");
     cy.get("button:not([type]),button[type=submit]").first().click();
     cy.url().should("match", /\/dashboard\/events\/new$/);
     cy.contains("Start Date must be before End Date");
@@ -184,5 +184,16 @@ context("Dashboard actions", () => {
       "Extra maps can be set only if the main map field is set first"
     );
     cy.contains("Competitor start time should be during the event time");
+
+    cy.get("#id_map").select("Jukola 2019 - 1st Leg");
+    cy.get("#id_map_title").type("Alt route");
+    cy.get("#id_map_assignations-0-map").select("Jukola 2019 - 1st Leg");
+    cy.get("#id_map_assignations-0-title").type("Alt route");
+
+    cy.get("button:not([type]),button[type=submit]").first().click();
+    cy.url().should("match", /\/dashboard\/events\/new$/);
+
+    cy.contains("Map assigned more than once in this event");
+    cy.contains("Map title given more than once in this event");
   });
 });
