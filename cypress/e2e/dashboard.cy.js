@@ -147,6 +147,20 @@ context("Dashboard actions", () => {
     cy.get(".color-tag").first().click();
     cy.contains("Select new color for Mats");
 
+    // check event can handle multiple maps
+    cy.createMap("Another map");
+    cy.visit("/dashboard/events");
+    cy.get('table a[href*="dashboard/events/"]').first().click();
+    cy.get("#id_map_assignations-0-map").select("Another map");
+    cy.get("#id_map_assignations-0-title").type("Alt route");
+    cy.get("button:not([type]),button[type=submit]").first().click();
+    cy.wait("@eventSubmit").then(({ request, response }) => {
+      expect(response.statusCode).to.eq(302);
+      expect(request.body).to.contain("&competitors-0-device=2&");
+    });
+    cy.url().should("match", /\/dashboard\/events$/);
+    cy.forceVisit("/kangasala-sk/Jukola-2019-2nd-leg");
+    cy.contains("Alt route", { timeout: 20000 });
     // trigger as many errors has possible
     cy.visit("/dashboard/events");
     cy.url().should("match", /\/dashboard\/events$/);
