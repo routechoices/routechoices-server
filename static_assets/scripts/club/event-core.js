@@ -2674,7 +2674,7 @@ function fitInnerBounds(bounds) {
   ];
   var z1 = map.getBoundsZoom(bounds1);
   var z2 = map.getBoundsZoom(bounds2);
-  if (z1 > z2) {
+  if (z1 < z2) {
     map.fitBounds(bounds1, { animate: false });
   } else {
     map.fitBounds(bounds2, { animate: false });
