@@ -685,7 +685,6 @@ class MapAdmin(admin.ModelAdmin):
         "name",
         "club",
         "creation_date",
-        "img_link",
         "center_link",
         "resolution",
         "max_zoom",
@@ -731,11 +730,6 @@ class MapAdmin(admin.ModelAdmin):
         return obj.event_count
 
     event_count.admin_order_field = "event_count"
-
-    def img_link(self, obj):
-        return format_html('<a href="{}">Image</a>', obj.image.url)
-
-    img_link.short_description = "Image"
 
 
 @admin.register(DeviceClubOwnership)
