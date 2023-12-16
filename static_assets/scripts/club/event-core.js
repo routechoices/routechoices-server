@@ -2653,13 +2653,25 @@ function sortingFunction(a, b) {
   return a - b;
 }
 
-function fitInnerBounds(bounds) {
+function fitInnerBounds(bounds, outer = true) {
   var bLat = bounds.map((coord) => coord[0]).sort(sortingFunction);
   var bLon = bounds.map((coord) => coord[1]).sort(sortingFunction);
   var s = (bLat[0] + bLat[1]) / 2;
   var n = (bLat[2] + bLat[3]) / 2;
   var w = (bLon[0] + bLon[1]) / 2;
   var e = (bLon[2] + bLon[3]) / 2;
+
+  var bounds3 = [
+    [n, e],
+    [n, w],
+    [s, w],
+    [s, e],
+  ];
+  if (outer == true) {
+    map.fitBounds(bounds3, { animate: false });
+    return;
+  }
+
   var bounds1 = [
     [(n + s) / 2, w],
     [(n + s) / 2, e],
@@ -2674,7 +2686,7 @@ function fitInnerBounds(bounds) {
   ];
   var z1 = map.getBoundsZoom(bounds1);
   var z2 = map.getBoundsZoom(bounds2);
-  if (z1 < z2) {
+  if (z1 > z2) {
     map.fitBounds(bounds1, { animate: false });
   } else {
     map.fitBounds(bounds2, { animate: false });
