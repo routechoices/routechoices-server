@@ -116,7 +116,7 @@ club_param = openapi.Parameter(
 event_param = openapi.Parameter(
     "event",
     openapi.IN_QUERY,
-    description="Filter by this event slug",
+    description="Filter by this event slug or url",
     type=openapi.TYPE_STRING,
 )
 
@@ -376,8 +376,13 @@ def event_list(request):
 
     club_slug = request.GET.get("club")
     event_slug = request.GET.get("event")
+    event_url = None
 
-    if event_slug and club_slug:
+    if event_slug and "/" in event_slug:
+        event_url = event_slug
+        event_slug = None
+
+    if (event_slug and club_slug) or event_url:
         privacy_arg = {"privacy__in": [PRIVACY_PUBLIC, PRIVACY_SECRET]}
     else:
         privacy_arg = {"privacy": PRIVACY_PUBLIC}
@@ -394,7 +399,18 @@ def event_list(request):
         events = events.filter(club__slug__iexact=club_slug)
     if event_slug:
         events = events.filter(slug__iexact=event_slug)
-
+    if event_url:
+        url = urllib.parse.urlparse(event_url)
+        domain = url.netloc
+        if domain.endswith(f".{settings.PARENT_HOST}"):
+            club_slug = domain[: -(len(settings.PARENT_HOST) + 1)]
+            events.filter(club__slug__iexact=club_slug)
+        else:
+            events.filter(club__domain__iexact=domain)
+        event_slug = url.path[1:]
+        if event_slug.endswith("/"):
+            event_slug[:-1]
+        events = events.filter(slug__iexact=event_slug)
     output = []
     for event in events:
         output.append(
