@@ -545,6 +545,9 @@ function onStart() {
     u("#permanent-sidebar").removeClass("loading");
     onAppResize();
     map.invalidateSize();
+    if (rasterMap) {
+      fitInnerBounds(rasterMap.options.bounds);
+    }
   });
 }
 
