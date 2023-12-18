@@ -1333,7 +1333,7 @@ function displayCompetitorList(force) {
               "d-inline-block",
               "align-middle"
             )
-            .css({ marginRight: "-5px", paddingTop: "2px" })
+            .css({ marginRight: "-5px", paddingTop: "1px" })
             .attr({
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("toggle"),
