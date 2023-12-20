@@ -821,14 +821,16 @@ def event_register(request, event_id):
         errs.append(err_messages[lang]["bad-sname"])
 
     device_id = request.data.get("device_id")
-    device = Device.objects.filter(aid=device_id).first()
+    device = Device.objects.filter(aid=device_id).defer("locations_encoded").first()
 
     if not device and device_id:
         errs.append(err_messages[lang]["no-device-id"])
 
     if (
         device
-        and Competitor.objects.filter(start_time=start_time, device=device).exists()
+        and Competitor.objects.filter(
+            start_time=start_time, device_id=device.id
+        ).exists()
     ):
         errs.append(err_messages[lang]["start-time-already-used"])
 
