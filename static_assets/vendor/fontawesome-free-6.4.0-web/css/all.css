@@ -717,6 +717,14 @@ readers do not read off random characters that represent icons */
   content: "\f1d8";
 }
 
+.fa-box-archive::before {
+  content: "\f187";
+}
+
+.fa-bell::before {
+  content: "\f0f3";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;

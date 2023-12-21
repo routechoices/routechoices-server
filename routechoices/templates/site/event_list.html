@@ -65,12 +65,7 @@
         <div class="container-fluid p-0">
             <div class="row m-0">
                 <div class="w-100"
-                     style="{% if club.banner %}min-height: 300px;
-                            background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }});
-                            background-size: cover;
-                            background-position: center;
-                            {% else %}background-color: #fff;
-                            {% endif %}">
+                     {% if club.banner %} style="min-height: 300px; background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }}); background-size: cover; background-position: center;" {% else %} style="background-color: #fff;" {% endif %}>
                     <div class="container content" style="min-height: 100px">
                         <div class="row">{{ club.description|markdownify }}</div>
                     </div>
@@ -148,7 +143,7 @@
                 {% if live_events %}
                     <div>
                         <h2 class="header-multiline mb-3">
-                            <span>Live Events</span>
+                            <span><i class="fa-solid fa-bolt"></i> Live Events</span>
                         </h2>
                     </div>
                     {% for event_set in live_events %}
@@ -229,7 +224,7 @@
                 {% if upcoming_events %}
                     <div class="mb-3">
                         <h2 class="header-multiline">
-                            <span>Upcoming Events</span>
+                            <span><i class="fa-solid fa-bell"></i> Upcoming Events</span>
                         </h2>
                         <h6>Starting in next 24 hours</h6>
                     </div>
@@ -319,7 +314,7 @@
                 {% if years or search_text or event_set_page and events %}
                     <div {% if not event_set_page %}class="mb-3"{% endif %}>
                         <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif %}">
-                            <span>Archived Events</span>
+                            <span><i class="fa-solid fa-box-archive"></i> Archived Events</span>
                         </h2>
                         {% if home_url and not event_set_page %}
                             <form class="mb-3 row" method="get">
