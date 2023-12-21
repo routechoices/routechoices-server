@@ -359,6 +359,7 @@ class ClubAdmin(admin.ModelAdmin):
         "upgraded",
         "domain",
     )
+    list_filter = (HasEventsFilter, HasMapsFilter, "upgraded")
     show_facets = False
     search_fields = ("name",)
 
@@ -762,9 +763,11 @@ admin.site.unregister(Group)
 
 @admin.register(UserModel)
 class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
-    list_display = UserAdmin.list_display + (
-        "date_joined",
+    list_display = (
+        "username",
+        "email",
         "has_verified_email",
+        "date_joined",
         "clubs",
     )
     actions = [
@@ -800,6 +803,7 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
     def has_verified_email(self, obj):
         return obj.has_verified_email
 
+    has_verified_email.short_description = "Is email verified"
     has_verified_email.admin_order_field = "has_verified_email"
 
     def clubs(self, obj):
