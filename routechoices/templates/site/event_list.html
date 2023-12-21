@@ -65,7 +65,7 @@
         <div class="container-fluid p-0">
             <div class="row m-0">
                 <div class="w-100"
-                     {% if club.banner %} style="min-height: 300px; background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }}); background-size: cover; background-position: center;" {% else %} style="background-color: #fff;" {% endif %}>
+                     {% if club.banner %}style="min-height: 300px; background-image: linear-gradient(0, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url({{ club.banner_url }});background-size: cover;background-position: center;"{% else %}style="background-color: #fff;"{% endif %}>
                     <div class="container content" style="min-height: 100px">
                         <div class="row">{{ club.description|markdownify }}</div>
                     </div>
@@ -163,7 +163,7 @@
                                                 {% if event_set.data.create_page and not event_set.data.list_secret_events %}
                                                     <i style="font-size: 1rem;
                                                               color: var(--bs-link-color)"
-                                                       class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>
+                                                       class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
                                                 {% endif %}
                                             </span>
                                             {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
@@ -180,7 +180,7 @@
                                             <div class="px-2 py-1 bd-highlight">
                                                 <div>
                                                     <a class="link-primary stretched-link text-decoration-none"
-                                                       href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="ms-2 py-1 px-2 badge bg-danger fst-italic"
+                                                       href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="mx-2 py-1 px-2 badge bg-danger fst-italic"
        style="font-size: 1em"><b><i>LIVE</i></b></span>
                                                 </div>
                                                 <div class="d-inline-block"
@@ -245,7 +245,7 @@
                                                 {% if event_set.data.create_page and not event_set.data.list_secret_events %}
                                                     <i style="font-size: 1rem;
                                                               color: var(--bs-link-color)"
-                                                       class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>
+                                                       class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
                                                 {% endif %}
                                             </span>
                                             {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
@@ -394,7 +394,7 @@
                                         {% if event_set.data.create_page and not event_set.data.list_secret_events %}
                                             <i style="font-size: 1rem;
                                                       color: var(--bs-link-color)"
-                                               class="ms-2 fa-solid fa-arrow-up-right-from-square"></i>
+                                               class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
                                         {% endif %}
                                     </span>
                                     {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
