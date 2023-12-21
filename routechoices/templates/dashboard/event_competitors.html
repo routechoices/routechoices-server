@@ -43,7 +43,7 @@
                 <h3>Competitors</h3>
                 {% if not competitors.object_list and search_query %}<h4>No competitors matches this search</h4>{% endif %}
                 {% bootstrap_formset_errors formset %}
-                <table class="table competitor_table">
+                <table class="table competitor-table">
                     {{ formset.management_form }}
                     {% for form in formset %}
                         {% bootstrap_form_errors form type='non_fields' %}

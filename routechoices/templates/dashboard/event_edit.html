@@ -109,7 +109,7 @@
                     <h4>Add more competitors</h4>
                 {% endif %}
                 {% bootstrap_formset_errors formset %}
-                <table class="table competitor_table">
+                <table class="table competitor-table">
                     {{ formset.management_form }}
                     {% for form in formset %}
                         {% bootstrap_form_errors form type='non_fields' %}

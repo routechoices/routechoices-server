@@ -48,7 +48,12 @@ function onAddedCompetitorRow(row) {
       lastDeviceSelectInput = new TomSelect(el, seletizeOptions);
     });
 
-  u(row).find('input[id$="-start_time"]').each(makeFieldNowable);
+  u(row)
+    .find('input[id$="-start_time"]')
+    .each((el) => {
+      makeTimeFieldClearable(el);
+      makeFieldNowable(el);
+    });
 
   u(el).attr("autocomplete", "off");
   showLocalTime(el);
@@ -270,12 +275,13 @@ function onCsvParsed(result) {
 
 function showLocalTime(el) {
   var val = u(el).val();
-  var local = "";
   if (val) {
-    local = dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss");
+    var local = dayjs(val).utc(true).local().format("YYYY-MM-DD HH:mm:ss");
     local += local === "Invalid Date" ? "" : " Local time";
+    u(el).parent().find(".local_time").text(local);
+  } else {
+    u(el).parent().find(".local_time").html("&ZeroWidthSpace;");
   }
-  u(el).parent().find(".local_time").text(local);
 }
 
 (function () {
@@ -413,7 +419,7 @@ function showLocalTime(el) {
 
   var originalEventStart = u("#id_start_date").val();
   var competitorsStartTimeElsWithSameStartAsEvents = u(
-    ".competitor_table .datetimepicker"
+    ".competitor-table .datetimepicker"
   ).filter(function (el) {
     return originalEventStart !== "" && u(el).val() == originalEventStart;
   }).nodes;
@@ -422,6 +428,7 @@ function showLocalTime(el) {
   });
 
   u("#iof_input").on("change", onIofXMLLoaded);
+  u(".competitor-table .datetimepicker").each(makeTimeFieldClearable);
   u(".datetimepicker").each(function (el) {
     u(el).attr("autocomplete", "off");
     makeFieldNowable(el);
