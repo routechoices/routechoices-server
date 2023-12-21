@@ -39,6 +39,7 @@ class CompetitorUploadGPXForm(Form):
             Competitor.objects.select_related("device")
             .filter(event=event)
             .filter(Q(device__locations_encoded="") | Q(device__isnull=True))
+            .defer("device__locations_encoded")
         )
         self.fields["competitor_aid"].choices = [(c.aid, c.name) for c in competitors]
 

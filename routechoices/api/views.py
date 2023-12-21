@@ -1424,7 +1424,11 @@ def create_device_id(request):
             raise ValidationError(str(e.message))
         status_code = status.HTTP_200_OK
         try:
-            idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
+            idevice = (
+                ImeiDevice.objects.select_related("device")
+                .defer("device__locations_encoded")
+                .get(imei=imei)
+            )
         except ImeiDevice.DoesNotExist:
             device = Device.objects.create()
             idevice = ImeiDevice.objects.create(imei=imei, device=device)
@@ -1462,7 +1466,11 @@ def get_device_for_imei(request):
     except Exception as e:
         raise ValidationError(str(e.message))
     try:
-        idevice = ImeiDevice.objects.select_related("device").get(imei=imei)
+        idevice = (
+            ImeiDevice.objects.select_related("device")
+            .defer("device__locations_encoded")
+            .get(imei=imei)
+        )
     except ImeiDevice.DoesNotExist:
         device = Device.objects.create()
         idevice = ImeiDevice.objects.create(imei=imei, device=device)

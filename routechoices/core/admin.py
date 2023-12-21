@@ -742,6 +742,7 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .select_related("club", "device")
+            .defer("device__locations_encoded")
             .order_by("club", "device__aid")
         )
 

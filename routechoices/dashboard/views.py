@@ -1452,6 +1452,7 @@ def device_list_download(request):
     devices_qs = (
         DeviceClubOwnership.objects.filter(club_id=club.id)
         .select_related("device")
+        .defer("device__locations_encoded")
         .order_by("nickname")
     )
     devices = {
