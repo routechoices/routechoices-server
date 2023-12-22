@@ -60,16 +60,14 @@
                                           style="font-variant-numeric: tabular-nums">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span>
                                     <br />
                                     <span class="text-nowrap"
-                                          style="color: #666;
-                                                 font-size:0.75em;
+                                          style="font-size:0.75em;
                                                  font-variant-numeric: tabular-nums">{{ event.duration|duration }}</span>
                                 </td>
                                 <td>
                                     <span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</span>
                                     <br />
                                     <span class="text-nowrap"
-                                          style="color: #666;
-                                                 font-size:0.75em;
+                                          style="font-size:0.75em;
                                                  font-variant-numeric: tabular-nums">
                                         {% if event.is_live %}
                                             <i class="fa-solid fa-bolt"></i> LIVE

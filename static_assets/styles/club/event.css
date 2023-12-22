@@ -22,7 +22,7 @@
   padding-right: var(--sidebar-size);
   overflow-x: hidden;
   overflow-y: hidden; /* Scrollable contents if viewport is shorter than content. */
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-secondary-bg);
   border-left: 1px solid rgba(0, 0, 0, 0.125);
 }
 
@@ -34,7 +34,7 @@
   bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0;
   z-index: 10002;
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-secondary-bg);
 }
 
 .main.no-sidebar {
@@ -50,6 +50,8 @@
   height: calc(100vh - 59px - var(--footer-size) - var(--ctrl-height));
 }
 .sidebar #competitorList {
+  overflow-y: auto;
+  display: block !important;
   max-height: calc(
     var(--app-height) - 93px - var(--footer-size) - var(--ctrl-height)
   );
@@ -73,7 +75,12 @@
   bottom: 0px;
   left: 0px;
   height: calc(var(--footer-size) + var(--ctrl-height));
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-secondary-bg);
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+#full_progress_bar {
+  background-color: var(--bs-dark-bg-subtle);
 }
 
 .time_bar.loading {

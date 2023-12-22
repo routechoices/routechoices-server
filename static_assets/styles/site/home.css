@@ -81,7 +81,7 @@
 }
 
 .image-banner h3 {
-  color: var(--bs-body-color);
+  color: var(--bs-body-bg);
 }
 .image-banner svg {
   position: relative;

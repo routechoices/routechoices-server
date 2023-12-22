@@ -1267,8 +1267,7 @@ function displayCompetitorList(force) {
   var scrollTopDiv = u("#competitorList").first()?.scrollTop;
   var listDiv = u("<div/>");
   listDiv.addClass("mt-1");
-  listDiv.attr({ id: "competitorList" });
-  listDiv.css({ overflowY: "auto" });
+  listDiv.attr({ id: "competitorList", "data-bs-theme": getCurrentTheme() });
 
   nbShown = 0;
 
@@ -1805,7 +1804,10 @@ function displayOptions(ev) {
     "overflow-y": "auto",
     "overflow-x": "hidden",
   });
-  optionsSidebar.attr({ id: "optionsSidebar" });
+  optionsSidebar.attr({
+    id: "optionsSidebar",
+    "data-bs-theme": getCurrentTheme(),
+  });
 
   {
     var tailLenWidget = u("<div/>").addClass("mb-2");
