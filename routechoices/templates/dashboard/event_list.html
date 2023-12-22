@@ -28,11 +28,17 @@
                         <tr>
                             <th>Name</th>
                             <th>Set</th>
-                            <th class="text-nowrap">Start Date</th>
-                            <th>Duration</th>
-                            <th>Privacy</th>
-                            <th class="text-nowrap">Is Live</th>
-                            <th>Actions</th>
+                            <th class="text-nowrap">
+                                Start Date
+                                <br />
+                                <small>Duration</small>
+                            </th>
+                            <th>
+                                Privacy
+                                <br />
+                                <small>Status</small>
+                            </th>
+                            <th>Link</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,47 +58,42 @@
                                     <span class="date-utc text-nowrap"
                                           data-date="{{ event.start_date|date:'c' }}"
                                           style="font-variant-numeric: tabular-nums">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="text-nowrap" style="font-variant-numeric: tabular-nums;">{{ event.duration|duration }}</span>
+                                    <br />
+                                    <span class="text-nowrap"
+                                          style="color: #666;
+                                                 font-size:0.75em;
+                                                 font-variant-numeric: tabular-nums">{{ event.duration|duration }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</a></span>
+                                    <span class="text-nowrap"><i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> {{ event.get_privacy_display }}</span>
+                                    <br />
+                                    <span class="text-nowrap"
+                                          style="color: #666;
+                                                 font-size:0.75em;
+                                                 font-variant-numeric: tabular-nums">
+                                        {% if event.is_live %}
+                                            <i class="fa-solid fa-bolt"></i> LIVE
+                                        {% elif event.ended %}
+                                            <i class="fa-solid fa-box-archive"></i> Archived
+                                        {% else %}
+                                            <i class="fa-solid fa-bell"></i> Upcoming
+                                        {% endif %}
+                                    </span>
                                 </td>
                                 <td>
-                                    {% if event.is_live %}
-                                        <i style="color:green" class="fa-solid fa-circle-check"></i>
-                                    {% else %}
-                                        <i style="color:red" class="fa-solid fa-circle-xmark"></i>
-                                    {% endif %}
-                                </a>
-                            </td>
-                            <td>
-                                <a href="{{ event.get_absolute_url }}"
-                                   class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
-                                {% if not event.hidden %}
-                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/export"
-                                       class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-floppy-disk"></i> Export</a>
-                                {% endif %}
-                                {% if event.started and event.allow_route_upload or event.open_registration and not event.ended %}
-                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
-                                       class="btn btn-sm btn-secondary mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor
-                                        {% if event.open_registration and not event.ended %}registration{% endif %}
-                                        {% if event.open_registration and event.allow_route_upload and event.started and not event.ended %}or{% endif %}
-                                        {% if event.started and event.allow_route_upload %}route upload{% endif %}
-                                    </a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% if events.paginator.num_pages > 1 %}
-                {% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}
+                                    <a href="{{ event.get_absolute_url }}"
+                                       class="btn btn-primary btn-sm mb-1"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if events.paginator.num_pages > 1 %}
+                    {% bootstrap_pagination events extra=request.GET.urlencode pages_to_show=4 %}
+                {% endif %}
             {% endif %}
-        {% endif %}
+        </div>
     </div>
-</div>
 {% endblock sub_sub_content %}
 {% block extra_body %}
     {% compress js %}

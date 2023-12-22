@@ -54,26 +54,17 @@ Label the data
     font-weight: bold;
   }
   td:nth-of-type(3):before {
-    content: "Start Date";
+    content: "Start Date\A Duration";
     font-weight: bold;
-  }
-  td:nth-of-type(4) {
-    text-align: initial !important;
+    white-space: pre-line;
   }
   td:nth-of-type(4):before {
-    content: "Duration";
+    content: "Privacy\A Status";
     font-weight: bold;
+    white-space: pre-line;
   }
   td:nth-of-type(5):before {
-    content: "Privacy";
-    font-weight: bold;
-  }
-  td:nth-of-type(6):before {
-    content: "Is Live";
-    font-weight: bold;
-  }
-  td:nth-of-type(7):before {
-    content: "Actions";
+    content: "Link";
     font-weight: bold;
   }
 }
