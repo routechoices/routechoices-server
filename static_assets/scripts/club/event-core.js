@@ -894,15 +894,23 @@ function refreshEventData() {
       }
 
       if (response.announcement && response.announcement != prevNotice) {
-        function onHidden(e) {
-          this.removeEventListener("hidden.bs.toast", onHidden);
+        function showToast() {
           u(".text-alert-content").text(response.announcement);
           toast.show();
         }
-        document
-          .getElementById("text-alert")
-          .addEventListener("hidden.bs.toast", onHidden);
-        toast.hide();
+        function onHidden(e) {
+          this.removeEventListener("hidden.bs.toast", onHidden);
+          showToast();
+        }
+        var isHidden = u("#text-alert").hasClass("show");
+        if (isHidden) {
+          document
+            .getElementById("text-alert")
+            .addEventListener("hidden.bs.toast", onHidden);
+          toast.hide();
+        } else {
+          showToast();
+        }
         prevNotice = response.announcement;
       }
 
