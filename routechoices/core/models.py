@@ -1366,7 +1366,7 @@ class Event(models.Model):
         self.invalidate_cache()
         super().save(*args, **kwargs)
 
-    def checkUserPermission(self, user):
+    def check_user_permission(self, user):
         if self.privacy == PRIVACY_PRIVATE and (
             not user.is_authenticated
             or not self.club.admins.filter(id=user.id).exists()
@@ -1414,7 +1414,7 @@ class Event(models.Model):
         ):
             raise Http404
 
-        event.checkUserPermission(user)
+        event.check_user_permission(user)
 
         if map_index == 0:
             raster_map = event.map

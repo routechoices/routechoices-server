@@ -562,7 +562,7 @@ def event_detail(request, event_id):
         res = {"error": "No event match this id"}
         return Response(res)
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     output = {
         "event": {
@@ -1126,7 +1126,7 @@ def event_data(request, event_id):
         except Exception:
             pass
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     competitors = (
         event.competitors.select_related("device").all().order_by("start_time", "name")
@@ -1697,7 +1697,7 @@ def competitor_gpx_download(request, competitor_id):
     )
     event = competitor.event
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     gpx_data = competitor.gpx
 
@@ -1738,7 +1738,7 @@ def two_d_rerun_race_status(request):
         request.user, event_id, map_idx, load_competitors=True
     )
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     response_json = {
         "status": "OK",
@@ -1812,7 +1812,7 @@ def two_d_rerun_race_data(request):
         start_date__lt=now(),
     )
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     competitors = event.competitors.all()
     devices = (c.device_id for c in competitors if c.device_id)

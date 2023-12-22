@@ -275,7 +275,7 @@ def event_view(request, slug, **kwargs):
     elif event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}")
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     resp_args = {
         "event": event,
@@ -323,7 +323,7 @@ def event_export_view(request, slug, **kwargs):
     elif event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/export")
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     response = render(
         request,
@@ -467,7 +467,7 @@ def event_map_thumbnail(request, slug, **kwargs):
         slug__iexact=slug,
     )
 
-    event.checkUserPermission(request.user)
+    event.check_user_permission(request.user)
 
     display_logo = request.GET.get("no-logo", False) is False
     mime = get_best_image_mime(request, "image/jpeg")
