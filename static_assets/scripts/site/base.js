@@ -5,6 +5,36 @@ if (window.Sentry) {
   });
 }
 
+(() => {
+  "use strict";
+
+  const getPreferredTheme = () => {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  };
+
+  const setTheme = (theme) => {
+    if (
+      theme === "dark" ||
+      (theme === "auto" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.setAttribute("data-bs-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-bs-theme", "light");
+    }
+  };
+
+  setTheme(getPreferredTheme());
+
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      setTheme(getPreferredTheme());
+    });
+})();
+
 if (needFlagsEmojiPolyfill) {
   document.body.classList.add("flags-polyfill");
 }
