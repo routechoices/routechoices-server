@@ -46,3 +46,10 @@
   -moz-background-clip: text;
   -moz-text-fill-color: transparent;
 }
+
+.link-primary-alt {
+  color: var(--bs-secondary-color);
+}
+.link-primary-alt:hover {
+  color: var(--bs-body-color);
+}

@@ -15,6 +15,18 @@
   background: transparent url("../../background.jpg") 50% 50% / cover no-repeat;
 }
 
+[data-bs-theme="light"] {
+  color-scheme: light;
+  --rc-opacity: 0.5;
+  --rc-opacity-cover: rgba(20, 30, 50, 0.5);
+}
+
+[data-bs-theme="dark"] {
+  color-scheme: dark;
+  --rc-opacity: 0.9;
+  --rc-opacity-cover: rgba(120, 130, 150, 0.5);
+}
+
 .video_cover {
   position: fixed;
   top: 0;
@@ -24,11 +36,11 @@
   width: auto;
   height: auto;
   z-index: -100;
-  background: rgb(20, 30, 50, 0.5);
+  background: var(--rc-opacity-cover);
 }
 
 .video_text_overlay {
-  color: #eee;
+  color: var(--bs-body-bg);
 }
 
 .frontpage_text {
@@ -62,14 +74,14 @@
 }
 
 .image-banner > div {
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--rc-opacity-cover);
 }
 .image-banner .container {
   margin-top: 40px;
 }
 
 .image-banner h3 {
-  color: #fff;
+  color: var(--bs-body-color);
 }
 .image-banner svg {
   position: relative;
@@ -93,10 +105,10 @@
 
 .engage-link {
   font-size: 1em;
-  background: rgb(0, 0, 0, 0.2);
+  background: rgb(0, 0, 0, calc(var(--rc-opacity) - 0.3));
   border-radius: 5px;
 }
 
 .sponsors-block {
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }

@@ -1094,7 +1094,9 @@ function toggleCompetitorFullRoute(competitor) {
   }
   if (competitor.displayFullRoute) {
     competitor.displayFullRoute = null;
-    competitor.sidebarCard?.find(".full-route-icon").attr({ fill: null });
+    competitor.sidebarCard
+      ?.find(".full-route-icon")
+      .attr({ fill: "var(--bs-body-color)" });
   } else {
     competitor.displayFullRoute = true;
     competitor.sidebarCard?.find(".full-route-icon").attr({ fill: "#20c997" });
@@ -1375,7 +1377,9 @@ function displayCompetitorList(force) {
                 commonDiv
                   .find(".competitor-highlight-btn")
                   .removeClass("highlighted");
-                commonDiv.find(".full-route-icon").attr({ fill: null });
+                commonDiv
+                  .find(".full-route-icon")
+                  .attr({ fill: "var(--bs-body-color)" });
                 commonDiv.find("button").attr({ disabled: true });
                 commonDiv
                   .removeClass("route-displayed")
@@ -1578,7 +1582,9 @@ function displayCompetitorList(force) {
           var competitorFullRouteBtnIcon = u("<svg/>")
             .addClass("full-route-icon")
             .attr({
-              fill: competitor.displayFullRoute ? "#20c997" : null,
+              fill: competitor.displayFullRoute
+                ? "#20c997"
+                : "var(--bs-body-color)",
               viewBox: "0 0 48 48",
               width: "16px",
               height: "16px",

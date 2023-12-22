@@ -1,5 +1,6 @@
 :root {
-  —-app-height: 100%;
+  color-scheme: light;
+  --app-height: 100%;
   --ctrl-height: 0px;
   --sidebar-size: 30px;
   --footer-size: 45px;
@@ -21,7 +22,7 @@
   padding-right: var(--sidebar-size);
   overflow-x: hidden;
   overflow-y: hidden; /* Scrollable contents if viewport is shorter than content. */
-  background-color: #f5f5f5;
+  background-color: var(--bs-body-bg);
   border-left: 1px solid rgba(0, 0, 0, 0.125);
 }
 
@@ -33,7 +34,7 @@
   bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0;
   z-index: 10002;
-  background-color: #f5f5f5;
+  background-color: var(--bs-body-bg);
 }
 
 .main.no-sidebar {
@@ -72,7 +73,7 @@
   bottom: 0px;
   left: 0px;
   height: calc(var(--footer-size) + var(--ctrl-height));
-  background-color: #e5e5e5;
+  background-color: var(--bs-body-bg);
 }
 
 .time_bar.loading {
@@ -210,7 +211,7 @@
 .odometer {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  color: #666;
+  color: RGBA(var(--bs-body-color-rgb), 0.3);
   font-size: 0.6em;
 }
 
