@@ -13,3 +13,36 @@
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+
+.fa-box-archive {
+  background-color: rgb(77, 77, 77);
+  background-image: linear-gradient(30deg, #afafaf, #808080);
+  background-size: 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
+.fa-bolt {
+  background-color: rgb(243, 9, 9);
+  background-image: linear-gradient(30deg, #d8962c, #e40000);
+  background-size: 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
+.fa-bell {
+  background-color: rgb(94, 202, 121);
+  background-image: linear-gradient(30deg, #eef167, #d4880d);
+  background-size: 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
