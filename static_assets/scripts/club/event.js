@@ -24,7 +24,7 @@
       banana.i18n("club-events-link-text", window.local.clubName)
     );
     toast = new bootstrap.Toast(document.getElementById("text-alert"), {
-      animation: false,
+      animation: true,
       autohide: false,
     });
     toast.hide();

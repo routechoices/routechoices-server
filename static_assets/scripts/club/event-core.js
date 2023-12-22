@@ -894,9 +894,16 @@ function refreshEventData() {
       }
 
       if (response.announcement && response.announcement != prevNotice) {
+        function onHidden(e) {
+          this.removeEventListener("hidden.bs.toast", onHidden);
+          u(".text-alert-content").text(response.announcement);
+          toast.show();
+        }
+        document
+          .getElementById("text-alert")
+          .addEventListener("hidden.bs.toast", onHidden);
+        toast.hide();
         prevNotice = response.announcement;
-        u(".text-alert-content").text(prevNotice);
-        toast.show();
       }
 
       if (
