@@ -400,7 +400,3 @@ body {
   --rc-color-to-trans2: rgba(0, 0, 0, 0.75);
   --rc-gradient-filter: rgba(0, 0, 0, 0.3);
 }
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--bs-body-bg);
-}
