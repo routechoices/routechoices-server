@@ -400,3 +400,27 @@ body {
   --rc-color-to-trans2: rgba(0, 0, 0, 0.75);
   --rc-gradient-filter: rgba(0, 0, 0, 0.3);
 }
+
+.sweet-alert {
+  background-color: var(--bs-body-bg);
+}
+
+.tempus-dominus-widget {
+  background-color: var(--bs-secondary-bg) !important;
+}
+.tempus-dominus-widget .arrow::before {
+  background-color: var(--bs-secondary-bg) !important;
+}
+.tempus-dominus-widget .toolbar div:hover {
+  background: var(--bs-dark-bg-subtle) !important;
+}
+.tempus-dominus-widget .date-container-decades div:not(.no-highlight):hover,
+.tempus-dominus-widget .date-container-years div:not(.no-highlight):hover,
+.tempus-dominus-widget .date-container-months div:not(.no-highlight):hover,
+.tempus-dominus-widget .date-container-days div:not(.no-highlight):hover,
+.tempus-dominus-widget .time-container-clock div:not(.no-highlight):hover,
+.tempus-dominus-widget .time-container-hour div:not(.no-highlight):hover,
+.tempus-dominus-widget .time-container-minute div:not(.no-highlight):hover,
+.tempus-dominus-widget .time-container-second div:not(.no-highlight):hover {
+  background: var(--bs-dark-bg-subtle) !important;
+}
