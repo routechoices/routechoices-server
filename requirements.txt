@@ -49,7 +49,7 @@ gpxpy==1.6.2
 idna==3.6
 inflection==0.5.1
 jmespath==1.0.1
-jwcrypto==1.5.0
+jwcrypto==1.5.1
 jxlpy @ git+https://github.com/rphlo/jxlpy
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 markdown==3.5.1
