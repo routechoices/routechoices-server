@@ -246,8 +246,8 @@ def device_list_view(request):
 
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
-        .defer("locations_encoded")
         .select_related("club", "device")
+        .defer("device__locations_encoded")
         .order_by(ordering_blank_last, "nickname", "device__aid")
     )
     paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
