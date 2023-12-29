@@ -148,7 +148,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if raw_host[-1] == ".":
             raw_host = raw_host[:-1]
         if raw_host == default_domain:
-            return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
+            return redirect(f"//www.{default_domain}{request.get_full_path()}")
         request.use_cname = False
         club_slug = None
         if raw_host.endswith(default_subdomain_suffix):
@@ -161,16 +161,18 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
                 else:
                     club_exists = Club.objects.filter(slug__iexact=slug).exists()
                     if not club_exists:
-                        club_exists = Club.objects.filter(
+                        club = Club.objects.filter(
                             slug_changed_from__iexact=slug,
                             slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
-                        ).exists()
-                        if not club_exists:
-                            cache.set(cache_key, "", 60)
-                            request.club_slug = True
-                            if request.path != "/":
-                                return render(request, "404.html", status=404)
-                            return render(request, "club/404.html", status=404)
+                        ).first()
+                        if club:
+                            return redirect(
+                                f"//{club.slug}.{default_domain}{request.get_full_path()}"
+                            )
+                        request.club_slug = True
+                        if request.path != "/":
+                            return render(request, "404.html", status=404)
+                        return render(request, "club/404.html", status=404)
                     club_slug = slug.lower()
                     cache.set(cache_key, club_slug, 60)
         else:
@@ -181,7 +183,6 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
             else:
                 club = Club.objects.filter(domain__iexact=raw_host).first()
                 if not club:
-                    cache.set(cache_key, "", 60)
                     return render(request, "404-cname.html", status=404)
                 club_slug = club.slug
                 cache.set(cache_key, club_slug, 60)
