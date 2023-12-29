@@ -2091,7 +2091,7 @@ class Device(models.Model):
 
     @property
     def last_location(self):
-        if self.location_count == 0:
+        if not self._location_count:
             return None
         return (
             self._last_location_datetime.timestamp(),
@@ -2101,7 +2101,7 @@ class Device(models.Model):
 
     @property
     def last_location_timestamp(self):
-        if self.location_count == 0:
+        if self._location_count == 0:
             return None
         return self.last_location[LOCATION_TIMESTAMP_INDEX]
 
