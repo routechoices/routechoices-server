@@ -29,7 +29,7 @@ from django.core.paginator import Paginator
 from django.core.validators import MaxValueValidator, MinValueValidator, validate_slug
 from django.db import models
 from django.db.models import F, Min, Q
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models.functions import ExtractMonth, ExtractYear, Upper
 from django.db.models.signals import post_delete, pre_delete
 from django.dispatch import receiver
 from django.http.response import Http404
@@ -202,6 +202,17 @@ Follow our events live or replay them later.
         ordering = ["name"]
         verbose_name = "club"
         verbose_name_plural = "clubs"
+        indexes = [
+            models.Index(
+                Upper("slug"),
+                name="rc_event_slug_upper_idx",
+            ),
+            models.Index(
+                Upper("slug_changed_from"),
+                F("slug_changed_at").desc(),
+                name="rc_event_changed_slug_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.name
