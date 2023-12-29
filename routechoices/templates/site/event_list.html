@@ -65,7 +65,7 @@
         <div class="container-fluid p-0">
             <div class="row m-0">
                 <div class="w-100"
-                     {% if club.banner %}style="min-height: 300px; background-image: linear-gradient(0, var(--rc-color-to-trans2), var(--rc-color-to-trans2)), url({{ club.banner_url }});background-size: cover;background-position: center;"{% else %}style="background-color: var(--bs-body-bg);"{% endif %}>
+                     {% if club.banner %}style="min-height: 300px; background-image: linear-gradient(0, var(--rc-color-to-trans2), var(--rc-color-to-trans2)), url({{ club.banner_url }});background-size: cover;background-position: center;"{% else %}style="background-color: var(--bs-secondary-bg);"{% endif %}>
                     <div class="container content" style="min-height: 100px">
                         <div class="row">{{ club.description|markdownify }}</div>
                     </div>
