@@ -898,12 +898,14 @@ def event_create_view(request):
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
         else:
-            all_devices = set()
+            all_devices_id = set()
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
-                    all_devices.add(cform.cleaned_data.get("device").id)
-            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
-                "club_ownerships"
+                    all_devices_id.add(cform.cleaned_data.get("device").id)
+            dev_qs = (
+                Device.objects.filter(id__in=all_devices_id)
+                .defer("locations_encoded")
+                .prefetch_related("club_ownerships")
             )
             dev_qs |= club.devices.all()
             cd = [
@@ -981,9 +983,8 @@ def event_edit_view(request, event_id):
     else:
         comp_devices_id = []
 
-    own_devices = club.devices.all()
-    own_devices_id = own_devices.values_list("id", flat=True)
-    all_devices = set(list(comp_devices_id) + list(own_devices_id))
+    own_devices_id = club.devices.all().values_list("id", flat=True)
+    all_devices_id = set(list(comp_devices_id) + list(own_devices_id))
 
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -1034,9 +1035,11 @@ def event_edit_view(request, event_id):
         else:
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
-                    all_devices.add(cform.cleaned_data.get("device").id)
-            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
-                "club_ownerships"
+                    all_devices_id.add(cform.cleaned_data.get("device").id)
+            dev_qs = (
+                Device.objects.filter(id__in=all_devices_id)
+                .defer("locations_encoded")
+                .prefetch_related("club_ownerships")
             )
             cd = [
                 {
@@ -1068,8 +1071,10 @@ def event_edit_view(request, event_id):
         if event.has_notice:
             args = {"instance": event.notice}
         notice_form = NoticeForm(**args)
-        dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
-            "club_ownerships"
+        dev_qs = (
+            Device.objects.filter(id__in=all_devices_id)
+            .defer("locations_encoded")
+            .prefetch_related("club_ownerships")
         )
         cd = [
             {
@@ -1134,9 +1139,8 @@ def event_competitors_view(request, event_id):
         raise Http404()
     comps = Competitor.objects.filter(id__in=[c.id for c in competitors.object_list])
     comp_devices_id = [c.device_id for c in competitors.object_list]
-    own_devices = club.devices.all()
-    own_devices_id = own_devices.values_list("id", flat=True)
-    all_devices = set(list(comp_devices_id) + list(own_devices_id))
+    own_devices_id = club.devices.all().values_list("id", flat=True)
+    all_devices_id = set(list(comp_devices_id) + list(own_devices_id))
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         event_copy = deepcopy(event)
@@ -1152,9 +1156,11 @@ def event_competitors_view(request, event_id):
         else:
             for cform in formset.forms:
                 if cform.cleaned_data.get("device"):
-                    all_devices.add(cform.cleaned_data.get("device").id)
-            dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
-                "club_ownerships"
+                    all_devices_id.add(cform.cleaned_data.get("device").id)
+            dev_qs = (
+                Device.objects.filter(id__in=all_devices_id)
+                .defer("locations_encoded")
+                .prefetch_related("club_ownerships")
             )
             c = [
                 ["", "---------"],
@@ -1168,8 +1174,10 @@ def event_competitors_view(request, event_id):
             queryset=comps,
         )
         formset.extra = 0
-        dev_qs = Device.objects.filter(id__in=all_devices).prefetch_related(
-            "club_ownerships"
+        dev_qs = (
+            Device.objects.filter(id__in=all_devices_id)
+            .defer("locations_encoded")
+            .prefetch_related("club_ownerships")
         )
         c = [
             ["", "---------"],
