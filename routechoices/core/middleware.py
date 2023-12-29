@@ -7,8 +7,8 @@ import arrow
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+from django.core.cache import cache
 from django.core.exceptions import DisallowedHost
-from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.middleware.csrf import CsrfViewMiddleware as OrigCsrfViewMiddleware
 from django.shortcuts import redirect, render
@@ -150,31 +150,45 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         if raw_host == default_domain:
             return redirect(f"//www.{settings.PARENT_HOST}{request.get_full_path()}")
         request.use_cname = False
-        club = None
+        club_slug = None
         if raw_host.endswith(default_subdomain_suffix):
             slug = raw_host[: -(len(default_subdomain_suffix))].lower()
             if slug not in ("api", "map", "registration", "tiles", "wms", "www"):
-                club = Club.objects.filter(
-                    Q(slug__iexact=slug)
-                    | Q(
-                        slug_changed_from__iexact=slug,
-                        slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
-                    )
-                ).first()
-                if not club:
-                    request.club_slug = True
-                    if request.path != "/":
-                        return render(request, "404.html", status=404)
-                    return render(request, "club/404.html", status=404)
+                cache_key = f"club_slug_exists:{slug}"
+                cached_slug = cache.get(cache_key)
+                if cached_slug:
+                    club_slug = cached_slug
+                else:
+                    club_exists = Club.objects.filter(slug__iexact=slug).exists()
+                    if not club_exists:
+                        club_exists = Club.objects.filter(
+                            slug_changed_from__iexact=slug,
+                            slug_changed_at__gt=arrow.now().shift(hours=-72).datetime,
+                        ).exists()
+                        if not club_exists:
+                            cache.set(cache_key, "", 60)
+                            request.club_slug = True
+                            if request.path != "/":
+                                return render(request, "404.html", status=404)
+                            return render(request, "club/404.html", status=404)
+                    club_slug = slug.lower()
+                    cache.set(cache_key, club_slug, 60)
         else:
-            club = Club.objects.filter(domain__iexact=raw_host).first()
-            if not club:
-                return render(request, "404-cname.html", status=404)
-            original_host = f"{club.slug.lower()}{default_subdomain_suffix}"
+            cache_key = f"club_domain_exists:{raw_host}"
+            cached_slug = cache.get(cache_key)
+            if cached_slug:
+                club_slug = cached_slug
+            else:
+                club = Club.objects.filter(domain__iexact=raw_host).first()
+                if not club:
+                    cache.set(cache_key, "", 60)
+                    return render(request, "404-cname.html", status=404)
+                club_slug = club.slug
+                cache.set(cache_key, club_slug, 60)
+            original_host = f"{club_slug}{default_subdomain_suffix}"
             host, kwargs = self.get_host(original_host)
             request.use_cname = True
-        if club:
-            request.club_slug = club.slug
+        request.club_slug = club_slug
         # This is the main part of this middleware
         request.urlconf = host.urlconf
         request.host = host
