@@ -205,12 +205,12 @@ Follow our events live or replay them later.
         indexes = [
             models.Index(
                 Upper("slug"),
-                name="rc_event_slug_upper_idx",
+                name="core_club_slug_upper_idx",
             ),
             models.Index(
                 Upper("slug_changed_from"),
                 F("slug_changed_at").desc(),
-                name="rc_event_changed_slug_idx",
+                name="core_club_changed_slug_idx",
             ),
         ]
 
@@ -1265,7 +1265,11 @@ class Event(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
-        Club, verbose_name="Club", related_name="events", on_delete=models.CASCADE
+        Club,
+        verbose_name="Club",
+        related_name="events",
+        on_delete=models.CASCADE,
+        db_index=True,
     )
     name = models.CharField(verbose_name="Name", max_length=255)
     slug = models.CharField(
@@ -1351,6 +1355,7 @@ class Event(models.Model):
             "Events within the same event set will be grouped together "
             "on the event listing page."
         ),
+        db_index=True,
     )
     emergency_contact = models.EmailField(
         default="",
@@ -1369,6 +1374,19 @@ class Event(models.Model):
         )
         verbose_name = "event"
         verbose_name_plural = "events"
+        indexes = [
+            models.Index(
+                Upper("slug"),
+                name="core_event_slug_upper_idx",
+            ),
+            models.Index(
+                "privacy",
+                "list_on_routechoices_com",
+                "end_date",
+                "event_set_id",
+                name="core_event_listing_frontpage_idx",
+            ),
+        ]
 
     def __str__(self):
         return self.name
@@ -2226,6 +2244,7 @@ class Competitor(models.Model):
         Event,
         related_name="competitors",
         on_delete=models.CASCADE,
+        db_index=True,
     )
     device = models.ForeignKey(
         Device,
