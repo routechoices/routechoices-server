@@ -246,6 +246,7 @@ def device_list_view(request):
 
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
+        .defer("locations_encoded")
         .select_related("club", "device")
         .order_by(ordering_blank_last, "nickname", "device__aid")
     )
