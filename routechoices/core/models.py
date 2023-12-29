@@ -208,6 +208,10 @@ Follow our events live or replay them later.
                 name="core_club_slug_upper_idx",
             ),
             models.Index(
+                Upper("domain"),
+                name="core_club_domain_upper_idx",
+            ),
+            models.Index(
                 Upper("slug_changed_from"),
                 F("slug_changed_at").desc(),
                 name="core_club_changed_slug_idx",
@@ -1305,6 +1309,7 @@ class Event(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        db_index=True,
     )
     map_title = models.CharField(
         max_length=255,
@@ -1384,7 +1389,20 @@ class Event(models.Model):
                 "list_on_routechoices_com",
                 "end_date",
                 "event_set_id",
-                name="core_event_listing_frontpage_idx",
+                name="core_event_list_frontpage_idx",
+            ),
+            models.Index(
+                "privacy",
+                "club_id",
+                "end_date",
+                "event_set_id",
+                name="core_event_list_clubpage_idx",
+            ),
+            models.Index(
+                "privacy",
+                "list_on_routechoices_com",
+                "end_date",
+                name="core_event_listing_idx",
             ),
         ]
 
@@ -2202,6 +2220,7 @@ class ImeiDevice(models.Model):
         validators=[
             validate_imei,
         ],
+        db_index=True,
     )
     device = models.OneToOneField(
         Device, related_name="physical_device", on_delete=models.CASCADE
