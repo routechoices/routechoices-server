@@ -222,9 +222,11 @@ L.Control.Ranking = L.Control.extend({
       "div",
       "leaflet-bar leaflet-control leaflet-control-ranking"
     );
+    back.setAttribute("data-bs-theme", "light");
     u(back).append('<div class="result-name-list"/>');
     back.style.width = "205px";
     back.style.background = "white";
+    back.style.color = "black";
     back.style.padding = "5px";
     back.style.top = "0px";
     back.style.right = "0px";
@@ -299,8 +301,10 @@ L.Control.Grouping = L.Control.extend({
       "div",
       "leaflet-bar leaflet-control leaflet-control-grouping"
     );
+    back.setAttribute("data-bs-theme", "light");
     back.style.width = "205px";
     back.style.background = "white";
+    back.style.color = "black";
     back.style.padding = "5px";
     back.style.top = "0px";
     back.style.right = "0px";
