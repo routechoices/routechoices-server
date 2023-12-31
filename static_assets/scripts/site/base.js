@@ -103,7 +103,6 @@ const setTheme = (theme) => {
       toggle.addEventListener("click", () => {
         bootstrap.Tooltip.getInstance(".theme-selector").hide();
         let theme = getPreferredTheme();
-        console.log(theme);
         if (theme === "auto") {
           theme = "dark";
         } else if (theme === "dark") {

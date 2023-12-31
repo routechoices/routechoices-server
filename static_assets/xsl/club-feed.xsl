@@ -13,7 +13,7 @@
         <meta charset="utf-8"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="/static/vendor/bootstrap-5.2.3/bootstrap.min.css?v=2023081900"/>
+        <link rel="stylesheet" href="/static/vendor/bootstrap-5.3.2/bootstrap.min.css?v=2023123100"/>
       </head>
       <body>
         <main class="container">
