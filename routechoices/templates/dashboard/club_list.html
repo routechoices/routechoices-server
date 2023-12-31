@@ -1,8 +1,10 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 %}
+{% load static django_bootstrap5 compress %}
 {% block extra_head %}
     {{ block.super }}
-    <style>.club-card:hover{box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;}</style>
+    {% compress css %}
+        <link rel="stylesheet" href="{% static 'styles/dashboard/club_list.css' %}" />
+    {% endcompress %}
 {% endblock extra_head %}
 {% block sub_content %}
     <div class="row">

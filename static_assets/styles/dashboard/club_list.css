@@ -1,0 +1,6 @@
+.club-card:hover {
+  box-shadow: rgb(0 0 0 / 15%) 0px 8px 16px 0px;
+}
+.link-primary-alt {
+  color: var(--bs-body-color);
+}
