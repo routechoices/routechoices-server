@@ -17,7 +17,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Event Count</th>
-                            <th>Actions</th>
+                            <th>Link</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,8 +30,9 @@
                                 <td>
                                     {% if event_set.url %}
                                         <a href="{{ event_set.url }}"
+                                           target="_blank"
                                            class="btn btn-primary btn-sm"
-                                           role="button"><i class="fa-solid fa-right-to-bracket"></i> Open</a>
+                                           role="button"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>
                                     {% endif %}
                                 </td>
                             </tr>
