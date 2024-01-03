@@ -81,10 +81,7 @@
                         <div class="d-flex flex-wrap">
                             <div class="d-inline-flex flex-row flex-nowrap">
                                 <div class="btn-group mb-1 text-nowrap me-1" role="group">
-                                    <button class="btn btn-xs btn-info text-nowrap fw-bold disabled"
-                                            id="archived_event_button"
-                                            type="button">Archived Event</button>
-                                    <button class="btn btn-xs btn-secondary text-nowrap fw-bold fst-italic"
+                                    <button class="btn btn-xs btn-secondary text-nowrap fw-bold fst-italic active"
                                             id="live_button"
                                             type="button">Live</button>
                                 </div>
@@ -123,7 +120,7 @@
                                                 id="play_pause_button"
                                                 aria-label="play/pause"
                                                 type="button">
-                                            <i class="fa-solid fa-fw fa-play"></i>
+                                            <i class="fa-solid fa-fw fa-play"></i> x8
                                         </button>
                                         <button class="btn btn-xs btn-secondary"
                                                 id="next_button"
@@ -265,7 +262,6 @@
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-club-name="{{ event.club.name }}"
             data-csrf-token="{{ csrf_token }}"
-            data-data-url="{% host_url 'event_data' event_id=event.aid host 'api' %}"
             data-event-id="{{event.aid}}"
             data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
             data-server-clock-url="{% host_url 'time_api' host 'api' %}"
