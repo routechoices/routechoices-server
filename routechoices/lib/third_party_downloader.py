@@ -161,7 +161,7 @@ class Livelox(ThirdPartyTrackingSolution):
         if r.status_code != 200:
             raise EventImportError("Can not fetch class blob data")
         self.init_data["xtra"] = r.json()
-        self.init_data["relay_leg"] = int(relay_leg)
+        self.init_data["relay_leg"] = int(relay_leg) if relay_leg else ""
         self.init_data["class_id"] = int(class_id)
 
     def get_or_create_event(self, uid):
