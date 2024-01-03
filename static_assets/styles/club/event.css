@@ -222,12 +222,12 @@
   font-size: 0.6em;
 }
 
-#live_button {
+#live_button.btn-secondary {
   background-color: #8e1600;
   border-color: #8e1600;
 }
 
-#live_button.active {
+#live_button.btn-secondary.active {
   background-color: #e50000;
   border-color: #e50000;
   text-transform: uppercase;
