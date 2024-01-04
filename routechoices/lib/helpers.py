@@ -92,7 +92,7 @@ def safe64decode(b):
     return base64.urlsafe_b64decode(b.encode() + b"==")
 
 
-def int_to_base64(i):
+def int_base64(i):
     b = struct.pack(">Q", i)
     while b.startswith(b"\x00"):
         b = b[1:]
@@ -101,7 +101,7 @@ def int_to_base64(i):
 
 def time_base64():
     t = int(time.time())
-    int_to_base64(t)
+    return int_base64(t)
 
 
 def deg2rad(deg):
