@@ -33,6 +33,18 @@ def get_current_site():
     return MySite()
 
 
+def int_to_alpha(i, alphabet=None):
+    if alphabet is None:
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    alphabet_len = len(alphabet)
+    out = ""
+    while i > 0:
+        i -= 1
+        out += alphabet[i % alphabet_len]
+        i = i // alphabet_len
+    return out[::-1]
+
+
 def get_best_image_mime(request, default=None):
     accepted_mimes = request.COOKIES.get(
         "accept-image", request.META.get("HTTP_ACCEPT", "")
@@ -62,12 +74,6 @@ def set_content_disposition(filename, dl=True):
     return f"{prefix}filename*=UTF-8''{urllib.parse.quote(filename, safe='')}"
 
 
-def safe32encode(b):
-    if isinstance(b, str):
-        b = b.encode("utf-8")
-    return base64.b32encode(b).decode().rstrip("=").lower()
-
-
 def safe64encode(b):
     if isinstance(b, str):
         b = b.encode("utf-8")
@@ -75,9 +81,9 @@ def safe64encode(b):
 
 
 def safe64encodedsha(txt):
-    h = hashlib.sha256()
     if isinstance(txt, str):
         txt = txt.encode("utf-8")
+    h = hashlib.sha256()
     h.update(txt)
     return safe64encode(h.digest())
 
@@ -86,12 +92,16 @@ def safe64decode(b):
     return base64.urlsafe_b64decode(b.encode() + b"==")
 
 
-def time_base64():
-    t = int(time.time())
-    b = struct.pack(">Q", t)
+def int_to_base64(i):
+    b = struct.pack(">Q", i)
     while b.startswith(b"\x00"):
         b = b[1:]
     return safe64encode(b)
+
+
+def time_base64():
+    t = int(time.time())
+    int_to_base64(t)
 
 
 def deg2rad(deg):
