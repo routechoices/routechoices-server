@@ -49,7 +49,10 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
     range_header = request.META.get("HTTP_RANGE", "").strip()
     range_match = range_re.match(range_header)
 
-    fileIO = BytesIO(data)
+    if request.method == "HEAD":
+        fileIO = BytesIO(b"")
+    else:
+        fileIO = BytesIO(data)
 
     if range_match:
         first_byte, last_byte = range_match.groups()
@@ -59,7 +62,9 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
             last_byte = size - 1
         length = last_byte - first_byte + 1
         resp = StreamingHttpResponse(
-            RangeFileWrapper(fileIO, offset=first_byte, length=length),
+            FileWrapper(fileIO)
+            if request.method == "HEAD"
+            else RangeFileWrapper(fileIO, offset=first_byte, length=length),
             status=206,
             content_type=content_type,
             **kwargs,
