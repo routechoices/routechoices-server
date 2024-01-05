@@ -209,7 +209,7 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response["Location"])
-        self.assertEqual(response.status_code, 206)
+        self.assertEqual(response.status_code, 200)
 
         # event kmz
         url = self.reverse_and_check(
