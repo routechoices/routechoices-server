@@ -88,20 +88,15 @@ def serve_from_s3(
     headers=None,
     dl=True,
 ):
-    url = s3_object_url(path, bucket)
+    if request.method not in ("GET", "HEAD"):
+        raise NotImplementedError()
+
+    url = s3_object_url(request.method, path, bucket)
     url = url[len(settings.AWS_S3_ENDPOINT_URL) :]
 
-    response_status = status.HTTP_200_OK
-    if request.method == "GET":
-        response_status = status.HTTP_206_PARTIAL_CONTENT
-
-    response = HttpResponse(
-        "", status=response_status, headers=headers, content_type=mime
-    )
-
-    if request.method == "GET":
-        response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
-        response["X-Accel-Buffering"] = "no"
+    response = HttpResponse("", headers=headers, content_type=mime)
+    response["X-Accel-Redirect"] = urllib.parse.quote(f"/s3{url}".encode("utf-8"))
+    response["X-Accel-Buffering"] = "no"
     response["Content-Disposition"] = set_content_disposition(filename, dl=dl)
     return response
 

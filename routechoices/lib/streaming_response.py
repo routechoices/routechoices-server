@@ -46,14 +46,6 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
     if not content_type:
         content_type = magic.from_buffer(data, mime=True) or "application/octet-stream"
 
-    if request.method == "HEAD":
-        resp = StreamingHttpResponse(
-            FileWrapper(bytes()), content_type=content_type, **kwargs
-        )
-        resp["Content-Length"] = str(size)
-        resp["Accept-Ranges"] = "bytes"
-        return resp
-
     range_header = request.META.get("HTTP_RANGE", "").strip()
     range_match = range_re.match(range_header)
 

@@ -13,11 +13,16 @@ def get_s3_client():
     )
 
 
-def s3_object_url(key, bucket):
+def s3_object_url(method, key, bucket):
     s3 = get_s3_client()
     return s3.generate_presigned_url(
-        ClientMethod="get_object", Params={"Bucket": bucket, "Key": key}
+        ClientMethod=f"{method.lower()}_object", Params={"Bucket": bucket, "Key": key}
     )
+
+
+def s3_object_size(key, bucket):
+    s3 = get_s3_client()
+    return s3.head_object(Bucket=bucket, Key=key).get("ContentLength", 0)
 
 
 def s3_delete_key(key, bucket):
