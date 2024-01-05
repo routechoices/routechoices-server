@@ -41,13 +41,24 @@ class RangeFileWrapper:
 
 
 def StreamingHttpRangeResponse(request, data, **kwargs):
-    range_header = request.META.get("HTTP_RANGE", "").strip()
-    range_match = range_re.match(range_header)
     size = len(data)
     content_type = kwargs.pop("content_type", None)
     if not content_type:
         content_type = magic.from_buffer(data, mime=True) or "application/octet-stream"
+
+    if request.method == "HEAD":
+        resp = StreamingHttpResponse(
+            FileWrapper(bytes()), content_type=content_type, **kwargs
+        )
+        resp["Content-Length"] = str(size)
+        resp["Accept-Ranges"] = "bytes"
+        return resp
+
+    range_header = request.META.get("HTTP_RANGE", "").strip()
+    range_match = range_re.match(range_header)
+
     fileIO = BytesIO(data)
+
     if range_match:
         first_byte, last_byte = range_match.groups()
         first_byte = int(first_byte) if first_byte else 0

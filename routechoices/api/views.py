@@ -1614,7 +1614,7 @@ def device_ownership_api_view(request, club_id, device_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 def event_map_download(request, event_id, map_index="1"):
     event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     file_path = raster_map.path
@@ -1643,7 +1643,7 @@ def event_map_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 def event_kmz_download(request, event_id, map_index="1"):
     event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
     kmz_data = raster_map.kmz
@@ -1667,7 +1667,7 @@ def event_kmz_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 @login_required
 def map_kmz_download(request, map_id, *args, **kwargs):
     club_list = Club.objects.filter(admins=request.user)
@@ -1688,7 +1688,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
         Competitor.objects.select_related("event", "event__club", "device"),
