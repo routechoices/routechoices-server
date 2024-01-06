@@ -111,7 +111,7 @@
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-csrf-token="{{ csrf_token }}"
-            data-club-id="{{ club.aid }}"></script>
+            data-club-slug="{{ club.slug }}"></script>
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
         <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>

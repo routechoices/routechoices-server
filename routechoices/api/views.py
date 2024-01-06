@@ -130,11 +130,11 @@ mine_param = openapi.Parameter(
 @login_required
 @api_view(["POST"])
 def event_set_creation(request):
-    club_id = request.data.get("club_id")
-    club = Club.objects.filter(aid=club_id).first()
+    club_slug = request.data.get("club_slug")
     name = request.data.get("name")
-    if not name or not club:
+    if not name or not club_slug:
         raise ValidationError("Missing parameter")
+    club = Club.objects.filter(slug=club_slug).first()
     is_user_event_admin = club.admins.filter(id=request.user.id).exists()
     if not is_user_event_admin:
         raise PermissionDenied("not club admin")
@@ -439,14 +439,12 @@ def event_list(request):
             examples={
                 "application/json": [
                     {
-                        "id": "PlCG3xFS-f4",
                         "name": "Kangasala SK",
                         "slug": "ksk",
                         "url": "https://ksk.routechoices.com/",
                         "owner": False,
                     },
                     {
-                        "id": "ohFYzJep1hI",
                         "name": "Halden SK",
                         "slug": "halden-sk",
                         "url": "https://gps.haldensk.no/",
@@ -472,7 +470,6 @@ def club_list(request):
     output = []
     for club in clubs:
         data = {
-            "id": club.aid,
             "name": club.name,
             "slug": club.slug,
             "url": club.nice_url,
@@ -1585,8 +1582,8 @@ def device_registrations(request, device_id):
 )
 @api_view(["PATCH", "DELETE"])
 @login_required
-def device_ownership_api_view(request, club_id, device_id):
-    club = get_object_or_404(Club, aid=club_id)
+def device_ownership_api_view(request, club_slug, device_id):
+    club = get_object_or_404(Club, slug=club_slug)
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
 
     ownership, _created = DeviceClubOwnership.objects.get_or_create(

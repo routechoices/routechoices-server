@@ -41,7 +41,7 @@ function onCsvParsed(result) {
             url:
               window.local.apiBaseUrl +
               "clubs/" +
-              window.local.clubId +
+              window.local.clubSlug +
               "/devices/" +
               deviceId +
               "/",
@@ -86,7 +86,7 @@ function onCsvParsed(result) {
                 url:
                   window.local.apiBaseUrl +
                   "clubs/" +
-                  window.local.clubId +
+                  window.local.clubSlug +
                   "/devices/" +
                   deviceId +
                   "/",

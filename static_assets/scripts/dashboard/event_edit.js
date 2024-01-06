@@ -340,7 +340,7 @@ function showLocalTime(el) {
         url: window.local.apiBaseUrl + "event-set",
         method: "post",
         data: {
-          club_id: window.local.clubId,
+          club_slug: window.local.clubSlug,
           name: input,
         },
         type: "json",

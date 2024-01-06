@@ -50,7 +50,7 @@ urlpatterns = [
         name="club_list",
     ),
     re_path(
-        r"^clubs/(?P<club_id>[0-9a-zA-Z_-]+)/devices/(?P<device_id>[^/]+)/?$",
+        r"^clubs/(?P<club_slug>[0-9a-zA-Z_-]+)/devices/(?P<device_id>[^/]+)/?$",
         views.device_ownership_api_view,
         name="device_ownership_api_view",
     ),
