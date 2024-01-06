@@ -1644,13 +1644,14 @@ def event_kmz_download(request, event_id, map_index="1"):
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
 
+    filename = f"{raster_map.name}.kmz"
     response = StreamingHttpRangeResponse(
         request,
         kmz_data,
         content_type="application/vnd.google-earth.kmz",
         headers=headers,
     )
-    filename = f"{raster_map.name}.kmz"
+    response["ETag"] = f'W/"{safe64encodedsha(kmz_data)}"'
     response["Content-Disposition"] = set_content_disposition(filename)
     return response
 
