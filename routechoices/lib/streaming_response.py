@@ -23,7 +23,7 @@ class RangeFileWrapper:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.remaining is None:
             # If remaining is None, we're reading the entire file.
             data = self.filelike.read(self.blksize)
