@@ -82,6 +82,34 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        # test range response
+        url = self.reverse_and_check(
+            "club_banner",
+            "/banner",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+
+        response = client.get(url, HTTP_RANGE="bytes=0-10")
+        self.assertEqual(response.status_code, 206)
+        data = b""
+        for d in iter(response.streaming_content):
+            data += d
+        self.assertEqual(len(data), 11)
+        self.assertEqual(response.headers["Content-Length"], "11")
+        self.assertEqual(response.headers["Content-Range"], "bytes 0-10/633")
+
+        response = client.get(url, HTTP_RANGE="bytes=10-20")
+        self.assertEqual(response.status_code, 206)
+        data2 = b""
+        for d in iter(response.streaming_content):
+            data2 += d
+        self.assertEqual(len(data2), 11)
+        self.assertNotEqual(data, data2)
+        self.assertEqual(response.headers["Content-Length"], "11")
+        self.assertEqual(response.headers["Content-Range"], "bytes 10-20/633")
+
     def test_event_set_page_loads(self):
         s = EventSet.objects.create(
             club=self.club,
