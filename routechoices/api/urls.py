@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import include, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -18,6 +19,7 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
+    url=f"https://www.{settings.PARENT_HOST}/",
 )
 
 
