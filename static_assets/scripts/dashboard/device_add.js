@@ -10,6 +10,7 @@ function displaySuccess(msg) {
 
 function onCsvParsed(result) {
   u("#csv_input").val("");
+  displayErrors("");
   var nImported = 0;
   var errors = "";
   if (result.errors.length > 0) {
@@ -17,11 +18,10 @@ function onCsvParsed(result) {
   }
   if (!errors) {
     result.data.forEach(function (l) {
-      var empty = false;
       if (l.length == 1 && l[0] == "") {
-        empty = true;
+        return; // empty line
       }
-      if (!empty && l.length != 2) {
+      if (l.length != 2) {
         errors += "All rows should have 2 columns\n";
       } else {
         var imeiOrDeviceId = l[0];
@@ -64,7 +64,7 @@ function onCsvParsed(result) {
                 deviceId +
                 ', nickname "' +
                 nickname +
-                '": Failure\n';
+                '": Failed\n';
               displayErrors(errors);
             });
         } else {
@@ -105,7 +105,7 @@ function onCsvParsed(result) {
                 })
                 .fail(function () {
                   errors +=
-                    "IMEI " + imei + ', nickname "' + nickname + '": Failure\n';
+                    "IMEI " + imei + ', nickname "' + nickname + '": Failed\n';
                   displayErrors(errors);
                 });
             })
@@ -116,11 +116,13 @@ function onCsvParsed(result) {
                 ', nickname "' +
                 nickname +
                 '": Invalid IMEI\n';
-              displayErrors(errors);
             });
         }
       }
     });
+  }
+  if (errors) {
+    displayErrors(errors);
   }
 }
 
@@ -158,6 +160,9 @@ function onCsvParsed(result) {
 
   u("#importCSVImei").on("submit", function (e) {
     e.preventDefault();
-    Papa.parse(u("#csv_input").nodes[0].files[0], { complete: onCsvParsed });
+    Papa.parse(u("#csv_input").nodes[0].files[0], {
+      complete: onCsvParsed,
+      delimiter: ";",
+    });
   });
 })();
