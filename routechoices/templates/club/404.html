@@ -1,6 +1,10 @@
 {% extends "club/base.html" %}
-{% load hosts %}
+{% load static hosts %}
 {% block favicon %}
+    <link rel="apple-touch-icon"
+          href="{% static 'apple-touch-icon.png' %}?v=2023e">
+    <link rel="icon" sizes="32x32" href="{% static 'favicon.ico' %}?v=2023e">
+    <link rel="manifest" href="{% static 'manifest.json' %}?v=2023e">
 {% endblock favicon %}
 {% block content %}
     <div class="text-center">
