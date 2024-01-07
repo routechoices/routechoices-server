@@ -86,14 +86,14 @@ const setTheme = (theme) => {
     };
     document
       .querySelector(".theme-selector")
-      .setAttribute("title", tooltips[theme]);
+      ?.setAttribute("title", tooltips[theme]);
     document
       .querySelector(".theme-selector")
-      .setAttribute("data-bs-original-title", tooltips[theme]);
+      ?.setAttribute("data-bs-original-title", tooltips[theme]);
     document
       .querySelector(".theme-selector")
-      .setAttribute("aria-label", tooltips[theme]);
-    svgOfActiveBtn.setAttribute("xlink:href", `#icon-${icons[theme]}`);
+      ?.setAttribute("aria-label", tooltips[theme]);
+    svgOfActiveBtn?.setAttribute("xlink:href", `#icon-${icons[theme]}`);
   };
 
   window.addEventListener("DOMContentLoaded", () => {
