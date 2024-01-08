@@ -1,5 +1,5 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "//www.routechoices.com/static/vendor/pdfjs-3.3.122/pdf.worker.js";
+  "/static/vendor/pdfjs-3.3.122/pdf.worker.js";
 
 var extractCornersCoordsFromFilename = function (filename) {
   var re = /(_[-]?\d+(\.\d+)?){8}_\.(gif|png|jpg|jpeg|webp)$/;
@@ -50,6 +50,16 @@ var onPDF = function (ev, filename) {
             });
             var container = new DataTransfer();
             container.items.add(file);
+            if (container.files[0].size > 2 * 1e7) {
+              swal({
+                title: "Error!",
+                text: "File is too big!",
+                type: "error",
+                confirmButtonText: "OK",
+              });
+              u("#id_image").nodes[0].value = "";
+              return;
+            }
             u("#id_image").nodes[0].files = container.files;
             u("#id_image").trigger("change");
           },
@@ -669,7 +679,11 @@ function enableBtnToPreview() {
   );
 
   u("#id_image").on("change", function () {
-    if (this.files.length > 0 && this.files[0].size > 2 * 1e7) {
+    if (
+      this.files.length > 0 &&
+      this.files[0].size > 2 * 1e7 &&
+      this.files[0].type !== "application/pdf"
+    ) {
       swal({
         title: "Error!",
         text: "File is too big!",
