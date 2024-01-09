@@ -1,6 +1,6 @@
 {% extends "dashboard/club_view.html" %}
 {% load static django_bootstrap5 compress %}
-{% block sub_sub_content %}
+{% block sub_content %}
     <div class="row">
         <div class="col-12">
             <h1>Request invite to manage club</h1>
@@ -13,7 +13,7 @@
             </form>
         </div>
     </div>
-{% endblock sub_sub_content %}
+{% endblock sub_content %}
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
