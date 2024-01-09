@@ -1,0 +1,3 @@
+{% autoescape off %}
+Request for an invitation to manage club {{ club }} on {{ site_name }}
+{% endautoescape %}

@@ -52,6 +52,24 @@ class UserForm(ModelForm):
         return username
 
 
+class RequestInviteForm(Form):
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        return super().__init__(*args, **kwargs)
+
+    club = ModelChoiceField(
+        label="Club",
+        help_text="Enter the club you want to be added as admin",
+        queryset=Club.objects.all(),
+    )
+
+    def clean_club(self):
+        club = self.cleaned_data["club"]
+        if self.user in club.admins.all():
+            raise ValidationError("You are already an admin of this club.")
+        return club
+
+
 class ClubForm(ModelForm):
     class Meta:
         model = Club

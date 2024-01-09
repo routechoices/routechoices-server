@@ -56,6 +56,7 @@ from routechoices.dashboard.forms import (
     ExtraMapFormSet,
     MapForm,
     NoticeForm,
+    RequestInviteForm,
     UploadGPXForm,
     UploadKmzForm,
     UploadMapGPXForm,
@@ -96,10 +97,16 @@ def requires_club_in_session(function):
         club = None
         if obj:
             club = obj.club
-        elif "dashboard_club" in request.session:
+        if "dashboard_club" in request.session:
             session_club_aid = request.session["dashboard_club"]
             club = Club.objects.filter(
                 aid=session_club_aid,
+                admins=request.user,
+            ).first()
+        if "club" in request.GET:
+            club_qp = request.GET.get("club")
+            club = Club.objects.filter(
+                slug=club_qp,
                 admins=request.user,
             ).first()
         if club is None:
@@ -124,6 +131,8 @@ def home_view(request):
 @requires_club_in_session
 def club_invite_add_view(request):
     club = request.club
+    email = request.GET.get("email")
+
     if request.method == "POST":
         form = InviteForm(request.POST, club=club)
         if form.is_valid():
@@ -135,8 +144,41 @@ def club_invite_add_view(request):
             messages.success(request, "Invite sent successfully")
             return redirect("dashboard:club_view")
     else:
-        form = InviteForm()
-    return render(request, "dashboard/invite_add.html", {"club": club, "form": form})
+        form = InviteForm(initial={"email": email})
+    return render(
+        request,
+        "dashboard/invite_add.html",
+        {
+            "club": club,
+            "form": form,
+        },
+    )
+
+
+@login_required
+def club_request_invite_view(request):
+    if request.method == "POST":
+        form = RequestInviteForm(request.user, request.POST)
+        if form.is_valid():
+            club = form.cleaned_data["club"]
+            current_site = get_current_site()
+            url = build_absolute_uri(request, reverse("dashboard:club_invite_add_view"))
+            context = {
+                "site_name": current_site.name,
+                "email": request.user.email,
+                "club": club,
+                "send_invite_url": f"{url}?club={club.slug}&email={request.user.email}",
+            }
+            get_adapter(request).send_mail(
+                "account/email/request_invite",
+                list(club.admins.all().values_list("email", flat=True)),
+                context,
+            )
+            messages.success(request, "Invite requested successfully")
+            return redirect("dashboard:home_view")
+    else:
+        form = RequestInviteForm(user=request.user)
+    return render(request, "dashboard/request_invite.html", {"form": form})
 
 
 @login_required

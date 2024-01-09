@@ -1,0 +1,10 @@
+{% autoescape off %}
+
+Hello,
+
+A user ({{ email }}) has requested an invite to manage the club {{ club }} on {{ site_name }}.
+You receive this email as you are a administrator of this club.
+
+If you'd like so, go to {{ send_invite_url }} to send an invite to this user.
+
+{% endautoescape %}

@@ -16,12 +16,16 @@
                     <p>
                         You can: <a href="{% url 'dashboard:club_create_view' %}" class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
                     </p>
-                    <p>Or request another user to add your username "{{ request.user.username }}" to the list of admins of theirs.</p>
+                    <p>
+                        Or ask to join the list of admins of an existing club <a href="{% url 'dashboard:club_request_admin_view' %}">Request Invite</a>.
+                    </p>
                 </div>
             {% else %}
                 <h3>Select one of your club</h3>
                 <a href="{% url 'dashboard:club_create_view' %}"
-                   class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+                   class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+                <a href="{% url 'dashboard:club_request_invite_view' %}"
+                   class="btn btn-primary mb-1">Request an Invite</a>
                 {% if clubs.paginator.num_pages > 1 %}
                     {% bootstrap_pagination clubs extra=request.GET.urlencode pages_to_show=4 %}
                 {% endif %}
