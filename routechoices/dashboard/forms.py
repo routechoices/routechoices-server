@@ -60,7 +60,7 @@ class RequestInviteForm(Form):
     club = ModelChoiceField(
         label="Club",
         help_text="Enter the club you want to be added as admin",
-        queryset=Club.objects.all(),
+        queryset=Club.objects.filter(forbid_invite_request=False),
     )
 
     def clean_club(self):
@@ -73,7 +73,16 @@ class RequestInviteForm(Form):
 class ClubForm(ModelForm):
     class Meta:
         model = Club
-        fields = ["name", "slug", "admins", "website", "logo", "banner", "description"]
+        fields = [
+            "name",
+            "slug",
+            "admins",
+            "forbid_invite_request",
+            "website",
+            "logo",
+            "banner",
+            "description",
+        ]
 
     def clean_slug(self):
         slug = self.cleaned_data["slug"].lower()

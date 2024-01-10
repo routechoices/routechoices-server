@@ -197,6 +197,9 @@ Follow our events live or replay them later.
     upgraded = models.BooleanField(default=False)
     upgraded_date = models.DateTimeField(blank=True, null=True)
     order_id = models.CharField(max_length=200, blank=True, default="")
+    forbid_invite_request = models.BooleanField(
+        "Prevent external users to request admin rights", default=False
+    )
 
     class Meta:
         ordering = ["name"]
