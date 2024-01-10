@@ -10,6 +10,7 @@ import requests
 from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
+from allauth.account.models import EmailAddress
 from allauth.account.signals import password_changed, password_reset
 from allauth.account.utils import user_username
 from allauth.account.views import EmailView
@@ -169,9 +170,15 @@ def club_request_invite_view(request):
                 "club": club,
                 "send_invite_url": f"{url}?club={club.slug}&email={request.user.email}",
             }
+            club_admins_ids = list(club.admins.all().values_list("id", flat=True))
+            emails = list(
+                EmailAddress.objects.filter(
+                    user_id__in=club_admins_ids, primary=True
+                ).values_list("email", flat=True)
+            )
             get_adapter(request).send_mail(
                 "account/email/request_invite",
-                list(club.admins.all().values_list("email", flat=True)),
+                emails,
                 context,
             )
             messages.success(request, "Invite requested successfully")
