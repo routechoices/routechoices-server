@@ -2105,7 +2105,7 @@ function RCEvent(infoURL, clockURL) {
             layer.nickname = e.target.value;
             layer.setZIndex(-1);
             layer.addTo(map);
-            bgLgyer = layer;
+            bgLayer = layer;
           }
         });
 
