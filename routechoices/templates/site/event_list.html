@@ -168,88 +168,6 @@
                                             </span>
                                             {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
                                     </h4>
-                                </div>
-                            {% endif %}
-                            {% for event in event_set.events %}
-                                <div class="card border-0 shadow mb-3"
-                                     style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
-                                            background-size: cover;
-                                            background-position: center">
-                                    <div class="card-body">
-                                        <div class="bd-highlight">
-                                            <div class="px-2 py-1 bd-highlight">
-                                                <div>
-                                                    <a class="link-primary-alt stretched-link text-decoration-none"
-                                                       href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="mx-2 py-1 px-2 badge bg-danger fst-italic"
-       style="font-size: 1em"><b><i>LIVE</i></b></span>
-                                                </div>
-                                                <div class="d-inline-block"
-                                                     style="color:grey;
-                                                            font-size:0.75em;
-                                                            line-height:0.8em;
-                                                            position:relative;
-                                                            z-index:11">
-                                                    <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                                                    {% if event.open_registration %}
-                                                        <span><i data-bs-toggle="tooltip"
-   data-bs-title="Competitor registration enabled"
-   class="me-1 fa-solid fa-user-plus"></i></span>
-                                                    {% endif %}
-                                                    {% if event.allow_route_upload %}
-                                                        <span><i data-bs-toggle="tooltip"
-   data-bs-title="GPS upload enabled"
-   class="me-1 fa-solid fa-file-arrow-up"></i></span>
-                                                    {% endif %}
-                                                    <div class="mt-2">
-                                                        {% if event.open_registration %}
-                                                            <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
-                                                               class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
-                                                        {% endif %}
-                                                        {% if event.allow_route_upload %}
-                                                            <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
-                                                               class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
-                                                        {% endif %}
-                                                        <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                    {% if upcoming_events or events %}<hr />{% endif %}
-                {% endif %}
-                {% if upcoming_events %}
-                    <div class="mb-3">
-                        <h2 class="header-multiline">
-                            <span><i class="fa-solid fa-bell"></i> Upcoming Events</span>
-                        </h2>
-                        <h6>Starting in the next 24 hours</h6>
-                    </div>
-                    {% for event_set in upcoming_events %}
-                        <div class="mb-4">
-                            {% if not event_set_page %}
-                                <div class="row">
-                                    <h4 class="padded-multiline">
-                                        {% if event_set.data.create_page and not event_set.data.list_secret_events %}
-                                            <a href="{{ event_set.data.url }}" class="text-decoration-none">
-                                            {% endif %}
-                                            <span>
-                                                {% if not event_set.fake %}
-                                                    {{ event_set.name }}
-                                                {% else %}
-                                                    Event
-                                                {% endif %}
-                                                {% if event_set.data.create_page and not event_set.data.list_secret_events %}
-                                                    <i style="font-size: 1rem;
-                                                              color: var(--bs-link-color)"
-                                                       class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
-                                                {% endif %}
-                                            </span>
-                                            {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
-                                    </h4>
                                     {% if not club %}
                                         <div class="mb-2"
                                              style="font-size: 0.8em;
@@ -271,20 +189,16 @@
                         {% endif %}
                         {% for event in event_set.events %}
                             <div class="card border-0 shadow mb-3"
-                                 style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
+                                 style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
                                         background-size: cover;
                                         background-position: center">
                                 <div class="card-body">
-                                    <div class="bd-highlight d-flex">
+                                    <div class="bd-highlight">
                                         <div class="px-2 py-1 bd-highlight">
                                             <div>
                                                 <a class="link-primary-alt stretched-link text-decoration-none"
-                                                   href="{{ event.get_absolute_url }}">
-                                                    <b style="font-size: 1.5em;">{{ event.name }}</b>
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+                                                   href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a> <span class="mx-2 py-1 px-2 badge bg-danger fst-italic"
+       style="font-size: 1em"><b><i>LIVE</i></b></span>
                                             </div>
                                             <div class="d-inline-block"
                                                  style="color:grey;
@@ -296,13 +210,24 @@
                                                 {% if event.open_registration %}
                                                     <span><i data-bs-toggle="tooltip"
    data-bs-title="Competitor registration enabled"
-   class="fa-solid fa-user-plus"></i></span>
+   class="me-1 fa-solid fa-user-plus"></i></span>
                                                 {% endif %}
-                                                {% if event.open_registration %}
-                                                    <div class="mt-2">
-                                                        <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
-                                                    </div>
+                                                {% if event.allow_route_upload %}
+                                                    <span><i data-bs-toggle="tooltip"
+   data-bs-title="GPS upload enabled"
+   class="me-1 fa-solid fa-file-arrow-up"></i></span>
                                                 {% endif %}
+                                                <div class="mt-2">
+                                                    {% if event.open_registration %}
+                                                        <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
+                                                           class="me-1"><i class="fa-solid fa-solid fa-user-plus"></i> Enter</a>
+                                                    {% endif %}
+                                                    {% if event.allow_route_upload %}
+                                                        <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
+                                                           class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                                                    {% endif %}
+                                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -311,176 +236,268 @@
                         {% endfor %}
                     </div>
                 {% endfor %}
-                {% if years or search_text or event_set_page and events %}<hr />{% endif %}
+                {% if upcoming_events or events %}<hr />{% endif %}
             {% endif %}
-            <div class="mb-3">
-                {% if years or search_text or event_set_page and events %}
-                    <div {% if not event_set_page %}class="mb-3"{% endif %}>
-                        <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif %}">
-                            <span><i class="fa-solid fa-box-archive"></i> Archived Events</span>
-                        </h2>
-                        {% if home_url and not event_set_page %}
-                            <form class="mb-3 row" method="get">
-                                <div class="col-auto pe-1">
-                                    <input class="form-control"
-                                           type="search"
-                                           placeholder="Search"
-                                           name="q"
-                                           value="{{ search_text }}">
-                                </div>
-                                <div class="col-auto ps-0">
-                                    <input class="btn btn-primary" type="submit" value="Search">
-                                </div>
-                            </form>
-                            {% if search_text %}Results for search: "<i>{{ search_text }}</i>"{% endif %}
-                            {% if years %}
-                                <div class="row" style="text-wrap: balance">
-                                    <p class="mb-1">
-                                        {% if year %}
-                                            <a class="me-1"
-                                               href="{{ home_url }}{% if search_text %}?q={{ search_text|urlencode }}{% endif %}">All</a>
-                                        {% else %}
-                                            <span class="me-1">All</span>
+            {% if upcoming_events %}
+                <div class="mb-3">
+                    <h2 class="header-multiline">
+                        <span><i class="fa-solid fa-bell"></i> Upcoming Events</span>
+                    </h2>
+                    <h6>Starting in the next 24 hours</h6>
+                </div>
+                {% for event_set in upcoming_events %}
+                    <div class="mb-4">
+                        {% if not event_set_page %}
+                            <div class="row">
+                                <h4 class="padded-multiline">
+                                    {% if event_set.data.create_page and not event_set.data.list_secret_events %}
+                                        <a href="{{ event_set.data.url }}" class="text-decoration-none">
                                         {% endif %}
-                                        {% for y in years %}
-                                            {% if year == y %}
-                                                <span class="me-1">{{ y }}</span>
+                                        <span>
+                                            {% if not event_set.fake %}
+                                                {{ event_set.name }}
                                             {% else %}
-                                                <a class="me-1"
-                                                   href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ y }}">{{ y }}</a>
+                                                Event
                                             {% endif %}
-                                        {% endfor %}
-                                    </p>
-                                </div>
-                                {% if year %}
-                                    <div class="row" style="text-wrap: balance">
-                                        <p class="mb-1">
-                                            {% if month %}
-                                                <a class="me-1"
-                                                   href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}">All</a>
-                                            {% else %}
-                                                <span class="me-1">All</span>
+                                            {% if event_set.data.create_page and not event_set.data.list_secret_events %}
+                                                <i style="font-size: 1rem;
+                                                          color: var(--bs-link-color)"
+                                                   class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
                                             {% endif %}
-                                            {% for m in months %}
-                                                {% if month == m %}
-                                                    <span class="me-1">{{ month_names|index:m }}</span>
-                                                {% else %}
-                                                    <a class="me-1"
-                                                       href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}&month={{ m }}">{{ month_names|index:m }}</a>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </p>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {% if events_page.paginator.num_pages > 1 %}
-                    {% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}
-                {% endif %}
-            </div>
-            {% for event_set in events %}
-                <div class="mb-4">
-                    {% if not event_set_page %}
-                        <div class="row">
-                            <h4 class="padded-multiline">
-                                {% if event_set.data.create_page and not event_set.data.list_secret_events %}
-                                    <a href="{{ event_set.data.url }}" class="text-decoration-none">
-                                    {% endif %}
-                                    <span>
-                                        {% if not event_set.fake %}
-                                            {{ event_set.name }}
-                                        {% else %}
-                                            Event
-                                        {% endif %}
-                                        {% if event_set.data.create_page and not event_set.data.list_secret_events %}
-                                            <i style="font-size: 1rem;
-                                                      color: var(--bs-link-color)"
-                                               class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
-                                        {% endif %}
-                                    </span>
-                                    {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
-                            </h4>
-                            {% if not club %}
-                                <div class="mb-2"
-                                     style="font-size: 0.8em;
-                                            margin-left: 25px;
-                                            max-width: calc(100% - 25px)">
-                                    By <a class="link-primary-alt"
+                                        </span>
+                                        {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
+                                </h4>
+                                {% if not club %}
+                                    <div class="mb-2"
+                                         style="font-size: 0.8em;
+                                                margin-left: 25px;
+                                                max-width: calc(100% - 25px)">
+                                        By <a class="link-primary-alt"
     href="{{ event_set.events.0.club.get_absolute_url }}">
-                                    {% if event_set.events.0.club.logo %}
-                                        <img src="{{ event_set.events.0.club.logo_url }}"
-                                             width="25px"
-                                             height="25px"
-                                             alt="{{ event_set.events.0.club.name }}'s logo"
-                                             style="vertical-align: bottom">
-                                    {% endif %}
-                                {{ event_set.events.0.club.name }}</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {% for event in event_set.events %}
-                    <div class="card border-0 shadow mb-3"
-                         style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
-                                background-size: cover;
-                                background-position: center">
-                        <div class="card-body">
-                            <div class="bd-highlight">
-                                <div class="px-2 py-1 bd-highlight">
-                                    <div>
-                                        <a class="link-primary-alt stretched-link text-decoration-none"
-                                           href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
-                                    </div>
-                                    <div>
-                                        <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
-                                    </div>
-                                    <div class="d-inline-block"
-                                         style="color:grey;
-                                                font-size:0.75em;
-                                                line-height:0.8em;
-                                                position:relative;
-                                                z-index:11">
-                                        <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
-                                        {% if event.allow_route_upload %}
-                                            <span><i data-bs-toggle="tooltip"
-   data-bs-title="GPS upload enabled"
-   class="fa-solid fa-file-arrow-up"></i></span>
+                                        {% if event_set.events.0.club.logo %}
+                                            <img src="{{ event_set.events.0.club.logo_url }}"
+                                                 width="25px"
+                                                 height="25px"
+                                                 alt="{{ event_set.events.0.club.name }}'s logo"
+                                                 style="vertical-align: bottom">
                                         {% endif %}
-                                        <div class="mt-2">
-                                            {% if event.allow_route_upload %}
-                                                <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
-                                                   class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                                    {{ event_set.events.0.club.name }}</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% for event in event_set.events %}
+                        <div class="card border-0 shadow mb-3"
+                             style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
+                                    background-size: cover;
+                                    background-position: center">
+                            <div class="card-body">
+                                <div class="bd-highlight d-flex">
+                                    <div class="px-2 py-1 bd-highlight">
+                                        <div>
+                                            <a class="link-primary-alt stretched-link text-decoration-none"
+                                               href="{{ event.get_absolute_url }}">
+                                                <b style="font-size: 1.5em;">{{ event.name }}</b>
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+                                        </div>
+                                        <div class="d-inline-block"
+                                             style="color:grey;
+                                                    font-size:0.75em;
+                                                    line-height:0.8em;
+                                                    position:relative;
+                                                    z-index:11">
+                                            <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
+                                            {% if event.open_registration %}
+                                                <span><i data-bs-toggle="tooltip"
+   data-bs-title="Competitor registration enabled"
+   class="fa-solid fa-user-plus"></i></span>
                                             {% endif %}
-                                            <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                                            {% if event.open_registration %}
+                                                <div class="mt-2">
+                                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-        {% if events_page.paginator.num_pages > 1 %}
-            {% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            {% if years or search_text or event_set_page and events %}<hr />{% endif %}
         {% endif %}
-    </div>
-    {% if not live_events and not events and not upcoming_events %}
-        <div class="card border-0 shadow mb-3"
-             style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
-                    background-size: cover;
-                    background-position: center">
-            <div class="card-body">
-                <h2 style="color: #888">
-                    No
-                    {% if not event_set_page or event_set.hide_secret_events %}public{% endif %}
-                    events...
-                </h2>
-            </div>
+        <div class="mb-3">
+            {% if years or search_text or event_set_page and events %}
+                <div {% if not event_set_page %}class="mb-3"{% endif %}>
+                    <h2 class="header-multiline{% if not event_set_page %} mb-3{% endif %}">
+                        <span><i class="fa-solid fa-box-archive"></i> Archived Events</span>
+                    </h2>
+                    {% if home_url and not event_set_page %}
+                        <form class="mb-3 row" method="get">
+                            <div class="col-auto pe-1">
+                                <input class="form-control"
+                                       type="search"
+                                       placeholder="Search"
+                                       name="q"
+                                       value="{{ search_text }}">
+                            </div>
+                            <div class="col-auto ps-0">
+                                <input class="btn btn-primary" type="submit" value="Search">
+                            </div>
+                        </form>
+                        {% if search_text %}Results for search: "<i>{{ search_text }}</i>"{% endif %}
+                        {% if years %}
+                            <div class="row" style="text-wrap: balance">
+                                <p class="mb-1">
+                                    {% if year %}
+                                        <a class="me-1"
+                                           href="{{ home_url }}{% if search_text %}?q={{ search_text|urlencode }}{% endif %}">All</a>
+                                    {% else %}
+                                        <span class="me-1">All</span>
+                                    {% endif %}
+                                    {% for y in years %}
+                                        {% if year == y %}
+                                            <span class="me-1">{{ y }}</span>
+                                        {% else %}
+                                            <a class="me-1"
+                                               href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ y }}">{{ y }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+                            {% if year %}
+                                <div class="row" style="text-wrap: balance">
+                                    <p class="mb-1">
+                                        {% if month %}
+                                            <a class="me-1"
+                                               href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}">All</a>
+                                        {% else %}
+                                            <span class="me-1">All</span>
+                                        {% endif %}
+                                        {% for m in months %}
+                                            {% if month == m %}
+                                                <span class="me-1">{{ month_names|index:m }}</span>
+                                            {% else %}
+                                                <a class="me-1"
+                                                   href="{{ home_url }}?{% if search_text %}q={{ search_text|urlencode }}&{% endif %}year={{ year }}&month={{ m }}">{{ month_names|index:m }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if events_page.paginator.num_pages > 1 %}
+                {% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}
+            {% endif %}
         </div>
+        {% for event_set in events %}
+            <div class="mb-4">
+                {% if not event_set_page %}
+                    <div class="row">
+                        <h4 class="padded-multiline">
+                            {% if event_set.data.create_page and not event_set.data.list_secret_events %}
+                                <a href="{{ event_set.data.url }}" class="text-decoration-none">
+                                {% endif %}
+                                <span>
+                                    {% if not event_set.fake %}
+                                        {{ event_set.name }}
+                                    {% else %}
+                                        Event
+                                    {% endif %}
+                                    {% if event_set.data.create_page and not event_set.data.list_secret_events %}
+                                        <i style="font-size: 1rem;
+                                                  color: var(--bs-link-color)"
+                                           class="mx-2 fa-solid fa-arrow-up-right-from-square"></i>
+                                    {% endif %}
+                                </span>
+                                {% if event_set.data.create_page and not event_set.data.list_secret_events %}</a>{% endif %}
+                        </h4>
+                        {% if not club %}
+                            <div class="mb-2"
+                                 style="font-size: 0.8em;
+                                        margin-left: 25px;
+                                        max-width: calc(100% - 25px)">
+                                By <a class="link-primary-alt"
+    href="{{ event_set.events.0.club.get_absolute_url }}">
+                                {% if event_set.events.0.club.logo %}
+                                    <img src="{{ event_set.events.0.club.logo_url }}"
+                                         width="25px"
+                                         height="25px"
+                                         alt="{{ event_set.events.0.club.name }}'s logo"
+                                         style="vertical-align: bottom">
+                                {% endif %}
+                            {{ event_set.events.0.club.name }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% for event in event_set.events %}
+                <div class="card border-0 shadow mb-3"
+                     style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
+                            background-size: cover;
+                            background-position: center">
+                    <div class="card-body">
+                        <div class="bd-highlight">
+                            <div class="px-2 py-1 bd-highlight">
+                                <div>
+                                    <a class="link-primary-alt stretched-link text-decoration-none"
+                                       href="{{ event.get_absolute_url }}"><b style="font-size: 1.5em;">{{ event.name }}</b></a>
+                                </div>
+                                <div>
+                                    <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date|date:'Y-m-d H:i' }}</span>
+                                </div>
+                                <div class="d-inline-block"
+                                     style="color:grey;
+                                            font-size:0.75em;
+                                            line-height:0.8em;
+                                            position:relative;
+                                            z-index:11">
+                                    <span class="me-1">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
+                                    {% if event.allow_route_upload %}
+                                        <span><i data-bs-toggle="tooltip"
+   data-bs-title="GPS upload enabled"
+   class="fa-solid fa-file-arrow-up"></i></span>
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        {% if event.allow_route_upload %}
+                                            <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"
+                                               class="me-1"><i class="fa-solid fa-file-arrow-up"></i> Upload Route</a>
+                                        {% endif %}
+                                        <a href="{{ event.club.nice_url }}{{ event.slug }}/export"><i class="fa-solid fa-floppy-disk"></i> Export</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    {% if events_page.paginator.num_pages > 1 %}
+        {% bootstrap_pagination events_page extra=request.GET.urlencode pages_to_show="6" %}
     {% endif %}
+</div>
+{% if not live_events and not events and not upcoming_events %}
+    <div class="card border-0 shadow mb-3"
+         style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
+                background-size: cover;
+                background-position: center">
+        <div class="card-body">
+            <h2 style="color: #888">
+                No
+                {% if not event_set_page or event_set.hide_secret_events %}public{% endif %}
+                events...
+            </h2>
+        </div>
+    </div>
+{% endif %}
 </div>
 </div>
 {% endblock contentup %}
