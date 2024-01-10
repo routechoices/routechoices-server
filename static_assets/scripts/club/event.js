@@ -2101,7 +2101,7 @@ function RCEvent(infoURL, clockURL) {
             u("#map").css({ background: "#fff" });
           } else {
             u("#map").css({ background: "#ddd" });
-            var layer = backdropMaps[e.target.value];
+            var layer = cloneLayer(backdropMaps[e.target.value]);
             layer.nickname = e.target.value;
             layer.setZIndex(-1);
             layer.addTo(map);
