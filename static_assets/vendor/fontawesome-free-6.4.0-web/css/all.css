@@ -725,6 +725,10 @@ readers do not read off random characters that represent icons */
   content: "\f0f3";
 }
 
+.fa-hand::before {
+  content: "\f256";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;
