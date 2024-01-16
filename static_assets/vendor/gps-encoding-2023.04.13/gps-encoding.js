@@ -66,10 +66,10 @@ var Coordinates = function (lat, lon) {
       dlat = this.latitude - c.latitude,
       dlon = this.longitude - c.longitude,
       a =
-        Math.pow(Math.sin((C * dlat) / 2), 2) +
+        Math.sin((C * dlat) / 2) * Math.sin((C * dlat) / 2) +
         Math.cos(C * this.latitude) *
           Math.cos(C * c.latitude) *
-          Math.pow(Math.sin((C * dlon) / 2), 2);
+          Math.sin((C * dlon) / 2) * Math.sin((C * dlon) / 2);
     return 12756274 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 };
