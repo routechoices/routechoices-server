@@ -68,6 +68,388 @@ function RCEvent(infoURL, clockURL) {
   var showUserLocation = false;
   var showAll = true;
 
+  class CompetitorSidebarEl extends HTMLElement {
+    constructor() {
+      super();
+      const competitorId = this.getAttribute("competitor-id");
+      const i = this.getAttribute("index");
+      const competitorIdx = competitorList.findIndex(function (competitor) {
+        return competitor.id == competitorId;
+      });
+      const competitor = competitorList[competitorIdx];
+
+      if (typeof competitor.isShown === "undefined") {
+        competitor.isShown = true;
+      }
+      if (!competitor.color) {
+        competitor.color = getColor(i);
+        competitor.isColorDark = getContrastYIQ(competitor.color);
+      }
+      var div = u("<div/>");
+      div.addClass("card-body", "px-1", "pt-1", "pb-0", "competitor-card");
+      {
+        var firstLine = u("<div/>")
+          .addClass("text-nowrap", "text-truncate", "overflow-hidden")
+          .css({ lineHeight: "1.13rem" });
+
+        var colorTag = u("<span/>")
+          .addClass("color-tag", "me-1")
+          .css({ cursor: "pointer" });
+
+        if (competitor.isShown) {
+          colorTag.on("click", function () {
+            onChangeCompetitorColor(competitor);
+          });
+        }
+
+        var colorTagIcon = u("<i/>")
+          .addClass(
+            "media-object",
+            "fa-3x",
+            "fa-solid",
+            "fa-circle",
+            "icon-sidebar"
+          )
+          .css({
+            marginLeft: "1px",
+            fontSize: "1em",
+            color: competitor.color,
+          });
+
+        if (competitor.isShown) {
+          colorTagIcon.css({
+            color: competitor.color,
+          });
+        } else {
+          colorTagIcon.css({
+            color: "rgba(250, 250, 250, 0.9)",
+          });
+        }
+
+        var nameDiv = u("<span/>")
+          .addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold")
+          .text(competitor.name);
+
+        colorTag.append(colorTagIcon);
+        firstLine.append(colorTag);
+        firstLine.append(nameDiv);
+        div.append(firstLine);
+      }
+      {
+        var secondLine = u("<div/>").addClass(
+          "text-nowrap",
+          "text-truncate",
+          "overflow-hidden",
+          "ps-0",
+          competitor.isShown ? "route-displayed" : "route-not-displayed"
+        );
+
+        {
+          var competitorSwitch = u("<div/>")
+            .addClass(
+              "form-check",
+              "form-switch",
+              "d-inline-block",
+              "align-middle"
+            )
+            .css({ marginRight: "-5px", paddingTop: "2px" })
+            .attr({
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("toggle"),
+            });
+
+          var competitorSwitchInput = u("<input/>")
+            .addClass("form-check-input", "competitor-switch")
+            .css({ boxShadow: "none" })
+            .attr({
+              type: "checkbox",
+              checked: !!competitor.isShown,
+            })
+            .on("click", function (e) {
+              var commonDiv = u(this).parent().parent();
+              if (!e.target.checked) {
+                competitor.isShown = false;
+                competitor.focused = false;
+                competitor.highlighted = false;
+                competitor.displayFullRoute = null;
+                commonDiv.find(".competitor-focus-btn").removeClass("focused");
+                commonDiv
+                  .find(".competitor-highlight-btn")
+                  .removeClass("highlighted");
+                commonDiv
+                  .find(".full-route-icon")
+                  .attr({ fill: "var(--bs-body-color)" });
+                commonDiv.find("button").attr({ disabled: true });
+                commonDiv
+                  .removeClass("route-displayed")
+                  .addClass("route-not-displayed");
+
+                var colorTag = commonDiv.parent().find(".color-tag");
+                colorTag
+                  .find("i.fa-circle")
+                  .css({ color: "rgba(250, 250, 250, 0.9)" });
+                colorTag.off("click");
+
+                ["mapMarker", "nameMarker", "tail"].forEach(function (
+                  layerName
+                ) {
+                  competitor[layerName]?.remove();
+                  competitor[layerName] = null;
+                });
+                commonDiv.find(".speedometer").text("");
+                commonDiv.find(".odometer").text("");
+                competitor.speedometerValue = "";
+                competitor.odometerValue = "";
+                commonDiv
+                  .find(".battery-indicator")
+                  .addClass("d-none")
+                  .removeClass("if-live");
+                updateCompetitor(competitor);
+              } else {
+                competitor.isShown = true;
+                commonDiv
+                  .removeClass("route-not-displayed")
+                  .addClass("route-displayed");
+                commonDiv.find("button").attr({ disabled: false });
+                if (isLive) {
+                  commonDiv
+                    .find(".battery-indicator")
+                    .removeClass("d-none")
+                    .addClass("if-live");
+                }
+
+                var colorTag = commonDiv.parent().find(".color-tag");
+                colorTag.find("i.fa-circle").css({ color: competitor.color });
+                colorTag.on("click", function () {
+                  onChangeCompetitorColor(competitor);
+                });
+
+                updateCompetitor(competitor);
+              }
+            });
+
+          competitorSwitch.append(competitorSwitchInput);
+          secondLine.append(competitorSwitch);
+        }
+
+        {
+          var competitorCenterBtn = u("<button/>")
+            .addClass("btn", "btn-default", "btn-sm", "p-0", "ms-1", "me-0")
+            .attr({
+              type: "button",
+              "aria-label": "Center",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("center"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              zoomOnCompetitor(competitor);
+            });
+
+          var competitorCenterIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-location-dot"
+          );
+
+          competitorCenterBtn.append(competitorCenterIcon);
+          secondLine.append(competitorCenterBtn);
+        }
+
+        {
+          var competitorFollowBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-focus-btn",
+              competitor.focused ? "focused" : ""
+            )
+            .attr({
+              type: "button",
+              "aria-label": "Follow competitor",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("follow"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              const wasFocused = competitor.focused;
+              if (wasFocused) {
+                competitor.focused = false;
+                competitor.sidebarCard
+                  ?.find(".competitor-focus-btn")
+                  .removeClass("focused");
+              } else {
+                if (!competitor.isShown) {
+                  return;
+                }
+                competitorList.map((otherCompetitor) => {
+                  if (otherCompetitor.focused) {
+                    otherCompetitor.focused = false;
+                    otherCompetitor.sidebarCard
+                      ?.find(".competitor-focus-btn")
+                      .removeClass("focused");
+                  }
+                });
+                competitor.focused = true;
+                competitor.sidebarCard
+                  ?.find(".competitor-focus-btn")
+                  .addClass("focused");
+                zoomOnCompetitor(competitor);
+              }
+            });
+
+          var competitorFollowBtnIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-crosshairs"
+          );
+
+          competitorFollowBtn.append(competitorFollowBtnIcon);
+          secondLine.append(competitorFollowBtn);
+        }
+
+        {
+          var competitorHighlightBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-highlight-btn",
+              competitor.highlighted ? " highlighted" : ""
+            )
+            .attr({
+              type: "button",
+              "aria-label": "Highlight competitor",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("highlight"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              toggleHighlightCompetitor(competitor);
+            });
+
+          var competitorHighlightIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-highlighter"
+          );
+
+          competitorHighlightBtn.append(competitorHighlightIcon);
+          secondLine.append(competitorHighlightBtn);
+        }
+
+        {
+          var competitorFullRouteBtn = u("<button/>")
+            .addClass(
+              "btn",
+              "btn-default",
+              "btn-sm",
+              "p-0",
+              "ms-1",
+              "me-0",
+              "competitor-full-route-btn",
+              competitor.displayFullRoute ? "full-route" : ""
+            )
+            .attr({
+              type: "button",
+              "aria-label": "Display competitor's full Route",
+              "data-bs-toggle": "tooltip",
+              "data-bs-title": banana.i18n("full-route"),
+              disabled: !competitor.isShown,
+            })
+            .on("click", function () {
+              toggleCompetitorFullRoute(competitor);
+            });
+
+          var competitorFullRouteBtnIcon = u("<svg/>")
+            .addClass("full-route-icon")
+            .attr({
+              fill: competitor.displayFullRoute
+                ? "#20c997"
+                : "var(--bs-body-color)",
+              viewBox: "0 0 48 48",
+              width: "16px",
+              height: "16px",
+              xmlns: "http://www.w3.org/2000/svg",
+            })
+            .css({ verticalAlign: "text-bottom" })
+            .html(
+              '<path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>'
+            );
+
+          competitorFullRouteBtn.append(competitorFullRouteBtnIcon);
+          secondLine.append(competitorFullRouteBtn);
+        }
+
+        if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
+          var batteryLevelDiv = u("<div/>").addClass(
+            "float-end",
+            "d-inline-blockv",
+            "text-end",
+            competitor.isShown ? "if-live" : "",
+            "battery-indicator",
+            !isLive || !competitor.isShown ? "d-none" : ""
+          );
+
+          var batterySpan = u("<span/>").attr({
+            "data-bs-toggle": "tooltip",
+            "data-bs-custom-class": "higher-z-index",
+            "data-bs-title":
+              competitorBatteyLevels[competitor.id] !== null
+                ? competitorBatteyLevels[competitor.id] + "%"
+                : banana.i18n("unknown"),
+          });
+
+          var batteryIcon = u("<i/>").addClass(
+            "fa-solid",
+            "fa-rotate-270",
+            `fa-battery-${batteryIconName(
+              competitorBatteyLevels[competitor.id]
+            )}`,
+            !competitorBatteyLevels[competitor.id] ? "text-muted" : ""
+          );
+
+          batterySpan.append(batteryIcon);
+          batteryLevelDiv.append(batterySpan);
+          secondLine.append(batteryLevelDiv);
+        }
+
+        {
+          var metersDiv = u("<div/>")
+            .addClass("float-end d-inline-block text-end")
+            .css({ lineHeight: "10px" });
+          var speedometer = u("<span/>")
+            .addClass("speedometer")
+            .text(!competitor.isShown ? "" : competitor.speedometerValue || "");
+          var odometer = u("<span/>")
+            .addClass("odometer")
+            .text(!competitor.isShown ? "" : competitor.odometerValue || "");
+          metersDiv.append(speedometer).append("<br/>").append(odometer);
+
+          secondLine.append(metersDiv);
+        }
+        div.append(secondLine);
+      }
+
+      competitor.sidebarCard = div;
+      competitor.speedometer = div.find(".speedometer").first();
+      competitor.odometer = div.find(".odometer").first();
+
+      var divOneUp = u(
+        '<div class="card mb-1" style="background-color:transparent;"/>'
+      ).append(div);
+
+      this.el = divOneUp.nodes[0];
+      this.appendChild(this.el);
+    }
+  }
+
+  window.customElements.define("competitor-sidebar-el", CompetitorSidebarEl);
+
   function initializeMap() {
     map = L.map("map", {
       center: [15, 0],
@@ -909,380 +1291,15 @@ function RCEvent(infoURL, clockURL) {
 
     for (var i = 0; i < competitorList.length; i++) {
       (function (competitor) {
-        if (typeof competitor.isShown === "undefined") {
-          competitor.isShown = true;
-        }
-        if (!competitor.color) {
-          competitor.color = getColor(i);
-          competitor.isColorDark = getContrastYIQ(competitor.color);
-        }
-        var div = u("<div/>");
-        div.addClass("card-body", "px-1", "pt-1", "pb-0", "competitor-card");
-        {
-          var firstLine = u("<div/>")
-            .addClass("text-nowrap", "text-truncate", "overflow-hidden")
-            .css({ lineHeight: "1.13rem" });
-
-          var colorTag = u("<span/>")
-            .addClass("color-tag", "me-1")
-            .css({ cursor: "pointer" });
-
-          if (competitor.isShown) {
-            colorTag.on("click", function () {
-              onChangeCompetitorColor(competitor);
-            });
-          }
-
-          var colorTagIcon = u("<i/>")
-            .addClass(
-              "media-object",
-              "fa-3x",
-              "fa-solid",
-              "fa-circle",
-              "icon-sidebar"
-            )
-            .css({
-              marginLeft: "1px",
-              fontSize: "1em",
-              color: competitor.color,
-            });
-
-          if (competitor.isShown) {
-            colorTagIcon.css({
-              color: competitor.color,
-            });
-          } else {
-            colorTagIcon.css({
-              color: "rgba(250, 250, 250, 0.9)",
-            });
-          }
-
-          var nameDiv = u("<span/>")
-            .addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold")
-            .text(competitor.name);
-
-          colorTag.append(colorTagIcon);
-          firstLine.append(colorTag);
-          firstLine.append(nameDiv);
-          div.append(firstLine);
-        }
-        {
-          var secondLine = u("<div/>").addClass(
-            "text-nowrap",
-            "text-truncate",
-            "overflow-hidden",
-            "ps-0",
-            competitor.isShown ? "route-displayed" : "route-not-displayed"
-          );
-
-          {
-            var competitorSwitch = u("<div/>")
-              .addClass(
-                "form-check",
-                "form-switch",
-                "d-inline-block",
-                "align-middle"
-              )
-              .css({ marginRight: "-5px", paddingTop: "2px" })
-              .attr({
-                "data-bs-toggle": "tooltip",
-                "data-bs-title": banana.i18n("toggle"),
-              });
-
-            var competitorSwitchInput = u("<input/>")
-              .addClass("form-check-input", "competitor-switch")
-              .css({ boxShadow: "none" })
-              .attr({
-                type: "checkbox",
-                checked: !!competitor.isShown,
-              })
-              .on("click", function (e) {
-                var commonDiv = u(this).parent().parent();
-                if (!e.target.checked) {
-                  competitor.isShown = false;
-                  competitor.focused = false;
-                  competitor.highlighted = false;
-                  competitor.displayFullRoute = null;
-                  commonDiv
-                    .find(".competitor-focus-btn")
-                    .removeClass("focused");
-                  commonDiv
-                    .find(".competitor-highlight-btn")
-                    .removeClass("highlighted");
-                  commonDiv
-                    .find(".full-route-icon")
-                    .attr({ fill: "var(--bs-body-color)" });
-                  commonDiv.find("button").attr({ disabled: true });
-                  commonDiv
-                    .removeClass("route-displayed")
-                    .addClass("route-not-displayed");
-
-                  var colorTag = commonDiv.parent().find(".color-tag");
-                  colorTag
-                    .find("i.fa-circle")
-                    .css({ color: "rgba(250, 250, 250, 0.9)" });
-                  colorTag.off("click");
-
-                  ["mapMarker", "nameMarker", "tail"].forEach(function (
-                    layerName
-                  ) {
-                    competitor[layerName]?.remove();
-                    competitor[layerName] = null;
-                  });
-                  commonDiv.find(".speedometer").text("");
-                  commonDiv.find(".odometer").text("");
-                  competitor.speedometerValue = "";
-                  competitor.odometerValue = "";
-                  commonDiv
-                    .find(".battery-indicator")
-                    .addClass("d-none")
-                    .removeClass("if-live");
-                  updateCompetitor(competitor);
-                } else {
-                  competitor.isShown = true;
-                  commonDiv
-                    .removeClass("route-not-displayed")
-                    .addClass("route-displayed");
-                  commonDiv.find("button").attr({ disabled: false });
-                  if (isLive) {
-                    commonDiv
-                      .find(".battery-indicator")
-                      .removeClass("d-none")
-                      .addClass("if-live");
-                  }
-
-                  var colorTag = commonDiv.parent().find(".color-tag");
-                  colorTag.find("i.fa-circle").css({ color: competitor.color });
-                  colorTag.on("click", function () {
-                    onChangeCompetitorColor(competitor);
-                  });
-
-                  updateCompetitor(competitor);
-                }
-              });
-
-            competitorSwitch.append(competitorSwitchInput);
-            secondLine.append(competitorSwitch);
-          }
-
-          {
-            var competitorCenterBtn = u("<button/>")
-              .addClass("btn", "btn-default", "btn-sm", "p-0", "ms-1", "me-0")
-              .attr({
-                type: "button",
-                "aria-label": "Center",
-                "data-bs-toggle": "tooltip",
-                "data-bs-title": banana.i18n("center"),
-                disabled: !competitor.isShown,
-              })
-              .on("click", function () {
-                zoomOnCompetitor(competitor);
-              });
-
-            var competitorCenterIcon = u("<i/>").addClass(
-              "fa-solid",
-              "fa-location-dot"
-            );
-
-            competitorCenterBtn.append(competitorCenterIcon);
-            secondLine.append(competitorCenterBtn);
-          }
-
-          {
-            var competitorFollowBtn = u("<button/>")
-              .addClass(
-                "btn",
-                "btn-default",
-                "btn-sm",
-                "p-0",
-                "ms-1",
-                "me-0",
-                "competitor-focus-btn",
-                competitor.focused ? "focused" : ""
-              )
-              .attr({
-                type: "button",
-                "aria-label": "Follow competitor",
-                "data-bs-toggle": "tooltip",
-                "data-bs-title": banana.i18n("follow"),
-                disabled: !competitor.isShown,
-              })
-              .on("click", function () {
-                const wasFocused = competitor.focused;
-                if (wasFocused) {
-                  competitor.focused = false;
-                  competitor.sidebarCard
-                    ?.find(".competitor-focus-btn")
-                    .removeClass("focused");
-                } else {
-                  if (!competitor.isShown) {
-                    return;
-                  }
-                  competitorList.map((otherCompetitor) => {
-                    if (otherCompetitor.focused) {
-                      otherCompetitor.focused = false;
-                      otherCompetitor.sidebarCard
-                        ?.find(".competitor-focus-btn")
-                        .removeClass("focused");
-                    }
-                  });
-                  competitor.focused = true;
-                  competitor.sidebarCard
-                    ?.find(".competitor-focus-btn")
-                    .addClass("focused");
-                  zoomOnCompetitor(competitor);
-                }
-              });
-
-            var competitorFollowBtnIcon = u("<i/>").addClass(
-              "fa-solid",
-              "fa-crosshairs"
-            );
-
-            competitorFollowBtn.append(competitorFollowBtnIcon);
-            secondLine.append(competitorFollowBtn);
-          }
-
-          {
-            var competitorHighlightBtn = u("<button/>")
-              .addClass(
-                "btn",
-                "btn-default",
-                "btn-sm",
-                "p-0",
-                "ms-1",
-                "me-0",
-                "competitor-highlight-btn",
-                competitor.highlighted ? " highlighted" : ""
-              )
-              .attr({
-                type: "button",
-                "aria-label": "Highlight competitor",
-                "data-bs-toggle": "tooltip",
-                "data-bs-title": banana.i18n("highlight"),
-                disabled: !competitor.isShown,
-              })
-              .on("click", function () {
-                toggleHighlightCompetitor(competitor);
-              });
-
-            var competitorHighlightIcon = u("<i/>").addClass(
-              "fa-solid",
-              "fa-highlighter"
-            );
-
-            competitorHighlightBtn.append(competitorHighlightIcon);
-            secondLine.append(competitorHighlightBtn);
-          }
-
-          {
-            var competitorFullRouteBtn = u("<button/>")
-              .addClass(
-                "btn",
-                "btn-default",
-                "btn-sm",
-                "p-0",
-                "ms-1",
-                "me-0",
-                "competitor-full-route-btn",
-                competitor.displayFullRoute ? "full-route" : ""
-              )
-              .attr({
-                type: "button",
-                "aria-label": "Display competitor's full Route",
-                "data-bs-toggle": "tooltip",
-                "data-bs-title": banana.i18n("full-route"),
-                disabled: !competitor.isShown,
-              })
-              .on("click", function () {
-                toggleCompetitorFullRoute(competitor);
-              });
-
-            var competitorFullRouteBtnIcon = u("<svg/>")
-              .addClass("full-route-icon")
-              .attr({
-                fill: competitor.displayFullRoute
-                  ? "#20c997"
-                  : "var(--bs-body-color)",
-                viewBox: "0 0 48 48",
-                width: "16px",
-                height: "16px",
-                xmlns: "http://www.w3.org/2000/svg",
-              })
-              .css({ verticalAlign: "text-bottom" })
-              .html(
-                '<path d="M28.65 42.95q-2.85 0-4.775-2.075Q21.95 38.8 21.95 35.45q0-2.5 1.325-4.4 1.325-1.9 3.125-3.1 1.8-1.2 3.7-1.825 1.9-.625 3.2-.675-.15-2.4-1.1-3.475-.95-1.075-2.75-1.075-2 0-3.7 1.15-1.7 1.15-4.5 5.1-2.85 4.05-5.075 5.65-2.225 1.6-4.675 1.6-2.5 0-4.475-1.625Q5.05 31.15 5.05 27.15q0-1.45 1.025-3.7T9.65 17.2q1.9-2.55 2.5-3.725.6-1.175.6-2.175 0-.55-.325-.875-.325-.325-.925-.325-.3 0-.8.15t-1 .6q-1 .55-1.825.525-.825-.025-1.375-.625-.7-.55-.7-1.525 0-.975.7-1.625 1.15-1 2.475-1.55Q10.3 5.5 11.75 5.5q2.35 0 3.9 1.65Q17.2 8.8 17.2 11q0 2.25-.95 4.15-.95 1.9-3.2 5.15-2.25 3.4-2.875 4.625T9.55 27.45q0 1.35.775 1.775.775.425 1.625.425 1.2 0 2.4-1.125t3.55-4.275q3.35-4.4 6-6.175 2.65-1.775 5.95-1.775 3.15 0 5.425 2.275T37.85 25.3h2.9q1 0 1.625.625T43 27.5q0 1-.625 1.65-.625.65-1.625.65h-2.9q-.55 8.8-3.9 10.975-3.35 2.175-5.3 2.175Zm.15-4.65q1.05 0 2.6-1.525t1.95-6.725q-1.9.2-4.375 1.55T26.5 35.95q0 1.1.575 1.725t1.725.625Z"/>'
-              );
-
-            competitorFullRouteBtn.append(competitorFullRouteBtnIcon);
-            secondLine.append(competitorFullRouteBtn);
-          }
-
-          if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
-            var batteryLevelDiv = u("<div/>").addClass(
-              "float-end",
-              "d-inline-blockv",
-              "text-end",
-              competitor.isShown ? "if-live" : "",
-              "battery-indicator",
-              !isLive || !competitor.isShown ? "d-none" : ""
-            );
-
-            var batterySpan = u("<span/>").attr({
-              "data-bs-toggle": "tooltip",
-              "data-bs-custom-class": "higher-z-index",
-              "data-bs-title":
-                competitorBatteyLevels[competitor.id] !== null
-                  ? competitorBatteyLevels[competitor.id] + "%"
-                  : banana.i18n("unknown"),
-            });
-
-            var batteryIcon = u("<i/>").addClass(
-              "fa-solid",
-              "fa-rotate-270",
-              `fa-battery-${batteryIconName(
-                competitorBatteyLevels[competitor.id]
-              )}`,
-              !competitorBatteyLevels[competitor.id] ? "text-muted" : ""
-            );
-
-            batterySpan.append(batteryIcon);
-            batteryLevelDiv.append(batterySpan);
-            secondLine.append(batteryLevelDiv);
-          }
-
-          {
-            var metersDiv = u("<div/>")
-              .addClass("float-end d-inline-block text-end")
-              .css({ lineHeight: "10px" });
-            var speedometer = u("<span/>")
-              .addClass("speedometer")
-              .text(
-                !competitor.isShown ? "" : competitor.speedometerValue || ""
-              );
-            var odometer = u("<span/>")
-              .addClass("odometer")
-              .text(!competitor.isShown ? "" : competitor.odometerValue || "");
-            metersDiv.append(speedometer).append("<br/>").append(odometer);
-
-            secondLine.append(metersDiv);
-          }
-          div.append(secondLine);
-        }
-
-        competitor.sidebarCard = div;
-        competitor.speedometer = div.find(".speedometer").first();
-        competitor.odometer = div.find(".odometer").first();
-
         if (
           searchText === null ||
           searchText === "" ||
           competitor.name.toLowerCase().search(searchText) != -1
         ) {
-          var divOneUp = u(
-            '<div class="card mb-1" style="background-color:transparent;"/>'
-          ).append(div);
-          listDiv.append(divOneUp);
+          var div = u(
+            `<competitor-sidebar-el index="${i}"competitor-id="${competitor.id}"/>`
+          );
+          listDiv.append(div);
         }
       })(competitorList[i]);
     }
