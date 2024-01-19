@@ -159,6 +159,7 @@ function RCEvent(infoURL, clockURL) {
             .attr({
               "data-bs-toggle": "tooltip",
               "data-bs-title": banana.i18n("toggle"),
+              "aria-label": "toggle competitor",
             });
 
           var competitorSwitchInput = u("<input/>")
@@ -1309,17 +1310,21 @@ function RCEvent(infoURL, clockURL) {
       var topDiv = u("<div/>");
       var searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
       if (Object.keys(competitorList).length) {
-        var toggleAllContent = u("<div/>").addClass(
-          "form-group",
-          "form-check",
-          "form-switch",
-          "d-inline-block",
-          "ms-1",
-          "col-auto",
-          "pt-2",
-          "me-0",
-          "pe-0"
-        );
+        var toggleAllContent = u("<div/>")
+          .addClass(
+            "form-group",
+            "form-check",
+            "form-switch",
+            "d-inline-block",
+            "ms-1",
+            "col-auto",
+            "pt-2",
+            "me-0",
+            "pe-0"
+          )
+          .attr({
+            "aria-label": "toggle all competitors",
+          });
         var toggleAllInput = u("<input/>")
           .addClass("form-check-input")
           .attr({
