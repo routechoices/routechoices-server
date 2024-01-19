@@ -36,7 +36,7 @@ function RCEvent(infoURL, clockURL) {
 
   var isRealTime = true;
   var isCustomStart = false;
-  var competitorList = [];
+  var competitorList = {};
   var competitorRoutes = {};
   var competitorBatteyLevels = {};
   var routesLastFetched = -Infinity;
@@ -71,12 +71,15 @@ function RCEvent(infoURL, clockURL) {
   class CompetitorSidebarEl extends HTMLElement {
     constructor() {
       super();
+
       const competitorId = this.getAttribute("competitor-id");
       const i = this.getAttribute("index");
-      const competitorIdx = competitorList.findIndex(function (competitor) {
-        return competitor.id == competitorId;
-      });
-      const competitor = competitorList[competitorIdx];
+
+      const competitor = competitorList[competitorId];
+      if (!competitor) {
+        this.innerHTML = "";
+        return;
+      }
 
       if (typeof competitor.isShown === "undefined") {
         competitor.isShown = true;
@@ -285,7 +288,7 @@ function RCEvent(infoURL, clockURL) {
                 if (!competitor.isShown) {
                   return;
                 }
-                competitorList.map((otherCompetitor) => {
+                Object.values(competitorList).map((otherCompetitor) => {
                   if (otherCompetitor.focused) {
                     otherCompetitor.focused = false;
                     otherCompetitor.sidebarCard
@@ -840,17 +843,14 @@ function RCEvent(infoURL, clockURL) {
   function getCompetitionStartDate(nullIfNone = false) {
     var res = +clock.now();
     var found = false;
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        var route = competitorRoutes[competitor.id];
-        if (route) {
-          if (res > route.getByIndex(0).timestamp) {
-            res = route.getByIndex(0).timestamp;
-            found = true;
-          }
+    Object.values(competitorRoutes).forEach(function (route) {
+      if (route) {
+        if (res > route.getByIndex(0).timestamp) {
+          res = route.getByIndex(0).timestamp;
+          found = true;
         }
-      })(competitorList[i]);
-    }
+      }
+    });
     if (nullIfNone && !found) {
       return null;
     }
@@ -859,18 +859,15 @@ function RCEvent(infoURL, clockURL) {
 
   function getCompetitionEndDate() {
     var res = new Date(0);
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        var route = competitorRoutes[competitor.id];
-        if (route) {
-          var idx = route.getPositionsCount() - 1;
-          res =
-            res < route.getByIndex(idx).timestamp
-              ? route.getByIndex(idx).timestamp
-              : res;
-        }
-      })(competitorList[i]);
-    }
+    Object.values(competitorRoutes).forEach(function (route) {
+      if (route) {
+        var idx = route.getPositionsCount() - 1;
+        res =
+          res < route.getByIndex(idx).timestamp
+            ? route.getByIndex(idx).timestamp
+            : res;
+      }
+    });
     return res;
   }
 
@@ -879,20 +876,18 @@ function RCEvent(infoURL, clockURL) {
       customOffset = false;
     }
     var res = 0;
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        var route = competitorRoutes[competitor.id];
-        if (route) {
-          var idx = route.getPositionsCount() - 1;
-          var dur =
-            route.getByIndex(idx).timestamp -
-            ((customOffset
-              ? +new Date(competitor.custom_offset)
-              : +new Date(competitor.start_time)) || getCompetitionStartDate());
-          res = res < dur ? dur : res;
-        }
-      })(competitorList[i]);
-    }
+    Object.values(competitorList).forEach(function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var idx = route.getPositionsCount() - 1;
+        var dur =
+          route.getByIndex(idx).timestamp -
+          ((customOffset
+            ? +new Date(competitor.custom_offset)
+            : +new Date(competitor.start_time)) || getCompetitionStartDate());
+        res = res < dur ? dur : res;
+      }
+    });
     return res;
   }
 
@@ -955,15 +950,13 @@ function RCEvent(infoURL, clockURL) {
 
   function getCompetitorsMinCustomOffset() {
     var res = 0;
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        var route = competitorRoutes[competitor.id];
-        if (route) {
-          var off = competitor.custom_offset - competitor.start_time || 0;
-          res = res < off ? off : res;
-        }
-      })(competitorList[i]);
-    }
+    Object.values(competitorList).forEach(function (competitor) {
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var off = competitor.custom_offset - competitor.start_time || 0;
+        res = res < off ? off : res;
+      }
+    });
     return res;
   }
 
@@ -1261,17 +1254,12 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function updateCompetitor(newData) {
-    var idx = competitorList.findIndex(function (competitor) {
-      return competitor.id == newData.id;
-    });
-    if (idx != -1) {
-      var competitor = competitorList[idx];
+    if (Object.keys(competitorList).includes(newData.id)) {
       Object.keys(newData).forEach(function (k) {
-        competitor[k] = newData[k];
+        competitorList[newData.id][k] = newData[k];
       });
-      competitorList[idx] = competitor;
     } else {
-      competitorList.push(newData);
+      competitorList[newData.id] = newData;
     }
   }
 
@@ -1289,21 +1277,20 @@ function RCEvent(infoURL, clockURL) {
     listDiv.addClass("mt-1");
     listDiv.attr({ id: "competitorList", "data-bs-theme": getCurrentTheme() });
 
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        if (
-          searchText === null ||
-          searchText === "" ||
-          competitor.name.toLowerCase().search(searchText) != -1
-        ) {
-          var div = u(
-            `<competitor-sidebar-el index="${i}"competitor-id="${competitor.id}"/>`
-          );
-          listDiv.append(div);
-        }
-      })(competitorList[i]);
-    }
-    if (competitorList.length === 0) {
+    Object.values(competitorList).forEach(function (competitor, i) {
+      if (
+        searchText === null ||
+        searchText === "" ||
+        competitor.name.toLowerCase().search(searchText) != -1
+      ) {
+        var div = u(
+          `<competitor-sidebar-el index="${i}"competitor-id="${competitor.id}"/>`
+        );
+        listDiv.append(div);
+      }
+    });
+
+    if (Object.keys(competitorList).length === 0) {
       var div = u(
         '<div class="no-competitor-warning text-center d-flex justify-content-center align-items-center"/>'
       );
@@ -1321,7 +1308,7 @@ function RCEvent(infoURL, clockURL) {
       );
       var topDiv = u("<div/>");
       var searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
-      if (competitorList.length) {
+      if (Object.keys(competitorList).length) {
         var toggleAllContent = u("<div/>").addClass(
           "form-group",
           "form-check",
@@ -1343,16 +1330,14 @@ function RCEvent(infoURL, clockURL) {
           .on("click", function (e) {
             showAll = !!e.target.checked;
             if (showAll) {
-              for (var i = 0; i < competitorList.length; i++) {
-                var competitor = competitorList[i];
+              Object.values(competitorList).forEach(function (competitor) {
                 if (!competitor.isShown) {
                   competitor.isShown = true;
                 }
                 updateCompetitor(competitor);
-              }
+              });
             } else {
-              for (var i = 0; i < competitorList.length; i++) {
-                var competitor = competitorList[i];
+              Object.values(competitorList).forEach(function (competitor) {
                 competitor.isShown = false;
                 competitor.focused = false;
                 competitor.highlighted = false;
@@ -1364,7 +1349,7 @@ function RCEvent(infoURL, clockURL) {
                   competitor[layerName] = null;
                 });
                 updateCompetitor(competitor);
-              }
+              });
             }
             displayCompetitorList();
           });
@@ -1389,7 +1374,7 @@ function RCEvent(infoURL, clockURL) {
       var mainDiv = u("#competitorSidebar");
       mainDiv.append(listDiv);
     }
-    if (competitorList.length == 0) {
+    if (Object.keys(competitorList).length == 0) {
       listDiv.addClass("without-competitor");
     }
     if (scrollTopDiv) {
@@ -1403,26 +1388,24 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function setCustomStart(latlng) {
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        var minDist = Infinity;
-        var minDistT = null;
-        var route = competitorRoutes[competitor.id];
-        if (route) {
-          var length = route.getPositionsCount();
-          for (var i = 0; i < length; i++) {
-            dist = route.getByIndex(i).distance({
-              coords: { latitude: latlng.lat, longitude: latlng.lng },
-            });
-            if (dist < minDist) {
-              minDist = dist;
-              minDistT = route.getByIndex(i).timestamp;
-            }
+    Object.values(competitorList).forEach(function (competitor) {
+      var minDist = Infinity;
+      var minDistT = null;
+      var route = competitorRoutes[competitor.id];
+      if (route) {
+        var length = route.getPositionsCount();
+        for (var i = 0; i < length; i++) {
+          dist = route.getByIndex(i).distance({
+            coords: { latitude: latlng.lat, longitude: latlng.lng },
+          });
+          if (dist < minDist) {
+            minDist = dist;
+            minDistT = route.getByIndex(i).timestamp;
           }
-          competitor.custom_offset = minDistT;
         }
-      })(competitorList[i]);
-    }
+        competitor.custom_offset = minDistT;
+      }
+    });
   }
 
   function toggleCompetitorList(e) {
@@ -2354,230 +2337,221 @@ function RCEvent(infoURL, clockURL) {
     var oldFinishCrosses = finishLineCrosses.slice();
     finishLineCrosses = [];
 
-    for (var i = 0; i < competitorList.length; i++) {
-      (function (competitor) {
-        if (!competitor.isShown) {
-          return;
+    Object.values(competitorList).forEach(function (competitor) {
+      if (!competitor.isShown) {
+        return;
+      }
+      var route = competitorRoutes[competitor.id];
+      if (route !== undefined) {
+        var viewedTime = currentTime;
+        if (!isLive && !isRealTime && !isCustomStart && competitor.start_time) {
+          viewedTime +=
+            new Date(competitor.start_time) - getCompetitionStartDate();
+        } else if (
+          !isLive &&
+          !isRealTime &&
+          isCustomStart &&
+          competitor.custom_offset
+        ) {
+          viewedTime += Math.max(
+            0,
+            new Date(competitor.custom_offset) - getCompetitionStartDate()
+          );
         }
-        var route = competitorRoutes[competitor.id];
-        if (route !== undefined) {
-          var viewedTime = currentTime;
-          if (
-            !isLive &&
-            !isRealTime &&
-            !isCustomStart &&
-            competitor.start_time
-          ) {
-            viewedTime +=
-              new Date(competitor.start_time) - getCompetitionStartDate();
-          } else if (
-            !isLive &&
-            !isRealTime &&
-            isCustomStart &&
-            competitor.custom_offset
-          ) {
-            viewedTime += Math.max(
-              0,
-              new Date(competitor.custom_offset) - getCompetitionStartDate()
-            );
-          }
-          var loc = route.getByTime(viewedTime);
-          var hasRecentPoints = route.hasPointInInterval(
-            viewedTime - (sendInterval * 4 + fetchPositionInterval) * 1e3, //kayak
+        var loc = route.getByTime(viewedTime);
+        var hasRecentPoints = route.hasPointInInterval(
+          viewedTime - (sendInterval * 4 + fetchPositionInterval) * 1e3, //kayak
+          viewedTime
+        );
+        if (competitor.focused) {
+          keepFocusOnCompetitor(competitor, loc);
+        }
+
+        var beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
+        if (beforeFirstPoint) {
+          clearCompetitorLayers(competitor);
+        }
+
+        var isIdle =
+          viewedTime > route.getByIndex(0).timestamp && !hasRecentPoints;
+        if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
+          competitor.idle = isIdle;
+          clearCompetitorLayers(competitor);
+        }
+        if (!beforeFirstPoint && loc && !isNaN(loc.coords.latitude)) {
+          redrawCompetitorMarker(competitor, loc, isIdle);
+          redrawCompetitorNametag(competitor, loc, isIdle);
+        }
+        redrawCompetitorTail(competitor, route, viewedTime);
+        if (refreshMeters) {
+          // odometer and speedometer
+          var hasPointInTail = route.hasPointInInterval(
+            viewedTime - 30 * 1e3,
             viewedTime
           );
-          if (competitor.focused) {
-            keepFocusOnCompetitor(competitor, loc);
-          }
-
-          var beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
-          if (beforeFirstPoint) {
-            clearCompetitorLayers(competitor);
-          }
-
-          var isIdle =
-            viewedTime > route.getByIndex(0).timestamp && !hasRecentPoints;
-          if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
-            competitor.idle = isIdle;
-            clearCompetitorLayers(competitor);
-          }
-          if (!beforeFirstPoint && loc && !isNaN(loc.coords.latitude)) {
-            redrawCompetitorMarker(competitor, loc, isIdle);
-            redrawCompetitorNametag(competitor, loc, isIdle);
-          }
-          redrawCompetitorTail(competitor, route, viewedTime);
-          if (refreshMeters) {
-            // odometer and speedometer
-            var hasPointInTail = route.hasPointInInterval(
-              viewedTime - 30 * 1e3,
-              viewedTime
-            );
-            if (!hasPointInTail) {
-              competitor.speedometerValue = "--'--\"/km";
-              competitor.speedometer.textContent = competitor.speedometerValue;
-            } else {
-              if (checkVisible(competitor.speedometer)) {
-                var distance = 0;
-                var prevPos = null;
-                var tail30s = route.extractInterval(
-                  viewedTime - 30 * 1e3,
-                  viewedTime
-                );
-                tail30s.getArray().forEach(function (pos) {
-                  if (prevPos && !isNaN(pos.coords.latitude)) {
-                    distance += pos.distance(prevPos);
-                  }
-                  prevPos = pos;
-                });
-                var speed = (30 / distance) * 1000;
-                competitor.speedometerValue = formatSpeed(speed);
-                competitor.speedometer.textContent =
-                  competitor.speedometerValue;
-              }
-            }
-            if (checkVisible(competitor.odometer)) {
-              var totalDistance = route.distanceUntil(viewedTime);
-              competitor.odometerValue =
-                (totalDistance / 1000).toFixed(1) + "km";
-              competitor.odometer.textContent = competitor.odometerValue;
-            }
-
-            // Splitimes
-            if (finishLineSet) {
-              if (
-                u("#crossing-time").nodes.length &&
-                oldCrossingForNTimes !== u("#crossing-time").val()
-              ) {
-                oldCrossingForNTimes = u("#crossing-time").val() || 1;
-                oldFinishCrosses = [];
-                finishLineCrosses = [];
-              }
-              var allPoints = route.getArray();
-              var oldCrossing = oldFinishCrosses.find(function (el) {
-                return el.competitor.id === competitor.id;
+          if (!hasPointInTail) {
+            competitor.speedometerValue = "--'--\"/km";
+            competitor.speedometer.textContent = competitor.speedometerValue;
+          } else {
+            if (checkVisible(competitor.speedometer)) {
+              var distance = 0;
+              var prevPos = null;
+              var tail30s = route.extractInterval(
+                viewedTime - 30 * 1e3,
+                viewedTime
+              );
+              tail30s.getArray().forEach(function (pos) {
+                if (prevPos && !isNaN(pos.coords.latitude)) {
+                  distance += pos.distance(prevPos);
+                }
+                prevPos = pos;
               });
-              var useOldCrossing = false;
-              var crossCount = 0;
-              if (oldCrossing) {
-                var oldTs = allPoints[oldCrossing.idx].timestamp;
-                if (viewedTime >= oldTs) {
-                  if (
-                    L.LineUtil.segmentsIntersect(
-                      map.project(finishLinePoints[0], intersectionCheckZoom),
-                      map.project(finishLinePoints[1], intersectionCheckZoom),
-                      map.project(
-                        L.latLng([
-                          allPoints[oldCrossing.idx].coords.latitude,
-                          allPoints[oldCrossing.idx].coords.longitude,
-                        ]),
-                        intersectionCheckZoom
-                      ),
-                      map.project(
-                        L.latLng([
-                          allPoints[oldCrossing.idx - 1].coords.latitude,
-                          allPoints[oldCrossing.idx - 1].coords.longitude,
-                        ]),
-                        intersectionCheckZoom
-                      )
+              var speed = (30 / distance) * 1000;
+              competitor.speedometerValue = formatSpeed(speed);
+              competitor.speedometer.textContent = competitor.speedometerValue;
+            }
+          }
+          if (checkVisible(competitor.odometer)) {
+            var totalDistance = route.distanceUntil(viewedTime);
+            competitor.odometerValue = (totalDistance / 1000).toFixed(1) + "km";
+            competitor.odometer.textContent = competitor.odometerValue;
+          }
+
+          // Splitimes
+          if (finishLineSet) {
+            if (
+              u("#crossing-time").nodes.length &&
+              oldCrossingForNTimes !== u("#crossing-time").val()
+            ) {
+              oldCrossingForNTimes = u("#crossing-time").val() || 1;
+              oldFinishCrosses = [];
+              finishLineCrosses = [];
+            }
+            var allPoints = route.getArray();
+            var oldCrossing = oldFinishCrosses.find(function (el) {
+              return el.competitor.id === competitor.id;
+            });
+            var useOldCrossing = false;
+            var crossCount = 0;
+            if (oldCrossing) {
+              var oldTs = allPoints[oldCrossing.idx].timestamp;
+              if (viewedTime >= oldTs) {
+                if (
+                  L.LineUtil.segmentsIntersect(
+                    map.project(finishLinePoints[0], intersectionCheckZoom),
+                    map.project(finishLinePoints[1], intersectionCheckZoom),
+                    map.project(
+                      L.latLng([
+                        allPoints[oldCrossing.idx].coords.latitude,
+                        allPoints[oldCrossing.idx].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        allPoints[oldCrossing.idx - 1].coords.latitude,
+                        allPoints[oldCrossing.idx - 1].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
                     )
-                  ) {
-                    crossCount++;
-                    if (crossCount == oldCrossingForNTimes) {
-                      var competitorTime = allPoints[oldCrossing.idx].timestamp;
-                      if (
-                        !isLive &&
-                        !isRealTime &&
-                        !isCustomStart &&
-                        competitor.start_time
-                      ) {
-                        competitorTime -=
-                          new Date(competitor.start_time) -
-                          getCompetitionStartDate();
-                      }
-                      if (
-                        !isLive &&
-                        !isRealTime &&
-                        isCustomStart &&
-                        competitor.custom_offset
-                      ) {
-                        competitorTime -= Math.max(
-                          0,
-                          new Date(competitor.custom_offset) -
-                            getCompetitionStartDate()
-                        );
-                      }
-                      if (getRelativeTime(competitorTime) > 0) {
-                        finishLineCrosses.push({
-                          competitor: competitor,
-                          time: competitorTime,
-                          idx: oldCrossing.idx,
-                        });
-                        useOldCrossing = true;
-                      }
+                  )
+                ) {
+                  crossCount++;
+                  if (crossCount == oldCrossingForNTimes) {
+                    var competitorTime = allPoints[oldCrossing.idx].timestamp;
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      !isCustomStart &&
+                      competitor.start_time
+                    ) {
+                      competitorTime -=
+                        new Date(competitor.start_time) -
+                        getCompetitionStartDate();
+                    }
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      isCustomStart &&
+                      competitor.custom_offset
+                    ) {
+                      competitorTime -= Math.max(
+                        0,
+                        new Date(competitor.custom_offset) -
+                          getCompetitionStartDate()
+                      );
+                    }
+                    if (getRelativeTime(competitorTime) > 0) {
+                      finishLineCrosses.push({
+                        competitor: competitor,
+                        time: competitorTime,
+                        idx: oldCrossing.idx,
+                      });
+                      useOldCrossing = true;
                     }
                   }
                 }
               }
-              if (!useOldCrossing) {
-                var crossCount = 0;
-                for (var i = 1; i < allPoints.length; i++) {
-                  var tPoint = allPoints[i];
-                  if (viewedTime < tPoint.timestamp) {
-                    break;
-                  }
-                  if (
-                    L.LineUtil.segmentsIntersect(
-                      map.project(finishLinePoints[0], intersectionCheckZoom),
-                      map.project(finishLinePoints[1], intersectionCheckZoom),
-                      map.project(
-                        L.latLng([
-                          tPoint.coords.latitude,
-                          tPoint.coords.longitude,
-                        ]),
-                        intersectionCheckZoom
-                      ),
-                      map.project(
-                        L.latLng([
-                          allPoints[i - 1].coords.latitude,
-                          allPoints[i - 1].coords.longitude,
-                        ]),
-                        intersectionCheckZoom
-                      )
+            }
+            if (!useOldCrossing) {
+              var crossCount = 0;
+              for (var i = 1; i < allPoints.length; i++) {
+                var tPoint = allPoints[i];
+                if (viewedTime < tPoint.timestamp) {
+                  break;
+                }
+                if (
+                  L.LineUtil.segmentsIntersect(
+                    map.project(finishLinePoints[0], intersectionCheckZoom),
+                    map.project(finishLinePoints[1], intersectionCheckZoom),
+                    map.project(
+                      L.latLng([
+                        tPoint.coords.latitude,
+                        tPoint.coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        allPoints[i - 1].coords.latitude,
+                        allPoints[i - 1].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
                     )
-                  ) {
-                    crossCount++;
-                    if (crossCount == oldCrossingForNTimes) {
-                      var competitorTime = tPoint.timestamp;
-                      if (
-                        !isLive &&
-                        !isRealTime &&
-                        !isCustomStart &&
-                        competitor.start_time
-                      ) {
-                        competitorTime -=
-                          new Date(competitor.start_time) -
-                          getCompetitionStartDate();
-                      }
-                      if (
-                        !isLive &&
-                        !isRealTime &&
-                        isCustomStart &&
-                        competitor.custom_offset
-                      ) {
-                        competitorTime -= Math.max(
-                          0,
-                          new Date(competitor.custom_offset) -
-                            getCompetitionStartDate()
-                        );
-                      }
-                      if (getRelativeTime(competitorTime) > 0) {
-                        finishLineCrosses.push({
-                          competitor: competitor,
-                          time: competitorTime,
-                          idx: i,
-                        });
-                        break;
-                      }
+                  )
+                ) {
+                  crossCount++;
+                  if (crossCount == oldCrossingForNTimes) {
+                    var competitorTime = tPoint.timestamp;
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      !isCustomStart &&
+                      competitor.start_time
+                    ) {
+                      competitorTime -=
+                        new Date(competitor.start_time) -
+                        getCompetitionStartDate();
+                    }
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      isCustomStart &&
+                      competitor.custom_offset
+                    ) {
+                      competitorTime -= Math.max(
+                        0,
+                        new Date(competitor.custom_offset) -
+                          getCompetitionStartDate()
+                      );
+                    }
+                    if (getRelativeTime(competitorTime) > 0) {
+                      finishLineCrosses.push({
+                        competitor: competitor,
+                        time: competitorTime,
+                        idx: i,
+                      });
+                      break;
                     }
                   }
                 }
@@ -2585,28 +2559,26 @@ function RCEvent(infoURL, clockURL) {
             }
           }
         }
-      })(competitorList[i]);
-    }
+      }
+    });
 
     // Create cluster
     if (showClusters) {
       var competitorsWithMarker = [];
       var competitorsLocations = [];
-      for (var i = 0; i < competitorList.length; i++) {
-        (function (competitor) {
-          if (competitor.mapMarker) {
-            competitorsWithMarker.push(competitor);
-            var latLon = competitor.mapMarker.getLatLng();
-            competitorsLocations.push({
-              location: {
-                accuracy: 0,
-                latitude: latLon.lat,
-                longitude: latLon.lng,
-              },
-            });
-          }
-        })(competitorList[i]);
-      }
+      Object.values(competitorList).forEach(function (competitor) {
+        if (competitor.mapMarker) {
+          competitorsWithMarker.push(competitor);
+          var latLon = competitor.mapMarker.getLatLng();
+          competitorsLocations.push({
+            location: {
+              accuracy: 0,
+              latitude: latLon.lat,
+              longitude: latLon.lng,
+            },
+          });
+        }
+      });
       var dbscanner = jDBSCAN()
         .eps(0.015)
         .minPts(1)

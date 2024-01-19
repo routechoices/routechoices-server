@@ -60,27 +60,6 @@ var printTime = function (t) {
   return text + prependZero(s) + "s";
 };
 
-Array.prototype.findIndex =
-  Array.prototype.findIndex ||
-  function (callback) {
-    if (this === null) {
-      throw new TypeError(
-        "Array.prototype.findIndex called on null or undefined"
-      );
-    } else if (typeof callback !== "function") {
-      throw new TypeError("callback must be a function");
-    }
-    var list = Object(this);
-    var length = list.length >>> 0;
-    var thisArg = arguments[1];
-    for (var i = 0; i < length; i++) {
-      if (callback.call(thisArg, list[i], i, list)) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
 L.Control.EventState = L.Control.extend({
   options: {
     position: "topleft",
