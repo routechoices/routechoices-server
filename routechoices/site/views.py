@@ -107,8 +107,8 @@ def contact(request):
                 message,
                 settings.DEFAULT_FROM_EMAIL,
                 [settings.EMAIL_CUSTOMER_SERVICE],
+                reply_to=[from_email],
             )
-            msg.content_subtype = "html"
             msg.send()
             messages.success(request, "Message sent succesfully")
             return redirect("site:contact_view")
