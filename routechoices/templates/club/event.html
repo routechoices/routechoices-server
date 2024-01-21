@@ -202,9 +202,10 @@
                     <path d="M0 0 V1 H1"></path>
                 </svg>
                 <div class="modal-body text-center">
-                    <h4 id="event-start-date-text">
-                        Event start on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>
-                    </h4>
+                    <h3 id="event-start-date-text" class="fw-bold text-uppercase">Starting at</h3>
+                    <div id="event-start-date-value">
+                        <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -268,6 +269,7 @@
             data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"></script>
     {% compress js %}
         <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-sv"></script>
+        <script src="{% static '/vendor/dayjs-1.11.7/duration.min.js' %}"></script>
         <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
         <script src="{% static '/vendor/server-clock-2023.01.21/server-clock.min.js' %}"></script>
         <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>

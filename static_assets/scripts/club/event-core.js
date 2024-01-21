@@ -394,7 +394,7 @@ function sortingFunction(a, b) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2023082700`)
+  return fetch(`${langFile}?v=2024012100`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

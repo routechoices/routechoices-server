@@ -622,6 +622,47 @@ function RCEvent(infoURL, clockURL) {
     } catch {}
   }
 
+  function CountDown() {
+    var duration = dayjs.duration(dayjs(eventStart).diff(dayjs()));
+    var durationInSeconds = duration.asSeconds();
+    var days = Math.floor(durationInSeconds / (24 * 3600));
+    durationInSeconds -= days * (24 * 3600);
+    var hours = Math.floor(durationInSeconds / 3600);
+    durationInSeconds -= hours * 3600;
+    var minutes = Math.floor(durationInSeconds / 60);
+    durationInSeconds -= minutes * 60;
+    var seconds = Math.floor(durationInSeconds);
+
+    var daysText = dayjs.duration(2, "days").humanize().replace("2", "").trim();
+    var hoursText = dayjs
+      .duration(2, "hours")
+      .humanize()
+      .replace("2", "")
+      .trim();
+    var minutesText = dayjs
+      .duration(2, "minutes")
+      .humanize()
+      .replace("2", "")
+      .trim();
+    var secondsText = dayjs
+      .duration(2, "seconds")
+      .humanize()
+      .replace("2", "")
+      .trim();
+
+    return `<div class="mb-3 justify-content-center fw-bold d-flex text-uppercase">
+      <div class="mx-3"><span class="fs-3">${days}</span><br/>${daysText}</div>
+      <div class="mx-3"><span class="fs-3">${hours}</span><br/>${hoursText}</div>
+      <div class="mx-3"><span class="fs-3">${minutes}</span><br/>${minutesText}</div>
+      <div class="mx-3"><span class="fs-3">${seconds}</span><br/>${secondsText}</div>
+      </div>
+      <div style="font-size:0.7em;color: var(--bs-secondary)">( ${capitalizeFirstLetter(
+        dayjs(eventStart).local().format("LLLL")
+      )} )</div>`;
+  }
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
   (function initialize() {
     window.addEventListener("resize", onAppResize);
     initializeMap();
@@ -643,20 +684,19 @@ function RCEvent(infoURL, clockURL) {
         }
         var now = clock.now();
         eventStart = new Date(response.event.start_date);
+
+        setInterval(function () {
+          u("#event-start-date-value").html(CountDown());
+        }, 1000);
+
+        u("#event-start-date-value").html(CountDown());
+
         eventEnd = new Date(response.event.end_date);
         if (eventStart > now) {
           // show event not started modal
           try {
             map.remove();
           } catch {}
-          var startDateTxt = dayjs(eventStart)
-            .local()
-            .locale(locale)
-            .format("LLLL");
-          u("#event-start-date-text").text(
-            banana.i18n("event-start-date-text", startDateTxt)
-          );
-
           u(".event-tool").hide();
           u("#eventLoadingModal").remove();
           u("#permanent-sidebar").remove();
@@ -979,13 +1019,6 @@ function RCEvent(infoURL, clockURL) {
         if (new Date(response.event.start_date) != eventStart) {
           var oldStart = eventStart;
           eventStart = new Date(response.event.start_date);
-          var startDateTxt = dayjs(eventStart)
-            .local()
-            .locale(locale)
-            .format("LLLL");
-          u("#event-start-date-text").text(
-            banana.i18n("event-start-date-text", startDateTxt)
-          );
           // user changed the event start from past to in the future
           if (oldStart < clock.now() && eventStart > clock.now()) {
             window.location.reload();
@@ -2646,9 +2679,10 @@ function RCEvent(infoURL, clockURL) {
   var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
   var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
   locale = urlLanguage || storedLanguage || browserLanguage || "en";
-
+  dayjs.locale(locale);
   banana = new Banana();
   updateText().then(function () {
+    u("#event-start-date-text").text(banana.i18n("event-start-date-text"));
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
     u("#export-text").text(banana.i18n("export"));
     u("#loading-text").text(banana.i18n("loading-text"));
