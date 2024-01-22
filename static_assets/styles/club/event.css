@@ -37,10 +37,13 @@
   background-color: var(--bs-secondary-bg);
 }
 
+#permanent-sidebar.no-sidebar {
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+}
+
 .main.no-sidebar {
-  right: calc(var(--sidebar-size) - 1px);
-  width: calc(100% - var(--sidebar-size) + 1px);
-  border-right: 1px solid rgba(0, 0, 0, 0.125);
+  right: var(--sidebar-size);
+  width: calc(100% - var(--sidebar-size));
 }
 
 .tooltip {

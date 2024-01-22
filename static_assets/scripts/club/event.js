@@ -594,6 +594,7 @@ function RCEvent(infoURL, clockURL) {
       .removeClass("col-sm-5")
       .removeClass("col-lg-3")
       .removeClass("col-xxl-2");
+    u("#permanent-sidebar").addClass("no-sidebar");
     sidebarShown = false;
     u("#permanent-sidebar .btn").removeClass("active");
     try {
@@ -616,6 +617,7 @@ function RCEvent(infoURL, clockURL) {
       .addClass("col-sm-5")
       .addClass("col-lg-3")
       .addClass("col-xxl-2");
+    u("#permanent-sidebar").removeClass("no-sidebar");
     sidebarShown = true;
     try {
       map.invalidateSize();
