@@ -1493,8 +1493,7 @@ class Event(models.Model):
         live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
         upcoming_events_qs = event_qs.filter(
             start_date__gt=now(), start_date__lte=now() + timedelta(hours=24)
-        )
-
+        ).order_by("start_date", "name")
         if search_text_raw:
             search_text = search_text_raw
             quoted_terms = re.findall(r"\"(.+?)\"", search_text)
@@ -1543,15 +1542,16 @@ class Event(models.Model):
             if selected_month:
                 past_event_qs = past_event_qs.filter(start_date__month=selected_month)
 
-        def list_events_sets(qs):
+        def list_events_sets(qs, decreasing_order=True):
             events_without_sets = qs.filter(event_set__isnull=True)
+            order = "-start_date" if decreasing_order else "start_date"
             first_events_of_each_set = (
                 qs.filter(event_set__isnull=False)
-                .order_by("event_set_id", "-start_date")
+                .order_by("event_set_id", order, "name")
                 .distinct("event_set_id")
             )
             return events_without_sets.union(first_events_of_each_set).order_by(
-                "-start_date", "name"
+                order, "name"
             )
 
         def events_to_sets(qs, type="past"):
@@ -1626,7 +1626,7 @@ class Event(models.Model):
             all_live_events = list_events_sets(live_events_qs)
             live_events = events_to_sets(all_live_events, type="live")
 
-            all_upcoming_events = list_events_sets(upcoming_events_qs)
+            all_upcoming_events = list_events_sets(upcoming_events_qs, False)
             upcoming_events = events_to_sets(all_upcoming_events, type="upcoming")
         else:
             live_events = upcoming_events = cls.objects.none()
