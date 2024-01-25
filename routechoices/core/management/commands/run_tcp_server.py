@@ -578,7 +578,7 @@ class TK201Connection:
 
     async def _process_data(self, data):
         if not self.db_device.user_agent:
-            self.db_device.user_agent = "TrackTape"
+            self.db_device.user_agent = "Xexun ARM"
         imei = data[17].split(":")[1]
         if imei != self.imei:
             return False
