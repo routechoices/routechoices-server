@@ -541,7 +541,7 @@ class TK201Connection:
         try:
             data_raw = ""
             while not data_raw:
-                data_bin = await self.stream.read_until(b"\n")
+                data_bin = await self.stream.read_bytes(255)
                 data_raw = data_bin.decode("ascii").strip()
             print(f"Received data ({data_raw})", flush=True)
             data = data_raw.split(",")
@@ -610,7 +610,7 @@ class TK201Connection:
         try:
             data_raw = ""
             while not data_raw:
-                data_bin = await self.stream.read_until(b"\n")
+                data_bin = await self.stream.read_bytes(255)
                 data_raw = data_bin.decode("ascii").strip()
             print(f"Received data ({data_raw})")
             data = data_raw.split(",")
