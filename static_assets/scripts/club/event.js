@@ -67,6 +67,7 @@ function RCEvent(infoURL, clockURL) {
   var intersectionCheckZoom = 18;
   var showUserLocation = false;
   var showAll = true;
+  var rankControl = null;
 
   class CompetitorSidebarEl extends HTMLElement {
     constructor() {
@@ -938,9 +939,12 @@ function RCEvent(infoURL, clockURL) {
     finishLinePoints = [];
     if (finishLinePoly) {
       map.removeLayer(finishLinePoly);
-      map.removeControl(rankControl);
+      if (rankControl) {
+        map.removeControl(rankControl);
+      }
       finishLinePoly = null;
       finishLineSet = false;
+      rankControl = null;
     }
     finishLinePoints.push(e.latlng);
     map.on("click", drawFinishLineEnd);
@@ -953,6 +957,7 @@ function RCEvent(infoURL, clockURL) {
       map.removeControl(rankControl);
       finishLinePoly = null;
       finishLineSet = false;
+      rankControl = null;
       map.contextmenu.removeItem(removeFinishLineContextMenuItem);
       removeFinishLineContextMenuItem = null;
     }
@@ -976,7 +981,9 @@ function RCEvent(infoURL, clockURL) {
           text: banana.i18n("remove-finish-line"),
           callback: removeFinishLine,
         },
-        2
+        2 +
+          (!!setMassStartContextMenuItem ? 1 : 0) +
+          (!!resetMassStartContextMenuItem ? 1 : 0)
       );
     }
   }
@@ -996,7 +1003,8 @@ function RCEvent(infoURL, clockURL) {
     Object.values(competitorList).forEach(function (competitor) {
       var route = competitorRoutes[competitor.id];
       if (route) {
-        var off = competitor.custom_offset - competitor.start_time || 0;
+        var off =
+          competitor.custom_offset - new Date(competitor.start_time) || 0;
         res = res < off ? off : res;
       }
     });
@@ -1146,7 +1154,7 @@ function RCEvent(infoURL, clockURL) {
           text: banana.i18n("mass-start-from-here"),
           callback: onPressCustomMassStart,
         },
-        2
+        1
       );
     }
     isLive = false;
