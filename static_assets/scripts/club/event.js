@@ -927,7 +927,7 @@ function RCEvent(infoURL, clockURL) {
         var dur =
           route.getByIndex(idx).timestamp -
           ((customOffset
-            ? +new Date(competitor.custom_offset)
+            ? competitor.custom_offset
             : +new Date(competitor.start_time)) || getCompetitionStartDate());
         res = res < dur ? dur : res;
       }
@@ -999,13 +999,12 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function getCompetitorsMinCustomOffset() {
-    var res = 0;
+    var res = +clock.now();
     Object.values(competitorList).forEach(function (competitor) {
       var route = competitorRoutes[competitor.id];
       if (route) {
-        var off =
-          competitor.custom_offset - new Date(competitor.start_time) || 0;
-        res = res < off ? off : res;
+        var off = competitor.custom_offset;
+        res = Math.min(res, off);
       }
     });
     return res;
@@ -1183,9 +1182,7 @@ function RCEvent(infoURL, clockURL) {
         var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
         if (isCustomStart) {
           maxCTime =
-            getCompetitionStartDate() +
-            getCompetitorsMinCustomOffset() +
-            getCompetitorsMaxDuration(true);
+            getCompetitorsMinCustomOffset() + getCompetitorsMaxDuration(true);
         }
         if (isRealTime) {
           maxCTime =
@@ -1499,7 +1496,6 @@ function RCEvent(infoURL, clockURL) {
           perc;
     } else if (isCustomStart) {
       currentTime =
-        getCompetitionStartDate() +
         getCompetitorsMinCustomOffset() +
         getCompetitorsMaxDuration(true) * perc;
     } else {
@@ -1543,7 +1539,7 @@ function RCEvent(infoURL, clockURL) {
       u("#real_time_button").removeClass("active");
       u("#mass_start_button").removeClass("active");
       setCustomStart(e.latlng);
-      currentTime = getCompetitionStartDate() - getCompetitorsMaxDuration();
+      currentTime = getCompetitorsMinCustomOffset();
       prevShownTime = currentTime;
       if (!resetMassStartContextMenuItem) {
         resetMassStartContextMenuItem = map.contextmenu.insertItem(
@@ -1656,8 +1652,7 @@ function RCEvent(infoURL, clockURL) {
     var timeT = currentTime;
     if (!isRealTime) {
       if (isCustomStart) {
-        timeT +=
-          +new Date(competitor.custom_offset) - getCompetitionStartDate();
+        timeT += competitor.custom_offset - getCompetitionStartDate();
       } else {
         timeT += +new Date(competitor.start_time) - getCompetitionStartDate();
       }
@@ -2242,13 +2237,10 @@ function RCEvent(infoURL, clockURL) {
 
   function getRelativeTime(currentTime) {
     var viewedTime = currentTime;
-    if (!isRealTime) {
-      if (isCustomStart) {
-        viewedTime -=
-          getCompetitorsMinCustomOffset() + getCompetitionStartDate();
-      } else {
-        viewedTime -= getCompetitionStartDate();
-      }
+    if (isCustomStart) {
+      viewedTime -= getCompetitorsMinCustomOffset();
+    } else {
+      viewedTime -= getCompetitionStartDate();
     }
     return viewedTime;
   }
@@ -2265,8 +2257,7 @@ function RCEvent(infoURL, clockURL) {
         return "00:00:00";
       }
       if (isCustomStart) {
-        viewedTime -=
-          getCompetitorsMinCustomOffset() + getCompetitionStartDate();
+        viewedTime -= getCompetitorsMinCustomOffset();
       } else {
         viewedTime -= getCompetitionStartDate();
       }
@@ -2361,8 +2352,7 @@ function RCEvent(infoURL, clockURL) {
     } else {
       if (isCustomStart) {
         perc =
-          ((currentTime -
-            (getCompetitionStartDate() + getCompetitorsMinCustomOffset())) /
+          ((currentTime - getCompetitorsMinCustomOffset()) /
             getCompetitorsMaxDuration(true)) *
           100;
       } else {
@@ -2405,7 +2395,7 @@ function RCEvent(infoURL, clockURL) {
         ) {
           viewedTime += Math.max(
             0,
-            new Date(competitor.custom_offset) - getCompetitionStartDate()
+            competitor.custom_offset - getCompetitorsMinCustomOffset()
           );
         }
         var loc = route.getByTime(viewedTime);
@@ -2527,8 +2517,8 @@ function RCEvent(infoURL, clockURL) {
                     ) {
                       competitorTime -= Math.max(
                         0,
-                        new Date(competitor.custom_offset) -
-                          getCompetitionStartDate()
+                        competitor.custom_offset -
+                          getCompetitorsMinCustomOffset()
                       );
                     }
                     if (getRelativeTime(competitorTime) > 0) {
@@ -2591,8 +2581,8 @@ function RCEvent(infoURL, clockURL) {
                     ) {
                       competitorTime -= Math.max(
                         0,
-                        new Date(competitor.custom_offset) -
-                          getCompetitionStartDate()
+                        competitor.custom_offset -
+                          getCompetitorsMinCustomOffset()
                       );
                     }
                     if (getRelativeTime(competitorTime) > 0) {
