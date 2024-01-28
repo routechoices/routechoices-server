@@ -1270,9 +1270,11 @@ function RCEvent(infoURL, clockURL) {
       // the sidebar hasnt beeen manually collapsed yet
       if (!u("#map").hasClass("no-sidebar") && width <= 576) {
         u("#map").addClass("no-sidebar");
+        u("#permanent-sidebar").addClass("no-sidebar");
         u("#permanent-sidebar .btn").removeClass("active");
       } else if (u("#map").hasClass("no-sidebar") && width > 576) {
         u("#map").removeClass("no-sidebar");
+        u("#permanent-sidebar").removeClass("no-sidebar");
         if (optionDisplayed) {
           u("#options_show_button").addClass("active");
         } else {
