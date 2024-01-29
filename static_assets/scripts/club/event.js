@@ -68,7 +68,7 @@ function RCEvent(infoURL, clockURL) {
   var showUserLocation = false;
   var showAll = true;
   var rankControl = null;
-
+  var competitorsMinCustomOffset = null;
   class CompetitorSidebarEl extends HTMLElement {
     constructor() {
       super();
@@ -999,15 +999,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function getCompetitorsMinCustomOffset() {
-    var res = +clock.now();
-    Object.values(competitorList).forEach(function (competitor) {
-      var route = competitorRoutes[competitor.id];
-      if (route) {
-        var off = competitor.custom_offset;
-        res = Math.min(res, off);
-      }
-    });
-    return res;
+    return competitorsMinCustomOffset;
   }
 
   function refreshData() {
@@ -1435,10 +1427,12 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function setCustomStart(latlng) {
+    competitorsMinCustomOffset = +clock.Now();
     Object.values(competitorList).forEach(function (competitor) {
       var minDist = Infinity;
       var minDistT = null;
       var route = competitorRoutes[competitor.id];
+
       if (route) {
         var length = route.getPositionsCount();
         for (var i = 0; i < length; i++) {
@@ -1451,6 +1445,10 @@ function RCEvent(infoURL, clockURL) {
           }
         }
         competitor.custom_offset = minDistT;
+        competitorsMinCustomOffset = Math.min(
+          minDistT,
+          competitorsMinCustomOffset
+        );
       }
     });
   }
