@@ -29,11 +29,7 @@ from routechoices.core.models import (
     MapAssignation,
     Notice,
 )
-from routechoices.lib.helpers import (
-    check_cname_record,
-    check_txt_record,
-    get_aware_datetime,
-)
+from routechoices.lib.helpers import check_cname_record, get_aware_datetime
 from routechoices.lib.validators import domain_validator, validate_nice_slug
 
 
@@ -233,10 +229,6 @@ class ClubDomainForm(ModelForm):
         domain = self.cleaned_data["domain"]
         if domain == "":
             return domain
-        if not check_txt_record(domain):
-            raise ValidationError(
-                f"TXT record for '{domain}' has not been set properly."
-            )
         if not check_cname_record(domain):
             raise ValidationError(
                 f"CNAME record for '{domain}' has not been set properly."
