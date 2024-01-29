@@ -1427,7 +1427,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function setCustomStart(latlng) {
-    competitorsMinCustomOffset = +clock.Now();
+    competitorsMinCustomOffset = +clock.now();
     Object.values(competitorList).forEach(function (competitor) {
       var minDist = Infinity;
       var minDistT = null;
