@@ -183,9 +183,11 @@ L.Control.Ranking = L.Control.extend({
       );
     }
     var innerOut = u('<div class="result-name-list"/>');
-    if(ranking.length > 0) {
+    if (ranking.length > 0) {
       ranking.sort(function (a, b) {
-        return myEvent.getRelativeTime(a.time) - myEvent.getRelativeTime(b.time);
+        return (
+          myEvent.getRelativeTime(a.time) - myEvent.getRelativeTime(b.time)
+        );
       });
     }
     ranking.forEach(function (c, i) {

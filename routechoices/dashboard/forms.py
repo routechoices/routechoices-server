@@ -253,9 +253,9 @@ class DeviceForm(Form):
 class MapForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields[
-            "image"
-        ].help_text = "Image of map as a PNG, JPEG, GIF, WEBP, or PDF file"
+        self.fields["image"].help_text = (
+            "Image of map as a PNG, JPEG, GIF, WEBP, or PDF file"
+        )
 
     class Meta:
         model = Map

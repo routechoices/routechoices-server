@@ -1552,15 +1552,17 @@ def device_info(request, device_id):
     return Response(
         {
             "id": device.aid,
-            "last_position": {
-                "timestamp": device.last_location_timestamp,
-                "coordinates": {
-                    "latitude": device.last_location[LOCATION_LATITUDE_INDEX],
-                    "longitude": device.last_location[LOCATION_LONGITUDE_INDEX],
-                },
-            }
-            if device.last_location
-            else None,
+            "last_position": (
+                {
+                    "timestamp": device.last_location_timestamp,
+                    "coordinates": {
+                        "latitude": device.last_location[LOCATION_LATITUDE_INDEX],
+                        "longitude": device.last_location[LOCATION_LONGITUDE_INDEX],
+                    },
+                }
+                if device.last_location
+                else None
+            ),
         }
     )
 
