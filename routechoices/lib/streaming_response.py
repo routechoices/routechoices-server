@@ -62,9 +62,11 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
             last_byte = size - 1
         length = last_byte - first_byte + 1
         resp = StreamingHttpResponse(
-            FileWrapper(fileIO)
-            if request.method == "HEAD"
-            else RangeFileWrapper(fileIO, offset=first_byte, length=length),
+            (
+                FileWrapper(fileIO)
+                if request.method == "HEAD"
+                else RangeFileWrapper(fileIO, offset=first_byte, length=length)
+            ),
             status=206,
             content_type=content_type,
             **kwargs,
