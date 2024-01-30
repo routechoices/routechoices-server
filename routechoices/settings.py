@@ -310,6 +310,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
+SECURE_REDIRECT_EXEMPT = [r"^\.well-known/acme-challenge/.+$"]
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 try:
