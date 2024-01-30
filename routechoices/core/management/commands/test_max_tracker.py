@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 for i, d in enumerate(devs):
                     if (i + k) % 50 == 0:
                         t0 = int(time.time()) - 5
-                        locations = tuple()
+                        locations = ()
                         for j in range(5):
                             locations += (
                                 ((t0 + j), lat + i / 100, lng + (k * 5 + j) / 5000),

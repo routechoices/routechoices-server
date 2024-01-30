@@ -46,7 +46,7 @@ def handle_legacy_request(request, view_name, club_slug=None, **kwargs):
                 kwargs=kwargs,
             )
         )
-    elif not use_custom_domain and getattr(request, "club_slug", None) is not None:
+    if not use_custom_domain and getattr(request, "club_slug", None) is not None:
         kwargs.update({"club_slug": request.club_slug})
         return redirect(
             reverse(
@@ -55,7 +55,7 @@ def handle_legacy_request(request, view_name, club_slug=None, **kwargs):
                 kwargs=kwargs,
             )
         )
-    elif (
+    if (
         not use_custom_domain
         and getattr(request, "club_slug", None) is None
         and club_slug
@@ -255,7 +255,7 @@ def event_view(request, slug, **kwargs):
             if club.domain and not request.use_cname:
                 return redirect(f"{club.nice_url}{slug}")
             return render(request, "club/404_event.html", {"club": club}, status=404)
-        elif event_set.club.domain and not request.use_cname:
+        if event_set.club.domain and not request.use_cname:
             return redirect(f"{event_set.club.nice_url}{slug}")
         return render(
             request, "site/event_list.html", event_set.extract_event_lists(request)
@@ -486,8 +486,7 @@ def acme_challenge(request, challenge):
     club = get_object_or_404(Club.objects.exclude(domain=""), slug__iexact=club_slug)
     if challenge == club.acme_challenge.partition(".")[0]:
         return HttpResponse(club.acme_challenge)
-    else:
-        raise Http404()
+    raise Http404()
 
 
 def robots_txt(request):

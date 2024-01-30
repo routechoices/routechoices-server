@@ -404,7 +404,7 @@ def event_list(request):
             events.filter(club__domain__iexact=domain)
         event_slug = url.path[1:]
         if event_slug.endswith("/"):
-            event_slug[:-1]
+            event_slug = event_slug[:-1]
         events = events.filter(slug__iexact=event_slug)
     output = []
     for event in events:
@@ -429,7 +429,7 @@ def event_list(request):
 
 @swagger_auto_schema(
     method="get",
-    operation_id="clubs_list",
+    operation_id="club_list",
     operation_description="List clubs",
     tags=["Clubs"],
     manual_parameters=[mine_param],
@@ -457,7 +457,7 @@ def event_list(request):
     },
 )
 @api_view(["GET"])
-def club_list(request):
+def club_list_view(request):
     only_yours = request.GET.get("mine")
     clubs = Club.objects.all()
     owned_clubs = Club.objects.none()
@@ -982,7 +982,7 @@ def competitor_route_upload(request, competitor_id):
 
     loc_array = []
     start_time = None
-    for i in range(len(times)):
+    for i, _ in enumerate(times):
         if times[i] and lats[i] and lons[i]:
             lat = lats[i]
             lon = lons[i]
@@ -1305,7 +1305,7 @@ def locations_api_gw(request):
             "Latitudes, longitudes, and timestamps, should have same amount of points"
         )
     loc_array = []
-    for i in range(len(times)):
+    for i, _ in enumerate(times):
         if times[i] and lats[i] and lons[i]:
             lat = lats[i]
             lon = lons[i]

@@ -1,4 +1,3 @@
-# coding=utf-8
 import math
 import os.path
 
@@ -73,7 +72,7 @@ def process_file(file_path):
                             continue
                         else:
                             new_locs[imei].append((tim, lat, lon))
-    for imei in new_locs.keys():
+    for imei in new_locs:
         devices[imei].add_locations(new_locs[imei])
         print(f"{len(new_locs[imei])} added to device {imei}")
 

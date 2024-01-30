@@ -54,8 +54,7 @@ def lemonsqueezy_webhook(request):
             obj.order_id = data["data"]["id"]
             obj.save()
             return HttpResponse(f"Upgraded {obj}")
-        else:
-            raise Http404()
+        raise Http404()
 
     # Club Downgrade
     elif "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", ""):
@@ -74,9 +73,9 @@ def lemonsqueezy_webhook(request):
             club.upgraded_date = None
             club.order_id = None
             club.save()
-            return HttpResponse(f"Downgraded {obj}")
-        elif individual:
+            return HttpResponse(f"Downgraded {club}")
+        if individual:
             individual.delete()
-        else:
-            raise Http404()
+            return HttpResponse("Downgraded user")
+        raise Http404()
     return HttpResponse("Valid webhook call with no action taken")

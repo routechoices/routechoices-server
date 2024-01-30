@@ -240,29 +240,29 @@ def account_delete_view(request):
                 "dashboard/account_delete_confirm.html",
                 {"confirmation_valid": False},
             )
-        else:
-            temp_key = token_generator.make_token(user)
-            current_site = get_current_site()
-            url = build_absolute_uri(request, reverse("dashboard:account_delete_view"))
-            context = {
-                "current_site": current_site,
-                "user": user,
-                "account_deletion_url": f"{url}?confirmation_key={temp_key}",
-                "request": request,
-            }
-            if (
-                allauth_settings.AUTHENTICATION_METHOD
-                != allauth_settings.AuthenticationMethod.EMAIL
-            ):
-                context["username"] = user_username(user)
-            get_adapter(request).send_mail(
-                "account/email/account_delete", request.user.email, context
-            )
-            return render(
-                request,
-                "dashboard/account_delete.html",
-                {"sent": True},
-            )
+
+        temp_key = token_generator.make_token(user)
+        current_site = get_current_site()
+        url = build_absolute_uri(request, reverse("dashboard:account_delete_view"))
+        context = {
+            "current_site": current_site,
+            "user": user,
+            "account_deletion_url": f"{url}?confirmation_key={temp_key}",
+            "request": request,
+        }
+        if (
+            allauth_settings.AUTHENTICATION_METHOD
+            != allauth_settings.AuthenticationMethod.EMAIL
+        ):
+            context["username"] = user_username(user)
+        get_adapter(request).send_mail(
+            "account/email/account_delete", request.user.email, context
+        )
+        return render(
+            request,
+            "dashboard/account_delete.html",
+            {"sent": True},
+        )
     conf_key = request.GET.get("confirmation_key")
     if conf_key:
         if token_generator.check_token(user, conf_key):
@@ -338,8 +338,7 @@ def device_add_view(request):
             ownership.save()
             messages.success(request, "Device added successfully")
             return redirect("dashboard:device_list_view")
-        else:
-            form.fields["device"].queryset = Device.objects.none()
+        form.fields["device"].queryset = Device.objects.none()
     else:
         form = DeviceForm()
         form.fields["device"].queryset = Device.objects.none()
@@ -946,31 +945,31 @@ def event_create_view(request):
             if request.POST.get("save_continue"):
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
-        else:
-            all_devices_id = set()
-            for cform in formset.forms:
-                if cform.cleaned_data.get("device"):
-                    all_devices_id.add(cform.cleaned_data.get("device").id)
-            dev_qs = (
-                Device.objects.filter(id__in=all_devices_id)
-                .defer("locations_encoded")
-                .prefetch_related("club_ownerships")
-            )
-            dev_qs |= club.devices.all()
-            cd = [
-                {
-                    "full": (d.id, d.get_display_str(club)),
-                    "key": (d.get_nickname(club), d.get_display_str(club)),
-                }
-                for d in dev_qs
-            ]
-            cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
-            c = [
-                ["", "---------"],
-            ] + [d["full"] for d in cd]
-            for cform in formset.forms:
-                cform.fields["device"].queryset = dev_qs
-                cform.fields["device"].choices = c
+
+        all_devices_id = set()
+        for cform in formset.forms:
+            if cform.cleaned_data.get("device"):
+                all_devices_id.add(cform.cleaned_data.get("device").id)
+        dev_qs = (
+            Device.objects.filter(id__in=all_devices_id)
+            .defer("locations_encoded")
+            .prefetch_related("club_ownerships")
+        )
+        dev_qs |= club.devices.all()
+        cd = [
+            {
+                "full": (d.id, d.get_display_str(club)),
+                "key": (d.get_nickname(club), d.get_display_str(club)),
+            }
+            for d in dev_qs
+        ]
+        cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
+        c = [
+            ["", "---------"],
+        ] + [d["full"] for d in cd]
+        for cform in formset.forms:
+            cform.fields["device"].queryset = dev_qs
+            cform.fields["device"].choices = c
     else:
         form = EventForm(club=club)
         form.fields["map"].queryset = map_list
@@ -1081,29 +1080,28 @@ def event_edit_view(request, event_id):
             if request.POST.get("save_continue"):
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
-        else:
-            for cform in formset.forms:
-                if cform.cleaned_data.get("device"):
-                    all_devices_id.add(cform.cleaned_data.get("device").id)
-            dev_qs = (
-                Device.objects.filter(id__in=all_devices_id)
-                .defer("locations_encoded")
-                .prefetch_related("club_ownerships")
-            )
-            cd = [
-                {
-                    "full": (d.id, d.get_display_str(club)),
-                    "key": (d.get_nickname(club), d.get_display_str(club)),
-                }
-                for d in dev_qs
-            ]
-            cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
-            c = [
-                ["", "---------"],
-            ] + [d["full"] for d in cd]
-            for cform in formset.forms:
-                cform.fields["device"].queryset = dev_qs
-                cform.fields["device"].choices = c
+        for cform in formset.forms:
+            if cform.cleaned_data.get("device"):
+                all_devices_id.add(cform.cleaned_data.get("device").id)
+        dev_qs = (
+            Device.objects.filter(id__in=all_devices_id)
+            .defer("locations_encoded")
+            .prefetch_related("club_ownerships")
+        )
+        cd = [
+            {
+                "full": (d.id, d.get_display_str(club)),
+                "key": (d.get_nickname(club), d.get_display_str(club)),
+            }
+            for d in dev_qs
+        ]
+        cd.sort(key=lambda x: (x["key"][0] == "", x["key"]))
+        c = [
+            ["", "---------"],
+        ] + [d["full"] for d in cd]
+        for cform in formset.forms:
+            cform.fields["device"].queryset = dev_qs
+            cform.fields["device"].choices = c
     else:
         form = EventForm(instance=event, club=club)
         form.fields["map"].queryset = map_list
@@ -1202,21 +1200,21 @@ def event_competitors_view(request, event_id):
             formset.save()
             messages.success(request, "Changes saved successfully")
             return redirect("dashboard:event_edit_view", event_id=event.aid)
-        else:
-            for cform in formset.forms:
-                if cform.cleaned_data.get("device"):
-                    all_devices_id.add(cform.cleaned_data.get("device").id)
-            dev_qs = (
-                Device.objects.filter(id__in=all_devices_id)
-                .defer("locations_encoded")
-                .prefetch_related("club_ownerships")
-            )
-            c = [
-                ["", "---------"],
-            ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
-            for cform in formset.forms:
-                cform.fields["device"].queryset = dev_qs
-                cform.fields["device"].choices = c
+
+        for cform in formset.forms:
+            if cform.cleaned_data.get("device"):
+                all_devices_id.add(cform.cleaned_data.get("device").id)
+        dev_qs = (
+            Device.objects.filter(id__in=all_devices_id)
+            .defer("locations_encoded")
+            .prefetch_related("club_ownerships")
+        )
+        c = [
+            ["", "---------"],
+        ] + [[d.id, d.get_display_str(club)] for d in dev_qs]
+        for cform in formset.forms:
+            cform.fields["device"].queryset = dev_qs
+            cform.fields["device"].choices = c
     else:
         formset = CompetitorFormSet(
             instance=event,
@@ -1474,7 +1472,7 @@ class CustomEmailView(EmailView):
         return ret
 
 
-email = login_required(CustomEmailView.as_view())
+email_view = login_required(CustomEmailView.as_view())
 
 
 class CustomBackupCodesView(BackupCodesView):

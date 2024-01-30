@@ -30,14 +30,13 @@ class RangeFileWrapper:
             if data:
                 return data
             raise StopIteration()
-        else:
-            if self.remaining <= 0:
-                raise StopIteration()
-            data = self.filelike.read(min(self.remaining, self.blksize))
-            if not data:
-                raise StopIteration()
-            self.remaining -= len(data)
-            return data
+        if self.remaining <= 0:
+            raise StopIteration()
+        data = self.filelike.read(min(self.remaining, self.blksize))
+        if not data:
+            raise StopIteration()
+        self.remaining -= len(data)
+        return data
 
 
 def StreamingHttpRangeResponse(request, data, **kwargs):

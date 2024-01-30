@@ -4,6 +4,7 @@ from django.http.response import HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.timezone import now
 from django.views.decorators.http import condition
+from rest_framework import status
 
 from routechoices.core.models import (
     PRIVACY_PRIVATE,
@@ -169,7 +170,7 @@ def wms_service(request):
             headers=headers,
         )
 
-    elif get_params.get("request", "").lower() == "getcapabilities":
+    if get_params.get("request", "").lower() == "getcapabilities":
         max_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": 89.9, "lon": 180})
         min_xy = GLOBAL_MERCATOR.latlon_to_meters({"lat": -89.9, "lon": -180})
 
@@ -216,4 +217,5 @@ def wms_service(request):
             {"layers": layers, "min_xy": min_xy, "max_xy": max_xy},
             content_type="text/xml",
         )
-    return HttpResponse(status=501)
+
+    return HttpResponse(status=status.HTTP_501_NOT_IMPLEMENTED)

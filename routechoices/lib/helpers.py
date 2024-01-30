@@ -340,7 +340,7 @@ def initial_of_name(name):
 
 def check_txt_record(domain):
     if not domain:
-        return
+        return False
 
     try:
         resp = requests.get(
@@ -372,7 +372,7 @@ def check_txt_record(domain):
 
 def check_cname_record(domain):
     if not domain:
-        return
+        return False
 
     try:
         resp = requests.get(

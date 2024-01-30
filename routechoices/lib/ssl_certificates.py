@@ -1,12 +1,10 @@
 import os
 import os.path
-from typing import cast
 
 import arrow
 from cryptography import x509
 from django.conf import settings
 from sewer.auth import ProviderBase
-from sewer.crypto import AcmeAccount
 
 
 def is_account_ssl_expirying(domain):
@@ -27,10 +25,10 @@ def read_account_ssl_key(domain, key_cls):
         data = f.read()
     prefix = b""
     n = data.find(b"-----BEGIN")
-    if 0 < n:
+    if n > 0:
         prefix = data[:n]
         data = data[n:]
-    acct = cast("AcmeAccount", key_cls.from_pem(data))
+    acct = key_cls.from_pem(data)
     if prefix:
         parts = prefix.split(b"\n")
         for p in parts:

@@ -51,7 +51,7 @@ class UserForm(ModelForm):
 class RequestInviteForm(Form):
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     club = ModelChoiceField(
         label="Club",

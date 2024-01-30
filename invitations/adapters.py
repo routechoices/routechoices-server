@@ -73,12 +73,11 @@ class BaseInvitationsAdapter:
             "account_verified_email",
         ):
             return True
-        elif app_settings.INVITATION_ONLY is True:
+        if app_settings.INVITATION_ONLY is True:
             # Site is ONLY open for invites
             return False
-        else:
-            # Site is open to signup
-            return True
+        # Site is open to signup
+        return True
 
     def clean_email(self, email):
         """

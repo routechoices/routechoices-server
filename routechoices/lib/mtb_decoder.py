@@ -95,13 +95,13 @@ class MtbDecoder:
                 a -= 4
                 e = self.fp.read(1)
                 a -= 1
-                if b"\x01" == e or b"\x03" == e:
+                if e in (b"\x01", b"\x03"):
                     self.get_int32()
                     a -= 4
                 else:
                     self.get_int64()
                     a -= 8
-                if b"\x02" == e or b"\x03" == e:
+                if e in (b"\x02", b"\x03"):
                     self.get_int32()
                     a -= 4
                 else:
@@ -179,13 +179,13 @@ class MtbDecoder:
                 r = n
                 t = self.fp.read(1)
                 n -= 1
-                if b"\x03" == t or b"\x01" == t:
+                if t in (b"\x01", b"\x03"):
                     self.get_int32()
                     n -= 4
                 else:
                     self.get_int64()
                     n -= 8
-                if b"\x02" == t or b"\x03" == t:
+                if t in (b"\x02", b"\x03"):
                     self.get_int32()
                     n -= 4
                 else:
@@ -211,13 +211,13 @@ class MtbDecoder:
             h -= 4
             s = self.fp.read(1)
             h -= 1
-            if b"\x03" == s or b"\x01" == s:
+            if s in (b"\x01", b"\x03"):
                 r = self.get_int32() + 2147483648
                 h -= 4
             else:
                 r = self.get_int64()
                 h -= 8
-            if b"\x02" == s or b"\x03" == s:
+            if s in (b"\x02", b"\x03"):
                 a = 1e3 * (self.get_int32() + 2147483648)
                 h -= 4
             else:

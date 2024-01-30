@@ -7,7 +7,7 @@ from routechoices.dashboard import views
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
-    re_path(r"^account/emails/?$", views.email, name="account_emails"),
+    re_path(r"^account/emails/?$", views.email_view, name="account_emails"),
     re_path(
         r"^account/change-password/?$",
         allauth_views.password_change,

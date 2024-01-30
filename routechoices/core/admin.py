@@ -47,8 +47,7 @@ class ImeiDeviceClubFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             return queryset.filter(device__club_ownerships__club_id=self.value())
-        else:
-            return queryset
+        return queryset
 
 
 class EventDateRangeFilter(admin.SimpleListFilter):
@@ -76,49 +75,49 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 end_date__date__gte=time_now.floor("day").date(),
                 start_date__date__lte=time_now.ceil("day").date(),
             )
-        elif self.value() == "yesterday":
+        if self.value() == "yesterday":
             return queryset.filter(
                 end_date__date__gte=time_now.shift(days=-1).floor("day").date(),
                 start_date__lte=time_now.shift(days=-1).ceil("day").date(),
             )
-        elif self.value() == "last_7_days":
+        if self.value() == "last_7_days":
             return queryset.filter(
                 end_date__date__gte=time_now.shift(days=-7).floor("day").date(),
                 start_date__lte=time_now.datetime,
             )
-        elif self.value() == "last_30_days":
+        if self.value() == "last_30_days":
             return queryset.filter(
                 end_date__date__gte=time_now.shift(days=-30).floor("day").date(),
                 start_date__lte=time_now.datetime,
             )
-        elif self.value() == "this_month":
+        if self.value() == "this_month":
             return queryset.filter(
                 end_date__date__gte=time_now.floor("month").date(),
                 start_date__lte=time_now.datetime,
             )
-        elif self.value() == "last_month":
+        if self.value() == "last_month":
             return queryset.filter(
                 end_date__date__gte=time_now.shift(months=-1).floor("month").date(),
                 start_date__date__lte=time_now.shift(months=-1).ceil("month").date(),
             )
-        elif self.value() == "this_year":
+        if self.value() == "this_year":
             return queryset.filter(
                 end_date__date__gte=time_now.floor("year").date(),
                 start_date__lte=time_now.datetime,
             )
-        elif self.value() == "last_year":
+        if self.value() == "last_year":
             return queryset.filter(
                 end_date__date__gte=time_now.shift(years=-1).floor("year").date(),
                 start_date__date__lte=time_now.shift(years=-1).ceil("year").date(),
             )
-        elif self.value() == "future":
+        if self.value() == "future":
             return queryset.filter(start_date__gt=time_now.datetime)
-        elif self.value() == "now":
+        if self.value() == "now":
             return queryset.filter(
                 start_date__lte=time_now.datetime,
                 end_date__gte=time_now.datetime,
             )
-        elif self.value():
+        if self.value():
             return queryset
 
 
@@ -156,23 +155,23 @@ class ModifiedDateFilter(admin.SimpleListFilter):
         time_now = arrow.utcnow()
         if self.value() == "all":
             return queryset.all()
-        elif self.value() == "yesterday":
+        if self.value() == "yesterday":
             return queryset.filter(
                 modification_date__date=time_now.shift(days=-1).date(),
             )
-        elif self.value() == "last_7_days":
+        if self.value() == "last_7_days":
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(days=-7).date()
             )
-        elif self.value() == "last_30_days":
+        if self.value() == "last_30_days":
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(days=-7).date()
             )
-        elif self.value() == "this_month":
+        if self.value() == "this_month":
             return queryset.filter(
                 modification_date__date__gte=time_now.floor("month").date()
             )
-        elif self.value() == "last_month":
+        if self.value() == "last_month":
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(months=-1)
                 .floor("month")
@@ -181,11 +180,11 @@ class ModifiedDateFilter(admin.SimpleListFilter):
                 .ceil("month")
                 .date(),
             )
-        elif self.value() == "this_year":
+        if self.value() == "this_year":
             return queryset.filter(
                 modification_date__date__gte=time_now.floor("year").date()
             )
-        elif self.value() == "last_year":
+        if self.value() == "last_year":
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(years=-1)
                 .floor("year")
@@ -194,8 +193,7 @@ class ModifiedDateFilter(admin.SimpleListFilter):
                 .ceil("year")
                 .date(),
             )
-        else:
-            return queryset.filter(modification_date__date=time_now.date())
+        return queryset.filter(modification_date__date=time_now.date())
 
 
 class HasLocationFilter(admin.SimpleListFilter):
@@ -211,7 +209,7 @@ class HasLocationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "false":
             return queryset.filter(_location_count=0)
-        elif self.value():
+        if self.value():
             return queryset.filter(_location_count__gt=0)
 
 
@@ -228,7 +226,7 @@ class HasCompetitorFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "false":
             return queryset.filter(competitor_count=0)
-        elif self.value():
+        if self.value():
             return queryset.filter(competitor_count__gt=0)
 
 
@@ -245,7 +243,7 @@ class HasEventsFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "false":
             return queryset.filter(event_count=0)
-        elif self.value():
+        if self.value():
             return queryset.filter(event_count__gt=0)
 
 
@@ -262,7 +260,7 @@ class HasMapsFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "false":
             return queryset.filter(map_count=0)
-        elif self.value():
+        if self.value():
             return queryset.filter(map_count__gt=0)
 
 
@@ -279,7 +277,7 @@ class HasClubsFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "false":
             return queryset.filter(club_count=0)
-        elif self.value():
+        if self.value():
             return queryset.filter(club_count__gt=0)
 
 
@@ -310,7 +308,7 @@ class IsGPXFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "virtual":
             return queryset.filter(is_gpx=True)
-        elif self.value():
+        if self.value():
             return queryset.all()
         return queryset.filter(is_gpx=False)
 

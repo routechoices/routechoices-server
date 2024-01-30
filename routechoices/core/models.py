@@ -2125,7 +2125,7 @@ class Device(models.Model):
 
     def get_events_at_date(self, at):
         competitors = self.get_competitors_at_date(at, load_events=True)
-        return set([c.event for c in competitors])
+        return {c.event for c in competitors}
 
     def get_events_between_dates(self, from_date, to_date, /, *, should_be_ended=False):
         qs = (
@@ -2139,7 +2139,7 @@ class Device(models.Model):
         )
         if should_be_ended:
             qs = qs.filter(event__end_date__lt=now())
-        return set([c.event for c in qs])
+        return {c.event for c in qs}
 
     def get_last_competitor(self, load_event=False):
         qs = self.competitor_set.all().order_by("-start_time")

@@ -46,7 +46,7 @@ urlpatterns = [
     ),
     re_path(
         r"^clubs/?$",
-        views.club_list,
+        views.club_list_view,
         name="club_list",
     ),
     re_path(

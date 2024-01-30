@@ -77,8 +77,7 @@ def pricing_page(request):
         if r.status_code // 100 == 2:
             data = r.json()
             return redirect(data["data"]["attributes"]["url"])
-        else:
-            messages.error(request, "Something went wrong!")
+        messages.error(request, "Something went wrong!")
     partners = Club.objects.filter(upgraded=True).order_by("name")
     indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
     return render(
@@ -145,28 +144,28 @@ class CustomLoginView(LoginView):
         if not self.requires_two_factor(user):
             # no keys registered, use single-factor auth
             return super().form_valid(form)
-        else:
-            self.request.session["kagi_pre_verify_user_pk"] = user.pk
-            self.request.session["kagi_pre_verify_user_backend"] = user.backend
 
-            verify_url = reverse("kagi:verify-second-factor")
-            redirect_to = self.request.POST.get(
-                auth.REDIRECT_FIELD_NAME,
-                self.request.GET.get(auth.REDIRECT_FIELD_NAME, ""),
-            )
-            params = {}
-            if url_has_allowed_host_and_scheme(
-                url=redirect_to,
-                allowed_hosts=[self.request.get_host()],
-                require_https=True,
-            ):
-                params[auth.REDIRECT_FIELD_NAME] = redirect_to
-            if self.is_admin:
-                params["admin"] = 1
-            if params:
-                verify_url += "?" + urlencode(params)
+        self.request.session["kagi_pre_verify_user_pk"] = user.pk
+        self.request.session["kagi_pre_verify_user_backend"] = user.backend
 
-            return HttpResponseRedirect(verify_url)
+        verify_url = reverse("kagi:verify-second-factor")
+        redirect_to = self.request.POST.get(
+            auth.REDIRECT_FIELD_NAME,
+            self.request.GET.get(auth.REDIRECT_FIELD_NAME, ""),
+        )
+        params = {}
+        if url_has_allowed_host_and_scheme(
+            url=redirect_to,
+            allowed_hosts=[self.request.get_host()],
+            require_https=True,
+        ):
+            params[auth.REDIRECT_FIELD_NAME] = redirect_to
+        if self.is_admin:
+            params["admin"] = 1
+        if params:
+            verify_url += "?" + urlencode(params)
+
+        return HttpResponseRedirect(verify_url)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)

@@ -258,12 +258,12 @@ class Livelox(ThirdPartyTrackingSolution):
                 )
                 for c in route
             ]
-            for i in range(len(ctrls) - 1):
-                if ctrls[i][0] == ctrls[i + 1][0]:
-                    ctrls[i][0] -= 0.0001
-                start_from_a = ctrls[i][0] < ctrls[i + 1][0]
-                pt_a = ctrls[i] if start_from_a else ctrls[i + 1]
-                pt_b = ctrls[i] if not start_from_a else ctrls[i + 1]
+            for i, ctrl in enumerate(ctrls[:-1]):
+                if ctrl[0] == ctrls[i + 1][0]:
+                    ctrl[0] -= 0.0001
+                start_from_a = ctrl[0] < ctrls[i + 1][0]
+                pt_a = ctrl if start_from_a else ctrls[i + 1]
+                pt_b = ctrl if not start_from_a else ctrls[i + 1]
                 angle = math.atan((pt_b[1] - pt_a[1]) / (pt_b[0] - pt_a[0]))
                 if i == 0:
                     # draw start triangle
@@ -813,8 +813,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             "lon": int(o_pt[1]) * 2.0 / 1e5,
             "ts": t,
         }
-        loc_array = []
-        loc_array.append((t, prev_loc["lat"], prev_loc["lon"]))
+        loc_array = [(t, prev_loc["lat"], prev_loc["lon"])]
         for p in data[1:]:
             if len(p) < 3:
                 continue

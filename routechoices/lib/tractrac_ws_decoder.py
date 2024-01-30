@@ -37,7 +37,7 @@ class TracTracWSReader:
             try:
                 self.result = ws.recv()
                 self.offset = 0
-                if not len(self.result):
+                if not self.result:
                     continue
                 message_type = self.get_int32()
                 if message_type == 103:
