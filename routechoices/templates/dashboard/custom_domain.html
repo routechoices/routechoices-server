@@ -15,51 +15,49 @@
                    name="domain"
                    maxlength="128"
                    class="form-control"
-                   id="id_domain">
-        </input>
-        <button type="submit" class="save btn btn-secondary">
-            <i class="fa-solid fa-xmark"></i> Unset
-        </button>
-    </form>
-{% else %}
-    <p>
-        If you don't have a domain of your own, you can get one <a href="https://gandi.link/f/1a96fb21"
+                   id="id_domain" />
+            <button type="submit" class="save btn btn-secondary">
+                <i class="fa-solid fa-xmark"></i> Unset
+            </button>
+        </form>
+    {% else %}
+        <p>
+            If you don't have a domain of your own, you can get one <a href="https://gandi.link/f/1a96fb21"
     target="_blank"
     rel="noopener noreferrer">here</a>
-    </p>
-    <h4>Set the following DNS record</h4>
-    <table class="table">
-        <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Content</th>
-            <th>TTL</th>
-        </tr>
-        <tr>
-            <td>CNAME</td>
-            <td>
-                <small>{your domain}</small>
-            </td>
-            <td>
-                <small>cname.routechoices.com</small>
-            </td>
-            <td>3600</td>
-        </tr>
-    </table>
-    <h4>Then add your domain below</h4>
-    <form method="post" class="post-form">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="save btn btn-primary mb-1" id="submit-btn">
-            <i class="fa-solid fa-floppy-disk"></i> Save
-        </button>
-    </form>
-    <p>
-        <small>
-            It may take some time for the DNS records to propagate.
-            <br>
-            {{ site.name }} automatically set up SSL certificates for your custom domains.
-        </small>
-    </p>
-{% endif %}
+        </p>
+        <h4>Set the following DNS record</h4>
+        <table class="table">
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Content</th>
+                <th>TTL</th>
+            </tr>
+            <tr>
+                <td>CNAME</td>
+                <td>
+                    <small>{your domain}</small>
+                </td>
+                <td>
+                    <small>cname.routechoices.com</small>
+                </td>
+                <td>3600</td>
+            </tr>
+        </table>
+        <h4>Then add your domain below</h4>
+        <form method="post" class="post-form mb-3">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="save btn btn-primary mb-1" id="submit-btn">
+                <i class="fa-solid fa-floppy-disk"></i> Save
+            </button>
+        </form>
+        <b class="mb-0">Notes:</b>
+        <ul>
+            <li>It may take some time for the DNS records to propagate.</li>
+            <li>{{ site.name }} automatically set up the SSL certificate for your custom domain.</li>
+            <li>Your old pages at {{ club.nice_url }}... will be seamlessly redirected to your new domain.</li>
+        </ul>
+    {% endif %}
 {% endblock sub_sub_content %}
