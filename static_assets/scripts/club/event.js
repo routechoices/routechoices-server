@@ -1486,6 +1486,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function onMoveProgressBar(perc) {
+    perc = Math.max(Math.min(100, perc), 0);
     if (isRealTime) {
       currentTime =
         getCompetitionStartDate() +
