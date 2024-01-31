@@ -11,6 +11,7 @@ from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
 from routechoices.lib.tcp_protocols import (
+    GT06Connection,
     MicTrackConnection,
     QueclinkConnection,
     TK201Connection,
@@ -44,6 +45,10 @@ class GenericTCPServer(TCPServer):
             pass
 
 
+class GT06Server(GenericTCPServer):
+    connection_class = GT06Connection
+
+
 class MicTrackServer(GenericTCPServer):
     connection_class = MicTrackConnection
 
@@ -69,7 +74,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--tmt250-port", nargs="?", type=int, help="Teltonika Handler Port"
+            "--gt06-port", nargs="?", type=int, help="GT06 Handler Port"
         )
         parser.add_argument(
             "--mictrack-port", nargs="?", type=int, help="Mictrack Handler Port"
@@ -78,14 +83,20 @@ class Command(BaseCommand):
             "--queclink-port", nargs="?", type=int, help="Queclink Handler Port"
         )
         parser.add_argument(
-            "--tracktape-port", nargs="?", type=int, help="Tracktape Handler Port"
+            "--tk201-port", nargs="?", type=int, help="TK201 Handler Port"
         )
         parser.add_argument(
-            "--tk201-port", nargs="?", type=int, help="TK201 Handler Port"
+            "--tmt250-port", nargs="?", type=int, help="Teltonika Handler Port"
+        )
+        parser.add_argument(
+            "--tracktape-port", nargs="?", type=int, help="Tracktape Handler Port"
         )
 
     def handle(self, *args, **options):
         signal.signal(signal.SIGTERM, sigterm_handler)
+        if options.get("gt06_port"):
+            gt06_server = GT06Server()
+            gt06_server.listen(options["gt06_port"])
         if options.get("tmt250_port"):
             tmt250_server = TMT250Server()
             tmt250_server.listen(options["tmt250_port"])
@@ -106,6 +117,8 @@ class Command(BaseCommand):
             logger.info(f"{arrow.now().datetime}, UP")
             IOLoop.current().start()
         except (KeyboardInterrupt, SystemExit):
+            if options.get("gt06_port"):
+                gt06_server.stop()
             if options.get("tmt250_port"):
                 tmt250_server.stop()
             if options.get("queclink_port"):
