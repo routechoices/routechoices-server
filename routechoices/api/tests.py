@@ -823,6 +823,26 @@ class RegistrationApiTestCase(EssentialApiBase):
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
         self.assertIn("Name is missing", errors[0])
+        # no name, no shortname
+        res = self.client.post(
+            url,
+            {
+                "device_id": device_id,
+            },
+            format="json",
+        )
+        errors = json.loads(res.content)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("Name is missing", errors[0])
+        # no data
+        res = self.client.post(
+            url,
+            {},
+            format="json",
+        )
+        errors = json.loads(res.content)
+        print("%r" % errors)
+        self.assertEqual(len(errors), 1)
         # no device
         res = self.client.post(
             url,
