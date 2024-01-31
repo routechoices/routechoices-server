@@ -785,7 +785,7 @@ def event_register(request, event_id):
     if not name:
         errs.append(err_messages[lang]["no-name"])
     short_name = request.data.get("short_name")
-    if not short_name:
+    if name and not short_name:
         short_name = initial_of_name(name)
     start_time_query = request.data.get("start_time")
     if start_time_query:
