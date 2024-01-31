@@ -147,7 +147,7 @@ const postCredential = async (keyName, credential, token) => {
     credentials: "same-origin",
   });
 
-  return await resp.json();
+  return resp.json();
 };
 
 const postAssertion = async (assertion, token) => {
@@ -162,7 +162,7 @@ const postAssertion = async (assertion, token) => {
     credentials: "same-origin",
   });
 
-  return await resp.json();
+  return resp.json();
 };
 
 const GuardWebAuthn = () => {
