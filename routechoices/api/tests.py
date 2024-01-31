@@ -841,7 +841,6 @@ class RegistrationApiTestCase(EssentialApiBase):
             format="json",
         )
         errors = json.loads(res.content)
-        print("%r" % errors)
         self.assertEqual(len(errors), 1)
         # no device
         res = self.client.post(
