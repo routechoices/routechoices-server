@@ -19,6 +19,7 @@ from django.utils.functional import cached_property
 from django.utils.http import http_date
 from django_hosts.middleware import HostsBaseMiddleware
 from geoip2.errors import GeoIP2Error
+from rest_framework import status
 
 from routechoices.core.models import Club
 
@@ -140,7 +141,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         try:
             host, kwargs = self.get_host(request.get_host())
         except DisallowedHost:
-            return HttpResponse(status=444)
+            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
         # Hack for custom domains
         default_domain = settings.PARENT_HOST
         default_subdomain_suffix = f".{default_domain}"
@@ -171,8 +172,12 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
                             )
                         request.club_slug = True
                         if request.path != "/":
-                            return render(request, "404.html", status=404)
-                        return render(request, "club/404.html", status=404)
+                            return render(
+                                request, "404.html", status=status.HTTP_404_NOT_FOUND
+                            )
+                        return render(
+                            request, "club/404.html", status=status.HTTP_404_NOT_FOUND
+                        )
                     club_slug = slug.lower()
                     cache.set(cache_key, club_slug, 60)
         else:
@@ -183,7 +188,9 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
             else:
                 club = Club.objects.filter(domain__iexact=raw_host).first()
                 if not club:
-                    return render(request, "404-cname.html", status=404)
+                    return render(
+                        request, "404-cname.html", status=status.HTTP_404_NOT_FOUND
+                    )
                 club_slug = club.slug
                 cache.set(cache_key, club_slug, 60)
             original_host = f"{club_slug}{default_subdomain_suffix}"

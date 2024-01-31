@@ -5,6 +5,7 @@ from wsgiref.util import FileWrapper
 
 import magic
 from django.http import StreamingHttpResponse
+from rest_framework import status
 
 range_re = re.compile(r"bytes\s*=\s*(\d+)\s*-\s*(\d*)", re.I)
 
@@ -66,7 +67,7 @@ def StreamingHttpRangeResponse(request, data, **kwargs):
                 if request.method == "HEAD"
                 else RangeFileWrapper(fileIO, offset=first_byte, length=length)
             ),
-            status=206,
+            status=status.HTTP_206_PARTIAL_CONTENT,
             content_type=content_type,
             **kwargs,
         )

@@ -18,6 +18,7 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
 from PIL import Image
+from rest_framework import status
 
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
@@ -254,7 +255,12 @@ def event_view(request, slug, **kwargs):
             club = get_object_or_404(Club, slug__iexact=club_slug)
             if club.domain and not request.use_cname:
                 return redirect(f"{club.nice_url}{slug}")
-            return render(request, "club/404_event.html", {"club": club}, status=404)
+            return render(
+                request,
+                "club/404_event.html",
+                {"club": club},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         if event_set.club.domain and not request.use_cname:
             return redirect(f"{event_set.club.nice_url}{slug}")
         return render(
@@ -307,7 +313,12 @@ def event_export_view(request, slug, **kwargs):
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
             return redirect(f"{club.nice_url}{slug}/export")
-        return render(request, "club/404_event.html", {"club": club}, status=404)
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
     # If event is private, page needs to be sent with cookies to prove identity,
     # cannot be done from custom domain
     if event.privacy == PRIVACY_PRIVATE:
@@ -357,7 +368,12 @@ def event_map_view(request, slug, index="1", **kwargs):
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
             return redirect(f"{club.nice_url}{slug}map/{index if index != '1' else ''}")
-        return render(request, "club/404_event.html", {"club": club}, status=404)
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/map/{index}")
     return redirect(
@@ -389,7 +405,12 @@ def event_kmz_view(request, slug, index="1", **kwargs):
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
             return redirect(f"{club.nice_url}{slug}kmz/{index if index != '1' else ''}")
-        return render(request, "club/404_event.html", {"club": club}, status=404)
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/kmz/{index}")
     return redirect(
@@ -422,7 +443,12 @@ def event_contribute_view(request, slug, **kwargs):
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
             return redirect(f"{club.nice_url}{slug}/contribute")
-        return render(request, "club/404_event.html", {"club": club}, status=404)
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
     if event.club.domain and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/contribute")
 
