@@ -336,7 +336,7 @@ def event_list(request):
         if allow_route_upload_raw:
             allow_route_upload = True
 
-        event = Event.objects.create(
+        event = Event(
             club=club,
             slug=slug,
             name=name,
