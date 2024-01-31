@@ -463,10 +463,8 @@ def club_list_view(request):
     owned_clubs = Club.objects.none()
     if request.user.is_authenticated:
         owned_clubs = clubs.filter(admins=request.user)
-
-        if only_yours:
-            clubs = owned_clubs
-
+    if only_yours:
+        clubs = owned_clubs
     output = []
     for club in clubs:
         data = {
