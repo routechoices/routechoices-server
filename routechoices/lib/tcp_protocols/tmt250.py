@@ -87,7 +87,7 @@ class TMT250Connection:
         data_len = await self.stream.read_into(data, partial=True)
         if data_len < 3:
             print("too little data", flush=True)
-            await self.stream.write(pack("b", 0))
+            await self.stream.write(b"\x00")
             self.stream.close()
             return
         data = data[:data_len]
@@ -103,7 +103,7 @@ class TMT250Connection:
             print(
                 f"invalid identification {self.address}, {imei}, {imei_len}", flush=True
             )
-            await self.stream.write(pack("b", 0))
+            await self.stream.write(b"\x00")
             self.stream.close()
             return
         self.logger.info(
@@ -113,11 +113,11 @@ class TMT250Connection:
         self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
         if not self.db_device:
             print(f"imei not registered {self.address}, {imei}", flush=True)
-            await self.stream.write(pack("b", 0))
+            await self.stream.write(b"\x00")
             self.stream.close()
             return
         self.imei = imei
-        await self.stream.write(pack("b", 1))
+        await self.stream.write(b"\x01")
         print(f"{self.imei} is connected", flush=True)
 
         while await self._on_write_complete():
