@@ -75,18 +75,18 @@ class GT06Connection:
         lat_bin = data_bin[11:15]
         lon_bin = data_bin[15:19]
         flags = data_bin[20]
+
         north = flags & 0x4
         west = flags & 0x8
 
         year, month, day, hours, minutes, seconds = unpack(">BBBBBB", date_bin)
         year += 2000
         date_str = f"{year}-{month:02}-{day:02}T{hours:02}:{minutes:02}:{seconds:02}Z"
-        lat = unpack(">I", lat_bin)
-        lat = lat[0] / 60 / 30000
-        lon = unpack(">I", lon_bin)
-        lon = lon[0] / 60 / 30000
+        lat = unpack(">I", lat_bin)[0] / 60 / 30000
         if not north:
             lat *= -1
+
+        lon = unpack(">I", lon_bin)[0] / 60 / 30000
         if west:
             lon *= -1
 
