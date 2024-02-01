@@ -14,9 +14,9 @@ from routechoices.lib.tcp_protocols import (
     GT06Connection,
     MicTrackConnection,
     QueclinkConnection,
-    TK201Connection,
     TMT250Connection,
     TrackTapeConnection,
+    XexunConnection,
 )
 
 logger = logging.getLogger("TCP Rotating Log")
@@ -65,8 +65,8 @@ class TrackTapeServer(GenericTCPServer):
     connection_class = TrackTapeConnection
 
 
-class TK201Server(GenericTCPServer):
-    connection_class = TK201Connection
+class XexunServer(GenericTCPServer):
+    connection_class = XexunConnection
 
 
 class Command(BaseCommand):
@@ -83,7 +83,7 @@ class Command(BaseCommand):
             "--queclink-port", nargs="?", type=int, help="Queclink Handler Port"
         )
         parser.add_argument(
-            "--tk201-port", nargs="?", type=int, help="TK201 Handler Port"
+            "--xexun-port", nargs="?", type=int, help="Xexun Handler Port"
         )
         parser.add_argument(
             "--tmt250-port", nargs="?", type=int, help="Teltonika Handler Port"
@@ -97,21 +97,21 @@ class Command(BaseCommand):
         if options.get("gt06_port"):
             gt06_server = GT06Server()
             gt06_server.listen(options["gt06_port"])
-        if options.get("tmt250_port"):
-            tmt250_server = TMT250Server()
-            tmt250_server.listen(options["tmt250_port"])
-        if options.get("queclink_port"):
-            queclink_server = QueclinkServer()
-            queclink_server.listen(options["queclink_port"])
         if options.get("mictrack_port"):
             mictrack_server = MicTrackServer()
             mictrack_server.listen(options["mictrack_port"])
+        if options.get("queclink_port"):
+            queclink_server = QueclinkServer()
+            queclink_server.listen(options["queclink_port"])
+        if options.get("tmt250_port"):
+            tmt250_server = TMT250Server()
+            tmt250_server.listen(options["tmt250_port"])
         if options.get("tracktape_port"):
             tracktape_server = TrackTapeServer()
             tracktape_server.listen(options["tracktape_port"])
-        if options.get("tk201_port"):
-            tk201_server = TK201Server()
-            tk201_server.listen(options["tk201_port"])
+        if options.get("xexun_port"):
+            xexun_server = XexunServer()
+            xexun_server.listen(options["xexun_port"])
         try:
             print("Start listening TCP data...", flush=True)
             logger.info(f"{arrow.now().datetime}, UP")
@@ -119,16 +119,16 @@ class Command(BaseCommand):
         except (KeyboardInterrupt, SystemExit):
             if options.get("gt06_port"):
                 gt06_server.stop()
-            if options.get("tmt250_port"):
-                tmt250_server.stop()
-            if options.get("queclink_port"):
-                queclink_server.stop()
             if options.get("mictrack_port"):
                 mictrack_server.stop()
+            if options.get("queclink_port"):
+                queclink_server.stop()
+            if options.get("tmt250_port"):
+                tmt250_server.stop()
             if options.get("tracktape_port"):
                 tracktape_server.stop()
-            if options.get("tk201_port"):
-                tk201_server.stop()
+            if options.get("xexun_port"):
+                xexun_server.stop()
             IOLoop.current().stop()
         finally:
             print("Stopped listening TCP data...", flush=True)

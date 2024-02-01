@@ -7,7 +7,7 @@ from routechoices.lib.tcp_protocols.commons import _get_device
 from routechoices.lib.validators import validate_imei
 
 
-class TK201Connection:
+class XexunConnection:
     def __init__(self, stream, address, logger):
         print(f"received a new connection from {address} on port 2004")
         self.aid = random_key()
