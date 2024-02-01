@@ -1,3 +1,5 @@
+import re
+
 import arrow
 from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
@@ -28,7 +30,7 @@ class XexunConnection:
                 data_raw = data_bin.decode("ascii").strip()
             print(f"Received data ({data_raw})", flush=True)
             data = data_raw.split(",")
-            imei = data[17].split(":")[1]
+            imei = re.search(r"imei:(\d+),", data_raw).group(1)
         except Exception as e:
             print(e, flush=True)
             self.stream.close()
@@ -54,15 +56,15 @@ class XexunConnection:
         self.imei = imei
         print(f"{self.imei} is connected")
 
-        await self._process_data(data)
+        await self._process_data(data, data_raw)
 
         while await self._read_line():
             pass
 
-    async def _process_data(self, data):
+    async def _process_data(self, data, data_raw):
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Xexun ARM"
-        imei = data[17].split(":")[1]
+        imei = re.search(r"imei:(\d+),", data_raw).group(1)
         if imei != self.imei:
             return False
         self.logger.info(
@@ -97,7 +99,7 @@ class XexunConnection:
                 data_raw = data_bin.decode("ascii").strip()
             print(f"Received data ({data_raw})")
             data = data_raw.split(",")
-            await self._process_data(data)
+            await self._process_data(data, data_raw)
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
             self.stream.close()
