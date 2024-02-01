@@ -90,24 +90,12 @@ class GT06Connection:
         if west:
             lon *= -1
 
-        is_alarm = data_bin[3] == 0x26
-
         if flags & 0x16:
             loc_array = [(arrow.get(date_str).timestamp(), lat, lon)]
             await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
                 loc_array
             )
             print("1 locations wrote to DB", flush=True)
-
-        if is_alarm:
-            sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
-                self.db_device.send_sos, thread_sensitive=True
-            )()
-            print(
-                f"SOS triggered by device {sos_device_aid}, {sos_lat},"
-                f" {sos_lon} email sent to {sos_sent_to}",
-                flush=True,
-            )
 
     async def _read_line(self):
         try:
