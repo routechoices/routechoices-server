@@ -9,7 +9,7 @@ from routechoices.lib.validators import validate_imei
 
 class MicTrackConnection:
     def __init__(self, stream, address, logger):
-        print(f"Received a new connection from {address} on port 2001")
+        print(f"Received a new connection from {address} on mictrack port")
         self.aid = random_key()
         self.imei = None
         self.address = address

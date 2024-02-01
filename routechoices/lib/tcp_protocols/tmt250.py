@@ -69,7 +69,7 @@ class TMT250Decoder:
 
 class TMT250Connection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address} on port 2000")
+        print(f"received a new connection from {address} on teltonika port")
         self.aid = random_key()
         self.imei = None
         self.address = address

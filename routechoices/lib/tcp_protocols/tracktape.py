@@ -11,7 +11,7 @@ from routechoices.lib.validators import validate_imei
 
 class TrackTapeConnection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address} on port 2003")
+        print(f"received a new connection from {address} on tracktape port")
         self.aid = random_key()
         self.imei = None
         self.address = address

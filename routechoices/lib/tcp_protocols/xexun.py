@@ -9,7 +9,7 @@ from routechoices.lib.validators import validate_imei
 
 class XexunConnection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address} on port 2004")
+        print(f"received a new connection from {address} on xexun port")
         self.aid = random_key()
         self.imei = None
         self.address = address
@@ -66,7 +66,7 @@ class XexunConnection:
         if imei != self.imei:
             return False
         self.logger.info(
-            f"{arrow.now().datetime}, TK201 DATA, "
+            f"{arrow.now().datetime}, XEXUN DATA, "
             f"{self.aid}, {self.address}: {','.join(data)}"
         )
         try:

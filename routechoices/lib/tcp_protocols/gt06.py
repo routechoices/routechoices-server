@@ -12,7 +12,7 @@ from routechoices.lib.validators import validate_imei
 
 class GT06Connection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address}")
+        print(f"received a new connection from {address} on gt06 port")
         self.aid = random_key()
         self.imei = None
         self.address = address
