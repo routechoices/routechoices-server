@@ -58,7 +58,7 @@ class GT06Connection:
         serial_number = data_bin[16:18]
         data_to_send = b"\x05\x01" + serial_number
         checksum = pack(">H", crc16(data_to_send))
-        self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
+        await self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
 
         while await self._read_line():
             pass
@@ -110,7 +110,7 @@ class GT06Connection:
                 serial_number = data_bin[9:11]
                 data_to_send = b"\x05\x13" + serial_number
                 checksum = pack(">H", crc16(data_to_send))
-                self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
+                await self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
 
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
