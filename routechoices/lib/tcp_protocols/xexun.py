@@ -27,7 +27,8 @@ class XexunConnection:
             data_raw = ""
             while not data_raw:
                 data_bin = await self.stream.read_bytes(255, partial=True)
-                data_raw = data_bin.decode("ascii").strip()
+                data_raw = data_bin[:-2].decode("ascii").strip()
+                data_raw = re.search(r"G[PN]RMC,.+", data_raw).group(0)
             print(f"Received data ({data_raw})", flush=True)
             data = data_raw.split(",")
             imei = re.search(r"imei:(\d+),", data_raw).group(1)
@@ -72,20 +73,20 @@ class XexunConnection:
             f"{self.aid}, {self.address}: {','.join(data)}"
         )
         try:
-            tim = arrow.get(f"{data[11]} {data[3][:6]}", "DDMMYY HHmmss").int_timestamp
-            lat_minute = float(data[5])
+            tim = arrow.get(f"{data[9]} {data[1][:6]}", "DDMMYY HHmmss").int_timestamp
+            lat_minute = float(data[3])
             lat = lat_minute // 100 + (lat_minute % 100) / 60
-            if data[6] == "S":
+            if data[4] == "S":
                 lat *= -1
-            lon_minute = float(data[7])
+            lon_minute = float(data[5])
             lon = lon_minute // 100 + (lon_minute % 100) / 60
-            if data[8] == "W":
+            if data[6] == "W":
                 lon *= -1
-        except Exception:
-            print("Could not parse GPS data", flush=True)
+        except Exception as e:
+            print(f"Could not parse GPS data {str(e)}", flush=True)
         else:
             loc_array = [(tim, lat, lon)]
-            if data[4] == "A":
+            if data[2] == "A":
                 await sync_to_async(
                     self.db_device.add_locations, thread_sensitive=True
                 )(loc_array)
@@ -96,7 +97,8 @@ class XexunConnection:
             data_raw = ""
             while not data_raw:
                 data_bin = await self.stream.read_bytes(255, partial=True)
-                data_raw = data_bin.decode("ascii").strip()
+                data_raw = data_bin[:-2].decode("ascii").strip()
+                data_raw = re.search(r"G[PN]RMC,.+", data_raw).group(0)
             print(f"Received data ({data_raw})")
             data = data_raw.split(",")
             await self._process_data(data, data_raw)
