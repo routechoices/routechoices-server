@@ -75,7 +75,7 @@ class QueclinkConnection:
             return
         access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
         for command in commands:
-            self.stream.write(command.encode())
+            await self.stream.write(command.encode())
         commands_count = len(commands)
         if commands_count > 0:
             print(f"{commands_count} commands sent")
@@ -136,7 +136,9 @@ class QueclinkConnection:
                         flush=True,
                     )
             elif parts[0] == "+ACK:GTHBD":
-                self.stream.write(f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii"))
+                await self.stream.write(
+                    f"+SACK:GTHBD,{parts[1]},{parts[5]}".encode("ascii")
+                )
             elif parts[0][:8] == "+RESP:GT" and parts[0][8:] == "INF":
                 imei = parts[2]
                 if imei != self.imei:
