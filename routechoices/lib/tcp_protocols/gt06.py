@@ -109,7 +109,7 @@ class GT06Connection:
             # HEARTBEAT
             if data_bin[:4] == b"\x78\x78\x0a\x13":
                 serial_number = data_bin[9:11]
-                battery_level = min(100, data_bin[5] * 100 / 6)
+                battery_level = int(min(100, data_bin[5] * 100 / 6))
                 data_to_send = b"\x05\x13" + serial_number
                 checksum = pack(">H", crc16(data_to_send))
                 await self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
