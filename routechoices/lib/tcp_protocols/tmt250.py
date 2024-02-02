@@ -1,10 +1,13 @@
 from struct import pack, unpack
 
 import arrow
-from asgiref.sync import sync_to_async
 
 from routechoices.lib.helpers import random_key, safe64encode
-from routechoices.lib.tcp_protocols.commons import _get_device
+from routechoices.lib.tcp_protocols.commons import (
+    add_locations,
+    get_device_by_imei,
+    send_sos,
+)
 from routechoices.lib.validators import validate_imei
 
 
@@ -69,7 +72,7 @@ class TMT250Decoder:
 
 class TMT250Connection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address} on teltonika port")
+        print(f"Received a new connection from {address} on teltonika port")
         self.aid = random_key()
         self.imei = None
         self.address = address
@@ -82,7 +85,7 @@ class TMT250Connection:
         self.logger = logger
 
     async def start_listening(self):
-        print("start listening from %s", self.address)
+        print("Start listening from %s", self.address)
         data = bytearray(b"0" * 1024)
         data_len = await self.stream.read_into(data, partial=True)
         if data_len < 3:
@@ -110,9 +113,9 @@ class TMT250Connection:
             f"{arrow.now().datetime}, TMT250 CONN, "
             f"{self.aid}, {self.address}: {safe64encode(bytes(data))}"
         )
-        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
-            print(f"imei not registered {self.address}, {imei}", flush=True)
+            print(f"imei {imei} not registered ({self.address})", flush=True)
             await self.stream.write(b"\x00")
             self.stream.close()
             return
@@ -149,7 +152,7 @@ class TMT250Connection:
         return True
 
     def _on_close(self):
-        print("client quit", self.address)
+        print("Client quit", self.address)
 
     async def _on_full_data(self):
         try:
@@ -165,15 +168,13 @@ class TMT250Connection:
                 self.db_device.user_agent = "Teltonika"
             if self.decoder.battery_level:
                 self.db_device.battery_level = self.decoder.battery_level
-            await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
-                loc_array
-            )
+            await add_locations(self.db_device, loc_array)
             print(f"{len(loc_array)} locations wrote to DB", flush=True)
             self.waiting_for_content = True
             if self.decoder.alarm_triggered:
-                sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
-                    self.db_device.send_sos, thread_sensitive=True
-                )()
+                sos_device_aid, sos_lat, sos_lon, sos_sent_to = await send_sos(
+                    self.db_device
+                )
                 print(
                     f"SOS triggered by device {sos_device_aid}, {sos_lat}, {sos_lon}"
                     f" email sent to {sos_sent_to}",

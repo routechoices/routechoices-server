@@ -1,56 +1,54 @@
-import time
-
 import arrow
-from django.db import DatabaseError
+from asgiref.sync import sync_to_async
+from django.db import connection
 
 from routechoices.core.models import Device, TcpDeviceCommand
 
 
-def _get_device(imei):
-    try:
-        return Device.objects.get(physical_device__imei=imei)
-    except DatabaseError:
-        from django.db import connections
-
-        for conn in connections.all():
-            conn.close_if_unusable_or_obsolete()
-        time.sleep(5)
-        return _get_device(imei)
-    except Exception:
-        return None
+@sync_to_async
+def get_device_by_imei(imei):
+    device = Device.objects.filter(physical_device__imei=imei).first()
+    connection.close()
+    return device
 
 
-def _get_pending_commands(imei):
-    try:
-        commands = list(
-            TcpDeviceCommand.objects.filter(target__imei=imei, sent=False).values_list(
-                "command", flat=True
-            )
+@sync_to_async
+def add_locations(device, locations):
+    device.add_locations(locations)
+    connection.close()
+
+
+@sync_to_async
+def send_sos(device):
+    r = device.send_sos()
+    connection.close()
+    return r
+
+
+@sync_to_async
+def save_device(device):
+    device.add_save()
+    connection.close()
+
+
+@sync_to_async
+def get_pending_commands(imei):
+    commands = list(
+        TcpDeviceCommand.objects.filter(target__imei=imei, sent=False).values_list(
+            "command", flat=True
         )
-        t = arrow.now().datetime
-        return t, commands
-    except DatabaseError:
-        from django.db import connections
-
-        for conn in connections.all():
-            conn.close_if_unusable_or_obsolete()
-        return None
-    except Exception:
-        return None
+    )
+    t = arrow.now().datetime
+    connection.close()
+    return t, commands
 
 
-def _mark_pending_commands_sent(imei, max_date):
-    try:
-        return TcpDeviceCommand.objects.filter(
-            target__imei=imei,
-            sent=False,
-            creation_date__lte=max_date,
-        ).update(sent=True, modification_date=arrow.now().datetime)
-    except DatabaseError:
-        from django.db import connections
-
-        for conn in connections.all():
-            conn.close_if_unusable_or_obsolete()
-        return 0
-    except Exception:
-        return 0
+@sync_to_async
+def mark_pending_commands_sent(imei, max_date):
+    r = TcpDeviceCommand.objects.filter(
+        target__imei=imei,
+        sent=False,
+        creation_date__lte=max_date,
+    ).update(sent=True, modification_date=arrow.now().datetime)
+    connection.close()
+    return r

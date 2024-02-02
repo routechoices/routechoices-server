@@ -1,14 +1,16 @@
 import math
 
 import arrow
-from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 
 from routechoices.lib.helpers import random_key
 from routechoices.lib.tcp_protocols.commons import (
-    _get_device,
-    _get_pending_commands,
-    _mark_pending_commands_sent,
+    add_locations,
+    get_device_by_imei,
+    get_pending_commands,
+    mark_pending_commands_sent,
+    save_device,
+    send_sos,
 )
 from routechoices.lib.validators import validate_imei
 
@@ -55,9 +57,9 @@ class QueclinkConnection:
             print("Invalid imei", flush=True)
             self.stream.close()
             return
-        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
-            print(f"Imei not registered {self.address}, {imei}", flush=True)
+            print(f"Imei {imei} not registered ({self.address})", flush=True)
             self.stream.close()
             return
         self.imei = imei
@@ -73,15 +75,13 @@ class QueclinkConnection:
     async def send_pending_commands(self):
         if not self.imei:
             return
-        access_date, commands = await sync_to_async(_get_pending_commands)(self.imei)
+        access_date, commands = await get_pending_commands(self.imei)
         for command in commands:
             await self.stream.write(command.encode())
         commands_count = len(commands)
         if commands_count > 0:
             print(f"{commands_count} commands sent")
-            await sync_to_async(_mark_pending_commands_sent, thread_sensitive=True)(
-                self.imei, access_date
-            )
+            await mark_pending_commands_sent(self.imei, access_date)
 
     async def process_line(self, data):
         try:
@@ -124,12 +124,16 @@ class QueclinkConnection:
                         continue
                     else:
                         pts.append((tim, lat, lon))
-                batt = int(parts[-3])
+                batt = None
+                try:
+                    batt = int(parts[-3])
+                except Exception:
+                    pass
                 await self.on_data(pts, batt)
                 if parts[0][8:] == "SOS":
-                    sos_device_aid, sos_lat, sos_lon, sos_sent_to = await sync_to_async(
-                        self.db_device.send_sos, thread_sensitive=True
-                    )()
+                    sos_device_aid, sos_lat, sos_lon, sos_sent_to = await send_sos(
+                        self.db_device
+                    )
                     print(
                         f"SOS triggered by device {sos_device_aid}, {sos_lat},"
                         f" {sos_lon} email sent to {sos_sent_to}",
@@ -149,7 +153,7 @@ class QueclinkConnection:
                 except Exception as e:
                     print(f"Error parsing battery level: {str(e)}", flush=True)
                 self.db_device.battery_level = batt
-                await sync_to_async(self.db_device.save, thread_sensitive=True)()
+                await save_device(self.db_device)
         except Exception as e:
             print(f"Error processing line: {str(e)}", flush=True)
             self.stream.close()
@@ -172,9 +176,7 @@ class QueclinkConnection:
         if batt:
             self.db_device.battery_level = batt
         loc_array = pts
-        await sync_to_async(self.db_device.add_locations, thread_sensitive=True)(
-            loc_array
-        )
+        await add_locations(self.db_device, loc_array)
         print(f"{len(pts)} Locations wrote to DB", flush=True)
 
     def on_close(self):

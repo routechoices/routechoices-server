@@ -1,17 +1,16 @@
 import re
 
 import arrow
-from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 
 from routechoices.lib.helpers import random_key
-from routechoices.lib.tcp_protocols.commons import _get_device
+from routechoices.lib.tcp_protocols.commons import add_locations, get_device_by_imei
 from routechoices.lib.validators import validate_imei
 
 
 class XexunConnection:
     def __init__(self, stream, address, logger):
-        print(f"received a new connection from {address} on xexun port")
+        print(f"Received a new connection from {address} on xexun port")
         self.aid = random_key()
         self.imei = None
         self.address = address
@@ -30,7 +29,6 @@ class XexunConnection:
                 data_raw = data_bin[:-2].decode("ascii").strip()
                 data_raw = re.search(r"G[PN]RMC,.+", data_raw).group(0)
             print(f"Received data ({data_raw})", flush=True)
-            data = data_raw.split(",")
             imei = re.search(r"imei:(\d+),", data_raw).group(1)
         except Exception as e:
             print(e, flush=True)
@@ -49,20 +47,22 @@ class XexunConnection:
             print("Invalid imei", flush=True)
             self.stream.close()
             return
-        self.db_device = await sync_to_async(_get_device, thread_sensitive=True)(imei)
+        print("Valid Imei", flush=True)
+        self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
-            print(f"Imei not registered {self.address}, {imei}", flush=True)
+            print(f"Imei {imei} not registered  ({self.address})", flush=True)
             self.stream.close()
             return
         self.imei = imei
-        print(f"{self.imei} is connected")
+        print(f"{self.imei} is connected", flush=True)
 
-        await self._process_data(data, data_raw)
+        await self._process_data(data_raw)
 
         while await self._read_line():
             pass
 
-    async def _process_data(self, data, data_raw):
+    async def _process_data(self, data_raw):
+        data = data_raw.split(",")
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Xexun ARM"
         imei = re.search(r"imei:(\d+),", data_raw).group(1)
@@ -85,11 +85,10 @@ class XexunConnection:
         except Exception as e:
             print(f"Could not parse GPS data {str(e)}", flush=True)
         else:
+
             loc_array = [(tim, lat, lon)]
             if data[2] == "A":
-                await sync_to_async(
-                    self.db_device.add_locations, thread_sensitive=True
-                )(loc_array)
+                await add_locations(self.db_device, loc_array)
                 print(f"{len(loc_array)} locations wrote to DB", flush=True)
 
     async def _read_line(self):
@@ -100,8 +99,7 @@ class XexunConnection:
                 data_raw = data_bin[:-2].decode("ascii").strip()
                 data_raw = re.search(r"G[PN]RMC,.+", data_raw).group(0)
             print(f"Received data ({data_raw})")
-            data = data_raw.split(",")
-            await self._process_data(data, data_raw)
+            await self._process_data(data_raw)
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
             self.stream.close()
@@ -109,4 +107,4 @@ class XexunConnection:
         return True
 
     def _on_close(self):
-        print("client quit", flush=True)
+        print("Client quit", flush=True)
