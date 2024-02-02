@@ -5,7 +5,11 @@ from django.core.exceptions import ValidationError
 
 from routechoices.lib.crc_itu import crc16
 from routechoices.lib.helpers import random_key, safe64encode
-from routechoices.lib.tcp_protocols.commons import add_locations, get_device_by_imei
+from routechoices.lib.tcp_protocols.commons import (
+    add_locations,
+    get_device_by_imei,
+    save_device,
+)
 from routechoices.lib.validators import validate_imei
 
 
@@ -105,9 +109,12 @@ class GT06Connection:
             # HEARTBEAT
             if data_bin[:4] == b"\x78\x78\x0a\x13":
                 serial_number = data_bin[9:11]
+                battery_level = min(100, data_bin[5] * 100 / 6)
                 data_to_send = b"\x05\x13" + serial_number
                 checksum = pack(">H", crc16(data_to_send))
                 await self.stream.write(b"\x78\x78" + data_to_send + checksum + b"\r\n")
+                self.db_device.battery_level = battery_level
+                await save_device(self.db_device)
 
         except Exception as e:
             print(f"Error parsing data: {str(e)}")
