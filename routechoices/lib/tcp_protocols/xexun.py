@@ -31,7 +31,7 @@ class XexunConnection:
             print(f"Received data ({data_raw})", flush=True)
             imei = re.search(r"imei:(\d+),", data_raw).group(1)
         except Exception as e:
-            print(e, flush=True)
+            print("Error parsing data: " + str(e), flush=True)
             self.stream.close()
             return
         if not imei:

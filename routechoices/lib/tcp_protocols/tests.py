@@ -12,8 +12,10 @@ from tornado.testing import AsyncTestCase, bind_unused_port, gen_test
 
 from routechoices.core.management.commands.run_tcp_server import (
     GT06Server,
+    MicTrackServer,
     QueclinkServer,
     TMT250Server,
+    TrackTapeServer,
     XexunServer,
 )
 from routechoices.core.models import Device, ImeiDevice
@@ -73,6 +75,46 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
             client.close()
 
     @gen_test
+    async def test_mictrack(self):
+        gps_data = b"#867198059727390#MT710#0000#AUTO#1\r\n#38$GPRMC,123318.00,A,2238.8946,N,11402.0635,E,,,100124,,,A*5C\r\n##"
+
+        server = client = None
+        device = await create_imei_device("867198059727390")
+        sock, port = bind_unused_port()
+        server = MicTrackServer()
+        server.add_socket(sock)
+        client = IOStream(socket.socket())
+        await client.connect(("localhost", port))
+        await client.write(gps_data)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEquals(device.location_count, 1)
+        if server is not None:
+            server.stop()
+        if client is not None:
+            client.close()
+
+    @gen_test
+    async def test_mictrack_alt(self):
+        gps_data = b"MT;6;866425031361423;R0;10+190109091803+22.63827+114.02922+2.14+69+2+3744+113"
+
+        server = client = None
+        device = await create_imei_device("866425031361423")
+        sock, port = bind_unused_port()
+        server = MicTrackServer()
+        server.add_socket(sock)
+        client = IOStream(socket.socket())
+        await client.connect(("localhost", port))
+        await client.write(gps_data)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEquals(device.location_count, 1)
+        if server is not None:
+            server.stop()
+        if client is not None:
+            client.close()
+
+    @gen_test
     async def test_queclink(self):
         hbt_data = b"+ACK:GTHBD,C30203,860201061588748,,20240201161532,FFFF$"
         ack_data = b"+SACK:GTHBD,C30203,FFFF$"
@@ -119,6 +161,26 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await asyncio.sleep(1)
         device = await refresh_device(device)
         self.assertEquals(device.location_count, 4)
+        if server is not None:
+            server.stop()
+        if client is not None:
+            client.close()
+
+    @gen_test
+    async def test_tracktape(self):
+        gps_data = b'{"id":"352022008228783","guid":"B01633000","batteryLevel":55,"inst":"start","positions":[{"timestamp":1706872596,"lat":60.455,"lon":18.567},{"timestamp":1706872597,"lat": 60.4555,"lon": 18.5675}]}\n'
+
+        server = client = None
+        device = await create_imei_device("352022008228783")
+        sock, port = bind_unused_port()
+        server = TrackTapeServer()
+        server.add_socket(sock)
+        client = IOStream(socket.socket())
+        await client.connect(("localhost", port))
+        await client.write(gps_data)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEquals(device.location_count, 2)
         if server is not None:
             server.stop()
         if client is not None:
