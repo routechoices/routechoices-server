@@ -11,12 +11,12 @@ from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 
 from routechoices.lib.tcp_protocols import (
-    GT06Connection,
-    MicTrackConnection,
-    QueclinkConnection,
-    TMT250Connection,
-    TrackTapeConnection,
-    XexunConnection,
+    gt06,
+    mictrack,
+    queclink,
+    tmt250,
+    tracktape,
+    xexun,
 )
 
 logger = logging.getLogger("TCP Rotating Log")
@@ -46,27 +46,27 @@ class GenericTCPServer(TCPServer):
 
 
 class GT06Server(GenericTCPServer):
-    connection_class = GT06Connection
+    connection_class = gt06.GT06Connection
 
 
 class MicTrackServer(GenericTCPServer):
-    connection_class = MicTrackConnection
+    connection_class = mictrack.MicTrackConnection
 
 
 class TMT250Server(GenericTCPServer):
-    connection_class = TMT250Connection
+    connection_class = tmt250.TMT250Connection
 
 
 class QueclinkServer(GenericTCPServer):
-    connection_class = QueclinkConnection
+    connection_class = queclink.QueclinkConnection
 
 
 class TrackTapeServer(GenericTCPServer):
-    connection_class = TrackTapeConnection
+    connection_class = tracktape.TrackTapeConnection
 
 
 class XexunServer(GenericTCPServer):
-    connection_class = XexunConnection
+    connection_class = xexun.XexunConnection
 
 
 class Command(BaseCommand):
