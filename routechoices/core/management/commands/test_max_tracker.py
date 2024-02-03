@@ -7,7 +7,7 @@ from routechoices.core.models import Club, Competitor, Device, Event
 
 
 class Command(BaseCommand):
-    help = "Renew letsencrypt certificate for club custom domain"
+    help = "Simulate N trackers updating data"
 
     def add_arguments(self, parser):
         parser.add_argument("--nb-trackers", dest="nb_trackers", type=int, default=1)
