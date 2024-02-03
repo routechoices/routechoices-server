@@ -1,34 +1,19 @@
 import asyncio
-import logging
-import os
 import socket
 
 from asgiref.sync import sync_to_async
-from django.conf import settings
 from django.db import connection
 from django.test import TransactionTestCase
 from tornado.iostream import IOStream
 from tornado.testing import AsyncTestCase, bind_unused_port, gen_test
 
-from routechoices.core.management.commands.run_tcp_server import (
-    GT06Server,
-    MicTrackServer,
-    QueclinkServer,
-    TMT250Server,
-    TrackTapeServer,
-    XexunServer,
-)
 from routechoices.core.models import Device, ImeiDevice
-
-logger = logging.getLogger("TCP Rotating Log")
-logger.setLevel(logging.INFO)
-handler = logging.handlers.RotatingFileHandler(
-    os.path.join(settings.BASE_DIR, "logs", "tests_tcp.log"),
-    maxBytes=10000000,
-    backupCount=5,
-)
-logger.addHandler(handler)
-socket.setdefaulttimeout(30)
+from routechoices.lib.tcp_protocols.gt06 import GT06Server
+from routechoices.lib.tcp_protocols.mictrack import MicTrackServer
+from routechoices.lib.tcp_protocols.queclink import QueclinkServer
+from routechoices.lib.tcp_protocols.tmt250 import TMT250Server
+from routechoices.lib.tcp_protocols.tracktape import TrackTapeServer
+from routechoices.lib.tcp_protocols.xexun import XexunServer
 
 
 @sync_to_async

@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from routechoices.lib.crc_itu import crc16
 from routechoices.lib.helpers import random_key, safe64encode
 from routechoices.lib.tcp_protocols.commons import (
+    GenericTCPServer,
     add_locations,
     get_device_by_imei,
     save_device,
@@ -124,3 +125,7 @@ class GT06Connection:
 
     def _on_close(self):
         print("Client quit", flush=True)
+
+
+class GT06Server(GenericTCPServer):
+    connection_class = GT06Connection

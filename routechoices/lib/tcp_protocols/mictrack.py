@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from routechoices.lib.helpers import random_key, safe64encode
 from routechoices.lib.tcp_protocols.commons import (
+    GenericTCPServer,
     add_locations,
     get_device_by_imei,
     send_sos,
@@ -252,3 +253,7 @@ class MicTrackConnection:
 
     def _on_close(self):
         print("Client quit", flush=True)
+
+
+class MicTrackServer(GenericTCPServer):
+    connection_class = MicTrackConnection

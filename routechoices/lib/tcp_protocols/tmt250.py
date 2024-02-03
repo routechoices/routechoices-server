@@ -4,6 +4,7 @@ import arrow
 
 from routechoices.lib.helpers import random_key, safe64encode
 from routechoices.lib.tcp_protocols.commons import (
+    GenericTCPServer,
     add_locations,
     get_device_by_imei,
     send_sos,
@@ -181,3 +182,7 @@ class TMT250Connection:
                     flush=True,
                 )
             await self.stream.write(self.decoder.generate_response())
+
+
+class TMT250Server(GenericTCPServer):
+    connection_class = TMT250Connection

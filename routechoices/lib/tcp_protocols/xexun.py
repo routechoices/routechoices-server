@@ -4,7 +4,11 @@ import arrow
 from django.core.exceptions import ValidationError
 
 from routechoices.lib.helpers import random_key
-from routechoices.lib.tcp_protocols.commons import add_locations, get_device_by_imei
+from routechoices.lib.tcp_protocols.commons import (
+    GenericTCPServer,
+    add_locations,
+    get_device_by_imei,
+)
 from routechoices.lib.validators import validate_imei
 
 
@@ -108,3 +112,7 @@ class XexunConnection:
 
     def _on_close(self):
         print("Client quit", flush=True)
+
+
+class XexunServer(GenericTCPServer):
+    connection_class = XexunConnection

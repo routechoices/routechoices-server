@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from routechoices.lib.helpers import random_key
 from routechoices.lib.tcp_protocols.commons import (
+    GenericTCPServer,
     add_locations,
     get_device_by_imei,
     get_pending_commands,
@@ -181,3 +182,7 @@ class QueclinkConnection:
 
     def on_close(self):
         print("Client quit", flush=True)
+
+
+class QueclinkServer(GenericTCPServer):
+    connection_class = QueclinkConnection
