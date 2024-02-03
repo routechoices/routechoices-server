@@ -1,0 +1,17 @@
+{
+    "dev-id": "Identyfikator urządzenia",
+    "refresh": "Odśwież",
+    "settings": "Ustawienia",
+    "name": "Imię",
+    "short-name": "Krótki identyfikator",
+    "save": "Zapisz",
+    "event": "Zawody",
+    "no-events": "Brak dostępnych zawodów.",
+    "register-this": "Zapisz się na te zawody",
+    "registered": "Zostałeś zarejestrowany.",
+    "registration-info": "Dane z urządzenia muszą być przypisane do pojedynczego uczestnika. Jeśli potwierdzisz rejestrację dane GPS zostaną od razu przeniesione na nowego uczestnika.",
+    "registration-info-time": "Dane z urządzenia muszą być przypisane do pojedynczego uczestnika. Jeśli potwierdzisz rejestrację dane GPS zostaną przeniesione na nowego uczestnika najpóźniej o $1",
+    "error": "Wystąpił błąd.",
+    "register": "Zarejestruj na zawody",
+    "no-device-id": "Nie znaleziono urządzenia"
+}

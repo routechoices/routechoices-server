@@ -759,6 +759,18 @@ def event_register(request, event_id):
                 "Dit toestel is al aangemeld voor dezelfde starttijd"
             ),
         },
+        "pl": {
+            "no-device-id": "Nie znaleziono urządzenia",
+            "no-name": "Brak imienia",
+            "invalid-start-time": "Niepoprawny zapis czasu",
+            "bad-start-time": "Godzina startu musi mieścić się w czasie trwania zawodów",
+            "bad-name": "Zawodnik o tym imieniu już istnieje",
+            "bad-sname": "Identyfikator uczestnika już istnieje",
+            "registration-closed": "Anmälningarna är stängda",
+            "start-time-already-used": (
+                "To urządzenie jest już zarejestrowane na ten sam czas rozpoczęcia"
+            ),
+        },
         "sv": {
             "no-device-id": "Enhets-ID hittades inte",
             "no-name": "Namn saknas",

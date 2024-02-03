@@ -6,6 +6,7 @@ var supportedLanguages = {
   fr: "Français",
   fi: "Suomi",
   nl: "Nederlands",
+  pl: "Polski",
   sv: "Svensk",
 };
 var locale =
@@ -21,7 +22,7 @@ function updateText() {
     window.local.staticRoot +
     "i18n/site/registration/" +
     locale +
-    ".json?v=2023101700";
+    ".json?v=2024020300";
   return fetch(langFile)
     .then((response) => response.json())
     .then((messages) => {

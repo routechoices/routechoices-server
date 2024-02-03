@@ -12,7 +12,7 @@ Media:
 Translations:
 -------------
 
-    Raphaël Stefanini, Santiago Isaza Hurtado, Saara Norrgrann, Toon Melis, Jukka Inkeri
+    Raphaël Stefanini, Santiago Isaza Hurtado, Saara Norrgrann, Toon Melis, Jukka Inkeri, Michał Kuś
 
 
 JS Libraries:
