@@ -3,8 +3,8 @@ import hmac
 import json
 
 from django.conf import settings
-from django.core.exceptions import BadRequest, ValidationError
-from django.http import Http404, HttpResponse
+from django.core.exceptions import BadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
@@ -20,7 +20,7 @@ def lemonsqueezy_webhook(request):
     ).hexdigest()
 
     if request.META.get("HTTP_X_SIGNATURE") != digest:
-        raise ValidationError("Invalid signature")
+        return HttpResponseBadRequest("Invalid signature")
 
     data = json.loads(request.body, strict=False)
 
@@ -71,7 +71,7 @@ def lemonsqueezy_webhook(request):
         if club:
             club.upgraded = False
             club.upgraded_date = None
-            club.order_id = None
+            club.order_id = ""
             club.save()
             return HttpResponse(f"Downgraded {club}")
         if individual:
