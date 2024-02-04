@@ -236,7 +236,7 @@ class TestInviteFlow(APITestCase):
     def test_request_invite(self):
         self.client.force_login(self.user2)
         self.client.get("/dashboard/request-invite/")
-        res = self.client.post("/dashboard/request-invite/", {"club": 1})
+        res = self.client.post("/dashboard/request-invite/", {"club": self.club.id})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue(
