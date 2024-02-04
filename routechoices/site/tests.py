@@ -45,6 +45,10 @@ class SiteViewsTestCase(EssentialApiBase):
         url = self.reverse_and_check("site:events_view", "/events", host="www")
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
+        response = client.get(f"{url}?q=Kiila+Cup+2")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Kiila Cup 1")
+        self.assertContains(response, "Kiila Cup 2")
 
     def test_semi_static_pages_loads(self):
         client = APIClient(HTTP_HOST="www.routechoices.dev")
