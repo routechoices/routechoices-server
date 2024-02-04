@@ -164,11 +164,16 @@ def club_request_invite_view(request):
             club = form.cleaned_data["club"]
             current_site = get_current_site()
             url = build_absolute_uri(request, reverse("dashboard:club_invite_add_view"))
+            requester_email = (
+                EmailAddress.objects.filter(user_id=request.user.id, primary=True)
+                .first()
+                .email
+            )
             context = {
                 "site_name": current_site.name,
-                "email": request.user.email,
+                "email": requester_email,
                 "club": club,
-                "send_invite_url": f"{url}?club={club.slug}&email={request.user.email}",
+                "send_invite_url": f"{url}?club={club.slug}&email={requester_email}",
             }
             club_admins_ids = list(club.admins.all().values_list("id", flat=True))
             emails = list(
@@ -255,8 +260,13 @@ def account_delete_view(request):
             != allauth_settings.AuthenticationMethod.EMAIL
         ):
             context["username"] = user_username(user)
+        requester_email = (
+            EmailAddress.objects.filter(user_id=request.user.id, primary=True)
+            .first()
+            .email
+        )
         get_adapter(request).send_mail(
-            "account/email/account_delete", request.user.email, context
+            "account/email/account_delete", requester_email, context
         )
         return render(
             request,
