@@ -1,7 +1,9 @@
 import random
 from io import BytesIO
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django_hosts.resolvers import reverse
 from PIL import Image
@@ -210,3 +212,52 @@ class TestEditClub(EssentialDashboardBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "The image is too small, minimum 600x315 pixels")
+
+
+class TestInviteFlow(APITestCase):
+    def setUp(self):
+        self.client = APIClient(HTTP_HOST="www.routechoices.dev")
+        self.club = Club.objects.create(name="My Club", slug="myclub")
+        self.user = User.objects.create_user(
+            "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
+        )
+        self.user2 = User.objects.create_user(
+            "bob", f"bob{random.randrange(1000)}@example.com", "pa$$word123"
+        )
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, primary=True, verified=True
+        )
+        EmailAddress.objects.create(
+            user=self.user2, email=self.user2.email, primary=True, verified=True
+        )
+
+        self.club.admins.set([self.user])
+
+    def test_request_invite(self):
+        self.client.force_login(self.user2)
+        self.client.get("/dashboard/request-invite/")
+        res = self.client.post("/dashboard/request-invite/", {"club": 1})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(
+            f"Request for an invitation to manage club { self.club }"
+            in mail.outbox[0].subject
+        )
+        self.assertTrue(
+            mail.outbox[0].body.startswith(
+                f"Hello,\n\nA user ({ self.user2.email }) has requested an invite to manage the club"
+            )
+        )
+
+    def test_send_invite(self):
+        self.client.force_login(self.user)
+        self.client.get(f"/dashboard/club/{self.club.aid}")
+        self.client.get("/dashboard/club/send-invite/")
+        res = self.client.post(
+            "/dashboard/club/send-invite/", {"email": self.user2.email}
+        )
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(
+            f"Invitation to manage club { self.club } on " in mail.outbox[0].subject
+        )
