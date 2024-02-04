@@ -42,11 +42,6 @@ class AppSettings:
         return self._setting("LOGIN_REDIRECT", settings.LOGIN_URL)
 
     @property
-    def ADAPTER(self):
-        """The adapter, setting ACCOUNT_ADAPTER overrides this default"""
-        return self._setting("ADAPTER", "invitations.adapters.BaseInvitationsAdapter")
-
-    @property
     def EMAIL_MAX_LENGTH(self):
         """
         Adjust max_length of e-mail addresses
