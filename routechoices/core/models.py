@@ -2413,7 +2413,10 @@ class Competitor(models.Model):
 def invalidate_competitor_event_cache(sender, instance, **kwargs):
     instance.event.invalidate_cache()
     if instance.device:
-        new_events_for_device = instance.device.get_events_at_date(instance.start_time)
+        start_time = instance.start_time
+        if not start_time:
+            start_time = instance.event.start_date
+        new_events_for_device = instance.device.get_events_at_date(start_time)
         for event in new_events_for_device:
             event.invalidate_cache()
 
