@@ -1,5 +1,7 @@
 from io import BytesIO
 
+import cv2
+import numpy as np
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.sitemaps.views import (
@@ -82,15 +84,21 @@ def serve_image_from_s3(
         out_buffer = BytesIO()
         s3_client = get_s3_client()
         s3_client.download_fileobj(settings.AWS_S3_BUCKET, file_path, s3_buffer)
-        pil_image = Image.open(BytesIO(s3_buffer.getvalue()))
+        nparr = np.fromstring(s3_buffer.getvalue(), np.uint8)
+        cv2_image = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
+        color_corrected_img = cv2.cvtColor(np.array(cv2_image), cv2.COLOR_BGR2RGBA)
+        pil_image = Image.fromarray(color_corrected_img)
         if img_mode and pil_image.mode != img_mode:
             pil_image = pil_image.convert("RGB")
         pil_image.save(
             out_buffer,
             mime[6:].upper(),
-            quality=(40 if mime in ("image/avif", "imgae/jxl") else 80),
+            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
         )
+        pil_image.save("a.png")
         image = out_buffer.getvalue()
+        with open("aa." + mime[6:].upper(), "wb") as fp:
+            fp.write(image)
         cache.set(cache_key, image, 31 * 24 * 3600)
 
     resp = StreamingHttpRangeResponse(
