@@ -95,10 +95,7 @@ def serve_image_from_s3(
             mime[6:].upper(),
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
         )
-        pil_image.save("a.png")
         image = out_buffer.getvalue()
-        with open("aa." + mime[6:].upper(), "wb") as fp:
-            fp.write(image)
         cache.set(cache_key, image, 31 * 24 * 3600)
 
     resp = StreamingHttpRangeResponse(
