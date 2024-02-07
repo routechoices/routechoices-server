@@ -14,6 +14,7 @@ from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django_hosts.resolvers import reverse
 
 from routechoices.core.models import Club, Event, IndividualDonator
+from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import ContactForm
 
 
@@ -25,6 +26,18 @@ def home_page(request):
         "site/home.html",
         {"partner_clubs": club_partners, "individual_partners": indi_partners},
     )
+
+
+def site_favicon(request, icon_name, **kwargs):
+    icon_info = {
+        "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
+        "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
+        "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
+        "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
+    }.get(icon_name)
+    with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
+        data = fp.read()
+    return StreamingHttpRangeResponse(request, data, content_type=icon_info["mime"])
 
 
 def pricing_page(request):

@@ -30,6 +30,11 @@ urlpatterns = [
         views.pricing_page,
         name="pricing_view",
     ),
+    re_path(
+        r"(?P<icon_name>favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png)",
+        views.site_favicon,
+        name="site_favicon",
+    ),
     re_path(r"^robots\.txt$", views.robots_txt, name="robots.txt"),
     re_path(
         r"^(?P<club_slug>[0-9a-zA-Z][0-9a-zA-Z-]+)/",

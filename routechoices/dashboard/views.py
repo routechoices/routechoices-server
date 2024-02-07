@@ -1538,15 +1538,3 @@ def device_list_download(request):
     filename = f"device_list_{club.slug}.csv"
     response["Content-Disposition"] = set_content_disposition(filename)
     return response
-
-
-def site_favicon(request, icon_name, **kwargs):
-    icon_info = {
-        "favicon.ico": {"size": 32, "format": "ICO", "mime": "image/x-icon"},
-        "apple-touch-icon.png": {"size": 180, "format": "PNG", "mime": "image/png"},
-        "icon-192.png": {"size": 192, "format": "PNG", "mime": "image/png"},
-        "icon-512.png": {"size": 512, "format": "PNG", "mime": "image/png"},
-    }.get(icon_name)
-    with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
-        data = fp.read()
-    return StreamingHttpRangeResponse(request, data, content_type=icon_info["mime"])
