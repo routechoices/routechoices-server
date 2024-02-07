@@ -2182,7 +2182,9 @@ class Device(models.Model):
             else:
                 club = event.club
                 for user in club.admins.all():
-                    to_email = EmailAddress.objects.get_primary(user) or user.email
+                    to_email = (
+                        EmailAddress.objects.get_primary(user).email or user.email
+                    )
                     to_emails.add(to_email)
 
             if to_emails:

@@ -3,8 +3,10 @@ import random
 import time
 
 import arrow
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.cache import cache
 from django_hosts.resolvers import reverse
 from rest_framework import status
@@ -723,6 +725,46 @@ class RouteUploadApiTestCase(EssentialApiBase):
             "Event not yet started",
             errors[0],
         )
+
+
+class CompetitionTestCase(EssentialApiBase):
+    def test_send_sos(self):
+        self.club = Club.objects.create(name="Kemiön Kiilat", slug="kiilat")
+        self.club.admins.set([self.user])
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, primary=True, verified=True
+        )
+        device = Device.objects.create()
+        event = Event.objects.create(
+            club=self.club,
+            name="Test event",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=1).datetime,
+        )
+        Competitor.objects.create(
+            name="Alice A",
+            short_name="A",
+            event=event,
+            device=device,
+            start_time=arrow.get().shift(minutes=-70).datetime,
+        )
+        device.add_location(arrow.get().timestamp(), 12.34567, 123.45678)
+        device.send_sos()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(
+            "Routechoices.com - SOS from competitor Alice" in mail.outbox[0].subject
+        )
+        self.assertTrue(
+            "His latest known location is latitude, longitude: 12.34567, 123.45678"
+            in mail.outbox[0].body
+        )
+        self.assertEqual([self.user.email], mail.outbox[0].to)
+        event.emergency_contact = "beargrills@discovery.com"
+        event.save()
+        device.send_sos()
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(["beargrills@discovery.com"], mail.outbox[1].to)
 
 
 class RegistrationApiTestCase(EssentialApiBase):
