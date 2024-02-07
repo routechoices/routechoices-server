@@ -2181,12 +2181,12 @@ class Device(models.Model):
                 to_emails.add(event.emergency_contact)
             else:
                 club = event.club
-                for user in club.admins.all():
-                    to_email = (
-                        EmailAddress.objects.get_primary(user).email or user.email
-                    )
-                    to_emails.add(to_email)
-
+                admin_ids = list(club.admins.all().values_list("id", flat=True))
+                to_emails = list(
+                    EmailAddress.objects.filter(
+                        primary=True, user__in=admin_ids
+                    ).values_list("email", flat=True)
+                )
             if to_emails:
                 msg = EmailMessage(
                     (
