@@ -10,7 +10,7 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from routechoices.core.models import Club
+from routechoices.core.models import Club, Device, ImeiDevice
 
 
 class EssentialDashboardBase(APITestCase):
@@ -212,6 +212,37 @@ class TestEditClub(EssentialDashboardBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "The image is too small, minimum 600x315 pixels")
+
+    def test_device_lists(self):
+        device = Device.objects.create()
+
+        url = self.reverse_and_check(
+            "dashboard:device_add_view", "/dashboard/devices/new"
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.post(url, {"device": device.id, "nickname": "MyTrckr"})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+
+        url = self.reverse_and_check("dashboard:device_list_view", "/dashboard/devices")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, device.id)
+        self.assertContains(res, "MyTrckr")
+
+        url = self.reverse_and_check(
+            "dashboard:device_list_download", "/dashboard/devices.csv"
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, f"MyTrckr;{device.aid};\n")
+
+        ImeiDevice.objects.create(imei="012345678901237", device=device)
+
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, f"MyTrckr;{device.aid};012345678901237\n")
 
 
 class TestInviteFlow(APITestCase):
