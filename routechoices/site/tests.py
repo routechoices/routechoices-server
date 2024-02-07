@@ -23,8 +23,8 @@ class SiteViewsTestCase(EssentialApiBase):
             name="Kiila Cup 1",
             slug="kiila-cup-1",
             club=self.club,
-            start_date=arrow.now().shift(days=-12).datetime,
-            end_date=arrow.now().shift(days=-11).datetime,
+            start_date=arrow.now().shift(days=-112).datetime,
+            end_date=arrow.now().shift(days=-111).datetime,
             event_set=s,
         )
         Event.objects.create(
@@ -49,6 +49,16 @@ class SiteViewsTestCase(EssentialApiBase):
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = client.get(f"{url}?q=Kiila+Cup+2")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotContains(response, "Kiila Cup 1")
+        self.assertContains(response, "Kiila Cup 2")
+        response = client.get(f'{url}?q="Cup+2"')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotContains(response, "Kiila Cup 1")
+        self.assertContains(response, "Kiila Cup 2")
+        response = client.get(
+            f"{url}?year={arrow.get().year}&month={arrow.get().month}"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotContains(response, "Kiila Cup 1")
         self.assertContains(response, "Kiila Cup 2")
