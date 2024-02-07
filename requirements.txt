@@ -19,7 +19,7 @@ cython==3.0.7
 defusedxml==0.7.1
 deprecated==1.2.14
 diskcache==5.6.3
-django==5.0.1
+django==5.0.2
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git
 django-allauth==0.59.0
 django-appconf==1.0.6
