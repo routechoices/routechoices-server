@@ -1,4 +1,7 @@
 import arrow
+from allauth.account.models import EmailAddress
+from django.core import mail
+from rest_framework import status
 from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
@@ -44,9 +47,9 @@ class SiteViewsTestCase(EssentialApiBase):
 
         url = self.reverse_and_check("site:events_view", "/events", host="www")
         response = client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = client.get(f"{url}?q=Kiila+Cup+2")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotContains(response, "Kiila Cup 1")
         self.assertContains(response, "Kiila Cup 2")
 
@@ -55,16 +58,37 @@ class SiteViewsTestCase(EssentialApiBase):
 
         url = self.reverse_and_check("site:home_view", "/", host="www")
         response = client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = client.get("/favicon.ico")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = client.get("/robots.txt")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         url = self.reverse_and_check("site:trackers_view", "/trackers", host="www")
         response = client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         url = self.reverse_and_check("site:contact_view", "/contact", host="www")
         response = client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         url = self.reverse_and_check("site:pricing_view", "/pricing", host="www")
         response = client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_send_message(self):
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, primary=True, verified=True
+        )
+        client = APIClient(HTTP_HOST="www.routechoices.dev")
+        client.force_login(self.user)
+        url = self.reverse_and_check("site:contact_view", "/contact", host="www")
+        response = client.post(
+            url, {"subject": "Hello, can I ask a question?", "message": "Does it work?"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertTrue("Hello, can I ask a question?" in mail.outbox[0].subject)
+        self.assertTrue(self.user.email in mail.outbox[0].subject)
+        self.assertTrue(mail.outbox[0].body.startswith("Does it work?"))
