@@ -12,7 +12,14 @@ from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from routechoices.core.models import PRIVACY_PRIVATE, Club, Competitor, Device, Event
+from routechoices.core.models import (
+    PRIVACY_PRIVATE,
+    Club,
+    Competitor,
+    Device,
+    Event,
+    Map,
+)
 
 
 class EssentialApiBase(APITestCase):
@@ -349,6 +356,35 @@ class EventApiTestCase(EssentialApiBase):
         self.assertIsNone(res.headers.get("X-Cache-Hit"))
         res = self.client.get(url_data_c)
         self.assertIsNone(res.headers.get("X-Cache-Hit"))
+
+        raster_map = Map.objects.create(
+            club=club,
+            name="Test map",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
+            width=1,
+            height=1,
+        )
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
+        raster_map.save()
+        event_a.map = raster_map
+        event_a.save()
+        url = self.reverse_and_check(
+            "2d_rerun_race_status", "/woo/race_status/get_info.json", "api"
+        )
+        res = self.client.get(f"{url}?eventid={event_a.aid}")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        url = self.reverse_and_check(
+            "2d_rerun_race_data", "/woo/race_status/get_data.json", "api"
+        )
+        res = self.client.get(f"{url}?eventid={event_a.aid}")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_live_event_data(self):
         cache.clear()
