@@ -286,7 +286,7 @@ class EventApiTestCase(EssentialApiBase):
             device=device,
             start_time=arrow.get().shift(minutes=-70).datetime,
         )
-        competitor_b = Competitor.objects.create(
+        Competitor.objects.create(
             name="Alice B",
             short_name="A",
             event=event_b,
@@ -357,6 +357,23 @@ class EventApiTestCase(EssentialApiBase):
         res = self.client.get(url_data_c)
         self.assertIsNone(res.headers.get("X-Cache-Hit"))
 
+    def test_events_endpoints(self):
+        club = Club.objects.create(name="Test club", slug="club")
+        event = Event.objects.create(
+            club=club,
+            name="Test event A",
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        device = Device.objects.create()
+        device.add_location(arrow.get().shift(minutes=-72).timestamp(), 0.2, 0.1)
+        competitor = Competitor.objects.create(
+            name="Alice B",
+            short_name="A",
+            event=event,
+            device=device,
+            start_time=arrow.get().shift(minutes=-75).datetime,
+        )
         raster_map = Map.objects.create(
             club=club,
             name="Test map",
@@ -373,24 +390,24 @@ class EventApiTestCase(EssentialApiBase):
             "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
         )
         raster_map.save()
-        event_a.map = raster_map
-        event_a.save()
+        event.map = raster_map
+        event.save()
         url = self.reverse_and_check(
             "2d_rerun_race_status", "/woo/race_status/get_info.json", "api"
         )
-        res = self.client.get(f"{url}?eventid={event_a.aid}")
+        res = self.client.get(f"{url}?eventid={event.aid}")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         url = self.reverse_and_check(
             "2d_rerun_race_data", "/woo/race_status/get_data.json", "api"
         )
-        res = self.client.get(f"{url}?eventid={event_a.aid}")
+        res = self.client.get(f"{url}?eventid={event.aid}")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         url = self.reverse_and_check(
             "competitor_gpx_download",
-            f"/competitors/{competitor_b.aid}/gpx",
+            f"/competitors/{competitor.aid}/gpx",
             "api",
-            {"competitor_id": competitor_b.aid},
+            {"competitor_id": competitor.aid},
         )
         res = self.client.get(f"{url}")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
