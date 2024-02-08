@@ -394,6 +394,7 @@ class EventApiTestCase(EssentialApiBase):
         )
         res = self.client.get(f"{url}")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, 'lat="0.2" lon="0.1"')
 
     def test_live_event_data(self):
         cache.clear()
