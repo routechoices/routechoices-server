@@ -286,7 +286,7 @@ class EventApiTestCase(EssentialApiBase):
             device=device,
             start_time=arrow.get().shift(minutes=-70).datetime,
         )
-        Competitor.objects.create(
+        competitor_b = Competitor.objects.create(
             name="Alice B",
             short_name="A",
             event=event_b,
@@ -384,6 +384,15 @@ class EventApiTestCase(EssentialApiBase):
             "2d_rerun_race_data", "/woo/race_status/get_data.json", "api"
         )
         res = self.client.get(f"{url}?eventid={event_a.aid}")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        url = self.reverse_and_check(
+            "competitor_gpx_download",
+            f"/competitors/{competitor_b.aid}/gpx",
+            "api",
+            {"competitor_id": competitor_b.aid},
+        )
+        res = self.client.get(f"{url}")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_live_event_data(self):
