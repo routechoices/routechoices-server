@@ -11,7 +11,15 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from routechoices.core.models import Club, Device, Event, EventSet, ImeiDevice, Map
+from routechoices.core.models import (
+    Club,
+    Competitor,
+    Device,
+    Event,
+    EventSet,
+    ImeiDevice,
+    Map,
+)
 
 
 class EssentialDashboardBase(APITestCase):
@@ -382,6 +390,31 @@ class TestDashboard(EssentialDashboardBase):
         res = self.client.post(url)
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertFalse(Event.objects.filter(id=event.id).exists())
+
+    def test_competitors_page(self):
+        event = Event.objects.create(
+            club=self.club,
+            slug="abc",
+            name="WOC Long Distance",
+            start_date=arrow.get("2023-08-01T00:00:00Z").datetime,
+            end_date=arrow.get("2023-08-01T23:59:59Z").datetime,
+        )
+        comps = []
+        for i in range(120):
+            c = Competitor(
+                event=event,
+                name="c {i}",
+                short_name=f"c{i}",
+            )
+            comps.append(c)
+        Competitor.objects.bulk_create(comps)
+        url = self.reverse_and_check(
+            "dashboard:event_competitors_view",
+            f"/dashboard/events/{event.aid}/competitors",
+            extra_kwargs={"event_id": event.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
 class TestInviteFlow(APITestCase):
