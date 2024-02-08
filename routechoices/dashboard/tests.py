@@ -1,6 +1,7 @@
 import random
 from io import BytesIO
 
+import arrow
 from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
 from django.core import mail
@@ -10,7 +11,7 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from routechoices.core.models import Club, Device, ImeiDevice, Map
+from routechoices.core.models import Club, Device, Event, EventSet, ImeiDevice, Map
 
 
 class EssentialDashboardBase(APITestCase):
@@ -36,8 +37,8 @@ class EssentialDashboardBase(APITestCase):
         return url
 
 
-class TestEditClub(EssentialDashboardBase):
-    def test_change_slug(self):
+class TestDashboard(EssentialDashboardBase):
+    def test_change_club_slug(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 
         res = self.client.get(url)
@@ -85,7 +86,7 @@ class TestEditClub(EssentialDashboardBase):
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "Domain prefix already registered.")
 
-    def test_change_logo(self):
+    def test_change_club_logo(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 
         res = self.client.get(url)
@@ -149,7 +150,7 @@ class TestEditClub(EssentialDashboardBase):
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "The image is too small, minimum 128x128 pixels")
 
-    def test_change_banner(self):
+    def test_change_club_banner(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 
         res = self.client.get(url)
@@ -310,6 +311,77 @@ class TestEditClub(EssentialDashboardBase):
         res = self.client.post(url)
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertFalse(Map.objects.filter(id=raster_map.id).exists())
+
+    def test_edit_event_sets(self):
+        # Create event set
+        url = self.reverse_and_check(
+            "dashboard:event_set_create_view",
+            "/dashboard/event-sets/new",
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url, {"name": "Tough Competition"})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+
+        # List event set
+        url = self.reverse_and_check(
+            "dashboard:event_set_list_view",
+            "/dashboard/event-sets",
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertContains(res, "Tough Competition")
+
+        # Edit event set
+        es = EventSet.objects.all().first()
+        url = self.reverse_and_check(
+            "dashboard:event_set_edit_view",
+            f"/dashboard/event-sets/{es.aid}",
+            extra_kwargs={"event_set_id": es.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url, {"name": "Easy Competition"})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        res = self.client.get("/dashboard/event-sets")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotContains(res, "Tough Competition")
+        self.assertContains(res, "Easy Competition")
+
+        # Delete event set
+        url = self.reverse_and_check(
+            "dashboard:event_set_delete_view",
+            f"/dashboard/event-sets/{es.aid}/delete",
+            extra_kwargs={"event_set_id": es.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        res = self.client.get("/dashboard/event-sets")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotContains(res, "Tough Competition")
+        self.assertNotContains(res, "Easy Competition")
+        self.assertFalse(EventSet.objects.filter(id=es.id).exists())
+
+    def test_delete_event(self):
+        event = Event.objects.create(
+            club=self.club,
+            slug="abc",
+            name="WOC Long Distance",
+            start_date=arrow.get("2023-08-01T00:00:00Z").datetime,
+            end_date=arrow.get("2023-08-01T23:59:59Z").datetime,
+        )
+        url = self.reverse_and_check(
+            "dashboard:event_delete_view",
+            f"/dashboard/events/{event.aid}/delete",
+            extra_kwargs={"event_id": event.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertFalse(Event.objects.filter(id=event.id).exists())
 
 
 class TestInviteFlow(APITestCase):
