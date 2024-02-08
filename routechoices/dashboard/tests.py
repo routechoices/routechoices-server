@@ -10,7 +10,7 @@ from PIL import Image
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from routechoices.core.models import Club, Device, ImeiDevice
+from routechoices.core.models import Club, Device, ImeiDevice, Map
 
 
 class EssentialDashboardBase(APITestCase):
@@ -243,6 +243,73 @@ class TestEditClub(EssentialDashboardBase):
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, f"MyTrckr;{device.aid};012345678901237\n")
+
+    def test_delete_club(self):
+        url = self.reverse_and_check(
+            "dashboard:club_delete_view", "/dashboard/club/delete"
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url, {"password": "not the password"})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertTrue(Club.objects.filter(id=self.club.id).exists())
+        res = self.client.post(url, {"password": "pa$$word123"})
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertFalse(Club.objects.filter(id=self.club.id).exists())
+
+    def test_edit_map(self):
+        raster_map = Map.objects.create(
+            club=self.club,
+            name="Test map",
+            corners_coordinates=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
+            width=1,
+            height=1,
+        )
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
+        raster_map.save()
+
+        url = self.reverse_and_check(
+            "dashboard:map_edit_view",
+            f"/dashboard/maps/{raster_map.aid}",
+            extra_kwargs={"map_id": raster_map.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        image = Image.new("RGB", (100, 100), (255, 0, 0))
+        buffer = BytesIO()
+        image.save(buffer, "JPEG")
+        banner = SimpleUploadedFile(
+            "map.jpg", buffer.getvalue(), content_type="image/jpeg"
+        )
+
+        res = self.client.post(
+            url,
+            {
+                "name": "My Test Map",
+                "image": banner,
+                "corners_coordinates": "61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18157",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+
+        url = self.reverse_and_check(
+            "dashboard:map_delete_view",
+            f"/dashboard/maps/{raster_map.aid}/delete",
+            extra_kwargs={"map_id": raster_map.aid},
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_302_FOUND)
+        self.assertFalse(Map.objects.filter(id=raster_map.id).exists())
 
 
 class TestInviteFlow(APITestCase):
