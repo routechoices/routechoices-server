@@ -85,7 +85,7 @@ rjsmin==1.2.1
 s3transfer==0.10.0
 segno==1.6.0
 sentry-sdk==1.40.2
-sewer==0.8.4
+sewer @ git+https://github.com/rphlo/sewer@e75ae41b925cec8018e7cece06e7570af04ec047
 six==1.16.0
 soupsieve==2.5
 sqlparse==0.4.4
