@@ -74,6 +74,58 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(len(dev_id), 8)
         self.assertTrue(dev_id != self.get_device_id())
 
+    def test_list_events(self):
+        club = Club.objects.create(name="Test club", slug="club")
+        alt_club = Club.objects.create(
+            name="Alternative club", slug="alt-club", domain="example.com"
+        )
+        Event.objects.create(
+            club=club,
+            name="Test event A",
+            slug="abc",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        Event.objects.create(
+            club=club,
+            name="Test event B",
+            slug="def",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+        Event.objects.create(
+            club=alt_club,
+            name="Test event C",
+            slug="ghi",
+            open_registration=True,
+            start_date=arrow.get().shift(hours=-2).datetime,
+            end_date=arrow.get().shift(hours=-1).datetime,
+        )
+
+        url = self.reverse_and_check("event_list", "/events")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_json = json.loads(res.content)
+        self.assertEqual(len(res_json), 3)
+        res = self.client.get(f"{url}?club=club")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_json = json.loads(res.content)
+        self.assertEqual(len(res_json), 2)
+        res = self.client.get(f"{url}?event=abc")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_json = json.loads(res.content)
+        self.assertEqual(len(res_json), 1)
+        res = self.client.get(f"{url}?event=https://club.routechoices.dev/def")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_json = json.loads(res.content)
+        self.assertEqual(len(res_json), 1)
+        res = self.client.get(f"{url}?event=https://example.com/ghi")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_json = json.loads(res.content)
+        self.assertEqual(len(res_json), 1)
+
 
 class ImeiApiTestCase(EssentialApiBase):
     def setUp(self):
