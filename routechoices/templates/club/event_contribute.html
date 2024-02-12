@@ -28,14 +28,7 @@
                         </h2>
                         <h4>Contribute</h4>
                         <p>
-                            Event
-                            {% if not event.hidden %}
-                                started {{ event.start_date|timesince }} ago
-                            {% else %}
-                                starts on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>
-                            {% endif %}
-                            {% if event.ended %}, ended {{ event.start_date|timesince }} ago{% endif %}
-                            .
+                            {% comment %} djlint: off {% endcomment %}Event {% if not event.hidden %}started {{ event.start_date|timesince }} ago{% else %}starts on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>{% endif %}{% if event.ended %}, ended {{ event.start_date|timesince }} ago{% endif %}.{% comment %} djlint: on {% endcomment %}
                         </p>
                     </div>
                 </div>
