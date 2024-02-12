@@ -397,6 +397,10 @@
 
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
 readers do not read off random characters that represent icons */
+.fa-cloud-arrow-up::before {
+  content: "\f0ee";
+}
+
 .fa-chart-pie::before {
   content: "\f200";
 }

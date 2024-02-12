@@ -57,6 +57,17 @@
                         <i class="fa-solid fa-fw fa-users"></i>
                     </button>
                 </div>
+                {% if event.open_registration and not event.ended or event.allow_route_upload and event.started %}
+                    <div class="mb-1 mx-0" role="group">
+                        <a class="btn btn-lg active"
+                            href={{ event.club.nice_url }}{{ event.slug }}/contribute"
+                            aria-label="Upload route"
+                            type="button"
+                            target="_blank">
+                            <i class="fa-solid fa-fw fa-user-plus"></i>
+                        </a>
+                    </div>
+                {% endif %}
                 <div class="bottom-btn">
                     <div class="mb-2 mx-0" role="group" id="options_buttons">
                         <button class="btn btn-lg"
