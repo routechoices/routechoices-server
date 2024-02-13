@@ -161,13 +161,6 @@ function selectizeDeviceInput() {
     window.history.pushState("-", null, window.location.pathname);
   }
 
-  u(".date-utc").each(function (el) {
-    var _el = u(el);
-    _el.text(
-      dayjs(_el.data("date")).local().format("MMMM D, YYYY [at] HH:mm:ss")
-    );
-  });
-
   if (u("#registration-form").nodes.length) {
     u("#registration-form").on("submit", function (e) {
       e.preventDefault();

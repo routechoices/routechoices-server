@@ -28,7 +28,17 @@
                         </h2>
                         <h4>Contribute</h4>
                         <p>
-                            {% comment %} djlint: off {% endcomment %}Event {% if not event.hidden %}started {{ event.start_date|timesince }} ago{% else %}starts on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>{% endif %}{% if event.ended %}, ended {{ event.end_date|timesince }} ago{% endif %}.{% comment %} djlint: on {% endcomment %}
+                            Event
+                            {% if not event.hidden %}
+                                started {{ event.start_date|timesince }} ago,
+                            {% else %}
+                                starts in {{ event.start_date|timeuntil }}{{ event.start_date }},
+                            {% endif %}
+                            {% if event.ended %}
+                                ended {{ event.end_date|timesince }} ago.
+                            {% else %}
+                                ends in {{ event.end_date|timeuntil }}.
+                            {% endif %}
                         </p>
                     </div>
                 </div>
@@ -111,7 +121,6 @@
         <script src="{% static '/vendor/tom-select-2.0.1/tom-select.custom.js' %}"></script>
         <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-        <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
         <script src="{% static '/scripts/club/event_contribute.js' %}"></script>
     {% endcompress %}
 {% endblock extra_body %}
