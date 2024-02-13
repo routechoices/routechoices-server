@@ -28,7 +28,7 @@
 
 #permanent-sidebar {
   width: var(--sidebar-size);
-  padding: 1px;
+  padding: 0 1px;
   position: fixed;
   top: 46px;
   bottom: calc(var(--footer-size) + var(--ctrl-height));
