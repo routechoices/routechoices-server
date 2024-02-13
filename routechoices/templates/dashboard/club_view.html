@@ -21,8 +21,11 @@
        href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
     {% if not club.upgraded %}
         <p class="p-1 text-center"
-           style="background: linear-gradient(120deg, #98d6a699 0%, #98cdd699 100%)">
-            Support the platform, <a href="{% url 'dashboard:upgrade' %}" style="color:var(--bs-success)">Become Partner!</a>
+           style="color: #000;
+                  background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
+            Support the platform, <a href="{% url 'dashboard:upgrade' %}"
+    style="color:var(--bs-success)"
+    class="fw-bold">Become Partner!</a>
         </p>
     {% endif %}
     <ul class="nav nav-tabs mb-3">
