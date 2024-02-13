@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 continue
 
             if not is_account_ssl_expirying(domain):
-                self.stderr.write("Domain is not yet expiring")
+                self.stderr.write("Certificate for domain is not yet expiring")
                 continue
 
             if not check_cname_record(domain):

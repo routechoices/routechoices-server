@@ -14,7 +14,7 @@ def is_account_ssl_expirying(domain):
     with open(cert_path, "rb") as fp:
         data = fp.read()
     cert = x509.load_pem_x509_certificate(data)
-    return arrow.utcnow().shift(days=30) > arrow.get(cert.not_valid_after)
+    return arrow.utcnow().shift(days=30) > arrow.get(cert.not_valid_after_utc)
 
 
 def read_account_ssl_key(domain, key_cls):
