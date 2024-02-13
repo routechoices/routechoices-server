@@ -1,5 +1,7 @@
+import os
 import os.path
 import subprocess
+import sys
 from pathlib import Path
 
 import sewer.client
@@ -91,13 +93,16 @@ class Command(BaseCommand):
             cert_filename = os.path.join(
                 settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"
             )
-            with open(cert_filename, "w", encoding="utf_8") as fp:
-                fp.write(certificate)
-
             cert_key_filename = os.path.join(
                 settings.BASE_DIR, "nginx", "certs", f"{domain}.key"
             )
+
+            with open(cert_filename, "w", encoding="utf_8") as fp:
+                fp.write(certificate)
             cert_key.write_pem(cert_key_filename)
+
+            os.chmod(cert_filename, 0o400)
+            os.chmod(cert_key_filename, 0o400)
 
             write_nginx_conf(domain)
             nginx_need_restart = True
@@ -112,3 +117,6 @@ class Command(BaseCommand):
                     universal_newlines=True,
                     check=False,
                 )
+            sys.exit(0)
+        else:
+            sys.exit(1)
