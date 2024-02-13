@@ -57,7 +57,7 @@ def lemonsqueezy_webhook(request):
         raise Http404()
 
     # Club Downgrade
-    elif "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", ""):
+    if "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", ""):
         club = None
         individual = None
         try:
