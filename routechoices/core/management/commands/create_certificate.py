@@ -93,13 +93,11 @@ class Command(BaseCommand):
             )
             with open(cert_filename, "w", encoding="utf_8") as fp:
                 fp.write(certificate)
-            os.chmod(cert_filename, 0o400)
 
             cert_key_filename = os.path.join(
                 settings.BASE_DIR, "nginx", "certs", f"{domain}.key"
             )
             cert_key.write_pem(cert_key_filename)
-            os.chmod(cert_filename, 0o400)
 
             write_nginx_conf(domain)
             nginx_need_restart = True
