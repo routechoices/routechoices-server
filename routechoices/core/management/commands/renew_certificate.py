@@ -87,15 +87,18 @@ class Command(BaseCommand):
                 continue
             cert_key = client.cert_key
 
-            with open(
-                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"),
-                "w",
-                encoding="utf_8",
-            ) as fp:
-                fp.write(certificate)
-            cert_key.write_pem(
-                os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
+            cert_filename = os.path.join(
+                settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"
             )
+            with open(cert_filename, "w", encoding="utf_8") as fp:
+                fp.write(certificate)
+            os.chmod(cert_filename, 0o400)
+
+            cert_key_filename = os.path.join(
+                settings.BASE_DIR, "nginx", "certs", f"{domain}.key"
+            )
+            cert_key.write_pem(cert_key_filename)
+            os.chmod(cert_key_filename, 0o400)
             nginx_need_restart = True
             self.stdout.write("Certificate renewed.")
         if nginx_need_restart:
