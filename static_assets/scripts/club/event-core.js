@@ -19,8 +19,8 @@ var COLORS = [
 ];
 var supportedLanguages = {
   en: "English",
-  es: "Español",
-  fr: "Français",
+  es: "Espa??ol",
+  fr: "Fran??ais",
   nl: "Nederlands",
   pl: "Polski",
   fi: "Suomi",
@@ -197,7 +197,7 @@ L.Control.Ranking = L.Control.extend({
           (i + 1) +
           ' <span style="color: ' +
           c.competitor.color +
-          '">⬤</span> ' +
+          '">???</span> ' +
           u("<span/>").text(c.competitor.name).html() +
           '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
           myEvent.getProgressBarText(c.time) +
@@ -260,7 +260,7 @@ L.Control.Grouping = L.Control.extend({
         out +=
           '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
           c[ci].color +
-          '">⬤</span> ' +
+          '">???</span> ' +
           u("<span/>").text(c[ci].name).html() +
           "</span></div>";
       });
@@ -352,7 +352,7 @@ function getRunnerNameMarker(
     html: iconHtml,
     iconAnchor: [
       rightSide ? nameTagWidth + (focused ? 10 : 0) : focused ? -10 : 0,
-      rightSide ? 0 : 30,
+      rightSide ? 0 : 20,
     ],
   });
   return runnerIcon;
