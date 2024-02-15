@@ -2726,6 +2726,7 @@ function RCEvent(infoURL, clockURL) {
       .querySelector("#fullscreenSwitch")
       .addEventListener("click", function (e) {
         document.getElementById("main").requestFullscreen();
+        alert("ok")
       });
     document
       .querySelector("#myFooter")
