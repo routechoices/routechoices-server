@@ -668,6 +668,28 @@ function RCEvent(infoURL, clockURL) {
   }
   (function initialize() {
     window.addEventListener("resize", onAppResize);
+
+    window.addEventListener("fullscreenchange", onAppResize);
+
+    document
+      .getElementById("fullscreenSwitch")
+      .addEventListener("click", function (e) {
+        if (document.fullscreenElement != null) {
+          document.exitFullscreen();
+        } else {
+          var elem = document.getElementById("main-div");
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) {
+            /* Safari */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) {
+            /* IE11 */
+            elem.msRequestFullscreen();
+          }
+        }
+      });
+
     initializeMap();
     reqwest({
       url: infoURL,
@@ -1258,6 +1280,14 @@ function RCEvent(infoURL, clockURL) {
     doc.style.setProperty(
       "--ctrl-height",
       `${document.getElementById("ctrl-wrapper").clientHeight}px`
+    );
+    doc.style.setProperty(
+      "--footer-size",
+      document.fullscreenElement != null ? "7px" : "45px"
+    );
+    doc.style.setProperty(
+      "--navbar-size",
+      document.fullscreenElement != null ? "0px" : "46px"
     );
     var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
     if (
@@ -2721,6 +2751,15 @@ function RCEvent(infoURL, clockURL) {
           e.preventDefault();
         }
       });
+    var elem = document.getElementById("main-div");
+    if (
+      !elem.requestFullscreen &&
+      !elem.webkitRequestFullscreen &&
+      !elem.msRequestFullscreen
+    ) {
+      document.getElementById("fullscreenSwitch").remove();
+    }
+
     document
       .querySelector("#myFooter")
       .addEventListener("touchmove", function (e) {

@@ -4,6 +4,7 @@
   --ctrl-height: 0px;
   --sidebar-size: 30px;
   --footer-size: 45px;
+  --navbar-size: 46px;
 }
 
 .sub-header {
@@ -13,7 +14,7 @@
 
 .sidebar {
   position: fixed;
-  top: 46px;
+  top: var(--navbar-size);
   bottom: calc(var(--footer-size) + var(--ctrl-height));
   left: 0;
   z-index: 10001;
@@ -30,7 +31,7 @@
   width: var(--sidebar-size);
   padding: 0 1px;
   position: fixed;
-  top: 46px;
+  top: var(--navbar-size);
   bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0;
   z-index: 10002;
@@ -119,7 +120,7 @@
 
 .main {
   position: fixed;
-  top: 46px;
+  top: var(--navbar-size);
   bottom: calc(var(--footer-size) + var(--ctrl-height));
   right: 0px;
   left: 0px;
@@ -140,10 +141,11 @@
 
 .main-alerts {
   position: fixed;
-  top: 46px;
+  top: var(--navbar-size);
   right: 0px;
   left: 0px;
 }
+
 .main .page-header .main-alerts {
   margin-top: 0;
 }
@@ -200,7 +202,7 @@
 #eventNotStartedModal,
 #eventLoadingModal,
 #colorModal {
-  top: 46px;
+  top: var(--navbar-size);
 }
 
 .navbar {
