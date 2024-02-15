@@ -2725,7 +2725,7 @@ function RCEvent(infoURL, clockURL) {
     document
       .getElementById("fullscreenSwitch")
       .addEventListener("click", function (e) {
-        var elem = document.getElementById("main");
+        var elem = document.getElementById("main-div");
         if (elem.requestFullscreen) {
           elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) { /* Safari */
@@ -2734,7 +2734,7 @@ function RCEvent(infoURL, clockURL) {
           elem.msRequestFullscreen();
         }
       });
-    var elem = document.getElementById("main");
+    var elem = document.getElementById("main-div");
     if (!elem.requestFullscreen && !elem.webkitRequestFullscreen && !elem.msRequestFullscreen) {
       document.getElementById("fullsreenSwitch").remove();
     }
