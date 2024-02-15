@@ -25,6 +25,7 @@ function RCEvent(infoURL, clockURL) {
   var zoomOnRunners = false;
   var rasterMapLayer;
   var mapOpacity = 1;
+  var fullscreenOn = false;
   var toastAnouncement = new bootstrap.Toast(
     document.getElementById("text-alert"),
     {
@@ -2720,6 +2721,11 @@ function RCEvent(infoURL, clockURL) {
         ) {
           e.preventDefault();
         }
+      });
+    document
+      .querySelector("#fullscreenSwitch")
+      .addEventListener("click", function (e) {
+        document.getElementById("main").requestFullscreen();
       });
     document
       .querySelector("#myFooter")

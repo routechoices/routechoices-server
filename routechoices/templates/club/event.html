@@ -41,7 +41,7 @@
     {% with is_event_page=True %}
         {% include "club/navbar.html" %}
     {% endwith %}
-    <div class="container-fluid">
+    <div id="main" class="container-fluid">
         <div class="row">
             <div id="map"
                  class="col-12 d-sm-block col-sm-7 col-lg-9 col-xxl-10 main loading"></div>
@@ -69,6 +69,14 @@
                     </div>
                 {% endif %}
                 <div class="bottom-btn">
+                    <div class="mt-1 mx-0" role="group">
+                        <button class="btn btn-lg"
+                                id="fullscreenSwitch"
+                                aria-label="Fullscreen"
+                                type="button">
+                                F
+                        </button>
+                    </div>
                     <div class="mt-1 mx-0" role="group" id="options_buttons">
                         <button class="btn btn-lg"
                                 id="options_show_button"
