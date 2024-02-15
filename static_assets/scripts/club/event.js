@@ -2736,7 +2736,7 @@ function RCEvent(infoURL, clockURL) {
       });
     var elem = document.getElementById("main-div");
     if (!elem.requestFullscreen && !elem.webkitRequestFullscreen && !elem.msRequestFullscreen) {
-      document.getElementById("fullsreenSwitch").remove();
+      //document.getElementById("fullsreenSwitch").remove();
     }
     
     document
