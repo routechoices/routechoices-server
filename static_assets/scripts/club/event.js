@@ -2723,17 +2723,22 @@ function RCEvent(infoURL, clockURL) {
         }
       });
     document
-      .querySelector("#fullscreenSwitch")
+      .getElementById("fullscreenSwitch")
       .addEventListener("click", function (e) {
-        var elem = document.querySelector(".container-fluid");
-        try{if (elem.requestFullscreen) {
+        var elem = document.getElementById("main");
+        if (elem.requestFullscreen) {
           elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) { /* Safari */
           elem.webkitRequestFullscreen();
         } else if (elem.msRequestFullscreen) { /* IE11 */
           elem.msRequestFullscreen();
-        }}catch(re){alert(re)}
+        }
       });
+    var elem = document.getElementById("main");
+    if (!elem.requestFullscreen && !elem.webkitRequestFullscreen && !elem.msRequestFullscreen) { /* IE11 */
+      document.getElementById(fullsreenSwitch).remove();
+    }
+    
     document
       .querySelector("#myFooter")
       .addEventListener("touchmove", function (e) {
