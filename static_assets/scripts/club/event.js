@@ -2725,8 +2725,14 @@ function RCEvent(infoURL, clockURL) {
     document
       .querySelector("#fullscreenSwitch")
       .addEventListener("click", function (e) {
-        document.getElementById("main").requestFullscreen();
-        alert("ok")
+        var elem = document.getElementById("main");
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE11 */
+          elem.msRequestFullscreen();
+        }
       });
     document
       .querySelector("#myFooter")
