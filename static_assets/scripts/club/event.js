@@ -673,7 +673,7 @@ function RCEvent(infoURL, clockURL) {
 
     document
       .getElementById("fullscreenSwitch")
-      .addEventListener("click", function (e) {
+      ?.addEventListener("click", function (e) {
         if (document.fullscreenElement != null) {
           document.exitFullscreen();
         } else {
