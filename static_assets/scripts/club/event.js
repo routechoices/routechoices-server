@@ -2726,13 +2726,13 @@ function RCEvent(infoURL, clockURL) {
       .querySelector("#fullscreenSwitch")
       .addEventListener("click", function (e) {
         var elem = document.getElementById("main");
-        if (elem.requestFullscreen) {
+        try{if (elem.requestFullscreen) {
           elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) { /* Safari */
           elem.webkitRequestFullscreen();
         } else if (elem.msRequestFullscreen) { /* IE11 */
           elem.msRequestFullscreen();
-        }
+        }}catch(re){alert(re)}
       });
     document
       .querySelector("#myFooter")
