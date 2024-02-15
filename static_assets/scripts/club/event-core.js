@@ -19,8 +19,8 @@ var COLORS = [
 ];
 var supportedLanguages = {
   en: "English",
-  es: "Espa??ol",
-  fr: "Fran??ais",
+  es: "Español",
+  fr: "Français",
   nl: "Nederlands",
   pl: "Polski",
   fi: "Suomi",
