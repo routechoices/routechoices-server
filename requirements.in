@@ -38,7 +38,7 @@ psycopg
 python-magic
 requests
 sentry-sdk
-sewer==0.8.4
+sewer @ git+https://github.com/rphlo/sewer@0.8.4a
 tornado
 uwsgi
 websocket-client

@@ -14,7 +14,6 @@ commands:
       - run: mv ./.env.dev ./.env
       - run: echo "SECURE_SSL_REDIRECT = False" > ./routechoices/settings_overrides.py
       - run: ./dc up -d
-      - run: ./dc pipinstall
       - run: ./da migrate
       - run: ./da collectstatic
       - run: ./da compress

@@ -18,16 +18,16 @@ elif [ "$1" = 'exec' -a $# -eq 2 ]; then
 elif [ "$1" = 'pipcompile' ]; then
     echo "Compiling pip env..."
     docker exec -u root -i rc_django \
-        pip --no-cache-dir install -U pip pip-tools
+        pip --no-cache-dir install -U uv
     docker exec -u root -i rc_django \
-        pip-compile requirements.in --upgrade --no-header --no-annotate
+        uv pip compile requirements.in --upgrade --no-header --no-annotate -o requirements.txt
     exit 0
 elif [ "$1" = 'pipinstall' ]; then
     echo "Updating pip env..."
     docker exec -u root -i rc_django \
-        pip --no-cache-dir install -U pip
+        pip --no-cache-dir install -U uv
     docker exec -u root -i rc_django \
-        pip --no-cache-dir install -r requirements.txt
+        uv pip install -r requirements.txt
     exit 0
 elif [ "$1" = 'test' ]; then
     shift
