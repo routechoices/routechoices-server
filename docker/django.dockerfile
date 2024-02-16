@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 # final stage
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends curl gcc g++ git libgdal-dev libjpeg-dev zlib1g-dev libwebp-dev libmagic-dev libgl1 libpq5 libglib2.0-0 libjxl-dev && \
