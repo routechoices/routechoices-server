@@ -30,6 +30,7 @@ cache/
 routechoices/settings_overrides.py
 cypress/screenshots/
 cypress/videos/
+cypress/downloads/
 node_modules/
 nginx/certs/
 .coverage*
