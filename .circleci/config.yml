@@ -81,8 +81,8 @@ jobs:
             nvm install v18 && nvm use v18 && nvm alias default v18
             node -v
             curl -o- -L https://yarnpkg.com/install.sh | bash
-            ~/.yarn/bin/yarn add cypress@12 cypress-real-events
-            ~/.yarn/bin/yarn cypress install
+            ~/.yarn/bin/yarn add cypress@^13 cypress-real-events
+            ~/.yarn/bin/yarn install
             TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
       - run: docker kill --signal=HUP rc_django
       - run: sleep 5
