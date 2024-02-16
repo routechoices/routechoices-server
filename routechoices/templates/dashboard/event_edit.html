@@ -201,6 +201,7 @@
             data-api-base-url="{% host_url 'api_doc' host 'api' %}"
             data-event-id="{{event.aid}}"
             data-club-id="{{club.aid}}"
+            {% if club.upgraded %}data-club-upgraded=true{% endif %}
             data-club-slug="{{club.slug}}"
             data-club-url="{{club.nice_url}}"
             data-csrf-token="{{ csrf_token }}"></script>

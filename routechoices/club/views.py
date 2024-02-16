@@ -225,7 +225,6 @@ def club_live_event_feed(request, **kwargs):
     return feeds.club_live_event_feed(request, **kwargs)
 
 
-@xframe_options_exempt
 @cache_page(5 if not settings.DEBUG else 0)
 def event_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
@@ -294,6 +293,8 @@ def event_view(request, slug, **kwargs):
     response = render(request, "club/event.html", resp_args)
     if event.privacy == PRIVACY_PRIVATE:
         response["Cache-Control"] = "private"
+    if event.club.upgraded:
+        response.xframe_options_exempt = True
     return response
 
 
