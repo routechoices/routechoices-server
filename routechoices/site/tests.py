@@ -11,7 +11,9 @@ from routechoices.core.models import Club, Event, EventSet
 class SiteViewsTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()
-        self.club = Club.objects.create(name="Kemiön Kiilat", slug="kiilat", upgraded=True)
+        self.club = Club.objects.create(
+            name="Kemiön Kiilat", slug="kiilat", upgraded=True
+        )
         self.club.admins.set([self.user])
 
     def test_events_page_loads(self):

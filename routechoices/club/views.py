@@ -17,7 +17,6 @@ from django.template.response import TemplateResponse
 from django.utils.http import http_date
 from django.utils.timezone import now
 from django.views.decorators.cache import cache_page
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django_hosts.resolvers import reverse
 from PIL import Image
 from rest_framework import status

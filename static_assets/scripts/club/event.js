@@ -668,7 +668,6 @@ function RCEvent(infoURL, clockURL) {
   }
   (function initialize() {
     window.addEventListener("resize", onAppResize);
-
     window.addEventListener("fullscreenchange", onAppResize);
 
     document
