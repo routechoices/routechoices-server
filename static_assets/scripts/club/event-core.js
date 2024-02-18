@@ -222,7 +222,7 @@ L.Control.Ranking = L.Control.extend({
       var element = document.createElement("a");
       element.setAttribute(
         "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(out)
+        "data:text/csv;charset=utf-8," + encodeURIComponent(out)
       );
       element.setAttribute("download", "result.csv");
       element.style.display = "none";
