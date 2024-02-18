@@ -60,25 +60,30 @@
   z-index: 10001;
 }
 .no-competitor-warning {
-  height: calc(100vh - 13px - var(--navbar-size) - var(--footer-size) - var(--ctrl-height));
+  height: calc(
+    100vh - 13px - var(--navbar-size) - var(--footer-size) - var(--ctrl-height)
+  );
 }
 .sidebar #competitorList {
   overflow-y: auto;
   display: block !important;
   max-height: calc(
-    var(--app-height) - 47px - var(--navbar-size) - var(--footer-size) - var(--ctrl-height)
+    var(--app-height) - 47px - var(--navbar-size) - var(--footer-size) -
+      var(--ctrl-height)
   );
 }
 
 .sidebar #competitorList.without-competitor {
   max-height: calc(
-    var(--app-height) - 13px - var(--navbar-size) - var(--footer-size) - var(--ctrl-height)
+    var(--app-height) - 13px - var(--navbar-size) - var(--footer-size) -
+      var(--ctrl-height)
   );
 }
 
 .sidebar #optionsSidebar {
   max-height: calc(
-    var(--app-height) - 8px - var(--navbar-size) - var(--footer-size) - var(--ctrl-height)
+    var(--app-height) - 8px - var(--navbar-size) - var(--footer-size) -
+      var(--ctrl-height)
   );
 }
 
