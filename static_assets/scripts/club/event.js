@@ -2062,7 +2062,7 @@ function RCEvent(infoURL, clockURL) {
       Object.keys(supportedLanguages).forEach(function (lang) {
         var option = u("<option/>");
         option.attr({ value: lang });
-        option.text(supportedLanguages[lang]);
+        option.html(supportedLanguages[lang]);
         if (locale === lang) {
           option.attr({ selected: true });
         }

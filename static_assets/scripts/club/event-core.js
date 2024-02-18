@@ -19,8 +19,8 @@ var COLORS = [
 ];
 var supportedLanguages = {
   en: "English",
-  es: "Español",
-  fr: "Français",
+  es: "Espa&ntilde;ol",
+  fr: "Fran&ccedil;ais",
   nl: "Nederlands",
   pl: "Polski",
   fi: "Suomi",
@@ -177,6 +177,7 @@ L.Control.Ranking = L.Control.extend({
         '<div class="result-list-title">' +
           '<h6><i class="fa-solid fa-trophy"></i> ' +
           banana.i18n("ranking") +
+          '<button class="btn float-end m-0 p-0" type="button" id="dl-ranking-btn"><i class="fa-solid fa-download"></i></button>' +
           "</h6><label>" +
           banana.i18n("crossing-count") +
           '</label><input type="number" min="1" id="crossing-time" step="1" value="1" class="d-block cross-count form-control" style="font-size: 0.7rem;width: 61px">' +
@@ -197,7 +198,7 @@ L.Control.Ranking = L.Control.extend({
           (i + 1) +
           ' <span style="color: ' +
           c.competitor.color +
-          '">???</span> ' +
+          '">&#11044;</span> ' +
           u("<span/>").text(c.competitor.name).html() +
           '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
           myEvent.getProgressBarText(c.time) +
@@ -212,6 +213,23 @@ L.Control.Ranking = L.Control.extend({
     if (el.html() !== innerOut.html()) {
       el.html(innerOut.html());
     }
+    u(".leaflet-control-ranking #dl-ranking-btn").on("click", function () {
+      var out = "";
+      ranking.forEach(function (c, i) {
+        out +=
+          c.competitor.name + ";" + myEvent.getProgressBarText(c.time) + "\n";
+      });
+      var element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(out)
+      );
+      element.setAttribute("download", "result.csv");
+      element.style.display = "none";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    });
   },
 
   onRemove: function (map) {
