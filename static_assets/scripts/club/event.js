@@ -2709,6 +2709,7 @@ function RCEvent(infoURL, clockURL) {
   var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
   var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
   locale = urlLanguage || storedLanguage || browserLanguage || "en";
+  document.documentElement.setAttribute('lang', locale);
   dayjs.locale(locale);
   banana = new Banana();
   updateText().then(function () {
