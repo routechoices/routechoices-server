@@ -141,107 +141,6 @@ L.control.eventState = function (opts) {
   return new L.Control.EventState(opts);
 };
 
-L.Control.Ranking = L.Control.extend({
-  onAdd: function (map) {
-    var back = L.DomUtil.create(
-      "div",
-      "leaflet-bar leaflet-control leaflet-control-ranking"
-    );
-    back.setAttribute("data-bs-theme", "light");
-    u(back).append('<div class="result-name-list"/>');
-    back.style.width = "205px";
-    back.style.background = "white";
-    back.style.color = "black";
-    back.style.padding = "5px";
-    back.style.top = "0px";
-    back.style.right = "0px";
-    back.style["max-height"] = "195px";
-    back.style["overflow-y"] = "auto";
-    back.style["overflow-x"] = "hidden";
-    back.style["z-index"] = 10000;
-    back.style["font-size"] = "12px";
-    L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
-    L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
-    L.DomEvent.on(back, "click", L.DomEvent.stopPropagation);
-    L.DomEvent.on(back, "dblclick", L.DomEvent.stopPropagation);
-    return back;
-  },
-
-  setValues: function (ranking) {
-    var el = u(".leaflet-control-ranking").find(".result-name-list");
-    if (
-      u(".leaflet-control-ranking").find(".result-list-title").nodes.length ===
-      0
-    ) {
-      u(".leaflet-control-ranking").prepend(
-        '<div class="result-list-title">' +
-          '<h6><i class="fa-solid fa-trophy"></i> ' +
-          banana.i18n("ranking") +
-          '<button class="btn float-end m-0 p-0" type="button" id="dl-ranking-btn"><i class="fa-solid fa-download"></i></button>' +
-          "</h6><label>" +
-          banana.i18n("crossing-count") +
-          '</label><input type="number" min="1" id="crossing-time" step="1" value="1" class="d-block cross-count form-control" style="font-size: 0.7rem;width: 61px">' +
-          "</div>"
-      );
-    }
-    var innerOut = u('<div class="result-name-list"/>');
-    if (ranking.length > 0) {
-      ranking.sort(function (a, b) {
-        return (
-          myEvent.getRelativeTime(a.time) - myEvent.getRelativeTime(b.time)
-        );
-      });
-    }
-    ranking.forEach(function (c, i) {
-      innerOut.append(
-        '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px;"><span class="text-nowrap d-inline-block float-start overflow-hidden text-truncate" style="width: 135px;">' +
-          (i + 1) +
-          ' <span style="color: ' +
-          c.competitor.color +
-          '">&#11044;</span> ' +
-          u("<span/>").text(c.competitor.name).html() +
-          '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
-          myEvent.getProgressBarText(c.time) +
-          '">' +
-          myEvent.getProgressBarText(c.time) +
-          "</span></div>"
-      );
-    });
-    if (innerOut.html() === "") {
-      innerOut.append("<div>-</div>");
-    }
-    if (el.html() !== innerOut.html()) {
-      el.html(innerOut.html());
-    }
-    u(".leaflet-control-ranking #dl-ranking-btn").on("click", function () {
-      var out = "";
-      ranking.forEach(function (c, i) {
-        out +=
-          c.competitor.name + ";" + myEvent.getProgressBarText(c.time) + "\n";
-      });
-      var element = document.createElement("a");
-      element.setAttribute(
-        "href",
-        "data:text/csv;charset=utf-8," + encodeURIComponent(out)
-      );
-      element.setAttribute("download", "result.csv");
-      element.style.display = "none";
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    });
-  },
-
-  onRemove: function (map) {
-    u(".leaflet-control-ranking").remove();
-    u(".tmp").remove();
-  },
-});
-
-L.control.ranking = function (opts) {
-  return new L.Control.Ranking(opts);
-};
-
 L.Control.Grouping = L.Control.extend({
   onAdd: function (map) {
     var back = L.DomUtil.create(
@@ -376,6 +275,20 @@ function getRunnerNameMarker(
   return runnerIcon;
 }
 
+function getSplitLineMarker(name, color = "purple") {
+  var iconStyle = `color: ${color};opacity: 0.75;`;
+  var iconHtml = `<span style="${iconStyle}">${u("<span/>")
+    .text(name)
+    .text()}</span>`;
+  var iconClass = "runner-icon runner-icon-dark";
+  var icon = L.divIcon({
+    className: iconClass,
+    html: iconHtml,
+    iconAnchor: [10, 0],
+  });
+  return icon;
+}
+
 function alphabetizeNumber(integer) {
   return Number(integer)
     .toString(26)
@@ -417,7 +330,7 @@ function sortingFunction(a, b) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2024020500`)
+  return fetch(`${langFile}?v=2024021900`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

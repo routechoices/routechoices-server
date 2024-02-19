@@ -51,24 +51,219 @@ function RCEvent(infoURL, clockURL) {
   var searchText = null;
   var resetMassStartContextMenuItem = null;
   var setMassStartContextMenuItem = null;
-  var removeFinishLineContextMenuItem = null;
   var clusters = {};
-  var finishLineCrosses = [];
-  var finishLinePoints = [];
-  var finishLinePoly = null;
-  var finishLineSet = false;
+  var splitLineCount = 0;
+  var splitTimes = [];
+  var startLineCrosses = [];
+  var splitLinesPoints = [];
+  var splitLinesLine = [];
+  var splitLinesLabel = [];
+  var removeSplitLinesContextMenuItem = [];
+  var rankingFromLap = 1;
+  var rankingFromSplit = null;
+  var rankingToLap = 1;
+  var rankingToSplit = null;
   var showClusters = false;
   var showControls = false;
   var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
   var mapSelectorLayer = null;
   var sidebarShown = true;
   var isMapMoving = false;
-  var oldCrossingForNTimes = 1;
   var intersectionCheckZoom = 18;
   var showUserLocation = false;
   var showAll = true;
   var rankControl = null;
   var competitorsMinCustomOffset = null;
+
+  L.Control.Ranking = L.Control.extend({
+    onAdd: function () {
+      var back = L.DomUtil.create(
+        "div",
+        "leaflet-bar leaflet-control leaflet-control-ranking"
+      );
+      back.setAttribute("data-bs-theme", "light");
+      u(back).append('<div class="result-name-list"/>');
+      back.style.width = "205px";
+      back.style.background = "white";
+      back.style.color = "black";
+      back.style.padding = "5px";
+      back.style.top = "0px";
+      back.style.right = "0px";
+      back.style["max-height"] = "195px";
+      back.style["overflow-y"] = "auto";
+      back.style["overflow-x"] = "hidden";
+      back.style["z-index"] = 10000;
+      back.style["font-size"] = "12px";
+      L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "click", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "dblclick", L.DomEvent.stopPropagation);
+
+      u(back).prepend(
+        '<div class="result-list-title">' +
+          '<h6><i class="fa-solid fa-trophy"></i> ' +
+          banana.i18n("ranking") +
+          '<button class="btn float-end m-0 p-0" type="button" id="dl-ranking-btn"><i class="fa-solid fa-download"></i></button>' +
+          "</h6>" +
+          "</div>" +
+          '<div class="result-split-selectors"></div>'
+      );
+
+      return back;
+    },
+
+    setSplitSelectors: function () {
+      var out =
+        '<div class="d-flex flex-row">' +
+        '<div class="me-1">' +
+        "<label>" +
+        banana.i18n("from") +
+        "</label>" +
+        '<select class="form-control" style="font-size: 0.5rem;width: 41px" id="from-split">' +
+        `<option value="" ${
+          rankingFromSplit === null ? "selected" : ""
+        }>&#x25B7;</option>` +
+        splitLinesLine
+          .map(function (a, i) {
+            return !!a
+              ? `<option value="${i}" ${
+                  i === rankingFromSplit ? "selected" : ""
+                }>${i + 1}</option>`
+              : "";
+          })
+          .filter(function (a) {
+            return !!a;
+          })
+          .join("") +
+        "</select>" +
+        "</div>" +
+        '<div class="me-1">' +
+        "<label>" +
+        banana.i18n("lap") +
+        "</label>" +
+        `<input type="number" min="1" id="from-lap" step="1" value="${rankingFromLap}" class="d-block cross-count form-control" style="font-size: 0.5rem;width: 50px">` +
+        "</div>" +
+        '<div class="me-1">' +
+        "<label>" +
+        banana.i18n("to") +
+        "</label>" +
+        '<select class="form-control" style="font-size: 0.5rem;width: 41px" id="to-split">' +
+        splitLinesLine
+          .map(function (a, i) {
+            return !!a
+              ? `<option value="${i}" ${
+                  i === rankingToSplit ? "selected" : ""
+                }>${i + 1}</option>`
+              : "";
+          })
+          .filter(function (a) {
+            return !!a;
+          })
+          .join("") +
+        "</select>" +
+        "</div>" +
+        '<div class="m-0">' +
+        "<label>" +
+        banana.i18n("lap") +
+        "</label>" +
+        `<input type="number" min="1" id="to-lap" step="1" value="${rankingToLap}" class="d-block cross-count form-control" style="font-size: 0.5rem;width: 50px">` +
+        "</div>" +
+        "</div>";
+      u(".result-split-selectors").html(out);
+
+      u("#from-split").on("change", function (e) {
+        if (e.target.value !== "") {
+          rankingFromSplit = parseInt(e.target.value);
+          u("#from-lap").val(1);
+        } else {
+          rankingFromSplit = null;
+        }
+        u("#from-lap").val(1).trigger("change");
+      });
+      u("#from-lap").on("change", function (e) {
+        if (rankingFromSplit == null) {
+          e.target.value = 1;
+        }
+        rankingFromLap = Math.max(1, parseInt(e.target.value));
+      });
+      u("#to-split").on("change", function (e) {
+        if (e.target.value !== "") {
+          rankingToSplit = parseInt(e.target.value);
+        } else {
+          rankingToSplit = null;
+        }
+        u("#to-lap").val(1).trigger("change");
+      });
+      u("#to-lap").on("change", function (e) {
+        rankingToLap = Math.max(1, parseInt(e.target.value));
+      });
+      u("#from-lap").trigger("change");
+      u("#to-lap").trigger("change");
+    },
+
+    setValues: function (ranking) {
+      var el = u(".leaflet-control-ranking").find(".result-name-list");
+      var innerOut = u('<div class="result-name-list"/>');
+      if (ranking.length > 0) {
+        ranking.sort(function (a, b) {
+          return a.time - b.time;
+        });
+      }
+      var relativeTime = rankingFromSplit == null;
+      ranking.forEach(function (c, i) {
+        innerOut.append(
+          '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px;"><span class="text-nowrap d-inline-block float-start overflow-hidden text-truncate" style="width: 135px;">' +
+            (i + 1) +
+            ' <span style="color: ' +
+            c.competitor.color +
+            '">&#11044;</span> ' +
+            u("<span/>").text(c.competitor.name).html() +
+            '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
+            getProgressBarText(c.time, false, false, relativeTime) +
+            '">' +
+            getProgressBarText(c.time, false, false, relativeTime) +
+            "</span></div>"
+        );
+      });
+      if (innerOut.html() === "") {
+        innerOut.append("<div>-</div>");
+      }
+      if (el.html() !== innerOut.html()) {
+        el.html(innerOut.html());
+      }
+      u(".leaflet-control-ranking #dl-ranking-btn").off("click");
+      u(".leaflet-control-ranking #dl-ranking-btn").on("click", function () {
+        var out = "";
+        ranking.forEach(function (c, i) {
+          out +=
+            c.competitor.name +
+            ";" +
+            myEvent.getProgressBarText(c.time, false, false, relativeTime) +
+            "\n";
+        });
+        var element = document.createElement("a");
+        element.setAttribute(
+          "href",
+          "data:text/plain;charset=utf-8," + encodeURIComponent(out)
+        );
+        element.setAttribute("download", "result.csv");
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      });
+    },
+
+    onRemove: function (map) {
+      u(".leaflet-control-ranking").remove();
+      u(".tmp").remove();
+    },
+  });
+
+  L.control.ranking = function (opts) {
+    return new L.Control.Ranking(opts);
+  };
+
   class CompetitorSidebarEl extends HTMLElement {
     constructor() {
       super();
@@ -780,8 +975,8 @@ function RCEvent(infoURL, clockURL) {
           u("#share_button").on("click", shareURL);
           map.contextmenu.insertItem(
             {
-              text: banana.i18n("draw-finish-line"),
-              callback: drawFinishLine,
+              text: banana.i18n("draw-split-line"),
+              callback: drawSplitLine,
             },
             1
           );
@@ -956,66 +1151,109 @@ function RCEvent(infoURL, clockURL) {
     return res;
   }
 
-  function drawFinishLine(e) {
-    finishLinePoints = [];
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
-      if (rankControl) {
-        map.removeControl(rankControl);
-      }
-      finishLinePoly = null;
-      finishLineSet = false;
-      rankControl = null;
+  function drawSplitLine(e) {
+    splitLinesPoints[splitLineCount] = [];
+    if (splitLinesLine[splitLineCount]) {
+      map.removeLayer(splitLinesLine[splitLineCount]);
+      splitLinesLine[splitLineCount] = null;
     }
-    finishLinePoints.push(e.latlng);
-    map.on("click", drawFinishLineEnd);
-    map.on("mousemove", drawFinishLineTmp);
+    splitLinesPoints[splitLineCount].push(e.latlng);
+    map.on("click", drawSplitLineEnd);
+    map.on("mousemove", drawSplitLineTmp);
   }
 
-  function removeFinishLine() {
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
+  function removeSplitLine(n) {
+    if (splitLinesLine[n]) {
+      map.removeLayer(splitLinesLine[n]);
+      splitLinesLine[n] = null;
+    }
+    if (splitLinesLabel[n]) {
+      map.removeLayer(splitLinesLabel[n]);
+      splitLinesLabel[n] = null;
+    }
+    map.contextmenu.removeItem(removeSplitLinesContextMenuItem[n]);
+    removeSplitLinesContextMenuItem[n] = null;
+
+    rankControl.setSplitSelectors();
+    if (
+      !removeSplitLinesContextMenuItem.find(function (a) {
+        return !!a;
+      })
+    ) {
       map.removeControl(rankControl);
-      finishLinePoly = null;
-      finishLineSet = false;
       rankControl = null;
-      map.contextmenu.removeItem(removeFinishLineContextMenuItem);
-      removeFinishLineContextMenuItem = null;
+      rankingFromSplit = null;
+      rankingToSplit = null;
     }
   }
 
-  function drawFinishLineEnd(e) {
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
+  function drawSplitLineEnd(e) {
+    if (splitLinesLine[splitLineCount]) {
+      map.removeLayer(splitLinesLine[splitLineCount]);
     }
-    finishLinePoints.push(e.latlng);
-    finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
-    map.off("click", drawFinishLineEnd);
-    map.off("mousemove", drawFinishLineTmp);
-    rankControl = L.control.ranking({ position: "topright" });
-    map.addControl(rankControl);
-    map.addLayer(finishLinePoly);
-    finishLineSet = true;
-    if (!removeFinishLineContextMenuItem) {
-      removeFinishLineContextMenuItem = map.contextmenu.insertItem(
+    if (splitLinesLabel[splitLineCount]) {
+      map.removeLayer(splitLinesLabel[splitLineCount]);
+    }
+
+    splitLinesPoints[splitLineCount][1] = e.latlng;
+    splitLinesLine[splitLineCount] = L.polyline(
+      splitLinesPoints[splitLineCount],
+      { color: "purple" }
+    );
+    var splitLineIcon = getSplitLineMarker("" + (splitLineCount + 1));
+    var coordinates = splitLinesPoints[splitLineCount].sort(function (a, b) {
+      return a.lat - b.lat;
+    })[0];
+    splitLinesLabel[splitLineCount] = L.marker(coordinates, {
+      icon: splitLineIcon,
+    });
+
+    map.addLayer(splitLinesLine[splitLineCount]);
+    map.addLayer(splitLinesLabel[splitLineCount]);
+
+    map.off("click", drawSplitLineEnd);
+    map.off("mousemove", drawSplitLineTmp);
+    removeSplitLinesContextMenuItem.push(
+      map.contextmenu.insertItem(
         {
-          text: banana.i18n("remove-finish-line"),
-          callback: removeFinishLine,
+          text: banana.i18n("remove-split-line", splitLineCount + 1),
+          callback: (function (n) {
+            return function () {
+              removeSplitLine(n);
+            };
+          })(splitLineCount),
         },
         2 +
           (!!setMassStartContextMenuItem ? 1 : 0) +
-          (!!resetMassStartContextMenuItem ? 1 : 0)
-      );
+          (!!resetMassStartContextMenuItem ? 1 : 0) +
+          removeSplitLinesContextMenuItem.filter(function (a) {
+            return !!a;
+          }).length
+      )
+    );
+
+    if (!rankControl) {
+      rankingFromSplit = null;
+      rankingToSplit = splitLineCount;
+      rankControl = L.control.ranking({ position: "topright" });
+      map.addControl(rankControl);
     }
+    rankControl.setSplitSelectors();
+    splitLineCount = splitLineCount + 1;
   }
 
-  function drawFinishLineTmp(e) {
-    finishLinePoints[1] = e.latlng;
-    if (!finishLinePoly) {
-      finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
-      map.addLayer(finishLinePoly);
+  function drawSplitLineTmp(e) {
+    splitLinesPoints[splitLineCount][1] = e.latlng;
+    if (!splitLinesLine[splitLineCount]) {
+      splitLinesLine[splitLineCount] = L.polyline(
+        splitLinesPoints[splitLineCount],
+        { color: "purple" }
+      );
+      map.addLayer(splitLinesLine[splitLineCount]);
     } else {
-      finishLinePoly.setLatLngs(finishLinePoints);
+      splitLinesLine[splitLineCount].setLatLngs(
+        splitLinesPoints[splitLineCount]
+      );
     }
   }
 
@@ -2274,20 +2512,27 @@ function RCEvent(infoURL, clockURL) {
   }
   this.getRelativeTime = getRelativeTime;
 
-  function getProgressBarText(currentTime, bg = false, date = false) {
+  function getProgressBarText(
+    currentTime,
+    bg = false,
+    date = false,
+    relative = true
+  ) {
     var result = "";
     if (bg && isLive) {
       return "";
     }
     var viewedTime = currentTime;
-    if (!isRealTime) {
+    if (!isRealTime || !relative) {
       if (currentTime === 0) {
         return "00:00:00";
       }
-      if (isCustomStart) {
-        viewedTime -= getCompetitorsMinCustomOffset();
-      } else {
-        viewedTime -= getCompetitionStartDate();
+      if (relative) {
+        if (isCustomStart) {
+          viewedTime -= getCompetitorsMinCustomOffset();
+        } else {
+          viewedTime -= getCompetitionStartDate();
+        }
       }
       var t = viewedTime / 1e3;
 
@@ -2402,8 +2647,8 @@ function RCEvent(infoURL, clockURL) {
 
     if (isMapMoving) return;
 
-    var oldFinishCrosses = finishLineCrosses.slice();
-    finishLineCrosses = [];
+    startLineCrosses = [];
+    splitTimes = [];
 
     Object.values(competitorList).forEach(function (competitor) {
       if (!competitor.isShown) {
@@ -2485,93 +2730,32 @@ function RCEvent(infoURL, clockURL) {
             competitor.odometer.textContent = competitor.odometerValue;
           }
 
-          // Splitimes
-          if (finishLineSet) {
-            if (
-              u("#crossing-time").nodes.length &&
-              oldCrossingForNTimes !== u("#crossing-time").val()
-            ) {
-              oldCrossingForNTimes = u("#crossing-time").val() || 1;
-              oldFinishCrosses = [];
-              finishLineCrosses = [];
-            }
+          // Splittimes
+          if (
+            refreshMeters &&
+            removeSplitLinesContextMenuItem.find(function (a) {
+              return !!a;
+            })
+          ) {
             var allPoints = route.getArray();
-            var oldCrossing = oldFinishCrosses.find(function (el) {
-              return el.competitor.id === competitor.id;
-            });
-            var useOldCrossing = false;
             var crossCount = 0;
-            if (oldCrossing) {
-              var oldTs = allPoints[oldCrossing.idx].timestamp;
-              if (viewedTime >= oldTs) {
+            var startPointIdx = null;
+            for (var i = 1; i < allPoints.length; i++) {
+              var tPoint = allPoints[i];
+              if (viewedTime < tPoint.timestamp) {
+                break;
+              }
+              if (rankingFromSplit != null) {
                 if (
                   L.LineUtil.segmentsIntersect(
-                    map.project(finishLinePoints[0], intersectionCheckZoom),
-                    map.project(finishLinePoints[1], intersectionCheckZoom),
                     map.project(
-                      L.latLng([
-                        allPoints[oldCrossing.idx].coords.latitude,
-                        allPoints[oldCrossing.idx].coords.longitude,
-                      ]),
+                      splitLinesPoints[rankingFromSplit][0],
                       intersectionCheckZoom
                     ),
                     map.project(
-                      L.latLng([
-                        allPoints[oldCrossing.idx - 1].coords.latitude,
-                        allPoints[oldCrossing.idx - 1].coords.longitude,
-                      ]),
+                      splitLinesPoints[rankingFromSplit][1],
                       intersectionCheckZoom
-                    )
-                  )
-                ) {
-                  crossCount++;
-                  if (crossCount == oldCrossingForNTimes) {
-                    var competitorTime = allPoints[oldCrossing.idx].timestamp;
-                    if (
-                      !isLive &&
-                      !isRealTime &&
-                      !isCustomStart &&
-                      competitor.start_time
-                    ) {
-                      competitorTime -=
-                        new Date(competitor.start_time) -
-                        getCompetitionStartDate();
-                    }
-                    if (
-                      !isLive &&
-                      !isRealTime &&
-                      isCustomStart &&
-                      competitor.custom_offset
-                    ) {
-                      competitorTime -= Math.max(
-                        0,
-                        competitor.custom_offset -
-                          getCompetitorsMinCustomOffset()
-                      );
-                    }
-                    if (getRelativeTime(competitorTime) > 0) {
-                      finishLineCrosses.push({
-                        competitor: competitor,
-                        time: competitorTime,
-                        idx: oldCrossing.idx,
-                      });
-                      useOldCrossing = true;
-                    }
-                  }
-                }
-              }
-            }
-            if (!useOldCrossing) {
-              var crossCount = 0;
-              for (var i = 1; i < allPoints.length; i++) {
-                var tPoint = allPoints[i];
-                if (viewedTime < tPoint.timestamp) {
-                  break;
-                }
-                if (
-                  L.LineUtil.segmentsIntersect(
-                    map.project(finishLinePoints[0], intersectionCheckZoom),
-                    map.project(finishLinePoints[1], intersectionCheckZoom),
+                    ),
                     map.project(
                       L.latLng([
                         tPoint.coords.latitude,
@@ -2589,7 +2773,7 @@ function RCEvent(infoURL, clockURL) {
                   )
                 ) {
                   crossCount++;
-                  if (crossCount == oldCrossingForNTimes) {
+                  if (crossCount == rankingFromLap) {
                     var competitorTime = tPoint.timestamp;
                     if (
                       !isLive &&
@@ -2614,11 +2798,95 @@ function RCEvent(infoURL, clockURL) {
                       );
                     }
                     if (getRelativeTime(competitorTime) > 0) {
-                      finishLineCrosses.push({
+                      startLineCrosses.push({
                         competitor: competitor,
                         time: competitorTime,
-                        idx: i,
                       });
+                      startPointIdx = i;
+                      break;
+                    }
+                  }
+                }
+              } else {
+                startPointIdx = 1;
+                break;
+              }
+            }
+            crossCount = 0;
+            if (startPointIdx != null) {
+              for (var i = startPointIdx; i < allPoints.length; i++) {
+                var tPoint = allPoints[i];
+                if (viewedTime < tPoint.timestamp) {
+                  break;
+                }
+                if (
+                  L.LineUtil.segmentsIntersect(
+                    map.project(
+                      splitLinesPoints[rankingToSplit][0],
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      splitLinesPoints[rankingToSplit][1],
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        tPoint.coords.latitude,
+                        tPoint.coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    ),
+                    map.project(
+                      L.latLng([
+                        allPoints[i - 1].coords.latitude,
+                        allPoints[i - 1].coords.longitude,
+                      ]),
+                      intersectionCheckZoom
+                    )
+                  )
+                ) {
+                  crossCount++;
+                  if (crossCount == rankingToLap) {
+                    var competitorTime = tPoint.timestamp;
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      !isCustomStart &&
+                      competitor.start_time
+                    ) {
+                      competitorTime -=
+                        new Date(competitor.start_time) -
+                        getCompetitionStartDate();
+                    }
+                    if (
+                      !isLive &&
+                      !isRealTime &&
+                      isCustomStart &&
+                      competitor.custom_offset
+                    ) {
+                      competitorTime -= Math.max(
+                        0,
+                        competitor.custom_offset -
+                          getCompetitorsMinCustomOffset()
+                      );
+                    }
+
+                    if (getRelativeTime(competitorTime) > 0) {
+                      if (rankingFromSplit != null) {
+                        splitTimes.push({
+                          competitor: competitor,
+                          time:
+                            competitorTime -
+                            startLineCrosses.find(function (c) {
+                              return c.competitor.id === competitor.id;
+                            }).time,
+                        });
+                      } else {
+                        splitTimes.push({
+                          competitor: competitor,
+                          time: competitorTime,
+                        });
+                      }
                       break;
                     }
                   }
@@ -2629,7 +2897,6 @@ function RCEvent(infoURL, clockURL) {
         }
       }
     });
-
     // Create cluster
     if (showClusters) {
       var competitorsWithMarker = [];
@@ -2692,8 +2959,13 @@ function RCEvent(infoURL, clockURL) {
 
       groupControl.setValues(competitorsWithMarker, clustersCenter);
     }
-    if (finishLineSet && refreshMeters) {
-      rankControl.setValues(finishLineCrosses);
+    if (
+      removeSplitLinesContextMenuItem.find(function (a) {
+        return !!a;
+      }) &&
+      refreshMeters
+    ) {
+      rankControl.setValues(splitTimes);
     }
   }
 }

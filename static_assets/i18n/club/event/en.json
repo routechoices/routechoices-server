@@ -16,8 +16,8 @@
     "zoom-in": "Zoom In",
     "zoom-out": "Zoom Out",
     "reset-mass-start": "Reset mass start",
-    "draw-finish-line": "Draw finish line",
-    "remove-finish-line": "Remove finish line",
+    "draw-split-line": "Draw split line",
+    "remove-split-line": "Remove split line $1",
     "mass-start-from-here": "Mass start from here",
     "ranking": "Ranking",
     "group": "Group",
@@ -49,5 +49,8 @@
     "return-live-mode": "Back to Live",
     "background-map": "Background map",
     "map": "Map",
-    "hide-map": "Hide map"
+    "hide-map": "Hide map",
+    "lap": "Lap",
+    "from": "From",
+    "to": "To"
 }

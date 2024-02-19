@@ -16,8 +16,8 @@
     "zoom-in": "Przybiliż",
     "zoom-out": "Oddal",
     "reset-mass-start": "Reset startu masowego",
-    "draw-finish-line": "Rysuj linię mety ",
-    "remove-finish-line": "Usuń linię mety",
+    "draw-split-line": "Rysuj linię pośrednią",
+    "remove-split-line": "usuń linię pośrednią 1",
     "mass-start-from-here": "Startu masowego",
     "ranking": "Ranking",
     "group": "Grupa",
@@ -49,5 +49,8 @@
     "return-live-mode": "Tryb na żywo",
     "background-map": "Mapa w tle",
     "map": "Map",
-    "hide-map": "Ukryj mapę"
+    "hide-map": "Ukryj mapę",
+    "lap": "Zakładka",
+    "from": "Skąd",
+    "to": "Koniec"
 }

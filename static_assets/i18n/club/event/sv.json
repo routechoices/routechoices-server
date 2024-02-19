@@ -16,8 +16,8 @@
     "zoom-in": "Zooma in",
     "zoom-out": "Zooma ut",
     "reset-mass-start": "Nollställ masstart",
-    "draw-finish-line": "Rita mållinjen",
-    "remove-finish-line": "Ta bort mållinjen",
+    "draw-split-line": "Rita mellanlinje",
+    "remove-split-line": "Ta bort mellanlinje $1",
     "mass-start-from-here": "Masstart härifrån",
     "ranking": "Ranking",
     "group": "Grupp",
@@ -49,5 +49,8 @@
     "return-live-mode": "Tillbaka till Live",
     "background-map": "Bakgrundskarta",
     "map": "Karta",
-    "hide-map": "Göm kartan"
+    "hide-map": "Göm kartan",
+    "lap": "Varv",
+    "from": "Från",
+    "to": "Till"
 }

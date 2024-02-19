@@ -16,8 +16,8 @@
   "zoom-in": "Acercar",
   "zoom-out": "Alejar",
   "reset-mass-start": "Reiniciar salida en masa",
-  "draw-finish-line": "Dibujar línea de meta",
-  "remove-finish-line": "Borrar lïnea de meta",
+  "draw-split-line": "Dibujar línea intermedia",
+  "remove-split-line": "Borrar lïnea intermedia $1",
   "mass-start-from-here": "Salida en masa desde aquí",
   "ranking": "Ranking",
   "group": "Grupo",
@@ -49,5 +49,8 @@
   "return-live-mode": "Volver al Vivo",
   "background-map": "Mapa de fondo",
   "map": "Mapa",
-  "hide-map": "Ocultar mapa"
+  "hide-map": "Ocultar mapa",
+  "lap": "Vuelta",
+  "from": "De",
+  "to": "Meta"
 }
