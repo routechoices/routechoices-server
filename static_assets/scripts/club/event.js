@@ -51,24 +51,151 @@ function RCEvent(infoURL, clockURL) {
   var searchText = null;
   var resetMassStartContextMenuItem = null;
   var setMassStartContextMenuItem = null;
-  var removeFinishLineContextMenuItem = null;
   var clusters = {};
-  var finishLineCrosses = [];
-  var finishLinePoints = [];
-  var finishLinePoly = null;
-  var finishLineSet = false;
+  var splitLineCount = 0;
+  var splitLinesCrosses = [];
+  var splitLinesPoints = [];
+  var splitLinesLine = [];
+  var splitLinesLabel = [];
+  var removeSplitLinesContextMenuItem = [];
   var showClusters = false;
   var showControls = false;
   var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
   var mapSelectorLayer = null;
   var sidebarShown = true;
   var isMapMoving = false;
-  var oldCrossingForNTimes = 1;
   var intersectionCheckZoom = 18;
   var showUserLocation = false;
   var showAll = true;
   var rankControl = null;
   var competitorsMinCustomOffset = null;
+
+  L.Control.Ranking = L.Control.extend({
+    onAdd: function () {
+      var back = L.DomUtil.create(
+        "div",
+        "leaflet-bar leaflet-control leaflet-control-ranking"
+      );
+      back.setAttribute("data-bs-theme", "light");
+      u(back).append('<div class="result-name-list"/>');
+      back.style.width = "205px";
+      back.style.background = "white";
+      back.style.color = "black";
+      back.style.padding = "5px";
+      back.style.top = "0px";
+      back.style.right = "0px";
+      back.style["max-height"] = "195px";
+      back.style["overflow-y"] = "auto";
+      back.style["overflow-x"] = "hidden";
+      back.style["z-index"] = 10000;
+      back.style["font-size"] = "12px";
+      L.DomEvent.on(back, "mousewheel", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "touchstart", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "click", L.DomEvent.stopPropagation);
+      L.DomEvent.on(back, "dblclick", L.DomEvent.stopPropagation);
+
+      u(back).prepend(
+        '<div class="result-list-title">' +
+          '<h6><i class="fa-solid fa-trophy"></i> ' +
+          banana.i18n("ranking") +
+          '<button class="btn float-end m-0 p-0" type="button" id="dl-ranking-btn"><i class="fa-solid fa-download"></i></button>' +
+          "</h6>" +
+          "</div>" +
+          '<div class="result-split-selectors">' +
+          '<div class="d-flex flex-row">' +
+          '<div class="mx-1">' +
+          "<label>" +
+          banana.i18n("from") +
+          "</label>" +
+          '<select class="form-control" style="font-size: 0.7rem;width: 61px" id="from-split"><option value="0">&#x25B7;</option></select>' +
+          "</div>" +
+          '<div class="mx-1">' +
+          "<label>" +
+          banana.i18n("lap") +
+          "</label>" +
+          '<input type="number" min="1" id="from-lap" step="1" value="1" class="d-block cross-count form-control" style="font-size: 0.7rem;width: 61px">' +
+          "</div>" +
+          "</div>" +
+          '<div class="d-flex flex-row">' +
+          '<div class="mx-1">' +
+          "<label>" +
+          banana.i18n("to") +
+          "</label>" +
+          '<select class="form-control" style="font-size: 0.7rem;width: 61px" id="to-split"><option value="0">&#x25B7;</option></select>' +
+          "</div>" +
+          '<div class="mx-1">' +
+          "<label>" +
+          banana.i18n("lap") +
+          "</label>" +
+          '<input type="number" min="1" id="to-lap" step="1" value="1" class="d-block cross-count form-control" style="font-size: 0.7rem;width: 61px">' +
+          "</div>" +
+          "</div>" +
+          "</div>"
+      );
+
+      return back;
+    },
+
+    setValues: function (ranking) {
+      var el = u(".leaflet-control-ranking").find(".result-name-list");
+      var innerOut = u('<div class="result-name-list"/>');
+      if (ranking.length > 0) {
+        ranking.sort(function (a, b) {
+          return (
+            myEvent.getRelativeTime(a.time) - myEvent.getRelativeTime(b.time)
+          );
+        });
+      }
+      ranking.forEach(function (c, i) {
+        innerOut.append(
+          '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px;"><span class="text-nowrap d-inline-block float-start overflow-hidden text-truncate" style="width: 135px;">' +
+            (i + 1) +
+            ' <span style="color: ' +
+            c.competitor.color +
+            '">&#11044;</span> ' +
+            u("<span/>").text(c.competitor.name).html() +
+            '</span><span class="text-nowrap overflow-hidden d-inline-block float-end" style="width: 55px; font-feature-settings: tnum; font-variant-numeric: tabular-nums lining-nums; margin-right: 10px;" title="' +
+            myEvent.getProgressBarText(c.time) +
+            '">' +
+            myEvent.getProgressBarText(c.time) +
+            "</span></div>"
+        );
+      });
+      if (innerOut.html() === "") {
+        innerOut.append("<div>-</div>");
+      }
+      if (el.html() !== innerOut.html()) {
+        el.html(innerOut.html());
+      }
+      u(".leaflet-control-ranking #dl-ranking-btn").on("click", function () {
+        var out = "";
+        ranking.forEach(function (c, i) {
+          out +=
+            c.competitor.name + ";" + myEvent.getProgressBarText(c.time) + "\n";
+        });
+        var element = document.createElement("a");
+        element.setAttribute(
+          "href",
+          "data:text/plain;charset=utf-8," + encodeURIComponent(out)
+        );
+        element.setAttribute("download", "result.csv");
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      });
+    },
+
+    onRemove: function (map) {
+      u(".leaflet-control-ranking").remove();
+      u(".tmp").remove();
+    },
+  });
+
+  L.control.ranking = function (opts) {
+    return new L.Control.Ranking(opts);
+  };
+
   class CompetitorSidebarEl extends HTMLElement {
     constructor() {
       super();
@@ -780,8 +907,8 @@ function RCEvent(infoURL, clockURL) {
           u("#share_button").on("click", shareURL);
           map.contextmenu.insertItem(
             {
-              text: banana.i18n("draw-finish-line"),
-              callback: drawFinishLine,
+              text: banana.i18n("draw-split-line"),
+              callback: drawSplitLine,
             },
             1
           );
@@ -956,66 +1083,95 @@ function RCEvent(infoURL, clockURL) {
     return res;
   }
 
-  function drawFinishLine(e) {
-    finishLinePoints = [];
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
-      if (rankControl) {
-        map.removeControl(rankControl);
-      }
-      finishLinePoly = null;
-      finishLineSet = false;
-      rankControl = null;
+  function drawSplitLine(e) {
+    splitLinesPoints[splitLineCount] = [];
+    if (splitLinesLine[splitLineCount]) {
+      map.removeLayer(splitLinesLine[splitLineCount]);
+      splitLinesLine[splitLineCount] = null;
     }
-    finishLinePoints.push(e.latlng);
-    map.on("click", drawFinishLineEnd);
-    map.on("mousemove", drawFinishLineTmp);
+    splitLinesPoints[splitLineCount].push(e.latlng);
+    map.on("click", drawSplitLineEnd);
+    map.on("mousemove", drawSplitLineTmp);
   }
 
-  function removeFinishLine() {
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
+  function removeSplitLine(n) {
+    if (splitLinesLine[n]) {
+      map.removeLayer(splitLinesLine[n]);
+      splitLinesLine[n] = null;
+    }
+    if (splitLinesLabel[n]) {
+      map.removeLayer(splitLinesLabel[n]);
+      splitLinesLabel[n] = null;
+    }
+    map.contextmenu.removeItem(removeSplitLinesContextMenuItem[n]);
+    removeSplitLinesContextMenuItem.splice(n, 1);
+
+    if (removeSplitLinesContextMenuItem.length == 0) {
       map.removeControl(rankControl);
-      finishLinePoly = null;
-      finishLineSet = false;
-      rankControl = null;
-      map.contextmenu.removeItem(removeFinishLineContextMenuItem);
-      removeFinishLineContextMenuItem = null;
     }
   }
 
-  function drawFinishLineEnd(e) {
-    if (finishLinePoly) {
-      map.removeLayer(finishLinePoly);
+  function drawSplitLineEnd(e) {
+    if (splitLinesLine[splitLineCount]) {
+      map.removeLayer(splitLinesLine[splitLineCount]);
     }
-    finishLinePoints.push(e.latlng);
-    finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
-    map.off("click", drawFinishLineEnd);
-    map.off("mousemove", drawFinishLineTmp);
-    rankControl = L.control.ranking({ position: "topright" });
-    map.addControl(rankControl);
-    map.addLayer(finishLinePoly);
-    finishLineSet = true;
-    if (!removeFinishLineContextMenuItem) {
-      removeFinishLineContextMenuItem = map.contextmenu.insertItem(
+    if (splitLinesLabel[splitLineCount]) {
+      map.removeLayer(splitLinesLabel[splitLineCount]);
+    }
+    splitLinesPoints[splitLineCount].push(e.latlng);
+    splitLinesLine[splitLineCount] = L.polyline(
+      splitLinesPoints[splitLineCount],
+      { color: "purple" }
+    );
+    var splitLineIcon = getSplitLineMarker("" + (splitLineCount + 1));
+    var coordinates = splitLinesPoints[splitLineCount].sort(function (a, b) {
+      return a.lat - b.lat;
+    })[0];
+    splitLinesLabel[splitLineCount] = L.marker(coordinates, {
+      icon: splitLineIcon,
+    });
+
+    map.addLayer(splitLinesLine[splitLineCount]);
+    map.addLayer(splitLinesLabel[splitLineCount]);
+
+    map.off("click", drawSplitLineEnd);
+    map.off("mousemove", drawSplitLineTmp);
+    removeSplitLinesContextMenuItem.push(
+      map.contextmenu.insertItem(
         {
-          text: banana.i18n("remove-finish-line"),
-          callback: removeFinishLine,
+          text: banana.i18n("remove-split-line") + " " + (splitLineCount + 1),
+          callback: (function (n) {
+            return function () {
+              removeSplitLine(n);
+            };
+          })(splitLineCount),
         },
         2 +
           (!!setMassStartContextMenuItem ? 1 : 0) +
-          (!!resetMassStartContextMenuItem ? 1 : 0)
-      );
+          (!!resetMassStartContextMenuItem ? 1 : 0) +
+          splitLineCount
+      )
+    );
+
+    if (!rankControl) {
+      rankControl = L.control.ranking({ position: "topright" });
+      map.addControl(rankControl);
     }
+    splitLineCount = splitLineCount + 1;
   }
 
-  function drawFinishLineTmp(e) {
-    finishLinePoints[1] = e.latlng;
-    if (!finishLinePoly) {
-      finishLinePoly = L.polyline(finishLinePoints, { color: "purple" });
-      map.addLayer(finishLinePoly);
+  function drawSplitLineTmp(e) {
+    splitLinesPoints[splitLineCount][1] = e.latlng;
+    if (!splitLinesLine[splitLineCount]) {
+      splitLinesLine[splitLineCount] = L.polyline(
+        splitLinesPoints[splitLineCount],
+        { color: "purple" }
+      );
+      map.addLayer(splitLinesLine[splitLineCount]);
     } else {
-      finishLinePoly.setLatLngs(finishLinePoints);
+      splitLinesLine[splitLineCount].setLatLngs(
+        splitLinesPoints[splitLineCount]
+      );
     }
   }
 
@@ -2402,8 +2558,8 @@ function RCEvent(infoURL, clockURL) {
 
     if (isMapMoving) return;
 
-    var oldFinishCrosses = finishLineCrosses.slice();
-    finishLineCrosses = [];
+    var prevSplitLinesCrosses = { ...splitLinesCrosses };
+    splitLinesCrosses = {};
 
     Object.values(competitorList).forEach(function (competitor) {
       if (!competitor.isShown) {
@@ -2486,7 +2642,8 @@ function RCEvent(infoURL, clockURL) {
           }
 
           // Splitimes
-          if (finishLineSet) {
+          /*
+          if (splitLineCount > 0) {
             if (
               u("#crossing-time").nodes.length &&
               oldCrossingForNTimes !== u("#crossing-time").val()
@@ -2625,11 +2782,10 @@ function RCEvent(infoURL, clockURL) {
                 }
               }
             }
-          }
+          }*/
         }
       }
     });
-
     // Create cluster
     if (showClusters) {
       var competitorsWithMarker = [];
@@ -2692,9 +2848,11 @@ function RCEvent(infoURL, clockURL) {
 
       groupControl.setValues(competitorsWithMarker, clustersCenter);
     }
+    /*
     if (finishLineSet && refreshMeters) {
       rankControl.setValues(finishLineCrosses);
     }
+    */
   }
 }
 
