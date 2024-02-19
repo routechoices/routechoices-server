@@ -16,8 +16,8 @@
     "zoom-in": "Zoomaa lähemmäs",
     "zoom-out": "Zoomaa kauemmas",
     "reset-mass-start": "Resetoi yhteislähtö",
-    "draw-finish-line": "Piirrä maaliviiva",
-    "remove-finish-line": "Poista maaliviiva",
+    "draw-split-line": "Piirrä väliaikaviiva",
+    "remove-split-line": "Poista väliaikaviiva $1",
     "mass-start-from-here": "Yhteislähtö tästä",
     "ranking": "Sijoitus",
     "group": "Ryhmä",
@@ -49,5 +49,8 @@
     "return-live-mode": "Paluu Liveen",
     "background-map": "Taustakartta",
     "map": "Kartta",
-    "hide-map": "Piilota kartta"
+    "hide-map": "Piilota kartta",
+    "lap": "Kierros",
+    "from": "Alkaen",
+    "to": "Maali"
 }

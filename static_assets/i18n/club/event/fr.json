@@ -16,8 +16,8 @@
     "zoom-in": "Zoomer",
     "zoom-out": "Dezoomer",
     "reset-mass-start": "Réinitialiser le départ en masse",
-    "draw-finish-line": "Dessiner une ligne d'arrivée",
-    "remove-finish-line": "Enlever la ligne d'arrivée",
+    "draw-split-line": "Dessiner une ligne intermediaire",
+    "remove-split-line": "Enlever la ligne intermediaire $1",
     "mass-start-from-here": "Départ en masse ici",
     "ranking": "Classement",
     "group": "Groupe",
@@ -49,5 +49,8 @@
     "return-live-mode": "Retour au Direct",
     "background-map": "Carte de fond",
     "map": "Carte",
-    "hide-map": "Masquer la carte"
+    "hide-map": "Masquer la carte",
+    "lap": "Tour",
+    "from": "De",
+    "to": "À"
 }

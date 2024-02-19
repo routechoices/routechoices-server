@@ -16,8 +16,8 @@
     "zoom-in": "Zoom in",
     "zoom-out": "Zoom uit",
     "reset-mass-start": "Reset massastart",
-    "draw-finish-line": "Teken finish lijn",
-    "remove-finish-line": "Verwijder finish lijn",
+    "draw-split-line": "Teken splitslijn",
+    "remove-split-line": "Verwijder splitslijn $1",
     "mass-start-from-here": "Massastart vanaf hier",
     "ranking": "Rangschikking",
     "group": "Groeperen",
@@ -49,5 +49,8 @@
     "return-live-mode": "Terug Live",
     "background-map": "Achtergrondkaart",
     "map": "Kaart",
-    "hide-map": "Kaart verbergen"
+    "hide-map": "Kaart verbergen",
+    "lap": "Ronde",
+    "from": "Van",
+    "to": "Eind"
 }

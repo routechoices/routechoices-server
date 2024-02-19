@@ -1104,10 +1104,15 @@ function RCEvent(infoURL, clockURL) {
       splitLinesLabel[n] = null;
     }
     map.contextmenu.removeItem(removeSplitLinesContextMenuItem[n]);
-    removeSplitLinesContextMenuItem.splice(n, 1);
+    removeSplitLinesContextMenuItem[n] = null;
 
-    if (removeSplitLinesContextMenuItem.length == 0) {
+    if (
+      !removeSplitLinesContextMenuItem.find(function (a) {
+        return !!a;
+      })
+    ) {
       map.removeControl(rankControl);
+      rankControl = null;
     }
   }
 
@@ -1139,7 +1144,7 @@ function RCEvent(infoURL, clockURL) {
     removeSplitLinesContextMenuItem.push(
       map.contextmenu.insertItem(
         {
-          text: banana.i18n("remove-split-line") + " " + (splitLineCount + 1),
+          text: banana.i18n("remove-split-line", splitLineCount + 1),
           callback: (function (n) {
             return function () {
               removeSplitLine(n);
@@ -1149,7 +1154,9 @@ function RCEvent(infoURL, clockURL) {
         2 +
           (!!setMassStartContextMenuItem ? 1 : 0) +
           (!!resetMassStartContextMenuItem ? 1 : 0) +
-          splitLineCount
+          removeSplitLinesContextMenuItem.filter(function (a) {
+            return !!a;
+          }).length
       )
     );
 
