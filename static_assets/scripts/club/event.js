@@ -2742,6 +2742,15 @@ function RCEvent(infoURL, clockURL) {
             var startPointIdx = null;
             for (var i = 1; i < allPoints.length; i++) {
               var tPoint = allPoints[i];
+              if (
+                !isLive &&
+                !isRealTime &&
+                isCustomStart &&
+                competitor.custom_offset &&
+                tPoint.timestamp < competitor.custom_offset
+              ) {
+                continue;
+              }
               if (viewedTime < tPoint.timestamp) {
                 break;
               }
@@ -2808,7 +2817,7 @@ function RCEvent(infoURL, clockURL) {
                   }
                 }
               } else {
-                startPointIdx = 1;
+                startPointIdx = i;
                 break;
               }
             }
