@@ -2802,7 +2802,7 @@ function RCEvent(infoURL, clockURL) {
                         competitor: competitor,
                         time: competitorTime,
                       });
-                      startPointIdx = i;
+                      startPointIdx = i + 1;
                       break;
                     }
                   }
