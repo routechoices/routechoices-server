@@ -362,7 +362,7 @@ class EventForm(ModelForm):
         listed = self.cleaned_data.get("list_on_routechoices_com")
         if not club.upgraded and listed:
             raise ValidationError(
-                "Only Partners can list their events" " on routechoices.com events page"
+                "Only partners can list their events on routechoices.com events page"
             )
         return listed
 
