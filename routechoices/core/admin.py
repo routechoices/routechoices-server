@@ -610,8 +610,11 @@ class DeviceAdmin(admin.ModelAdmin):
         return ""
 
     def last_coordinates(self, obj):
-        lat = round(obj._last_location_latitude, 5)
-        lon = round(obj._last_location_longitude, 5)
+        lat = obj._last_location_latitude
+        lon = obj._last_location_longitude
+        if not lat or not lon:
+            return "-"
+        lat, lon = round(lat, 5), round(lon, 5)
         return format_html(
             '<a href="http://www.openstreetmap.org/?mlat={}&mlon={}" target="_blank">{}, {}</a>',
             lat,
