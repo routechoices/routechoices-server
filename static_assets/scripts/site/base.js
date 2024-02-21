@@ -33,33 +33,26 @@ const getPreferredTheme = () => {
   return "auto";
 };
 
-const getCurrentTheme = () => {
-  var theme = getPreferredTheme();
-  if (
-    theme === "dark" ||
-    (theme === "auto" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
-    return "dark";
+const getAbsTheme = (theme) => {
+  if (theme === "auto") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   } else {
-    return "light";
+    return theme;
   }
 };
 
+const getCurrentTheme = () => {
+  var theme = getPreferredTheme();
+  return getAbsTheme(theme);
+};
+
 const setTheme = (theme) => {
-  if (
-    theme === "dark" ||
-    (theme === "auto" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
-    document
-      .querySelectorAll("[data-bs-theme]")
-      .forEach((el) => el.setAttribute("data-bs-theme", "dark"));
-  } else {
-    document
-      .querySelectorAll("[data-bs-theme]")
-      .forEach((el) => el.setAttribute("data-bs-theme", "light"));
-  }
+  var detectedTheme = getAbsTheme(theme);
+  document
+    .querySelectorAll("[data-bs-theme]")
+    .forEach((el) => el.setAttribute("data-bs-theme", detectedTheme));
 };
 
 (() => {
@@ -130,19 +123,6 @@ async function checkVersion() {
     if (resp.v !== window.local.siteVersion) {
       window.local.siteVersion = resp.v;
       console.log("New Version Available! " + resp.v);
-      /*
-      var alertEl = document.createElement("div");
-      alertEl.classList.add(
-        "alert",
-        "alert-info",
-        "alert-dismissible",
-        "fade",
-        "show"
-      );
-      alertEl.innerHTML =
-        'A new version of Routechoices.com is available! Refresh the page to load.</button><button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>';
-      document.getElementById("django-messages").appendChild(alertEl);
-      */
     }
   } catch {}
 }
