@@ -2599,6 +2599,13 @@ function RCEvent(infoURL, clockURL) {
     });
   }
 
+  function intersectRatio(a, b, c, d) {
+    denominator = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+    return (
+      ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) / denominator
+    );
+  }
+
   function drawCompetitors(refreshMeters) {
     // play/pause button
     if (playbackPaused) {
@@ -2783,7 +2790,33 @@ function RCEvent(infoURL, clockURL) {
                 ) {
                   crossCount++;
                   if (crossCount == rankingFromLap) {
-                    var competitorTime = tPoint.timestamp;
+                    var competitorTime =
+                      allPoints[i - 1].timestamp +
+                      intersectRatio(
+                        map.project(
+                          L.latLng([
+                            allPoints[i - 1].coords.latitude,
+                            allPoints[i - 1].coords.longitude,
+                          ]),
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          L.latLng([
+                            allPoints[i].coords.latitude,
+                            allPoints[i].coords.longitude,
+                          ]),
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          splitLinesPoints[rankingFromSplit][0],
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          splitLinesPoints[rankingFromSplit][1],
+                          intersectionCheckZoom
+                        )
+                      ) *
+                        (tPoint.timestamp - allPoints[i - 1].timestamp);
                     if (
                       !isLive &&
                       !isRealTime &&
@@ -2856,7 +2889,33 @@ function RCEvent(infoURL, clockURL) {
                 ) {
                   crossCount++;
                   if (crossCount == rankingToLap) {
-                    var competitorTime = tPoint.timestamp;
+                    var competitorTime =
+                      allPoints[i - 1].timestamp +
+                      intersectRatio(
+                        map.project(
+                          L.latLng([
+                            allPoints[i - 1].coords.latitude,
+                            allPoints[i - 1].coords.longitude,
+                          ]),
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          L.latLng([
+                            allPoints[i].coords.latitude,
+                            allPoints[i].coords.longitude,
+                          ]),
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          splitLinesPoints[rankingToSplit][0],
+                          intersectionCheckZoom
+                        ),
+                        map.project(
+                          splitLinesPoints[rankingToSplit][1],
+                          intersectionCheckZoom
+                        )
+                      ) *
+                        (tPoint.timestamp - allPoints[i - 1].timestamp);
                     if (
                       !isLive &&
                       !isRealTime &&
