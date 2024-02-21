@@ -610,7 +610,15 @@ class DeviceAdmin(admin.ModelAdmin):
         return ""
 
     def last_coordinates(self, obj):
-        return obj._last_location_latitude, obj._last_location_longitude
+        lat = round(obj._last_location_latitude, 5)
+        lon = round(obj._last_location_longitude, 5)
+        return format_html(
+            '<a href="http://www.openstreetmap.org/?mlat={}&mlon={}" target="_blank">{}, {}</a>',
+            lat,
+            lon,
+            lat,
+            lon,
+        )
 
     location_count.admin_order_field = "_location_count"
     competitor_count.admin_order_field = "competitor_count"
@@ -716,7 +724,7 @@ class MapAdmin(admin.ModelAdmin):
         lat = round(center["lat"], 5)
         lon = round(center["lon"], 5)
         return format_html(
-            '<a href="http://www.openstreetmap.org/?mlat={}&mlon={}">{}, {}</a>',
+            '<a href="http://www.openstreetmap.org/?mlat={}&mlon={}" target="_blank">{}, {}</a>',
             lat,
             lon,
             lat,
