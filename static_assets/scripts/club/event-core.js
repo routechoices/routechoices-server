@@ -236,6 +236,11 @@ function getRunnerIcon(color, faded = false, focused = false) {
   return runnerIcon;
 }
 
+function intersectRatio(a, b, c, d) {
+  denominator = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+  return ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) / denominator;
+}
+
 function getRunnerNameMarker(
   name,
   color,

@@ -2599,13 +2599,6 @@ function RCEvent(infoURL, clockURL) {
     });
   }
 
-  function intersectRatio(a, b, c, d) {
-    denominator = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
-    return (
-      ((d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x)) / denominator
-    );
-  }
-
   function drawCompetitors(refreshMeters) {
     // play/pause button
     if (playbackPaused) {
@@ -2748,75 +2741,52 @@ function RCEvent(infoURL, clockURL) {
             var crossCount = 0;
             var startPointIdx = null;
             for (var i = 1; i < allPoints.length; i++) {
-              var tPoint = allPoints[i];
+              var prevPoint = allPoints[i - 1];
+              var currPoint = allPoints[i];
               if (
                 !isLive &&
                 !isRealTime &&
                 isCustomStart &&
                 competitor.custom_offset &&
-                tPoint.timestamp < competitor.custom_offset
+                currPoint.timestamp < competitor.custom_offset
               ) {
                 continue;
               }
-              if (viewedTime < tPoint.timestamp) {
+              if (viewedTime < currPoint.timestamp) {
                 break;
               }
               if (rankingFromSplit != null) {
+                var prevXY = map.project(
+                  L.latLng([
+                    prevPoint.coords.latitude,
+                    prevPoint.coords.longitude,
+                  ]),
+                  intersectionCheckZoom
+                );
+                var currXY = map.project(
+                  L.latLng([
+                    currPoint.coords.latitude,
+                    currPoint.coords.longitude,
+                  ]),
+                  intersectionCheckZoom
+                );
+                var lineAXY = map.project(
+                  splitLinesPoints[rankingFromSplit][0],
+                  intersectionCheckZoom
+                );
+                var lineBXY = map.project(
+                  splitLinesPoints[rankingFromSplit][1],
+                  intersectionCheckZoom
+                );
                 if (
-                  L.LineUtil.segmentsIntersect(
-                    map.project(
-                      splitLinesPoints[rankingFromSplit][0],
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      splitLinesPoints[rankingFromSplit][1],
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      L.latLng([
-                        tPoint.coords.latitude,
-                        tPoint.coords.longitude,
-                      ]),
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      L.latLng([
-                        allPoints[i - 1].coords.latitude,
-                        allPoints[i - 1].coords.longitude,
-                      ]),
-                      intersectionCheckZoom
-                    )
-                  )
+                  L.LineUtil.segmentsIntersect(prevXY, currXY, lineAXY, lineBXY)
                 ) {
                   crossCount++;
                   if (crossCount == rankingFromLap) {
                     var competitorTime =
-                      allPoints[i - 1].timestamp +
-                      intersectRatio(
-                        map.project(
-                          L.latLng([
-                            allPoints[i - 1].coords.latitude,
-                            allPoints[i - 1].coords.longitude,
-                          ]),
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          L.latLng([
-                            allPoints[i].coords.latitude,
-                            allPoints[i].coords.longitude,
-                          ]),
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          splitLinesPoints[rankingFromSplit][0],
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          splitLinesPoints[rankingFromSplit][1],
-                          intersectionCheckZoom
-                        )
-                      ) *
-                        (tPoint.timestamp - allPoints[i - 1].timestamp);
+                      prevPoint.timestamp +
+                      intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
+                        (currPoint.timestamp - prevPoint.timestamp);
                     if (
                       !isLive &&
                       !isRealTime &&
@@ -2857,65 +2827,42 @@ function RCEvent(infoURL, clockURL) {
             crossCount = 0;
             if (startPointIdx != null) {
               for (var i = startPointIdx; i < allPoints.length; i++) {
-                var tPoint = allPoints[i];
-                if (viewedTime < tPoint.timestamp) {
+                var prevPoint = allPoints[i - 1];
+                var currPoint = allPoints[i];
+                if (viewedTime < currPoint.timestamp) {
                   break;
                 }
+                var prevXY = map.project(
+                  L.latLng([
+                    prevPoint.coords.latitude,
+                    prevPoint.coords.longitude,
+                  ]),
+                  intersectionCheckZoom
+                );
+                var currXY = map.project(
+                  L.latLng([
+                    currPoint.coords.latitude,
+                    currPoint.coords.longitude,
+                  ]),
+                  intersectionCheckZoom
+                );
+                var lineAXY = map.project(
+                  splitLinesPoints[rankingToSplit][0],
+                  intersectionCheckZoom
+                );
+                var lineBXY = map.project(
+                  splitLinesPoints[rankingToSplit][1],
+                  intersectionCheckZoom
+                );
                 if (
-                  L.LineUtil.segmentsIntersect(
-                    map.project(
-                      splitLinesPoints[rankingToSplit][0],
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      splitLinesPoints[rankingToSplit][1],
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      L.latLng([
-                        tPoint.coords.latitude,
-                        tPoint.coords.longitude,
-                      ]),
-                      intersectionCheckZoom
-                    ),
-                    map.project(
-                      L.latLng([
-                        allPoints[i - 1].coords.latitude,
-                        allPoints[i - 1].coords.longitude,
-                      ]),
-                      intersectionCheckZoom
-                    )
-                  )
+                  L.LineUtil.segmentsIntersect(prevXY, currXY, lineAXY, lineBXY)
                 ) {
                   crossCount++;
                   if (crossCount == rankingToLap) {
                     var competitorTime =
-                      allPoints[i - 1].timestamp +
-                      intersectRatio(
-                        map.project(
-                          L.latLng([
-                            allPoints[i - 1].coords.latitude,
-                            allPoints[i - 1].coords.longitude,
-                          ]),
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          L.latLng([
-                            allPoints[i].coords.latitude,
-                            allPoints[i].coords.longitude,
-                          ]),
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          splitLinesPoints[rankingToSplit][0],
-                          intersectionCheckZoom
-                        ),
-                        map.project(
-                          splitLinesPoints[rankingToSplit][1],
-                          intersectionCheckZoom
-                        )
-                      ) *
-                        (tPoint.timestamp - allPoints[i - 1].timestamp);
+                      prevPoint.timestamp +
+                      intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
+                        (currPoint.timestamp - prevPoint.timestamp);
                     if (
                       !isLive &&
                       !isRealTime &&
