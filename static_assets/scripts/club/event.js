@@ -2889,14 +2889,17 @@ function RCEvent(infoURL, clockURL) {
 
                     if (getRelativeTime(competitorTime) > 0) {
                       if (rankingFromSplit != null) {
-                        splitTimes.push({
-                          competitor: competitor,
-                          time:
-                            competitorTime -
-                            startLineCrosses.find(function (c) {
-                              return c.competitor.id === competitor.id;
-                            }).time,
-                        });
+                        var stime =
+                          competitorTime -
+                          startLineCrosses.find(function (c) {
+                            return c.competitor.id === competitor.id;
+                          }).time;
+                        if (stime >= 0) {
+                          splitTimes.push({
+                            competitor: competitor,
+                            time: stime,
+                          });
+                        }
                       } else {
                         splitTimes.push({
                           competitor: competitor,
