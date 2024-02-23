@@ -2899,14 +2899,15 @@ function RCEvent(infoURL, clockURL) {
                             competitor: competitor,
                             time: stime,
                           });
+                          break;
                         }
                       } else {
                         splitTimes.push({
                           competitor: competitor,
                           time: competitorTime,
                         });
+                        break;
                       }
-                      break;
                     }
                   }
                 }
