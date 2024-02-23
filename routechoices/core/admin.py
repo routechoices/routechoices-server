@@ -434,6 +434,7 @@ class EventAdmin(admin.ModelAdmin):
         "db_duration",
         "db_is_live",
         "privacy",
+        "on_frontpage",
         "competitor_count",
         "map_count",
         "link",
@@ -479,6 +480,13 @@ class EventAdmin(admin.ModelAdmin):
 
     db_duration.admin_order_field = "db_duration"
     db_duration.short_description = "Duration"
+
+    @admin.display(boolean=True)
+    def on_frontpage(self, obj):
+        return obj.list_on_routechoices_com
+
+    on_frontpage.admin_order_field = "list_on_routechoices_com"
+    on_frontpage.short_description = "On Frontpage"
 
     @admin.display(boolean=True)
     def db_is_live(self, obj):
