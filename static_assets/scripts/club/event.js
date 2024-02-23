@@ -2814,7 +2814,8 @@ function RCEvent(infoURL, clockURL) {
                         competitor: competitor,
                         time: competitorTime,
                       });
-                      startPointIdx = i + 1;
+                      startPointIdx =
+                        i + (rankingFromSplit != rankingToSplit ? 0 : 1);
                       break;
                     }
                   }
