@@ -2900,6 +2900,8 @@ function RCEvent(infoURL, clockURL) {
                             time: stime,
                           });
                           break;
+                        } else {
+                          crossCount--;
                         }
                       } else {
                         splitTimes.push({
