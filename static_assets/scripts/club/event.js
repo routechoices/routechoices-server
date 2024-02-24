@@ -2809,15 +2809,19 @@ function RCEvent(infoURL, clockURL) {
                           getCompetitorsMinCustomOffset()
                       );
                     }
-                    if (getRelativeTime(competitorTime) > 0) {
-                      startLineCrosses.push({
-                        competitor: competitor,
-                        time: competitorTime,
-                      });
-                      startPointIdx =
-                        i + (rankingFromSplit != rankingToSplit ? 0 : 1);
-                      break;
+
+                    if (getRelativeTime(competitorTime) < 0) {
+                      crossCount--;
+                      continue;
                     }
+
+                    startLineCrosses.push({
+                      competitor: competitor,
+                      time: competitorTime,
+                    });
+                    startPointIdx =
+                      i + (rankingFromSplit != rankingToSplit ? 0 : 1);
+                    break;
                   }
                 }
               } else {
@@ -2887,30 +2891,26 @@ function RCEvent(infoURL, clockURL) {
                       );
                     }
 
-                    if (getRelativeTime(competitorTime) > 0) {
-                      if (rankingFromSplit != null) {
-                        var stime =
-                          competitorTime -
-                          startLineCrosses.find(function (c) {
-                            return c.competitor.id === competitor.id;
-                          }).time;
-                        if (stime >= 0) {
-                          splitTimes.push({
-                            competitor: competitor,
-                            time: stime,
-                          });
-                          break;
-                        } else {
-                          crossCount--;
-                        }
-                      } else {
-                        splitTimes.push({
-                          competitor: competitor,
-                          time: competitorTime,
-                        });
-                        break;
+                    if (getRelativeTime(competitorTime) < 0) {
+                      crossCount--;
+                      continue;
+                    }
+
+                    if (rankingFromSplit != null) {
+                      competitorTime -= startLineCrosses.find(function (c) {
+                        return c.competitor.id === competitor.id;
+                      }).time;
+                      if (competitorTime < 0) {
+                        crossCount--;
+                        continue;
                       }
                     }
+
+                    splitTimes.push({
+                      competitor: competitor,
+                      time: competitorTime,
+                    });
+                    break;
                   }
                 }
               }
