@@ -1238,7 +1238,7 @@ def event_zip(request, event_id):
         for i, competitor in enumerate(event.competitors.all(), start=1):
             if competitor.device_id:
                 data = competitor.gpx
-                filename = f"gpx/{competitor.name} - {competitor.aid}.gpx"
+                filename = f"gpx/{competitor.name} [{competitor.aid}].gpx"
                 with fp.open(filename, "w") as gpx_file:
                     gpx_file.write(data.encode("utf-8"))
         raster_map = event.map
