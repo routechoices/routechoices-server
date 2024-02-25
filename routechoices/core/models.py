@@ -1506,7 +1506,7 @@ class Event(models.Model):
 
         if map_index == 0:
             raster_map = event.map
-            title = event.map_title
+            title = event.map_title or "Main map"
         else:
             assignation = event.map_assignations.all()[map_index - 1]
             raster_map = assignation.map
