@@ -1506,9 +1506,12 @@ class Event(models.Model):
 
         if map_index == 0:
             raster_map = event.map
+            title = event.map_title
         else:
-            raster_map = event.map_assignations.all()[map_index - 1].map
-        return event, raster_map
+            assignation = event.map_assignations.all()[map_index - 1]
+            raster_map = assignation.map
+            title = assignation.title
+        return event, raster_map, title
 
     @classmethod
     def extract_event_lists(cls, request, club=None):

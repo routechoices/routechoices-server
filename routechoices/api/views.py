@@ -1640,7 +1640,7 @@ def device_ownership_api_view(request, club_slug, device_id):
 )
 @api_view(["GET", "HEAD"])
 def event_map_download(request, event_id, map_index="1"):
-    event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
+    event, raster_map, title = Event.get_public_map_at_index(request.user, event_id, map_index)
     file_path = raster_map.path
     mime_type = raster_map.mime_type
 
@@ -1653,7 +1653,7 @@ def event_map_download(request, event_id, map_index="1"):
         request,
         file_path,
         filename=(
-            f"{raster_map.name}_"
+            f"{event.name} - {title}_"
             f"{raster_map.corners_coordinates_short.replace(',', '_')}_."
             f"{mime_type[6:]}"
         ),
@@ -1669,14 +1669,14 @@ def event_map_download(request, event_id, map_index="1"):
 )
 @api_view(["GET", "HEAD"])
 def event_kmz_download(request, event_id, map_index="1"):
-    event, raster_map = Event.get_public_map_at_index(request.user, event_id, map_index)
+    event, raster_map, title = Event.get_public_map_at_index(request.user, event_id, map_index)
     kmz_data = raster_map.kmz
 
     headers = {}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
 
-    filename = f"{raster_map.name}.kmz"
+    filename = f"{event.name} - {title}.kmz"
     response = StreamingHttpRangeResponse(
         request,
         kmz_data,
@@ -1759,7 +1759,7 @@ def two_d_rerun_race_status(request):
             raise Http404()
     if map_idx < 1:
         raise Http404()
-    event, raster_map = Event.get_public_map_at_index(
+    event, raster_map, _  = Event.get_public_map_at_index(
         request.user, event_id, map_idx, load_competitors=True
     )
 
