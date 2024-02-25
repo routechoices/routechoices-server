@@ -97,6 +97,11 @@ urlpatterns = [
         name="event_data",
     ),
     re_path(
+        r"^events/(?P<event_id>[0-9a-zA-Z_-]+)/zip/?$",
+        views.event_zip,
+        name="event_zip",
+    ),
+    re_path(
         r"^maps/(?P<map_id>[-0-9a-zA-Z_]+)/kmz/?$",
         views.map_kmz_download,
         name="map_kmz_download",

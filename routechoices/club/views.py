@@ -353,6 +353,43 @@ def event_export_view(request, slug, **kwargs):
     return response
 
 
+def event_zip_view(request, slug, **kwargs):
+    bypass_resp = handle_legacy_request(
+        request, "event_zip_view", kwargs.get("club_slug"), slug=slug
+    )
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    event = (
+        Event.objects.all()
+        .select_related("club")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
+    )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        if club.domain and not request.use_cname:
+            return redirect(f"{club.nice_url}{slug}/zip")
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    if event.club.domain and not request.use_cname:
+        return redirect(f"{event.club.nice_url}{event.slug}/zip")
+    return redirect(
+        reverse(
+            "event_zip",
+            host="api",
+            kwargs={"event_id": event.aid},
+        )
+    )
+
+
 def event_map_view(request, slug, index="1", **kwargs):
     bypass_resp = handle_legacy_request(
         request, "event_map_view", kwargs.get("club_slug"), slug=slug, index=index
@@ -372,7 +409,9 @@ def event_map_view(request, slug, index="1", **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}{slug}map/{index if index != '1' else ''}")
+            return redirect(
+                f"{club.nice_url}{slug}/map/{index if index != '1' else ''}"
+            )
         return render(
             request,
             "club/404_event.html",
@@ -409,7 +448,9 @@ def event_kmz_view(request, slug, index="1", **kwargs):
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
         if club.domain and not request.use_cname:
-            return redirect(f"{club.nice_url}{slug}kmz/{index if index != '1' else ''}")
+            return redirect(
+                f"{club.nice_url}{slug}/kmz/{index if index != '1' else ''}"
+            )
         return render(
             request,
             "club/404_event.html",

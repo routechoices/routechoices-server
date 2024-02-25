@@ -44,6 +44,12 @@
                     <h3>Export is not available yet...</h3>
                 </div>
             {% else %}
+                {% if event.map_id or event.competitors.all %}
+                    <div class="mb-3">
+                        <a href="{{ event.club.nice_url }}{{ event.slug }}/zip/"
+                           class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-download"></i> Download all data</a>
+                    </div>
+                {% endif %}
                 {% if event.map_id %}
                     <h4 class="padded-multiline">
                         <span>Maps</span>

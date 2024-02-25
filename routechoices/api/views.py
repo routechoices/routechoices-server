@@ -2,6 +2,8 @@ import logging
 import re
 import time
 import urllib.parse
+from io import BytesIO
+from zipfile import ZipFile
 
 import arrow
 import orjson as json
@@ -1201,6 +1203,65 @@ def event_data(request, event_id):
             pass
 
     return Response(response, headers=headers)
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_view(["GET"])
+def event_zip(request, event_id):
+    event = (
+        Event.objects.select_related("club")
+        .filter(aid=event_id, start_date__lt=now())
+        .select_related("map")
+        .prefetch_related(
+            Prefetch(
+                "map_assignations",
+                queryset=MapAssignation.objects.select_related("map"),
+            )
+        )
+        .prefetch_related(
+            Prefetch(
+                "competitors",
+                queryset=Competitor.objects.select_related("device"),
+            )
+        )
+        .first()
+    )
+    if not event:
+        response = {"error": "No event match this id"}
+        return Response(response)
+    event.check_user_permission(request.user)
+    archive = BytesIO()
+    with ZipFile(archive, "w") as fp:
+        for competitor in event.competitors.all():
+            if competitor.device_id:
+                data = competitor.gpx
+                filename = f"gpx/{competitor.name}.gpx"
+                with fp.open(filename, "w") as gpx_file:
+                    gpx_file.write(data.encode("utf-8"))
+        raster_map = event.map
+        if raster_map:
+            data = raster_map.kmz
+            filename = f"kmz/{raster_map.name}.kmz"
+            with fp.open(filename, "w") as kmz_file:
+                kmz_file.write(data)
+        for ass in event.map_assignations.all():
+            raster_map = ass.map
+            data = raster_map.kmz
+            filename = f"kmz/{raster_map.name}.kmz"
+            with fp.open(filename, "w") as kmz_file:
+                kmz_file.write(data)
+    response_data = archive.getbuffer()
+    headers = {"ETag": f'W/"{safe64encodedsha(response_data)}"'}
+    if event.privacy == PRIVACY_PRIVATE:
+        headers["Cache-Control"] = "Private"
+    response = StreamingHttpRangeResponse(
+        request, response_data, content_type="application/zip", headers=headers
+    )
+    response["Content-Disposition"] = set_content_disposition(f"{event.name}.zip")
+    return response
 
 
 @swagger_auto_schema(
