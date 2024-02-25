@@ -1244,13 +1244,13 @@ def event_zip(request, event_id):
         raster_map = event.map
         if raster_map:
             data = raster_map.kmz
-            filename = f"kmz/{raster_map.name}.kmz"
+            filename = f"kmz/{event.map_title or 'Main map'}.kmz"
             with fp.open(filename, "w") as kmz_file:
                 kmz_file.write(data)
         for ass in event.map_assignations.all():
             raster_map = ass.map
             data = raster_map.kmz
-            filename = f"kmz/{raster_map.name}.kmz"
+            filename = f"kmz/{ass.title}.kmz"
             with fp.open(filename, "w") as kmz_file:
                 kmz_file.write(data)
     response_data = archive.getbuffer()
