@@ -1221,23 +1221,50 @@ def event_zip(request, event_id):
                 queryset=MapAssignation.objects.select_related("map"),
             )
         )
-        .prefetch_related(
-            Prefetch(
-                "competitors",
-                queryset=Competitor.objects.select_related("device"),
-            )
-        )
         .first()
     )
     if not event:
         response = {"error": "No event match this id"}
         return Response(response)
     event.check_user_permission(request.user)
+
+    competitors = (
+        event.competitors.select_related("device").all().order_by("start_time", "name")
+    )
+    # We need this to determine the end time of each of this event's competitors
+    # For each devices used in the event we fetch all the competitors that starts during this event's span
+    # We order the device's competitors by their start time
+    # We then pick and for each of this event competitor the other competitor that comes after its own start time
+    max_end_date = min(event.end_date, now())
+    devices_used = (
+        competitor.device_id for competitor in competitors if competitor.device_id
+    )
+    competitors_for_devices_during_event = (
+        Competitor.objects.filter(
+            start_time__gte=event.start_date,
+            start_time__lte=max_end_date,
+            device_id__in=devices_used,
+        )
+        .only("device_id", "start_time")
+        .order_by("start_time")
+    )
+    start_times_by_device = {}
+    for competitor in competitors_for_devices_during_event:
+        start_times_by_device.setdefault(competitor.device_id, [])
+        start_times_by_device[competitor.device_id].append(competitor.start_time)
+
     archive = BytesIO()
     with ZipFile(archive, "w") as fp:
-        for i, competitor in enumerate(event.competitors.all(), start=1):
+        for competitor in competitors:
+            from_date = competitor.start_time
+            end_date = max_end_date
             if competitor.device_id:
-                data = competitor.gpx
+                for start_time in start_times_by_device.get(competitor.device_id, []):
+                    if from_date < start_time < end_date:
+                        end_date = start_time
+                        break
+            if competitor.device_id:
+                data = competitor.device.gpx(from_date, end_date)
                 filename = f"gpx/{competitor.name} [{competitor.aid}].gpx"
                 with fp.open(filename, "w") as gpx_file:
                     gpx_file.write(data.encode("utf-8"))

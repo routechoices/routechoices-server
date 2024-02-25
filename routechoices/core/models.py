@@ -1993,6 +1993,26 @@ class Device(models.Model):
         encoded_locs = gps_data_codec.encode(locs)
         return encoded_locs, len(locs)
 
+    def gpx(self, from_date, end_date):
+        current_site = get_current_site()
+        gpx = gpxpy.gpx.GPX()
+        gpx.creator = current_site.name
+        gpx_track = gpxpy.gpx.GPXTrack()
+        gpx.tracks.append(gpx_track)
+
+        gpx_segment = gpxpy.gpx.GPXTrackSegment()
+        locs, n = self.get_locations_between_dates(from_date, end_date)
+        for location in locs:
+            gpx_segment.points.append(
+                gpxpy.gpx.GPXTrackPoint(
+                    location[LOCATION_LATITUDE_INDEX],
+                    location[LOCATION_LONGITUDE_INDEX],
+                    time=epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
+                )
+            )
+        gpx_track.segments.append(gpx_segment)
+        return gpx.to_xml()
+
     def add_locations(self, loc_array, /, *, save=True):
         if len(loc_array) == 0:
             return
@@ -2382,24 +2402,9 @@ class Competitor(models.Model):
 
     @property
     def gpx(self):
-        current_site = get_current_site()
-        gpx = gpxpy.gpx.GPX()
-        gpx.creator = current_site.name
-        gpx_track = gpxpy.gpx.GPXTrack()
-        gpx.tracks.append(gpx_track)
-
-        gpx_segment = gpxpy.gpx.GPXTrackSegment()
-        locs = self.locations
-        for location in locs:
-            gpx_segment.points.append(
-                gpxpy.gpx.GPXTrackPoint(
-                    location[LOCATION_LATITUDE_INDEX],
-                    location[LOCATION_LONGITUDE_INDEX],
-                    time=epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
-                )
-            )
-        gpx_track.segments.append(gpx_segment)
-        return gpx.to_xml()
+        if not self.device:
+            return ""
+        return self.device.gpx(self.start_datetime, self.end_datetime)
 
     def get_absolute_gpx_url(self):
         return reverse(
