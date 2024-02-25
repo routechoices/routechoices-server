@@ -1204,7 +1204,9 @@ def event_zip(request, event_id):
                 filename = f"gpx/{competitor.name} [{competitor.aid}].gpx"
                 with fp.open(filename, "w") as gpx_file:
                     gpx_file.write(data.encode("utf-8"))
-        raster_maps = [(event.map, event.map_title)]
+        raster_maps = []
+        if event.map:
+            raster_maps.append((event.map, event.map_title or "Main map"))
         for ass in event.map_assignations.all():
             raster_maps.append((ass.map, ass.title))
         for raster_map, title in raster_maps:
