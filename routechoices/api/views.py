@@ -1235,10 +1235,16 @@ def event_zip(request, event_id):
     event.check_user_permission(request.user)
     archive = BytesIO()
     with ZipFile(archive, "w") as fp:
-        for competitor in event.competitors.all():
+        name_occurence = {}
+        for i, competitor in enumerate(event.competitors.all(), start=1):
             if competitor.device_id:
                 data = competitor.gpx
-                filename = f"gpx/{competitor.name}.gpx"
+                name_occurence.setdefault(competitor.name, 0)
+                ext = ""
+                if name_occurence[competitor.name] != 0:
+                    ext = f" ({name_occurence[competitor.name]})"
+                name_occurence[competitor.name] += 1
+                filename = f"gpx/{competitor.name}{ext}.gpx"
                 with fp.open(filename, "w") as gpx_file:
                     gpx_file.write(data.encode("utf-8"))
         raster_map = event.map
