@@ -1423,6 +1423,44 @@ class Event(models.Model):
         ):
             raise PermissionDenied
 
+    def iterate_competitors(self):
+        competitors = (
+            self.competitors.select_related("device")
+            .all()
+            .order_by("start_time", "name")
+        )
+        # We need this to determine the end time of each of this event's competitors
+        # For each devices used in the event we fetch all the competitors that starts during this event's span
+        # We order the device's competitors by their start time
+        # We then pick and for each of this event competitor the other competitor that comes after its own start time
+        max_end_date = min(self.end_date, now())
+        devices_used = (
+            competitor.device_id for competitor in competitors if competitor.device_id
+        )
+        competitors_for_devices_during_event = (
+            Competitor.objects.filter(
+                start_time__gte=self.start_date,
+                start_time__lte=max_end_date,
+                device_id__in=devices_used,
+            )
+            .only("device_id", "start_time")
+            .order_by("start_time")
+        )
+        start_times_by_device = {}
+        for competitor in competitors_for_devices_during_event:
+            start_times_by_device.setdefault(competitor.device_id, [])
+            start_times_by_device[competitor.device_id].append(competitor.start_time)
+
+        for competitor in competitors:
+            from_date = competitor.start_time
+            end_date = max_end_date
+            if competitor.device_id:
+                for start_time in start_times_by_device.get(competitor.device_id, []):
+                    if from_date < start_time < end_date:
+                        end_date = start_time
+                        break
+            yield (competitor, from_date, end_date)
+
     @classmethod
     def get_public_map_at_index(cls, user, event_id, map_index, load_competitors=False):
         """map_index is 1 based"""

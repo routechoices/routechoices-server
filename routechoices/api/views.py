@@ -1132,42 +1132,10 @@ def event_data(request, event_id):
 
     event.check_user_permission(request.user)
 
-    competitors = (
-        event.competitors.select_related("device").all().order_by("start_time", "name")
-    )
-    # We need this to determine the end time of each of this event's competitors
-    # For each devices used in the event we fetch all the competitors that starts during this event's span
-    # We order the device's competitors by their start time
-    # We then pick and for each of this event competitor the other competitor that comes after its own start time
-    max_end_date = min(event.end_date, now())
-    devices_used = (
-        competitor.device_id for competitor in competitors if competitor.device_id
-    )
-    competitors_for_devices_during_event = (
-        Competitor.objects.filter(
-            start_time__gte=event.start_date,
-            start_time__lte=max_end_date,
-            device_id__in=devices_used,
-        )
-        .only("device_id", "start_time")
-        .order_by("start_time")
-    )
-    start_times_by_device = {}
-    for competitor in competitors_for_devices_during_event:
-        start_times_by_device.setdefault(competitor.device_id, [])
-        start_times_by_device[competitor.device_id].append(competitor.start_time)
-
     total_nb_pts = 0
     competitors_data = []
 
-    for competitor in competitors:
-        from_date = competitor.start_time
-        end_date = max_end_date
-        if competitor.device_id:
-            for start_time in start_times_by_device.get(competitor.device_id, []):
-                if from_date < start_time < end_date:
-                    end_date = start_time
-                    break
+    for competitor, from_date, end_date in event.iterate_competitors():
         encoded_data = ""
         if competitor.device_id:
             encoded_data, nb_pts = competitor.device.get_locations_between_dates(
@@ -1228,56 +1196,20 @@ def event_zip(request, event_id):
         return Response(response)
     event.check_user_permission(request.user)
 
-    competitors = (
-        event.competitors.select_related("device").all().order_by("start_time", "name")
-    )
-    # We need this to determine the end time of each of this event's competitors
-    # For each devices used in the event we fetch all the competitors that starts during this event's span
-    # We order the device's competitors by their start time
-    # We then pick and for each of this event competitor the other competitor that comes after its own start time
-    max_end_date = min(event.end_date, now())
-    devices_used = (
-        competitor.device_id for competitor in competitors if competitor.device_id
-    )
-    competitors_for_devices_during_event = (
-        Competitor.objects.filter(
-            start_time__gte=event.start_date,
-            start_time__lte=max_end_date,
-            device_id__in=devices_used,
-        )
-        .only("device_id", "start_time")
-        .order_by("start_time")
-    )
-    start_times_by_device = {}
-    for competitor in competitors_for_devices_during_event:
-        start_times_by_device.setdefault(competitor.device_id, [])
-        start_times_by_device[competitor.device_id].append(competitor.start_time)
-
     archive = BytesIO()
     with ZipFile(archive, "w") as fp:
-        for competitor in competitors:
-            from_date = competitor.start_time
-            end_date = max_end_date
-            if competitor.device_id:
-                for start_time in start_times_by_device.get(competitor.device_id, []):
-                    if from_date < start_time < end_date:
-                        end_date = start_time
-                        break
+        for competitor, from_date, end_date in event.iterate_competitors():
             if competitor.device_id:
                 data = competitor.device.gpx(from_date, end_date)
                 filename = f"gpx/{competitor.name} [{competitor.aid}].gpx"
                 with fp.open(filename, "w") as gpx_file:
                     gpx_file.write(data.encode("utf-8"))
-        raster_map = event.map
-        if raster_map:
-            data = raster_map.kmz
-            filename = f"kmz/{event.map_title or 'Main map'}.kmz"
-            with fp.open(filename, "w") as kmz_file:
-                kmz_file.write(data)
+        raster_maps = [(event.map, event.map_title)]
         for ass in event.map_assignations.all():
-            raster_map = ass.map
+            raster_maps.append((ass.map, ass.title))
+        for raster_map, title in raster_maps:
             data = raster_map.kmz
-            filename = f"kmz/{ass.title}.kmz"
+            filename = f"kmz/{title}.kmz"
             with fp.open(filename, "w") as kmz_file:
                 kmz_file.write(data)
     response_data = archive.getbuffer()
@@ -1907,52 +1839,24 @@ def two_d_rerun_race_data(request):
 
     event.check_user_permission(request.user)
 
-    competitors = event.competitors.all()
-    devices = (c.device_id for c in competitors if c.device_id)
-    # we need this to determine the end time of the competitor device stream
-    all_devices_competitors = (
-        Competitor.objects.filter(
-            start_time__gte=event.start_date, device_id__in=devices
-        )
-        .only("device_id", "start_time")
-        .order_by("start_time")
-    )
-    start_times_by_device = {}
-    for c in all_devices_competitors:
-        start_times_by_device.setdefault(c.device_id, [])
-        start_times_by_device[c.device_id].append(c.start_time)
-
     total_nb_pts = 0
     results = []
-    for c in competitors:
-        from_date = c.start_time
-        next_competitor_start_time = None
-        if c.device_id:
-            for nxt in start_times_by_device.get(c.device_id, []):
-                if nxt > c.start_time:
-                    next_competitor_start_time = nxt
-                    break
-        end_date = now()
-        if next_competitor_start_time:
-            end_date = min(next_competitor_start_time, end_date)
-        end_date = min(event.end_date, end_date)
-        nb_pts = 0
-        locations = []
-        if c.device_id:
-            locations, nb_pts = c.device.get_locations_between_dates(
+    for competitor, from_date, end_date in event.iterate_competitors():
+        if competitor.device_id:
+            locations, nb_pts = competitor.device.get_locations_between_dates(
                 from_date, end_date
             )
-        total_nb_pts += nb_pts
-        results += [
-            [
-                c.aid,
-                location[LOCATION_LATITUDE_INDEX],
-                location[LOCATION_LONGITUDE_INDEX],
-                0,
-                epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
+            total_nb_pts += nb_pts
+            results += [
+                [
+                    competitor.aid,
+                    location[LOCATION_LATITUDE_INDEX],
+                    location[LOCATION_LONGITUDE_INDEX],
+                    0,
+                    epoch_to_datetime(location[LOCATION_TIMESTAMP_INDEX]),
+                ]
+                for location in locations
             ]
-            for location in locations
-        ]
     response_json = {
         "containslastpos": 1,
         "lastpos": total_nb_pts,
