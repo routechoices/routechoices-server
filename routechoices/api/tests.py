@@ -368,7 +368,7 @@ class EventApiTestCase(EssentialApiBase):
         device = Device.objects.create()
         device.add_location(arrow.get().shift(minutes=-72).timestamp(), 0.2, 0.1)
         competitor = Competitor.objects.create(
-            name="Alice B",
+            name="Alice",
             short_name="A",
             event=event,
             device=device,
@@ -409,9 +409,15 @@ class EventApiTestCase(EssentialApiBase):
             "api",
             {"competitor_id": competitor.aid},
         )
-        res = self.client.get(f"{url}")
+        res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, 'lat="0.2" lon="0.1"')
+
+        url = self.reverse_and_check(
+            "event_zip", f"/events/{event.aid}/zip", "api", {"event_id": event.aid}
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_live_event_data(self):
         cache.clear()

@@ -253,6 +253,20 @@ class ClubViewsTestCase(EssentialApiBase):
         response = self.client.get(response["Location"])
         self.assertEqual(response.status_code, 200)
 
+        # event zip
+        url = self.reverse_and_check(
+            "event_zip_view",
+            "/kiila-cup-1/zip",
+            host="clubs",
+            host_kwargs={"club_slug": "kiilat"},
+            extra_kwargs={"slug": "kiila-cup-1"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response["Location"])
+        self.assertEqual(response.status_code, 200)
+
         # event thumbnail
         url = self.reverse_and_check(
             "event_map_thumbnail",
