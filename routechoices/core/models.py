@@ -997,9 +997,9 @@ class Map(models.Model):
             ]
             colors = [
                 (255, 255, 255, 200),
-                line_color],
+                line_color,
                 (255, 255, 255, 200),
-                line_color],
+                line_color,
             ]
                 
             for i, w in enumerate(widths):
