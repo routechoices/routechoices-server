@@ -988,7 +988,7 @@ class Map(models.Model):
         for pt in waypoints:
             map_pt = new_map.wsg84_to_map_xy(pt[0], pt[1], round_values=True)
             widths = [66, 63, 11, 8]
-            thicknesses = [22, 16, 22,16]
+            thicknesses = [22, 16, 22, 16]
             fills = [
                 (0, 0, 0, 0),
                 None,
@@ -1001,7 +1001,7 @@ class Map(models.Model):
                 (255, 255, 255, 200),
                 line_color,
             ]
-                
+
             for i, w in enumerate(widths):
                 wr = w * res_scale
                 draw.ellipse(
