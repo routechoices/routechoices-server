@@ -177,37 +177,23 @@ class ClubForm(ModelForm):
         with Image.open(logo.file) as image:
             rgba_img = image.convert("RGBA")
             target = min([256, w, h])
-            if w < h:
+            if w > h:
                 resized_image = rgba_img.resize(
-                    (target, int(image.size[1] * (target / image.size[0])))
+                    (target, int(target * image.size[1] / image.size[0]))
                 )
-                required_loss = resized_image.size[1] - target
-                sqare_image = resized_image.crop(
-                    box=(
-                        0,
-                        required_loss / 2,
-                        target,
-                        resized_image.size[1] - required_loss / 2,
-                    )
-                )
+                offsets = (0, int((target - resized_image.size[1]) / 2))
             else:
                 resized_image = rgba_img.resize(
-                    (int(image.size[0] * (target / image.size[1])), target)
+                    (int(target * image.size[0] / image.size[1]), target)
                 )
-                required_loss = resized_image.size[0] - target
-                sqare_image = resized_image.crop(
-                    box=(
-                        required_loss / 2,
-                        0,
-                        resized_image.size[0] - required_loss / 2,
-                        target,
-                    )
-                )
+                offsets = (int((target - resized_image.size[0]) / 2), 0)
+            square_image = Image.new("RGBA", (target, target), (0, 0, 0, 0))
+            square_image.paste(resized_image, offsets)
             out_buffer = BytesIO()
             params = {
                 "dpi": (72, 72),
             }
-            sqare_image.save(out_buffer, "PNG", **params)
+            square_image.save(out_buffer, "PNG", **params)
             f_new = File(out_buffer, name=fn)
             return f_new
 
