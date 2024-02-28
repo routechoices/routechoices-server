@@ -5,6 +5,7 @@
     btn.prepend('<i class="fa-solid fa-spinner fa-spin me-1"></i>');
   });
   u("#id_token")
+    .addClass("font-monospace")
     .attr({
       placeholder: "••••••",
       maxLength: 6,
