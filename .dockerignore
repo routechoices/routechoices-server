@@ -16,10 +16,8 @@ LICENSE
 Makefile
 package.json
 README.md
-yarn.lock
 *.json.gz
 *.sqlite3
-yarn.lock
 .git/*
 .coverage
 coverage.xml

@@ -78,12 +78,11 @@ jobs:
           command: |
             export NVM_DIR="/opt/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm install v18 && nvm use v18 && nvm alias default v18
+            nvm install v20 && nvm use v20 && nvm alias default v20
             node -v
-            curl -o- -L https://yarnpkg.com/install.sh | bash
-            ~/.yarn/bin/yarn add cypress@^13 cypress-real-events
-            ~/.yarn/bin/yarn install
-            TZ=Europe/Helsinki ~/.yarn/bin/yarn cypress run --browser chrome
+            npm install --global pnpm
+            pnpm install
+            TZ=Europe/Helsinki pnpm cypress run --browser chrome
       - run: docker kill --signal=HUP rc_django
       - run: sleep 5
       - run: ./dc exec django coverage xml

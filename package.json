@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "preinstall": "npx only-allow pnpm"
+  },
+  "engines": {
+    "npm": "Please use pnpm",
+    "yarn": "Please use pnpm"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
     "cypress": "^13",
