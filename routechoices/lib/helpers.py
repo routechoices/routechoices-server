@@ -11,7 +11,7 @@ import zoneinfo
 from datetime import datetime
 from math import cos, pi, sin
 
-import requests
+from curl_cffi import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
@@ -344,7 +344,7 @@ def check_txt_record(domain):
 
     try:
         resp = requests.get(
-            f"https://cloudflare-dns.com/dns-query?type=TXT&name={requests.utils.quote(domain)}",
+            f"https://cloudflare-dns.com/dns-query?type=TXT&name={urllib.parse.quote(domain)}",
             headers={"accept": "application/dns-json"},
             timeout=10,
         )
@@ -376,7 +376,7 @@ def check_cname_record(domain):
 
     try:
         resp = requests.get(
-            f"https://cloudflare-dns.com/dns-query?type=CNAME&name={requests.utils.quote(domain)}",
+            f"https://cloudflare-dns.com/dns-query?type=CNAME&name={urllib.parse.quote(domain)}",
             headers={"accept": "application/dns-json"},
             timeout=10,
         )

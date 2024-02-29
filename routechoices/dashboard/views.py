@@ -6,7 +6,6 @@ from copy import deepcopy
 from io import StringIO
 
 import gpxpy
-import requests
 from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import default_token_generator
@@ -16,6 +15,7 @@ from allauth.account.utils import user_username
 from allauth.account.views import EmailView
 from allauth.decorators import rate_limit
 from allauth.utils import build_absolute_uri
+from curl_cffi import requests
 from defusedxml import minidom
 from django.conf import settings
 from django.contrib import messages

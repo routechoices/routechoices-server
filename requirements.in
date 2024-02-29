@@ -2,6 +2,7 @@ arrow
 beautifulsoup4
 coverage
 cryptography
+curl_cffi
 defusedxml
 diskcache
 django>=5.0
@@ -36,9 +37,7 @@ pillow-heif
 pillow
 psycopg
 python-magic
-requests
 sentry-sdk
 sewer @ git+https://github.com/rphlo/sewer@0.8.4a
 tornado
 uwsgi
-websocket-client

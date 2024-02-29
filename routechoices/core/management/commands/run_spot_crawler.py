@@ -1,7 +1,7 @@
 import time
 
 import arrow
-import requests
+from curl_cffi import requests
 from defusedxml import minidom
 from django.core.management.base import BaseCommand
 
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                         f"startDate={last_fetch}&endDate={now}"
                     )
                     last_fetched[feed.id] = now
-                    res = requests.get(url)
+                    res = requests.get(url, timeout=10)
                     if res.status_code == 200:
                         try:
                             n += self.parse_response(res.text)

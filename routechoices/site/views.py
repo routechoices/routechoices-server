@@ -1,10 +1,10 @@
 from decimal import Decimal
 
 import arrow
-import requests
 from allauth.account.forms import LoginForm
 from allauth.account.models import EmailAddress
 from allauth.account.views import LoginView
+from curl_cffi import requests
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core.mail import EmailMessage

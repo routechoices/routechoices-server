@@ -54,6 +54,7 @@ PyPi Packages:
     arrow                       Apache Software License
     beautifulsoup4              MIT License
     cryptography                Apache Software License; BSD License
+    curl_cffi                   MIT License
     defusedxml                  Python Software Foundation License
     diskcache                   Apache Software License
     django                      BSD License
@@ -85,11 +86,9 @@ PyPi Packages:
     pip-tools                   BSD License
     psycopg2                    GNU Library or Lesser General Public License (LGPL)
     python-magic                MIT License
-    requests                    Apache Software License
     sewer                       MIT License
     tornado                     Apache Software License
     uWSGI                       GNU General Public License v2 or later (GPLv2+)
-    websocket-client            Apache Software License
 
 Fonts:
 ------

@@ -6,8 +6,8 @@ import urllib.parse
 from io import BytesIO
 
 import arrow
-import requests
 from bs4 import BeautifulSoup
+from curl_cffi import requests
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
