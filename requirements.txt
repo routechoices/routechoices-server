@@ -19,7 +19,7 @@ curl-cffi==0.6.1
 cython==3.0.8
 defusedxml==0.7.1
 diskcache==5.6.3
-django==5.0.2
+django==5.0.3
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git@09f8b0ad150754be88d20c0e7c6a1473b8006872
 django-allauth==0.61.1
 django-appconf==1.0.6
