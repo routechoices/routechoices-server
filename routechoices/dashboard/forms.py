@@ -343,14 +343,14 @@ class EventForm(ModelForm):
         if start_date and end_date and end_date < start_date:
             raise ValidationError("Start Date must be before End Date")
 
-    def clean_list_on_routechoices_com(self):
-        club = self.club
-        listed = self.cleaned_data.get("list_on_routechoices_com")
-        if not club.upgraded and listed:
-            raise ValidationError(
-                "Only partners can list their events on routechoices.com events page"
-            )
-        return listed
+    # def clean_list_on_routechoices_com(self):
+    #    club = self.club
+    #    listed = self.cleaned_data.get("list_on_routechoices_com")
+    #    if not club.upgraded and listed:
+    #        raise ValidationError(
+    #            "Only partners can list their events on routechoices.com events page"
+    #        )
+    #    return listed
 
     def clean_map(self):
         raster_map = self.cleaned_data.get("map")

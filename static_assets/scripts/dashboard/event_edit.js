@@ -110,9 +110,9 @@ function addCompetitor(name, shortName, startTime, deviceId) {
 }
 
 function displayRoutechoicesListedOption(value, first) {
-  if (value === "public" && window.local.clubUpgraded) {
+  if (value === "public") {
     u("#id_list_on_routechoices_com").parent().parent().show();
-    if (!first) {
+    if (!first && window.local.clubUpgraded) {
       u("#id_list_on_routechoices_com").first().checked = true;
     }
   } else {
