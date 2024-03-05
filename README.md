@@ -8,12 +8,12 @@ Server stack for a live GPS tracking solution for orienteering events.
 
 It includes:
 
-  - A frontend for listing events and displaying live and archived events
-  - A dashboard for users to manage their events
-  - A public API
+  - A web frontend for listing events and displaying live and archived events
+  - A web dashboard for users to manage their events, maps, devices...
+  - A REST API
   - A TCP server for listening to dedicated trackers
   - A WMS server for serving events maps
-  - A full-fledged admin interface for owners
+  - A full-fledged web admin interface for owners
 
 This project rely on the Django and the Tornado Web python frameworks.
 
