@@ -15,11 +15,11 @@
     <div class="row">
         <div class="col-12">
             {% if event %}
-                <h3>{{ event.name }}</h3>
+                <h2>{{ event.name }}</h2>
                 <div class="row">
                     <div class="col-12 col-md-8">
                         <div class="mb-2">
-                            <h6>Links for all</h6>
+                            <h6 class="fw-bold">Links for all</h6>
                             <a href="{{ event.get_absolute_url }}"
                                class="btn btn-primary btn-sm mb-1 me-1"><i class="fa-solid fa-right-to-bracket"></i> Event Page</a>
                             {% if not event.hidden %}
@@ -35,8 +35,8 @@
                                 </a>
                             {% endif %}
                         </div>
-                        <div class="mb-2">
-                            <h6>Links for admins</h6>
+                        <div class="mb-2 ">
+                            <h6 class="fw-bold">Links for admins</h6>
                             {% if event.started %}
                                 <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}"
                                    class="btn btn-secondary btn-sm me-1 mb-1"
