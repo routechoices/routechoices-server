@@ -1073,7 +1073,6 @@ def event_edit_view(request, event_id):
         ):
             form.save()
             formset.save()
-            extra_map_formset.instance = event
             extra_map_formset.save()
             prev_text = ""
             if event.has_notice:
@@ -1091,6 +1090,7 @@ def event_edit_view(request, event_id):
             if request.POST.get("save_continue"):
                 return redirect("dashboard:event_edit_view", event_id=event.aid)
             return redirect("dashboard:event_list_view")
+
         for cform in formset.forms:
             if cform.cleaned_data.get("device"):
                 all_devices_id.add(cform.cleaned_data.get("device").id)

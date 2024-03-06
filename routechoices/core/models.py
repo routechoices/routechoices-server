@@ -1884,7 +1884,6 @@ class MapAssignation(models.Model):
     title = models.CharField(max_length=255)
 
     class Meta:
-        unique_together = (("map", "event"), ("event", "title"))
         ordering = ["id"]
 
 
