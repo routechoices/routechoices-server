@@ -20,13 +20,13 @@
                     </div>
                 </div>
             {% endif %}
-            <h1>
+            <h2>
                 {% if context == 'edit' %}
                     Edit Event Set
                 {% else %}
                     New Event Set
                 {% endif %}
-            </h1>
+            </h2>
             <form action="" method="post">
                 {% csrf_token %}
                 {% bootstrap_form form %}
