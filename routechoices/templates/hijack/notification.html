@@ -16,7 +16,9 @@
                   method="post"
                   class="djhj-actions">
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
+                <input type="hidden"
+                       name="next"
+                       value="{% host_url 'admin:auth_user_changelist' host 'admin' %}">
                 <button class="djhj-button" id="djhj-hide-btn" type="button">hide</button>
                 <button class="djhj-button" id="djhj-release-btn" type="submit">release</button>
             </form>

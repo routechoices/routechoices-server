@@ -145,5 +145,5 @@ urlpatterns = [
         views.dashboard_banner_download,
         name="dashboard_banner_download",
     ),
-    path("hijack/", include("hijack.urls")),
+    path("hijack/release/", views.MyReleaseUserView.as_view(), name="hijack_release"),
 ]

@@ -28,8 +28,10 @@ from django.dispatch import receiver
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
+from hijack.views import ReleaseUserView
 from kagi.views.backup_codes import BackupCodesView
 from PIL import Image
 from user_sessions.views import SessionDeleteOtherView
@@ -1567,3 +1569,16 @@ def device_list_download(request):
     filename = f"device_list_{club.slug}.csv"
     response["Content-Disposition"] = set_content_disposition(filename)
     return response
+
+
+class MyReleaseUserView(ReleaseUserView):
+    def get_redirect_url(self):
+        """Return the user-originating redirect URL if it's safe."""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name, self.request.GET.get(self.redirect_field_name, "")
+        )
+        url_is_safe = url_has_allowed_host_and_scheme(
+            url=redirect_to,
+            allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS,
+        )
+        return redirect_to if url_is_safe else ""
