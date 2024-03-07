@@ -1,4 +1,4 @@
-{% load hijack %}
+{% load hijack hosts %}
 {% if request.user|can_hijack:another_user %}
     <button type="button"
             class="button"
@@ -6,7 +6,7 @@
                    font-weight: bold"
             data-hijack-user="{{ another_user.pk }}"
             data-hijack-next="{{ next }}"
-            data-hijack-url="{% url 'hijack:acquire' %}">
+            data-hijack-url="{% host_url 'hijack:acquire' host 'www' %}">
         {% if is_user_admin %}
             HIJACK
         {% else %}
