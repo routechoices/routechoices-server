@@ -224,11 +224,7 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
 
 class CorsMiddleware(OrigCorsMiddleware):
     def is_enabled(self, request):
-        return (
-            request.host.name == "api"
-            or (request.host.name == "dashboard" and request.path == "/")
-            or (request.host.name == "www" and request.path == "/login/")
-        ) and super().is_enabled(request)
+        return (request.host.name == "api") and super().is_enabled(request)
 
 
 class CsrfViewMiddleware(OrigCsrfViewMiddleware):
