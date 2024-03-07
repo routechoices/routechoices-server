@@ -14,16 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
-
-admin.site.site_header = "Admin"
-admin.site.site_title = "Admin Site"
-admin.site.index_title = "Welcome to the administration site"
 
 sitemaps = {
     "static": StaticViewSitemap,
@@ -35,7 +30,6 @@ urlpatterns = [
     path("account/logout/", RedirectView.as_view(url="/logout")),
     path("account/signup/", RedirectView.as_view(url="/signup")),
     path("account/", include("allauth.urls")),
-    path("admin/", admin.site.urls),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
     path(
         "dashboard/",
