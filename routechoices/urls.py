@@ -43,7 +43,6 @@ urlpatterns = [
         "webhooks/",
         include(("routechoices.webhooks.urls", "webhooks"), namespace="webhooks"),
     ),
-    path("hijack/", include("hijack.urls")),
     path(
         "sitemap.xml",
         sitemaps_views.index,

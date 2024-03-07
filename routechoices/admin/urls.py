@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 admin.site.site_header = "Admin"
 admin.site.site_title = "Admin Site"
@@ -9,4 +9,5 @@ admin.site.site_url = f"//www.{settings.PARENT_HOST}"
 
 urlpatterns = [
     path("", admin.site.urls),
+    path("hijack/", include("hijack.urls")),
 ]
