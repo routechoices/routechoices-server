@@ -1,10 +1,14 @@
 {% load hijack hosts %}
 {% if request.user|can_hijack:another_user %}
-    <form action="{% host_url 'hijack:acquire' host 'admin' %}"
-          method="post"
-          class="djhj-actions">
-        {% csrf_token %}
-        <input type="hidden" name="user_pk" value="{{ another_user.pk }}">
-        <button class="button" style="padding: 2px 5px" type="submit">HIJACK</button>
-    </form>
+    <button type="button"
+            class="button"
+            data-hijack-user="{{ another_user.pk }}"
+            data-hijack-next="{{ next }}"
+            data-hijack-url="{% host_url 'hijack:acquire' host 'admin' %}">
+        {% if is_user_admin %}
+            HIJACK
+        {% else %}
+            Hijack {{ username }}
+        {% endif %}
+    </button>
 {% endif %}

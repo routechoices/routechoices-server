@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import arrow
 from allauth.account.models import EmailAddress
+from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
@@ -791,6 +792,12 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
         "clean_fake_users",
     ]
     show_facets = False
+
+    @property
+    def media(self):
+        return super(UserAdmin, self).media + forms.Media(
+            js=["scripts/admin/hijack.min.js"]
+        )
 
     def get_list_filter(self, request):
         return super().get_list_filter(request) + (HasClubsFilter,)
