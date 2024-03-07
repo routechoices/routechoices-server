@@ -1,5 +1,5 @@
 from allauth.account import views as allauth_views
-from django.urls import include, re_path
+from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 from user_sessions import views as user_sessions_views
 
@@ -145,4 +145,5 @@ urlpatterns = [
         views.dashboard_banner_download,
         name="dashboard_banner_download",
     ),
+    path("hijack/", include("hijack.urls")),
 ]

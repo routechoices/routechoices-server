@@ -12,7 +12,7 @@
             <div class="djhj-message">
                 You are currently working on behalf of <em>{{ request.user }}</em>.
             </div>
-            <form action="{% host_url 'hijack:release' host 'admin' %}"
+            <form action="{% host_url 'hijack:release' host 'dashboard' %}"
                   method="post"
                   class="djhj-actions">
                 {% csrf_token %}
