@@ -82,7 +82,7 @@
     content: "Start time (UTC)";
   }
   .competitor-table td:nth-of-type(4) {
-    min-height: 5.5em;
+    min-height: 7.5em;
   }
   .competitor-table td:nth-of-type(5):before {
     content: "Delete";

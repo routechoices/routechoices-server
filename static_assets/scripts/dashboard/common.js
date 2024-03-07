@@ -39,7 +39,7 @@ var makeFieldNowable = function (el) {
 var makeTimeFieldClearable = function (el) {
   var localTimeDisplay = u(el).parent().find(".local_time");
   localTimeDisplay.before(
-    '<button class="set_time_null_btn btn btn-info btn-sm ms-1 py-1 px-2 float-end" type="button"><i class="fa-solid fa-xmark"></i> Clear</button>'
+    '<button class="set_time_null_btn btn btn-info btn-sm ms-1 mb-1 py-1 px-2 float-end" type="button"><i class="fa-solid fa-xmark"></i> Clear</button>'
   );
   u(el)
     .parent()
