@@ -1,13 +1,19 @@
 from allauth.account import views as allauth_views
-from django.urls import re_path
+from django.urls import include, re_path
+from django.views.generic.base import RedirectView
 from user_sessions import views as user_sessions_views
 
 from routechoices.dashboard import views
+
+app_name = "dashboard"
 
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
     re_path(r"^account/emails/?$", views.email_view, name="account_emails"),
+    re_path(r"^account/mfa/login/?$", RedirectView.as_view(url="/login")),
+    re_path(r"^account/mfa/backup-codes/?$", views.backup_codes, name="backup-codes"),
+    re_path(r"^account/mfa/", include("kagi.urls", namespace="kagi")),
     re_path(
         r"^account/change-password/?$",
         allauth_views.password_change,
@@ -121,4 +127,22 @@ urlpatterns = [
         name="quick_event_view",
     ),
     re_path(r"^upgrade/?$", views.upgrade, name="upgrade"),
+    re_path(
+        r"^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
+        r"(?P<map_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        views.dashboard_map_download,
+        name="dashboard_map_download",
+    ),
+    re_path(
+        r"^media/logos/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
+        r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        views.dashboard_logo_download,
+        name="dashboard_logo_download",
+    ),
+    re_path(
+        r"^media/banners/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
+        r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        views.dashboard_banner_download,
+        name="dashboard_banner_download",
+    ),
 ]

@@ -34,7 +34,7 @@
                     <i class="fa-solid fa-floppy-disk"></i> Save
                 </button>
                 {% if context == 'edit' %}
-                    <a href="{% url 'dashboard:event_set_delete_view' event_set_id=event_set.aid %}"
+                    <a href="{% host_url 'event_set_delete_view' event_set_id=event_set.aid host 'dashboard' %}"
                        class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
                 {% endif %}
             </form>
@@ -47,7 +47,7 @@
             <ul>
                 {% for event in event_set.events.all %}
                     <li>
-                        <a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a>
+                        <a href="{% host_url 'event_edit_view' event_id=event.aid host 'dashboard' %}">{{ event.name }}</a>
                     </li>
                 {% endfor %}
             </ul>

@@ -24,30 +24,32 @@ from routechoices.core.models import (
 
 class EssentialDashboardBase(APITestCase):
     def setUp(self):
-        self.client = APIClient(HTTP_HOST="www.routechoices.dev")
+        self.client = APIClient(HTTP_HOST="dashboard.routechoices.dev")
         self.club = Club.objects.create(name="My Club", slug="myclub")
         self.user = User.objects.create_user(
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
         )
         self.club.admins.set([self.user])
         self.client.force_login(self.user)
-        self.client.get(f"/dashboard/club/{self.club.aid}")
+        self.client.get(f"/club/{self.club.aid}")
 
     def reverse_and_check(
         self,
         path,
         expected,
+        host="dashboard",
         extra_kwargs=None,
         host_kwargs=None,
+        prefix=None,
     ):
-        url = reverse(path, host="www", kwargs=extra_kwargs, host_kwargs=host_kwargs)
-        self.assertEqual(url, f"//www.routechoices.dev{expected}")
+        url = reverse(path, host=host, kwargs=extra_kwargs, host_kwargs=host_kwargs)
+        self.assertEqual(url, f"//{prefix or host}.routechoices.dev{expected}")
         return url
 
 
 class TestDashboard(EssentialDashboardBase):
     def test_change_club_slug(self):
-        url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
+        url = self.reverse_and_check("club_view", "/club")
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -95,7 +97,7 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "Domain prefix already registered.")
 
     def test_change_club_logo(self):
-        url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
+        url = self.reverse_and_check("club_view", "/club")
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -159,7 +161,7 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "The image is too small, minimum 128x128 pixels")
 
     def test_change_club_banner(self):
-        url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
+        url = self.reverse_and_check("club_view", "/club")
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -225,24 +227,20 @@ class TestDashboard(EssentialDashboardBase):
     def test_device_lists(self):
         device = Device.objects.create()
 
-        url = self.reverse_and_check(
-            "dashboard:device_add_view", "/dashboard/devices/new"
-        )
+        url = self.reverse_and_check("device_add_view", "/devices/new")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         res = self.client.post(url, {"device": device.id, "nickname": "MyTrckr"})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
 
-        url = self.reverse_and_check("dashboard:device_list_view", "/dashboard/devices")
+        url = self.reverse_and_check("device_list_view", "/devices")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, device.id)
         self.assertContains(res, "MyTrckr")
 
-        url = self.reverse_and_check(
-            "dashboard:device_list_download", "/dashboard/devices.csv"
-        )
+        url = self.reverse_and_check("device_list_download", "/devices.csv")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, f"MyTrckr;{device.aid};\n")
@@ -254,9 +252,7 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, f"MyTrckr;{device.aid};012345678901237\n")
 
     def test_delete_club(self):
-        url = self.reverse_and_check(
-            "dashboard:club_delete_view", "/dashboard/club/delete"
-        )
+        url = self.reverse_and_check("club_delete_view", "/club/delete")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res = self.client.post(url, {"password": "not the password"})
@@ -285,8 +281,8 @@ class TestDashboard(EssentialDashboardBase):
         raster_map.save()
 
         url = self.reverse_and_check(
-            "dashboard:map_edit_view",
-            f"/dashboard/maps/{raster_map.aid}",
+            "map_edit_view",
+            f"/maps/{raster_map.aid}",
             extra_kwargs={"map_id": raster_map.aid},
         )
         res = self.client.get(url)
@@ -310,8 +306,8 @@ class TestDashboard(EssentialDashboardBase):
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
 
         url = self.reverse_and_check(
-            "dashboard:map_delete_view",
-            f"/dashboard/maps/{raster_map.aid}/delete",
+            "map_delete_view",
+            f"/maps/{raster_map.aid}/delete",
             extra_kwargs={"map_id": raster_map.aid},
         )
         res = self.client.get(url)
@@ -323,8 +319,8 @@ class TestDashboard(EssentialDashboardBase):
     def test_edit_event_sets(self):
         # Create event set
         url = self.reverse_and_check(
-            "dashboard:event_set_create_view",
-            "/dashboard/event-sets/new",
+            "event_set_create_view",
+            "/event-sets/new",
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -333,8 +329,8 @@ class TestDashboard(EssentialDashboardBase):
 
         # List event set
         url = self.reverse_and_check(
-            "dashboard:event_set_list_view",
-            "/dashboard/event-sets",
+            "event_set_list_view",
+            "/event-sets",
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -343,30 +339,30 @@ class TestDashboard(EssentialDashboardBase):
         # Edit event set
         es = EventSet.objects.all().first()
         url = self.reverse_and_check(
-            "dashboard:event_set_edit_view",
-            f"/dashboard/event-sets/{es.aid}",
+            "event_set_edit_view",
+            f"/event-sets/{es.aid}",
             extra_kwargs={"event_set_id": es.aid},
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res = self.client.post(url, {"name": "Easy Competition"})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
-        res = self.client.get("/dashboard/event-sets")
+        res = self.client.get("/event-sets")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertNotContains(res, "Tough Competition")
         self.assertContains(res, "Easy Competition")
 
         # Delete event set
         url = self.reverse_and_check(
-            "dashboard:event_set_delete_view",
-            f"/dashboard/event-sets/{es.aid}/delete",
+            "event_set_delete_view",
+            f"/event-sets/{es.aid}/delete",
             extra_kwargs={"event_set_id": es.aid},
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res = self.client.post(url)
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
-        res = self.client.get("/dashboard/event-sets")
+        res = self.client.get("/event-sets")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertNotContains(res, "Tough Competition")
         self.assertNotContains(res, "Easy Competition")
@@ -381,8 +377,8 @@ class TestDashboard(EssentialDashboardBase):
             end_date=arrow.get("2023-08-01T23:59:59Z").datetime,
         )
         url = self.reverse_and_check(
-            "dashboard:event_delete_view",
-            f"/dashboard/events/{event.aid}/delete",
+            "event_delete_view",
+            f"/events/{event.aid}/delete",
             extra_kwargs={"event_id": event.aid},
         )
         res = self.client.get(url)
@@ -409,8 +405,8 @@ class TestDashboard(EssentialDashboardBase):
             comps.append(c)
         Competitor.objects.bulk_create(comps)
         url = self.reverse_and_check(
-            "dashboard:event_competitors_view",
-            f"/dashboard/events/{event.aid}/competitors",
+            "event_competitors_view",
+            f"/events/{event.aid}/competitors",
             extra_kwargs={"event_id": event.aid},
         )
         res = self.client.get(url)
@@ -419,7 +415,7 @@ class TestDashboard(EssentialDashboardBase):
 
 class TestInviteFlow(APITestCase):
     def setUp(self):
-        self.client = APIClient(HTTP_HOST="www.routechoices.dev")
+        self.client = APIClient(HTTP_HOST="dashboard.routechoices.dev")
         self.club = Club.objects.create(name="My Club", slug="myclub")
         self.user = User.objects.create_user(
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
@@ -438,8 +434,8 @@ class TestInviteFlow(APITestCase):
 
     def test_request_invite(self):
         self.client.force_login(self.user2)
-        self.client.get("/dashboard/request-invite/")
-        res = self.client.post("/dashboard/request-invite/", {"club": self.club.id})
+        self.client.get("/request-invite")
+        res = self.client.post("/request-invite", {"club": self.club.id})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue(
@@ -454,11 +450,9 @@ class TestInviteFlow(APITestCase):
 
     def test_send_invite(self):
         self.client.force_login(self.user)
-        self.client.get(f"/dashboard/club/{self.club.aid}")
-        self.client.get("/dashboard/club/send-invite/")
-        res = self.client.post(
-            "/dashboard/club/send-invite/", {"email": self.user2.email}
-        )
+        self.client.get(f"/club/{self.club.aid}")
+        self.client.get("/club/send-invite/")
+        res = self.client.post("/club/send-invite/", {"email": self.user2.email})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue(

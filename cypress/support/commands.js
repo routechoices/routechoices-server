@@ -64,7 +64,7 @@ Cypress.Commands.add("createMap", (name = "Jukola 2019 - 1st Leg") => {
     "Jukola_1st_leg_blank_61.45075_24.18994_61.44656_24.24721_61.42094_24.23851_61.42533_24.18156_.jpg";
   cy.get("#id_image").selectFile("cypress/fixtures/" + mapFileName);
   cy.get("#submit-btn").click();
-  cy.url().should("match", /\/dashboard\/maps$/);
+  cy.url().should("match", /\/maps$/);
 });
 
 Cypress.Commands.add("forceVisit", (url) => {

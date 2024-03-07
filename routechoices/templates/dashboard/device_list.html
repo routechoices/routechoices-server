@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 hash compress %}
+{% load static django_bootstrap5 hash compress hosts %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -11,12 +11,12 @@
     <div class="row">
         <div class="mb3">
             {% if not devices %}<p>You haven't added any devices.</p>{% endif %}
-            <a href="{% url 'dashboard:device_add_view' %}"
+            <a href="{% host_url 'device_add_view' host 'dashboard' %}"
                class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Add new device</a>
             {% if devices %}
                 <br>
                 <br>
-                <a href="{% url 'dashboard:device_list_download' %}"
+                <a href="{% host_url 'device_list_download' host 'dashboard' %}"
                    class="btn btn-info mb-1"><i class="fa-solid fa-download"></i> Download device list</a>
             {% endif %}
         </div>

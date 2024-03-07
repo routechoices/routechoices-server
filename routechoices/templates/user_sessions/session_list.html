@@ -1,5 +1,5 @@
 {% extends "user_sessions/_base.html" %}
-{% load user_sessions i18n %}
+{% load user_sessions i18n hosts %}
 {% block sub_sub_content %}
     {% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}
     {% trans "<em>unknown</em>" as unknown %}
@@ -29,7 +29,7 @@
     </table>
     {% if object_list.count > 1 %}
         <form method="post"
-              action="{% url 'dashboard:account_session_delete_other' %}">
+              action="{% host_url 'account_session_delete_other' host 'dashboard' %}">
             {% csrf_token %}
             <p>
                 {% blocktrans %}You can end all other sessions but the current.

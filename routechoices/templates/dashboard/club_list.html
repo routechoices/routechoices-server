@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 compress %}
+{% load static django_bootstrap5 compress hosts %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -14,18 +14,19 @@
                     <h3>Welcome to your dashboard.</h3>
                     <p>It seems you don't have a club yet! No worries...</p>
                     <p>
-                        You can: <a href="{% url 'dashboard:club_create_view' %}" class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+                        You can: <a href="{% host_url 'club_create_view' host 'dashboard' %}"
+    class="btn btn-primary"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
                     </p>
                     <p>
-                        Or ask to join the list of admins of an existing club: <a href="{% url 'dashboard:club_request_invite_view' %}"
+                        Or ask to join the list of admins of an existing club: <a href="{% host_url 'club_request_invite_view' host 'dashboard' %}"
     class="btn btn-primary"><i class="fa-solid fa-hand"></i> Request an invite</a>
                     </p>
                 </div>
             {% else %}
                 <h3>Select one of your club</h3>
-                <a href="{% url 'dashboard:club_create_view' %}"
+                <a href="{% host_url 'club_create_view' host 'dashboard' %}"
                    class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
-                <a href="{% url 'dashboard:club_request_invite_view' %}"
+                <a href="{% host_url 'club_request_invite_view' host 'dashboard' %}"
                    class="btn btn-primary mb-1"><i class="fa-solid fa-hand"></i> Request an invite</a>
                 {% if clubs.paginator.num_pages > 1 %}
                     {% bootstrap_pagination clubs extra=request.GET.urlencode pages_to_show=4 %}
@@ -41,7 +42,7 @@
                                     <div>
                                         <a class="link-primary-alt stretched-link text-decoration-none fw-bold"
                                            style="font-size: 1.2rem"
-                                           href="{% url 'dashboard:club_set_view' club_id=club.aid %}?next={{ next }}">{{ club.name }}</a>
+                                           href="{% host_url 'club_set_view' club_id=club.aid host 'dashboard' %}?next={{ next }}">{{ club.name }}</a>
                                     </div>
                                 </div>
                             </div>

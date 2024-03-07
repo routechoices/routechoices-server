@@ -1,16 +1,12 @@
 import datetime
 
-from routechoices.lib.helpers import get_current_site
-
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
-
 from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
+from django_hosts.resolvers import reverse
+
+from routechoices.lib.helpers import get_current_site
 
 from . import signals
 from .adapters import get_invitations_adapter
@@ -47,7 +43,9 @@ class Invitation(AbstractBaseInvitation):
 
     def send_invitation(self, request, **kwargs):
         current_site = get_current_site()
-        invite_url = reverse(app_settings.CONFIRMATION_URL_NAME, args=[self.key])
+        invite_url = reverse(
+            app_settings.CONFIRMATION_URL_NAME, args=[self.key], host="www"
+        )
         invite_url = request.build_absolute_uri(invite_url)
         ctx = kwargs
         ctx.update(

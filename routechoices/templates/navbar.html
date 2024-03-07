@@ -47,8 +47,8 @@
             <ul class="navbar-nav d-flex">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="text-nowrap nav-link me-2 dashboard-navbar-link{% if request.resolver_match.view_name|slice:":10" == 'dashboard:' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %} active{% endif %}"
-                           href="{% host_url 'dashboard:home_view' %}"><i class="fa-solid fa-table-columns"></i> Dashboard</a>
+                        <a class="text-nowrap nav-link me-2 dashboard-navbar-link{% if request.host.regex == 'dashboard' %} active{% endif %}"
+                           href="{% host_url 'home_view' host 'dashboard' %}"><i class="fa-solid fa-table-columns"></i> Dashboard</a>
                     </li>
                     <li class="nav-item">
                         <a href="{% host_url 'site:account_logout' host 'www' %}"

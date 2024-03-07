@@ -27,9 +27,9 @@ from django.db.models import Case, Q, Value, When
 from django.dispatch import receiver
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.timezone import now
+from django_hosts.resolvers import reverse
 from kagi.views.backup_codes import BackupCodesView
 from PIL import Image
 from user_sessions.views import SessionDeleteOtherView
@@ -111,7 +111,7 @@ def requires_club_in_session(function):
                 admins=request.user,
             ).first()
         if club is None:
-            club_select_page = reverse("dashboard:club_select_view")
+            club_select_page = reverse("club_select_view", host="dashboard")
             return redirect(f"{club_select_page}?next={request.path}")
         request.session["dashboard_club"] = club.aid
         request.club = club
@@ -125,7 +125,7 @@ def requires_club_in_session(function):
 @login_required
 @requires_club_in_session
 def home_view(request):
-    return redirect("dashboard:club_view")
+    return redirect(reverse("club_view", host="dashboard"))
 
 
 @login_required
@@ -143,7 +143,7 @@ def club_invite_add_view(request):
             invite.save()
             invite.send_invitation(request)
             messages.success(request, "Invite sent successfully")
-            return redirect("dashboard:club_view")
+            return redirect(reverse("club_view", host="dashboard"))
     else:
         form = InviteForm(initial={"email": email})
     return render(
@@ -163,7 +163,9 @@ def club_request_invite_view(request):
         if form.is_valid():
             club = form.cleaned_data["club"]
             current_site = get_current_site()
-            url = build_absolute_uri(request, reverse("dashboard:club_invite_add_view"))
+            url = build_absolute_uri(
+                request, reverse("club_invite_add_view", host="dashboard")
+            )
             requester_email = (
                 EmailAddress.objects.filter(user_id=request.user.id, primary=True)
                 .first()
@@ -187,7 +189,7 @@ def club_request_invite_view(request):
                 context,
             )
             messages.success(request, "Invite requested successfully")
-            return redirect("dashboard:home_view")
+            return redirect(reverse("home_view", host="dashboard"))
     else:
         form = RequestInviteForm(user=request.user)
     return render(request, "dashboard/request_invite.html", {"form": form})
@@ -214,7 +216,7 @@ def account_edit_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved.")
-            return redirect("dashboard:account_edit_view")
+            return redirect(reverse("account_edit_view", host="dashboard"))
     else:
         form = UserForm(instance=request.user)
     return render(
@@ -239,7 +241,7 @@ def account_delete_view(request):
                 request.user.delete()
                 request.session.user_id = None
                 messages.success(request, "Account deleted.")
-                return redirect("site:home_view")
+                return redirect(reverse("site:home_view"))
             return render(
                 request,
                 "dashboard/account_delete_confirm.html",
@@ -248,7 +250,9 @@ def account_delete_view(request):
 
         temp_key = token_generator.make_token(user)
         current_site = get_current_site()
-        url = build_absolute_uri(request, reverse("dashboard:account_delete_view"))
+        url = build_absolute_uri(
+            request, reverse("account_delete_view", host="dashboard")
+        )
         context = {
             "current_site": current_site,
             "user": user,
@@ -347,7 +351,7 @@ def device_add_view(request):
             ownership.nickname = form.cleaned_data["nickname"]
             ownership.save()
             messages.success(request, "Device added successfully")
-            return redirect("dashboard:device_list_view")
+            return redirect(reverse("device_list_view", host="dashboard"))
         form.fields["device"].queryset = Device.objects.none()
     else:
         form = DeviceForm()
@@ -374,7 +378,9 @@ def club_create_view(request):
             club.save()
             form.save_m2m()
             messages.success(request, "Club created successfully")
-            return redirect("dashboard:club_set_view", club_id=club.aid)
+            return redirect(
+                reverse("club_set_view", host="dashboard", kwargs={"club_id": club.aid})
+            )
     else:
         form = ClubForm(initial={"admins": request.user})
     form.fields["admins"].queryset = User.objects.filter(id=request.user.id)
@@ -394,7 +400,7 @@ def club_set_view(request, club_id):
     next_page = request.GET.get("next")
     if next_page:
         return redirect(next_page)
-    return redirect("dashboard:club_view")
+    return redirect(reverse("club_view", host="dashboard"))
 
 
 @login_required
@@ -409,7 +415,7 @@ def club_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:club_view")
+            return redirect(reverse("club_view", host="dashboard"))
     else:
         form = ClubForm(instance=club)
     form.fields["admins"].queryset = User.objects.filter(id__in=club.admins.all())
@@ -435,7 +441,7 @@ def club_custom_domain_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:club_custom_domain_view")
+            return redirect(reverse("club_custom_domain_view", host="dashboard"))
     else:
         form = ClubDomainForm(instance=club)
     return render(
@@ -458,10 +464,10 @@ def club_delete_view(request):
         password = request.POST.get("password")
         if not request.user.check_password(password):
             messages.error(request, "Invalid password")
-            return redirect("dashboard:club_delete_view")
+            return redirect(reverse("club_delete_view", host="dashboard"))
         club.delete()
         messages.success(request, "Club deleted")
-        return redirect("dashboard:club_select_view")
+        return redirect(reverse("club_select_view", host="dashboard"))
     return render(
         request,
         "dashboard/club_delete.html",
@@ -496,7 +502,7 @@ def map_create_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Map created successfully")
-            return redirect("dashboard:map_list_view")
+            return redirect(reverse("map_list_view", host="dashboard"))
     else:
         form = MapForm()
     return render(
@@ -525,7 +531,7 @@ def map_edit_view(request, map_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:map_list_view")
+            return redirect(reverse("map_list_view", host="dashboard"))
     else:
         form = MapForm(instance=raster_map)
 
@@ -555,7 +561,7 @@ def map_delete_view(request, map_id):
     if request.method == "POST":
         raster_map.delete()
         messages.success(request, "Map deleted")
-        return redirect("dashboard:map_list_view")
+        return redirect(reverse("map_list_view", host="dashboard"))
     return render(
         request,
         "dashboard/map_delete.html",
@@ -654,7 +660,7 @@ def map_gpx_upload_view(request):
                 messages.error(request, error)
             else:
                 messages.success(request, "The import of the map was successful")
-                return redirect("dashboard:map_list_view")
+                return redirect(reverse("map_list_view", host="dashboard"))
     else:
         form = UploadMapGPXForm()
     return render(
@@ -790,7 +796,7 @@ def map_kmz_upload_view(request):
                         " was successful"
                     ),
                 )
-                return redirect("dashboard:map_list_view")
+                return redirect(reverse("map_list_view", host="dashboard"))
             else:
                 messages.error(request, "Could not find maps in this file")
     else:
@@ -837,7 +843,7 @@ def event_set_create_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Event set created successfully")
-            return redirect("dashboard:event_set_list_view")
+            return redirect(reverse("event_set_list_view", host="dashboard"))
     else:
         form = EventSetForm(club=club)
     return render(
@@ -867,7 +873,7 @@ def event_set_edit_view(request, event_set_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:event_set_list_view")
+            return redirect(reverse("event_set_list_view", host="dashboard"))
     else:
         form = EventSetForm(instance=event_set, club=club)
     return render(
@@ -890,7 +896,7 @@ def event_set_delete_view(request, event_set_id):
     if request.method == "POST":
         event_set.delete()
         messages.success(request, "Event set deleted")
-        return redirect("dashboard:event_list_view")
+        return redirect(reverse("event_list_view", host="dashboard"))
     return render(
         request,
         "dashboard/event_set_delete.html",
@@ -953,8 +959,14 @@ def event_create_view(request):
             notice.save()
             messages.success(request, "Event created successfully")
             if request.POST.get("save_continue"):
-                return redirect("dashboard:event_edit_view", event_id=event.aid)
-            return redirect("dashboard:event_list_view")
+                return redirect(
+                    reverse(
+                        "event_edit_view",
+                        host="dashboard",
+                        kwargs={"event_id": event.aid},
+                    )
+                )
+            return redirect(reverse("event_list_view", host="dashboard"))
 
         all_devices_id = set()
         for cform in formset.forms:
@@ -1088,8 +1100,14 @@ def event_edit_view(request, event_id):
                 notice.save()
             messages.success(request, "Changes saved successfully")
             if request.POST.get("save_continue"):
-                return redirect("dashboard:event_edit_view", event_id=event.aid)
-            return redirect("dashboard:event_list_view")
+                return redirect(
+                    reverse(
+                        "event_edit_view",
+                        host="dashboard",
+                        kwargs={"event_id": event.aid},
+                    )
+                )
+            return redirect(reverse("event_list_view", host="dashboard"))
 
         for cform in formset.forms:
             if cform.cleaned_data.get("device"):
@@ -1210,7 +1228,11 @@ def event_competitors_view(request, event_id):
         if formset.is_valid():
             formset.save()
             messages.success(request, "Changes saved successfully")
-            return redirect("dashboard:event_edit_view", event_id=event.aid)
+            return redirect(
+                reverse(
+                    "event_edit_view", host="dashboard", kwargs={"event_id": event.aid}
+                )
+            )
 
         for cform in formset.forms:
             if cform.cleaned_data.get("device"):
@@ -1290,7 +1312,7 @@ def event_delete_view(request, event_id):
     if request.method == "POST":
         event.delete()
         messages.success(request, "Event deleted")
-        return redirect("dashboard:event_list_view")
+        return redirect(reverse("event_list_view", host="dashboard"))
 
     return render(
         request,
@@ -1434,7 +1456,13 @@ def event_route_upload_view(request, event_id):
                     messages.warning(
                         request, "Some points were outside of the event schedule..."
                     )
-                return redirect("dashboard:event_edit_view", event_id=event.aid)
+                return redirect(
+                    reverse(
+                        "event_edit_view",
+                        host="dashboard",
+                        kwargs={"event_id": event.aid},
+                    )
+                )
 
     else:
         form = UploadGPXForm()
@@ -1470,7 +1498,7 @@ def logoutOtherSessionsAfterPassChange(request, user, **kwargs):
 
 class CustomSessionDeleteOtherView(SessionDeleteOtherView):
     def get_success_url(self):
-        return str(reverse("dashboard:account_session_list"))
+        return str(reverse("account_session_list", host="dashboard"))
 
 
 @method_decorator(rate_limit(action="manage_email"), name="dispatch")

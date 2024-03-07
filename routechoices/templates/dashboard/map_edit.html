@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 compress %}
+{% load static django_bootstrap5 compress hosts %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -51,7 +51,7 @@
                     <i class="fa-solid fa-floppy-disk"></i> Save
                 </button>
                 {% if context == 'edit' %}
-                    <a href="{% url 'dashboard:map_delete_view' map_id=map.aid %}"
+                    <a href="{% host_url 'map_delete_view' map_id=map.aid host 'dashboard' %}"
                        class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
                 {% endif %}
             </form>
@@ -62,7 +62,7 @@
                     <ul>
                         {% for event in used_in %}
                             <li>
-                                <a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a>
+                                <a href="{% host_url 'event_edit_view' event_id=event.aid host 'dashboard' %}">{{ event.name }}</a>
                             </li>
                         {% endfor %}
                     </ul>

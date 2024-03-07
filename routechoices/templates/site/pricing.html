@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static django_bootstrap5 compress %}
+{% load static django_bootstrap5 compress hosts %}
 {% block head_title %}
     Pricing | {{ site.name }} | Live GPS tracking for orienteering
 {% endblock head_title %}
@@ -107,7 +107,8 @@
                                 You can become partner and join the following clubs and individuals that contribute to maintain the platform alive.
                             </p>
                             <p>
-                                <a href="{% url "dashboard:upgrade" %}" class="btn btn-success mb-1">Become a Partner Club</a>
+                                <a href="{% host_url 'upgrade' host 'dashboard' %}"
+                                   class="btn btn-success mb-1">Become a Partner Club</a>
                                 <br />
                                 <button id="become-ind-partner-btn"
                                         data-bs-toggle="modal"

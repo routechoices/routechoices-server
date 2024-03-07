@@ -1,24 +1,30 @@
 {% extends "kagi/base.html" %}
+{% load hosts %}
 {% block sub_sub_content %}
     <h3>WebAuthn</h3>
     {% if webauthn_enabled %}
-        <a class="btn btn-primary mb-1" href="{% url 'kagi:webauthn-keys' %}">Manage WebAuthn keys</a>
+        <a class="btn btn-primary mb-1"
+           href="{% host_url 'kagi:webauthn-keys' host 'dashboard' %}">Manage WebAuthn keys</a>
     {% else %}
-        <a class="btn btn-primary" href="{% url 'kagi:add-webauthn-key' %}">Add a key</a>
+        <a class="btn btn-primary"
+           href="{% host_url 'kagi:add-webauthn-key' host 'dashboard' %}">Add a key</a>
     {% endif %}
     <hr />
     <h3>TOTP</h3>
     {% if totp_enabled %}
-        <a class="btn btn-primary mb-1" href="{% url 'kagi:totp-devices' %}">Manage TOTP (Authenticator) devices</a>
+        <a class="btn btn-primary mb-1"
+           href="{% host_url 'kagi:totp-devices' host 'dashboard' %}">Manage TOTP (Authenticator) devices</a>
     {% else %}
-        <a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">Add a TOTP (Authenticator) Device</a>
+        <a class="btn btn-primary"
+           href="{% host_url 'kagi:add-totp' host 'dashboard' %}">Add a TOTP (Authenticator) Device</a>
     {% endif %}
     <hr />
     <h3>Backup codes</h3>
     {% if backup_codes_count %}
-        <a class="btn btn-primary mb-1" href="{% url 'backup-codes' %}">Manage backup codes</a>
+        <a class="btn btn-primary mb-1"
+           href="{% host_url 'backup-codes' host 'dashboard' %}">Manage backup codes</a>
     {% else %}
-        <form method="post" action="{% url 'backup-codes' %}">
+        <form method="post" action="{% host_url 'backup-codes' host 'dashboard' %}">
             {% csrf_token %}
             <input type="submit"
                    class="btn btn-primary"

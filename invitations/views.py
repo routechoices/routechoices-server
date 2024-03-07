@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
+from django_hosts.resolvers import reverse
 
 from .adapters import get_invitations_adapter
 from .app_settings import app_settings
@@ -83,7 +84,7 @@ class AcceptInvite(SingleObjectMixin, View):
                     request=self.request,
                     signal_sender=self.__class__,
                 )
-                return redirect("dashboard:club_select_view")
+                return redirect(reverse("club_select_view", host="dashboard"))
             get_invitations_adapter().stash_verified_email(
                 self.request, invitation.email
             )

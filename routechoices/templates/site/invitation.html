@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static django_bootstrap5 %}
+{% load static django_bootstrap5 hosts %}
 {% block content %}
     {% if not target_user %}
         <h3>Invite is targeted to a different email address than yours</h3>
@@ -7,7 +7,7 @@
             You were invited to manage club {{ invitation.club }}, however the email provided for the invite is not listed in your account's email addresses.
         </p>
         <p>
-            To continue you can either add that email address to your account <a href={% url 'dashboard:account_emails' %}>here</a>, or create a new account in which case you need to <a href={% url 'site:account_logout' %}>logout</a> first.
+            To continue you can either add that email address to your account <a href={% host_url 'account_emails' host 'dashboard' %}>here</a>, or create a new account in which case you need to <a href={% url 'site:account_logout' %}>logout</a> first.
         </p>
     {% elif not invitation %}
         <h3>Invite cannot be found</h3>

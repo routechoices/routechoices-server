@@ -154,7 +154,15 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
         club_slug = None
         if raw_host.endswith(default_subdomain_suffix):
             slug = raw_host[: -(len(default_subdomain_suffix))].lower()
-            if slug not in ("api", "map", "registration", "tiles", "wms", "www"):
+            if slug not in (
+                "api",
+                "dashboard",
+                "map",
+                "registration",
+                "tiles",
+                "wms",
+                "www",
+            ):
                 cache_key = f"club_slug_exists:{slug}"
                 cached_slug = cache.get(cache_key)
                 if cached_slug:

@@ -18,36 +18,36 @@
         </div>
     </div>
     <a class="btn btn-success btn-sm mb-3"
-       href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
+       href="{% host_url 'club_select_view' host 'dashboard' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
     {% if not club.upgraded %}
         <p class="p-1 text-center"
            style="color: #000;
                   background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
-            Support the platform, <a href="{% url 'dashboard:upgrade' %}"
+            Support the platform, <a href="{% host_url 'upgrade' host 'dashboard' %}"
     style="color:var(--bs-info)"
     class="fw-bold">Become Partner!</a>
         </p>
     {% endif %}
     <ul class="nav nav-tabs mb-3">
         <li>
-            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:club_view dashboard:club_custom_domain_view dashboard:club_invite_add_view' %}active{% endif %}"
-               href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club Info</a>
+            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'club_view club_custom_domain_view club_invite_add_view' %}active{% endif %}"
+               href="{% host_url 'club_view' host 'dashboard' %}"><i class="fa-solid fa-house-flag"></i> Club Info</a>
         </li>
         <li>
-            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:device_list_view dashboard:device_add_view' %}active{% endif %}"
-               href="{% url 'dashboard:device_list_view' %}"><i class="fa-solid fa-mobile-screen-button"></i> Devices</a>
+            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'device_list_view device_add_view' %}active{% endif %}"
+               href="{% host_url 'device_list_view' host 'dashboard' %}"><i class="fa-solid fa-mobile-screen-button"></i> Devices</a>
         </li>
         <li>
-            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:map_list_view dashboard:map_create_view dashboard:map_upload_kmz_view dashboard:map_upload_gpx_view dashboard:map_edit_view dashboard:map_draw_view' %}active{% endif %}"
-               href="{% url 'dashboard:map_list_view' %}"><i class="fa-regular fa-map"></i>  Maps</a>
+            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'map_list_view map_create_view map_upload_kmz_view map_upload_gpx_view map_edit_view map_draw_view' %}active{% endif %}"
+               href="{% host_url 'map_list_view' host 'dashboard' %}"><i class="fa-regular fa-map"></i>  Maps</a>
         </li>
         <li>
-            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:event_set_list_view dashboard:event_set_create_view dashboard:event_set_edit_view' %}active{% endif %}"
-               href="{% url 'dashboard:event_set_list_view' %}"><i class="fa-solid fa-folder-open"></i> Event Sets</a>
+            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'event_set_list_view event_set_create_view event_set_edit_view' %}active{% endif %}"
+               href="{% host_url 'event_set_list_view' host 'dashboard' %}"><i class="fa-solid fa-folder-open"></i> Event Sets</a>
         </li>
         <li>
-            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'dashboard:event_list_view dashboard:event_create_view dashboard:event_edit_view dashboard:event_route_upload_view dashboard:quick_event_view' %}active{% endif %}"
-               href="{% url 'dashboard:event_list_view' %}"><i class="fa-solid fa-trophy"></i> Events</a>
+            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name in 'event_list_view event_create_view event_edit_view event_route_upload_view quick_event_view' %}active{% endif %}"
+               href="{% host_url 'event_list_view' host 'dashboard' %}"><i class="fa-solid fa-trophy"></i> Events</a>
         </li>
     </ul>
     {% block sub_sub_content %}
@@ -56,7 +56,7 @@
         </p>
         <p>
             <a class="btn btn-info mb-1 me-1"
-               href="{% url 'dashboard:club_custom_domain_view' %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
+               href="{% host_url 'club_custom_domain_view' host 'dashboard' %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
             {% if club.analytics_site %}
                 <a href="{{ club.analytics_site }}" class="btn btn-info mb-1"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a>
             {% endif %}
@@ -65,7 +65,7 @@
         <h2>Edit info</h2>
         <p id="invite-btn">
             <a class="btn btn-info mb-1"
-               href="{% url 'dashboard:club_invite_add_view' %}"><i class="fa-solid fa-user-plus"></i> Invite more people</a>
+               href="{% host_url 'club_invite_add_view' host 'dashboard' %}"><i class="fa-solid fa-user-plus"></i> Invite more people</a>
         </p>
         <form action=""
               method="post"
@@ -76,7 +76,7 @@
             <button type="submit" class="btn btn-primary mb-1 me-1" id="submit-btn">
                 <i class="fa-solid fa-floppy-disk"></i> Save
             </button>
-            <a href="{% url 'dashboard:club_delete_view' %}"
+            <a href="{% host_url 'club_delete_view' host 'dashboard' %}"
                class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
         </form>
         {% if club.upgraded %}
@@ -88,7 +88,7 @@
     {% endblock sub_sub_content %}
 {% endblock sub_content %}
 {% block extra_body %}
-    {% if request.resolver_match.view_name == 'dashboard:club_view' %}
+    {% if request.resolver_match.view_name == 'club_view' %}
         <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-slug="{{club.slug}}" data-club-nice-url="{{club.nice_url}}" data-club-has-analytics="{% if club.analytics_site %}1{% endif %}">
         </script>
         {% compress js %}
@@ -97,8 +97,8 @@
             <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
             <script src="{% static '/vendor/slugify-1.6.5/slugify.js' %}"></script>
             <script src="{% static '/scripts/dashboard/common.js' %}"></script>
-            <script src="{% static '/scripts/dashboard/club_edit.js' %}"></script>
             <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
+            <script src="{% static '/scripts/dashboard/club_edit.js' %}"></script>
         {% endcompress %}
     {% endif %}
 {% endblock extra_body %}
