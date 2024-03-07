@@ -11,6 +11,7 @@ fontawesomeSubset(
     regular: ["window-restore", "map", "copy", "clock", "eye", "eye-slash"],
     solid: [
       "expand",
+      "compress",
       "arrows-rotate",
       "trash-can",
       "triangle-exclamation",
