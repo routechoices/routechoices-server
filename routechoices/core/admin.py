@@ -61,16 +61,26 @@ class EventDateRangeFilter(admin.SimpleListFilter):
             ("today", "Today"),
             ("yesterday", "Yesterday"),
             ("future", "Future"),
+            ("this_week", "This week"),
+            ("last_week", "Last week"),
             ("last_7_days", "Last 7 days"),
-            ("last_30_days", "Last 30 days"),
             ("this_month", "Month to date"),
             ("last_month", "Last month"),
+            ("last_30_days", "Last 30 days"),
             ("this_year", "Year to date"),
             ("last_year", "Last year"),
+            ("last_365_days", "Last 365 days"),
         ]
 
     def queryset(self, request, queryset):
         time_now = arrow.utcnow()
+        if self.value() == "now":
+            return queryset.filter(
+                start_date__lte=time_now.datetime,
+                end_date__gte=time_now.datetime,
+            )
+        if self.value() == "future":
+            return queryset.filter(start_date__gt=time_now.datetime)
         if self.value() == "today":
             today = time_now.date()
             return queryset.filter(
@@ -93,10 +103,31 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 end_date__date__gte=time_now.shift(days=-30).date(),
                 start_date__lte=time_now.datetime,
             )
+        if self.value() == "last_365_days":
+            return queryset.filter(
+                end_date__date__gte=time_now.shift(days=-365).date(),
+                start_date__lte=time_now.datetime,
+            )
+        if self.value() == "this_week":
+            return queryset.filter(
+                end_date__date__gte=time_now.floor("week").date(),
+                start_date__lte=time_now.datetime,
+            )
         if self.value() == "this_month":
             return queryset.filter(
                 end_date__date__gte=time_now.floor("month").date(),
                 start_date__lte=time_now.datetime,
+            )
+        if self.value() == "this_year":
+            return queryset.filter(
+                end_date__date__gte=time_now.floor("year").date(),
+                start_date__lte=time_now.datetime,
+            )
+        if self.value() == "last_week":
+            one_week_ago = time_now.shift(months=-1)
+            return queryset.filter(
+                end_date__date__gte=one_week_ago.floor("month").date(),
+                start_date__date__lte=one_week_ago.ceil("month").date(),
             )
         if self.value() == "last_month":
             one_month_ago = time_now.shift(months=-1)
@@ -104,23 +135,11 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 end_date__date__gte=one_month_ago.floor("month").date(),
                 start_date__date__lte=one_month_ago.ceil("month").date(),
             )
-        if self.value() == "this_year":
-            return queryset.filter(
-                end_date__date__gte=time_now.floor("year").date(),
-                start_date__lte=time_now.datetime,
-            )
         if self.value() == "last_year":
             one_year_ago = time_now.shift(years=-1)
             return queryset.filter(
                 end_date__date__gte=one_year_ago.floor("year").date(),
                 start_date__date__lte=one_year_ago.ceil("year").date(),
-            )
-        if self.value() == "future":
-            return queryset.filter(start_date__gt=time_now.datetime)
-        if self.value() == "now":
-            return queryset.filter(
-                start_date__lte=time_now.datetime,
-                end_date__gte=time_now.datetime,
             )
         if self.value():
             return queryset
@@ -135,12 +154,15 @@ class ModifiedDateFilter(admin.SimpleListFilter):
             ("all", "All"),
             (None, "Today"),
             ("yesterday", "Yesterday"),
+            ("this_week", "This week"),
+            ("last_week", "Last week"),
             ("last_7_days", "Last 7 days"),
-            ("last_30_days", "Last 30 days"),
-            ("this_month", "Month to date"),
+            ("this_month", "This month"),
             ("last_month", "Last month"),
-            ("this_year", "Year to date"),
+            ("last_30_days", "Last 30 days"),
+            ("this_year", "This year"),
             ("last_year", "Last year"),
+            ("last_365_days", "Last 365 days"),
         ]
 
     def choices(self, cl):
@@ -172,31 +194,39 @@ class ModifiedDateFilter(admin.SimpleListFilter):
             return queryset.filter(
                 modification_date__date__gte=time_now.shift(days=-7).date()
             )
+        if self.value() == "last_365_days":
+            return queryset.filter(
+                modification_date__date__gte=time_now.shift(days=-365).date()
+            )
+        if self.value() == "this_week":
+            return queryset.filter(
+                modification_date__date__gte=time_now.floor("week").date()
+            )
         if self.value() == "this_month":
             return queryset.filter(
                 modification_date__date__gte=time_now.floor("month").date()
-            )
-        if self.value() == "last_month":
-            return queryset.filter(
-                modification_date__date__gte=time_now.shift(months=-1)
-                .floor("month")
-                .date(),
-                modification_date__date__lte=time_now.shift(months=-1)
-                .ceil("month")
-                .date(),
             )
         if self.value() == "this_year":
             return queryset.filter(
                 modification_date__date__gte=time_now.floor("year").date()
             )
-        if self.value() == "last_year":
+        if self.value() == "last_week":
+            one_week_ago = time_now.shift(days=-7)
             return queryset.filter(
-                modification_date__date__gte=time_now.shift(years=-1)
-                .floor("year")
-                .date(),
-                modification_date__date__lte=time_now.shift(years=-1)
-                .ceil("year")
-                .date(),
+                modification_date__date__gte=one_week_ago.floor("week").date(),
+                modification_date__date__lte=one_week_ago.ceil("week").date(),
+            )
+        if self.value() == "last_month":
+            one_month_ago = time_now.shift(months=-1)
+            return queryset.filter(
+                modification_date__date__gte=one_month_ago.floor("month").date(),
+                modification_date__date__lte=one_month_ago.ceil("month").date(),
+            )
+        if self.value() == "last_year":
+            one_year_ago = time_now.shift(years=-1)
+            return queryset.filter(
+                modification_date__date__gte=one_year_ago.floor("year").date(),
+                modification_date__date__lte=one_year_ago.ceil("year").date(),
             )
         return queryset.filter(modification_date__date=time_now.date())
 
