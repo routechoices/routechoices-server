@@ -124,7 +124,7 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 start_date__lte=time_now.datetime,
             )
         if self.value() == "last_week":
-            one_week_ago = time_now.shift(months=-1)
+            one_week_ago = time_now.shift(days=-7)
             return queryset.filter(
                 end_date__date__gte=one_week_ago.floor("week").date(),
                 start_date__date__lte=one_week_ago.ceil("week").date(),
