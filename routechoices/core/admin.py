@@ -72,23 +72,25 @@ class EventDateRangeFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         time_now = arrow.utcnow()
         if self.value() == "today":
+            today = time_now.date()
             return queryset.filter(
-                end_date__date__gte=time_now.floor("day").date(),
-                start_date__date__lte=time_now.ceil("day").date(),
+                end_date__date__gte=today,
+                start_date__date__lte=today,
             )
         if self.value() == "yesterday":
+            yesterday = time_now.shift(days=-1).date()
             return queryset.filter(
-                end_date__date__gte=time_now.shift(days=-1).floor("day").date(),
-                start_date__lte=time_now.shift(days=-1).ceil("day").date(),
+                end_date__date__gte=yesterday,
+                start_date__date__lte=yesterday,
             )
         if self.value() == "last_7_days":
             return queryset.filter(
-                end_date__date__gte=time_now.shift(days=-7).floor("day").date(),
+                end_date__date__gte=time_now.shift(days=-7).date(),
                 start_date__lte=time_now.datetime,
             )
         if self.value() == "last_30_days":
             return queryset.filter(
-                end_date__date__gte=time_now.shift(days=-30).floor("day").date(),
+                end_date__date__gte=time_now.shift(days=-30).date(),
                 start_date__lte=time_now.datetime,
             )
         if self.value() == "this_month":
@@ -97,9 +99,10 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 start_date__lte=time_now.datetime,
             )
         if self.value() == "last_month":
+            one_month_ago = time_now.shift(months=-1)
             return queryset.filter(
-                end_date__date__gte=time_now.shift(months=-1).floor("month").date(),
-                start_date__date__lte=time_now.shift(months=-1).ceil("month").date(),
+                end_date__date__gte=one_month_ago.floor("month").date(),
+                start_date__date__lte=one_month_ago.ceil("month").date(),
             )
         if self.value() == "this_year":
             return queryset.filter(
@@ -107,9 +110,10 @@ class EventDateRangeFilter(admin.SimpleListFilter):
                 start_date__lte=time_now.datetime,
             )
         if self.value() == "last_year":
+            one_year_ago = time_now.shift(years=-1)
             return queryset.filter(
-                end_date__date__gte=time_now.shift(years=-1).floor("year").date(),
-                start_date__date__lte=time_now.shift(years=-1).ceil("year").date(),
+                end_date__date__gte=one_year_ago.floor("year").date(),
+                start_date__date__lte=one_year_ago.ceil("year").date(),
             )
         if self.value() == "future":
             return queryset.filter(start_date__gt=time_now.datetime)
