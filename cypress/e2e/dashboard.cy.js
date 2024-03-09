@@ -8,7 +8,18 @@ context("Dashboard actions", () => {
   after(() => {
     cy.wait(100);
   });
-
+  it("Upgrade", function () {
+    cy.login();
+    cy.contains("Halden SK").click();
+    cy.contains("Become Partner!").click();
+    cy.url().should("match", /\/upgrade$/);
+    cy.contains("Become Partner").click();
+    cy.get("#price-per-month").focus().clear().type("9.99");
+    cy.contains("Proceed to payment").click();
+    cy.origin("https://store.routechoices.com", () => {
+      cy.contains("Test mode is currently enabled.");
+    });
+  });
   it("Map importers", function () {
     cy.login();
     cy.contains("Halden SK").click();

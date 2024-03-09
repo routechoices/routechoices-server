@@ -11,7 +11,9 @@ from django.core.mail import EmailMessage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
+from rest_framework.exceptions import MethodNotAllowed
 
 from routechoices.core.models import Club, Event, IndividualDonator
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
@@ -41,56 +43,6 @@ def site_favicon(request, icon_name, **kwargs):
 
 
 def pricing_page(request):
-    if request.method == "POST":
-        price = request.POST.get("price-per-month", "4.99")
-        price = max(Decimal(4.99), Decimal(price))
-        yearly_payment = request.POST.get("per-year", False) == "on"
-        final_price = price * Decimal(100)
-        if yearly_payment:
-            final_price *= 12
-        body = {
-            "data": {
-                "type": "checkouts",
-                "attributes": {
-                    "custom_price": int(final_price),
-                    "product_options": {
-                        "enabled_variants": [78515 if yearly_payment else 78535],
-                    },
-                    "checkout_options": {
-                        "embed": True,
-                        "desc": False,
-                    },
-                    "preview": False,
-                    "expires_at": arrow.utcnow().shift(hours=1).isoformat(),
-                },
-                "relationships": {
-                    "store": {"data": {"type": "stores", "id": "19955"}},
-                    "variant": {
-                        "data": {
-                            "type": "variants",
-                            "id": "78515" if yearly_payment else "78535",
-                        }
-                    },
-                },
-            }
-        }
-        if club_slug := request.POST.get("club"):
-            body["data"]["attributes"]["checkout_data"] = {
-                "custom": {"club": club_slug}
-            }
-        r = requests.post(
-            "https://api.lemonsqueezy.com/v1/checkouts",
-            headers={
-                "Accept": "application/vnd.api+json",
-                "Authorization": f"Bearer {settings.LEMONSQUEEZY_API_KEY}",
-                "Content-Type": "application/vnd.api+json",
-            },
-            json=body,
-        )
-        if r.status_code // 100 == 2:
-            data = r.json()
-            return redirect(data["data"]["attributes"]["url"])
-        messages.error(request, "Something went wrong!")
     partners = Club.objects.filter(upgraded=True).order_by("name")
     indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
     return render(
@@ -98,6 +50,64 @@ def pricing_page(request):
         "site/pricing.html",
         {"partner_clubs": partners, "individual_partners": indi_partners},
     )
+
+
+@csrf_exempt
+def pay_view(request):
+    if request.method != "POST":
+        raise MethodNotAllowed(request.method)
+    price = request.POST.get("price-per-month", "4.99")
+    price = max(Decimal(4.99), Decimal(price))
+    yearly_payment = request.POST.get("per-year", False) == "on"
+    final_price = price * Decimal(100)
+    if yearly_payment:
+        final_price *= 12
+    variants = settings.LEMONSQUEEZY_PRODUCTS_VARIANTS
+    variant_id = variants[1] if yearly_payment else variants[0]
+    body = {
+        "data": {
+            "type": "checkouts",
+            "attributes": {
+                "custom_price": int(final_price),
+                "product_options": {
+                    "enabled_variants": [variant_id],
+                },
+                "checkout_options": {
+                    "embed": True,
+                    "desc": False,
+                },
+                "preview": False,
+                "expires_at": arrow.utcnow().shift(hours=1).isoformat(),
+            },
+            "relationships": {
+                "store": {
+                    "data": {"type": "stores", "id": settings.LEMONSQUEEZY_STORE_ID}
+                },
+                "variant": {
+                    "data": {
+                        "type": "variants",
+                        "id": variant_id,
+                    }
+                },
+            },
+        }
+    }
+    if club_slug := request.POST.get("club"):
+        body["data"]["attributes"]["checkout_data"] = {"custom": {"club": club_slug}}
+    r = requests.post(
+        "https://api.lemonsqueezy.com/v1/checkouts",
+        headers={
+            "Accept": "application/vnd.api+json",
+            "Authorization": f"Bearer {settings.LEMONSQUEEZY_API_KEY}",
+            "Content-Type": "application/vnd.api+json",
+        },
+        json=body,
+    )
+    if r.status_code // 100 == 2:
+        data = r.json()
+        return redirect(data["data"]["attributes"]["url"])
+    messages.error(request, "Something went wrong!")
+    return redirect("/")
 
 
 def events_view(request):

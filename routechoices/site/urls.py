@@ -31,6 +31,11 @@ urlpatterns = [
         name="pricing_view",
     ),
     re_path(
+        r"^proceed-payment/?$",
+        views.pay_view,
+        name="pay_view",
+    ),
+    re_path(
         r"(?P<icon_name>favicon\.ico|apple-touch-icon\.png|icon-192\.png|icon-512\.png)",
         views.site_favicon,
         name="site_favicon",

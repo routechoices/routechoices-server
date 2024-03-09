@@ -163,7 +163,7 @@
                             data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
-                <form method="post">
+                <form method="post" action="{% host_url 'site:pay_view' host 'www' %}">
                     <div class="modal-body">
                         <h6>Please enter how much you want to contribute per month.</h6>
                         <div class="input-group mb-3">
