@@ -38,8 +38,8 @@
         <div class="row text-center">
             <div class="col-12 mx-auto">
                 <div class="card border-0 shadow rounded-3 my-3">
-                    <div class="card-body p-4 p-sm-5">
-                        <div id="generic_price_table" class="mb-4">
+                    <div class="card-body p-4 p-sm-5 mb-5">
+                        <div id="generic_price_table" class="mb-5">
                             <!--BLOCK ROW START-->
                             <div class="row d-grid justify-content-center">
                                 <div style="width: 320px;">
@@ -98,26 +98,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div class="mb-5">
+                            <h2 class="fw-bold">Why Free?</h2>
                             <p>{{ site.name }} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
                             <p>We will never display ads, and your data is not sold to third party.</p>
                         </div>
                         <div>
+                            <h2 class="fw-bold">How to help the project.</h2>
                             <p>
                                 You can become partner and join the following clubs and individuals that contribute to maintain the platform alive.
                             </p>
                             <p>
                                 <a href="{% host_url 'upgrade' host 'dashboard' %}"
-                                   class="btn btn-success mb-1">Become a Partner Club</a>
+                                   class="btn btn-success mb-1 fs-5">Become a Partner Club</a>
                                 <br />
                                 <button id="become-ind-partner-btn"
                                         data-bs-toggle="modal"
                                         data-bs-target="#contributeModal"
-                                        class="btn btn-info mb-1"
+                                        class="btn btn-info mb-1 fs-5"
                                         type="button">Become an Individual Partner</button>
                             </p>
-                            <h4 id="partners">Partners</h4>
-                            <h5>Clubs</h5>
+                            <h3 id="partners">Partners</h3>
+                            <h4>Clubs</h4>
                             <div class="row justify-content-between mb-3">
                                 {% for club in partner_clubs %}
                                     <div class="col align-self-start text-center">
@@ -133,7 +135,7 @@
                                 {% endfor %}
                             </div>
                             {% if individual_partners %}
-                                <h5>People</h5>
+                                <h4>People</h4>
                                 <div class="row justify-content-between mb-3">
                                     {% for person in individual_partners %}
                                         <div class="col align-self-start text-center">
