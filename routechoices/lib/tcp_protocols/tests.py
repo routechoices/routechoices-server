@@ -168,6 +168,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
     @gen_test
     async def test_tracktape(self):
         gps_data = b'{"id":"352022008228783","guid":"B01633000","batteryLevel":55,"inst":"start","positions":[{"timestamp":1706872596,"lat":60.455,"lon":18.567},{"timestamp":1706872597,"lat": 60.4555,"lon": 18.5675}]}\n'
+        gps_data2 = b'{"id":"352022008228783","guid":"B01633000","batteryLevel":55,"inst":"start","positions":[{"timestamp":1706872598,"lat":60.455,"lon":18.567}]}\n'
 
         server = client = None
         device = await create_imei_device("352022008228783")
@@ -180,6 +181,10 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await asyncio.sleep(1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 2)
+        await client.write(gps_data2)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEqual(device.location_count, 3)
         if server is not None:
             server.stop()
         if client is not None:
