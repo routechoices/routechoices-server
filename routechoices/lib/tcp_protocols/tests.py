@@ -62,6 +62,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
     @gen_test
     async def test_mictrack(self):
         gps_data = b"#867198059727390#MT710#0000#AUTO#1\r\n#38$GPRMC,123318.00,A,2238.8946,N,11402.0635,E,,,100124,,,A*5C\r\n##"
+        gps_data2 = b"#867198059727390#MT710#0000#AUTO#1\r\n#38$GPRMC,123319.00,A,2238.8946,N,11402.0635,E,,,100124,,,A*5C\r\n##"
 
         server = client = None
         device = await create_imei_device("867198059727390")
@@ -74,6 +75,10 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await asyncio.sleep(1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
+        await client.write(gps_data2)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEqual(device.location_count, 2)
         if server is not None:
             server.stop()
         if client is not None:
@@ -82,6 +87,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
     @gen_test
     async def test_mictrack_alt(self):
         gps_data = b"MT;6;866425031361423;R0;10+190109091803+22.63827+114.02922+2.14+69+2+3744+113"
+        gps_data2 = b"MT;6;866425031361423;R0;10+190109091804+22.63827+114.02922+2.14+69+2+3744+113"
 
         server = client = None
         device = await create_imei_device("866425031361423")
@@ -94,6 +100,10 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await asyncio.sleep(1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
+        await client.write(gps_data2)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEqual(device.location_count, 2)
         if server is not None:
             server.stop()
         if client is not None:
@@ -104,7 +114,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         hbt_data = b"+ACK:GTHBD,C30203,860201061588748,,20240201161532,FFFF$"
         ack_data = b"+SACK:GTHBD,C30203,FFFF$"
         gps_data = b"+BUFF:GTFRI,8020040200,860201061588748,,12194,10,1,3,0.0,0,20.1,-71.596533,-33.524718,20240201161533,0730,0001,772A,052B253E,02,0,0.0,,,,,0,420000,,,,20230926200340,1549$"
-
+        battery_data = b"+RESP:GTINF,020102,860201061588748,,41,898600810906F8048812,16,0,0,0,,4.10,0,0,0,0,,020240201161534,69,,,+0800,0,20100214093254,11F0$"
         server = client = None
         device = await create_imei_device("860201061588748")
         sock, port = bind_unused_port()
@@ -119,6 +129,10 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await asyncio.sleep(1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
+        await client.write(battery_data)
+        await asyncio.sleep(1)
+        device = await refresh_device(device)
+        self.assertEqual(device.battery_level, 69)
         if server is not None:
             server.stop()
         if client is not None:

@@ -53,7 +53,7 @@ def send_sos(device):
 
 @sync_to_async
 def save_device(device):
-    device.add_save()
+    device.save()
     connection.close()
 
 
