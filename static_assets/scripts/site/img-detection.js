@@ -25,7 +25,7 @@ function hasImgCookie() {
       accepted.push("image/" + format);
     }
     if (formatTested === 3) {
-      var domain = document.domain.match(/[^\.]*\.[^.]*$/)[0] + ";";
+      var domain = document.domain.match(/[^\.]*\.[^.]*$/)?.[0] + ";";
       document.cookie =
         "accept-image=" + accepted.join(",") + ";path=/;domain=." + domain;
     }
