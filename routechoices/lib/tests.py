@@ -1,6 +1,11 @@
 from django.test import TestCase
 
-from .helpers import three_point_calibration_to_corners
+from .helpers import (
+    check_cname_record,
+    check_txt_record,
+    compute_corners_from_kml_latlonbox,
+    three_point_calibration_to_corners,
+)
 
 
 class HelperTestCase(TestCase):
@@ -24,3 +29,25 @@ class HelperTestCase(TestCase):
                 9.54753,
             ],
         )
+
+    def test_kml_cal(self):
+        cal = compute_corners_from_kml_latlonbox(
+            63.35268625254615,
+            63.325978161823549,
+            12.55481008348568,
+            12.470815025221196,
+            -5.6769774354892242,
+        )
+        self.assertEqual(
+            cal,
+            (
+                (65.21144277090194, 15.781876945283638),
+                (61.24478638169717, 66.38761575963139),
+                (10.696053565129883, 60.0149162417611),
+                (14.662709954334655, 9.409177427413347),
+            ),
+        )
+
+    def test_check_dns(self):
+        self.assertTrue(check_cname_record("live.kiilat.com"))
+        self.assertTrue(check_txt_record("live.kiilat.com"))
