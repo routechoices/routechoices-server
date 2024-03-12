@@ -2268,7 +2268,7 @@ class Device(models.Model):
                     (
                         f"Competitor {competitor.name} has triggered the SOS button"
                         f" of his GPS tracker during event {event.name}\r\n\r\n"
-                        "His latest known location is latitude, longitude: "
+                        "Latest SOS known location is latitude, longitude: "
                         f"{lat}, {lon}"
                     ),
                     settings.DEFAULT_FROM_EMAIL,

@@ -877,7 +877,7 @@ class CompetitionTestCase(EssentialApiBase):
             "Routechoices.com - SOS from competitor Alice" in mail.outbox[0].subject
         )
         self.assertTrue(
-            "His latest known location is latitude, longitude: 12.34567, 123.45678"
+            "Latest SOS known location is latitude, longitude: 12.34567, 123.45678"
             in mail.outbox[0].body
         )
         self.assertEqual([self.user.email], mail.outbox[0].to)
