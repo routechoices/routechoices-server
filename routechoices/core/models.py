@@ -2067,6 +2067,8 @@ class Device(models.Model):
 
     def add_locations(self, loc_array, /, *, save=True):
         if len(loc_array) == 0:
+            if save:
+                self.save()
             return
         new_pts = []
         locations = self.locations_series
@@ -2098,6 +2100,8 @@ class Device(models.Model):
             new_pts.append((ts, lat, lon))
 
         if len(new_pts) == 0:
+            if save:
+                self.save()
             return
 
         locations += new_pts
