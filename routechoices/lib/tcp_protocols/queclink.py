@@ -157,8 +157,6 @@ class QueclinkConnection:
                 await save_device(self.db_device)
         except Exception as e:
             print(f"Error processing line: {str(e)}", flush=True)
-            self.stream.close()
-            return False
         return True
 
     async def read_line(self):
