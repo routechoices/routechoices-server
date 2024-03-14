@@ -179,6 +179,9 @@ class QueclinkConnection:
         print(f"{len(pts)} Locations wrote to DB", flush=True)
 
     def on_close(self):
+        self.logger.info(
+            f"{arrow.now().datetime}, GL300 QUIT, {self.aid}, {self.address}"
+        )
         print("Client quit", flush=True)
 
 
