@@ -849,10 +849,10 @@ function RCEvent(infoURL, clockURL) {
       .trim();
 
     return `<div class="mb-3 justify-content-center fw-bold d-flex text-uppercase">
-      <div class="mx-3"><span class="fs-3">${days}</span><br/>${daysText}</div>
-      <div class="mx-3"><span class="fs-3">${hours}</span><br/>${hoursText}</div>
-      <div class="mx-3"><span class="fs-3">${minutes}</span><br/>${minutesText}</div>
-      <div class="mx-3"><span class="fs-3">${seconds}</span><br/>${secondsText}</div>
+      <div class="mx-3"><span class="fs-3 cd-nb">${days}</span><br/>${daysText}</div>
+      <div class="mx-3"><span class="fs-3 cd-nb">${hours}</span><br/>${hoursText}</div>
+      <div class="mx-3"><span class="fs-3 cd-nb">${minutes}</span><br/>${minutesText}</div>
+      <div class="mx-3"><span class="fs-3 cd-nb">${seconds}</span><br/>${secondsText}</div>
       </div>
       <div style="font-size:0.7em;color: var(--bs-secondary)">( ${capitalizeFirstLetter(
         dayjs(eventStart).local().format("LLLL")

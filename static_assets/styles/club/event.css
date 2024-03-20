@@ -336,3 +336,7 @@
 .higher-z-index {
   z-index: 10003;
 }
+
+.cd-nb {
+  font-variant-numeric: tabular-nums;
+}
