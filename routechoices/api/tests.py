@@ -843,7 +843,7 @@ class RouteUploadApiTestCase(EssentialApiBase):
         errors = json.loads(res.content)
         self.assertEqual(len(errors), 1)
         self.assertIn(
-            "Event not yet started",
+            "Event has not yet started",
             errors[0],
         )
 
