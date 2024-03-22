@@ -8,7 +8,28 @@ context("Dashboard actions", () => {
   after(() => {
     cy.wait(100);
   });
-  it("Upgrade", function () {
+
+  it("Manage devices", function () {
+    cy.login();
+    cy.contains("Halden SK").click();
+    cy.contains("Devices").click();
+    cy.contains("Add new device").click();
+    cy.get("#id_device-ts-control").type(this.devId).wait(1000);
+    cy.get("#id_nickname").type("MyDevice");
+    cy.get("input").contains("Add").click();
+    cy.get("#django-messages").contains("Device added successfully");
+    cy.contains("MyDevice");
+    cy.get(".edit-nick-btn").first().click();
+    cy.get("input[placeholder='Nickname'")
+      .clear()
+      .type("Dev1")
+      .wait(1000)
+      .type("{enter}");
+    cy.contains("Dev1");
+    cy.contains("MyDevice").should("not.exist");
+  });
+
+  it("Upgrade Account", function () {
     cy.login();
     cy.contains("Halden SK").click();
     cy.contains("Become Partner!").click();
