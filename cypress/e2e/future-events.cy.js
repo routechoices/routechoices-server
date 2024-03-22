@@ -6,7 +6,7 @@ context("Events in future", () => {
 
   it("Can not see Event as in future", function () {
     cy.forceVisit("/halden-sk/future-default");
-    cy.contains("Event not yet started.");
+    cy.contains("Event has not yet started.");
     cy.contains("Starting in");
   });
 
@@ -15,7 +15,7 @@ context("Events in future", () => {
     cy.contains("Registration and route upload closed.");
   });
 
-  it("Can not export Event as not yet started", function () {
+  it("Can not export Event as it is not yet started", function () {
     cy.forceVisit("/halden-sk/future-default/export");
     cy.contains("Export is not available yet...");
   });
@@ -30,12 +30,12 @@ context("Events in future", () => {
     cy.contains("Competitor Added!");
   });
 
-  it("Can not upload to an Event even if upload allowed since not yet started", function () {
+  it("Can not upload to an Event even if upload allowed since it is not yet started", function () {
     cy.forceVisit("/halden-sk/future-upload-allowed/contribute");
     cy.contains("Registration and route upload closed.");
   });
 
-  it("Can only add competitor and not upload route to an Event if everything allowed even since not yet started", function () {
+  it("Can only add competitor and not upload route to an Event if everything allowed even since it is not yet started", function () {
     cy.forceVisit(
       "/halden-sk/future-open-registration-upload-allowed/contribute"
     );

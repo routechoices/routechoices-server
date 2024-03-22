@@ -975,7 +975,7 @@ def competitor_route_upload(request, competitor_id):
         raise ValidationError("Competitor already assigned a route")
 
     if event.start_date > now():
-        raise ValidationError("Event not yet started")
+        raise ValidationError("Event has not yet started")
 
     try:
         lats = [float(x) for x in request.data.get("latitudes", "").split(",") if x]
