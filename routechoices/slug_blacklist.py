@@ -278,6 +278,7 @@ SLUG_BLACKLIST = [
     "friend",
     "friends",
     "ftp",
+    "fw",
     "get",
     "ghost",
     "gift",
