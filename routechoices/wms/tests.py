@@ -149,6 +149,50 @@ class MapApiTestCase(EssentialApiBase):
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+        # return ok if srs is CRS:84
+        def_query = f"{query_junk}srs=CRS%3A84&{query_size}bbox=61.40,24.18,61.5,24.25"
+        res = client.get(
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            )
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # return ok if srs is EPSG:4326
+        def_query = (
+            f"{query_junk}srs=EPSG%3A4326&{query_size}bbox=24.18,61.40,24.25,61.5"
+        )
+        res = client.get(
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            )
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # return 400 if srs is not supported
+        def_query = (
+            f"{query_junk}srs=EPSG%3A4327&{query_size}bbox=24.18,61.40,24.25,61.5"
+        )
+        res = client.get(
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            )
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # return 400 if bound is invalid
+        def_query = f"{query_junk}{query_espg}{query_size}{query_bbox}invalid"
+        res = client.get(
+            (
+                f"{url}?service=WMS&request=GetMap&layers={event.aid}&"
+                f"format=image%2Fjpeg&{def_query}"
+            )
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_should_hit_cache(self):
         cache.clear()
         client = APIClient(HTTP_HOST="wms.routechoices.dev")
