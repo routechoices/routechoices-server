@@ -23,10 +23,12 @@ context("Dashboard actions", () => {
     cy.get("input[placeholder='Nickname'")
       .clear()
       .type("Dev1")
-      .wait(1000)
+      .wait(500)
       .type("{enter}");
     cy.contains("Dev1");
     cy.contains("MyDevice").should("not.exist");
+    cy.get(".remove-btn").first().click().wait(500);
+    cy.get("button.confirm").click();
   });
 
   it("Upgrade Account", function () {
