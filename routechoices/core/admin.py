@@ -804,7 +804,7 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
 
 @admin.register(TcpDeviceCommand)
 class TcpDeviceCommandAdmin(admin.ModelAdmin):
-    list_display = ("target", "creation_date", "modification_date", "sent")
+    list_display = ("target", "modification_date", "comment", "sent")
     autocomplete_fields = ("target",)
     actions = ["mark_as_not_sent"]
 
