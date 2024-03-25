@@ -806,6 +806,10 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
 class TcpDeviceCommandAdmin(admin.ModelAdmin):
     list_display = ("target", "creation_date", "modification_date", "sent")
     autocomplete_fields = ("target",)
+    actions = ["mark_as_not_sent"]
+
+    def mark_as_not_sent(self, request, queryset):
+        queryset.update(sent=False)
 
 
 UserModel = get_user_model()
