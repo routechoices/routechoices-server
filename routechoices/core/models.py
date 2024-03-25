@@ -2521,6 +2521,7 @@ class TcpDeviceCommand(models.Model):
     )
     sent = models.BooleanField(default=False)
     command = models.TextField()
+    comment = models.CharField(blank=True, default="")
 
     class Meta:
         ordering = ["-modification_date"]
