@@ -12,7 +12,7 @@ admin.site.site_url = f"//www.{settings.PARENT_HOST}"
 
 def admin_login(request):
     return redirect(
-        reverse("account_login", host="www") + f"?next=//admin.{settings.PARENT_HOST}"
+        f"{reverse('site:account_login', host='www')}?next=//admin.{settings.PARENT_HOST}"
     )
 
 
