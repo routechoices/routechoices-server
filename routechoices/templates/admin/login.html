@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static hosts %}
+{% load i18n static %}
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static "admin/css/login.css" %}">
@@ -55,7 +55,7 @@
                 {{ form.otp_token.label_tag }} {{ form.otp_token }}
                 <input type="hidden" name="next" value="{{ next }}">
             </div>
-            {% host_url 'admin_password_reset' host 'www' as password_reset_url %}
+            {% url 'admin_password_reset' as password_reset_url %}
             {% if password_reset_url %}
                 <div class="password-reset-link">
                     <a href="{{ password_reset_url }}">{% translate "Forgotten your password or username?" %}</a>
