@@ -171,7 +171,7 @@ class CustomLoginView(LoginView):
         self.request.session["kagi_pre_verify_user_pk"] = user.pk
         self.request.session["kagi_pre_verify_user_backend"] = user.backend
 
-        verify_url = reverse("kagi:verify-second-factor", host="www")
+        verify_url = reverse("kagi:verify-second-factor", host="dashboard")
         redirect_to = self.request.POST.get(
             auth.REDIRECT_FIELD_NAME,
             self.request.GET.get(auth.REDIRECT_FIELD_NAME, ""),
