@@ -822,7 +822,7 @@ function RCEvent(infoURL, clockURL) {
 
   function CountDown() {
     var duration = dayjs.duration(dayjs(eventStart).diff(dayjs()));
-    var durationInSeconds = Math.max(duration.asSeconds(), 0)
+    var durationInSeconds = Math.max(duration.asSeconds(), 0);
     var days = Math.floor(durationInSeconds / (24 * 3600));
     durationInSeconds -= days * (24 * 3600);
     var hours = Math.floor(durationInSeconds / 3600);
