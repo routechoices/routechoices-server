@@ -1,12 +1,12 @@
 {% extends "dashboard/account_edit.html" %}
-{% load static compress hosts %}
+{% load static compress %}
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-            data-begin-activate="{% host_url 'kagi:begin-activate' host 'dashboard' %}"
-            data-begin-assertion="{% host_url 'kagi:begin-assertion' host 'dashboard' %}"
-            data-verify-credential-info="{% host_url 'kagi:verify-credential-info' host 'dashboard' %}"
-            data-verify-assertion="{% host_url 'kagi:verify-assertion' host 'dashboard' %}"
-            data-keys-list="{% host_url 'kagi:webauthn-keys' host 'dashboard' %}"></script>
+            data-begin-activate="{% url 'kagi:begin-activate' %}"
+            data-begin-assertion="{% url 'kagi:begin-assertion' %}"
+            data-verify-credential-info="{% url 'kagi:verify-credential-info' %}"
+            data-verify-assertion="{% url 'kagi:verify-assertion' %}"
+            data-keys-list="{% url 'kagi:webauthn-keys' %}"></script>
     {% compress js %}
         <script src="{% static '/kagi/base64js.min.js' %}"></script>
         <script src="{% static '/scripts/kagi.js' %}"></script>

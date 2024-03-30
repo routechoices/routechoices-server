@@ -112,7 +112,7 @@
                     {% if user.is_authenticated %}
                         <h3 class="frontpage_text mb-3">
                             <a class="px-4 py-2 text-decoration-none engage-link"
-                               href="{% host_url 'home_view' host 'dashboard' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
+                               href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
                         </h3>
                     {% else %}
                         <h3 class="frontpage_text mb-3">

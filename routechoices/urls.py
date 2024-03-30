@@ -18,6 +18,7 @@ from django.contrib.sitemaps import views as sitemaps_views
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
+from routechoices.dashboard.views import backup_codes
 from routechoices.site.sitemaps import DynamicViewSitemap, StaticViewSitemap
 
 sitemaps = {
@@ -29,16 +30,21 @@ urlpatterns = [
     path("account/login/", RedirectView.as_view(url="/login")),
     path("account/logout/", RedirectView.as_view(url="/logout")),
     path("account/signup/", RedirectView.as_view(url="/signup")),
+    path("account/email/", RedirectView.as_view(url="/dashboard/account/emails")),
+    path(
+        "account/password/change/",
+        RedirectView.as_view(url="/dashboard/account/change-password"),
+    ),
     path("account/", include("allauth.urls")),
     path("api/", include(("routechoices.api.urls", "api"), namespace="api")),
+    path("dashboard/account/mfa/login/", RedirectView.as_view(url="/login")),
+    path("dashboard/account/mfa/backup-codes/", backup_codes, name="backup-codes"),
+    path("dashboard/account/mfa/", include("kagi.urls", namespace="kagi")),
     path(
         "dashboard/",
         include(("routechoices.dashboard.urls", "dashboard"), namespace="dashboard"),
     ),
-    path(
-        "invitations/",
-        include(("invitations.urls", "invitations"), namespace="invitations"),
-    ),
+    path("invitations/", include("invitations.urls", namespace="invitations")),
     path(
         "webhooks/",
         include(("routechoices.webhooks.urls", "webhooks"), namespace="webhooks"),

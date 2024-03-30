@@ -1,7 +1,6 @@
 import gzip
 import shutil
 
-from django.conf import settings
 from django_s3_storage.storage import S3File, S3Storage, _wrap_errors
 
 
@@ -44,4 +43,4 @@ class OverwriteImageStorage(S3Storage):
         return S3File(content, name, self)
 
     def url(self, name):
-        return f"//dashboard.{settings.PARENT_HOST}/media/{name}"
+        return "/media/" + name

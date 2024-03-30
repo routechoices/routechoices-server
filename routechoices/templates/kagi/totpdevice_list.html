@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load static compress hosts %}
+{% load static compress %}
 {% block sub_sub_content %}
     <h1>TOTP (Authenticator) Devices</h1>
     {% if object_list %}
@@ -40,8 +40,7 @@
             <i class="fa-solid fa-triangle-exclamation	"></i> You do not have any TOTP (Authenticator) device!
         </p>
     {% endif %}
-    <a class="btn btn-primary"
-       href="{% host_url 'kagi:add-totp' host 'dashboard' %}">Add a TOTP (Authenticator) Device</a>
+    <a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">Add a TOTP (Authenticator) Device</a>
 {% endblock sub_sub_content %}
 {% block extra_body %}
     {{ block.super }}

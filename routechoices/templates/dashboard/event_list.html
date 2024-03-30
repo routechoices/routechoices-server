@@ -12,9 +12,9 @@
         <div class="col-12">
             <div class="mb-3">
                 {% if not events %}<p>You haven't created any events.</p>{% endif %}
-                <a href="{% host_url 'event_create_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:event_create_view' %}"
                    class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new event</a>
-                <a href="{% host_url 'quick_event_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:quick_event_view' %}"
                    class="btn btn-secondary mb-1"
                    data-bs-toggle="tooltip"
                    data-bs-title="Single person GPS tracking without custom maps starting immediately"><i class="fa-solid fa-circle-plus"></i> Quick tracking</a>
@@ -45,7 +45,7 @@
                         {% for event in events %}
                             <tr class="collapsable">
                                 <td>
-                                    <a href="{% host_url 'event_edit_view' event_id=event.aid host 'dashboard' %}">{{ event.name }}</a>
+                                    <a href="{% url 'dashboard:event_edit_view' event_id=event.aid %}">{{ event.name }}</a>
                                 </td>
                                 <td>
                                     {% if event.event_set %}

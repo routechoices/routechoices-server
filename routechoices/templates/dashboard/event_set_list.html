@@ -5,7 +5,7 @@
         <div class="col-12">
             <div class="mb-3">
                 {% if not event_sets %}<p>You haven't created any event sets.</p>{% endif %}
-                <a href="{% host_url 'event_set_create_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:event_set_create_view' %}"
                    class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create new event set</a>
             </div>
             {% if event_sets %}
@@ -24,7 +24,7 @@
                         {% for event_set in event_sets %}
                             <tr>
                                 <td>
-                                    <a href="{% host_url 'event_set_edit_view' event_set_id=event_set.aid host 'dashboard' %}">{{ event_set.name }}</a>
+                                    <a href="{% url 'dashboard:event_set_edit_view' event_set_id=event_set.aid %}">{{ event_set.name }}</a>
                                 </td>
                                 <td>{{ event_set.events.all.count }}</td>
                                 <td>

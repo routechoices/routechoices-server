@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static compress hosts %}
+{% load static compress %}
 {% block extra_head %}
     {% compress css %}
         <link rel="stylesheet"
@@ -13,12 +13,12 @@
                 <div class="card-body p-4 p-sm-5">
                     <ul class="nav nav-tabs mb-3">
                         <li>
-                            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:":8" == 'account_' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
-                               href="{% host_url 'account_edit_view' host 'dashboard' %}"><i class="fa-solid fa-circle-user"></i> Account</a>
+                            <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:":18" == 'dashboard:account_' or request.resolver_match.view_name in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
+                               href="{% url 'dashboard:account_edit_view' %}"><i class="fa-solid fa-circle-user"></i> Account</a>
                         </li>
                         <li>
-                            <a class="flex-sm-fill text-sm-center nav-link {% if not request.resolver_match.view_name|slice:":8" == 'account_' and request.resolver_match.view_name not in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
-                               href="{% host_url 'club_view' host 'dashboard' %}"><i class="fa-solid fa-house-flag"></i> Club</a>
+                            <a class="flex-sm-fill text-sm-center nav-link {% if not request.resolver_match.view_name|slice:":18" == 'dashboard:account_' and request.resolver_match.view_name not in "kagi:webauthn-keys backup-codes kagi:totp-devices kagi:add-webauthn-key kagi:two-factor-settings kagi:add-totp" %}active{% endif %}"
+                               href="{% url 'dashboard:club_view' %}"><i class="fa-solid fa-house-flag"></i> Club</a>
                         </li>
                     </ul>
                     <div class="col-12">

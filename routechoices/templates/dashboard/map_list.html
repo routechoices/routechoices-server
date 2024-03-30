@@ -5,17 +5,17 @@
         <div class="col-12">
             <div class="mb-3">
                 {% if not maps %}<p>You haven't created any map yet.</p>{% endif %}
-                <a href="{% host_url 'map_create_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:map_create_view' %}"
                    class="btn btn-primary me-1 mb-1"><i class="fa-solid fa-image"></i> Create from Image</a>
-                <a href="{% host_url 'map_upload_kmz_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:map_upload_kmz_view' %}"
                    class="btn btn-secondary me-1 mb-1">
                     <img alt="kmz upload" src="{% static "/img/google-earth.svg" %}" width="20" height="20" style="vertical-align: sub" />
                 Create from KMZ/KML</a>
-                <a href="{% host_url 'map_upload_gpx_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:map_upload_gpx_view' %}"
                    class="btn btn-secondary me-1 mb-1">
                     <img alt="gpx upload" src="{% static "/img/gpx.svg" %}" width="20" height="20" style="vertical-align: sub" />
                 Create from GPX</a>
-                <a href="{% host_url 'map_draw_view' host 'dashboard' %}"
+                <a href="{% url 'dashboard:map_draw_view' %}"
                    class="btn btn-secondary mb-1"><i class="fa-solid fa-pencil"></i> Draw</a>
             </div>
             {% if maps %}
@@ -33,7 +33,7 @@
                     {% for map in maps %}
                         <tr>
                             <td>
-                                <a href="{% host_url 'map_edit_view' map_id=map.aid host 'dashboard' %}">{{ map.name }}</a>
+                                <a href="{% url 'dashboard:map_edit_view' map_id=map.aid %}">{{ map.name }}</a>
                             </td>
                             <td>
                                 {% if map.image %}

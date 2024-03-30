@@ -1,5 +1,5 @@
 {% extends "account/base.html" %}
-{% load account hosts %}
+{% load account %}
 {% block head_title %}
     Confirm E-mail Address
 {% endblock head_title %}
@@ -23,7 +23,7 @@
                                 </div>
                             </form>
                         {% else %}
-                            {% host_url 'account_emails' host 'dashboard' as email_url %}
+                            {% url 'dashboard:account_emails' as email_url %}
                             <p>
                                 This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.
                             </p>

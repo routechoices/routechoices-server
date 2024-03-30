@@ -1,5 +1,5 @@
 {% extends "dashboard/account_edit.html" %}
-{% load i18n static django_bootstrap5 compress hosts %}
+{% load i18n static django_bootstrap5 compress %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -32,8 +32,7 @@
                             {% endif %}
                         </td>
                         <td {% if emailaddress.primary %}class="collapsed-none"{% endif %}>
-                            <form action="{% host_url 'account_emails' host 'dashboard' %}"
-                                  method="post">
+                            <form action="{% url 'dashboard:account_emails' %}"  method="post">
                                 {% csrf_token %}
                                 <input id="email_radio_{{ forloop.counter }}"
                                        type="hidden"
@@ -70,7 +69,7 @@
     <br />
     <h3>{% trans "Add E-mail Address" %}</h3>
     <form method="post"
-          action="{% host_url 'account_emails' host 'dashboard' %}"
+          action="{% url 'dashboard:account_emails' %}"
           class="add_email">
         {% csrf_token %}
         {% bootstrap_form form %}

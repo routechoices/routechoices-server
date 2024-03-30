@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static account compress hosts %}
+{% load static account compress %}
 {% block head_title %}
     Confirm Account Deletion
 {% endblock head_title %}
@@ -26,7 +26,7 @@
                                 This account deletion confirmation link is either expired, invalid or not destinated for account {{ request.user }}.
                             </p>
                             <p>
-                                Please <a href="{% host_url 'account_delete_view' host 'dashboard' %}">issue a new account deletion request</a>.
+                                Please <a href="{% url 'dashboard:account_delete_view' %}">issue a new account deletion request</a>.
                             </p>
                         {% endif %}
                     </div>

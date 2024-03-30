@@ -7,6 +7,7 @@ sitemaps = {
     "dynamic": DynamicViewSitemap,
 }
 
+
 urlpatterns = [
     re_path(r"^$", views.club_view, name="club_view"),
     re_path(r"^logo/?$", views.club_logo, name="club_logo"),

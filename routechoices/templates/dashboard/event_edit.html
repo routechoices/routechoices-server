@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 hosts qr_code compress hosts %}
+{% load static django_bootstrap5 hosts qr_code compress %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -38,11 +38,11 @@
                         <div class="mb-2 ">
                             <h6 class="fw-bold">Links for admins</h6>
                             {% if event.started %}
-                                <a href="{% host_url 'event_route_upload_view' event_id=event.aid host 'dashboard' %}"
+                                <a href="{% url 'dashboard:event_route_upload_view' event_id=event.aid %}"
                                    class="btn btn-secondary btn-sm me-1 mb-1"
                                    id="upload_route_btn"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>
                             {% endif %}
-                            <a href="{% host_url 'event_competitors_printer_view' event_id=event.aid host 'dashboard' %}"
+                            <a href="{% url 'dashboard:event_competitors_printer_view' event_id=event.aid %}"
                                class="btn btn-secondary btn-sm me-1 mb-1"><i class="fa-solid fa-print"></i> Competitor List For Printing</a>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                 {% if not use_competitor_formset and context == 'edit' %}
                     <p>
                         You have more than 100 competitors <a class="btn btn-primary"
-    href="{% host_url 'event_competitors_view' event_id=event.aid host 'dashboard' %}"
+    href="{% url 'dashboard:event_competitors_view' event_id=event.aid %}"
     target="_blank">Manage existing competitors</a>
                     </p>
                     <h4>Add more competitors</h4>
@@ -197,7 +197,7 @@
                     <i class="fa-solid fa-floppy-disk"></i> Save and Continue Editing
                 </button>
                 {% if context == 'edit' %}
-                    <a href="{% host_url 'event_delete_view' event_id=event.aid host 'dashboard' %}"
+                    <a href="{% url 'dashboard:event_delete_view' event_id=event.aid %}"
                        class="btn btn-danger mb-1"><i class="fa-solid fa-trash-can"></i> Delete</a>
                 {% endif %}
             </form>

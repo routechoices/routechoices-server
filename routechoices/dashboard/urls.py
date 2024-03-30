@@ -1,19 +1,13 @@
 from allauth.account import views as allauth_views
-from django.urls import include, path, re_path
-from django.views.generic.base import RedirectView
+from django.urls import path, re_path
 from user_sessions import views as user_sessions_views
 
 from routechoices.dashboard import views
-
-app_name = "dashboard"
 
 urlpatterns = [
     re_path(r"^$", views.home_view, name="home_view"),
     re_path(r"^account/?$", views.account_edit_view, name="account_edit_view"),
     re_path(r"^account/emails/?$", views.email_view, name="account_emails"),
-    re_path(r"^account/mfa/login/?$", RedirectView.as_view(url="/login")),
-    re_path(r"^account/mfa/backup-codes/?$", views.backup_codes, name="backup-codes"),
-    re_path(r"^account/mfa/", include("kagi.urls", namespace="kagi")),
     re_path(
         r"^account/change-password/?$",
         allauth_views.password_change,

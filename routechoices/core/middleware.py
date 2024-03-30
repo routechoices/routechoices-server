@@ -157,7 +157,6 @@ class HostsRequestMiddleware(HostsBaseMiddleware):
             if slug not in (
                 "admin",
                 "api",
-                "dashboard",
                 "map",
                 "registration",
                 "tiles",
