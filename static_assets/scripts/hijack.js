@@ -4,6 +4,6 @@ document
     e.preventDefault();
     document.getElementById("djhj").style.display = "none";
   });
-if (window.location.host.split(".").at(-3) !== "dashboard") {
+if (window.location.host.split(".").at(-3) !== "www") {
   document.getElementById("djhj-release-btn").remove();
 }
