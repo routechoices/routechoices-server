@@ -946,7 +946,7 @@ function RCEvent(infoURL, clockURL) {
             });
           preRaceModal.show();
           window.setInterval(function () {
-            if (clock.now() > eventStart) {
+            if (clock.now() >= eventStart) {
               location.reload();
             }
           }, 1e3);
