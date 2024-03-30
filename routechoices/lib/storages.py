@@ -43,4 +43,4 @@ class OverwriteImageStorage(S3Storage):
         return S3File(content, name, self)
 
     def url(self, name):
-        return "/media/" + name
+        return "//www.{settings.PARENT_HOST}/dashboard/media/{name}"
