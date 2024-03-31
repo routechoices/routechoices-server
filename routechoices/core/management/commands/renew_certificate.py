@@ -99,8 +99,8 @@ class Command(BaseCommand):
                 fp.write(certificate)
             cert_key.write_pem(cert_key_filename)
 
-            os.chmod(cert_filename, 0o400)
-            os.chmod(cert_key_filename, 0o400)
+            os.chmod(cert_filename, 0o600)
+            os.chmod(cert_key_filename, 0o600)
 
             nginx_need_restart = True
             self.stdout.write("Certificate renewed.")

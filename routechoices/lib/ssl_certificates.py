@@ -49,7 +49,7 @@ def write_account_ssl_key(domain, key):
             if key._timestamp:
                 f.write(f"Timestamp: {key._timestamp}\n".encode())
         f.write(key.to_pem())
-    os.chmod(filename, 0o400)
+    os.chmod(filename, 0o600)
 
 
 class ClubAcmeProvider(ProviderBase):
