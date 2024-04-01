@@ -62,7 +62,7 @@ class SiteViewsTestCase(EssentialApiBase):
         self.assertNotContains(response, "Kiila Cup 1")
         self.assertContains(response, "Kiila Cup 2")
         response = client.get(
-            f"{url}?year={arrow.get().year}&month={arrow.get().month}"
+            f"{url}?year={arrow.get().shift(hours=-10, minutes=59).year}&month={arrow.get().shift(hours=-10, minutes=59).month}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotContains(response, "Kiila Cup 1")
