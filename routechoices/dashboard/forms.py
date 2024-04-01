@@ -249,7 +249,13 @@ class MapForm(ModelForm):
 
     def clean_corners_coordinates(self):
         cc = self.cleaned_data["corners_coordinates"]
-        return ",".join([f"{round(float(c), 5)}" for c in cc.split(",")])
+        cs = cc.split(",")
+        if len(cs) != 8:
+            raise ValidationError("Invalid format")
+        try:
+            return ",".join([f"{round(float(c), 5)}" for c in cs])
+        except Exception:
+            raise ValidationError("Invalid format")
 
     def clean_image(self):
         f_orig = self.cleaned_data["image"]
