@@ -15,8 +15,8 @@ logger.setLevel(logging.INFO)
 handler = logging.handlers.RotatingFileHandler(
     os.path.join(settings.BASE_DIR, "logs", "tcp.log"), maxBytes=10000000, backupCount=5
 )
-formatter = logger.Formatter(
-    format="%(asctime)s.%(msecs)03d, %(message)s",
+formatter = logging.Formatter(
+    fmt="%(asctime)s.%(msecs)03d, %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 handler.setFormatter(formatter)
