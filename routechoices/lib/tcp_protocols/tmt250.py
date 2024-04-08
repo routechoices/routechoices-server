@@ -1,7 +1,5 @@
 from struct import pack, unpack
 
-import arrow
-
 from routechoices.lib.helpers import random_key, safe64encode
 from routechoices.lib.tcp_protocols.commons import (
     GenericTCPServer,
@@ -111,8 +109,7 @@ class TMT250Connection:
             self.stream.close()
             return
         self.logger.info(
-            f"{arrow.now().datetime}, TMT250 CONN, "
-            f"{self.aid}, {self.address}: {safe64encode(bytes(data))}"
+            f"TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
         )
         self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
@@ -142,8 +139,7 @@ class TMT250Connection:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
                 self.logger.info(
-                    f"{arrow.now().datetime}, TMT250 DATA, "
-                    f"{self.aid}, {self.address}: "
+                    f"TMT250 DATA, {self.aid}, {self.address}: "
                     f"{safe64encode(bytes(data[:data_len]))}"
                 )
                 await self._on_read_line(data[:data_len])

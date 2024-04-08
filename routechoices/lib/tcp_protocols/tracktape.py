@@ -79,8 +79,7 @@ class TrackTapeConnection:
         locs = data.get("positions", [])
         loc_array = []
         self.logger.info(
-            f"{arrow.now().datetime}, TRCKTP DATA, "
-            f"{self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
+            f"TRCKTP DATA, {self.aid}, {self.address}: {safe64encode(json.dumps(data))}"
         )
         for loc in locs:
             try:

@@ -76,13 +76,11 @@ class MicTrackConnection:
             return
         if self.protocol_version == 1:
             self.logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA, "
-                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         else:
             self.logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA2, "
-                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
         self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
@@ -209,8 +207,7 @@ class MicTrackConnection:
                 return False
             print(f"Received data ({data_raw})")
             self.logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA, "
-                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"MICTRK DATA, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             data = data_raw.split("#")
             await self._process_data(data)
@@ -241,8 +238,7 @@ class MicTrackConnection:
                 data_raw += data_bin.decode("ascii")
             print(f"Received data ({data_raw})")
             self.logger.info(
-                f"{arrow.now().datetime}, MICTRK DATA2, "
-                f"{self.aid}, {self.address}: {safe64encode(data_raw)}"
+                f"MICTRK DATA2, {self.aid}, {self.address}: {safe64encode(data_raw)}"
             )
             await self._process_data2(data)
         except Exception as e:
