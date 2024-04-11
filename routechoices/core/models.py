@@ -1192,7 +1192,7 @@ class EventSet(models.Model):
         if self.id:
             qs = qs.exclude(id=self.id)
         if qs.exists():
-            errors.append("Event Set with this Club and Name already exists.")
+            errors.append("An Event Set with this Club and Name already exists.")
 
         if self.create_page:
             qs = EventSet.objects.filter(
@@ -1201,11 +1201,13 @@ class EventSet(models.Model):
             if self.id:
                 qs = qs.exclude(id=self.id)
             if qs.exists():
-                errors.append("Event Set with this Club and Slug already exists.")
+                errors.append("An Event Set with this Club and Slug already exists.")
             elif Event.objects.filter(
                 club_id=self.club_id, slug__iexact=self.slug
             ).exists():
-                errors.append("Event with this Club and Slug already exists.")
+                errors.append(
+                    "An Event with this Event Set's Club and Slug already exists."
+                )
         if errors:
             raise ValidationError(errors)
         super().validate_unique(exclude)
@@ -1757,23 +1759,30 @@ class Event(models.Model):
 
     def validate_unique(self, exclude=None):
         errors = []
-        qs = Event.objects.filter(
-            club_id=self.club_id, event_set_id=self.event_set_id, name__iexact=self.name
-        )
-        if self.id:
-            qs = qs.exclude(id=self.id)
-        if qs.exists():
-            errors.append("Event with this Club, Event Set, and Name already exists.")
-
-        qs = Event.objects.filter(club_id=self.club_id, slug__iexact=self.slug)
-        if self.id:
-            qs = qs.exclude(id=self.id)
-        if qs.exists():
-            errors.append("Event with this Club and Slug already exists.")
-        elif EventSet.objects.filter(
-            club_id=self.club_id, create_page=True, slug__iexact=self.slug
-        ).exists():
-            errors.append("Event Set with this Club and Slug already exists.")
+        if self.event_set_id:
+            qs = Event.objects.filter(
+                club_id=self.club_id,
+                event_set_id=self.event_set_id,
+                name__iexact=self.name,
+            )
+            if self.id:
+                qs = qs.exclude(id=self.id)
+            if qs.exists():
+                errors.append(
+                    "An Event with this Club, Event Set, and Name already exists."
+                )
+        elif not errors:
+            qs = Event.objects.filter(club_id=self.club_id, slug__iexact=self.slug)
+            if self.id:
+                qs = qs.exclude(id=self.id)
+            if qs.exists():
+                errors.append("An Event with this Club and Slug already exists.")
+            elif EventSet.objects.filter(
+                club_id=self.club_id, create_page=True, slug__iexact=self.slug
+            ).exists():
+                errors.append(
+                    "An Event Set with this Event's Club and Event's Slug already exists."
+                )
         if errors:
             raise ValidationError(errors)
         super().validate_unique(exclude)
