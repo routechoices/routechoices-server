@@ -352,7 +352,6 @@ def event_list(request):
         try:
             event.full_clean()
         except Exception as e:
-            event.delete()
             raise ValidationError(e)
         event.save()
         output = {
