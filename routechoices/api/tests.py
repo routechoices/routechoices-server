@@ -296,6 +296,13 @@ class EventCreationApiTestCase(EssentialApiBase):
         res = self.client.post(
             self.url,
             {
+                "end_date": arrow.now().shift(minutes=-60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
                 "club_slug": "not-a-club",
                 "end_date": arrow.now().shift(minutes=60),
             },
@@ -402,6 +409,16 @@ class EventCreationApiTestCase(EssentialApiBase):
             {
                 "club_slug": "club",
                 "open_registration": True,
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # open upload
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "allow_route_upload": True,
                 "end_date": arrow.now().shift(minutes=60),
             },
         )
