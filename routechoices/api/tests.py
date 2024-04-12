@@ -199,6 +199,49 @@ class ImeiApiTestCase(EssentialApiBase):
         self.assertEqual(len(new_dev_id), 8)
 
 
+class EventSetCreationApiTestCase(EssentialApiBase):
+    def setUp(self):
+        super().setUp()
+        self.url = self.reverse_and_check("event_set", "/event-set")
+        self.club = Club.objects.create(name="Test club", slug="club")
+        self.club.admins.set([self.user])
+        self.client.force_login(self.user)
+
+    def test_ok(self):
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "name": "My event set",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_not_ok(self):
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "not-a-club",
+                "name": "My event set",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "name": "My event set",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
 class EventCreationApiTestCase(EssentialApiBase):
     def setUp(self):
         super().setUp()

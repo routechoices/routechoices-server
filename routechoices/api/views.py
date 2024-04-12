@@ -136,11 +136,10 @@ def event_set_creation(request):
     name = request.data.get("name")
     if not name or not club_slug:
         raise ValidationError("Missing parameter")
-    club = Club.objects.filter(slug=club_slug).first()
-    is_user_event_admin = club.admins.filter(id=request.user.id).exists()
-    if not is_user_event_admin:
-        raise PermissionDenied("not club admin")
-    event_set, created = EventSet.objects.get_or_create(club=club, name=name)
+    club = Club.objects.filter(admins=request.user, slug__iexact=club_slug).first()
+    if not club:
+        raise ValidationError("club not found")
+    event_set, _ = EventSet.objects.get_or_create(club=club, name=name)
     return Response(
         {
             "value": event_set.id,
