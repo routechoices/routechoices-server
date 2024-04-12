@@ -1,5 +1,8 @@
-from django.test import TestCase
+from unittest.mock import Mock, patch
 
+from django.test import TestCase, override_settings
+
+from . import plausible
 from .helpers import (
     check_cname_record,
     check_txt_record,
@@ -8,8 +11,46 @@ from .helpers import (
 )
 
 
-class HelperTestCase(TestCase):
+@override_settings(ANALYTICS_API_KEY=True)
+class PlausibleTestCase(TestCase):
+    @patch("curl_cffi.requests.get")
+    def test_domain_setup(self, mock_get):
+        mock_response = Mock()
+        expected_dict = {}
+        mock_response.json.return_value = expected_dict
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+        self.assertTrue(plausible.domain_is_setup("example.com"))
+        mock_response.status_code = 404
+        mock_get.return_value = mock_response
+        self.assertFalse(plausible.domain_is_setup("example.com"))
 
+    @patch("curl_cffi.requests.post")
+    def test_create_domain(self, mock_post):
+        mock_response = Mock()
+        expected_dict = {}
+        mock_response.json.return_value = expected_dict
+        mock_response.status_code = 200
+        mock_post.return_value = mock_response
+        self.assertTrue(plausible.create_domain("gps.example.com"))
+        mock_response.status_code = 404
+        mock_post.return_value = mock_response
+        self.assertFalse(plausible.create_domain("gps.example.com"))
+
+    @patch("curl_cffi.requests.put")
+    def test_change_domain(self, mock_put):
+        mock_response = Mock()
+        expected_dict = {}
+        mock_response.json.return_value = expected_dict
+        mock_response.status_code = 200
+        mock_put.return_value = mock_response
+        self.assertTrue(plausible.change_domain("olddomain.com", "gps.example.com"))
+        mock_response.status_code = 400
+        mock_put.return_value = mock_response
+        self.assertFalse(plausible.change_domain("olddomain.com", "gps.example.com"))
+
+
+class HelperTestCase(TestCase):
     def test_calibration_conversion(self):
         cal = three_point_calibration_to_corners(
             "9.5480564597566|46.701263850274|1|1|9.5617738453051|46.701010852567|4961|1|9.5475331306949|46.687915214433|1|7016",
