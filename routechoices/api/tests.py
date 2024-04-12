@@ -217,6 +217,153 @@ class EventCreationApiTestCase(EssentialApiBase):
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
+    def test_duplicate_slug(self):
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "name": "My event",
+                "slug": "hello-event",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "slug": "hello-event",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_invalid_case(self):
+        # invalid date
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "end_date": arrow.now().shift(minutes=-60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # invalid club
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "not-a-club",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # invalid slug
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "slug": "-- not a nice slug :)",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # invalid start date
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "start_date": "-- not a start date",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "start_date": arrow.now().shift(minutes=70),
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "start_date": arrow.now().shift(minutes=50),
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # invalid end date
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "end_date": "-- not a end date",
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        # invalid background map
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "backdrop": "openstreetmap",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "backdrop": "osm",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        # invalid privacy
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "privacy": "secret",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "privacy": "potato",
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # open registration
+        res = self.client.post(
+            self.url,
+            {
+                "club_slug": "club",
+                "open_registration": True,
+                "end_date": arrow.now().shift(minutes=60),
+            },
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
 
 class EventApiTestCase(EssentialApiBase):
     def test_live_event_detail(self):
