@@ -90,7 +90,7 @@ setuptools==69.2.0
 sewer @ git+https://github.com/rphlo/sewer@8d25ea1f1e95e97f52c2354c1752d2adbbfdafaf
 six==1.16.0
 soupsieve==2.5
-sqlparse==0.4.4
+sqlparse==0.5.0
 tinycss2==1.2.1
 tornado==6.4
 types-python-dateutil==2.9.0.20240316
