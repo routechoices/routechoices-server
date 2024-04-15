@@ -20,10 +20,10 @@ class PlausibleTestCase(TestCase):
         mock_response.json.return_value = expected_dict
         mock_response.status_code = 200
         mock_get.return_value = mock_response
-        self.assertTrue(plausible.domain_is_setup("example.com"))
+        self.assertTrue(plausible.is_domain_setup("example.com"))
         mock_response.status_code = 404
         mock_get.return_value = mock_response
-        self.assertFalse(plausible.domain_is_setup("example.com"))
+        self.assertFalse(plausible.is_domain_setup("example.com"))
 
     @patch("curl_cffi.requests.post")
     def test_create_domain(self, mock_post):
@@ -60,6 +60,27 @@ class PlausibleTestCase(TestCase):
         mock_response.status_code = 400
         mock_delete.return_value = mock_response
         self.assertFalse(plausible.delete_domain("gps.example.com"))
+
+    @patch("routechoices.lib.plausible.is_domain_setup")
+    @patch("curl_cffi.requests.put")
+    def test_create_link(self, mock_put, mock_is_domain_setup):
+        mock_is_domain_setup_return = Mock()
+        mock_is_domain_setup_return.return_value = True
+        mock_is_domain_setup.return_value = mock_is_domain_setup_return
+
+        mock_response = Mock()
+        expected_dict = {"url": "https://plausible.example.com/abc123"}
+        mock_response.json.return_value = expected_dict
+        mock_response.status_code = 200
+        mock_put.return_value = mock_response
+
+        link, created = plausible.create_shared_link("gps.example.com", "Hello")
+        self.assertTrue(created)
+        self.assertEqual(link, "https://plausible.example.com/abc123")
+        mock_response.status_code = 400
+        mock_put.return_value = mock_response
+        _, created = plausible.create_shared_link("gps.example.com", "Hello")
+        self.assertFalse(created)
 
 
 class HelperTestCase(TestCase):

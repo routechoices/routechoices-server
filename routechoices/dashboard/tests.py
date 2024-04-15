@@ -94,6 +94,23 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "Domain prefix already registered.")
 
+    def test_custom_domain(self):
+        url = self.reverse_and_check(
+            "dashboard:club_custom_domain_view", "/dashboard/club/custom-domain"
+        )
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.post(
+            url,
+            {"domain": "live.kiilat.com"},
+            follow=True,
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotContains(res, "invalid-feedback")
+        self.club.refresh_from_db()
+        self.assertEqual(self.club.domain, "live.kiilat.com")
+
     def test_change_club_logo(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 

@@ -216,6 +216,7 @@ class ClubDomainForm(ModelForm):
         if domain == "":
             return domain
         if not check_cname_record(domain):
+            print(check_cname_record)
             raise ValidationError(
                 f"CNAME record for '{domain}' has not been set properly."
             )

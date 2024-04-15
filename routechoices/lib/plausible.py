@@ -2,7 +2,7 @@ from curl_cffi import requests
 from django.conf import settings
 
 
-def domain_is_setup(domain):
+def is_domain_setup(domain):
     if not settings.ANALYTICS_API_KEY:
         return False
     r = requests.get(
@@ -28,7 +28,7 @@ def create_domain(domain):
 def create_shared_link(domain, name):
     if not settings.ANALYTICS_API_KEY:
         return "", False
-    if not domain_is_setup(domain):
+    if not is_domain_setup(domain):
         if not create_domain(domain):
             return "", False
     r = requests.put(
