@@ -224,7 +224,7 @@ class ClubDomainForm(ModelForm):
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
         if matching_clubs.exists():
-            raise ValidationError(f"Domain '{domain}' already exists.")
+            raise ValidationError(f"Domain '{domain}' already used by another club.")
         return domain.lower()
 
 
