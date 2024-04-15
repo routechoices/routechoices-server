@@ -49,6 +49,18 @@ class PlausibleTestCase(TestCase):
         mock_put.return_value = mock_response
         self.assertFalse(plausible.change_domain("olddomain.com", "gps.example.com"))
 
+    @patch("curl_cffi.requests.delete")
+    def test_delete_domain(self, mock_delete):
+        mock_response = Mock()
+        expected_dict = {}
+        mock_response.json.return_value = expected_dict
+        mock_response.status_code = 200
+        mock_delete.return_value = mock_response
+        self.assertTrue(plausible.delete_domain("gps.example.com"))
+        mock_response.status_code = 400
+        mock_delete.return_value = mock_response
+        self.assertFalse(plausible.delete_domain("gps.example.com"))
+
 
 class HelperTestCase(TestCase):
     def test_calibration_conversion(self):
