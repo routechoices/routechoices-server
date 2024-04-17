@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-./dc exec django coverage run ./manage.py test
+./dc exec django coverage run ./manage.py test --buffer --shuffle
 ./dc exec django coverage xml

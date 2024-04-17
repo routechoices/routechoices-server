@@ -49,6 +49,7 @@ class EssentialApiBase(APITestCase):
 
 class EssentialApiTestCase1(EssentialApiBase):
     def test_api_root(self):
+        self.assertFalse(settings.DEBUG)
         url = self.reverse_and_check("api_doc", "/")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)

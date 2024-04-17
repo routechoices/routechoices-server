@@ -13,6 +13,7 @@ commands:
       - run: mkdir -p media/routechoices/maps/
       - run: mv ./.env.dev ./.env
       - run: echo "SECURE_SSL_REDIRECT = False" > ./routechoices/settings_overrides.py
+      - run: echo "DEBUG = False" >> ./routechoices/settings_overrides.py
       - run: ./dc up -d
       - run: ./da migrate
       - run: ./da collectstatic

@@ -8,12 +8,8 @@ if __name__ == "__main__":
         command = argv[1]
     except IndexError:
         argv[1] = "help"
-    if command == "test":
-        default = "routechoices.test_settings"
-    else:
-        default = "routechoices.settings"
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", default)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "routechoices.settings")
 
     try:
         from django.core.management import execute_from_command_line
