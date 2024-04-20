@@ -51,7 +51,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         data = await client.read_bytes(255, partial=True)
         self.assertEqual(data, ack_data)
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         if server is not None:
@@ -72,11 +72,11 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         client = IOStream(socket.socket())
         await client.connect(("localhost", port))
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         await client.write(gps_data2)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 2)
         if server is not None:
@@ -97,11 +97,11 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         client = IOStream(socket.socket())
         await client.connect(("localhost", port))
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         await client.write(gps_data2)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 2)
         if server is not None:
@@ -126,11 +126,11 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         data = await client.read_bytes(255, partial=True)
         self.assertEqual(data, ack_data)
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         await client.write(battery_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.battery_level, 69)
         if server is not None:
@@ -157,7 +157,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         data = await client.read_bytes(255, partial=True)
         self.assertEqual(data, ack_data)
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 4)
         if server is not None:
@@ -178,11 +178,11 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         client = IOStream(socket.socket())
         await client.connect(("localhost", port))
         await client.write(gps_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 2)
         await client.write(gps_data2)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 3)
         if server is not None:
@@ -203,7 +203,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await client.connect(("localhost", port))
         await client.write(gps_data)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         if server is not None:
@@ -224,7 +224,7 @@ class TCPConnectionsTest(AsyncTestCase, TransactionTestCase):
         await client.connect(("localhost", port))
         await client.write(gps_data)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
         device = await refresh_device(device)
         self.assertEqual(device.location_count, 1)
         if server is not None:
