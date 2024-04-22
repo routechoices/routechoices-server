@@ -120,7 +120,7 @@
                             </p>
                             <h3 id="partners">Partners</h3>
                             <h4>Clubs</h4>
-                            <div class="row justify-content-between mb-3">
+                            <div class="row justify-content-between mb-3" style="font-size: small;">
                                 {% for club in partner_clubs %}
                                     <div class="col align-self-start text-center">
                                         {% if club.website %}
@@ -128,7 +128,11 @@
                                                target="_blank"
                                                class="text-decoration-none dark-link">
                                             {% endif %}
-                                            <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
+                                            <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static '/img/club-default.png' %}{% endif %}"
+                                                 width="150px"
+                                                 height="150px"
+                                                 class="rounded mx-auto d-block"
+                                                 alt="{{ club.name }}'s logo" />
                                             <span class="fw-bold">{{ club.name }}</span>
                                             {% if club.website %}</a>{% endif %}
                                     </div>
@@ -136,10 +140,14 @@
                             </div>
                             {% if individual_partners %}
                                 <h4>People</h4>
-                                <div class="row justify-content-between mb-3">
+                                <div class="row justify-content-between mb-3" style="font-size: small;">
                                     {% for person in individual_partners %}
                                         <div class="col align-self-start text-center">
-                                            <img src="{% static "/img/avatar-default.png" %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ people.name }}'s avatar" />
+                                            <img src="{% static '/img/avatar-default.png' %}"
+                                                 width="150px"
+                                                 height="150px"
+                                                 class="rounded mx-auto d-block"
+                                                 alt="{{ people.name }}'s avatar" />
                                             <span class="fw-bold">{{ person.name }}</span>
                                         </div>
                                     {% endfor %}
