@@ -62,7 +62,7 @@ class RequestInviteForm(Form):
     def clean_club(self):
         club = self.cleaned_data["club"]
         if self.user in club.admins.all():
-            raise ValidationError("You are already an admin of this club.")
+            self.add_error("club", "You are already an admin of this club.")
         return club
 
 
@@ -104,12 +104,13 @@ class ClubForm(ModelForm):
                     or slug == self.instance.slug
                 )
             ):
-                raise ValidationError(
-                    "Domain prefix can be changed only once every 72 hours."
+                self.add_error(
+                    "slug",
+                    "Domain prefix can be changed only once every 72 hours.",
                 )
 
         if club_with_slug_qs.exists():
-            raise ValidationError("Domain prefix already registered.")
+            self.add_error("slug", "Domain prefix already registered.")
         return slug
 
     def clean_banner(self):
@@ -216,15 +217,15 @@ class ClubDomainForm(ModelForm):
         if domain == "":
             return domain
         if not check_cname_record(domain):
-            print(check_cname_record)
-            raise ValidationError(
-                f"CNAME record for '{domain}' has not been set properly."
+            self.add_error(
+                "domain",
+                f"CNAME record for '{domain}' has not been set properly.",
             )
         matching_clubs = Club.objects.filter(domain__iexact=domain)
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
         if matching_clubs.exists():
-            raise ValidationError(f"Domain '{domain}' already used by another club.")
+            self.add_error("domain", f"Domain '{domain}' already used by another club.")
         return domain.lower()
 
 
@@ -348,7 +349,7 @@ class EventForm(ModelForm):
         start_date = self.cleaned_data.get("start_date")
         end_date = self.cleaned_data.get("end_date")
         if start_date and end_date and end_date < start_date:
-            raise ValidationError("Start Date must be before End Date")
+            self.add_error("Start Date must be before End Date")
 
     # def clean_list_on_routechoices_com(self):
     #    club = self.club
@@ -489,8 +490,8 @@ class CompetitorForm(ModelForm):
             and event_end
             and (event_start > start or start > event_end)
         ):
-            raise ValidationError(
-                "Competitor start time should be during the event time"
+            self.add_error(
+                "start_time", "Competitor start time should be during the event time"
             )
         return start
 
