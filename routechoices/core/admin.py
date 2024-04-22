@@ -917,4 +917,5 @@ ADMIN_COMMAND_LIST = [
     "import_from_tractrac",
     "export_device_list",
     "export_email_list",
+    "clean_admin_logs",
 ]
