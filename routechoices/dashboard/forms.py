@@ -349,7 +349,7 @@ class EventForm(ModelForm):
         start_date = self.cleaned_data.get("start_date")
         end_date = self.cleaned_data.get("end_date")
         if start_date and end_date and end_date < start_date:
-            self.add_error("Start Date must be before End Date")
+            self.add_error(None, "Start Date must be before End Date")
 
     # def clean_list_on_routechoices_com(self):
     #    club = self.club
