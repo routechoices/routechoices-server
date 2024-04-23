@@ -353,7 +353,7 @@ class EventSetAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "slug",
-        "club",
+        "club_link",
         "creation_date",
         "event_count",
         "page",
@@ -366,7 +366,9 @@ class EventSetAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.annotate(event_count=Count("events", distinct=True))
+        return qs.select_related("club").annotate(
+            event_count=Count("events", distinct=True)
+        )
 
     def event_count(self, obj):
         return obj.event_count
@@ -378,6 +380,12 @@ class EventSetAdmin(admin.ModelAdmin):
             return ""
         link = obj.url
         return format_html('<a href="{}">Open</a>', link)
+
+    def club_link(self, obj):
+        link = f"/core/club/{obj.club_id}/change/"
+        return format_html('<a href="{}">{}</a>', link, obj.club)
+
+    club_link.short_description = "Club"
 
 
 @admin.register(Club)
@@ -424,7 +432,16 @@ class ClubAdmin(admin.ModelAdmin):
         )
 
     def admin_list(self, obj):
-        return ", ".join((a.username for a in obj.admins.all()))
+        return mark_safe(
+            ", ".join(
+                (
+                    format_html(
+                        '<a href="/auth/user/{}/change">{}</a>', a.id, a.username
+                    )
+                    for a in obj.admins.all()
+                )
+            )
+        )
 
     event_count.admin_order_field = "event_count"
     map_count.admin_order_field = "map_count"
@@ -463,8 +480,8 @@ class NoticeInline(admin.TabularInline):
 class EventAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "event_set",
-        "club",
+        "event_set_link",
+        "club_link",
         "start_date",
         "db_duration",
         "db_is_live",
@@ -489,7 +506,7 @@ class EventAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .select_related("event_set")
+            .select_related("event_set", "club")
             .annotate(
                 db_duration=F("end_date") - F("start_date"),
                 competitor_count=Count("competitors", distinct=True),
@@ -543,6 +560,20 @@ class EventAdmin(admin.ModelAdmin):
         return obj.competitor_count
 
     competitor_count.admin_order_field = "competitor_count"
+
+    def club_link(self, obj):
+        link = f"/core/club/{obj.club_id}/change/"
+        return format_html('<a href="{}">{}</a>', link, obj.club)
+
+    club_link.short_description = "Club"
+
+    def event_set_link(self, obj):
+        if not obj.event_set_id:
+            return None
+        link = f"/core/eventset/{obj.event_set_id}/change/"
+        return format_html('<a href="{}">{}</a>', link, obj.event_set)
+
+    club_link.short_description = "Club"
 
 
 class DeviceCompetitorInline(admin.TabularInline):
@@ -684,16 +715,23 @@ class DeviceAdmin(admin.ModelAdmin):
 class DeviceArchiveReferenceAdmin(admin.ModelAdmin):
     list_display = (
         "archive",
-        "original",
+        "original_link",
         "creation_date",
     )
+
+    def original_link(self, obj):
+        return format_html(
+            '<a href="/core/device/{}/change">{}</a>', obj.original_id, obj.original
+        )
+
+    original_link.short_description = "Original"
 
 
 @admin.register(ImeiDevice)
 class ImeiDeviceAdmin(admin.ModelAdmin):
     list_display = (
         "imei",
-        "device",
+        "device_link",
         "creation_date",
         "clubs",
     )
@@ -702,8 +740,20 @@ class ImeiDeviceAdmin(admin.ModelAdmin):
 
     search_fields = ("imei", "device__aid")
 
+    def device_link(self, obj):
+        return format_html(
+            '<a href="/core/device/{}/change">{}</a>', obj.device_id, obj.device
+        )
+
     def clubs(self, obj):
-        return ", ".join(c.club.name for c in obj.device.club_ownerships.all())
+        return mark_safe(
+            ", ".join(
+                format_html(
+                    '<a href="/core/club/{}/change">{}</a>', c.club.id, c.club.name
+                )
+                for c in obj.device.club_ownerships.all()
+            )
+        )
 
     def get_queryset(self, request):
         return (
@@ -736,7 +786,7 @@ class SpotFeedAdmin(admin.ModelAdmin):
 class MapAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "club",
+        "club_link",
         "creation_date",
         "center_link",
         "resolution",
@@ -784,10 +834,17 @@ class MapAdmin(admin.ModelAdmin):
 
     event_count.admin_order_field = "event_count"
 
+    def club_link(self, obj):
+        return format_html(
+            '<a href="/core/club/{}/change">{}</a>', obj.club_id, obj.club
+        )
+
+    club_link.short_description = "Club"
+
 
 @admin.register(DeviceClubOwnership)
 class DeviceClubOwnershipAdmin(admin.ModelAdmin):
-    list_display = ("device", "club", "nickname")
+    list_display = ("device", "club_link", "nickname")
     list_filter = ("club",)
 
     def get_queryset(self, request):
@@ -800,6 +857,12 @@ class DeviceClubOwnershipAdmin(admin.ModelAdmin):
         )
 
     search_fields = ("device__aid", "nickname")
+
+    def club_link(self, obj):
+        link = f"/core/club/{obj.club_id}/change/"
+        return format_html('<a href="{}">{}</a>', link, obj.club)
+
+    club_link.short_description = "Club"
 
 
 @admin.register(TcpDeviceCommand)
@@ -869,7 +932,14 @@ class MyUserAdmin(HijackUserAdminMixin, UserAdmin):
     has_verified_email.admin_order_field = "has_verified_email"
 
     def clubs(self, obj):
-        return ", ".join((c.name for c in obj.club_set.all()))
+        return mark_safe(
+            ", ".join(
+                (
+                    format_html('<a href="/core/club/{}/change">{}</a>', c.id, c.name)
+                    for c in obj.club_set.all()
+                )
+            )
+        )
 
     def clean_fake_users(self, request, queryset):
         two_weeks_ago = now() - timedelta(days=14)
