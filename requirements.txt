@@ -50,7 +50,7 @@ idna==3.7
 inflection==0.5.1
 jmespath==1.0.1
 jwcrypto==1.5.6
-jxlpy @ git+https://github.com/rphlo/jxlpy@7b79e0b0accc848929cbf0fe080dd55762ae2980
+jxlpy==0.9.4
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 markdown==3.6
 maxminddb==2.6.0
