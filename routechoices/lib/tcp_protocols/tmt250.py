@@ -108,9 +108,6 @@ class TMT250Connection:
             await self.stream.write(b"\x00")
             self.stream.close()
             return
-        self.logger.info(
-            f"TMT250 CONN, {self.aid}, {self.address}: {safe64encode(bytes(data))}"
-        )
         self.db_device = await get_device_by_imei(imei)
         if not self.db_device:
             print(f"imei {imei} not registered ({self.address})", flush=True)
@@ -119,6 +116,9 @@ class TMT250Connection:
             return
         self.imei = imei
         await self.stream.write(b"\x01")
+        self.logger.info(
+            f"TMT250 CONN, {self.aid}, {self.address}, {self.imei}: {safe64encode(bytes(data))}"
+        )
         print(f"{self.imei} is connected", flush=True)
 
         while await self._on_write_complete():
@@ -139,7 +139,7 @@ class TMT250Connection:
                 data_len = await self.stream.read_into(data, partial=True)
                 print(f"{self.imei} is sending {data_len} bytes")
                 self.logger.info(
-                    f"TMT250 DATA, {self.aid}, {self.address}: "
+                    f"TMT250 DATA, {self.aid}, {self.address}, {self.imei}: "
                     f"{safe64encode(bytes(data[:data_len]))}"
                 )
                 await self._on_read_line(data[:data_len])

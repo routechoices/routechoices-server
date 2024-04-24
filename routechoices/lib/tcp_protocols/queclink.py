@@ -33,7 +33,6 @@ class QueclinkConnection:
         try:
             data_bin = await self.stream.read_until(b"$")
             data = data_bin.decode("ascii")
-            self.logger.info(f"GL300 DATA, {self.aid}, {self.address}, {data}")
             print(f"Received data ({data})", flush=True)
             parts = data.split(",")
             if parts[0][:7] == "+ACK:GT" or parts[0][:8] in ("+RESP:GT", "+BUFF:GT"):
@@ -61,6 +60,8 @@ class QueclinkConnection:
             self.stream.close()
             return
         self.imei = imei
+
+        self.logger.info(f"GL300 DATA, {self.aid}, {self.address}, {self.imei}: {data}")
         print(f"{self.imei} is connected")
 
         await self.send_pending_commands()
@@ -159,7 +160,7 @@ class QueclinkConnection:
     async def read_line(self):
         data_bin = await self.stream.read_until(b"$")
         data = data_bin.decode("ascii")
-        self.logger.info(f"GL300 DATA, {self.aid}, {self.address}, {data}")
+        self.logger.info(f"GL300 DATA, {self.aid}, {self.address}, {self.imei}: {data}")
         print(f"Received data ({data})")
         await self.send_pending_commands()
         return await self.process_line(data)

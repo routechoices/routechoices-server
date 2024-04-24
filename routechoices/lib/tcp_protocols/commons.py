@@ -13,7 +13,9 @@ from routechoices.core.models import Device, TcpDeviceCommand
 logger = logging.getLogger("TCP Rotating Log")
 logger.setLevel(logging.INFO)
 handler = logging.handlers.RotatingFileHandler(
-    os.path.join(settings.BASE_DIR, "logs", "tcp.log"), maxBytes=10000000, backupCount=5
+    os.path.join(settings.BASE_DIR, "logs", "tcp.log"),
+    maxBytes=50000000,
+    backupCount=10,
 )
 formatter = logging.Formatter(
     fmt="%(asctime)s.%(msecs)03d, %(message)s",

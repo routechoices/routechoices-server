@@ -72,7 +72,9 @@ class XexunConnection:
         imei = re.search(r"imei:(\d+),", data_raw).group(1)
         if imei != self.imei:
             return False
-        self.logger.info(f"XEXUN DATA, {self.aid}, {self.address}: {','.join(data)}")
+        self.logger.info(
+            f"XEXUN DATA, {self.aid}, {self.address}, {self.imei}: {','.join(data)}"
+        )
         try:
             tim = arrow.get(f"{data[9]} {data[1][:6]}", "DDMMYY HHmmss").int_timestamp
             lat_minute = float(data[3])

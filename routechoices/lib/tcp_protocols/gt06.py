@@ -69,7 +69,7 @@ class GT06Connection:
 
     async def _process_data(self, data_bin):
         self.logger.info(
-            f"GT06 DATA, {self.aid}, {self.address}: {safe64encode(data_bin)}"
+            f"GT06 DATA, {self.aid}, {self.address}, {self.imei}: {safe64encode(data_bin)}"
         )
         if not self.db_device.user_agent:
             self.db_device.user_agent = "Gt06"
