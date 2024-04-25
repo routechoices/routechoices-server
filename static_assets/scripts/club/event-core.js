@@ -172,7 +172,13 @@ L.Control.Grouping = L.Control.extend({
         out += "<br>";
       }
       out +=
-        "<h6>" + banana.i18n("group") + " " + alphabetizeNumber(i) + "</h6>";
+        '<h6><span style="color: ' +
+        k.color +
+        '">&#11044;</span> ' +
+        banana.i18n("group") +
+        " " +
+        alphabetizeNumber(i) +
+        "</h6>";
       k.parts.forEach(function (ci) {
         out +=
           '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
@@ -185,7 +191,8 @@ L.Control.Grouping = L.Control.extend({
     if (out === "") {
       out = "<h6>" + banana.i18n("no-group") + "</h6>";
     }
-    if (el.html() !== out) {
+    var testOut = u("<div>").html(out);
+    if (el.html() !== testOut.html()) {
       el.html(out);
     }
   },

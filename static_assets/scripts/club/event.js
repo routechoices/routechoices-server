@@ -2976,6 +2976,7 @@ function RCEvent(infoURL, clockURL) {
             cluster.color = getColor(d - 1);
             cluster.isColorDark = getContrastYIQ(cluster.color);
           }
+          clustersCenter[d - 1].color = cluster.color;
           var competitorInCluster = competitorsWithMarker[i];
           ["mapMarker", "nameMarker"].forEach(function (layerName) {
             if (competitorInCluster[layerName]) {
