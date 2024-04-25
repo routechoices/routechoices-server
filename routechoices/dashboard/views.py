@@ -241,7 +241,7 @@ def account_delete_view(request):
                 request.user.delete()
                 request.session.user_id = None
                 messages.success(request, "Account deleted.")
-                return redirect("site:home_view")
+                return redirect("site:landing_page")
             return render(
                 request,
                 "dashboard/account_delete_confirm.html",

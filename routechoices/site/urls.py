@@ -6,6 +6,7 @@ from routechoices.site import feeds, views
 
 urlpatterns = [
     re_path(r"^$", views.home_page, name="home_view"),
+    re_path(r"^live-gps-tracking/?$", views.landing_page, name="landing_page"),
     re_path(r"^login/?$", views.CustomLoginView.as_view(), name="account_login"),
     re_path(r"^logout/?$", account_views.logout, name="account_logout"),
     re_path(r"^signup/?$", account_views.signup, name="account_signup"),

@@ -15,7 +15,7 @@ class StaticViewSitemap(Sitemap):
 
     def items(self):
         return [
-            "site:home_view",
+            "site:landing_page",
             "site:trackers_view",
             "site:contact_view",
             "site:pricing_view",

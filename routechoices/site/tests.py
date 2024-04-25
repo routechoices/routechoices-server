@@ -71,7 +71,9 @@ class SiteViewsTestCase(EssentialApiBase):
     def test_semi_static_pages_loads(self):
         client = APIClient(HTTP_HOST="www.routechoices.dev")
 
-        url = self.reverse_and_check("site:home_view", "/", host="www")
+        url = self.reverse_and_check(
+            "site:landing_page", "/live-gps-tracking", host="www"
+        )
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

@@ -21,6 +21,10 @@ from routechoices.site.forms import ContactForm
 
 
 def home_page(request):
+    return redirect(reverse("site:landing_page", host="www"), permanent=True)
+
+
+def landing_page(request):
     club_partners = Club.objects.filter(upgraded=True).order_by("name")
     indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
     return render(
