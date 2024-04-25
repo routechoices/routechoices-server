@@ -50,7 +50,7 @@ jobs:
     steps:
       - prepare-docker
       - run: ./dc restart django
-      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
+      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev/live-gps-tracking)" != "200" ]]; do sleep 5; done' || false
       - run: ./test
       - codecov/upload:
           file: coverage.xml
@@ -69,7 +69,7 @@ jobs:
           environment:
             WSGI_FILE: wsgi-with-cov
             NUM_PROCESSES: 1
-      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev)" != "200" ]]; do sleep 5; done' || false
+      - run: timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' https://www.routechoices.dev/live-gps-tracking)" != "200" ]]; do sleep 5; done' || false
       - run: sudo apt update
       - run: sudo apt install -y libgbm-dev
       - browser-tools/install-chrome
