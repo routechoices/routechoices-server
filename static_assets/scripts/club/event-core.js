@@ -177,7 +177,7 @@ L.Control.Grouping = L.Control.extend({
         out +=
           '<div class="text-nowrap" style="clear:both;width:200px;height:1em"><span class="text-nowrap overflow-hidden float-start d-inline-block text-truncate" style="width:195px;"><span style="color: ' +
           c[ci].color +
-          '">???</span> ' +
+          '">&#11044;</span> ' +
           u("<span/>").text(c[ci].name).html() +
           "</span></div>";
       });
