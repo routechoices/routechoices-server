@@ -381,6 +381,7 @@ SLUG_BLACKLIST = [
     "list",
     "lists",
     "live",
+    "live-gps-tracking",
     "livelox-map",
     "load",
     "local",
