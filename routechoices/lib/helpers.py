@@ -49,7 +49,7 @@ def get_best_image_mime(request, default=None):
     accepted_mimes = request.COOKIES.get(
         "accept-image", request.META.get("HTTP_ACCEPT", "")
     ).split(",")
-    for mime in ("image/avif", "image/jxl", "image/webp"):
+    for mime in ("image/avif", "image/webp"):
         if mime in accepted_mimes:
             return mime
     return default

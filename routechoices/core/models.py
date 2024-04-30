@@ -38,7 +38,8 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from jxlpy import JXLImagePlugin  # noqa: F401
+
+# from jxlpy import JXLImagePlugin  # noqa: F401
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
