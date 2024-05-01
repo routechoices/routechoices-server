@@ -35,8 +35,8 @@ class SiteViewsTestCase(EssentialApiBase):
             slug="kiila-cup-2",
             club=self.club,
             list_on_routechoices_com=True,
-            start_date=arrow.now().shift(hours=-12).datetime,
-            end_date=arrow.now().shift(hours=-11).datetime,
+            start_date=arrow.now().shift(hours=-2).datetime,
+            end_date=arrow.now().shift(hours=-1).datetime,
             event_set=s,
         )
         Event.objects.create(
