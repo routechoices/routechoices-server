@@ -33,6 +33,7 @@ numpy
 opencv-python
 orjson
 pillow-heif
+pillow-jxl-plugin
 pillow
 psycopg
 python-magic

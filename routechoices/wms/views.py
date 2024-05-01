@@ -36,6 +36,7 @@ def common_wms(function):
                 "image/png",
                 "image/webp",
                 "image/avif",
+                "image/jxl",
             ):
                 img_mime = asked_mime
                 if img_mime == "image/apng":
