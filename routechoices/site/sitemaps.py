@@ -41,7 +41,7 @@ class DynamicViewSitemap(Sitemap):
     def items(self):
         event_list = Event.objects.filter(
             privacy=PRIVACY_PUBLIC,
-            list_on_routechoices_com=True,
+            on_events_page=True,
         )
         event_list = event_list.filter(end_date__lt=now())
 

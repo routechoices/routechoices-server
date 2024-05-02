@@ -535,9 +535,9 @@ class EventAdmin(admin.ModelAdmin):
 
     @admin.display(boolean=True)
     def on_frontpage(self, obj):
-        return obj.list_on_routechoices_com
+        return obj.on_events_page
 
-    on_frontpage.admin_order_field = "list_on_routechoices_com"
+    on_frontpage.admin_order_field = "on_events_page"
     on_frontpage.short_description = "On Frontpage"
 
     @admin.display(boolean=True)

@@ -25,7 +25,7 @@ class SiteViewsTestCase(EssentialApiBase):
             name="Kiila Cup 1",
             slug="kiila-cup-1",
             club=self.club,
-            list_on_routechoices_com=True,
+            on_events_page=True,
             start_date=arrow.now().shift(days=-112).datetime,
             end_date=arrow.now().shift(days=-111).datetime,
             event_set=s,
@@ -34,16 +34,16 @@ class SiteViewsTestCase(EssentialApiBase):
             name="Kiila Cup 2",
             slug="kiila-cup-2",
             club=self.club,
-            list_on_routechoices_com=True,
-            start_date=arrow.now().shift(hours=-2).datetime,
-            end_date=arrow.now().shift(hours=-1).datetime,
+            on_events_page=True,
+            start_date=arrow.now().shift(minutes=-2).datetime,
+            end_date=arrow.now().shift(minutes=-1).datetime,
             event_set=s,
         )
         Event.objects.create(
             name="Training",
             slug="training-1",
             club=self.club,
-            list_on_routechoices_com=True,
+            on_events_page=True,
             start_date=arrow.now().shift(hours=-2).datetime,
             end_date=arrow.now().shift(hours=-1).datetime,
         )
@@ -62,7 +62,7 @@ class SiteViewsTestCase(EssentialApiBase):
         self.assertNotContains(response, "Kiila Cup 1")
         self.assertContains(response, "Kiila Cup 2")
         response = client.get(
-            f"{url}?year={arrow.get().shift(hours=-10, minutes=59).year}&month={arrow.get().shift(hours=-10, minutes=59).month}"
+            f"{url}?year={arrow.get().shift(minutes=-1).year}&month={arrow.get().shift(minutes=-1).month}"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotContains(response, "Kiila Cup 1")
@@ -70,7 +70,6 @@ class SiteViewsTestCase(EssentialApiBase):
 
     def test_semi_static_pages_loads(self):
         client = APIClient(HTTP_HOST="www.routechoices.dev")
-
         url = self.reverse_and_check(
             "site:landing_page", "/live-gps-tracking", host="www"
         )

@@ -1315,7 +1315,7 @@ class Event(models.Model):
             "Private: Only a logged in admin of the club can access the page"
         ),
     )
-    list_on_routechoices_com = models.BooleanField(
+    on_events_page = models.BooleanField(
         "Listed on Routechoices.com events page",
         default=False,
     )
@@ -1403,7 +1403,7 @@ class Event(models.Model):
             ),
             models.Index(
                 "privacy",
-                "list_on_routechoices_com",
+                "on_events_page",
                 "end_date",
                 "event_set_id",
                 name="core_event_list_frontpage_idx",
@@ -1417,7 +1417,7 @@ class Event(models.Model):
             ),
             models.Index(
                 "privacy",
-                "list_on_routechoices_com",
+                "on_events_page",
                 "end_date",
                 name="core_event_listing_idx",
             ),
@@ -1540,7 +1540,7 @@ class Event(models.Model):
             .prefetch_related("competitors")
         )
         if club is None:
-            event_qs = event_qs.filter(list_on_routechoices_com=True)
+            event_qs = event_qs.filter(on_events_page=True)
         else:
             event_qs = event_qs.filter(club=club)
 
@@ -1620,9 +1620,7 @@ class Event(models.Model):
                     .order_by("-start_date", "name")
                 )
                 if not club:
-                    all_events_w_set = all_events_w_set.filter(
-                        list_on_routechoices_com=True
-                    )
+                    all_events_w_set = all_events_w_set.filter(on_events_page=True)
                 if type == "live":
                     all_events_w_set = all_events_w_set.filter(
                         start_date__lte=now(), end_date__gte=now()

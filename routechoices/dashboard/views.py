@@ -986,7 +986,7 @@ def event_create_view(request):
         form = EventForm(club=club)
         form.fields["map"].queryset = map_list
         form.fields["event_set"].queryset = event_set_list
-        form.fields["list_on_routechoices_com"].initial = club.upgraded
+        form.fields["on_events_page"].initial = club.upgraded
         formset = CompetitorFormSet()
         extra_map_formset = ExtraMapFormSet()
         for mform in extra_map_formset.forms:

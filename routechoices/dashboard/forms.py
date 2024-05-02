@@ -319,7 +319,7 @@ class EventForm(ModelForm):
             "open_registration",
             "allow_route_upload",
             "privacy",
-            "list_on_routechoices_com",
+            "on_events_page",
             "send_interval",
             "tail_length",
             "emergency_contact",
@@ -351,9 +351,9 @@ class EventForm(ModelForm):
         if start_date and end_date and end_date < start_date:
             self.add_error(None, "Start Date must be before End Date")
 
-    # def clean_list_on_routechoices_com(self):
+    # def clean_on_events_page(self):
     #    club = self.club
-    #    listed = self.cleaned_data.get("list_on_routechoices_com")
+    #    listed = self.cleaned_data.get("on_events_page")
     #    if not club.upgraded and listed:
     #        raise ValidationError(
     #            "Only partners can list their events on routechoices.com events page"

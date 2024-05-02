@@ -111,13 +111,13 @@ function addCompetitor(name, shortName, startTime, deviceId) {
 
 function displayRoutechoicesListedOption(value, first) {
   if (value === "public") {
-    u("#id_list_on_routechoices_com").parent().parent().show();
+    u("#id_on_events_page").parent().parent().show();
     if (!first && window.local.clubUpgraded) {
-      u("#id_list_on_routechoices_com").first().checked = true;
+      u("#id_on_events_page").first().checked = true;
     }
   } else {
-    u("#id_list_on_routechoices_com").parent().parent().hide();
-    u("#id_list_on_routechoices_com").first().checked = false;
+    u("#id_on_events_page").parent().parent().hide();
+    u("#id_on_events_page").first().checked = false;
   }
 }
 
