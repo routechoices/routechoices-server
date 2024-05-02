@@ -17,7 +17,6 @@ import gpxpy
 import gpxpy.gpx
 import magic
 import numpy as np
-import pillow_jxl  # noqa: F401
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -39,6 +38,7 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
+from jxlpy import JXLImagePlugin  # noqa: F401
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 

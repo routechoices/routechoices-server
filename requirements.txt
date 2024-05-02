@@ -7,8 +7,8 @@ asn1crypto==1.5.1
 attrs==23.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
-boto3==1.34.95
-botocore==1.34.95
+boto3==1.34.96
+botocore==1.34.96
 cbor2==5.6.3
 certifi==2024.2.2
 cffi==1.16.0
@@ -16,6 +16,7 @@ charset-normalizer==3.3.2
 coverage==7.5.0
 cryptography==42.0.5
 curl-cffi==0.6.3
+cython==3.0.10
 defusedxml==0.7.1
 diskcache==5.6.3
 django==5.0.4
@@ -49,6 +50,7 @@ idna==3.7
 inflection==0.5.1
 jmespath==1.0.1
 jwcrypto==1.5.6
+jxlpy==0.9.4
 kagi @ git+https://github.com/rphlo/kagi@c5d239bb0d32a51549aa3835ccb255964fa1a456
 markdown==3.6
 maxminddb==2.6.1
@@ -62,7 +64,6 @@ orjson==3.10.2
 packaging==24.0
 pillow==10.3.0
 pillow-heif==0.16.0
-pillow-jxl-plugin==1.2.4
 psycopg==3.1.18
 pycodestyle==2.11.1
 pycparser==2.22
