@@ -303,13 +303,37 @@ def account_delete_view(request):
 def device_list_view(request):
     club = request.club
 
-    ordering_blank_last = Case(When(nickname="", then=Value(1)), default=Value(0))
+    ordering_nickname_blank_last = Case(
+        When(nickname="", then=Value(1)), default=Value(0)
+    )
+    ordering_timestamp_blank_last = Case(
+        When(device___last_location_datetime=None, then=Value(1)), default=Value(0)
+    )
+    ordering = [ordering_nickname_blank_last, "nickname", "device__aid"]
+    ordering_query = request.GET.get("sort_by")
+
+    if ordering_query == "nickname_asc":
+        ordering = [ordering_nickname_blank_last, "nickname", "device__aid"]
+    elif ordering_query == "nickname_dsc":
+        ordering = ["-nickname", "device__aid"]
+    elif ordering_query == "device-id_asc":
+        ordering = ["device__aid"]
+    elif ordering_query == "device-id_dsc":
+        ordering = ["-device__aid"]
+    elif ordering_query == "seen_asc":
+        ordering = ["device___last_location_datetime"]
+    elif ordering_query == "seen_dsc":
+        ordering = [ordering_timestamp_blank_last, "-device___last_location_datetime"]
+    elif ordering_query == "battery_asc":
+        ordering = ["device__battery_level"]
+    elif ordering_query == "battery_dsc":
+        ordering = ["-device__battery_level"]
 
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
         .select_related("club", "device")
         .defer("device__locations_encoded")
-        .order_by(ordering_blank_last, "nickname", "device__aid")
+        .order_by(*ordering)
     )
     paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
     page = request.GET.get("page")

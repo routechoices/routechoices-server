@@ -3,6 +3,35 @@
     var $el = u(el);
     $el.text(dayjs($el.data("date")).local().format("YYYY-MM-DD HH:mm:ss"));
   });
+
+  u("th[data-sort-name]").each((el) => {
+    const sortName = u(el).attr("data-sort-name");
+    const name = u(el).text();
+    const params = new URL(document.location.toString()).searchParams;
+    const [currentSort, currentDir] = (
+      params.get("sort_by") ?? "nickname_asc"
+    ).split("_");
+    let newDir = "asc";
+    if (currentSort === sortName) {
+      newDir = currentDir === "asc" ? "dsc" : "asc";
+    }
+    const newUrl = new URL(document.location.toString());
+    params.set("sort_by", [sortName, newDir].join("_"));
+    newUrl.search = params;
+    u(el).html(
+      '<a href="' +
+        newUrl.toString() +
+        '">' +
+        name +
+        (sortName === currentSort
+          ? ' <i class="fa-solid fa-chevron-' +
+            (currentDir === "asc" ? "up" : "down") +
+            '"></i>'
+          : "") +
+        "</a>"
+    );
+  });
+
   u(".copy-btn").on("click", function (ev) {
     var $el = u(ev.currentTarget);
     var tooltip = new bootstrap.Tooltip(ev.currentTarget, {
