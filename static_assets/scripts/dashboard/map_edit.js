@@ -214,6 +214,11 @@ function enableBtnToPreview() {
 }
 
 (function () {
+  var isNameEdited = u("#id_name").val() != "";
+  u("#id_name").on("change", function () {
+    isNameEdited = this.value != "";
+  });
+
   function openCalibrationHelper() {
     u("#main").addClass("d-none");
     u("#calibration-helper").removeClass("d-none");
@@ -693,6 +698,10 @@ function enableBtnToPreview() {
       this.value = "";
     }
     if (this.files.length > 0 && this.value) {
+      if (!isNameEdited) {
+        u("#id_name").val(this.files[0].name.replace(/\.[^/.]+$/, ""));
+        isNameEdited = true;
+      }
       if (this.files[0].type == "application/pdf") {
         var pdfFile = this.files[0];
         var pdfFileReader = new FileReader();
