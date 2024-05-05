@@ -309,9 +309,8 @@ def device_list_view(request):
     ordering_timestamp_blank_last = Case(
         When(device___last_location_datetime=None, then=Value(1)), default=Value(0)
     )
-    ordering = [ordering_nickname_blank_last, "nickname", "device__aid"]
-    ordering_query = request.GET.get("sort_by")
 
+    ordering_query = request.GET.get("sort_by")
     if ordering_query == "nickname_asc":
         ordering = [ordering_nickname_blank_last, "nickname", "device__aid"]
     elif ordering_query == "nickname_dsc":
@@ -328,6 +327,8 @@ def device_list_view(request):
         ordering = ["device__battery_level"]
     elif ordering_query == "battery_dsc":
         ordering = ["-device__battery_level"]
+    else:
+        ordering = [ordering_nickname_blank_last, "nickname", "device__aid"]
 
     device_owned_list = (
         DeviceClubOwnership.objects.filter(club=club)
