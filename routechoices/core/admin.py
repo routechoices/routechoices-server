@@ -419,14 +419,14 @@ class ClubAdmin(admin.ModelAdmin):
 
     def event_count(self, obj):
         return format_html(
-            '<a href="/admin/core/event/?club__id__exact={}">{}</a>',
+            '<a href="/core/event/?club__id__exact={}">{}</a>',
             obj.pk,
             obj.event_count,
         )
 
     def map_count(self, obj):
         return format_html(
-            '<a href="/admin/core/map/?club__id__exact={}">{}</a>',
+            '<a href="/core/map/?club__id__exact={}">{}</a>',
             obj.pk,
             obj.map_count,
         )
