@@ -152,12 +152,23 @@ class Livelox(ThirdPartyTrackingSolution):
         if r.status_code != 200:
             raise EventImportError(f"Can not fetch class info data {r.status_code}")
         self.init_data = r.json().get("general", {})
-        blob_url = self.init_data.get("classBlobUrl")
-        if not blob_url or not blob_url.startswith(
-            "https://livelox.blob.core.windows.net"
-        ):
-            raise EventImportError(f"Can not fetch data: bad url ({blob_url})")
-        r = requests.get(blob_url, headers=self.HEADERS)
+
+        post_data = json.dumps(
+            {
+                "classIds": class_ids,
+                "courseIds": [],
+                "relayLegs": relay_legs,
+                "relayLegGroupIds": [],
+                "includeMap": True,
+                "includeCourses": True,
+            }
+        )
+        r = requests.post(
+            "https://www.livelox.com/Data/ClassBlob",
+            data=post_data,
+            headers=self.HEADERS,
+            timeout=60,
+        )
         if r.status_code != 200:
             raise EventImportError("Can not fetch class blob data")
         self.init_data["xtra"] = r.json()
