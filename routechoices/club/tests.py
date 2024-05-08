@@ -98,7 +98,7 @@ class ClubViewsTestCase(EssentialApiBase):
             data += d
         self.assertEqual(len(data), 11)
         self.assertEqual(response.headers["Content-Length"], "11")
-        self.assertEqual(response.headers["Content-Range"], "bytes 0-10/633")
+        self.assertEqual(response.headers["Content-Range"], "bytes 0-10/286")
 
         response = client.get(url, HTTP_RANGE="bytes=10-20")
         self.assertEqual(response.status_code, 206)
@@ -108,7 +108,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(len(data2), 11)
         self.assertNotEqual(data, data2)
         self.assertEqual(response.headers["Content-Length"], "11")
-        self.assertEqual(response.headers["Content-Range"], "bytes 10-20/633")
+        self.assertEqual(response.headers["Content-Range"], "bytes 10-20/286")
 
     def test_event_set_page_loads(self):
         s = EventSet.objects.create(
