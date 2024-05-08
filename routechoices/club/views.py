@@ -92,6 +92,7 @@ def serve_image_from_s3(
         pil_image.save(
             out_buffer,
             mime[6:].upper(),
+            optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
         )
         image = out_buffer.getvalue()

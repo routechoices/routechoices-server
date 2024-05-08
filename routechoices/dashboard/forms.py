@@ -275,7 +275,7 @@ class MapForm(ModelForm):
             }
             if format == "WEBP":
                 params["quality"] = 80
-            rgba_img.save(out_buffer, format, **params)
+            rgba_img.save(out_buffer, format, optimize=True, **params)
             f_new = File(out_buffer, name=fn)
             return f_new
 

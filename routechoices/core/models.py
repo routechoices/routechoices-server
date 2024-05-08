@@ -296,7 +296,9 @@ Follow our events live or replay them later.
         logo = Image.open(BytesIO(logo_b))
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
-        logo_s.save(buffer, ext, quality=(40 if ext in ("AVIF", "JXL") else 80))
+        logo_s.save(
+            buffer, ext, optimize=True, quality=(40 if ext in ("AVIF", "JXL") else 80)
+        )
         return buffer.getvalue()
 
     @property
@@ -343,6 +345,7 @@ Follow our events live or replay them later.
         img.save(
             buffer,
             mime[6:].upper(),
+            optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
         )
         data_out = buffer.getvalue()
@@ -725,7 +728,7 @@ class Map(models.Model):
                     size=(output_height, output_width),
                     color=(255, 255, 255, 0),
                 )
-                pil_image.save(buffer, img_mime[6:].upper(), quality=10)
+                pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=10)
                 data_out = buffer.getvalue()
             else:
                 n_channels = 3 if img_mime == "image/jpeg" else 4
@@ -832,7 +835,7 @@ class Map(models.Model):
             color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_coverted)
             buffer = BytesIO()
-            pil_image.save(buffer, img_mime[6:].upper(), quality=80)
+            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=80)
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
@@ -885,7 +888,7 @@ class Map(models.Model):
             }
             if img_ext == "WEBP":
                 params["quality"] = 80
-            rgba_img.save(out_buffer, img_ext, **params)
+            rgba_img.save(out_buffer, img_ext, optimize=True, **params)
             f_new = File(out_buffer, name=self.image.name)
             self.image.save(
                 "filename",
@@ -1018,7 +1021,7 @@ class Map(models.Model):
 
         im = im.resize((int(width), int(height)), resample=Image.Resampling.BICUBIC)
         out_buffer = BytesIO()
-        im.save(out_buffer, "WEBP", dpi=(72, 72), quality=80)
+        im.save(out_buffer, "WEBP", dpi=(72, 72), optimize=True, quality=80)
         f_new = File(out_buffer)
         new_map.image.save(
             "filename",
@@ -1861,6 +1864,7 @@ class Event(models.Model):
         img.save(
             buffer,
             mime[6:].upper(),
+            optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
         )
         data_out = buffer.getvalue()
