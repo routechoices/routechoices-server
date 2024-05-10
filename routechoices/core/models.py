@@ -832,16 +832,16 @@ class Map(models.Model):
             )
         extra_args = []
         if img_mime in ("image/avif", "image/jxl"):
-            color_coverted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
-            pil_image = Image.fromarray(color_coverted)
+            color_converted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
+            pil_image = Image.fromarray(color_converted)
             buffer = BytesIO()
             pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=80)
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
-                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 100]
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 80]
             elif img_mime == "image/jpeg":
-                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
+                extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
             data_out = BytesIO(buffer).getvalue()
 
