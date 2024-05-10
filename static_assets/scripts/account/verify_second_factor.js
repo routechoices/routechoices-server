@@ -10,7 +10,7 @@
       placeholder: "••••••",
       maxLength: 6,
     })
-    .css({ letterSpacing: "0.5em", width: "8.5em"})
+    .css({ letterSpacing: "0.5em", width: "8.3em"})
     .on("input", function () {
       this.value = this.value.replace(/[^0-9]/g, "");
       if (this.value.length >= 6)
