@@ -1228,9 +1228,7 @@ class EventSet(models.Model):
             event_qs = event_qs.filter(privacy=PRIVACY_PUBLIC)
         past_event_qs = event_qs.filter(end_date__lt=now())
         live_events_qs = event_qs.filter(start_date__lte=now(), end_date__gte=now())
-        upcoming_events_qs = event_qs.filter(
-            start_date__gt=now(), start_date__lte=now() + timedelta(hours=24)
-        )
+        upcoming_events_qs = event_qs.filter(start_date__gt=now())
 
         def events_to_sets(qs, type="past"):
             all_events_w_set = event_qs.order_by("-start_date", "name")
@@ -1240,8 +1238,7 @@ class EventSet(models.Model):
                 )
             elif type == "upcoming":
                 all_events_w_set = all_events_w_set.filter(
-                    start_date__gt=now(),
-                    start_date__lte=now() + timedelta(hours=24),
+                    start_date__gt=now()
                 ).order_by("start_date", "name")
             else:
                 all_events_w_set = all_events_w_set.filter(end_date__lt=now())
