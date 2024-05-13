@@ -1831,7 +1831,9 @@ class Event(models.Model):
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
-            img = img.rotate(round(self.map.rotation / 90) * 90)
+            rot_angle = (round(raster_map.rotation / 90) + 4) % 4
+            if rot_angle != 0:
+                img = img.transpose(rot_angle + 1)
             img_width, img_height = img.size
             is_portrait = img_height > img_width
             if is_portrait:
