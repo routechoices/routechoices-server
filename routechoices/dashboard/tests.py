@@ -254,7 +254,7 @@ class TestDashboard(EssentialDashboardBase):
         url = self.reverse_and_check("dashboard:device_list_view", "/dashboard/devices")
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertContains(res, device.id)
+        self.assertContains(res, device.aid)
         self.assertContains(res, "MyTrckr")
 
         url = self.reverse_and_check(
