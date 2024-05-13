@@ -1,6 +1,6 @@
 if (window.Sentry) {
   Sentry.init({
-    dsn: "https://90a1a7dd37134928b5a981eeb3a20293@o91052.ingest.sentry.io/198396",
+    dsn: "https://6b0a0b9b04b5a2912cda9bd502e114bb@o4507089008197632.ingest.de.sentry.io/4507247483551824",
     release: "routechoices@" + window.local.siteVersion,
   });
 }

@@ -74,8 +74,8 @@
                 {% endif %}
             {% endblock footer %}
         {% endblock body %}
-        <script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js"
-                integrity="sha384-5Zu44WQLIjQtAmHoeW6zq6diH9kymV7kGUaYAV1PK5LPCSGURU7y840OHlpaU8NQ"
+        <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js"
+                integrity="sha384-ZI11RF8XfI7ic0+HK1UnGkClkyjeQrHLUX+42WJHeu8+O94vBhb5Wivro/pn5lhG"
                 crossorigin="anonymous"></script>
         <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-site-version={{version}} data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
         {% if analytics_enabled and request.host.regex != 'dashboard' %}
