@@ -57,6 +57,7 @@ from routechoices.lib.helpers import (
     random_key,
     safe64encodedsha,
     short_random_slug,
+    shortsafe64encodedsha,
     time_base64,
 )
 from routechoices.lib.storages import OverwriteImageStorage
@@ -899,7 +900,9 @@ class Map(models.Model):
 
     @property
     def hash(self):
-        return safe64encodedsha(f"{self.path}:{self.corners_coordinates}:20230420")
+        return shortsafe64encodedsha(
+            f"{self.path}:{self.corners_coordinates}:20230420"
+        )[:8]
 
     @property
     def bound(self):

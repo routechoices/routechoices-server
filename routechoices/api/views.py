@@ -522,7 +522,7 @@ def club_list_view(request):
                                 "https://www.routechoices.com/api/events/PlCG3xFS-f4/map",
                             ),
                             "title": "",
-                            "hash": "u8cWoEiv2z1Cz2bjjJ66b2EF4groSULVlzKg9HGE1gM=",
+                            "hash": "u8cWoEiv",
                             "max_zoom": 18,
                             "modification_date": "2019-06-10T17:21:52.417000Z",
                             "default": True,

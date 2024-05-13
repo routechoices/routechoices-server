@@ -88,6 +88,10 @@ def safe64encodedsha(txt):
     return safe64encode(h.digest())
 
 
+def shortsafe64encodedsha(txt):
+    return safe64encodedsha(txt)[:8]
+
+
 def safe64decode(b):
     return base64.urlsafe_b64decode(b.encode() + b"==")
 
