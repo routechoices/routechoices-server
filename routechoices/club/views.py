@@ -562,7 +562,10 @@ def acme_challenge(request, challenge):
     raise Http404()
 
 
-def robots_txt(request):
+def robots_txt(request, **kwargs):
+    bypass_resp = handle_legacy_request(request, "robots.txt", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug=club_slug)
     if club.domain and not request.use_cname:
@@ -572,7 +575,10 @@ def robots_txt(request):
     )
 
 
-def manifest(request):
+def manifest(request, **kwargs):
+    bypass_resp = handle_legacy_request(request, "manifest", kwargs.get("club_slug"))
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug=club_slug)
     if club.domain and not request.use_cname:
@@ -597,7 +603,15 @@ def sitemap_index(
     template_name="sitemap_index.xml",
     content_type="application/xml",
     sitemap_url_name="club_sitemap_sections",
+    **kwargs,
 ):
+    bypass_resp = handle_legacy_request(
+        request,
+        "club_sitemap",
+        kwargs.get("club_slug"),
+    )
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug__iexact=club_slug)
     if club.domain and not request.use_cname:
@@ -645,7 +659,13 @@ def sitemap(
     section=None,
     template_name="sitemap.xml",
     content_type="application/xml",
+    **kwargs,
 ):
+    bypass_resp = handle_legacy_request(
+        request, "club_sitemap_sections", kwargs.get("club_slug"), section=section
+    )
+    if bypass_resp:
+        return bypass_resp
     club_slug = request.club_slug
     req_protocol = request.scheme
     req_site = get_current_site()
