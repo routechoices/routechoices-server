@@ -789,7 +789,7 @@ class MapAdmin(admin.ModelAdmin):
         "club_link",
         "creation_date",
         "center_link",
-        "resolution",
+        "resolution_rounded",
         "max_zoom",
         "north_declination",
         "area",
@@ -828,6 +828,11 @@ class MapAdmin(admin.ModelAdmin):
         )
 
     center_link.short_description = "Center"
+
+    def resolution_rounded(self, obj):
+        return round(obj.resolution, 3)
+
+    resolution_rounded.short_description = "Resolution"
 
     def event_count(self, obj):
         return obj.event_count

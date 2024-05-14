@@ -624,7 +624,7 @@ class Map(models.Model):
             + distance_latlon(ll_c, ll_d)
             + distance_latlon(ll_d, ll_a)
         )
-        return round(resolution, 3)
+        return resolution
 
     @property
     def center(self):
@@ -645,16 +645,35 @@ class Map(models.Model):
         tr = self.map_xy_to_spherical_mercator(self.width, 0)
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
-        rot = (
+
+        roth = (
             (
-                math.atan2(tr[1] - tl[1], tr[0] - tl[0])
-                + math.atan2(br[1] - bl[1], br[0] - bl[0])
+                (
+                    math.atan2(tl[1] - bl[1], tl[0] - bl[0])
+                    + math.atan2(tr[1] - br[1], tr[0] - br[0])
+                    - math.pi
+                )
+                / 2
+                * 180
+                / math.pi
             )
-            / 2
-            * 180
-            / math.pi
-        )
-        return round(rot, 2)
+            + 360
+        ) % 360
+
+        rotv = (
+            (
+                (
+                    math.atan2(tr[1] - tl[1], tr[0] - tl[0])
+                    + math.atan2(br[1] - bl[1], br[0] - bl[0])
+                )
+                / 2
+                * 180
+                / math.pi
+            )
+            + 360
+        ) % 360
+
+        return round((roth + rotv) / 2, 2)
 
     @property
     def north_declination(self):
@@ -1821,9 +1840,8 @@ class Event(models.Model):
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
-            rot = (math.floor(((raster_map.rotation + 360) % 360 + 45) / 90)) % 4
+            rot = (math.floor((raster_map.rotation + 45) / 90)) % 4
             img_width, img_height = img.size
-
             if rot in (1, 3):
                 h = int(img_height / 3)
                 w = h * 21 / 40
