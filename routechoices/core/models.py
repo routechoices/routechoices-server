@@ -1828,29 +1828,63 @@ class Event(models.Model):
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
-            rot_angle = (round(raster_map.rotation / 90) + 4) % 4
-            if rot_angle != 0:
-                img = img.transpose(rot_angle + 1)
+
+            rot = (math.floor(((raster_map.rotation + 360) % 360 + 45) / 90)) % 4
             img_width, img_height = img.size
-            is_portrait = img_height > img_width
-            if is_portrait:
-                w = int(img_width / 3)
+            if rot in (1, 3):
+                h = int(img_height / 3)
+                w = h * 21 / 40
+                if rot == 1:
+                    t = (
+                        int(img_width / 2) + w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) + h,
+                    )
+                elif rot == 3:
+                    t = (
+                        int(img_width / 2) - w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) - h,
+                    )
             else:
-                w = int(img_height / 3)
-            h = w * 21 / 40
+                w = int(img_width / 3)
+                h = w * 21 / 40
+                if rot == 0:
+                    t = (
+                        int(img_width / 2) - w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) - h,
+                    )
+                elif rot == 2:
+                    t = (
+                        int(img_width / 2) + w,
+                        int(img_height / 2) + h,
+                        int(img_width / 2) + w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) - h,
+                        int(img_width / 2) - w,
+                        int(img_height / 2) + h,
+                    )
             img = img.transform(
                 (1200, 630),
                 Image.QUAD,
-                (
-                    int(img_width / 2) - w,
-                    int(img_height / 2) - h,
-                    int(img_width / 2) - w,
-                    int(img_height / 2) + h,
-                    int(img_width / 2) + w,
-                    int(img_height / 2) + h,
-                    int(img_width / 2) + w,
-                    int(img_height / 2) - h,
-                ),
+                t,
             )
         if display_logo:
             logo = None
