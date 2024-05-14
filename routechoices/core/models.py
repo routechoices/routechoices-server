@@ -657,7 +657,6 @@ class Map(models.Model):
                 * 180
                 / math.pi
             )
-            + 360
         ) % 360
 
         rotv = (
@@ -670,7 +669,6 @@ class Map(models.Model):
                 * 180
                 / math.pi
             )
-            + 360
         ) % 360
 
         return round((roth + rotv) / 2, 2)
