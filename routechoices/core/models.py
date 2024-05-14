@@ -647,17 +647,10 @@ class Map(models.Model):
         bl = self.map_xy_to_spherical_mercator(0, self.height)
         rot = (
             (
-                (
-                    math.atan2(tr[1] - tl[1], tr[0] - tl[0])
-                    + math.atan2(br[1] - bl[1], br[0] - bl[0])
-                )
-                + (
-                    math.atan2(tl[1] - bl[1], tl[0] - bl[0])
-                    + math.atan2(tr[1] - br[1], tr[0] - br[0])
-                    - math.pi
-                )
+                math.atan2(tr[1] - tl[1], tr[0] - tl[0])
+                + math.atan2(br[1] - bl[1], br[0] - bl[0])
             )
-            / 4
+            / 2
             * 180
             / math.pi
         )
@@ -1828,59 +1821,28 @@ class Event(models.Model):
             white_bg_img = Image.new("RGBA", img.size, "WHITE")
             white_bg_img.paste(img, (0, 0), img)
             img = white_bg_img.convert("RGB")
-
             rot = (math.floor(((raster_map.rotation + 360) % 360 + 45) / 90)) % 4
             img_width, img_height = img.size
+
             if rot in (1, 3):
                 h = int(img_height / 3)
                 w = h * 21 / 40
-                if rot == 1:
-                    t = (
-                        int(img_width / 2) + w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) + h,
-                    )
-                elif rot == 3:
-                    t = (
-                        int(img_width / 2) - w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) - h,
-                    )
             else:
                 w = int(img_width / 3)
                 h = w * 21 / 40
-                if rot == 0:
-                    t = (
-                        int(img_width / 2) - w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) - h,
-                    )
-                elif rot == 2:
-                    t = (
-                        int(img_width / 2) + w,
-                        int(img_height / 2) + h,
-                        int(img_width / 2) + w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) - h,
-                        int(img_width / 2) - w,
-                        int(img_height / 2) + h,
-                    )
+
+            t = (
+                int(img_width / 2) - w,
+                int(img_height / 2) - h,
+                int(img_width / 2) - w,
+                int(img_height / 2) + h,
+                int(img_width / 2) + w,
+                int(img_height / 2) + h,
+                int(img_width / 2) + w,
+                int(img_height / 2) - h,
+            )
+            t = t[(-2 * rot) :] + t[: (-2 * rot)]
+
             img = img.transform(
                 (1200, 630),
                 Image.QUAD,
