@@ -19,7 +19,7 @@ curl-cffi==0.6.3
 cython==3.0.10
 defusedxml==0.7.1
 diskcache==5.6.3
-django==5.0.4
+django==5.0.6
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git@09f8b0ad150754be88d20c0e7c6a1473b8006872
 django-allauth==0.62.1
 django-appconf==1.0.6
@@ -82,7 +82,7 @@ requests==2.31.0
 rjsmin==1.2.1
 s3transfer==0.10.1
 segno==1.6.1
-sentry-sdk==2.0.1
+sentry-sdk==2.1.1
 setuptools==69.5.1
 sewer @ git+https://github.com/rphlo/sewer@8d25ea1f1e95e97f52c2354c1752d2adbbfdafaf
 six==1.16.0
