@@ -92,10 +92,10 @@ L.Control.EventState = L.Control.extend({
       return;
     }
     this._div.innerHTML =
-      '<div class="m-0 py-0 px-2 fst-italic" style="color: red;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
+      '<div class="m-0 py-0 px-2"><span style="background-color:red;color: white;" class="px-1 rounded">' +
       banana.i18n("live-mode") +
-      "</div>" +
-      '<div class="m-0 py-0 px-2" style="font-size:1rem;color: #09F;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
+      "</span></div>" +
+      '<div class="m-0 py-0 px-2" style="font-size:0.7rem;color: #09F;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
       banana.i18n("tails") +
       '</span> <span id="tail-length-display" style="text-transform: none;">' +
       printTime(myEvent?.getTailLength()) +
@@ -113,15 +113,15 @@ L.Control.EventState = L.Control.extend({
   },
   setReplay() {
     this._div.innerHTML =
-      '<div class="m-0 py-0 px-2" style="color: #666;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff">' +
+      '<div class="m-0 py-0 px-2"><span class="px-1 rounded" style="background-color: #666;color: white">' +
       banana.i18n("replay-mode") +
-      "</div>" +
-      '<div class="m-0 py-0 px-2" style="font-size:1rem;color: #09F;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
+      "</span></div>" +
+      '<div id="big-clock" class="py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>' +
+      '<div class="m-0 py-0 px-2" style="font-size:0.7rem;color: #09F;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff"><span>' +
       banana.i18n("tails") +
       '</span> <span id="tail-length-display" style="text-transform: none;">' +
       printTime(myEvent?.getTailLength()) +
-      "</span></div>" +
-      '<div id="big-clock" class="py-0 px-2" style="font-size:1rem;color: #000;text-shadow: -1px -1px 0 #fff,-1px 0px 0 #fff,-1px 1px 0 #fff,0px -1px 0 #fff,0px 0px 0 #fff,0px 1px 0 #fff,1px -1px 0 #fff,1px 0px 0 #fff,1px 1px 0 #fff""></div>';
+      "</span></div>";
     u(this._div).css({
       display: "block",
       fontSize: "20px",
