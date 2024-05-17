@@ -1393,14 +1393,6 @@ class Event(models.Model):
         ),
         db_index=True,
     )
-    emergency_contact = models.EmailField(
-        default="",
-        blank=True,
-        help_text=(
-            "Email address of a person available to respond in the case a competitor "
-            "carrying a GPS tracker with SOS feature enabled triggers the SOS button."
-        ),
-    )
     emergency_contacts = models.TextField(
         default="",
         blank=True,
