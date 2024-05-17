@@ -1089,7 +1089,7 @@ class CompetitionTestCase(EssentialApiBase):
             in mail.outbox[0].body
         )
         self.assertEqual([self.user.email], mail.outbox[0].to)
-        event.emergency_contact = "beargrills@discovery.com"
+        event.emergency_contacts = "beargrills@discovery.com"
         event.save()
         device.send_sos()
         self.assertEqual(len(mail.outbox), 2)

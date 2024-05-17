@@ -322,7 +322,7 @@ class EventForm(ModelForm):
             "on_events_page",
             "send_interval",
             "tail_length",
-            "emergency_contact",
+            "emergency_contacts",
             "backdrop_map",
             "map",
             "map_title",

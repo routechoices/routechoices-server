@@ -2,7 +2,7 @@ import re
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.validators import RegexValidator, ValidationError
+from django.core.validators import RegexValidator, ValidationError, validate_email
 from django.utils.translation import gettext_lazy as _
 
 import routechoices.lib.luhn as luhn
@@ -13,6 +13,11 @@ FLOAT_RE = re.compile(r"^(\-?[0-9]+(\.[0-9]+)?)$")
 domain_validator = RegexValidator(
     r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$", "Please enter a valid domain"
 )
+
+
+def validate_emails(email_list_str):
+    for email in email_list_str.split(" "):
+        validate_email(email)
 
 
 def validate_imei(number):

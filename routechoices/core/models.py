@@ -65,6 +65,7 @@ from routechoices.lib.validators import (
     domain_validator,
     validate_corners_coordinates,
     validate_domain_slug,
+    validate_emails,
     validate_esn,
     validate_imei,
     validate_latitude,
@@ -1392,13 +1393,14 @@ class Event(models.Model):
         ),
         db_index=True,
     )
-    emergency_contact = models.EmailField(
+    emergency_contacts = models.TextField(
         default="",
         blank=True,
         help_text=(
-            "Email address of a person available to respond in the case a competitor "
-            "carrying a GPS tracker with SOS feature enabled triggers the SOS button."
+            "Email addresses of people that will be contacted if a runner "
+            "carrying a GPS tracker triggers an SOS signal. (Device specific feature)"
         ),
+        validators=[validate_emails],
     )
 
     class Meta:
@@ -2278,8 +2280,8 @@ class Device(models.Model):
         for competitor in competitors:
             event = competitor.event
             to_emails = set()
-            if event.emergency_contact:
-                to_emails.add(event.emergency_contact)
+            if event.emergency_contacts:
+                to_emails = event.emergency_contacts.split(" ")
             else:
                 club = event.club
                 admin_ids = list(club.admins.all().values_list("id", flat=True))

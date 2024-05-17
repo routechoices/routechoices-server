@@ -300,7 +300,6 @@ function showLocalTime(el) {
     display: "inline-block",
   });
   u("#id_slug").parent().find(".form-label").text("URL");
-
   var newSlug = u("#id_name").val() == "";
   var slugEdited = false;
   makeFieldRandomizable("#id_slug");
@@ -323,6 +322,54 @@ function showLocalTime(el) {
   } else {
     slugEdited = true;
   }
+
+  var REGEX_EMAIL =
+    "([a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@" +
+    "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)";
+
+  new TomSelect("#id_emergency_contacts", {
+    persist: false,
+    maxItems: null,
+    valueField: "email",
+    delimiter: " ",
+    render: {
+      item: function (item, escape) {
+        return (
+          "<div>" +
+          (item.email
+            ? '<span class="email">' + escape(item.email) + "</span>"
+            : "") +
+          "</div>"
+        );
+      },
+      option: function (item, escape) {
+        var label = item.email;
+        return (
+          "<div>" +
+          '<span class="label">' +
+          escape(label) +
+          "</span>" +
+          "</div>"
+        );
+      },
+    },
+    createFilter: function (input) {
+      var regexpA = new RegExp("^" + REGEX_EMAIL + "$", "i");
+      return regexpA.test(input);
+    },
+    create: function (input) {
+      if (new RegExp("^" + REGEX_EMAIL + "$", "i").test(input)) {
+        return { email: input };
+      }
+      swal({
+        title: "Error!",
+        text: "Invalid email address.",
+        type: "error",
+        confirmButtonText: "OK",
+      });
+      return false;
+    },
+  });
 
   new TomSelect("#id_event_set", {
     allowEmptyOption: true,
