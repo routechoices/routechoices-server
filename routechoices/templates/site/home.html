@@ -17,8 +17,9 @@
         <div class="video_cover"></div>
         <div class="row text-center">
             <h1 class="video_text_overlay frontpage_text mb-0 intro-prefix">Presenting</h1>
-            <h1 class="video_text_overlay frontpage_text_bold mb-0 intro">{{ site.name }}</h1>
-            <h1 class="video_text_overlay frontpage_text intro-bottom">Live GPS tracking for orienteering events</h1>
+            <h1 id="site_title"
+                class="video_text_overlay frontpage_text_bold mb-0 intro">{{ site.name }}</h1>
+            <h1 id="site_subtitle" class="video_text_overlay frontpage_text">Live GPS tracking for orienteering events</h1>
             <p>
                 <picture>
                     <source type="image/avif"
@@ -193,3 +194,9 @@
         </div>
     </div>
 {% endblock contentup %}
+{% block extra_body %}
+    {% compress js %}
+        <script src="{% static '/vendor/fittext-1.0/fittext.js' %}"></script>
+        <script src="{% static '/scripts/site/home.js' %}"></script>
+    {% endcompress %}
+{% endblock extra_body %}
