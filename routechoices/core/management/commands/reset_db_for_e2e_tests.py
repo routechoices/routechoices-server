@@ -22,7 +22,7 @@ class Command(BaseCommand):
             "admin", "admin@routechoices.com", "pa$$word123"
         )
 
-        club = Club.objects.create(name="Halden SK", slug="halden-sk", o_club=True)
+        club = Club.objects.create(name="Halden SK", slug="halden-sk")
         club.admins.set([admin_user])
 
         Event.objects.create(
