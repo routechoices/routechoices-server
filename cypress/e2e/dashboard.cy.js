@@ -43,6 +43,7 @@ context("Dashboard actions", () => {
       cy.contains("Test mode is currently enabled.");
     });
   });
+
   it("Map importers", function () {
     cy.login();
     cy.contains("Halden SK").click();
