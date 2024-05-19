@@ -19,7 +19,9 @@
             <h1 class="video_text_overlay frontpage_text mb-0 intro-prefix">Presenting</h1>
             <h1 id="site_title"
                 class="video_text_overlay frontpage_text_bold mb-0 intro">{{ site.name }}</h1>
-            <h1 id="site_subtitle" class="video_text_overlay frontpage_text">Live GPS tracking for orienteering events</h1>
+            <h1 id="site_subtitle" class="video_text_overlay frontpage_text">
+                Live GPS tracking for <b>orienteering</b> events
+            </h1>
             <p>
                 <picture>
                     <source type="image/avif"
@@ -57,10 +59,10 @@
                     <h2 class="mb-0" id="partners">
                         <b>They trust us</b>
                     </h2>
-                    <small>And help the platform running</small>
+                    <small class="text-muted">We host their events live GPS tracking page since 2019</small>
                 </div>
                 <div class="row justify-content-between" style="font-size: small;">
-                    {% for club in partner_clubs %}
+                    {% for club in club_featured %}
                         <div class="col align-self-start text-center">
                             {% if club.website %}
                                 <a href="{{ club.website }}"
@@ -70,16 +72,6 @@
                                 <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="150px" height="150px" class="rounded mx-auto d-block" alt="{{ club.name }}'s logo" />
                                 <span class="fw-bold">{{ club.name }}</span>
                                 {% if club.website %}</a>{% endif %}
-                        </div>
-                    {% endfor %}
-                    {% for people in individual_partners %}
-                        <div class="col align-self-start text-center">
-                            <img src="{% static '/img/avatar-default.png' %}"
-                                 width="150px"
-                                 height="150px"
-                                 class="rounded mx-auto d-block"
-                                 alt="{{ people.name }}'s avatar" />
-                            <span class="fw-bold">{{ people.name }}</span>
                         </div>
                     {% endfor %}
                 </div>

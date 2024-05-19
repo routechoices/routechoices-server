@@ -24,7 +24,6 @@ from routechoices.core.models import (
     Event,
     EventSet,
     ImeiDevice,
-    IndividualDonator,
     Map,
     MapAssignation,
     Notice,
@@ -408,7 +407,9 @@ class ClubAdmin(admin.ModelAdmin):
     actions = ["mark_as_o_club"]
 
     def mark_as_o_club(self, request, queryset):
-        queryset.update(o_club=True)
+        for q in queryset:
+            q.o_club = True
+            q.save()
 
     def get_ordering(self, request):
         if request.resolver_match.url_name == "core_club_changelist":
@@ -974,11 +975,6 @@ class TOTPDeviceAdmin(admin.ModelAdmin):
 
     def secret_base32(self, obj):
         return b32encode(obj.key).decode()
-
-
-@admin.register(IndividualDonator)
-class IndividualDonatorAdmin(admin.ModelAdmin):
-    list_display = ("name", "email")
 
 
 admin.site.unregister(WebAuthnKey)

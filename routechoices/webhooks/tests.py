@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
-from routechoices.core.models import Club, IndividualDonator
+from routechoices.core.models import Club
 
 
 class LemonSqueezyAPIClient(APIClient):
@@ -92,46 +92,3 @@ class WebHookTestCase(EssentialApiBase):
         self.club.refresh_from_db()
         self.assertFalse(self.club.upgraded)
         self.assertEqual(self.club.order_id, "")
-
-    def test_upgrade_person(self):
-        url = self.reverse_and_check(
-            "webhooks:lemonsqueezy_webhook", "/webhooks/lemonsqueezy", host="www"
-        )
-        res = self.ls_client.post(
-            url,
-            {
-                "data": {
-                    "id": "abc123",
-                    "attributes": {
-                        "user_name": "Bill Gates",
-                        "user_email": "bill@microsoft.com",
-                    },
-                }
-            },
-            HTTP_X_EVENT_NAME="order_created",
-            content_type="json",
-        )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.club.refresh_from_db()
-        self.assertTrue(
-            IndividualDonator.objects.filter(order_id="abc123", upgraded=True).exists()
-        )
-
-    def test_downgrade_person(self):
-        url = self.reverse_and_check(
-            "webhooks:lemonsqueezy_webhook", "/webhooks/lemonsqueezy", host="www"
-        )
-        p = IndividualDonator.objects.create(
-            name="Bill Gates",
-            email="bill@microsoft.com",
-            upgraded=True,
-            order_id="abc123",
-        )
-        res = self.ls_client.post(
-            url,
-            {"data": {"attributes": {"order_id": "abc123"}}},
-            HTTP_X_EVENT_NAME="subscription_expired",
-            content_type="json",
-        )
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertFalse(IndividualDonator.objects.filter(id=p.id).exists())

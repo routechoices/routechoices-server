@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
 from rest_framework.exceptions import MethodNotAllowed
 
-from routechoices.core.models import Club, Event, IndividualDonator
+from routechoices.core.models import Club, Event
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import ContactForm
 
@@ -25,12 +25,11 @@ def home_page(request):
 
 
 def landing_page(request):
-    club_partners = Club.objects.filter(upgraded=True).order_by("name")
-    indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
+    club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")
     return render(
         request,
         "site/home.html",
-        {"partner_clubs": club_partners, "individual_partners": indi_partners},
+        {"club_featured": club_featured},
     )
 
 
@@ -47,12 +46,9 @@ def site_favicon(request, icon_name, **kwargs):
 
 
 def pricing_page(request):
-    partners = Club.objects.filter(upgraded=True).order_by("name")
-    indi_partners = IndividualDonator.objects.filter(upgraded=True).order_by("name")
     return render(
         request,
         "site/pricing.html",
-        {"partner_clubs": partners, "individual_partners": indi_partners},
     )
 
 
