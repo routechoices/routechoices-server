@@ -52,7 +52,7 @@
                                                 <!--HEAD START-->
                                                 <div class="head_bg"></div>
                                                 <div class="head">
-                                                    <span>Free</span>
+                                                    <span>Commercial Use / Non Orienteering</span>
                                                 </div>
                                                 <!--//HEAD END-->
                                             </div>
@@ -60,9 +60,10 @@
                                             <!--PRICE START-->
                                             <div class="generic_price_tag clearfix">
                                                 <span class="price">
-                                                    <span class="currency">0</span>
-                                                    <span class="cent">.00</span>
+                                                    <span class="currency">4</span>
+                                                    <span class="cent">.99</span>
                                                     <span class="sign">€</span>
+                                                    <span class="cent">/Mo<small class="text-muted" style="font-size: 0.7rem">+ VAT</small></span>
                                                 </span>
                                             </div>
                                             <!--//PRICE END-->
@@ -86,6 +87,9 @@
                                                 <li>
                                                     <span>Unlimited Team Members</span>
                                                 </li>
+                                                <li>
+                                                    <span>Ads Free Experience</span>
+                                                </li>
                                             </ul>
                                         </div>
                                         <!--//FEATURE LIST END-->
@@ -98,61 +102,55 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-5">
-                            <h2 class="fw-bold">Why Free?</h2>
-                            <p>{{ site.name }} is a not-for-profit, free and open source project whose goal is to promote orienteering.</p>
-                            <p>We will never display ads, and your data is not sold to third party.</p>
+                        <div class="col-12 mt-5 mb-1">
+                            <h1 class="text-center fw-bold">Frequently asked questions</h1>
                         </div>
-                        <div>
-                            <h2 class="fw-bold">How to help the project?</h2>
-                            <p>
-                                You can become partner by donating and join the following clubs and individuals that contribute to maintain the platform alive.
-                            </p>
-                            <p>
-                                <a href="{% host_url 'dashboard:upgrade' host 'www' %}"
-                                   class="btn btn-success mb-1 fs-5">Become a Partner Club</a>
-                                <br />
-                                <button id="become-ind-partner-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#contributeModal"
-                                        class="btn btn-info mb-1 fs-5"
-                                        type="button">Become an Individual Partner</button>
-                            </p>
-                            <h3 id="partners">Partners</h3>
-                            <h4>Clubs</h4>
-                            <div class="row justify-content-between mb-3" style="font-size: small;">
-                                {% for club in partner_clubs %}
-                                    <div class="col align-self-start text-center">
-                                        {% if club.website %}
-                                            <a href="{{ club.website }}"
-                                               target="_blank"
-                                               class="text-decoration-none dark-link">
-                                            {% endif %}
-                                            <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static '/img/club-default.png' %}{% endif %}"
-                                                 width="150px"
-                                                 height="150px"
-                                                 class="rounded mx-auto d-block"
-                                                 alt="{{ club.name }}'s logo" />
-                                            <span class="fw-bold">{{ club.name }}</span>
-                                            {% if club.website %}</a>{% endif %}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            {% if individual_partners %}
-                                <h4>People</h4>
-                                <div class="row justify-content-between mb-3" style="font-size: small;">
-                                    {% for person in individual_partners %}
-                                        <div class="col align-self-start text-center">
-                                            <img src="{% static '/img/avatar-default.png' %}"
-                                                 width="150px"
-                                                 height="150px"
-                                                 class="rounded mx-auto d-block"
-                                                 alt="{{ people.name }}'s avatar" />
-                                            <span class="fw-bold">{{ person.name }}</span>
-                                        </div>
-                                    {% endfor %}
+                        <div class="col-lg-6 offset-3">
+                            <p class="text-muted text-center mb-5">about {{ site.name }} subscriptions and billing</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">Do I need a credit card to sign up?</h3>
+                                    <p class="context-text">No. We won't ask for any payment information until you decide to subscribe to a plan.</p>
                                 </div>
-                            {% endif %}
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">Will I get a trial period to test the features?</h3>
+                                    <p class="context-text">
+                                        Yes. It's enabled automatically when you create your first club. It does not require a credit card and lasts for 10 days. When the Free Trial is over, you can continue with a paid plan.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">Do Orienteering Clubs have to pay something?</h3>
+                                    <p>
+                                        No, {{ site.name }} main goal is to promote orienteering. Hence if you qualify as a non commercial orienteering organisation, you can use {{ site.name }} completely for free. Just create a club and fill the Orienteering Club Request in the settings to get started.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">Do each club member need a subscription?</h3>
+                                    <p class="context-text">No. The members you assign to your club have their contributions included your club plan.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">Do I need to pay something to watch events?</h3>
+                                    <p>
+                                        No, The organisers are the only one required to pay something. All the spectators have the same access to the events.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <div class="py-4 px-3 px-lg-5">
+                                    <h3 class="content-title-l3">What happen when I stop my subscription?</h3>
+                                    <p>Once you stop your subscription, you will not be able to create new events, all your past events stay online.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

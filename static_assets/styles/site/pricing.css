@@ -151,7 +151,7 @@
   .generic_head_price
   .generic_head_content
   .head {
-  padding-top: 40px;
+  padding-top: 20px;
   position: relative;
   z-index: 1;
 }
@@ -162,7 +162,7 @@
   .generic_head_content
   .head
   span {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 2px;
   margin: 0;
@@ -282,13 +282,6 @@
 @media (min-width: 1200px) {
 }
 
-.text-center h1,
-.text-center h1 a {
-  color: #7885cb;
-  font-size: 1.8rem;
-  font-weight: 300;
-  text-decoration: none;
-}
 .demo-pic {
   margin: 0 auto;
 }
