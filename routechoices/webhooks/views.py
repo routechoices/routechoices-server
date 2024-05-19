@@ -51,9 +51,10 @@ def lemonsqueezy_webhook(request):
             # Could not find order_id info
             raise BadRequest("Missing order id")
         club = Club.objects.filter(order_id=order_id).first()
-        club.upgraded = False
-        club.upgraded_date = None
-        club.order_id = ""
-        club.save()
-        return HttpResponse(f"Downgraded {club}")
+        if club:
+            club.upgraded = False
+            club.upgraded_date = None
+            club.order_id = ""
+            club.save()
+            return HttpResponse(f"Downgraded {club}")
     return HttpResponse("Valid webhook call with no action taken")
