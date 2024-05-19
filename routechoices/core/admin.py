@@ -404,6 +404,11 @@ class ClubAdmin(admin.ModelAdmin):
     show_facets = False
     search_fields = ("name",)
 
+    actions = ["mark_as_o_club"]
+
+    def mark_as_o_club(self, request, queryset):
+        queryset.update(o_club=True)
+
     def get_ordering(self, request):
         if request.resolver_match.url_name == "core_club_changelist":
             return ("-creation_date",)
