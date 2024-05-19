@@ -25,7 +25,7 @@ UTC_TZ = zoneinfo.ZoneInfo("UTC")
 
 
 class MySite:
-    domain = f"www.{settings.RELYING_PARTY_ID}"
+    domain = {settings.RELYING_PARTY_ID}
     name = settings.RELYING_PARTY_NAME
 
 
