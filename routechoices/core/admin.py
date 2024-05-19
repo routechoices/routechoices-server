@@ -392,6 +392,7 @@ class EventSetAdmin(admin.ModelAdmin):
 class ClubAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "o_club",
         "creation_date",
         "slug",
         "admin_list",
