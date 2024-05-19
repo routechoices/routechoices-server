@@ -23,8 +23,15 @@
                 </div>
             {% else %}
                 <h3>Select one of your club</h3>
-                <a href="{% url 'dashboard:club_create_view' %}"
-                   class="btn btn-primary mb-1 me-1"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+                {% if not request.user.can_create_club %}
+                    <span class="d-inline-block"
+                          tabindex="0"
+                          data-bs-toggle="tooltip"
+                          data-bs-title="You already have use your quota of free clubs">
+                    {% endif %}
+                    <a href="{% url 'dashboard:club_create_view' %}"
+                       class="btn btn-primary mb-1 me-1{% if not request.user.can_create_club %} disabled{% endif %}"><i class="fa-solid fa-circle-plus"></i> Create new club</a>
+                    {% if not request.user.can_create_club %}</span>{% endif %}
                 <a href="{% url 'dashboard:club_request_invite_view' %}"
                    class="btn btn-primary mb-1"><i class="fa-solid fa-hand"></i> Request an invite</a>
                 {% if clubs.paginator.num_pages > 1 %}

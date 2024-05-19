@@ -284,7 +284,8 @@ def event_list(request):
         club = Club.objects.filter(admins=request.user, slug__iexact=club_slug).first()
         if not club:
             raise ValidationError("club not found")
-
+        if not club.can_modify_events:
+            raise ValidationError("free trial expired")
         name = f"Untitled {short_random_slug()}"
         name_raw = request.data.get("name")
         if name_raw:

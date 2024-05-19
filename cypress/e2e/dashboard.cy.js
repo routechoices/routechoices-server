@@ -34,9 +34,9 @@ context("Dashboard actions", () => {
   it("Upgrade Account", function () {
     cy.login();
     cy.contains("Halden SK").click();
-    cy.contains("Become Partner!").click();
+    cy.contains("Upgrade to our paid plan!").click();
     cy.url().should("match", /\/upgrade$/);
-    cy.contains("Become Partner").click();
+    cy.contains("Upgrade my subscription").click();
     cy.get("#price-per-month").focus().clear().type("9.99");
     cy.contains("Proceed to payment").click();
     cy.origin("https://store.routechoices.com", () => {

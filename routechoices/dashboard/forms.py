@@ -14,6 +14,7 @@ from django.forms import (
     Form,
     ModelChoiceField,
     ModelForm,
+    Textarea,
     inlineformset_factory,
 )
 from PIL import Image
@@ -346,19 +347,16 @@ class EventForm(ModelForm):
 
     def clean(self):
         super().clean()
+        club = self.club
+        if not club.can_modify_events:
+            self.add_error(
+                None,
+                "Your 10 days free trial has now expired, you cannot create or edit events anymore",
+            )
         start_date = self.cleaned_data.get("start_date")
         end_date = self.cleaned_data.get("end_date")
         if start_date and end_date and end_date < start_date:
             self.add_error(None, "Start Date must be before End Date")
-
-    # def clean_on_events_page(self):
-    #    club = self.club
-    #    listed = self.cleaned_data.get("on_events_page")
-    #    if not club.upgraded and listed:
-    #        raise ValidationError(
-    #            "Only partners can list their events on routechoices.com events page"
-    #        )
-    #    return listed
 
     def clean_map(self):
         raster_map = self.cleaned_data.get("map")
@@ -536,3 +534,11 @@ ExtraMapFormSet = inlineformset_factory(
     max_num=None,
     validate_min=True,
 )
+
+
+class InquiryOStatusForm(Form):
+    request = CharField(
+        widget=Textarea,
+        required=True,
+        help_text="Tell us how you qualify as a non-commercial orienteering club.",
+    )

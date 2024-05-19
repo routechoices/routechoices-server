@@ -5,7 +5,7 @@ import math
 import os.path
 import re
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
@@ -204,6 +204,8 @@ Follow our events live or replay them later.
     )
     o_club = models.BooleanField("Is an orienteering club", default=False)
 
+    frontpage_featured = models.BooleanField("Featured on frontpage", default=False)
+
     class Meta:
         ordering = ["name"]
         verbose_name = "club"
@@ -253,6 +255,16 @@ Follow our events live or replay them later.
             if created:
                 self.analytics_site = analytics_site
         super().save(*args, **kwargs)
+
+    @property
+    def free_trial_active(self):
+        return now() - self.creation_date < timedelta(
+            days=10
+        ) or now() < datetime.fromisoformat("2024-06-01T00:00:00Z")
+
+    @property
+    def can_modify_events(self):
+        return self.free_trial_active or self.o_club or self.upgraded
 
     def get_absolute_url(self):
         return self.nice_url
@@ -369,6 +381,16 @@ def delete_club_receiver(sender, instance, using, **kwargs):
     plausible.delete_domain(instance.analytics_domain)
     if instance.domain:
         delete_domain(instance.domain)
+
+
+def can_user_create_club(user):
+    user_free_clubs_count = Club.objects.filter(
+        o_club=False, upgraded=False, admins__id=user.id
+    ).count()
+    return user_free_clubs_count == 0
+
+
+User.add_to_class("can_create_club", property(can_user_create_club))
 
 
 def map_upload_path(instance=None, file_name=None):
@@ -2558,14 +2580,3 @@ class TcpDeviceCommand(models.Model):
 
     def __str__(self):
         return f"Command for imei {self.target}"
-
-
-class IndividualDonator(models.Model):
-    name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=255)
-    upgraded = models.BooleanField(default=False)
-    upgraded_date = models.DateTimeField(blank=True, null=True)
-    order_id = models.CharField(max_length=200, blank=True, default="")
-
-    def __str__(self):
-        return self.name

@@ -19,13 +19,18 @@
     </div>
     <a class="btn btn-success btn-sm mb-3"
        href="{% url 'dashboard:club_select_view' %}"><i class="fa-solid fa-arrow-right-arrow-left"></i> Switch Club</a>
-    {% if not club.upgraded %}
+    {% if not club.upgraded and not club.o_club %}
         <p class="p-1 text-center"
            style="color: #000;
                   background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
-            Support the platform, <a href="{% url 'dashboard:upgrade' %}"
-    style="color:var(--bs-info)"
-    class="fw-bold">Become Partner!</a>
+            {% if club.free_trial_active %}
+                You are enjoying a 10 days free trial,
+            {% else %}
+                The 10 days free trial has now expired,
+            {% endif %}
+            <a href="{% url 'dashboard:upgrade' %}"
+               style="color:var(--bs-info)"
+               class="fw-bold">Upgrade to our paid plan!</a>
         </p>
     {% endif %}
     <ul class="nav nav-tabs mb-3">
@@ -82,7 +87,7 @@
         {% if club.upgraded %}
             <hr />
             <p class="p-1 text-center">
-                Thank you for being a partner! You can manage your subscription on <a href="https://store.routechoices.com/billing" target="_blank">LemonSqueezy</a>.
+                Thank you for using our paid plan! You can manage your subscription on <a href="https://store.routechoices.com/billing" target="_blank">LemonSqueezy</a>.
             </p>
         {% endif %}
     {% endblock sub_sub_content %}
