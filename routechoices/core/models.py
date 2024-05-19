@@ -202,6 +202,7 @@ Follow our events live or replay them later.
     forbid_invite_request = models.BooleanField(
         "Prevent external users to request admin rights", default=False
     )
+    o_club = models.BooleanField("Is an orienteering club", default=False)
 
     class Meta:
         ordering = ["name"]
