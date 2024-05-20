@@ -23,17 +23,23 @@ JS Libraries:
     bootstrap-sweetalert        MIT https://github.com/lipis/bootstrap-sweetalert
     bootstrap                   MIT https://github.com/twbs/bootstrap
     dayjs                       MIT https://github.com/iamkun/dayjs
+    emoji-supported             MIT https://github.com/benaubin/emoji-supported
     filesaver                   MIT https://github.com/eligrey/FileSaver.js
-    fittext                     WTFPL license https://github.com/adactio/FitText.js
+    fittext                     WTFPL License https://github.com/adactio/FitText.js
     fontawesome                 Font Awesome Free License https://fontawesome.com
+    gpxparser                   MIT https://github.com/Luuka/GPXParser.js
     iro                         MPL-2.0 https://github.com/jaames/iro.js
     jdbscan                     GPL-2.0 https://github.com/upphiminn/jDBSCAN
     jquery                      MIT https://github.com/jquery/jquery
     jquery-formset              BSD https://github.com/jmjacquet/jquery.formset/
+    jszip                       GPL-3.0 https://github.com/Stuk/jszip
     leaflet                     BSD-2-Clause https://github.com/Leaflet/Leaflet
     leaflet-color-markers       BSD-2-Clause https://github.com/pointhi/leaflet-color-markers
     leaflet-contextmenu         MIT https://github.com/aratcliffe/Leaflet.contextmenu
     leaflet-control-geocoder    BSD-2-Clause https://github.com/perliedman/leaflet-control-geocoder
+    leaflet-draw                MIT https://github.com/Leaflet/Leaflet.draw/
+    leaflet-locatecontrol       MIT https://github.com/domoritz/leaflet-locatecontrol
+    leaflet-mapcentercoord      MIT https://github.com/xguaita/Leaflet.MapCenterCoord
     leaflet-pancontrol          BSD-2-Clause https://github.com/kartena/Leaflet.Pancontrol
     leaflet-rotate              GPL-3.0 https://github.com/Raruto/leaflet-rotate
     load-image                  MIT https://github.com/blueimp/JavaScript-Load-Image
@@ -42,9 +48,10 @@ JS Libraries:
     popperjs                    MIT https://github.com/floating-ui/floating-ui/tree/v2.x
     qrious                      GPL-3.0 https://github.com/neocotic/qrious
     reqwest                     MIT https://github.com/neocotic/qrious
+    slugify                     MIT github.com/simov/slugify
     tempus-dominus              MIT https://github.com/Eonasdan/tempus-dominus
-    tom-select                  Apache-2.0 https://github.com/orchidjs/tom-select
     tinycolor                   MIT https://github.com/bgrins/TinyColor
+    tom-select                  Apache-2.0 https://github.com/orchidjs/tom-select
     umbrellajs                  MIT https://github.com/franciscop/umbrella
 
 
