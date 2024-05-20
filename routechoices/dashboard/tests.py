@@ -433,6 +433,24 @@ class TestDashboard(EssentialDashboardBase):
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
+    def test_orienteering_status_request(self):
+        url = self.reverse_and_check(
+            "dashboard:upgrade",
+            "/dashboard/upgrade",
+        )
+        res = self.client.get(url)
+        self.assertContains(res, "Orienteering club?")
+
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, primary=True, verified=True
+        )
+        self.club.admins.set([self.user])
+        res = self.client.post(url, {"request": "Please give me access"})
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue("Please give me access" in mail.outbox[0].body)
+        self.assertTrue("We received your request for" in mail.outbox[1].body)
+
 
 class TestInviteFlow(APITestCase):
     def setUp(self):
