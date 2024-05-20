@@ -24,6 +24,7 @@ JS Libraries:
     bootstrap                   MIT https://github.com/twbs/bootstrap
     dayjs                       MIT https://github.com/iamkun/dayjs
     filesaver                   MIT https://github.com/eligrey/FileSaver.js
+    fittext                     WTFPL license https://github.com/adactio/FitText.js
     fontawesome                 Font Awesome Free License https://fontawesome.com
     iro                         MPL-2.0 https://github.com/jaames/iro.js
     jdbscan                     GPL-2.0 https://github.com/upphiminn/jDBSCAN
@@ -35,7 +36,6 @@ JS Libraries:
     leaflet-control-geocoder    BSD-2-Clause https://github.com/perliedman/leaflet-control-geocoder
     leaflet-pancontrol          BSD-2-Clause https://github.com/kartena/Leaflet.Pancontrol
     leaflet-rotate              GPL-3.0 https://github.com/Raruto/leaflet-rotate
-    leaflet-tilelayer-nogap     THE BEER-WARE LICENSE https://github.com/Leaflet/Leaflet.TileLayer.NoGap
     load-image                  MIT https://github.com/blueimp/JavaScript-Load-Image
     papaparse                   MIT https://github.com/mholt/PapaParse
     pdfjs                       Apache-2.0 https://github.com/mozilla/pdfjs-dist
