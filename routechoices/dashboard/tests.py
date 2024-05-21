@@ -1,4 +1,5 @@
 import random
+import re
 from io import BytesIO
 
 import arrow
@@ -46,6 +47,50 @@ class EssentialDashboardBase(APITestCase):
 
 
 class TestDashboard(EssentialDashboardBase):
+    def test_edit_account(self):
+        url = self.reverse_and_check(
+            "dashboard:account_edit_view", "/dashboard/account"
+        )
+
+        res = self.client.get(url)
+        self.assertContains(res, "alice")
+
+        res = self.client.post(
+            url,
+            {"username": "brice", "first_name": "Brice", "last_name": ""},
+            follow=True,
+        )
+        self.assertContains(res, "brice")
+        self.assertContains(res, "Brice")
+
+    def test_delete_account(self):
+        url = self.reverse_and_check(
+            "dashboard:account_delete_view", "/dashboard/account/delete"
+        )
+        res = self.client.get(url)
+        self.assertContains(res, "Delete your account?")
+        res = self.client.get(f"{url}?confirmation_key=invalid")
+        self.assertContains(
+            res,
+            "This account deletion confirmation link is either expired, invalid or not destinated for account",
+        )
+
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, primary=True, verified=True
+        )
+        res = self.client.post(url)
+        self.assertContains(res, "Account deletion confirmation sent")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue("Sad to see you go" in mail.outbox[0].body)
+
+        key = re.search(r"\?confirmation_key=([^\n]+)", mail.outbox[0].body).group(1)
+
+        res = self.client.get(f"{url}?confirmation_key={key}")
+        self.assertContains(res, "This is definitive and cannot be reversed.")
+        res = self.client.post(url, {"confirmation_key": key}, follow=True)
+        self.assertContains(res, "They trust us")
+        self.assertEqual(User.objects.all().count(), 0)
+
     def test_change_club_slug(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 
