@@ -59,9 +59,7 @@ def extract_ground_overlay_info(kml):
                 ne = ne.split(",")[::-1]
                 se = se.split(",")[::-1]
                 sw = sw.split(",")[::-1]
-                corners_coords = (
-                    f"{nw[0]},{nw[1]},{ne[0]},{ne[1]},{se[0]},{se[1]},{sw[0]},{sw[1]}"
-                )
+                corners_coords = f"{round(float(nw[0]), 5)},{round(float(nw[1]), 5)},{round(float(ne[0]), 5)},{round(float(ne[1]), 5)},{round(float(se[0]), 5)},{round(float(se[1]), 5)},{round(float(sw[0]), 5)},{round(float(sw[1]), 5)}"
             else:
                 raise Exception("Invalid GroundOverlay")
         except Exception:

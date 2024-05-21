@@ -3,7 +3,7 @@ import os
 import tempfile
 import zipfile
 from copy import deepcopy
-from io import StringIO
+from io import BytesIO, StringIO
 
 import gpxpy
 from allauth.account import app_settings as allauth_settings
@@ -722,37 +722,9 @@ def map_kmz_upload_view(request):
             new_maps = []
             file = form.cleaned_data["file"]
             error = None
-            if file.name.lower().endswith(".kml"):
-                try:
-                    kml = file.read()
-                    overlays = extract_ground_overlay_info(kml)
-                    for data in overlays:
-                        name, image_path, corners_coords = data
-                        if not name:
-                            name = "Untitled"
-                        if not image_path.startswith(
-                            "http://"
-                        ) and not image_path.startswith("https://"):
-                            raise Exception("Fishy KML")
-
-                        with tempfile.TemporaryFile() as dest:
-                            r = requests.get(image_path, timeout=10)
-                            if r.status_code != 200:
-                                raise Exception("Could not reach image source")
-                            dest.write(r.content)
-                            dest.flush()
-                            dest.seek(0)
-                            new_map = Map(
-                                club=club,
-                                name=name,
-                                corners_coordinates=corners_coords,
-                            )
-                            image_file = File(dest)
-                            new_map.image.save("file", image_file, save=False)
-                            new_maps.append(new_map)
-                except Exception:
-                    error = "An error occured while extracting the map from this file."
-            elif file.name.lower().endswith(".kmz"):
+            kml = None
+            is_kml = False
+            if file.name.lower().endswith(".kmz"):
                 try:
                     dest = tempfile.mkdtemp("_kmz")
                     zf = zipfile.ZipFile(file)
@@ -765,34 +737,36 @@ def map_kmz_upload_view(request):
                         raise Exception("No valid doc.kml file")
                     with open(os.path.join(dest, doc_file), "r", encoding="utf-8") as f:
                         kml = f.read().encode("utf8")
+                except Exception:
+                    error = "An error occured while extracting the map from this file."
+            elif file.name.lower().endswith(".kml"):
+                kml = file.read()
+                is_kml = True
+
+            if kml:
+                try:
                     overlays = extract_ground_overlay_info(kml)
                     for data in overlays:
                         name, image_path, corners_coords = data
+                        file_data = None
                         if not name:
                             name = "Untitled"
                         if image_path.startswith("http://") or image_path.startswith(
                             "https://"
                         ):
-                            with tempfile.TemporaryFile() as dest:
-                                r = requests.get(image_path, timeout=10)
-                                if r.status_code != 200:
-                                    raise Exception("Could not reach image source")
-                                dest.write(r.content)
-                                dest.flush()
-                                dest.seek(0)
-                                image_file = File(dest)
-                                new_map = Map(
-                                    name=name,
-                                    club=club,
-                                    corners_coordinates=corners_coords,
-                                )
-                                new_map.image.save("file", image_file, save=True)
-                                new_maps.append(new_map)
-                        else:
+                            r = requests.get(image_path, timeout=10)
+                            if r.status_code != 200:
+                                raise Exception("Could not reach image source")
+                            file_data = BytesIO(r.content)
+                        elif not is_kml:
                             image_path = os.path.abspath(os.path.join(dest, image_path))
                             if not image_path.startswith(dest):
                                 raise Exception("Fishy KMZ")
-                            image_file = File(open(image_path, "rb"))
+                            file_data = open(image_path, "rb")
+                        else:
+                            raise Exception("Fishy KMZ")
+                        if file_data:
+                            image_file = File(file_data)
                             new_map = Map(
                                 name=name,
                                 club=club,
@@ -801,7 +775,9 @@ def map_kmz_upload_view(request):
                             new_map.image.save("file", image_file, save=False)
                             new_maps.append(new_map)
                 except Exception:
-                    error = "An error occured while extracting the map from this file."
+                    error = (
+                        "An error occured while extracting the map(s) from this file."
+                    )
             if error:
                 messages.error(request, error)
             elif new_maps:
