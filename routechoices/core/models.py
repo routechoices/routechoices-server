@@ -489,7 +489,7 @@ class Map(models.Model):
                 file1.write(doc_kml.encode("utf-8"))
             with fp.open(f"files/doc.{ext}", "w") as file2:
                 file2.write(doc_img)
-        return kmz.getbuffer()
+        return kmz.getvalue()
 
     @property
     def mime_type(self):

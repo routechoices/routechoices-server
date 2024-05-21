@@ -1213,7 +1213,7 @@ def event_zip(request, event_id):
             filename = f"kmz/{title}.kmz"
             with fp.open(filename, "w") as kmz_file:
                 kmz_file.write(data)
-    response_data = archive.getbuffer()
+    response_data = archive.getvalue()
     headers = {"ETag": f'W/"{safe64encodedsha(response_data)}"'}
     if event.privacy == PRIVACY_PRIVATE:
         headers["Cache-Control"] = "Private"
