@@ -724,6 +724,7 @@ def map_kmz_upload_view(request):
             error = None
             kml = None
             is_kml = False
+            dest = None
             if file.name.lower().endswith(".kmz"):
                 try:
                     dest = tempfile.mkdtemp("_kmz")
@@ -742,7 +743,6 @@ def map_kmz_upload_view(request):
             elif file.name.lower().endswith(".kml"):
                 kml = file.read()
                 is_kml = True
-
             if kml:
                 try:
                     overlays = extract_ground_overlay_info(kml)
@@ -778,6 +778,9 @@ def map_kmz_upload_view(request):
                     error = (
                         "An error occured while extracting the map(s) from this file."
                     )
+            if dest:
+                os.rmdir(dest)
+            os.rmdir()
             if error:
                 messages.error(request, error)
             elif new_maps:
