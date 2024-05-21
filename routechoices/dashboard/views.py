@@ -1,5 +1,6 @@
 import math
 import os
+import shutil
 import tempfile
 import zipfile
 from copy import deepcopy
@@ -779,7 +780,7 @@ def map_kmz_upload_view(request):
                         "An error occured while extracting the map(s) from this file."
                     )
             if dest:
-                os.rmdir(dest)
+                shutil.rmtree(dest, ignore_errors=True)
             if error:
                 messages.error(request, error)
             elif new_maps:
