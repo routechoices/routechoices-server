@@ -75,6 +75,12 @@ class TestDashboard(EssentialDashboardBase):
             "This account deletion confirmation link is either expired, invalid or not destinated for account",
         )
 
+        res = self.client.post(url, {"confirmation_key": "invalid"}, follow=True)
+        self.assertContains(
+            res,
+            "This account deletion confirmation link is either expired, invalid or not destinated for account",
+        )
+
         EmailAddress.objects.create(
             user=self.user, email=self.user.email, primary=True, verified=True
         )
