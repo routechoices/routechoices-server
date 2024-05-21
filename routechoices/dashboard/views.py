@@ -780,7 +780,6 @@ def map_kmz_upload_view(request):
                     )
             if dest:
                 os.rmdir(dest)
-            os.rmdir()
             if error:
                 messages.error(request, error)
             elif new_maps:
