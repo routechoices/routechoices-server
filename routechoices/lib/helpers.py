@@ -57,10 +57,12 @@ def get_best_image_mime(request, default=None):
 
 def git_master_hash():
     try:
-        with open(
-            os.path.join(settings.BASE_DIR, ".git", "refs", "heads", "master")
-        ) as fp:
-            return fp.read(8)
+        with open(os.path.join(settings.BASE_DIR, ".git", "HEAD")) as fp:
+            rev = fp.read().strip()
+        if ":" not in rev:
+            return rev[:8]
+        with open(os.path.join(settings.BASE_DIR, ".git", rev[5:])) as fp:
+            return fp.read().strip()[:8]
     except Exception:
         return "dev"
 
