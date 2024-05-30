@@ -265,7 +265,7 @@
 .btn-group-xs > .btn,
 .btn-xs {
   padding: 0.25rem 0.4rem;
-  font-size: 0.875rem;
+  font-size: 0.7695rem;
   line-height: 1;
   border-radius: 0.2rem;
 }
@@ -336,7 +336,7 @@
 }
 
 @media (max-height: 460px) {
-  .powered {
-    display: none;
+  .powered-vert {
+    display: none !important;
   }
 }
