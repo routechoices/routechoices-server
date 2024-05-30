@@ -1009,7 +1009,7 @@ function RCEvent(infoURL, clockURL) {
             u("#live_button")
               .off("click", onSwitchToLive)
               .text(banana.i18n("archived-event"))
-              .removeClass("btn-secondary", "fst-italic")
+              .removeClass("btn-secondary")
               .addClass("btn-info", "disabled");
           }
 
@@ -1076,8 +1076,7 @@ function RCEvent(infoURL, clockURL) {
     u("#live_button")
       .off("click")
       .removeClass("btn-info", "disabled")
-      .addClass("active", "fst-italic")
-      .text(banana.i18n("live-mode"));
+      .addClass("d-none");
     u("#replay_button").removeClass("d-none");
     u("#real_time_button").removeClass("active");
     u("#mass_start_button").removeClass("active");
@@ -1404,7 +1403,7 @@ function RCEvent(infoURL, clockURL) {
     u("#live_button")
       .on("click", onSwitchToLive)
       .text(banana.i18n("return-live-mode"))
-      .removeClass("active", "fst-italic", "btn-info", "disabled")
+      .removeClass("active", "btn-info", "disabled", "d-none")
       .addClass("btn-secondary");
     u("#replay_button").addClass("d-none");
     u("#replay_mode_buttons").css({ display: "" });
@@ -1479,7 +1478,7 @@ function RCEvent(infoURL, clockURL) {
         u("#live_button")
           .off("click")
           .text(banana.i18n("archived-event"))
-          .removeClass("btn-secondary", "fst-italic", "active")
+          .removeClass("btn-secondary", "d-none")
           .addClass("btn-info", "disabled");
         isLiveEvent = false;
       }
@@ -1487,7 +1486,7 @@ function RCEvent(infoURL, clockURL) {
         u("#live_button")
           .on("click", onSwitchToLive)
           .text(banana.i18n("return-live-mode"))
-          .removeClass("active", "fst-italic", "btn-info", "disabled")
+          .removeClass("d-none", "btn-info", "disabled")
           .addClass("btn-secondary");
         isLiveEvent = true;
       }

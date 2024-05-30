@@ -246,12 +246,6 @@
   border-color: #8e1600;
 }
 
-#live_button.btn-secondary.active {
-  background-color: #e50000;
-  border-color: #e50000;
-  text-transform: uppercase;
-}
-
 .leaflet-control-zoom-out,
 .leaflet-control-zoom-in {
   user-select: none;
