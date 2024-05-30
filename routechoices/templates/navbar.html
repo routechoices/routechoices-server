@@ -3,14 +3,20 @@
         style="color: #fff;
                background-color: #111 !important">
     <div class="container">
-        <a class="navbar-brand site-name"
-           href="{% host_url 'site:landing_page' host 'www' %}"><span class="d-inline-block">
-            <img src="{% static 'img/logo.svg' %}"
-                 alt="Site logo"
-                 height="25"
-                 width="34.66"
-                 style="vertical-align: text-bottom">
-        </span> {{ site.name }}</a>
+        <a class="navbar-brand site-name d-inline-flex"
+           href="{% host_url 'site:landing_page' host 'www' %}">
+            <div class="d-inline-block">
+                <img src="{% static 'img/logo.svg' %}"
+                     alt="Site logo"
+                     height="25"
+                     width="34.66"
+                     style="vertical-align: text-bottom">
+            </div>
+            <div class="px-2">
+                <div style="line-height:1.4em;margin-top:-5px;">{{ site.name }}</div>
+                <div style="font-size:0.65em; line-height:0">Live GPS Tracking Solution</div>
+            </div>
+        </a>
         <button id="navbar-toogler"
                 class="navbar-toggler"
                 type="button"
