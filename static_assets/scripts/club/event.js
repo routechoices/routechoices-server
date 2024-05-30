@@ -1531,7 +1531,7 @@ function RCEvent(infoURL, clockURL) {
       "--ctrl-height",
       `${document.getElementById("ctrl-wrapper").clientHeight}px`
     );
-    doc.style.setProperty("--footer-size", "15px");
+    doc.style.setProperty("--footer-size", "7px");
     doc.style.setProperty(
       "--navbar-size",
       document.fullscreenElement != null ? "0px" : "46px"
