@@ -1533,7 +1533,7 @@ function RCEvent(infoURL, clockURL) {
     );
     doc.style.setProperty(
       "--footer-size",
-      document.fullscreenElement != null ? "7px" : "45px"
+      document.fullscreenElement != null ? "7px" : "55px"
     );
     doc.style.setProperty(
       "--navbar-size",

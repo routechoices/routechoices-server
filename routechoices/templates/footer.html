@@ -51,15 +51,22 @@
     </div>
     <div class="second-bar">
         <div class="container">
-            <h2 class="logo site-name">
-                <a href="{% host_url 'site:landing_page' host 'www' %}">
-                    <img src="{% static 'img/logo.svg' %}"
-                         alt="Site logo"
-                         height="35"
-                         width="48.52"
-                         style="vertical-align: text-bottom">
-                {{ site.name }}</a>
-            </h2>
+            <div class="logo site-name">
+                <a href="{% host_url 'site:landing_page' host 'www' %}"
+                   class="d-inline-flex ">
+                    <div class="p-0">
+                        <img src="{% static 'img/logo.svg' %}"
+                             alt="Site logo"
+                             height="35"
+                             width="48.52"
+                             style="vertical-align: baseline">
+                    </div>
+                    <div class="px-2 py-0">
+                        <div style="line-height:1.4em">{{ site.name }}</div>
+                        <div style="font-size: 0.65em;line-height:0">Live GPS Tracking Solution</div>
+                    </div>
+                </a>
+            </div>
             <div class="social-icons">
                 <a href="https://github.com/routechoices"
                    class="github"
