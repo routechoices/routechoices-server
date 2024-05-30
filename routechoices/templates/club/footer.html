@@ -18,11 +18,13 @@
                     <div class="px-0 py-1">
                         <a {% if is_event_page %}target="_blank"{% endif %}
                            href="{% host_url 'site:landing_page' host 'www' %}"
-                           style="line-height: 25px">
-                            <div>Powered by {{ site.name }}</div>
-                            <div style="font-size: 0.67em;
-                                        line-height: 0px;
-                                        text-align: right">Live GPS Tracking Solution</div>
+                           style="line-height: 25px"
+                           class="d-flex">
+                            <div>Powered by</div>
+                            <div>
+                                <div>{{ site.name }}</div>
+                                <div style="font-size: 0.67em; line-height: 0px;">Live GPS Tracking Solution</div>
+                            </div>
                         </a>
                     </div>
                 </div>
