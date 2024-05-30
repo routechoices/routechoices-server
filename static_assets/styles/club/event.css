@@ -334,3 +334,9 @@
 .cd-nb {
   font-variant-numeric: tabular-nums;
 }
+
+@media (max-height: 460px) {
+  .powered {
+    display: none;
+  }
+}
