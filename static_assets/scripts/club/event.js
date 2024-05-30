@@ -1531,10 +1531,7 @@ function RCEvent(infoURL, clockURL) {
       "--ctrl-height",
       `${document.getElementById("ctrl-wrapper").clientHeight}px`
     );
-    doc.style.setProperty(
-      "--footer-size",
-      document.fullscreenElement != null ? "7px" : "55px"
-    );
+    doc.style.setProperty("--footer-size", "15px");
     doc.style.setProperty(
       "--navbar-size",
       document.fullscreenElement != null ? "0px" : "46px"
@@ -3067,12 +3064,6 @@ function RCEvent(infoURL, clockURL) {
     ) {
       document.getElementById("fullscreenSwitch").remove();
     }
-
-    document
-      .querySelector("#myFooter")
-      .addEventListener("touchmove", function (e) {
-        e.preventDefault();
-      });
     myEvent = new RCEvent(window.local.eventUrl, window.local.serverClockUrl);
   });
 })();
