@@ -984,7 +984,7 @@ function RCEvent(infoURL, clockURL) {
           });
           u("#mass_start_text").text(banana.i18n("mass-start"));
           u("#options_show_button").on("click", displayOptions);
-          u("#full_progress_bar").on("click", pressProgressBar);
+          u("#full_progress_bar").parent().on("click", pressProgressBar);
           u("#share_button").on("click", shareURL);
           map.contextmenu.insertItem(
             {
@@ -999,7 +999,7 @@ function RCEvent(infoURL, clockURL) {
             isLiveEvent = true;
             eventStateControl.setLive();
             u(".if-live").removeClass("d-none");
-            u("#full_progress_bar").addClass("d-none");
+            u("#full_progress_bar").parent().addClass("d-none");
             u("#replay_mode_buttons").hide();
             u("#replay_control_buttons").hide();
           } else {
@@ -1061,7 +1061,7 @@ function RCEvent(infoURL, clockURL) {
     }
     isLive = true;
     isRealTime = true;
-    u("#full_progress_bar").addClass("d-none");
+    u("#full_progress_bar").parent().addClass("d-none");
 
     eventStateControl.setLive();
     if (setMassStartContextMenuItem) {
@@ -1396,7 +1396,7 @@ function RCEvent(infoURL, clockURL) {
     }
 
     u(".if-live").addClass("d-none");
-    u("#full_progress_bar").removeClass("d-none");
+    u("#full_progress_bar").parent().removeClass("d-none");
     u("#real_time_button").addClass("active");
     u("#mass_start_button").removeClass("active");
 

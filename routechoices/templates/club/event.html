@@ -122,6 +122,20 @@
         <div class="row" id="bottom-div">
             <div class="col-12 time_bar loading" style="z-index: 110001">
                 <div id="ctrl-wrapper">
+                    <div class="event-tool pb-2">
+                        <div id="full_progress_bar" class="progress" style="cursor: pointer">
+                            <div id="progress_bar"
+                                 class="progress-bar progress-bar-info"
+                                 role="progressbar"
+                                 aria-label="time"
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 style="transition: unset">
+                                <span id="progress_bar_text" class="p-2"></span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="event-tool mb-1">
                         <div class="d-flex flex-wrap">
                             <div class="d-inline-flex flex-row flex-nowrap">
@@ -175,20 +189,6 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="event-tool mb-2">
-                        <div id="full_progress_bar" class="progress" style="cursor: pointer">
-                            <div id="progress_bar"
-                                 class="progress-bar progress-bar-info"
-                                 role="progressbar"
-                                 aria-label="time"
-                                 aria-valuenow="0"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100"
-                                 style="transition: unset">
-                                <span id="progress_bar_text" class="p-2"></span>
                             </div>
                         </div>
                     </div>
