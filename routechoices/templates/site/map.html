@@ -40,26 +40,25 @@
                 style="z-index: 110002">
             <div class="second-bar">
                 <div class="container-fluid">
-                    <div class="logosmall site-name my-0 py-0 text-end">
-                        <a {% if is_event_page %}target="_blank"{% endif %}
-                           href="{% host_url 'site:landing_page' host 'www' %}"
-                           style="line-height: 25px"
-                           class="d-flex flex-row justify-content-between">
-                            <div class="px-2 py-1">
-                                <img src="{% static 'img/logo.svg' %}"
-                                     alt="Site logo"
-                                     height="30"
-                                     width="42"
-                                     style="vertical-align: top">
-                            </div>
-                            <div class="px-2 py-1">
-                                <div>Powered by {{ site.name }}</div>
-                                <div style="margin:0;
-                                            font-size: 0.67em;
-                                            line-height: 0px;
-                                            margin-left: 105px">Live GPS Tracking Solution</div>
-                            </div>
-                        </a>
+                    <div class="logosmall site-name my-0 py-0">
+                        <div class="px-0 py-1">
+                            <a href="https://www.routechoices.com/"
+                               style="line-height: 25px"
+                               class="d-flex justify-content-end">
+                                <div>Powered by</div>
+                                <div class="ps-1">
+                                    <div>Routechoices.com</div>
+                                    <div style="font-size: 0.67em; line-height: 0px;">Live GPS Tracking Solution</div>
+                                </div>
+                                <div>
+                                    <img src="{% static 'img/logo.svg' %}"
+                                         alt="Site logo"
+                                         height="30"
+                                         width="42"
+                                         style="vertical-align: top">
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
