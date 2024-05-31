@@ -82,56 +82,58 @@
     </div>
     <div class="container-fluid frontpage_text image-banner p-0">
         <div>
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 1 1"
-                 width="100%"
-                 height="2em"
-                 preserveAspectRatio="none"
-                 fill="var(--bs-body-bg)">
-                <path d="M0 0 H1 V1" />
-            </svg>
-            <div class="container">
-                <div class="row text-center">
-                    <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
-                    {% if user.is_authenticated %}
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 1 1"
+                     width="100%"
+                     height="2em"
+                     preserveAspectRatio="none"
+                     fill="var(--bs-body-bg)">
+                    <path d="M0 0 H1 V1" />
+                </svg>
+                <div class="container">
+                    <div class="row text-center">
+                        <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
+                        {% if user.is_authenticated %}
+                            <h3 class="frontpage_text mb-3">
+                                A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                            </h3>
+                        {% else %}
+                            <h3 class="frontpage_text mb-3">
+                                Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                            </h3>
+                        {% endif %}
                         <h3 class="frontpage_text mb-3">
-                            A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                            You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a dedicated GPS trackers or a smartphone running our app. Purpose being entertainment, fast analysis, or safety.
                         </h3>
-                    {% else %}
-                        <h3 class="frontpage_text mb-3">
-                            Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                        <h3 class="frontpage_text mb-4">
+                            After the event you can replay what happened as many time as you want for deeper analysis.
                         </h3>
-                    {% endif %}
-                    <h3 class="frontpage_text mb-3">
-                        You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a dedicated GPS trackers or a smartphone running our app. Purpose being entertainment, fast analysis, or safety.
-                    </h3>
-                    <h3 class="frontpage_text mb-4">
-                        After the event you can replay what happened as many time as you want for deeper analysis.
-                    </h3>
-                    {% if user.is_authenticated %}
-                        <h3 class="frontpage_text mb-3">
-                            <a class="px-4 py-2 text-decoration-none engage-link"
-                               href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
-                        </h3>
-                    {% else %}
-                        <h3 class="frontpage_text mb-3">
-                            <a class="px-4 py-2 text-decoration-none engage-link"
-                               href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
-                        </h3>
-                    {% endif %}
+                        {% if user.is_authenticated %}
+                            <h3 class="frontpage_text mb-3">
+                                <a class="px-4 py-2 text-decoration-none engage-link"
+                                   href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
+                            </h3>
+                        {% else %}
+                            <h3 class="frontpage_text mb-3">
+                                <a class="px-4 py-2 text-decoration-none engage-link"
+                                   href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
+                            </h3>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="container-fluid p-0 m-0">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 1 1"
-                 width="100%"
-                 height="2.0em"
-                 preserveAspectRatio="none"
-                 fill="var(--bs-body-bg)"
-                 style="margin-bottom: -0.5px">
-                <path d="M0 0 V1 H1" />
-            </svg>
+            <div class="container-fluid p-0 m-0">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 1 1"
+                     width="100%"
+                     height="2.0em"
+                     preserveAspectRatio="none"
+                     fill="var(--bs-body-bg)"
+                     style="margin-bottom: -0.5px">
+                    <path d="M0 0 V1 H1" />
+                </svg>
+            </div>
         </div>
     </div>
     <div class="container-fluid frontpage_text px-2 py-5 screenshots-block">
