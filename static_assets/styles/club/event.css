@@ -334,7 +334,16 @@
 .cd-nb {
   font-variant-numeric: tabular-nums;
 }
-
+.powered-vert {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  transform: rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 0.8em;
+  margin-left: -1px;
+}
+.powered-vert:hover {
+  background: rgba(0, 0, 0, 0.125);
+}
 @media (max-height: 460px) {
   .powered-vert {
     display: none !important;
