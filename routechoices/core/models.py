@@ -260,7 +260,7 @@ Follow our events live or replay them later.
     def free_trial_active(self):
         return now() - self.creation_date < timedelta(
             days=10
-        ) or now() < datetime.fromisoformat("2024-06-01T00:00:00Z")
+        )
 
     @property
     def can_modify_events(self):
