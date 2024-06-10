@@ -695,7 +695,9 @@ class Map(models.Model):
             )
         ) % 360
 
-        return round((roth + rotv) / 2, 2)
+        d = ((roth - rotv + 180) % 360) - 180
+        avg = (rotv + d / 2) % 360
+        return round(avg, 2)
 
     @property
     def north_declination(self):
