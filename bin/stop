@@ -10,5 +10,5 @@ then
   echo 'stopping'
   $UWSGI --stop $PID_FILE
 else
-  echo 'proccess not running'
+  echo 'process not running'
 fi

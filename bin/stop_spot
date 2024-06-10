@@ -9,5 +9,5 @@ then
   kill -9 `cat $PID_FILE`
   rm $PID_FILE
 else
-  echo 'proccess not running'
+  echo 'process not running'
 fi
