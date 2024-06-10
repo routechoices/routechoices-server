@@ -29,6 +29,11 @@ class MySite:
     name = settings.RELYING_PARTY_NAME
 
 
+def avg_angles(a, b):
+    d = ((b - a + 180) % 360) - 180
+    return (a + d / 2) % 360
+
+
 def get_current_site():
     return MySite()
 

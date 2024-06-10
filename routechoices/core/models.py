@@ -5,7 +5,7 @@ import math
 import os.path
 import re
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
@@ -46,6 +46,7 @@ from routechoices.lib import plausible
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     adjugate_matrix,
+    avg_angles,
     delete_domain,
     distance_latlon,
     distance_xy,
@@ -258,9 +259,7 @@ Follow our events live or replay them later.
 
     @property
     def free_trial_active(self):
-        return now() - self.creation_date < timedelta(
-            days=10
-        )
+        return now() - self.creation_date < timedelta(days=10)
 
     @property
     def can_modify_events(self):
@@ -670,34 +669,19 @@ class Map(models.Model):
         br = self.map_xy_to_spherical_mercator(self.width, self.height)
         bl = self.map_xy_to_spherical_mercator(0, self.height)
 
-        roth = (
-            (
-                (
-                    math.atan2(tl[1] - bl[1], tl[0] - bl[0])
-                    + math.atan2(tr[1] - br[1], tr[0] - br[0])
-                    - math.pi
-                )
-                / 2
-                * 180
-                / math.pi
-            )
-        ) % 360
+        rot_vert_left = (
+            (math.atan2(tl[1] - bl[1], tl[0] - bl[0]) - math.pi / 2) * 180 / math.pi
+        )
+        rot_vert_right = (
+            (math.atan2(tr[1] - br[1], tr[0] - br[0]) - math.pi / 2) * 180 / math.pi
+        )
+        rot_vert = (avg_angles(rot_vert_left, rot_vert_right)) % 360
 
-        rotv = (
-            (
-                (
-                    math.atan2(tr[1] - tl[1], tr[0] - tl[0])
-                    + math.atan2(br[1] - bl[1], br[0] - bl[0])
-                )
-                / 2
-                * 180
-                / math.pi
-            )
-        ) % 360
+        rot_hori_top = (math.atan2(tr[1] - tl[1], tr[0] - tl[0])) * 180 / math.pi
+        rot_hori_bottom = (math.atan2(br[1] - bl[1], br[0] - bl[0])) * 180 / math.pi
+        rot_hori = avg_angles(rot_hori_top, rot_hori_bottom) % 360
 
-        d = ((roth - rotv + 180) % 360) - 180
-        avg = (rotv + d / 2) % 360
-        return round(avg, 2)
+        return round(avg_angles(rot_vert, rot_hori), 2)
 
     @property
     def north_declination(self):
