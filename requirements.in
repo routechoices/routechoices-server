@@ -40,4 +40,4 @@ python-magic
 sentry-sdk
 sewer @ git+https://github.com/rphlo/sewer@0.8.4a
 tornado
-uwsgi==2.0.25.1
+uwsgi
