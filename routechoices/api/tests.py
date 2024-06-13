@@ -87,7 +87,7 @@ class EssentialApiTestCase1(EssentialApiBase):
         alt_club = Club.objects.create(
             name="Alternative club", slug="alt-club", domain="example.com"
         )
-        Event.objects.create(
+        e1 = Event.objects.create(
             club=club,
             name="Test event A",
             slug="abc",
@@ -103,7 +103,7 @@ class EssentialApiTestCase1(EssentialApiBase):
             start_date=arrow.get().shift(hours=-2).datetime,
             end_date=arrow.get().shift(hours=-1).datetime,
         )
-        Event.objects.create(
+        e3 = Event.objects.create(
             club=alt_club,
             name="Test event C",
             slug="ghi",
@@ -111,6 +111,19 @@ class EssentialApiTestCase1(EssentialApiBase):
             start_date=arrow.get().shift(hours=-2).datetime,
             end_date=arrow.get().shift(hours=-1).datetime,
         )
+
+        e1b = Event.get_by_url("https://club.routechoices.dev/abc")
+        self.assertEqual(e1, e1b)
+        e3b = Event.get_by_url("https://example.com/ghi")
+        self.assertEqual(e3, e3b)
+        e3c = Event.get_by_url("https://alt-club.routechoices.dev/ghi")
+        self.assertEqual(e3, e3c)
+        e = Event.get_by_url("https://alt-club-routechoices.dev/ghi")
+        self.assertIsNone(e)
+        e = Event.get_by_url("https://alt-club.routechoices.dev/abc")
+        self.assertIsNone(e)
+        e = Event.get_by_url("https://google.com/abc")
+        self.assertIsNone(e)
 
         url = self.reverse_and_check("event_list", "/events")
         res = self.client.get(url)

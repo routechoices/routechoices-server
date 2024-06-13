@@ -9,6 +9,7 @@ from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
 from operator import itemgetter
+from urllib.parse import urlparse
 from zipfile import ZipFile
 
 import cv2
@@ -1460,6 +1461,17 @@ class Event(models.Model):
             or not self.club.admins.filter(id=user.id).exists()
         ):
             raise PermissionDenied
+
+    @classmethod
+    def get_by_url(cls, url):
+        o = urlparse(url)
+        domain = o.netloc
+        filters = {"slug": o.path[1:]}
+        if domain.endswith(f".{settings.PARENT_HOST}"):
+            filters["club__slug"] = domain[: -len(f".{settings.PARENT_HOST}")]
+        else:
+            filters["club__domain"] = domain
+        return cls.objects.filter(**filters).first()
 
     def iterate_competitors(self):
         competitors = (

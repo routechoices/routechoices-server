@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = "Crop all points of the competitors of an event so that their distances are within a given distance range (in km)"
 
     def add_arguments(self, parser):
-        parser.add_argument("--event_id", type=str)
+        parser.add_argument("--event_url", type=str)
         parser.add_argument("--min_dist", type=float, default=0)
         parser.add_argument("--max_dist", type=float)
         parser.add_argument("--force", action="store_true", default=False)
@@ -17,9 +17,9 @@ class Command(BaseCommand):
         force = options["force"]
         min_dist = options["min_dist"]
         max_dist = options["max_dist"]
-        event = Event.objects.filter(aid=options["event_id"]).first()
+        event = Event.get_by_url(options["event_url"])
         if not event:
-            self.stderr.write("Event does not exists")
+            self.stderr.write("Event not found")
             return
         if max_dist and max_dist <= min_dist:
             self.stderr.write("max_dist must be higher than min_dist")
