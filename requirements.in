@@ -29,7 +29,7 @@ geoip2
 gps-data-codec @ git+https://github.com/routechoices/gps-data-codec@8d267eb11190c811d8c9dc07eddc7e3c228a708b
 gpxpy
 jxlpy
-kagi @ git+https://github.com/rphlo/kagi@cc23e6718382c5ed4f88077a8d8c9e11fc4dc295
+kagi @ git+https://github.com/rphlo/kagi@ede8bf4405ee55fe4ca56dd7d81dd0f0a57db265
 numpy
 opencv-python
 orjson
