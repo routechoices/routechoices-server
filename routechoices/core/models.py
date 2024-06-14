@@ -1464,13 +1464,19 @@ class Event(models.Model):
 
     @classmethod
     def get_by_url(cls, url):
-        o = urlparse(url)
-        domain = o.netloc
-        filters = {"slug": o.path[1:]}
-        if domain.endswith(f".{settings.PARENT_HOST}"):
-            filters["club__slug"] = domain[: -len(f".{settings.PARENT_HOST}")]
+        if url.startswith(settings.SHORTCUT_URL):
+            url = url[len(settings.SHORTCUT_URL) :]
+            o = urlparse(url)
+            club_slug, slug = o.path.split("/", 1)
+            filters = {"slug": slug, "club__slug": club_slug}
         else:
-            filters["club__domain"] = domain
+            o = urlparse(url)
+            domain = o.netloc
+            filters = {"slug": o.path[1:]}
+            if domain.endswith(f".{settings.PARENT_HOST}"):
+                filters["club__slug"] = domain[: -len(f".{settings.PARENT_HOST}")]
+            else:
+                filters["club__domain"] = domain
         return cls.objects.filter(**filters).first()
 
     def iterate_competitors(self):

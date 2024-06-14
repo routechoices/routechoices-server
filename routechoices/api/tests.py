@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.cache import cache
+from django.test import override_settings
 from django_hosts.resolvers import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -82,6 +83,7 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(len(dev_id), 8)
         self.assertTrue(dev_id != self.get_device_id())
 
+    @override_settings(SHORTCUT_URL="https://rtchcs.dev/")
     def test_list_events(self):
         club = Club.objects.create(name="Test club", slug="club")
         alt_club = Club.objects.create(
@@ -118,6 +120,10 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(e3, e3b)
         e3c = Event.get_by_url("https://alt-club.routechoices.dev/ghi")
         self.assertEqual(e3, e3c)
+        e3d = Event.get_by_url("https://rtchcs.dev/alt-club/ghi")
+        self.assertEqual(e3, e3d)
+        e = Event.get_by_url("https://www.rtchcs.dev/alt-club/ghi")
+        self.assertIsNone(e)
         e = Event.get_by_url("https://alt-club-routechoices.dev/ghi")
         self.assertIsNone(e)
         e = Event.get_by_url("https://alt-club.routechoices.dev/abc")
