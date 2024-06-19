@@ -26,7 +26,8 @@ class AcceptInvite(SingleObjectMixin, View):
         self.object = invitation = self.get_object()
         target_user = True
         if (
-            self.request.user.is_authenticated
+            invitation
+            and self.request.user.is_authenticated
             and not EmailAddress.objects.filter(
                 user=self.request.user, email=invitation.email
             ).exists()
