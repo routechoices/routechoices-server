@@ -424,6 +424,11 @@ body {
   background: var(--bs-dark-bg-subtle) !important;
 }
 
-#id_token.invalid {
-  width: 9.3em;
+.totp-token {
+  letter-spacing: 0.5em;
+  width: 8.3em;
+}
+
+.totp-token.is-invalid {
+  width: 9.7em;
 }

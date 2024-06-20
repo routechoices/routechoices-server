@@ -5,16 +5,10 @@
     btn.prepend('<i class="fa-solid fa-spinner fa-spin me-1"></i>');
   });
   u("#id_token")
-    .addClass("font-monospace")
+    .addClass("font-monospace", "totp-token")
     .attr({
       placeholder: "••••••",
       maxLength: 6,
-    })
-    .css({
-      letterSpacing: "0.5em",
-      width: "8.3em",
-      fontFeatureSettings: "tnum",
-      fontVariantNumeric: "tabular-nums"
     })
     .on("input", function () {
       this.value = this.value.replace(/[^0-9]/g, "");
