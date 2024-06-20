@@ -423,3 +423,7 @@ body {
 .tempus-dominus-widget .time-container-second div:not(.no-highlight):hover {
   background: var(--bs-dark-bg-subtle) !important;
 }
+
+#id_token.invalid {
+  width: 9.3em;
+}
