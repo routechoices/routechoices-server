@@ -524,7 +524,7 @@ function enableBtnToPreview() {
       setRefPtsWorld(e.latlng);
     });
 
-    fetch("https://api.routechoices.com/check-latlon")
+    fetch(window.local.apiRoot + "check-latlon")
       .then(function (r) {
         return r.json();
       })

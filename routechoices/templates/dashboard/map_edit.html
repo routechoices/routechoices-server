@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 compress %}
+{% load static django_bootstrap5 compress hosts %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -162,6 +162,8 @@
     </div>
 {% endblock sub_sub_content %}
 {% block extra_body %}
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
+            data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
         <script src="{% static '/vendor/load-image-5.16.0/load-image.all.min.js' %}"></script>

@@ -1230,9 +1230,9 @@ def event_zip(request, event_id):
 )
 @api_view(["GET"])
 def ip_latlon(request):
-    g = GeoIP2()
     headers = {"Cache-Control": "Private"}
     try:
+        g = GeoIP2()
         lat, lon = g.lat_lon(request.META["REMOTE_ADDR"])
     except Exception:
         return Response({"status": "fail"}, headers=headers)

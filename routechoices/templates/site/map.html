@@ -63,6 +63,8 @@
                 </div>
             </div>
         </footer>
+        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
+                data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
         {% compress js %}
             <script src="{% static '/vendor/leaflet-1.9.4/leaflet.js'%}"></script>
             <script src="{% static '/vendor/leaflet-image-transform-2022.02.26/leaflet-image-transform.min.js'%}"></script>
