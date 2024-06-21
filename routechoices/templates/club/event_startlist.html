@@ -56,7 +56,12 @@
         </div>
     </div>
     <div class="container content">
-        {% if event.competitors.all %}
+        {% if not event.competitors.all.exists %}<h4>No competitors...</h4>{% endif %}
+        {% if event.open_registration %}
+            <a class="my-3 btn btn-primary"
+               href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
+        {% endif %}
+        {% if event.competitors.all.exists %}
             <table class="table competitor-table">
                 <thead>
                     <tr>
@@ -74,8 +79,6 @@
                     </tr>
                 {% endfor %}
             </table>
-        {% else %}
-            <h4>No competitors...</h4>
         {% endif %}
     </div>
 {% endblock contentup %}
