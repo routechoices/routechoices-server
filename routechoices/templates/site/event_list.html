@@ -314,7 +314,8 @@
                                             {% endif %}
                                             <div class="mt-2">
                                                 {% if event.open_registration %}
-                                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
+                                                    <a class="me-1"
+                                                       href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
                                                 {% endif %}
                                                 <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist"><i class="fa-solid fa-list"></i> Start list</a>
                                             </div>
