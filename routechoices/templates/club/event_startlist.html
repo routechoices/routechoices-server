@@ -1,0 +1,91 @@
+{% extends "club/base.html" %}
+{% load static hosts django_bootstrap5 compress %}
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
+{% endblock extra_head %}
+{% block head_title %}
+    {{ event.name }} contribution page | Powered by {{ site.name }}
+{% endblock head_title %}
+{% block head_description %}
+    {{ event.name }} by {{ event.club.name }} contribution page
+{% endblock head_description %}
+{% block contentup %}
+    <div class="container-fluid p-0">
+        <div class="row m-0">
+            <div class="w-100" style="background-color: var(--bs-secondary-bg);">
+                <div class="container content">
+                    <div class="row">
+                        {% if event.event_set %}
+                            <h2 class="padded-multiline">
+                                <span>{{ event.event_set.name }}</span>
+                            </h2>
+                        {% endif %}
+                        <h2>
+                            <a href="{{ event.club.nice_url }}{{ event.slug }}"
+                               class="fw-bold text-decoration-none">{{ event.name }}</a>
+                        </h2>
+                        <h4>Start List</h4>
+                        <p>
+                            Event
+                            {% if not event.hidden %}
+                                started {{ event.start_date|timesince }} ago,
+                            {% else %}
+                                starts in {{ event.start_date|timeuntil }},
+                            {% endif %}
+                            {% if event.ended %}
+                                ended {{ event.end_date|timesince }} ago.
+                            {% else %}
+                                ends in {{ event.end_date|timeuntil }}.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 1 1"
+                 width="100%"
+                 height="2em"
+                 preserveAspectRatio="none"
+                 fill="var(--bs-body-bg)"
+                 style="margin-top: -2em"
+                 class="p-0">
+                <path d="M0 0 V1 H1" />
+            </svg>
+        </div>
+    </div>
+    <div class="container content">
+        {% if event.competitors.all %}
+            <table class="table competitor-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Start Time</th>
+                    </tr>
+                </thead>
+                {% for competitor in event.competitors.all %}
+                    <tr class="competitor">
+                        <td>{{ competitor.name }}</td>
+                        <td>
+                            <span class="date-utc text-nowrap"
+                                  data-date="{{ competitor.start_time|date:"c" }}">{{ competitor.start_time|date:'Y-m-d H:i:s' }} UTC</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <h4>No competitors...</h4>
+        {% endif %}
+    </div>
+{% endblock contentup %}
+{% block extra_body %}
+    {{ block.super }}
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-event-id="{{ event.aid }}" data-csrf-token="{{ csrf_token }}" {% if event_ended %}data-event-ended="1"{% endif %}>
+    </script>
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/event_competitors_printer.js' %}"></script>
+    {% endcompress %}
+{% endblock extra_body %}

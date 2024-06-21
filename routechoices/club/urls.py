@@ -41,6 +41,11 @@ urlpatterns = [
         name="event_export_view",
     ),
     re_path(
+        r"(?P<slug>[0-9a-zA-Z_-]+)/startlist/?$",
+        views.event_startlist_view,
+        name="event_startlist_view",
+    ),
+    re_path(
         r"(?P<slug>[0-9a-zA-Z_-]+)/zip/?$",
         views.event_zip_view,
         name="event_zip_view",

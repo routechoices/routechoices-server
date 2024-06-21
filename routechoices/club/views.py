@@ -298,6 +298,58 @@ def event_view(request, slug, **kwargs):
     return response
 
 
+def event_startlist_view(request, slug, **kwargs):
+    bypass_resp = handle_legacy_request(
+        request, "event_export_view", kwargs.get("club_slug"), slug=slug
+    )
+    if bypass_resp:
+        return bypass_resp
+    club_slug = request.club_slug
+    event = (
+        Event.objects.all()
+        .select_related("club", "event_set")
+        .prefetch_related("competitors")
+        .filter(
+            club__slug__iexact=club_slug,
+            slug__iexact=slug,
+        )
+        .first()
+    )
+    if not event:
+        club = get_object_or_404(Club, slug__iexact=club_slug)
+        if club.domain and not request.use_cname:
+            return redirect(f"{club.nice_url}{slug}/export")
+        return render(
+            request,
+            "club/404_event.html",
+            {"club": club},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    if event.privacy == PRIVACY_PRIVATE:
+        if request.use_cname:
+            return redirect(
+                reverse(
+                    "event_startlist_view",
+                    host="clubs",
+                    kwargs={"slug": slug},
+                    host_kwargs={"club_slug": club_slug},
+                )
+            )
+    elif event.club.domain and not request.use_cname:
+        return redirect(f"{event.club.nice_url}{event.slug}/startlist")
+
+    response = render(
+        request,
+        "club/event_startlist.html",
+        {
+            "event": event,
+        },
+    )
+    if event.privacy == PRIVACY_PRIVATE:
+        response["Cache-Control"] = "private"
+    return response
+
+
 def event_export_view(request, slug, **kwargs):
     bypass_resp = handle_legacy_request(
         request, "event_export_view", kwargs.get("club_slug"), slug=slug

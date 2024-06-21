@@ -32,7 +32,7 @@
                             {% if not event.hidden %}
                                 started {{ event.start_date|timesince }} ago,
                             {% else %}
-                                starts in {{ event.start_date|timeuntil }}{{ event.start_date }},
+                                starts in {{ event.start_date|timeuntil }},
                             {% endif %}
                             {% if event.ended %}
                                 ended {{ event.end_date|timesince }} ago.

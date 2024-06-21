@@ -52,5 +52,6 @@
     "hide-map": "Piilota kartta",
     "lap": "Kierros",
     "from": "Alkaen",
-    "to": "Maali"
+    "to": "Maali",
+    "start-list": "Aloituslista"
 }

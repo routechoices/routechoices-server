@@ -22,6 +22,8 @@
                             <h6 class="fw-bold">Links for all</h6>
                             <a href="{{ event.get_absolute_url }}"
                                class="btn btn-primary btn-sm mb-1 me-1"><i class="fa-solid fa-right-to-bracket"></i> Event Page</a>
+                            <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist"
+                               class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-list"></i> Start List</a>
                             {% if not event.hidden %}
                                 <a href="{{ event.club.nice_url }}{{ event.slug }}/export"
                                    class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-floppy-disk"></i> Export Page</a>

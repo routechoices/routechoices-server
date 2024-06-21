@@ -312,11 +312,12 @@
    data-bs-title="Competitor registration enabled"
    class="fa-solid fa-user-plus"></i></span>
                                             {% endif %}
-                                            {% if event.open_registration %}
-                                                <div class="mt-2">
+                                            <div class="mt-2">
+                                                {% if event.open_registration %}
                                                     <a href="{{ event.club.nice_url }}{{ event.slug }}/contribute"><i class="fa-solid fa-user-plus"></i> Enter</a>
-                                                </div>
-                                            {% endif %}
+                                                {% endif %}
+                                                <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist"><i class="fa-solid fa-list"></i> Start list</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

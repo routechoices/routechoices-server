@@ -10,6 +10,7 @@ fontawesomeSubset(
     brands: ["twitter", "instagram", "github", "android", "apple"],
     regular: ["window-restore", "map", "copy", "clock", "eye", "eye-slash"],
     solid: [
+      "list",
       "chevron-up",
       "chevron-down",
       "expand",

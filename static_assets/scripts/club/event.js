@@ -3020,6 +3020,7 @@ function RCEvent(infoURL, clockURL) {
     u("#event-start-date-text").text(banana.i18n("event-start-date-text"));
     u("#heads-up-text").text(banana.i18n("heads-up-text"));
     u("#export-text").text(banana.i18n("export"));
+    u("#event-start-list-link").text(banana.i18n("start-list"));
     u("#loading-text").text(banana.i18n("loading-text"));
     u(".cancel-text").text(banana.i18n("cancel"));
     u(".save-text").text(banana.i18n("save"));

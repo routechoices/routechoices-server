@@ -745,6 +745,10 @@ readers do not read off random characters that represent icons */
   content: "\f256";
 }
 
+.fa-list::before {
+  content: "\f03a";
+}
+
 .sr-only,
 .fa-sr-only {
   position: absolute;
