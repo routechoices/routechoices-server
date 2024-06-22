@@ -366,6 +366,18 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, 404)
         self.assertIn("This page does not exist", response.content.decode())
 
+        url = self.reverse_and_check(
+            "event_startlist_view",
+            "/kiila-cup-1/startlist",
+            host="clubs",
+            extra_kwargs={"slug": "kiila-cup-1"},
+            host_kwargs={"club_slug": "kiilat"},
+            prefix="kiilat",
+        )
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Start List")
+
     def test_no_event_pages_loads(self):
         client = APIClient(HTTP_HOST="kiilat.routechoices.dev")
         url = self.reverse_and_check(
