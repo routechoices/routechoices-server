@@ -5,8 +5,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASEDIR=$(dirname $DIR)
 cd $BASEDIR
 
-./bin/reload
-./bin/restart_task_queue
-./bin/restart_tornado
-# next ones arent in use at the moment
-./bin/restart_spot
+./bin/reload-django
+./bin/restart-taskqueue
+./bin/restart-tornado

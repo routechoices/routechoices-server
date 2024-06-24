@@ -20,4 +20,4 @@ doppler secrets download --no-file --format=env 1> ".env"
 ./manage.py collectstatic --noinput
 ./manage.py compress
 ./manage.py migrate --noinput
-./bin/restart_all
+./bin/restart-all

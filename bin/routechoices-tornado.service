@@ -1,0 +1,17 @@
+[Unit]
+Description="routechoices tornado server"
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=Simple
+ExecStart=/apps/routechoices-server/env/bin/python /apps/routechoices-server/manage.py run_tcp_server --tmt250-port=12000 --mictrack-port=12001 --queclink-port=12002 --tracktape-port=12003 --xexun-port=12004 --gt06-port=12005
+Restart=always
+Environment="PATH=/apps/routechoices-server/env/bin/"
+WorkingDirectory=/apps/routechoices-server/
+KillMode=mixed
+TimeoutSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

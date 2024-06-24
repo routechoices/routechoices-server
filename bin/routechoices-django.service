@@ -1,0 +1,18 @@
+[Unit]
+Description="routechoices django server"
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=Simple
+ExecStart=/apps/routechoices-server/env/bin/uwsgi --ini /apps/routechoices-server/bin/uwsgi.ini
+Restart=always
+Environment="PATH=/apps/routechoices-server/env/bin/"
+WorkingDirectory=/apps/routechoices-server/
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
