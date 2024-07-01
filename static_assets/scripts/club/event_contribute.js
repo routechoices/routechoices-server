@@ -334,9 +334,9 @@ function selectizeDeviceInput(field) {
       if (
         !competitorsToUploadValue.includes(u(el).attr("data-competitor-aid"))
       ) {
-        u(el).attr({ disabled: true }).removeClass("float-end");
+        u(el).attr({ disabled: true });
         var wrapper = u(
-          '<div class="float-end d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
+          '<div class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
         );
         u(el).wrap(wrapper);
         new bootstrap.Tooltip(wrapper.nodes[0]);
@@ -363,9 +363,9 @@ function selectizeDeviceInput(field) {
       if (
         !competitorsToSetDeviceValue.includes(u(el).attr("data-competitor-aid"))
       ) {
-        u(el).attr({ disabled: true }).removeClass("float-end");
+        u(el).attr({ disabled: true });
         var wrapper = u(
-          '<div class="float-end d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
+          '<div class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
         );
         u(el).wrap(wrapper);
         new bootstrap.Tooltip(wrapper.nodes[0]);
