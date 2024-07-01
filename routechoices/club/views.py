@@ -559,6 +559,8 @@ def event_contribute_view(request, slug, **kwargs):
         messages.success(request, "Competitor Added!")
     if request.GET.get("route-uploaded", None):
         messages.success(request, "Data uploaded!")
+    if request.GET.get("device-set", None):
+        messages.success(request, "Device ID updated!")
 
     can_upload = event.allow_route_upload and (event.start_date <= now())
     can_register = event.open_registration and (event.end_date >= now() or can_upload)
