@@ -569,7 +569,7 @@ def event_contribute_view(request, slug, **kwargs):
     set_device_id_form = None
     if can_register:
         register_form = RegisterForm(event=event)
-        set_device_id_form = SetDeviceIdForm(event=event)
+        # set_device_id_form = SetDeviceIdForm(event=event)
 
     upload_form = None
     if can_upload:
