@@ -1,5 +1,4 @@
 from django.core.validators import FileExtensionValidator
-from django.db.models import Q
 from django.forms import (
     CharField,
     ChoiceField,
@@ -9,7 +8,7 @@ from django.forms import (
     Textarea,
 )
 
-from routechoices.core.models import Competitor, Device
+from routechoices.core.models import Device
 
 
 class RegisterForm(Form):
@@ -35,13 +34,19 @@ class CompetitorUploadGPXForm(Form):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
-        competitors = list(
-            Competitor.objects.select_related("device")
-            .filter(event=event)
-            .filter(Q(device__locations_encoded="") | Q(device__isnull=True))
-            .defer("device__locations_encoded")
-        )
-        self.fields["competitor_aid"].choices = [(c.aid, c.name) for c in competitors]
+        competitors_who_can_upload = []
+        for competitor, from_date, end_date in event.iterate_competitors():
+            if competitor.device_id:
+                _, nb_pts = competitor.device.get_locations_between_dates(
+                    from_date, end_date
+                )
+                if nb_pts == 0:
+                    competitors_who_can_upload.append(competitor)
+            else:
+                competitors_who_can_upload.append(competitor)
+        self.fields["competitor_aid"].choices = [
+            (c.aid, c.name) for c in competitors_who_can_upload
+        ]
 
 
 class ContactForm(Form):

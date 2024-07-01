@@ -12,7 +12,8 @@ context("Events in future", () => {
 
   it("Can not register or upload to Event as registration not open", function () {
     cy.forceVisit("/halden-sk/future-default/contribute");
-    cy.contains("Registration and route upload closed.");
+    cy.get("#registration-form").should("not.exist");
+    cy.get("#upload-form").should("not.exist");
   });
 
   it("Can not export Event as it is not yet started", function () {
@@ -32,7 +33,8 @@ context("Events in future", () => {
 
   it("Can not upload to an Event even if upload allowed since it is not yet started", function () {
     cy.forceVisit("/halden-sk/future-upload-allowed/contribute");
-    cy.contains("Registration and route upload closed.");
+    cy.get("#registration-form").should("not.exist");
+    cy.get("#upload-form").should("not.exist");
   });
 
   it("Can only add competitor and not upload route to an Event if everything allowed even since it is not yet started", function () {

@@ -220,7 +220,7 @@ function selectizeDeviceInput() {
     }
     if (u("#upload-form").nodes.length) {
       u("#id_device_id-ts-label").text(
-        "Device ID (Leave blank if you want to upload a GPX File)"
+        "Device ID (You can leave blank if you want to upload a GPS File)"
       );
     }
   }
@@ -281,12 +281,30 @@ function selectizeDeviceInput() {
         },
       });
     });
-    if (
-      u("#upload-form").find("#id_competitor_aid").nodes[0].options.length === 0
-    ) {
-      u("#upload-form").html(
-        '<h3 class="text-muted">No competitors to upload data to.</h3>'
-      );
-    }
+
+    const uploadModal = new bootstrap.Modal("#uploadRouteModal");
+
+    var competitorsToUploadValue = [
+      ...u("#upload-form").find("#id_competitor_aid").nodes[0].options,
+    ].map((el) => el.value);
+    u(".upload-route-btn").each((el) => {
+      if (
+        !competitorsToUploadValue.includes(u(el).attr("data-competitor-aid"))
+      ) {
+        u(el).attr({ disabled: true }).removeClass("float-end");
+        var wrapper = u(
+          '<div class="float-end d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
+        );
+        u(el).wrap(wrapper);
+        new bootstrap.Tooltip(wrapper.nodes[0]);
+      } else {
+        u(el).on("click", (e) => {
+          u("#id_competitor_aid").parent().css({ display: "none" });
+          u("#id_competitor_aid").val(u(el).attr("data-competitor-aid"));
+          u("#uploader-name").text(u(el).attr("data-competitor-name"));
+          uploadModal.show();
+        });
+      }
+    });
   }
 })();

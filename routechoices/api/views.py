@@ -966,11 +966,7 @@ def competitor_route_upload(request, competitor_id):
     if not event.allow_route_upload:
         raise PermissionDenied()
 
-    if (
-        not is_user_event_admin
-        and competitor.device
-        and competitor.device.location_count != 0
-    ):
+    if not is_user_event_admin and competitor.locations:
         raise ValidationError("Competitor already assigned a route")
 
     if event.start_date > now():
