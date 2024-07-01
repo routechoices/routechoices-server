@@ -23,11 +23,11 @@ context("Events in future", () => {
 
   it("Can register to an Event if open registration", function () {
     cy.forceVisit("/halden-sk/future-open-registration/contribute");
-    cy.contains("Add competitor");
+    cy.contains("Enter yourself");
     cy.get("#id_name").type("Thierry Gueorgiou");
     cy.get("#id_short_name").type("🇫🇷 T.Gueorgiou");
     cy.get("#id_device_id-ts-control").type("123456").wait(1000).blur();
-    cy.get("input[value='Add competitor']").click();
+    cy.get("button:not([type]),button[type=submit]").click();
     cy.contains("Competitor Added!");
   });
 
