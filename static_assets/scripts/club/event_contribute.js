@@ -245,6 +245,10 @@ function selectizeDeviceInput() {
       }
     });
   }
+  u(".date-utc").each(function (el) {
+    $el = u(el);
+    $el.text(dayjs($el.data("date")).local().format("LLLL"));
+  });
 
   if (u("#upload-form").nodes.length) {
     u("#upload-form").on("submit", function (e) {
