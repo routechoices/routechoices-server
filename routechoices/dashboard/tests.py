@@ -299,7 +299,7 @@ class TestDashboard(EssentialDashboardBase):
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.post(url, {"device": device.id, "nickname": "MyTrckr"})
+        res = self.client.post(url, {"device": device.aid, "nickname": "MyTrckr"})
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
 
         url = self.reverse_and_check("dashboard:device_list_view", "/dashboard/devices")
