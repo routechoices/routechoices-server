@@ -1036,50 +1036,6 @@ def competitor_route_upload(request, competitor_id):
 
 
 @swagger_auto_schema(
-    method="post",
-    auto_schema=None,
-)
-@api_view(["POST"])
-def competitor_set_device(request, competitor_id):
-    competitor = (
-        Competitor.objects.select_related("event", "event__club", "device")
-        .filter(aid=competitor_id)
-        .first()
-    )
-    if not competitor:
-        res = {"error": "No competitor match this id"}
-        return Response(res)
-    event = competitor.event
-
-    is_user_event_admin = (
-        request.user.is_authenticated
-        and event.club.admins.filter(id=request.user.id).exists()
-    )
-
-    if not event.open_registration:
-        raise PermissionDenied()
-
-    if not is_user_event_admin and competitor.locations:
-        raise ValidationError("Competitor already assigned a route")
-
-    new_device_id = request.data.get("device_id")
-    device = Device.objects.filter(id=new_device_id).first()
-    if not device:
-        raise ValidationError("No device match this id")
-
-    competitor.device = device
-    competitor.save()
-
-    return Response(
-        {
-            "id": competitor.aid,
-            "device_id": device.aid,
-        },
-        status=status.HTTP_200_OK,
-    )
-
-
-@swagger_auto_schema(
     method="get",
     operation_id="event_data",
     operation_description="Read competitors data from an event",

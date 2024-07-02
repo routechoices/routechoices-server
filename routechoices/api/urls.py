@@ -72,11 +72,6 @@ urlpatterns = [
         name="competitor_api",
     ),
     re_path(
-        r"competitors/(?P<competitor_id>[0-9a-zA-Z_-]+)/device/?$",
-        views.competitor_set_device,
-        name="competitor_set_device",
-    ),
-    re_path(
         r"competitors/(?P<competitor_id>[0-9a-zA-Z_-]+)/route/?$",
         views.competitor_route_upload,
         name="competitor_route_upload",

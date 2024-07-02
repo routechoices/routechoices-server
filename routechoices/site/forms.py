@@ -49,30 +49,6 @@ class CompetitorUploadGPXForm(Form):
         ]
 
 
-class SetDeviceIdForm(Form):
-    competitor_aid_2 = ChoiceField(required=True, choices=[], label="Competitor")
-    device_id_2 = ModelChoiceField(
-        required=True, queryset=Device.objects.none(), label="Device ID"
-    )
-
-    def __init__(self, *args, **kwargs):
-        event = kwargs.pop("event", None)
-        super().__init__(*args, **kwargs)
-        competitors_who_can_upload = []
-        for competitor, from_date, end_date in event.iterate_competitors():
-            if competitor.device_id:
-                _, nb_pts = competitor.device.get_locations_between_dates(
-                    from_date, end_date
-                )
-                if nb_pts == 0:
-                    competitors_who_can_upload.append(competitor)
-            else:
-                competitors_who_can_upload.append(competitor)
-        self.fields["competitor_aid_2"].choices = [
-            (c.aid, c.name) for c in competitors_who_can_upload
-        ]
-
-
 class ContactForm(Form):
     subject = CharField(required=True, max_length=128)
     message = CharField(widget=Textarea, required=True)

@@ -156,48 +156,10 @@ function selectizeDeviceInput(field) {
   var thisUrl = window.location.href;
   if (
     thisUrl.includes("competitor-added=1") ||
-    thisUrl.includes("route-uploaded=1") ||
-    thisUrl.includes("device-set=1")
+    thisUrl.includes("route-uploaded=1")
   ) {
     window.history.pushState("-", null, window.location.pathname);
   }
-  if (u("#device-form").nodes.length) {
-    u("#device-form").on("submit", function (e) {
-      e.preventDefault();
-      var formData = new FormData(e.target);
-      var cmp_aid = formData.get("competitor_aid_2");
-      reqwest({
-        url: window.local.apiBaseUrl + "competitors/" + cmp_aid + "/device",
-        method: "post",
-        type: "json",
-        withCredentials: true,
-        crossOrigin: true,
-        data: { device_id: formData.get("device_id_2") },
-        headers: {
-          "X-CSRFToken": window.local.csrfToken,
-        },
-        success: function () {
-          window.location.href = window.location.href + "?device-set=1";
-        },
-        error: function (err) {
-          if (err.status == 400) {
-            swal({
-              text: JSON.parse(err.responseText).join("\n"),
-              title: "error",
-              type: "error",
-            });
-          } else {
-            swal({
-              text: "Something went wrong",
-              title: "error",
-              type: "error",
-            });
-          }
-        },
-      });
-    });
-  }
-
   if (u("#registration-form").nodes.length) {
     u("#registration-form").on("submit", function (e) {
       e.preventDefault();
@@ -351,34 +313,5 @@ function selectizeDeviceInput(field) {
     });
   } else {
     u(".upload-route-btn").hide();
-  }
-  let setDeviceModalDiv = document.getElementById("setDeviceModal");
-  if (setDeviceModalDiv) {
-    selectizeDeviceInput("select[name='device_id_2']");
-    const setDeviceModal = new bootstrap.Modal(setDeviceModalDiv);
-    const competitorsToSetDeviceValue = [
-      ...u("#device-form")?.find("#id_competitor_aid_2")?.nodes?.[0]?.options,
-    ].map((el) => el.value);
-    u(".set-device-btn").each((el) => {
-      if (
-        !competitorsToSetDeviceValue.includes(u(el).attr("data-competitor-aid"))
-      ) {
-        u(el).attr({ disabled: true });
-        var wrapper = u(
-          '<div class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">'
-        );
-        u(el).wrap(wrapper);
-        new bootstrap.Tooltip(wrapper.nodes[0]);
-      } else {
-        u(el).on("click", (e) => {
-          u("#id_competitor_aid_2").parent().css({ display: "none" });
-          u("#id_competitor_aid_2").val(u(el).attr("data-competitor-aid"));
-          u("#set-device-name").text(u(el).attr("data-competitor-name"));
-          setDeviceModal.show();
-        });
-      }
-    });
-  } else {
-    u(".set-device-btn").hide();
   }
 })();

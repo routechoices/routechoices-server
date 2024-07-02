@@ -92,15 +92,6 @@
                         <div class="p-1 m-1 border-bottom d-flex justify-content-between">
                             <div class="ms-2 fw-bold">{{ c.name }}</div>
                             <div>
-                                {% if set_device_id_form %}
-                                    <button type="button"
-                                            class="btn btn-primary btn-sm set-device-btn mb-1"
-                                            data-competitor-aid="{{ c.aid }}"
-                                            data-competitor-name="{{ c.name }}">
-                                        <i class="fa-solid fa-pen-to-square"></i> Change Device ID
-                                    </button>
-                                    <br />
-                                {% endif %}
                                 {% if upload_form %}
                                     <button type="button"
                                             class="btn btn-primary btn-sm upload-route-btn"
@@ -160,33 +151,6 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary">Upload</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-        {% if set_device_id_form %}
-            <div class="modal" tabindex="-1" id="setDeviceModal" style="top: 100px">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="" method="post" id="device-form">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    Set Device for <span id="set-device-name"></span>
-                                </h5>
-                                <button type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                {% csrf_token %}
-                                {% bootstrap_form set_device_id_form %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </form>
                     </div>

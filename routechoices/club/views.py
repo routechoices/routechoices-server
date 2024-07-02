@@ -31,11 +31,7 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
-from routechoices.site.forms import (
-    CompetitorUploadGPXForm,
-    RegisterForm,
-    SetDeviceIdForm,
-)
+from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
 def handle_legacy_request(request, view_name, club_slug=None, **kwargs):
@@ -559,17 +555,13 @@ def event_contribute_view(request, slug, **kwargs):
         messages.success(request, "Competitor Added!")
     if request.GET.get("route-uploaded", None):
         messages.success(request, "Data uploaded!")
-    if request.GET.get("device-set", None):
-        messages.success(request, "Device ID updated!")
 
     can_upload = event.allow_route_upload and (event.start_date <= now())
     can_register = event.open_registration and (event.end_date >= now() or can_upload)
 
     register_form = None
-    set_device_id_form = None
     if can_register:
         register_form = RegisterForm(event=event)
-        # set_device_id_form = SetDeviceIdForm(event=event)
 
     upload_form = None
     if can_upload:
@@ -582,7 +574,6 @@ def event_contribute_view(request, slug, **kwargs):
             "event": event,
             "register_form": register_form,
             "upload_form": upload_form,
-            "set_device_id_form": set_device_id_form,
             "event_ended": event.end_date < now(),
         },
     )
