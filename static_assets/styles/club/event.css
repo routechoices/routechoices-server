@@ -7,6 +7,21 @@
   --navbar-size: 46px;
 }
 
+@font-face {
+  font-family: "KodeMono";
+  src: url("../../fonts/KodeMono-Bold.woff2") format("woff2");
+}
+
+#big-clock {
+  font-family: "KodeMono";
+  font-variant-numeric: tabular-nums;
+  line-height: 1em;
+}
+
+#big-clock > .time {
+  font-size: 0.9em;
+}
+
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;

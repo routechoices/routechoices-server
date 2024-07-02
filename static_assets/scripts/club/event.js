@@ -2557,9 +2557,14 @@ function RCEvent(infoURL, clockURL) {
       }
 
       if (date) {
-        result = dayjs(viewedTime).format("YYYY-MM-DD HH:mm:ss");
+        result = dayjs(viewedTime).format("YYYY-MM-DD");
         if (bg) {
-          result = result.replace(" ", "<br/>");
+          result +=
+            '<br><span class="time">' +
+            dayjs(viewedTime).format("HH:mm:ss") +
+            "</span>";
+        } else {
+          result += " " + dayjs(viewedTime).format("HH:mm:ss");
         }
       } else {
         result = dayjs(viewedTime).format("HH:mm:ss");
