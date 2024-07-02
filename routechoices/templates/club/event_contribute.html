@@ -14,7 +14,8 @@
 {% block contentup %}
     <div class="container-fluid p-0">
         <div class="row m-0">
-            <div class="w-100" style="background-color: var(--bs-secondary-bg);">
+            <div class="w-100"
+                 {% if event.map and event.started %}style="background-image: linear-gradient(0, var(--rc-color-to-trans2), var(--rc-color-to-trans2)), url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1');background-size: cover;background-position: center;"{% else %}style="background-color: var(--bs-secondary-bg);"{% endif %}>
                 <div class="container content">
                     <div class="row">
                         {% if event.event_set %}
