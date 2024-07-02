@@ -121,7 +121,7 @@ function parseGpx(xmlstr) {
 
 function selectizeDeviceInput(field) {
   new TomSelect(field, {
-    valueField: "id",
+    valueField: "device_id",
     labelField: "device_id",
     searchField: "device_id",
     create: false,
@@ -169,9 +169,7 @@ function selectizeDeviceInput(field) {
         short_name: formData.get("short_name"),
       };
       if (formData.get("device_id")) {
-        data.device_id = u(
-          '#id_device_id > option[value="' + formData.get("device_id") + '"]'
-        ).text();
+        data.device_id = formData.get("device_id");
       }
       reqwest({
         url:

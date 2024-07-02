@@ -235,6 +235,7 @@ class DeviceForm(Form):
         label="Device ID",
         help_text="Enter the device ID of the tracker",
         queryset=Device.objects.all(),
+        to_field_name="aid",
     )
     nickname = CharField(max_length=12)
 

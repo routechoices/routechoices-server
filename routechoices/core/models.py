@@ -2000,7 +2000,7 @@ class Device(models.Model):
                 owner = ownership
                 break
         return (
-            f"{device.aid} {f'({owner.nickname})' if owner and owner.nickname else ''}"
+            f"{device.aid}{f' ({owner.nickname})' if owner and owner.nickname else ''}"
             f"{'*' if original_device else ''}"
         )
 

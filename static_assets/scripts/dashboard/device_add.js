@@ -128,7 +128,7 @@ function onCsvParsed(result) {
 
 (function () {
   new TomSelect("#id_device", {
-    valueField: "id",
+    valueField: "device_id",
     labelField: "device_id",
     searchField: "device_id",
     create: false,
