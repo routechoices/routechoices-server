@@ -255,7 +255,11 @@ function enableBtnToPreview() {
       function (d) {
         callback(d.toDataURL("image/png"));
       },
-      { orientation: 1 }
+      {
+        orientation: 1,
+        maxWidth: 4096,
+        maxHeight: 4096,
+      }
     );
   }
 
