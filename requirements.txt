@@ -7,8 +7,8 @@ asn1crypto==1.5.1
 attrs==23.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
-boto3==1.34.139
-botocore==1.34.139
+boto3==1.34.143
+botocore==1.34.143
 cbor2==5.6.4
 certifi==2024.7.4
 cffi==1.16.0
@@ -19,9 +19,9 @@ curl-cffi==0.7.0
 cython==3.0.10
 defusedxml==0.7.1
 diskcache==5.6.3
-django==5.0.6
+django==5.0.7
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git@09f8b0ad150754be88d20c0e7c6a1473b8006872
-django-allauth==0.63.3
+django-allauth==0.63.4
 django-appconf==1.0.6
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks@6b247d0b3a7565613656d0ec07b55f6c66aa03cc
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git@8c80f8000f62028aa27624205a64e385d497ac42
@@ -29,7 +29,7 @@ django-compressor==4.5
 django-cors-headers==4.4.0
 django-csp==3.8
 django-environ==0.11.2
-django-hijack==3.5.4
+django-hijack==3.6.0
 django-hosts==6.0
 django-markdownify==0.9.5
 django-minify-html==1.8.0
@@ -77,8 +77,8 @@ requests==2.32.3
 rjsmin==1.2.2
 s3transfer==0.10.2
 segno==1.6.1
-sentry-sdk==2.7.1
-setuptools==70.2.0
+sentry-sdk==2.9.0
+setuptools==70.3.0
 sewer @ git+https://github.com/rphlo/sewer@8d25ea1f1e95e97f52c2354c1752d2adbbfdafaf
 six==1.16.0
 soupsieve==2.5
