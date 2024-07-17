@@ -6,7 +6,7 @@ from re import compile
 import arrow
 from corsheaders.middleware import CorsMiddleware as OrigCorsMiddleware
 from django.conf import settings
-from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+from django.contrib.gis.geoip2 import GeoIP2
 from django.core.cache import cache
 from django.core.exceptions import DisallowedHost
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -18,7 +18,6 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import cached_property
 from django.utils.http import http_date
 from django_hosts.middleware import HostsBaseMiddleware
-from geoip2.errors import GeoIP2Error
 from rest_framework import status
 
 from routechoices.core.models import Club
@@ -255,7 +254,7 @@ class FilterCountriesIPsMiddleware:
         try:
             g = GeoIP2()
             country = g.country_code(request.META["REMOTE_ADDR"])
-        except (GeoIP2Exception, GeoIP2Error):
+        except Exception:
             country = None
         if country in getattr(settings, "BANNED_COUNTRIES", []):
             return HttpResponse("Sorry, we block IP addresses from your country.")
