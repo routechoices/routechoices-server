@@ -7,6 +7,8 @@ from allauth.account.views import LoginView
 from curl_cffi import requests
 from django.conf import settings
 from django.contrib import auth, messages
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -171,7 +173,7 @@ class CustomLoginView(LoginView):
         self.request.session["kagi_pre_verify_user_pk"] = user.pk
         self.request.session["kagi_pre_verify_user_backend"] = user.backend
 
-        verify_url = reverse("kagi:verify-second-factor")
+        verify_url = reverse("kagi:verify-second-factor", host="www")
         redirect_to = self.request.POST.get(
             auth.REDIRECT_FIELD_NAME,
             self.request.GET.get(auth.REDIRECT_FIELD_NAME, ""),
@@ -191,9 +193,28 @@ class CustomLoginView(LoginView):
         return HttpResponseRedirect(verify_url)
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs[auth.REDIRECT_FIELD_NAME] = self.request.GET.get(
-            auth.REDIRECT_FIELD_NAME, ""
+        signup_url = self.passthrough_next_url(reverse("account_signup", host="www"))
+        site = get_current_site(self.request)
+        ret = super(LoginView, self).get_context_data(**kwargs)
+        ret.update(
+            {
+                "signup_url": signup_url,
+                "site": site,
+                "SOCIALACCOUNT_ENABLED": False,
+                "SOCIALACCOUNT_ONLY": False,
+                "LOGIN_BY_CODE_ENABLED": False,
+                "PASSKEY_LOGIN_ENABLED": False,
+                auth.REDIRECT_FIELD_NAME: self.request.GET.get(
+                    auth.REDIRECT_FIELD_NAME, ""
+                ),
+            }
         )
-        kwargs.update(self.kwargs.get("extra_context", {}))
-        return kwargs
+        ret.update(self.kwargs.get("extra_context", {}))
+        return ret
+
+
+class CustomAdminLoginView(CustomLoginView):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_active and not request.user.is_staff:
+            raise PermissionDenied()
+        return super().dispatch(request, *args, **kwargs)
