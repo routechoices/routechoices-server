@@ -65,7 +65,7 @@ psycopg==3.2.1
 pycparser==2.22
 pydantic==2.8.2
 pydantic-core==2.20.1
-pyopenssl==24.1.0
+pyopenssl==24.2.1
 pypng==0.20220715.0
 python-dateutil==2.9.0.post0
 python-magic==0.4.27
