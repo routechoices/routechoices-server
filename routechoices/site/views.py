@@ -59,7 +59,10 @@ def pay_view(request):
     if request.method != "POST":
         raise MethodNotAllowed(request.method)
     price = request.POST.get("price-per-month", "4.99")
-    price = max(Decimal(4.99), Decimal(price))
+    try:
+        price = max(Decimal(4.99), Decimal(price))
+    except Exception:
+        price = Decimal(4.99)
     yearly_payment = request.POST.get("per-year", False) == "on"
     final_price = price * Decimal(100)
     if yearly_payment:
