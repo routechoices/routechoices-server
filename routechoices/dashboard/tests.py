@@ -94,7 +94,7 @@ class TestDashboard(EssentialDashboardBase):
         res = self.client.get(f"{url}?confirmation_key={key}")
         self.assertContains(res, "This is definitive and cannot be reversed.")
         res = self.client.post(url, {"confirmation_key": key}, follow=True)
-        self.assertContains(res, "They trust us")
+        self.assertContains(res, "They Trust Us")
         self.assertEqual(User.objects.all().count(), 0)
 
     def test_change_club_slug(self):
