@@ -97,37 +97,41 @@
                 <div class="container">
                     <div class="row text-center">
                         <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
-                        <h3 class="frontpage_text mb-3">
-                            {% if not user.is_authenticated %}
-                                Once you join, a
+                    </div>
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-8">
+                            <h3 class="frontpage_text mb-3">
+                                {% if not user.is_authenticated %}
+                                    Once you join, a
+                                {% else %}
+                                    A
+                                {% endif %}
+                                simple user interface let you setup a club and immediately prepare live GPS tracking of your trainings or competitions.
+                            </h3>
+                            <h3 class="frontpage_text mb-3">
+                                You can then easily provide to coaches, friends or spectators a way to follow, live, from any device with a web browser, the participants whom are carrying either a dedicated GPS trackers or a smartphone with our app.
+                            </h3>
+                            <h3 class="frontpage_text mb-3">Live GPS tracking can have many purpose, fast analysis, entertainment, or safety.</h3>
+                            <h3 class="frontpage_text mb-4">
+                                After the event you can replay what happened as many time as you desire with some extra features such as being able to simulate virtual mass starts from anywhere on the map.
+                            </h3>
+                            <h3 class="frontpage_text mb-4">
+                                We also integrate an advanced privacy friendly analytics tool, so that you can easily see how many and from where were your pages visitors.
+                            </h3>
+                        </div>
+                        <div class="row text-center">
+                            {% if user.is_authenticated %}
+                                <h3 class="frontpage_text mb-3">
+                                    <a class="px-4 py-2 text-decoration-none engage-link"
+                                       href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
+                                </h3>
                             {% else %}
-                                A
+                                <h3 class="frontpage_text mb-3">
+                                    <a class="px-4 py-2 text-decoration-none engage-link"
+                                       href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
+                                </h3>
                             {% endif %}
-                            simple user interface let you setup a club and immediately prepare live GPS tracking of your trainings or competitions.
-                        </h3>
-                        <h3 class="frontpage_text mb-3">
-                            You can then easily provide to coaches, friends or spectators a way to follow, live, from any device with a web browser, your participants whom are carrying either a dedicated GPS trackers or a smartphone with our app.
-                        </h3>
-                        <h3 class="frontpage_text mb-3">
-                            Your live GPS tracking can have many purpose: fast analysis, entertainment, or safety. For analysis, we also link to additional 3rd party tools. For entertainement, we also allows you to embed the tracking page to your event website. For safety, you can, as extra step, program your GPS device SOS button to trigger alert to safety contacts.
-                        </h3>
-                        <h3 class="frontpage_text mb-4">
-                            After the event you can replay what happened as many time as you desire with some extra features such as being able to simulate virtual mass starts from anywhere on the map.
-                        </h3>
-                        <h3 class="frontpage_text mb-4">
-                            We also integrate an advanced privacy friendly analytics tool, so that you can easily see how many and from where were your pages visitors.
-                        </h3>
-                        {% if user.is_authenticated %}
-                            <h3 class="frontpage_text mb-3">
-                                <a class="px-4 py-2 text-decoration-none engage-link"
-                                   href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
-                            </h3>
-                        {% else %}
-                            <h3 class="frontpage_text mb-3">
-                                <a class="px-4 py-2 text-decoration-none engage-link"
-                                   href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
-                            </h3>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
