@@ -97,20 +97,25 @@
                 <div class="container">
                     <div class="row text-center">
                         <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
-                        {% if user.is_authenticated %}
-                            <h3 class="frontpage_text mb-3">
-                                A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
-                            </h3>
-                        {% else %}
-                            <h3 class="frontpage_text mb-3">
-                                Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
-                            </h3>
-                        {% endif %}
                         <h3 class="frontpage_text mb-3">
-                            You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a dedicated GPS trackers or a smartphone running our app. Purpose being entertainment, fast analysis, or safety.
+                            {% if not user.is_authenticated %}
+                                Once you join, a
+                            {% else %}
+                                A
+                            {% endif %}
+                            simple user interface let you setup a club and immediately prepare live GPS tracking of your trainings or competitions.
+                        </h3>
+                        <h3 class="frontpage_text mb-3">
+                            You can then easily provide to coaches, friends or spectators a way to follow, live, from any device with a web browser, your participants whom are carrying either a dedicated GPS trackers or a smartphone with our app.
+                        </h3>
+                        <h3 class="frontpage_text mb-3">
+                            Your live GPS tracking can have many purpose: fast analysis, entertainment, or safety. For analysis, we also link to additional 3rd party tools. For entertainement, a feature also allow you to embed the tracking page to your event website. For safety, you can, as extra step, program your GPS device SOS button to trigger alert to safety contacts.
                         </h3>
                         <h3 class="frontpage_text mb-4">
-                            After the event you can replay what happened as many time as you want for deeper analysis.
+                            After the event you can replay what happened as many time as you desire with some extra features such as being able to simulate virtual mass starts from anywhere on the map.
+                        </h3>
+                        <h3 class="frontpage_text mb-4">
+                            We also integrate an advanced privacy friendly analytics tool, so that you can easily see how many and from where were your visitors.
                         </h3>
                         {% if user.is_authenticated %}
                             <h3 class="frontpage_text mb-3">
