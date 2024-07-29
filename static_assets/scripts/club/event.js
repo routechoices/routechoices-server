@@ -679,7 +679,29 @@ function RCEvent(infoURL, clockURL) {
           text: banana.i18n("zoom-out"),
           callback: zoomOut,
         },
+        "-",
       ],
+    });
+
+    map.on("contextmenu.show", function (e) {
+      console.log(map.contextmenu);
+      map.contextmenu.addItem({
+        text:
+          Math.round(e.latlng.lat * 1e5) / 1e5 +
+          ", " +
+          Math.round(e.latlng.lng * 1e5) / 1e5,
+        callback: () => {
+          window.open(
+            "https://www.openstreetmap.org/?mlat=" +
+              e.latlng.lat +
+              "&mlon=" +
+              e.latlng.lng
+          );
+        },
+      });
+    });
+    map.on("contextmenu.hide", function (e) {
+      map.contextmenu.removeItem(map.contextmenu._items.length - 1);
     });
 
     map.on("movestart", function () {
