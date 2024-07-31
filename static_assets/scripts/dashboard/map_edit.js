@@ -543,7 +543,7 @@ function enableBtnToPreview() {
   }
 
   function round5(x) {
-    return Math.round(x * 1e5) / 1e5;
+    return x.toFixed(5);
   }
 
   function buildCalibString(c) {

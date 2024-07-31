@@ -687,9 +687,9 @@ function RCEvent(infoURL, clockURL) {
       console.log(map.contextmenu);
       map.contextmenu.addItem({
         text:
-          Math.round(e.latlng.lat * 1e5) / 1e5 +
+          e.latlng.lat.toFixed(5) +
           ", " +
-          Math.round(e.latlng.lng * 1e5) / 1e5,
+          e.latlng.lng.toFixed(5),
         callback: () => {
           window.open(
             "https://www.openstreetmap.org/?mlat=" +

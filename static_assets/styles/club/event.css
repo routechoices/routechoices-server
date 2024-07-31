@@ -374,3 +374,8 @@
     opacity: 0;
   }
 }
+
+.leaflet-control-layers {
+  user-select: none;
+  -webkit-user-select: none;
+}
