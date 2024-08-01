@@ -686,10 +686,7 @@ function RCEvent(infoURL, clockURL) {
     map.on("contextmenu.show", function (e) {
       console.log(map.contextmenu);
       map.contextmenu.addItem({
-        text:
-          e.latlng.lat.toFixed(5) +
-          ", " +
-          e.latlng.lng.toFixed(5),
+        text: e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5),
         callback: () => {
           window.open(
             "https://www.openstreetmap.org/?mlat=" +
