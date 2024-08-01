@@ -1513,7 +1513,7 @@ def get_device_for_imei(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def get_time(request):
     return Response({"time": time.time()}, headers={"Cache-Control": "no-cache"})
 
