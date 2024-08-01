@@ -40,7 +40,7 @@ var ServerClock = function (opts) {
         if (drifts.length < options.burstSize) {
           var clientRequestTime = +new Date();
           fetch(options.url, {
-            method: "GET",
+            method: "POST",
             mode: "cors",
             headers: {
               Accept: "application/json",
