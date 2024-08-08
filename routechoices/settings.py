@@ -44,6 +44,7 @@ DATABASES = {"default": env.db()}
 # DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DATABASES["default"]["OPTIONS"]["pool"] = True
+DATABASES["default"]["OPTIONS"]["server_side_binding"] = True
 
 
 SHORTCUT_BASE_URL = env.str("SHORTCUT_BASE_URL", None)
