@@ -35,7 +35,7 @@ opencv-python
 orjson
 pillow-heif
 pillow
-psycopg
+psycopg[pool]
 python-magic
 sentry-sdk
 sewer @ git+https://github.com/rphlo/sewer@0.8.4a

@@ -42,6 +42,8 @@ BANNED_COUNTRIES = env.list("BANNED_COUNTRIES")
 
 DATABASES = {"default": env.db()}
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
 
 SHORTCUT_BASE_URL = env.str("SHORTCUT_BASE_URL", None)
 
