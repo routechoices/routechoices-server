@@ -31,7 +31,7 @@ from routechoices.core.models import (
     Notice,
 )
 from routechoices.lib.helpers import check_cname_record, get_aware_datetime
-from routechoices.lib.validators import domain_validator, validate_nice_slug
+from routechoices.lib.validators import validate_domain_name, validate_nice_slug
 
 
 class UserForm(ModelForm):
@@ -205,7 +205,7 @@ class ClubDomainForm(ModelForm):
         max_length=128,
         label="Custom domain",
         help_text="eg: 'example.com'",
-        validators=[domain_validator],
+        validators=[validate_domain_name],
         required=False,
     )
 

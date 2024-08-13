@@ -10,7 +10,7 @@ import routechoices.lib.luhn as luhn
 FLOAT_RE = re.compile(r"^(\-?[0-9]+(\.[0-9]+)?)$")
 
 
-domain_validator = DomainNameValidator(message="Please enter a valid domain")
+validate_domain_name = DomainNameValidator(message="Please enter a valid domain")
 
 
 def validate_emails(email_list_str):

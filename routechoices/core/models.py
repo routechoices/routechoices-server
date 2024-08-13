@@ -64,8 +64,8 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.validators import (
-    domain_validator,
     validate_corners_coordinates,
+    validate_domain_name,
     validate_domain_slug,
     validate_emails,
     validate_esn,
@@ -177,7 +177,7 @@ Follow our events live or replay them later.
         blank=True,
         default="",
         validators=[
-            domain_validator,
+            validate_domain_name,
         ],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
