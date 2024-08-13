@@ -272,63 +272,33 @@ class Livelox(ThirdPartyTrackingSolution):
             for i, ctrl in enumerate(ctrls[:-1]):
                 if ctrl[0] == ctrls[i + 1][0]:
                     ctrl[0] -= 0.0001
-                start_from_a = ctrl[0] < ctrls[i + 1][0]
-                pt_a = ctrl if start_from_a else ctrls[i + 1]
-                pt_b = ctrl if not start_from_a else ctrls[i + 1]
-                angle = math.atan((pt_b[1] - pt_a[1]) / (pt_b[0] - pt_a[0]))
+                pt = ctrl
+                next_pt = ctrls[i + 1]
+                angle = math.atan2(next_pt[1] - pt[1], next_pt[0] - pt[0])
                 if i == 0:
                     # draw start triangle
-                    pt_s = pt_a if start_from_a else pt_b
                     draw.line(
                         [
+                            int(pt[0] * upscale + circle_size * math.cos(angle)),
+                            int(pt[1] * upscale + circle_size * math.sin(angle)),
                             int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle)
+                                pt[0] * upscale
+                                + circle_size * math.cos(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle)
+                                pt[1] * upscale
+                                + circle_size * math.sin(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle + 2 * math.pi / 3)
+                                pt[0] * upscale
+                                + circle_size * math.cos(angle - 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle + 2 * math.pi / 3)
+                                pt[1] * upscale
+                                + circle_size * math.sin(angle - 2 * math.pi / 3)
                             ),
-                            int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle - 2 * math.pi / 3)
-                            ),
-                            int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle - 2 * math.pi / 3)
-                            ),
-                            int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle)
-                            ),
-                            int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle)
-                            ),
+                            int(pt[0] * upscale + circle_size * math.cos(angle)),
+                            int(pt[1] * upscale + circle_size * math.sin(angle)),
                         ],
                         fill=line_color,
                         width=line_width,
@@ -337,35 +307,34 @@ class Livelox(ThirdPartyTrackingSolution):
                 # draw line between controls
                 draw.line(
                     [
-                        int(pt_a[0] * upscale + circle_size * math.cos(angle)),
-                        int(pt_a[1] * upscale + circle_size * math.sin(angle)),
-                        int(pt_b[0] * upscale - circle_size * math.cos(angle)),
-                        int(pt_b[1] * upscale - circle_size * math.sin(angle)),
+                        int(pt[0] * upscale + circle_size * math.cos(angle)),
+                        int(pt[1] * upscale + circle_size * math.sin(angle)),
+                        int(next_pt[0] * upscale - circle_size * math.cos(angle)),
+                        int(next_pt[1] * upscale - circle_size * math.sin(angle)),
                     ],
                     fill=line_color,
                     width=line_width,
                 )
                 # draw controls
-                pt_o = pt_b if start_from_a else pt_a
                 draw.ellipse(
                     [
-                        int(pt_o[0] * upscale - circle_size),
-                        int(pt_o[1] * upscale - circle_size),
-                        int(pt_o[0] * upscale + circle_size),
-                        int(pt_o[1] * upscale + circle_size),
+                        int(next_pt[0] * upscale - circle_size),
+                        int(next_pt[1] * upscale - circle_size),
+                        int(next_pt[0] * upscale + circle_size),
+                        int(next_pt[1] * upscale + circle_size),
                     ],
                     outline=line_color,
                     width=line_width,
                 )
-                # draw finnish
+                # draw finish
                 if i == (len(ctrls) - 2):
                     inner_circle_size = int(30 * map_resolution) * upscale
                     draw.ellipse(
                         [
-                            int(pt_o[0] * upscale - inner_circle_size),
-                            int(pt_o[1] * upscale - inner_circle_size),
-                            int(pt_o[0] * upscale + inner_circle_size),
-                            int(pt_o[1] * upscale + inner_circle_size),
+                            int(next_pt[0] * upscale - inner_circle_size),
+                            int(next_pt[1] * upscale - inner_circle_size),
+                            int(next_pt[0] * upscale + inner_circle_size),
+                            int(next_pt[1] * upscale + inner_circle_size),
                         ],
                         outline=line_color,
                         width=line_width,
