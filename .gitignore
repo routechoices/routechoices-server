@@ -36,3 +36,6 @@ nginx/certs/
 .coverage*
 htmlcov/
 coverage.xml
+nginx/custom_domains/
+geoip/
+doppler.env
