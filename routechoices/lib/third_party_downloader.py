@@ -374,7 +374,7 @@ class Livelox(ThirdPartyTrackingSolution):
             )
         competitors = []
         for p in participant_data:
-            break
+            break  # TODO: Fix importer with new Base64 encoded binary data
             c_name = f"{p.get('firstName')} {p.get('lastName')}"
             c_sname = initial_of_name(c_name)
             competitor, _ = Competitor.objects.get_or_create(
