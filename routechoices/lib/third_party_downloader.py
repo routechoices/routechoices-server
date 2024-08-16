@@ -1,3 +1,4 @@
+import base64
 import json
 import math
 import re
@@ -245,6 +246,11 @@ class Livelox(ThirdPartyTrackingSolution):
         )
         img_blob = ContentFile(r.content)
         map_obj.image.save("imported_image", img_blob)
+        im = Image.open(img_blob)
+        width, height = im.size
+        map_obj.width = width
+        map_obj.height = height
+        map_obj.save()
         upscale = 4
         with Image.open(img_blob).convert("RGBA") as img:
             map_drawing = Image.new(
@@ -349,6 +355,9 @@ class Livelox(ThirdPartyTrackingSolution):
         out_buffer.seek(0)
         f_new = ContentFile(out_buffer.read())
         map_obj.image.save("imported_image", f_new)
+        map_obj.width = out.width
+        map_obj.height = out.height
+        map_obj.save()
         return [map_obj]
 
     def get_or_create_event_competitors(self, event, uid):
@@ -365,6 +374,7 @@ class Livelox(ThirdPartyTrackingSolution):
             )
         competitors = []
         for p in participant_data:
+            break
             c_name = f"{p.get('firstName')} {p.get('lastName')}"
             c_sname = initial_of_name(c_name)
             competitor, _ = Competitor.objects.get_or_create(
@@ -378,7 +388,10 @@ class Livelox(ThirdPartyTrackingSolution):
             pts = []
             if not p.get("routeData"):
                 continue
-            p_data = p["routeData"][1:]
+            p_data64 = p["routeData"] + "=="
+            print(p_data64)
+            p_data = base64.b64decode(p_data64, b"+/", validate=False)
+
             for i in range((len(p_data) - 1) // 3):
                 t += p_data[3 * i]
                 lon += p_data[3 * i + 1]
@@ -460,6 +473,11 @@ class SportRec(ThirdPartyTrackingSolution):
                 corners_coords += corner
             calib_string = ",".join(str(round(x, 5)) for x in corners_coords)
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
+            map_obj.image.update_dimension_fields(force=True)
             map_obj.corners_coordinates = calib_string
             map_obj.save()
         except Exception:
@@ -588,6 +606,10 @@ class OTracker(ThirdPartyTrackingSolution):
                 ]
             calib_string = ",".join(str(x) for x in corners_coords)
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
             map_obj.corners_coordinates = calib_string
             map_obj.save()
         except Exception:
@@ -712,6 +734,8 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             coordinates = ",".join([str(round(x, 5)) for x in corners])
 
             map_obj.image.save("imported_image", map_file, save=False)
+            map_obj.width = width
+            map_obj.height = height
             map_obj.corners_coordinates = coordinates
             map_obj.save()
         except Exception:
@@ -879,6 +903,10 @@ class Loggator(ThirdPartyTrackingSolution):
                 ]
             )
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
             map_obj.corners_coordinates = coordinates
             map_obj.save()
         except Exception:
@@ -1000,6 +1028,8 @@ class Tractrac(ThirdPartyTrackingSolution):
                 )
                 coordinates = ",".join([str(round(x, 5)) for x in corners])
                 map_obj.image.save("imported_image", map_file, save=False)
+                map_obj.width = width
+                map_obj.height = height
                 map_obj.corners_coordinates = coordinates
                 map_obj.save()
             except Exception:
