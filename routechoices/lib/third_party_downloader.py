@@ -1,4 +1,3 @@
-import base64
 import json
 import math
 import re
@@ -374,7 +373,6 @@ class Livelox(ThirdPartyTrackingSolution):
             )
         competitors = []
         for p in participant_data:
-            break  # TODO: Fix importer with new Base64 encoded binary data
             c_name = f"{p.get('firstName')} {p.get('lastName')}"
             c_sname = initial_of_name(c_name)
             competitor, _ = Competitor.objects.get_or_create(
@@ -382,27 +380,23 @@ class Livelox(ThirdPartyTrackingSolution):
                 short_name=c_sname,
                 event=event,
             )
-            lat = 0
-            lon = 0
-            t = -time_offset
             pts = []
             if not p.get("routeData"):
                 continue
-            p_data64 = p["routeData"] + "=="
-            print(p_data64)
-            p_data = base64.b64decode(p_data64, b"+/", validate=False)
-
-            for i in range((len(p_data) - 1) // 3):
-                t += p_data[3 * i]
-                lon += p_data[3 * i + 1]
-                lat += p_data[3 * i + 2]
+            p_data64 = p["routeData"]
+            d = LiveloxBase64Reader(p_data64)
+            pts_raw = d.readWaypoints()
+            for i, pt in enumerate(pts_raw):
                 if map_projection:
-                    px, py = project(matrix, lon / 10, lat / 10)
+                    px, py = project(matrix, pt[1] / 10, pt[2] / 10)
                     latlon = event.map.map_xy_to_wsg84(px, py)
-                    pts.append((int(t / 1e3), latlon["lat"], latlon["lon"]))
+                    pts.append(
+                        (int(pt[0] / 1e3) - time_offset, latlon["lat"], latlon["lon"])
+                    )
                 else:
-                    pts.append((int(t / 1e3), lat / 1e6, lon / 1e6))
-
+                    pts.append(
+                        (int(pt[0] / 1e3) - 2208981600, pt[1] / 1e6, pt[2] / 1e6)
+                    )
             dev_obj, created = Device.objects.get_or_create(
                 aid="LLX_" + safe64encodedsha(f"{p['id']}:{uid}")[:8], is_gpx=True
             )
@@ -1102,3 +1096,102 @@ class Tractrac(ThirdPartyTrackingSolution):
             competitor.save()
             competitors.append(competitor)
         return competitors
+
+
+class LiveloxBase64Reader:
+    base64util = {
+        "usableBitsPerByte": 6,
+        "headerBits": 8,
+        "numberToLetter": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+        "pow2": [0] * 64,
+        "bitLengthMaxValues": [0] * 65,
+        "letterToNumber": {},
+    }
+    for n in range(64):
+        base64util["pow2"][n] = 2**n
+    for n in range(1, 65):
+        base64util["bitLengthMaxValues"][n] = (
+            base64util["bitLengthMaxValues"][n - 1] + base64util["pow2"][n - 1]
+        )
+    for n, letter in enumerate(base64util["numberToLetter"]):
+        base64util["letterToNumber"][letter] = n
+    base64util["letterToNumber"]["="] = 0
+
+    def __init__(self, data):
+        self.length = len(data)
+        self.byte_array = [0] * self.length
+        self.current_byte_pos = 0
+        self.current_bit_pos = 0
+        self.bits_read_in_current_byte = 0
+        self.next_bit_position = None
+        self.next_bits_read_in_current_byte = None
+        self.byte = None
+        self.value = None
+        self.bits_left_to_read = None
+        self.i = None
+        self.bytes_read = None
+        for i in range(self.length):
+            self.byte_array[i] = self.base64util["letterToNumber"][data[i]]
+
+    def n(self, n):
+        self.value = 0
+        self.bits_left_to_read = self.bits_read_in_current_byte + n
+        self.bytes_read = 0
+        while self.bits_left_to_read > 0:
+            self.bits_left_to_read -= 6
+            self.bytes_read += 1
+        self.next_bit_position = self.current_bit_pos + n
+        self.next_bits_read_in_current_byte = self.next_bit_position % 6
+        self.i = 0
+        while self.i < self.bytes_read:
+            self.byte = self.byte_array[self.i + self.current_byte_pos]
+            if self.i == 0:
+                self.byte &= self.base64util["bitLengthMaxValues"][
+                    6 - self.bits_read_in_current_byte
+                ]
+            if self.i < self.bytes_read - 1:
+                self.value += (
+                    self.base64util["pow2"][
+                        (self.bytes_read - self.i - 1) * 6
+                        - (
+                            0
+                            if self.next_bits_read_in_current_byte == 0
+                            else (6 - self.next_bits_read_in_current_byte)
+                        )
+                    ]
+                    * self.byte
+                )
+            else:
+                if self.next_bits_read_in_current_byte > 0:
+                    self.byte >>= 6 - self.next_bits_read_in_current_byte
+                self.value += self.byte
+            self.i += 1
+        self.current_bit_pos = self.next_bit_position
+        self.bits_read_in_current_byte = self.next_bits_read_in_current_byte
+        self.current_byte_pos += (
+            self.bytes_read
+            if self.bits_read_in_current_byte == 0
+            else (self.bytes_read - 1)
+        )
+        return self.value
+
+    def read(self):
+        self.header = self.n(8)
+        return (
+            (-1 if (self.header & 2) else 1)
+            * (1e3 if (self.header & 1) else 1)
+            * self.n(self.header >> 2)
+        )
+
+    def readWaypoints(self):
+        k = self.read()
+        pts = []
+        t = 0
+        lat = 0
+        lng = 0
+        for i in range(k):
+            t += self.read()
+            lat += self.read()
+            lng += self.read()
+            pts.append((t, lat, lng))
+        return pts
