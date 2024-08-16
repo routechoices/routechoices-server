@@ -391,11 +391,11 @@ class Livelox(ThirdPartyTrackingSolution):
                     px, py = project(matrix, pt[1] / 10, pt[2] / 10)
                     latlon = event.map.map_xy_to_wsg84(px, py)
                     pts.append(
-                        (int(pt[0] / 1e3) - time_offset, latlon["lat"], latlon["lon"])
+                        (int((pt[0] - time_offset) / 1e3), latlon["lat"], latlon["lon"])
                     )
                 else:
                     pts.append(
-                        (int(pt[0] / 1e3) - 2208981600, pt[1] / 1e6, pt[2] / 1e6)
+                        (int((pt[0] - time_offset) / 1e3), pt[1] / 1e6, pt[2] / 1e6)
                     )
             dev_obj, created = Device.objects.get_or_create(
                 aid="LLX_" + safe64encodedsha(f"{p['id']}:{uid}")[:8], is_gpx=True
