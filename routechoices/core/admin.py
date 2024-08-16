@@ -986,12 +986,7 @@ class WebAuthnKeyAdmin(admin.ModelAdmin):
 
 
 ADMIN_COMMAND_LIST = [
-    "import_from_gpsseuranta",
-    "import_from_livelox",
-    "import_from_loggator",
-    "import_from_otracker",
-    "import_from_sportrec",
-    "import_from_tractrac",
+    "import_event",
     "export_device_list",
     "export_email_list",
     "clean_admin_logs",
