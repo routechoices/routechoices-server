@@ -1107,14 +1107,14 @@ class LiveloxBase64Reader:
         "bitLengthMaxValues": [0] * 65,
         "letterToNumber": {},
     }
-    for n in range(64):
-        base64util["pow2"][n] = 2**n
-    for n in range(1, 65):
-        base64util["bitLengthMaxValues"][n] = (
-            base64util["bitLengthMaxValues"][n - 1] + base64util["pow2"][n - 1]
+    for i in range(64):
+        base64util["pow2"][i] = 2**i
+    for i in range(1, 65):
+        base64util["bitLengthMaxValues"][i] = (
+            base64util["bitLengthMaxValues"][i - 1] + base64util["pow2"][i - 1]
         )
-    for n, letter in enumerate(base64util["numberToLetter"]):
-        base64util["letterToNumber"][letter] = n
+    for i, letter in enumerate(base64util["numberToLetter"]):
+        base64util["letterToNumber"][letter] = i
     base64util["letterToNumber"]["="] = 0
 
     def __init__(self, data):
@@ -1130,10 +1130,12 @@ class LiveloxBase64Reader:
         self.bits_left_to_read = None
         self.i = None
         self.bytes_read = None
+        self.header = None
+
         for i in range(self.length):
             self.byte_array[i] = self.base64util["letterToNumber"][data[i]]
 
-    def n(self, n):
+    def read_n_bits(self, n):
         self.value = 0
         self.bits_left_to_read = self.bits_read_in_current_byte + n
         self.bytes_read = 0
@@ -1175,23 +1177,23 @@ class LiveloxBase64Reader:
         )
         return self.value
 
-    def read(self):
-        self.header = self.n(8)
+    def read_value(self):
+        self.header = self.read_n_bits(8)
         return (
             (-1 if (self.header & 2) else 1)
             * (1e3 if (self.header & 1) else 1)
-            * self.n(self.header >> 2)
+            * self.read_n_bits(self.header >> 2)
         )
 
     def readWaypoints(self):
-        k = self.read()
+        k = self.read_value()
         pts = []
         t = 0
         lat = 0
         lng = 0
         for _ in range(k):
-            t += self.read()
-            lat += self.read()
-            lng += self.read()
+            t += self.read_value()
+            lat += self.read_value()
+            lng += self.read_value()
             pts.append((t, lat, lng))
         return pts
