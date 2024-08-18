@@ -1102,7 +1102,9 @@ class LiveloxBase64Reader:
     base64util = {
         "usableBitsPerByte": 6,
         "headerBits": 8,
-        "numberToLetter": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+        "numberToLetter": (
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+        ),
         "pow2": [0] * 64,
         "bitLengthMaxValues": [0] * 65,
         "letterToNumber": {},
