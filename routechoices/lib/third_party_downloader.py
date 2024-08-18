@@ -386,7 +386,7 @@ class Livelox(ThirdPartyTrackingSolution):
             p_data64 = p["routeData"]
             d = LiveloxBase64Reader(p_data64)
             pts_raw = d.readWaypoints()
-            for i, pt in enumerate(pts_raw):
+            for pt in pts_raw:
                 if map_projection:
                     px, py = project(matrix, pt[1] / 10, pt[2] / 10)
                     latlon = event.map.map_xy_to_wsg84(px, py)
@@ -1189,7 +1189,7 @@ class LiveloxBase64Reader:
         t = 0
         lat = 0
         lng = 0
-        for i in range(k):
+        for _ in range(k):
             t += self.read()
             lat += self.read()
             lng += self.read()
