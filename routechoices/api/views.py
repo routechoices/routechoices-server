@@ -1622,11 +1622,11 @@ def device_ownership_api_view(request, club_slug, device_id):
         nick = request.data.get("nickname", "")
         if nick and len(nick) > 12:
             raise ValidationError("Can not be more than 12 characters")
-
         ownership.nickname = nick
         ownership.save()
         return Response({"nickname": nick})
-    elif request.method == "DELETE":
+
+    if request.method == "DELETE":
         ownership.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
