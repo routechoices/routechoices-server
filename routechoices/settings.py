@@ -119,6 +119,7 @@ MIDDLEWARE = [
     "routechoices.core.middleware.FilterCountriesIPsMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.middleware.common.CommonMiddleware",
     "routechoices.core.middleware.CsrfViewMiddleware",
@@ -321,6 +322,24 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
 SECURE_REDIRECT_EXEMPT = [r"^\.well-known/acme-challenge/.+$"]
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+PERMISSIONS_POLICY = {
+    "accelerometer": [],
+    "ambient-light-sensor": [],
+    "autoplay": [],
+    "camera": [],
+    "display-capture": [],
+    "document-domain": [],
+    "encrypted-media": [],
+    "fullscreen": ["self"],
+    "geolocation": ["self"],
+    "gyroscope": [],
+    "interest-cohort": [],
+    "magnetometer": [],
+    "microphone": [],
+    "midi": [],
+    "payment": [],
+    "usb": [],
+}
 
 try:
     from .settings_overrides import *  # noqa: F403, F401

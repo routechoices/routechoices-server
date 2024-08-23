@@ -19,6 +19,7 @@ django-hosts
 django-markdownify
 django-minify-html
 django-oauth-toolkit
+django-permissions-policy
 django-qr-code
 django-s3-storage
 django-user-sessions
