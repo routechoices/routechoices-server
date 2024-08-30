@@ -28,7 +28,7 @@ def home_page(request):
 
 def landing_page(request):
     club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")[:6]
-    feedbacks = FrontPageFeedback.objects.filter(stars__gte=3).order_by("?")[:6]
+    feedbacks = FrontPageFeedback.objects.all().order_by("?")[:6]
     return render(
         request,
         "site/home.html",
