@@ -62,7 +62,7 @@
                     <h2 class="mb-0" id="partners">
                         <b>They Trust Us</b>
                     </h2>
-                    <small class="text-muted">We host theirs, and many more, live GPS tracking pages since 2019</small>
+                    <small class="text-muted">We host their live GPS tracking pages since 2019</small>
                 </div>
                 <div class="row justify-content-evenly" style="font-size: small;">
                     {% for club in club_featured %}
@@ -91,22 +91,20 @@
                 </div>
                 <div class="row g-2  justify-content-evenly align-items-center">
                     {% for fb in user_feedbacks %}
-                    <div class="col-lg-3 col-6">
-                        <div class="card p-3 text-center px-4">
-                            <div>
-                                <div class="mb-3" style="font-size: 0.7em">{{ fb.content }}</div>
+                        <div class="col-lg-3 col-6">
+                            <div class="card p-3 text-center px-4">
                                 <div>
-                                    {% for star in fb.stars|times %}
-                                        <i class="fa-solid fa-star" style="color: #FFD700"></i>
-                                    {% endfor %}
+                                    <div class="mb-3" style="font-size: 0.7em">{{ fb.content }}</div>
+                                    <div>
+                                        {% for star in fb.stars|times %}<i class="fa-solid fa-star" style="color: #FFD700"></i>{% endfor %}
+                                    </div>
+                                    <div class="mb-0 fw-bold">{{ fb.name }}</div>
+                                    <div class="text-muted" style="font-size: 0.7em;line-height:0.7em">{{ fb.club_name }}</div>
                                 </div>
-                                <div class="mb-0 fw-bold">{{ fb.name }}</div>
-                                <div class="text-muted" style="font-size: 0.7em;line-height:0.7em">{{ fb.club_name }}</div>
                             </div>
                         </div>
-                    </div>
                     {% endfor %}
-                 </div>
+                </div>
             </div>
         </div>
     </div>

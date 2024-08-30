@@ -32,10 +32,7 @@ def landing_page(request):
     return render(
         request,
         "site/home.html",
-        {
-            "club_featured": club_featured,
-            "user_feedbacks": feedbacks
-        },
+        {"club_featured": club_featured, "user_feedbacks": feedbacks},
     )
 
 

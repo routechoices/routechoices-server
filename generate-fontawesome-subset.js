@@ -8,7 +8,15 @@ const sass = require("sass");
 fontawesomeSubset(
   {
     brands: ["twitter", "instagram", "github", "android", "apple"],
-    regular: ["window-restore", "map", "copy", "clock", "eye", "eye-slash", "star"],
+    regular: [
+      "window-restore",
+      "map",
+      "copy",
+      "clock",
+      "eye",
+      "eye-slash",
+      "star",
+    ],
     solid: [
       "list",
       "chevron-up",
