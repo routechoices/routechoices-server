@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
 from rest_framework.exceptions import MethodNotAllowed
 
-from routechoices.core.models import Club, Event
+from routechoices.core.models import Club, Event, FrontPageFeedback
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import ContactForm
 
@@ -27,11 +27,15 @@ def home_page(request):
 
 
 def landing_page(request):
-    club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")
+    club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")[:6]
+    feedbacks = FrontPageFeedback.objects.filter(stars__gte=3).order_by("?")[:6]
     return render(
         request,
         "site/home.html",
-        {"club_featured": club_featured},
+        {
+            "club_featured": club_featured,
+            "user_feedbacks": feedbacks
+        },
     )
 
 
