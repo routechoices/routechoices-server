@@ -23,6 +23,7 @@ from routechoices.core.models import (
     DeviceClubOwnership,
     Event,
     EventSet,
+    FrontPageFeedback,
     ImeiDevice,
     Map,
     MapAssignation,
@@ -983,6 +984,11 @@ admin.site.unregister(WebAuthnKey)
 @admin.register(WebAuthnKey)
 class WebAuthnKeyAdmin(admin.ModelAdmin):
     list_display = ("user", "key_name")
+
+
+@admin.register(FrontPageFeedback)
+class FrontPageFeedbackAdmin(admin.ModelAdmin):
+    list_display = ("name", "stars", "club_name")
 
 
 ADMIN_COMMAND_LIST = [

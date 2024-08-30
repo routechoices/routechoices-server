@@ -2584,3 +2584,13 @@ class TcpDeviceCommand(models.Model):
 
     def __str__(self):
         return f"Command for imei {self.target}"
+
+
+class FrontPageFeedback(models.Model):
+    content = models.TextField(max_length=255)
+    stars = models.PositiveIntegerField(validators=[MaxValueValidator(5)])
+    name = models.CharField(max_length=50)
+    club_name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Feedback from {self.name} ({self.club_name})"
