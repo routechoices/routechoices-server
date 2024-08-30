@@ -2587,7 +2587,7 @@ class TcpDeviceCommand(models.Model):
 
 
 class FrontPageFeedback(models.Model):
-    content = models.TextField(max_length=255)
+    content = models.TextField()
     stars = models.PositiveIntegerField(validators=[MaxValueValidator(5)])
     name = models.CharField(max_length=50)
     club_name = models.CharField(max_length=50)
