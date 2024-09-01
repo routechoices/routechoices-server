@@ -2239,21 +2239,29 @@ function RCEvent(infoURL, clockURL) {
         .text(banana.i18n("icons-size"))
         .addClass("text-nowrap");
 
+      const label = u('<label for="icons-scale" class="fw-bold"/>').text(
+        Math.round(runnerIconScale * 100) + "%"
+      );
+
       const input = u(
-        '<input type="range" class="form-range ps-1 pe-3" min="1" max="2" step="0.1">'
+        '<input type="range" class="form-range ps-1 pe-3" min="1" max="2" step="0.01" name="icons-scale">'
       );
       input.val(runnerIconScale);
       const onChange = (e) => {
-        (runnerIconScale = e.target.value),
-          document.documentElement.style.setProperty(
-            "--runner-scale",
-            runnerIconScale
-          );
+        runnerIconScale = e.target.value;
+        document.documentElement.style.setProperty(
+          "--runner-scale",
+          runnerIconScale
+        );
+        label.text(Math.round(runnerIconScale * 100) + "%");
       };
       input.on("change", onChange);
       input.on("input", onChange);
 
-      const widgetContent = u("<div/>").addClass("ms-1").append(input);
+      const widgetContent = u("<div/>")
+        .addClass("ms-1")
+        .append(input)
+        .append(label);
 
       sizeWidget.append(widgetTitle).append(widgetContent);
 
