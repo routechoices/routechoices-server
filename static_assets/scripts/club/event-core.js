@@ -225,12 +225,14 @@ function getContrastYIQ(hexcolor) {
   return yiq <= 168;
 }
 
-function getRunnerIcon(color, faded = false, focused = false) {
-  var iconSize = 16;
+function getRunnerIcon(color, faded = false, focused = false, scale = 2) {
+  var iconSize = 16 * scale;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
-  var svgRect = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
+  var svgRect = `<svg viewBox="0 0 ${iconSize} ${iconSize}" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
     focused ? 3 : 1
-  }px" cx="8" cy="8" r="6"/></svg>`;
+  }px" cx="${iconSize / 2}" cy="${iconSize / 2}" r="${
+    (iconSize - 1) / 2
+  }"/></svg>`;
   var runnerIcon = L.icon({
     iconUrl: encodeURI("data:image/svg+xml," + svgRect),
     iconSize: [iconSize, iconSize],
@@ -254,7 +256,8 @@ function getRunnerNameMarker(
   isDark,
   rightSide,
   faded = false,
-  focused = false
+  focused = false,
+  scale = 2
 ) {
   var iconStyle = `color: ${color};opacity: ${faded ? 0.4 : 0.75};${
     focused ? `padding-bottom: 0px;border-bottom: 4px solid ${color};` : ""
@@ -280,8 +283,10 @@ function getRunnerNameMarker(
     className: iconClass,
     html: iconHtml,
     iconAnchor: [
-      rightSide ? nameTagWidth + (focused ? 10 : 0) : focused ? -10 : 0,
-      rightSide ? 0 : 20,
+      rightSide
+        ? nameTagWidth + scale * (focused ? 10 : 0)
+        : scale * (focused ? -10 : 0),
+      rightSide ? 0 : scale * 25,
     ],
   });
   return runnerIcon;
@@ -342,7 +347,7 @@ function sortingFunction(a, b) {
 function updateText() {
   banana.setLocale(locale);
   var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
-  return fetch(`${langFile}?v=2024062100`)
+  return fetch(`${langFile}?v=2024090100`)
     .then((response) => response.json())
     .then((messages) => {
       banana.load(messages, banana.locale);

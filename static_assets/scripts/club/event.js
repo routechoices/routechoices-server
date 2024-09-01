@@ -14,6 +14,7 @@ function RCEvent(infoURL, clockURL) {
   var zoomControl;
   var rotateControl;
   var scaleControl;
+  var runnerIconScale = 1;
   var isLive = false;
   var isLiveEvent = false;
   var shortcutURL = "";
@@ -1544,6 +1545,8 @@ function RCEvent(infoURL, clockURL) {
 
   function onAppResize() {
     const doc = document.documentElement;
+
+    doc.style.setProperty("--runner-scale", runnerIconScale);
     doc.style.setProperty("--app-height", `${window.innerHeight}px`);
     doc.style.setProperty(
       "--ctrl-height",
@@ -1962,14 +1965,22 @@ function RCEvent(infoURL, clockURL) {
 
   function redrawCompetitorMarker(competitor, location, faded) {
     var coordinates = [location.coords.latitude, location.coords.longitude];
+    var redraw =
+      competitor.mapMarker && competitor.iconScale != runnerIconScale;
+    if (redraw) {
+      map.removeLayer(competitor.mapMarker);
+      competitor.mapMarker = null;
+    }
     if (!competitor.mapMarker) {
       var runnerIcon = getRunnerIcon(
         competitor.color,
         faded,
-        competitor.highlighted
+        competitor.highlighted,
+        runnerIconScale
       );
       competitor.mapMarker = L.marker(coordinates, { icon: runnerIcon });
       competitor.mapMarker.addTo(map);
+      competitor.iconScale = runnerIconScale;
     } else {
       competitor.mapMarker.setLatLng(coordinates);
     }
@@ -1982,7 +1993,8 @@ function RCEvent(infoURL, clockURL) {
     var nametagOnRightSide = pointX > mapMiddleX;
     var nametagChangeSide =
       competitor.nameMarker &&
-      ((competitor.isNameOnRight && !nametagOnRightSide) ||
+      (competitor.scale != runnerIconScale ||
+        (competitor.isNameOnRight && !nametagOnRightSide) ||
         (!competitor.isNameOnRight && nametagOnRightSide));
     if (nametagChangeSide) {
       map.removeLayer(competitor.nameMarker);
@@ -1996,10 +2008,12 @@ function RCEvent(infoURL, clockURL) {
         competitor.isColorDark,
         nametagOnRightSide,
         faded,
-        competitor.highlighted
+        competitor.highlighted,
+        runnerIconScale
       );
       competitor.nameMarker = L.marker(coordinates, { icon: runnerIcon });
       competitor.nameMarker.addTo(map);
+      competitor.scale = runnerIconScale;
     } else {
       competitor.nameMarker.setLatLng(coordinates);
     }
@@ -2030,13 +2044,19 @@ function RCEvent(infoURL, clockURL) {
           return [pos.coords.latitude, pos.coords.longitude];
         });
 
+      const redraw = competitor.tail && competitor.tailScale != runnerIconScale;
+      if (redraw) {
+        map.removeLayer(competitor.tail);
+        competitor.tail = null;
+      }
       if (!competitor.tail) {
         competitor.tail = L.polyline(tailLatLng, {
           color: competitor.color,
           opacity: 0.75,
-          weight: 5,
+          weight: 5 * runnerIconScale,
           className: competitor.focused ? "icon-focused" : "",
         }).addTo(map);
+        competitor.tailScale = runnerIconScale;
       } else {
         competitor.tail.setLatLngs(tailLatLng);
       }
@@ -2212,6 +2232,34 @@ function RCEvent(infoURL, clockURL) {
 
       optionsSidebar.append(tailLenWidget);
     }
+    {
+      const sizeWidget = u("<div/>").addClass("mb-2");
+
+      const widgetTitle = u("<h4/>")
+        .text(banana.i18n("icons-size"))
+        .addClass("text-nowrap");
+
+      const input = u(
+        '<input type="range" class="form-range ps-1 pe-3" min="1" max="2" step="0.1">'
+      );
+      input.val(runnerIconScale);
+      const onChange = (e) => {
+        (runnerIconScale = e.target.value),
+          document.documentElement.style.setProperty(
+            "--runner-scale",
+            runnerIconScale
+          );
+      };
+      input.on("change", onChange);
+      input.on("input", onChange);
+
+      const widgetContent = u("<div/>").addClass("ms-1").append(input);
+
+      sizeWidget.append(widgetTitle).append(widgetContent);
+
+      optionsSidebar.append(sizeWidget);
+    }
+
     {
       var ctrlWidget = u("<div/>").addClass("mb-2");
 

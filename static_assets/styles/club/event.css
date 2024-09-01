@@ -5,6 +5,7 @@
   --sidebar-size: 30px;
   --footer-size: 7px;
   --navbar-size: 46px;
+  --runner-scale: 1;
 }
 
 @font-face {
@@ -200,7 +201,7 @@
 
 .runner-icon span {
   font-family: "Atkinson Hyperlegible", sans-serif;
-  font-size: 1rem;
+  font-size: calc(var(--runner-scale) * 1rem);
   font-weight: 700;
   padding: 0 15px;
   white-space: nowrap;
