@@ -95,7 +95,7 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "This is definitive and cannot be reversed.")
         res = self.client.post(url, {"confirmation_key": key}, follow=True)
         self.assertContains(res, "They Trust Us")
-        self.assertEqual(User.objects.all().count(), 0)
+        self.assertEqual(User.objects.count(), 0)
 
     def test_change_club_slug(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
@@ -409,7 +409,7 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "Tough Competition")
 
         # Edit event set
-        es = EventSet.objects.all().first()
+        es = EventSet.objects.first()
         url = self.reverse_and_check(
             "dashboard:event_set_edit_view",
             f"/dashboard/event-sets/{es.aid}",

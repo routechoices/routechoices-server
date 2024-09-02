@@ -1554,7 +1554,7 @@ class Event(models.Model):
         if (
             not event
             or (map_index == 0 and not event.map_id)
-            or (map_index > 0 and map_index > event.map_assignations.all().count())
+            or (map_index > 0 and map_index > event.map_assignations.count())
         ):
             raise Http404
 
@@ -2272,7 +2272,7 @@ class Device(models.Model):
         return {c.event for c in qs}
 
     def get_last_competitor(self, load_event=False):
-        qs = self.competitor_set.all().order_by("-start_time")
+        qs = self.competitor_set.order_by("-start_time")
         if load_event:
             qs = qs.select_related("event")
         return qs.first()
@@ -2311,7 +2311,7 @@ class Device(models.Model):
                 to_emails = event.emergency_contacts.split(" ")
             else:
                 club = event.club
-                admin_ids = list(club.admins.all().values_list("id", flat=True))
+                admin_ids = list(club.admins.values_list("id", flat=True))
                 to_emails = list(
                     EmailAddress.objects.filter(
                         primary=True, user__in=admin_ids
