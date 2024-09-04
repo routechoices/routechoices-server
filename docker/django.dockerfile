@@ -25,7 +25,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     pip install cmake>=3.5 && \
     git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules && \
     cd libjxl* && \
-    git checkout v0.10.1 && \
+    git checkout v0.10.3 && \
     mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_BENCHMARK=OFF -DJPEGXL_ENABLE_TOOLS=OFF -DJPEGXL_ENABLE_DEVTOOLS=OFF .. && \
     cmake --build . -- -j$(nproc) && \

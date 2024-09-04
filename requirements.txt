@@ -61,7 +61,7 @@ orjson==3.10.7
 packaging==24.1
 pillow==10.4.0
 pillow-heif==0.18.0
-pillow-jxl-plugin @ git+https://github.com/rphlo/pillow-jpegxl-plugin@2d9d658d186e9759b9a1b6ab0a65dd9a601d1fc4
+pillow-jxl-plugin==1.2.6
 psycopg==3.2.1
 psycopg-pool==3.2.2
 pycparser==2.22
