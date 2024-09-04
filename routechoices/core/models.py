@@ -39,7 +39,6 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from jxlpy import JXLImagePlugin  # noqa: F401
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
@@ -312,7 +311,11 @@ Follow our events live or replay them later.
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
         logo_s.save(
-            buffer, ext, optimize=True, quality=(40 if ext in ("AVIF", "JXL") else 80)
+            buffer,
+            ext,
+            optimize=True,
+            quality=(40 if ext in ("AVIF", "JXL") else 80),
+            exif=None,
         )
         return buffer.getvalue()
 
@@ -362,6 +365,7 @@ Follow our events live or replay them later.
             mime[6:].upper(),
             optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+            exif=None,
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
@@ -750,7 +754,9 @@ class Map(models.Model):
                     size=(output_height, output_width),
                     color=(255, 255, 255, 0),
                 )
-                pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=10)
+                pil_image.save(
+                    buffer, img_mime[6:].upper(), optimize=True, quality=10, exif=None
+                )
                 data_out = buffer.getvalue()
             else:
                 n_channels = 3 if img_mime == "image/jpeg" else 4
@@ -857,7 +863,9 @@ class Map(models.Model):
             color_converted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_converted)
             buffer = BytesIO()
-            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=80)
+            pil_image.save(
+                buffer, img_mime[6:].upper(), optimize=True, quality=80, exif=None
+            )
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
@@ -1909,6 +1917,7 @@ class Event(models.Model):
             mime[6:].upper(),
             optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+            exif=None,
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
