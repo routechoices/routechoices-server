@@ -860,8 +860,14 @@ class Map(models.Model):
             color_converted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_converted)
             buffer = BytesIO()
-            pil_image.info["exif"] = None
-            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=80)
+
+            extra_args = {}
+            if img_mime == "image/jxl":
+                extra_args["exif"] = None
+
+            pil_image.save(
+                buffer, img_mime[6:].upper(), optimize=True, quality=80, **extra_args
+            )
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
