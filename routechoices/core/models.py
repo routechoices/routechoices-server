@@ -18,6 +18,7 @@ import gpxpy
 import gpxpy.gpx
 import magic
 import numpy as np
+import pillow_jxl  # noqa: F401
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
