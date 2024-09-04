@@ -89,6 +89,7 @@ def serve_image_from_s3(
         pil_image = Image.fromarray(color_corrected_img)
         if img_mode and pil_image.mode != img_mode:
             pil_image = pil_image.convert("RGB")
+        pil_image.info["exif"] = None
         pil_image.save(
             out_buffer,
             mime[6:].upper(),
