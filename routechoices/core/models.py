@@ -871,7 +871,7 @@ class Map(models.Model):
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
-                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 80]
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 40]
             elif img_mime == "image/jpeg":
                 extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
