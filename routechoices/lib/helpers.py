@@ -51,7 +51,7 @@ def int_to_alpha(i, alphabet=None):
 
 
 def get_best_image_mime(request, default=None):
-    accepted_mimes = request.COOKIES.get("accept-image").split(",")
+    accepted_mimes = request.COOKIES.get("accept-image", "").split(",")
     accepted_mimes += request.META.get("HTTP_ACCEPT", "").split(",")
     for mime in (
         "image/webp",
