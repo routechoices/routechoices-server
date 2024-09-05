@@ -366,7 +366,7 @@ Follow our events live or replay them later.
             buffer,
             mime[6:].upper(),
             optimize=True,
-            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+            quality=(40 if mime in ("image/webp", "image/avif", "image/jxl") else 80),
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
