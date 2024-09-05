@@ -18,7 +18,6 @@ import gpxpy
 import gpxpy.gpx
 import magic
 import numpy as np
-import pillow_jxl  # noqa: F401
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -43,6 +42,7 @@ from django_hosts.resolvers import reverse
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
+import routechoices.lib.jxl  # noqa: F401
 from routechoices.lib import plausible
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
