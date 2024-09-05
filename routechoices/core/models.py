@@ -311,17 +311,11 @@ Follow our events live or replay them later.
         logo = Image.open(BytesIO(logo_b))
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
-
-        extra_args = {}
-        if ext == "JXL":
-            extra_args["exif"] = None
-
         logo_s.save(
             buffer,
             ext,
             optimize=True,
             quality=(40 if ext in ("AVIF", "JXL") else 80),
-            **extra_args,
         )
         return buffer.getvalue()
 
@@ -367,16 +361,11 @@ Follow our events live or replay them later.
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
 
-        extra_args = {}
-        if mime == "image/jxl":
-            extra_args["exif"] = None
-
         img.save(
             buffer,
             mime[6:].upper(),
             optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
-            **extra_args,
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
@@ -765,15 +754,11 @@ class Map(models.Model):
                     size=(output_height, output_width),
                     color=(255, 255, 255, 0),
                 )
-                extra_args = {}
-                if img_mime == "image/jxl":
-                    extra_args["exif"] = None
                 pil_image.save(
                     buffer,
                     img_mime[6:].upper(),
                     optimize=True,
                     quality=10,
-                    **extra_args,
                 )
                 data_out = buffer.getvalue()
             else:
@@ -881,14 +866,7 @@ class Map(models.Model):
             color_converted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_converted)
             buffer = BytesIO()
-
-            extra_args = {}
-            if img_mime == "image/jxl":
-                extra_args["exif"] = None
-
-            pil_image.save(
-                buffer, img_mime[6:].upper(), optimize=True, quality=80, **extra_args
-            )
+            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=40)
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
@@ -1935,17 +1913,11 @@ class Event(models.Model):
                 logo_f = logo.resize((250, 250), Image.LANCZOS)
                 img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
-
-        extra_args = {}
-        if mime == "image/jxl":
-            extra_args["exif"] = None
-
         img.save(
             buffer,
             mime[6:].upper(),
             optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
-            **extra_args,
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)

@@ -90,16 +90,11 @@ def serve_image_from_s3(
         if img_mode and pil_image.mode != img_mode:
             pil_image = pil_image.convert("RGB")
 
-        extra_args = {}
-        if mime == "image/jxl":
-            extra_args["exif"] = None
-
         pil_image.save(
             out_buffer,
             mime[6:].upper(),
             optimize=True,
             quality=(40 if mime in ("image/avif", "image/jxl") else 80),
-            **extra_args,
         )
         image = out_buffer.getvalue()
         cache.set(cache_key, image, 31 * 24 * 3600)
