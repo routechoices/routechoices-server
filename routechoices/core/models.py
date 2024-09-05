@@ -42,7 +42,6 @@ from django_hosts.resolvers import reverse
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
-import routechoices.lib.jxl  # noqa: F401
 from routechoices.lib import plausible
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
@@ -62,6 +61,7 @@ from routechoices.lib.helpers import (
     shortsafe64encodedsha,
     time_base64,
 )
+from routechoices.lib.jxl import register_jxl_opener
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.validators import (
     validate_corners_coordinates,
@@ -76,6 +76,7 @@ from routechoices.lib.validators import (
 )
 
 register_avif_opener()
+register_jxl_opener()
 
 logger = logging.getLogger(__name__)
 

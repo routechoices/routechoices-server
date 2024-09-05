@@ -93,7 +93,8 @@ def _save(im, fp, filename, save_all=False):
     fp.write(data)
 
 
-Image.register_open(JXLImageFile.format, JXLImageFile, _accept)
-Image.register_save(JXLImageFile.format, _save)
-Image.register_extension(JXLImageFile.format, ".jxl")
-Image.register_mime(JXLImageFile.format, "image/jxl")
+def register_jxl_opener():
+    Image.register_open(JXLImageFile.format, JXLImageFile, _accept)
+    Image.register_save(JXLImageFile.format, _save)
+    Image.register_mime(JXLImageFile.format, "image/jxl")
+    Image.register_extension(JXLImageFile.format, ".jxl")
