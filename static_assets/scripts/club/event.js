@@ -3087,7 +3087,11 @@ let wakeLock = null;
   if (!navigator.canShare) {
     document.getElementById("share_buttons").remove();
   }
-
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+  } catch (err) {
+    console.log("Wake Lock Screen failed");
+  }
   document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
       try {
