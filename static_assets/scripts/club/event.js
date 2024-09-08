@@ -3082,10 +3082,22 @@ function RCEvent(infoURL, clockURL) {
   }
 }
 
+let wakeLock = null;
 (function () {
   if (!navigator.canShare) {
     document.getElementById("share_buttons").remove();
   }
+
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible") {
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+      } catch (err) {
+        console.log("Wake Lock Screen failed");
+      }
+    }
+  });
+
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
