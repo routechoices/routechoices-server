@@ -3105,12 +3105,14 @@ function RCEvent(infoURL, clockURL) {
     }
   });
 
-  var queryString = window.location.search;
-  var urlParams = new URLSearchParams(queryString);
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
 
-  var urlLanguage = getLangIfSupported(urlParams.get("lang"));
-  var storedLanguage = getLangIfSupported(window.localStorage.getItem("lang"));
-  var browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
+  const urlLanguage = getLangIfSupported(urlParams.get("lang"));
+  const storedLanguage = getLangIfSupported(
+    window.localStorage.getItem("lang")
+  );
+  const browserLanguage = getLangIfSupported(navigator.language.slice(0, 2));
   locale = urlLanguage || storedLanguage || browserLanguage || "en";
   document.documentElement.setAttribute("lang", locale);
   dayjs.locale(locale);
@@ -3155,7 +3157,8 @@ function RCEvent(infoURL, clockURL) {
           e.preventDefault();
         }
       });
-    var elem = document.getElementById("main-div");
+
+    const elem = document.getElementById("main-div");
     if (
       !elem.requestFullscreen &&
       !elem.webkitRequestFullscreen &&
