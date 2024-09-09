@@ -3082,11 +3082,12 @@ function RCEvent(infoURL, clockURL) {
   }
 }
 
-let wakeLock = null;
 (function () {
   if (!navigator.canShare) {
     document.getElementById("share_buttons").remove();
   }
+
+  let wakeLock = null;
   (async () => {
     try {
       wakeLock = await navigator.wakeLock.request("screen");
