@@ -3087,10 +3087,9 @@ function RCEvent(infoURL, clockURL) {
     document.getElementById("share_buttons").remove();
   }
 
-  let wakeLock = null;
   (async () => {
     try {
-      wakeLock = await navigator.wakeLock.request("screen");
+      await navigator.wakeLock.request("screen");
     } catch (err) {
       console.log("Wake Lock Screen failed");
     }
@@ -3098,7 +3097,7 @@ function RCEvent(infoURL, clockURL) {
   document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
       try {
-        wakeLock = await navigator.wakeLock.request("screen");
+        await navigator.wakeLock.request("screen");
       } catch (err) {
         console.log("Wake Lock Screen failed");
       }
