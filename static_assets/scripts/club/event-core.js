@@ -228,9 +228,11 @@ function getContrastYIQ(hexcolor) {
 function getRunnerIcon(color, faded = false, focused = false, scale = 2) {
   var iconSize = 16 * scale;
   var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
-  var svgRect = `<svg viewBox="0 0 ${iconSize} ${iconSize}" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
-    focused ? 3 : 1
-  }px" cx="${iconSize / 2}" cy="${iconSize / 2}" r="${
+  var svgRect = `<svg viewBox="0 0 ${iconSize + 4} ${
+    iconSize + 4
+  }" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
+    focused ? 3 : 2
+  }px" cx="${iconSize / 2 + 2}" cy="${iconSize / 2 + 2}" r="${
     (iconSize - 1) / 2
   }"/></svg>`;
   var runnerIcon = L.icon({
