@@ -184,8 +184,9 @@
                             </div>
                         {% endif %}
                         {% for event in event_set.events %}
-                            <div class="card border-0 shadow mb-3"
-                                 style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
+                            <div class="card border-0 shadow mb-3 event-card"
+                                 data-bg-img="{% if event.map %}{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1{% endif %}"
+                                 style="background: linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
                                         background-size: cover;
                                         background-position: center">
                                 <div class="card-body">
@@ -438,8 +439,9 @@
                 </div>
             {% endif %}
             {% for event in event_set.events %}
-                <div class="card border-0 shadow mb-3"
-                     style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans)){% if event.map %}, url('{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1'){% endif %};
+                <div class="card border-0 shadow mb-3 event-card"
+                     data-bg-img="{% if event.map %}{{ event.club.nice_url }}{{ event.slug }}/thumbnail?no-logo=1{% endif %}"
+                     style="background:linear-gradient(to right, var(--rc-color-from-trans), var(--rc-color-to-trans));
                             background-size: cover;
                             background-position: center">
                     <div class="card-body">
