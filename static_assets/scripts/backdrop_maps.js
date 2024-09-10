@@ -22,13 +22,11 @@ var backdropMaps = {
       className: "wms256",
     }
   ),
-  "topo-fi": L.tileLayer(
-    "https://tiles.kartat.kapsi.fi/peruskartta/{z}/{x}/{y}.jpg",
-    {
-      attribution: "&copy; National Land Survey of Finland",
-      className: "wms256",
-    }
-  ),
+  "topo-fi": L.tileLayer.wms("https://tiles.kartat.kapsi.fi/peruskartta", {
+    attribution: "&copy; National Land Survey of Finland",
+    className: "wms256",
+    layers: "peruskartta",
+  }),
   "mapant-fi": L.tileLayer(
     "https://wmts.mapant.fi/wmts_EPSG3857.php?z={z}&x={x}&y={y}",
     {
