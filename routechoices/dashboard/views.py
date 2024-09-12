@@ -265,11 +265,14 @@ def account_delete_view(request):
             != allauth_settings.AuthenticationMethod.EMAIL
         ):
             context["username"] = user_username(user)
-        requester_email = (
-            EmailAddress.objects.filter(user_id=request.user.id, primary=True)
-            .first()
-            .email
-        )
+        requester_email = EmailAddress.objects.filter(
+            user_id=request.user.id, primary=True
+        ).first()
+        if requester_email:
+            requester_email = requester_email.email
+        else:
+            requester_email = request.user.email
+
         get_adapter(request).send_mail(
             "account/email/account_delete", requester_email, context
         )
