@@ -33,8 +33,8 @@
                             srcset="{% static 'img/iphone.webp' %}?v=2024070400" />
                     <img type="image/png"
                          src="{% static 'img/iphone.png' %}?v=2024070400"
-                         width="600px"
-                         height="600px"
+                         width="600"
+                         height="600"
                          class="image-hero"
                          alt="Website browsed on phone" />
                 </picture>
@@ -71,8 +71,8 @@
                                target="_blank"
                                class="d-inline-block text-decoration-none dark-link">
                                 <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static '/img/club-default.png' %}{% endif %}"
-                                     width="150px"
-                                     height="150px"
+                                     width="150"
+                                     height="150"
                                      class="rounded mx-auto d-block"
                                      alt="{{ club.name }}'s logo" />
                                 <span class="fw-bold">{{ club.name }}</span>
