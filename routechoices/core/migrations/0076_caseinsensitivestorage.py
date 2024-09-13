@@ -2,7 +2,7 @@
 
 # import re
 
-from django.conf import settings
+# from django.conf import settings
 from django.db import migrations
 
 # from routechoices.core.models import Club, Map
@@ -39,6 +39,7 @@ def transfer_data(apps, schema_editor):
     #         rmap.image.name = new_name
     #         rmap.save()
     pass
+
 
 class Migration(migrations.Migration):
     dependencies = [
