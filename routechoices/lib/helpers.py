@@ -90,6 +90,12 @@ def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip("=")
 
 
+def safe32encode(b):
+    if isinstance(b, str):
+        b = b.encode("utf-8")
+    return base64.b32encode(b).decode().rstrip("=")
+
+
 def safe64encodedsha(txt):
     if isinstance(txt, str):
         txt = txt.encode("utf-8")
@@ -106,16 +112,16 @@ def safe64decode(b):
     return base64.urlsafe_b64decode(b.encode() + b"==")
 
 
-def int_base64(i):
+def int_base32(i):
     b = struct.pack(">Q", i)
     while b.startswith(b"\x00"):
         b = b[1:]
-    return safe64encode(b)
+    return safe32encode(b)
 
 
-def time_base64():
+def time_base32():
     t = int(time.time())
-    return int_base64(t)
+    return int_base32(t)
 
 
 def deg2rad(deg):

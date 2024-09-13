@@ -59,7 +59,7 @@ from routechoices.lib.helpers import (
     safe64encodedsha,
     short_random_slug,
     shortsafe64encodedsha,
-    time_base64,
+    time_base32,
 )
 from routechoices.lib.jxl import register_jxl_opener
 from routechoices.lib.storages import OverwriteImageStorage
@@ -108,20 +108,20 @@ class Point:
 
 def logo_upload_path(instance=None, file_name=None):
     tmp_path = ["logos"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
 
 def banner_upload_path(instance=None, file_name=None):
     tmp_path = ["banners"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
@@ -400,10 +400,10 @@ User.add_to_class("can_create_club", property(can_user_create_club))
 
 def map_upload_path(instance=None, file_name=None):
     tmp_path = ["maps"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
