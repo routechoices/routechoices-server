@@ -5,6 +5,10 @@ import shutil
 from django.conf import settings
 from django_s3_storage.storage import S3File, S3Storage, _wrap_errors
 
+STORED_MEDIA_RE = re.compile(
+    r"^(maps|logos|banners)/[-A-Z0-9_]/[-A-Z0-9_]/([-0-9a-zA-Z_]{11})_[-a-zA-Z0-9_]+$"
+)
+
 
 class OverwriteImageStorage(S3Storage):
     """Storage that delete a previous file with the same name
@@ -46,7 +50,7 @@ class OverwriteImageStorage(S3Storage):
 
     def url(self, name):
         simple_name = re.sub(
-            r"^(maps|logos|banners)/[-A-Z0-9_]/[-A-Z0-9_]/([-0-9a-zA-Z_]{11})_[-a-zA-Z0-9_]+$",
+            STORED_MEDIA_RE,
             r"\1/\2",
             name,
         )
