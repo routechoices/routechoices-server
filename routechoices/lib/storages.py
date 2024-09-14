@@ -46,7 +46,7 @@ class OverwriteImageStorage(S3Storage):
 
     def url(self, name):
         simple_name = re.sub(
-            r"^(maps|logos|banners)/[-A-Z0-9_]/[-A-Z0-9_]/([-0-9a-zA-Z_]{11})_[-a-zA-Z0-9_]+",
+            r"^(maps|logos|banners)/[-A-Z0-9_]/[-A-Z0-9_]/([-0-9a-zA-Z_]{11})_[-a-zA-Z0-9_]+$",
             r"\1/\2",
             name,
         )
