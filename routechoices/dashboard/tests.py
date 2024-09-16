@@ -226,6 +226,11 @@ class TestDashboard(EssentialDashboardBase):
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "The image is too small, minimum 128x128 pixels")
 
+        self.club.refresh_from_db()
+        url = self.club.logo.url
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
     def test_change_club_banner(self):
         url = self.reverse_and_check("dashboard:club_view", "/dashboard/club")
 
@@ -289,6 +294,11 @@ class TestDashboard(EssentialDashboardBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertContains(res, "invalid-feedback")
         self.assertContains(res, "The image is too small, minimum 600x315 pixels")
+
+        self.club.refresh_from_db()
+        url = self.club.banner.url
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_device_lists(self):
         device = Device.objects.create()
@@ -363,7 +373,7 @@ class TestDashboard(EssentialDashboardBase):
         image = Image.new("RGB", (100, 100), (255, 0, 0))
         buffer = BytesIO()
         image.save(buffer, "JPEG")
-        banner = SimpleUploadedFile(
+        map_image = SimpleUploadedFile(
             "map.jpg", buffer.getvalue(), content_type="image/jpeg"
         )
 
@@ -371,12 +381,17 @@ class TestDashboard(EssentialDashboardBase):
             url,
             {
                 "name": "My Test Map",
-                "image": banner,
+                "image": map_image,
                 "corners_coordinates": "61.45075,24.18994,61.44656,24.24721,61.42094,24.23851,61.42533,24.18157",
             },
         )
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
 
+        raster_map.refresh_from_db()
+        url = raster_map.image.url
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         url = self.reverse_and_check(
             "dashboard:map_delete_view",
             f"/dashboard/maps/{raster_map.aid}/delete",
