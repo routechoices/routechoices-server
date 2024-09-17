@@ -31,6 +31,7 @@ gps-data-codec @ git+https://github.com/routechoices/gps-data-codec@8d267eb11190
 gpxpy
 pillow-jxl-plugin
 kagi @ git+https://github.com/rphlo/kagi@9d02f068abf0963575819455f2e3f05888726153
+lxml
 numpy
 opencv-python
 orjson

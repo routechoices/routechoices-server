@@ -8,11 +8,11 @@ asn1crypto==1.5.1
 attrs==24.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
-boto3==1.35.11
-botocore==1.35.11
+boto3==1.35.20
+botocore==1.35.20
 cbor2==5.6.4
 certifi==2024.8.30
-cffi==1.17.0
+cffi==1.17.1
 charset-normalizer==3.3.2
 coverage==7.6.1
 cryptography==43.0.1
@@ -21,7 +21,7 @@ defusedxml==0.7.1
 diskcache==5.6.3
 django==5.1.1
 django-admincommand @ git+https://github.com/rphlo/django-admincommand.git@09f8b0ad150754be88d20c0e7c6a1473b8006872
-django-allauth==64.2.0
+django-allauth==64.2.1
 django-appconf==1.0.6
 django-background-tasks @ git+https://github.com/rphlo/django-background-tasks@6b247d0b3a7565613656d0ec07b55f6c66aa03cc
 django-bootstrap5 @ git+https://github.com/rphlo/django-bootstrap5.git@8c80f8000f62028aa27624205a64e385d497ac42
@@ -45,15 +45,16 @@ frozenlist==1.4.1
 geoip2==4.8.0
 gps-data-codec @ git+https://github.com/routechoices/gps-data-codec@8d267eb11190c811d8c9dc07eddc7e3c228a708b
 gpxpy==1.6.2
-idna==3.8
+idna==3.10
 inflection==0.5.1
 jmespath==1.0.1
 jwcrypto==1.5.6
 kagi @ git+https://github.com/rphlo/kagi@9d02f068abf0963575819455f2e3f05888726153
+lxml==5.3.0
 markdown==3.7
 maxminddb==2.6.2
 minify-html==0.15.0
-multidict==6.0.5
+multidict==6.1.0
 numpy==2.1.1
 oauthlib==3.2.2
 opencv-python==4.10.0.84
@@ -62,16 +63,16 @@ packaging==24.1
 pillow==10.4.0
 pillow-heif==0.18.0
 pillow-jxl-plugin==1.2.7
-psycopg==3.2.1
-psycopg-pool==3.2.2
+psycopg==3.2.2
+psycopg-pool==3.2.3
 pycparser==2.22
-pydantic==2.8.2
-pydantic-core==2.20.1
+pydantic==2.9.1
+pydantic-core==2.23.3
 pyopenssl==24.2.1
 pypng==0.20220715.0
 python-dateutil==2.9.0.post0
 python-magic==0.4.27
-pytz==2024.1
+pytz==2024.2
 pyyaml==6.0.2
 qrcode==7.4.2
 rcssmin==1.1.2
@@ -79,19 +80,19 @@ requests==2.32.3
 rjsmin==1.2.2
 s3transfer==0.10.2
 segno==1.6.1
-sentry-sdk==2.13.0
-setuptools==74.1.1
+sentry-sdk==2.14.0
+setuptools==75.1.0
 sewer @ git+https://github.com/rphlo/sewer@8d25ea1f1e95e97f52c2354c1752d2adbbfdafaf
 six==1.16.0
 soupsieve==2.6
 sqlparse==0.5.1
 tinycss2==1.2.1
 tornado==6.4.1
-types-python-dateutil==2.9.0.20240821
+types-python-dateutil==2.9.0.20240906
 typing-extensions==4.12.2
 uritemplate==4.1.1
-urllib3==2.2.2
+urllib3==2.2.3
 uwsgi==2.0.26
 webauthn==1.11.1
 webencodings==0.5.1
-yarl==1.9.8
+yarl==1.11.1
