@@ -15,7 +15,6 @@ from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
-from rest_framework.exceptions import MethodNotAllowed
 
 from routechoices.core.models import Club, Event, FrontPageFeedback
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
@@ -58,7 +57,9 @@ def pricing_page(request):
 @csrf_exempt
 def pay_view(request):
     if request.method != "POST":
-        raise MethodNotAllowed(request.method)
+        if request.user.is_authenticated:
+            return redirect(reverse("dashboard:upgrade"))
+        return redirect(reverse("site:pricing_view"))
     price = request.POST.get("price-per-month", "4.99")
     try:
         price = max(Decimal(4.99), Decimal(price))
