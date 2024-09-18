@@ -62,13 +62,13 @@ const setTheme = (theme) => {
   "use strict";
   setTheme(getPreferredTheme());
 
-  try {
+  if (window.matchMedia) {
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addEventListener("change", () => {
         setTheme(getPreferredTheme());
       });
-  } catch {}
+  }
 
   const showActiveTheme = (theme) => {
     const svgOfActiveBtn = document.querySelector(".theme-selector-icon use");
