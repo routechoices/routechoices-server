@@ -71,6 +71,11 @@ from routechoices.lib.validators import (
 logger = logging.getLogger(__name__)
 GLOBAL_MERCATOR = GlobalMercator()
 
+api_GET_view = api_view(["GET"])
+api_GET_HEAD_view = api_view(["GET", "HEAD"])
+api_POST_view = api_view(["POST"])
+api_GET_POST_view = api_view(["GET", "POST"])
+
 
 class PostDataThrottle(AnonRateThrottle):
     rate = "70/min"
@@ -130,7 +135,7 @@ mine_param = openapi.Parameter(
     auto_schema=None,
 )
 @login_required
-@api_view(["POST"])
+@api_POST_view
 def event_set_creation(request):
     club_slug = request.data.get("club_slug")
     name = request.data.get("name")
@@ -273,7 +278,7 @@ def event_set_creation(request):
         ),
     },
 )
-@api_view(["GET", "POST"])
+@api_GET_POST_view
 def event_list(request):
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -457,7 +462,7 @@ def event_list(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def club_list_view(request):
     only_yours = request.GET.get("mine")
     clubs = Club.objects.all()
@@ -535,7 +540,7 @@ def club_list_view(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def event_detail(request, event_id):
     event = (
         Event.objects.select_related("club", "notice", "map")
@@ -678,7 +683,7 @@ def event_detail(request, event_id):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def event_register(request, event_id):
     event = Event.objects.select_related("club").filter(aid=event_id).first()
     if not event:
@@ -946,7 +951,7 @@ def competitor_api(request, competitor_id):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def competitor_route_upload(request, competitor_id):
     competitor = (
         Competitor.objects.select_related("event", "event__club", "device")
@@ -1063,7 +1068,7 @@ def competitor_route_upload(request, competitor_id):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def event_data(request, event_id):
     t0 = time.time()
     cache_key_found = None
@@ -1172,7 +1177,7 @@ def event_data(request, event_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def event_zip(request, event_id):
     event = (
         Event.objects.select_related("club")
@@ -1224,7 +1229,7 @@ def event_zip(request, event_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def ip_latlon(request):
     headers = {"Cache-Control": "Private"}
     try:
@@ -1294,7 +1299,7 @@ def ip_latlon(request):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 @throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
     secret_provided = request.data.get(
@@ -1385,7 +1390,7 @@ class DataRenderer(renderers.BaseRenderer):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def get_version(request):
     return Response({"v": git_master_hash()})
 
@@ -1394,7 +1399,7 @@ def get_version(request):
     method="post",
     auto_schema=None,
 )
-@api_view(["POST"])
+@api_POST_view
 def get_device_id(request):
     device = Device.objects.create(user_agent=request.session.user_agent[:200])
     return Response({"status": "ok", "device_id": device.aid})
@@ -1433,7 +1438,7 @@ def get_device_id(request):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def create_device_id(request):
     imei = request.data.get("imei")
     if imei:
@@ -1475,7 +1480,7 @@ def create_device_id(request):
     method="post",
     auto_schema=None,
 )
-@api_view(["POST"])
+@api_POST_view
 def get_device_for_imei(request):
     imei = request.data.get("imei")
     if not imei:
@@ -1513,7 +1518,7 @@ def get_device_for_imei(request):
         ),
     },
 )
-@api_view(["GET", "POST"])
+@api_GET_POST_view
 def get_time(request):
     return Response({"time": time.time()}, headers={"Cache-Control": "no-cache"})
 
@@ -1522,7 +1527,7 @@ def get_time(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 @login_required
 def user_search(request):
     users = []
@@ -1538,7 +1543,7 @@ def user_search(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 @login_required
 def user_view(request):
     user = request.user
@@ -1554,7 +1559,7 @@ def user_view(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_search(request):
     devices = []
     q = request.GET.get("q")
@@ -1569,7 +1574,7 @@ def device_search(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_info(request, device_id):
     device = Device.objects.filter(aid=device_id, is_gpx=False).first()
     if not device:
@@ -1598,7 +1603,7 @@ def device_info(request, device_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_registrations(request, device_id):
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
     competitors = device.competitor_set.filter(event__end_date__gte=now())
@@ -1635,7 +1640,7 @@ def device_ownership_api_view(request, club_slug, device_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def event_map_download(request, event_id, map_index="1"):
     event, raster_map, title = Event.get_public_map_at_index(
         request.user, event_id, map_index
@@ -1666,7 +1671,7 @@ def event_map_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def event_kmz_download(request, event_id, map_index="1"):
     event, raster_map, title = Event.get_public_map_at_index(
         request.user, event_id, map_index
@@ -1693,7 +1698,7 @@ def event_kmz_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 @login_required
 def map_kmz_download(request, map_id, *args, **kwargs):
     club_list = Club.objects.filter(admins=request.user)
@@ -1714,7 +1719,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
         Competitor.objects.select_related("event", "event__club", "device"),
@@ -1746,7 +1751,7 @@ def competitor_gpx_download(request, competitor_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def two_d_rerun_race_status(request):
     event_id = request.GET.get("eventid")
     if not event_id:
@@ -1820,7 +1825,7 @@ def two_d_rerun_race_status(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def two_d_rerun_race_data(request):
     event_id = request.GET.get("eventid")
     if not event_id:
