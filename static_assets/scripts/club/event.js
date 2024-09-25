@@ -918,12 +918,13 @@ function RCEvent(infoURL, clockURL) {
       ?.addEventListener("click", toggleFullscreen);
 
     initializeMap();
-    reqwest({
-      url: infoURL,
-      withCredentials: true,
-      crossOrigin: true,
-      type: "json",
-      success: function (response) {
+    fetch(infoURL, {
+      method: "GET",
+      credentials: "same-origin",
+      mode: "cors",
+    })
+      .then((r) => r.json())
+      .then(function (response) {
         if (response.event.backdrop === "blank") {
           u("#map").css({ background: "#fff" });
         } else {
@@ -1064,12 +1065,11 @@ function RCEvent(infoURL, clockURL) {
           });
         }
         setInterval(refreshData, 25 * 1e3);
-      },
-      error: function () {
+      })
+      .catch(function () {
         u("#eventLoadingModal").remove();
         swal({ text: "Something went wrong", title: "error", type: "error" });
-      },
-    });
+      });
   })();
 
   function onSwitchToLive(e) {
@@ -1294,12 +1294,13 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function refreshData() {
-    reqwest({
-      url: infoURL,
-      withCredentials: true,
-      crossOrigin: true,
-      type: "json",
-      success: function (response) {
+    fetch(infoURL, {
+      method: "GET",
+      credentials: "same-origin",
+      mode: "cors",
+    })
+      .then((r) => r.json())
+      .then(function (response) {
         if (response.error) {
           if (response.error === "No event match this id") {
             window.location.reload();
@@ -1324,8 +1325,7 @@ function RCEvent(infoURL, clockURL) {
         }
         displayAnouncement(response.announcement);
         displayMaps(response.maps);
-      },
-    });
+      });
   }
 
   function displayAnouncement(announcement) {
@@ -1878,12 +1878,13 @@ function RCEvent(infoURL, clockURL) {
 
   function fetchCompetitorRoutes(cb) {
     isCurrentlyFetchingRoutes = true;
-    reqwest({
-      url: dataURL,
-      crossOrigin: true,
-      withCredentials: true,
-      type: "json",
-      success: function (response) {
+    fetch(dataURL, {
+      method: "GET",
+      credentials: "same-origin",
+      mode: "cors",
+    })
+      .then((r) => r.json())
+      .then(function (response) {
         if (!response || !response.competitors) {
           // Prevent fetching competitor data for 1 second
           setTimeout(function () {
@@ -1929,11 +1930,10 @@ function RCEvent(infoURL, clockURL) {
           zoomOnRunners = false;
         }
         cb && cb();
-      },
-      error: function () {
+      })
+      .catch(function () {
         isCurrentlyFetchingRoutes = false;
-      },
-    });
+      });
   }
 
   function zoomOnCompetitor(competitor) {
