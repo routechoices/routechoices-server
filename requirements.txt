@@ -92,7 +92,7 @@ types-python-dateutil==2.9.0.20240906
 typing-extensions==4.12.2
 uritemplate==4.1.1
 urllib3==2.2.3
-uwsgi==2.0.26
+uwsgi==2.0.27
 webauthn==1.11.1
 webencodings==0.5.1
 yarl==1.11.1
