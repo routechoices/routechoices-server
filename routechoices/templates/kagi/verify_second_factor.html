@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 static %}
 {% block content %}
     <div class="container">
         <div class="row">
@@ -58,6 +58,7 @@
         </div>
     </div>
 {% endblock content %}
+
 {% block extra_body %}
     {{ block.super }}
     {% compress js %}

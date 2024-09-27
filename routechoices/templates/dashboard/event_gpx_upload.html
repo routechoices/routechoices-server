@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 static %}
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
@@ -14,6 +14,7 @@
         </div>
     </div>
 {% endblock sub_content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

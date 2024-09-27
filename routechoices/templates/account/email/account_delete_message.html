@@ -1,4 +1,5 @@
 {% extends "account/email/base_message.html" %}
+
 {% block main %}
     <p style="margin: 1.5rem 0;overflow-wrap: break-word;">
         You're receiving this email because you requested your user account at {{ current_site.name }} to be deleted.
@@ -11,6 +12,7 @@
     {% endblock reset_link %}
     <p style="margin: 1.5rem 0;overflow-wrap: break-word;">Sad to see you go!</p>
 {% endblock main %}
+
 {% block greeting %}
     <p style="margin: 1.5rem 0;overflow-wrap: break-word;">The {{ current_site.name }} team</p>
 {% endblock greeting %}

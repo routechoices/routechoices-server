@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static django_bootstrap5 hosts markdownify index math compress define_action %}
+{% load compress define_action django_bootstrap5 hosts index markdownify math static %}
 {% block favicon %}
     {% if club %}
         <link rel="apple-touch-icon"
@@ -16,6 +16,7 @@
         <link rel="manifest" href="{% static 'manifest.json' %}?v=2024a">
     {% endif %}
 {% endblock favicon %}
+
 {% block head_title %}
     {% if event_set_page %}
         {{ event_set.name }}
@@ -29,6 +30,7 @@
     {% endif %}
     | Live GPS tracking for orienteering
 {% endblock head_title %}
+
 {% block head_description %}
     {% if event_set_page %}
         {{ event_set.name }}
@@ -41,6 +43,7 @@
         on {{ site.name }}, an easy to use and powerful live GPS tracking solution for orienteering.
     {% endif %}
 {% endblock head_description %}
+
 {% block extra_head %}
     <link rel="alternate"
           type="application/rss+xml"
@@ -62,6 +65,7 @@
         <link rel="stylesheet" href="{% static 'styles/site/event_list.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block contentup %}
     {% if club %}
         {% define club.nice_url as home_url %}
@@ -502,6 +506,7 @@
 </div>
 </div>
 {% endblock contentup %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

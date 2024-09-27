@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-{% blocktrans %}Password Reset Attempt{% endblocktrans %} [{% now "Y-m-d H:i:s" %}]
+{% blocktranslate %}Password Reset Attempt{% endblocktranslate %} [{% now "Y-m-d H:i:s" %}]
 {% endautoescape %}

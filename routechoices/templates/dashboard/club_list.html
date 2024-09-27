@@ -1,11 +1,12 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
         <link rel="stylesheet" href="{% static 'styles/dashboard/club_list.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_content %}
     <div class="row">
         <div class="col-12">

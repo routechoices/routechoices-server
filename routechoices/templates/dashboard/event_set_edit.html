@@ -1,11 +1,12 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 hosts qr_code compress %}
+{% load compress django_bootstrap5 hosts qr_code static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
         <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_sub_content %}
     <div class="row">
         <div class="col-12">
@@ -56,9 +57,10 @@
         {% endif %}
     {% endif %}
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
-            data-club-url="{{club.nice_url}}"></script>
+            data-club-url="{{ club.nice_url }}"></script>
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
         <script src="{% static '/vendor/slugify-1.6.5/slugify.js' %}"></script>

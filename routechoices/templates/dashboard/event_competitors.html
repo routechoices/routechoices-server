@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -11,6 +11,7 @@
               href="{% static 'styles/dashboard/event_edit.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_sub_content %}
     <div class="row">
         <div class="col-12">
@@ -77,6 +78,7 @@
         </div>
     </div>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>

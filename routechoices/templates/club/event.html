@@ -1,11 +1,13 @@
 {% extends "club/base.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block head_title %}
     {{ event.name }} | Powered by {{ site.name }}
 {% endblock head_title %}
+
 {% block head_description %}
     GPS Tracking of {{ event.name }} by {{ event.club.name }}
 {% endblock head_description %}
+
 {% block extra_head %}
     <meta property="og:title" content="{{ event.name }}" />
     <meta property="og:type" content="website" />
@@ -46,6 +48,7 @@
           type="application/json"
           crossorigin="use-credentials" />
 {% endblock extra_head %}
+
 {% block body %}
     <!-- Fixed navbar -->
     {% with is_event_page=True %}
@@ -315,11 +318,12 @@
         </div>
     </div>
 {% endblock body %}
+
 {% block extra_body %}
     {{ block.super }}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-club-name="{{ event.club.name }}"
-            data-event-id="{{event.aid}}"
+            data-event-id="{{ event.aid }}"
             data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
             data-server-clock-url="{% host_url 'time_api' host 'api' %}"
             data-static-root="{% static '' %}"

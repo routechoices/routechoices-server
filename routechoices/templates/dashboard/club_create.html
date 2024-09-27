@@ -1,11 +1,12 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     <link rel="stylesheet"
           href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}" />
 {% endblock extra_head %}
+
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
@@ -23,6 +24,7 @@
         </div>
     </div>
 {% endblock sub_content %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}">
     </script>

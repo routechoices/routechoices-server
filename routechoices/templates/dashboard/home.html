@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% load static compress %}
+{% load compress static %}
 {% block extra_head %}
     {% compress css %}
         <link rel="stylesheet"
               href="{% static 'styles/dashboard/home.css' %}?_=2021100200" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block content %}
     <div class="row">
         <div class="col-12 mx-auto">

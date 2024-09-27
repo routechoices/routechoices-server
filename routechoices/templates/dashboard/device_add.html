@@ -1,10 +1,11 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     <link rel="stylesheet"
           href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
 {% endblock extra_head %}
+
 {% block sub_sub_content %}
     <div class="row">
         <div class="col-12">
@@ -45,8 +46,9 @@
         </div>
     </div>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
-    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-slug="{{club.slug}}" data-csrf-token="{{ csrf_token }}">
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-slug="{{ club.slug }}" data-csrf-token="{{ csrf_token }}">
     </script>
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

@@ -1,11 +1,13 @@
 {% extends "club/base.html" %}
-{% load static hosts compress %}
+{% load compress hosts static %}
 {% block head_title %}
     {{ event.name }} data export | Powered by {{ site.name }}
 {% endblock head_title %}
+
 {% block head_description %}
     {{ event.name }} by {{ event.club.name }} data export page
 {% endblock head_description %}
+
 {% block contentup %}
     <div class="container-fluid p-0">
         <div class="row m-0">
@@ -128,6 +130,7 @@
         </div>
     </div>
 {% endblock contentup %}
+
 {% block extra_body %}
     {{ block.super }}
     {% compress js %}

@@ -48,3 +48,8 @@ repos:
     hooks:
     -   id: djlint-reformat-django
     -   id: djlint-django
+-   repo: https://github.com/adamchainz/djade-pre-commit
+    rev: "1.0.0"
+    hooks:
+    -   id: djade
+        args: [--target-version, "5.1"]

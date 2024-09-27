@@ -1,4 +1,4 @@
-{% load static django_bootstrap5 compress hosts %}
+{% load compress django_bootstrap5 hosts static %}
 <!DOCTYPE html>
 <html lang="en-US" data-bs-theme="{{ theme }}">
     <head>
@@ -14,9 +14,9 @@
         <meta name="application-name" content="{{ site.name }}">
         <meta name="theme-color" content="#ffffff">
         <meta name="description"
-              content="{% block head_description %}{{ site.name }} is an easy to use and powerful live GPS tracking solution designed for orienteering events. View the competitors location in the forest on computer or phone screens.{% endblock head_description %}">
+              content="{% block head_description %}{{ site.name }} is an easy to use and powerful live GPS tracking solution designed for orienteering events. View the competitors location in the forest on computer or phone screens.{% endblock %}">
         <meta name="keywords"
-              content="{% block head_keywords %}gps,tracking,orienteering,live,gps tracking,tracker,orienteer,replay,trackers,gps seuranta,gps spårning,gps sporing,suunnistus,orientering{% endblock head_keywords %}" />
+              content="{% block head_keywords %}gps,tracking,orienteering,live,gps tracking,tracker,orienteer,replay,trackers,gps seuranta,gps spårning,gps sporing,suunnistus,orientering{% endblock %}" />
         <title>
             {% block head_title %}
                 {{ site.name }} | Live GPS tracking for orienteering
@@ -77,11 +77,11 @@
         <script src="https://browser.sentry-cdn.com/7.114.0/bundle.min.js"
                 integrity="sha384-ZI11RF8XfI7ic0+HK1UnGkClkyjeQrHLUX+42WJHeu8+O94vBhb5Wivro/pn5lhG"
                 crossorigin="anonymous"></script>
-        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-site-version={{version}} data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
+        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-site-version={{ version }} data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
         {% if analytics_enabled and request.host.regex != 'dashboard' %}
             <script defer
-                    {% if request.club_slug %}data-club-slug="{{request.club_slug}}"{% endif %}
-                    data-domain="{{site.domain}}"
+                    {% if request.club_slug %}data-club-slug="{{ request.club_slug }}"{% endif %}
+                    data-domain="{{ site.domain }}"
                     data-api="https://www.routechoices.com/api/ping"
                     src="{% static '/scripts/ping.js' %}?v=2023052700"></script>
         {% endif %}

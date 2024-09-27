@@ -20,7 +20,7 @@
       <Format>application/vnd.ogc.wms_xml</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{request.scheme}}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{ request.scheme }}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
         </HTTP>
       </DCPType>
     </GetCapabilities>
@@ -32,7 +32,7 @@
       <Format>image/webp</Format>
       <DCPType>
         <HTTP>
-          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{request.scheme}}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
+          <Get><OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{ request.scheme }}:{% host_url 'wms_service' host 'wms' %}?"/></Get>
         </HTTP>
       </DCPType>
     </GetMap>

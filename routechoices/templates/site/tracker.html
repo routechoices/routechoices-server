@@ -1,13 +1,15 @@
 {% extends "base.html" %}
-{% load static compress %}
+{% load compress static %}
 {% block extra_head %}
     {{ block.super }}
     <link rel="stylesheet"
           href="{% static 'styles/site/tracker.css' %}?_=2022022600" />
 {% endblock extra_head %}
+
 {% block head_title %}
     Trackers | {{ site.name }} | Live GPS tracking for orienteering
 {% endblock head_title %}
+
 {% block contentup %}
     <div class="container-fluid p-0">
         <div class="row m-0">
@@ -252,6 +254,7 @@
         </div>
     </div>
 {% endblock contentup %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-csrf-token="{{ csrf_token }}"></script>
