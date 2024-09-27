@@ -116,5 +116,15 @@ urlpatterns = [
         views.two_d_rerun_race_data,
         name="2d_rerun_race_data",
     ),
+    re_path(
+        r"^gpsseuranta/(?P<uid>[^/]+)$",
+        views.gpsseuranta_event,
+        name="gpsseuranta_event_detail",
+    ),
+    re_path(
+        r"^gpsseuranta/(?P<uid>[^/]+)/data$",
+        views.gpsseuranta_event_data,
+        name="gpsseuranta_event_data",
+    ),
     re_path(r"^check-latlon/?$", views.ip_latlon, name="ip_latlon"),
 ]

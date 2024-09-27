@@ -1773,6 +1773,20 @@ class Event(models.Model):
     def get_absolute_export_url(self):
         return f"{self.club.nice_url}{self.slug}/export"
 
+    def get_api_detail_url(self):
+        if self.club.slug == "gpsseuranta":
+            return reverse(
+                "gpsseuranta_event_detail", host="api", kwargs={"uid": self.slug}
+            )
+        return reverse("event_detail", host="api", kwargs={"event_id": self.aid})
+
+    def get_api_data_url(self):
+        if self.club.slug == "gpsseuranta":
+            return reverse(
+                "gpsseuranta_event_data", host="api", kwargs={"uid": self.slug}
+            )
+        return reverse("event_data", host="api", kwargs={"event_id": self.aid})
+
     @property
     def duration(self):
         return self.end_date - self.start_date

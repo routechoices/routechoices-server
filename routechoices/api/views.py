@@ -1,11 +1,14 @@
+import bisect
 import logging
 import re
 import time
 import urllib.parse
 from io import BytesIO
+from operator import itemgetter
 from zipfile import ZipFile
 
 import arrow
+import gps_data_codec
 import orjson as json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -61,6 +64,7 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
+from routechoices.lib.third_party_downloader import GpsSeurantaNet
 from routechoices.lib.validators import (
     validate_imei,
     validate_latitude,
@@ -1885,3 +1889,178 @@ def two_d_rerun_race_data(request):
         content_type=content_type,
         headers=headers,
     )
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_GET_view
+def gpsseuranta_event(request, uid):
+    event = Event()
+    event.slug = uid
+    club = Club(slug="gpsseuranta")
+    event.club = club
+    cache_key = f"gpsseuranta_detail:{uid}"
+    if cache.has_key(cache_key):
+        try:
+            data = cache.get(cache_key)
+        except Exception:
+            pass
+        else:
+            return Response(data, headers={"X-Cache-Hit": 1})
+    proxy = GpsSeurantaNet()
+    try:
+        proxy.parse_init_data(uid)
+    except Exception:
+        raise Http404()
+
+    min_start_time = None
+    for c_raw in proxy.init_data.get("COMPETITOR", []):
+        c_data = c_raw.strip().split("|")
+        start_time = None
+        start_time_raw = (
+            f"{c_data[1]}"
+            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        )
+        try:
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+            else:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+        except Exception:
+            continue
+        if min_start_time:
+            min_start_time = min(min_start_time, start_time)
+        else:
+            min_start_time = start_time
+    event.start_date = min_start_time.shift(
+        minutes=-int(proxy.init_data.get("TIMEZONE", 0))
+    ).datetime
+    is_live = proxy.init_data["LIVE"] == "1"
+    if is_live:
+        event.end_date = arrow.utcnow().shift(hours=1).datetime
+    else:
+        event.end_date = arrow.utcnow().datetime
+    event.send_interval = int(proxy.init_data.get("GRABINTERVAL", 10))
+    event.name = proxy.init_data.get("RACENAME")
+    output = {
+        "event": {
+            "id": event.aid,
+            "name": event.name,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "slug": event.slug,
+            "club": "GPS Seuranta",
+            "club_slug": "gpsseuranta",
+            "privacy": "secret",
+            "open_registration": False,
+            "open_route_upload": False,
+            "url": f"https://gpsseuranta.routechoice.com/{uid}",
+            "shortcut": "",
+            "backdrop": "blank",
+            "send_interval": event.send_interval,
+            "tail_length": event.tail_length,
+        },
+        "data_url": request.build_absolute_uri(event.get_api_data_url()),
+        "announcement": "",
+        "maps": [],
+    }
+
+    try:
+        cache.set(f"{cache_key}", output, 60)
+    except Exception:
+        pass
+
+    return Response(output)
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_GET_view
+def gpsseuranta_event_data(request, uid):
+    event = Event()
+    event.slug = uid
+    club = Club(slug="gpsseuranta")
+    event.club = club
+
+    cache_key = f"gpsseuranta_data:{uid}"
+    if cache.has_key(cache_key):
+        try:
+            data = cache.get(cache_key)
+        except Exception:
+            pass
+        else:
+            return Response(data, headers={"X-Cache-Hit": 1})
+
+    proxy = GpsSeurantaNet()
+    try:
+        proxy.parse_init_data(uid)
+    except Exception:
+        raise Http404()
+    min_start_time = None
+    for c_raw in proxy.init_data.get("COMPETITOR", []):
+        c_data = c_raw.strip().split("|")
+        start_time = None
+        start_time_raw = (
+            f"{c_data[1]}"
+            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        )
+        try:
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+            else:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+        except Exception:
+            continue
+        if min_start_time:
+            min_start_time = min(min_start_time, start_time)
+        else:
+            min_start_time = start_time
+    from_ts = int(
+        min_start_time.shift(
+            minutes=-int(proxy.init_data.get("TIMEZONE", 0))
+        ).timestamp()
+    )
+
+    dev_data = proxy.get_competitor_devices_data(uid)
+    output = {"competitors": []}
+
+    for c_raw in proxy.init_data.get("COMPETITOR", []):
+        c_data = c_raw.strip().split("|")
+        start_time = None
+        start_time_raw = (
+            f"{c_data[1]}"
+            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        )
+        try:
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+            else:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+        except Exception:
+            pass
+        else:
+            start_time = start_time.shift(
+                minutes=-int(proxy.init_data.get("TIMEZONE", 0))
+            ).datetime
+        locs = dev_data.get(c_data[0], [])
+        locs = sorted(locs, key=itemgetter(0))
+        from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
+        locs = locs[from_idx:]
+        output["competitors"].append(
+            {
+                "id": c_data[0],
+                "encoded_data": gps_data_codec.encode(locs),
+                "name": c_data[3],
+                "short_name": c_data[4],
+                "start_time": start_time,
+            }
+        )
+    try:
+        cache.set(f"{cache_key}", output, 10)
+    except Exception:
+        pass
+    return Response(output)

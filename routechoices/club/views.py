@@ -236,15 +236,22 @@ def event_view(request, slug, **kwargs):
     club_slug = request.club_slug
     if not club_slug:
         club_slug = request.club_slug
-    event = (
-        Event.objects.all()
-        .select_related("club")
-        .filter(
-            club__slug__iexact=club_slug,
-            slug__iexact=slug,
+
+    if club_slug == "gpsseuranta":
+        event = Event()
+        event.slug = slug
+        club = Club.objects.get(slug="gpsseuranta")
+        event.club = club
+    else:
+        event = (
+            Event.objects.all()
+            .select_related("club")
+            .filter(
+                club__slug__iexact=club_slug,
+                slug__iexact=slug,
+            )
+            .first()
         )
-        .first()
-    )
     if not event:
         event_set = (
             EventSet.objects.all()
