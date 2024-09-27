@@ -80,7 +80,7 @@
                            {% if is_event_page %}target="_blank"{% endif %}
                            rel="noopener noreferrer"><i class="fa-solid fa-compass"></i> <span id="club-events-link-text">Events by {{ club.name }}</span></a>
                     </li>
-                    {% if is_event_page %}
+                    {% if is_event_page and event.id %}
                         <li class="nav-item" id="export-nav-item">
                             <a class="nav-link text-nowrap"
                                href="{{ club.get_absolute_url }}{{ event.slug }}/export"
