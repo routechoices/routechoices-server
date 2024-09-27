@@ -752,6 +752,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 if "_" in dev_id:
                     dev_id, _ = dev_id.split("_", 1)
                 new_locations = self.decode_data_line(line_data[1:])
+                print()
                 if not device_map.get(dev_id):
                     dev_obj, created = Device.objects.get_or_create(
                         aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
@@ -808,9 +809,9 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         loc = [
             int(o_pt[0]) + 1136073600, # ts
             int(o_pt[2]) / 1e5,  # lat
-            int(o_pt[1]) * 5e4,  # lon
+            int(o_pt[1]) / 5e4,  # lon
         ]
-        locs = [loc]
+        locs = [tuple(loc)]
 
         def get_char_index(c):
             ascii_index = ord(c)
@@ -841,7 +842,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             loc[0] += dt
             loc[1] += dlat / 1e5
             loc[2] += dlon / 5e4
-            locs.append(loc)
+            locs.append(tuple(loc))
         return locs
 
 
