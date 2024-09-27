@@ -1977,7 +1977,7 @@ def gpsseuranta_event(request, uid):
             "privacy": "secret",
             "open_registration": False,
             "open_route_upload": False,
-            "url": f"https://gpsseuranta.routechoice.com/{uid}",
+            "url": request.build_absolute_uri(event.get_absolute_url()),
             "shortcut": "",
             "backdrop": "blank",
             "send_interval": event.send_interval,
