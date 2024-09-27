@@ -7,6 +7,7 @@ import secrets
 import struct
 import time
 import urllib
+import urllib.request
 import zoneinfo
 from datetime import datetime
 from math import cos, pi, sin
@@ -15,6 +16,7 @@ from curl_cffi import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
+from PIL import ImageFile
 from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -22,6 +24,24 @@ from routechoices.lib.random_strings import generate_random_string
 from routechoices.lib.validators import validate_nice_slug
 
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
+
+
+def get_remote_image_sizes(uri):
+    # get file size *and* image size (None if not known)
+    with urllib.request.urlopen(uri) as file:
+        size = file.headers.get("content-length")
+        if size:
+            size = int(size)
+        p = ImageFile.Parser()
+        while 1:
+            data = file.read(1024)
+            if not data:
+                break
+            p.feed(data)
+            if p.image:
+                return size, p.image.size
+                break
+        return size, None
 
 
 class MySite:

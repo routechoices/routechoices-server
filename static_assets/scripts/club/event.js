@@ -1523,22 +1523,28 @@ function RCEvent(infoURL, clockURL) {
   };
 
   function addRasterMapLayer(mapData, indexEventMap) {
-    var bounds = ["topLeft", "topRight", "bottomRight", "bottomLeft"].map(
+    const bounds = ["topLeft", "topRight", "bottomRight", "bottomLeft"].map(
       function (corner) {
         var cornerCoords = mapData.coordinates[corner];
         return [cornerCoords.lat, cornerCoords.lon];
       }
     );
-    var layer = L.tileLayer.wms(
-      `${window.local.wmsServiceUrl}?v=${mapData.hash}`,
-      {
-        layers: `${window.local.eventId}/${indexEventMap + 1}`,
-        bounds: bounds,
-        tileSize: 512,
-        noWrap: true,
-        maxNativeZoom: mapData.max_zoom,
-      }
-    );
+    let layer;
+    if (mapData.wms) {
+      layer = L.tileLayer.wms(
+        `${window.local.wmsServiceUrl}?v=${mapData.hash}`,
+        {
+          layers: `${window.local.eventId}/${indexEventMap + 1}`,
+          bounds: bounds,
+          tileSize: 512,
+          noWrap: true,
+          maxNativeZoom: mapData.max_zoom,
+        }
+      );
+    } else {
+      layer = L.imageTransform(mapData.url, bounds);
+      layer.options.bounds = bounds;
+    }
     layer.data = mapData;
     return layer;
   }
