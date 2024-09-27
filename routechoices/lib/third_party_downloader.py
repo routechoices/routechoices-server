@@ -738,7 +738,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         else:
             return [map_obj]
 
-    def get_or_create_event_competitors(self, event, uid):
+    def get_competitor_devices_data(self, uid):
         device_map = {}
         data_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/data.lst"
         r = requests.get(data_url)
@@ -761,7 +761,10 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                         dev_obj.locations_series = []
                     device_map[dev_id] = dev_obj
                 device_map[dev_id].add_locations(new_locations, save=False)
+        return device_map
 
+    def get_or_create_event_competitors(self, event, uid):
+        device_map = self.get_competitor_devices_data(uid)
         competitors = []
         for c_raw in self.init_data.get("COMPETITOR"):
             c_data = c_raw.strip().split("|")
