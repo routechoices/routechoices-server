@@ -739,7 +739,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             return [map_obj]
 
     def get_competitor_devices_data(self, uid):
-        device_map = {}
+        devices_data = {}
         data_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/data.lst"
         r = requests.get(data_url)
         if r.status_code == 200:
@@ -752,19 +752,25 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 if "_" in dev_id:
                     dev_id, _ = dev_id.split("_", 1)
                 new_locations = self.decode_data_line(line_data[1:])
-                if not device_map.get(dev_id):
-                    dev_obj, created = Device.objects.get_or_create(
-                        aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
-                        defaults={"is_gpx": True},
-                    )
-                    if not created:
-                        dev_obj.locations_series = []
-                    device_map[dev_id] = dev_obj
-                device_map[dev_id].add_locations(new_locations, save=False)
-        return device_map
+                if not devices_data.get(dev_id):
+                    devices_data[dev_id] = new_locations
+                else:
+                    devices_data[dev_id] += new_locations
+        return devices_data
 
     def get_or_create_event_competitors(self, event, uid):
-        device_map = self.get_competitor_devices_data(uid)
+        devices_data = self.get_competitor_devices_data(uid)
+        device_map = {}
+        for dev_id, locations in devices_data.items():
+            dev_obj, created = Device.objects.get_or_create(
+                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
+                defaults={"is_gpx": True},
+            )
+            if not created:
+                dev_obj.locations_series = []
+            dev_obj.add_locations(locations, save=False)
+            device_map[dev_id] = dev_obj
+
         competitors = []
         for c_raw in self.init_data.get("COMPETITOR"):
             c_data = c_raw.strip().split("|")
