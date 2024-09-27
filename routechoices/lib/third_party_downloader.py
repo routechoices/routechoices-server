@@ -805,13 +805,21 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         o_pt = data[0].split("_")
         if o_pt[0] == "*" or o_pt[1] == "*" or o_pt[2] == "*":
             return []
-        t = int(o_pt[0]) + 1136073600
-        prev_loc = {
-            "lat": int(o_pt[2]) * 1.0 / 1e5,
-            "lon": int(o_pt[1]) * 2.0 / 1e5,
-            "ts": t,
-        }
-        loc_array = [(t, prev_loc["lat"], prev_loc["lon"])]
+        loc = [
+            int(o_pt[0]) + 1136073600, # ts
+            int(o_pt[2]) / 1e5,  # lat
+            int(o_pt[1]) * 5e4,  # lon
+        ]
+        locs = [loc]
+
+        def get_char_index(c):
+            ascii_index = ord(c)
+            if ascii_index < 65:
+                return ascii_index - 79
+            if ascii_index < 97:
+                return ascii_index - 86
+            return ascii_index - 92
+
         for p in data[1:]:
             if len(p) < 3:
                 continue
@@ -827,21 +835,14 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 dlon = int(pt[1])
                 dlat = int(pt[2])
             else:
-                chars = (
-                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz"
-                )
-                dt = chars.index(p[0]) - 31
-                dlon = chars.index(p[1]) - 31
-                dlat = chars.index(p[2]) - 31
-            t = prev_loc["ts"] + dt
-            prev_loc = {
-                "lat": ((prev_loc["lat"] * 1e5) + dlat) / 1e5,
-                "lon": ((prev_loc["lon"] * 5e4) + dlon) / 5e4,
-                "ts": t,
-            }
-            loc_array.append((t, prev_loc["lat"], prev_loc["lon"]))
-        return loc_array
+                dt = get_char_index(p[0])
+                dlon = get_char_index(p[1])
+                dlat = get_char_index(p[2])
+            loc[0] += dt
+            loc[1] += dlat / 1e5
+            loc[2] += dlon / 5e4
+            locs.append(loc)
+        return locs
 
 
 class Loggator(ThirdPartyTrackingSolution):
