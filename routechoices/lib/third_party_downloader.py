@@ -752,7 +752,6 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 if "_" in dev_id:
                     dev_id, _ = dev_id.split("_", 1)
                 new_locations = self.decode_data_line(line_data[1:])
-                print()
                 if not device_map.get(dev_id):
                     dev_obj, created = Device.objects.get_or_create(
                         aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
