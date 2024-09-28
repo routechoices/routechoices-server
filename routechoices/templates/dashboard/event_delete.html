@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static compress %}
+{% load compress static %}
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
@@ -10,13 +10,21 @@
             <p>There is no way to recover your data if you confirm this step.</p>
             <form action="" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger mb-1" id="submit-btn">
-                    <i class="fa-solid fa-trash-can"></i> I understand the risk and I want to delete all this event data!
+                <div class="mb-3">
+                    <label for="type-confirmation" class="form-label">Type "DELETE" to confirm</label>
+                    <input name="type-confirmation"
+                           type="text"
+                           class="form-control"
+                           autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-danger mb-1" id="submit-btn" disabled>
+                    <i class="fa-solid fa-trash-can"></i> Delete!
                 </button>
             </form>
         </div>
     </div>
 {% endblock sub_content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

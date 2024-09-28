@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load static compress %}
+{% load compress static %}
 {% block sub_sub_content %}
     <h3>WebAuthn Keys</h3>
     {% if object_list %}
@@ -46,6 +46,7 @@
         <a class="btn btn-primary" href="{% url 'kagi:add-webauthn-key' %}">Add a key</a>
     </div>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     {{ block.super }}
     {% compress js %}

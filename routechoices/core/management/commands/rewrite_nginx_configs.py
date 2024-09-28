@@ -4,7 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from routechoices.core.management.commands.create_certificate import write_nginx_conf
+from routechoices.core.management.commands.ssl import write_nginx_conf
 from routechoices.core.models import Club
 
 

@@ -1,8 +1,13 @@
 import gzip
+import re
 import shutil
 
 from django.conf import settings
 from django_s3_storage.storage import S3File, S3Storage, _wrap_errors
+
+STORED_MEDIA_RE = re.compile(
+    r"^(maps|logos|banners)/[-A-Z0-9_]/[-A-Z0-9_]/([-0-9a-zA-Z_]{11})_[-a-zA-Z0-9_]+$"
+)
 
 
 class OverwriteImageStorage(S3Storage):
@@ -44,4 +49,9 @@ class OverwriteImageStorage(S3Storage):
         return S3File(content, name, self)
 
     def url(self, name):
-        return f"//www.{settings.PARENT_HOST}/dashboard/media/{name}"
+        simple_name = re.sub(
+            STORED_MEDIA_RE,
+            r"\1/\2",
+            name,
+        )
+        return f"//www.{settings.PARENT_HOST}/dashboard/media/{simple_name}"

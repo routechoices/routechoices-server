@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load static django_bootstrap5 compress hosts %}
+{% load compress django_bootstrap5 hosts static %}
 {% block head_title %}
     Pricing | {{ site.name }} | Live GPS tracking for orienteering
 {% endblock head_title %}
+
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -10,6 +11,7 @@
               href="{% static 'styles/site/pricing.css' %}?_=2021100200" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block contentup %}
     <div class="container-fluid p-0">
         <div class="row m-0">

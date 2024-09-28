@@ -39,7 +39,6 @@ from django.template.loader import render_to_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django_hosts.resolvers import reverse
-from jxlpy import JXLImagePlugin  # noqa: F401
 from PIL import Image, ImageDraw
 from pillow_heif import register_avif_opener
 
@@ -60,12 +59,13 @@ from routechoices.lib.helpers import (
     safe64encodedsha,
     short_random_slug,
     shortsafe64encodedsha,
-    time_base64,
+    time_base32,
 )
+from routechoices.lib.jxl import register_jxl_opener
 from routechoices.lib.storages import OverwriteImageStorage
 from routechoices.lib.validators import (
-    domain_validator,
     validate_corners_coordinates,
+    validate_domain_name,
     validate_domain_slug,
     validate_emails,
     validate_esn,
@@ -76,6 +76,7 @@ from routechoices.lib.validators import (
 )
 
 register_avif_opener()
+register_jxl_opener()
 
 logger = logging.getLogger(__name__)
 
@@ -107,20 +108,20 @@ class Point:
 
 def logo_upload_path(instance=None, file_name=None):
     tmp_path = ["logos"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
 
 def banner_upload_path(instance=None, file_name=None):
     tmp_path = ["banners"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
@@ -177,7 +178,7 @@ Follow our events live or replay them later.
         blank=True,
         default="",
         validators=[
-            domain_validator,
+            validate_domain_name,
         ],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
@@ -312,7 +313,10 @@ Follow our events live or replay them later.
         logo_s = logo.resize((width, width), Image.BILINEAR)
         buffer = BytesIO()
         logo_s.save(
-            buffer, ext, optimize=True, quality=(40 if ext in ("AVIF", "JXL") else 80)
+            buffer,
+            ext,
+            optimize=True,
+            quality=(40 if ext in ("AVIF", "JXL") else 80),
         )
         return buffer.getvalue()
 
@@ -357,11 +361,12 @@ Follow our events live or replay them later.
             logo_f = logo.resize((250, 250), Image.LANCZOS)
             img.paste(logo_f, (int((1200 - 250) / 2), int((630 - 250) / 2)), logo_f)
         buffer = BytesIO()
+
         img.save(
             buffer,
             mime[6:].upper(),
             optimize=True,
-            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+            quality=(40 if mime in ("image/webp", "image/avif", "image/jxl") else 80),
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
@@ -395,10 +400,10 @@ User.add_to_class("can_create_club", property(can_user_create_club))
 
 def map_upload_path(instance=None, file_name=None):
     tmp_path = ["maps"]
-    time_hash = time_base64()
+    time_hash = time_base32()
     basename = instance.aid + "_" + time_hash
-    tmp_path.append(basename[0])
-    tmp_path.append(basename[1])
+    tmp_path.append(basename[0].upper())
+    tmp_path.append(basename[1].upper())
     tmp_path.append(basename)
     return os.path.join(*tmp_path)
 
@@ -750,7 +755,12 @@ class Map(models.Model):
                     size=(output_height, output_width),
                     color=(255, 255, 255, 0),
                 )
-                pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=10)
+                pil_image.save(
+                    buffer,
+                    img_mime[6:].upper(),
+                    optimize=True,
+                    quality=10,
+                )
                 data_out = buffer.getvalue()
             else:
                 n_channels = 3 if img_mime == "image/jpeg" else 4
@@ -857,11 +867,11 @@ class Map(models.Model):
             color_converted = cv2.cvtColor(tile_img, cv2.COLOR_BGRA2RGBA)
             pil_image = Image.fromarray(color_converted)
             buffer = BytesIO()
-            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=80)
+            pil_image.save(buffer, img_mime[6:].upper(), optimize=True, quality=40)
             data_out = buffer.getvalue()
         else:
             if img_mime == "image/webp":
-                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 80]
+                extra_args = [int(cv2.IMWRITE_WEBP_QUALITY), 40]
             elif img_mime == "image/jpeg":
                 extra_args = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
             _, buffer = cv2.imencode(f".{img_mime[6:]}", tile_img, extra_args)
@@ -1554,7 +1564,7 @@ class Event(models.Model):
         if (
             not event
             or (map_index == 0 and not event.map_id)
-            or (map_index > 0 and map_index > event.map_assignations.all().count())
+            or (map_index > 0 and map_index > event.map_assignations.count())
         ):
             raise Http404
 
@@ -1763,6 +1773,20 @@ class Event(models.Model):
     def get_absolute_export_url(self):
         return f"{self.club.nice_url}{self.slug}/export"
 
+    def get_api_detail_url(self):
+        if self.club.slug == "gpsseuranta":
+            return reverse(
+                "gpsseuranta_event_detail", host="api", kwargs={"uid": self.slug}
+            )
+        return reverse("event_detail", host="api", kwargs={"event_id": self.aid})
+
+    def get_api_data_url(self):
+        if self.club.slug == "gpsseuranta":
+            return reverse(
+                "gpsseuranta_event_data", host="api", kwargs={"uid": self.slug}
+            )
+        return reverse("event_data", host="api", kwargs={"event_id": self.aid})
+
     @property
     def duration(self):
         return self.end_date - self.start_date
@@ -1908,7 +1932,7 @@ class Event(models.Model):
             buffer,
             mime[6:].upper(),
             optimize=True,
-            quality=(40 if mime in ("image/avif", "image/jxl") else 80),
+            quality=(40 if mime in ("image/webp", "image/avif", "image/jxl") else 80),
         )
         data_out = buffer.getvalue()
         cache.set(cache_key, data_out, 31 * 24 * 3600)
@@ -2272,7 +2296,7 @@ class Device(models.Model):
         return {c.event for c in qs}
 
     def get_last_competitor(self, load_event=False):
-        qs = self.competitor_set.all().order_by("-start_time")
+        qs = self.competitor_set.order_by("-start_time")
         if load_event:
             qs = qs.select_related("event")
         return qs.first()
@@ -2311,7 +2335,7 @@ class Device(models.Model):
                 to_emails = event.emergency_contacts.split(" ")
             else:
                 club = event.club
-                admin_ids = list(club.admins.all().values_list("id", flat=True))
+                admin_ids = list(club.admins.values_list("id", flat=True))
                 to_emails = list(
                     EmailAddress.objects.filter(
                         primary=True, user__in=admin_ids
@@ -2584,3 +2608,13 @@ class TcpDeviceCommand(models.Model):
 
     def __str__(self):
         return f"Command for imei {self.target}"
+
+
+class FrontPageFeedback(models.Model):
+    content = models.TextField()
+    stars = models.PositiveIntegerField(validators=[MaxValueValidator(5)])
+    name = models.CharField(max_length=50)
+    club_name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Feedback from {self.name} ({self.club_name})"

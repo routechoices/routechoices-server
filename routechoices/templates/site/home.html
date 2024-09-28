@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% load static hosts compress %}
+{% load compress hosts static times %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
         <link rel="stylesheet" href="{% static 'styles/site/home.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block contentup %}
     <div class="container content">
         <video class="bg_video" playsinline autoplay muted loop>
@@ -31,10 +32,9 @@
                             srcset="{% static 'img/iphone.avif' %}?v=2027070400" />
                     <source type="image/webp"
                             srcset="{% static 'img/iphone.webp' %}?v=2024070400" />
-                    <img type="image/png"
-                         src="{% static 'img/iphone.png' %}?v=2024070400"
-                         width="600px"
-                         height="600px"
+                    <img src="{% static 'img/iphone.png' %}?v2024070400"
+                         width="600"
+                         height="600"
                          class="image-hero"
                          alt="Website browsed on phone" />
                 </picture>
@@ -58,25 +58,50 @@
     <div class="container-fluid frontpage_text px-2 py-5 sponsors-block">
         <div class="container">
             <div class="text-center">
-                <div class="mb-5">
+                <div class="mb-3" id="club-featured">
                     <h2 class="mb-0" id="partners">
-                        <b>They trust us</b>
+                        <b>They Trust Us</b>
                     </h2>
-                    <small class="text-muted">We host their events' live GPS tracking pages since 2019</small>
+                    <small class="text-muted">We host their live GPS tracking pages since 2019</small>
                 </div>
-                <div class="row justify-content-between" style="font-size: small;">
+                <div class="row justify-content-evenly" style="font-size: small;">
                     {% for club in club_featured %}
                         <div class="col align-self-start text-center mb-4">
                             <a href="{{ club.nice_url }}"
                                target="_blank"
                                class="d-inline-block text-decoration-none dark-link">
                                 <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static '/img/club-default.png' %}{% endif %}"
-                                     width="150px"
-                                     height="150px"
+                                     width="150"
+                                     height="150"
                                      class="rounded mx-auto d-block"
                                      alt="{{ club.name }}'s logo" />
                                 <span class="fw-bold">{{ club.name }}</span>
                             </a>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="mb-5">
+                    <small class="text-muted">And many more...</small>
+                </div>
+                <div class="mb-3" id="user-feedbacks">
+                    <h2 class="mb-0" id="partners">
+                        <b>User Feedbacks</b>
+                    </h2>
+                    <small class="text-muted">What our users say</small>
+                </div>
+                <div class="row g-2  justify-content-evenly align-items-center">
+                    {% for fb in user_feedbacks %}
+                        <div class="col-lg-3 col-12 col-sm-6">
+                            <div class="card shadow border-0 p-3 text-center px-4">
+                                <div>
+                                    <div class="mb-3" style="font-size: 0.7em">{{ fb.content }}</div>
+                                    <div>
+                                        {% for star in fb.stars|times %}<i class="fa-solid fa-star" style="color: #FFD700"></i>{% endfor %}
+                                    </div>
+                                    <div class="mb-0 fw-bold">{{ fb.name }}</div>
+                                    <div class="text-muted" style="font-size: 0.7em;line-height:0.9em">{{ fb.club_name }}</div>
+                                </div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -96,33 +121,36 @@
                 </svg>
                 <div class="container">
                     <div class="row text-center">
-                        <h1 class="video_text_overlay frontpage_text_bold">For Clubs</h1>
-                        {% if user.is_authenticated %}
+                        <h1 class="video_text_overlay frontpage_text_bold">Revolutionize Your Orienteering Events</h1>
+                    </div>
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-8">
                             <h3 class="frontpage_text mb-3">
-                                A simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                                Set up your club effortlessly with our intuitive user interface and start live GPS tracking for your training sessions or competitions instantly. Our solution enables coaches, friends, and spectators to follow participants, whether they use dedicated GPS trackers or smartphones with our free app, in real-time from any device with a web browser.
                             </h3>
-                        {% else %}
                             <h3 class="frontpage_text mb-3">
-                                Once you join, a simple user interface let you setup a club and immediately prepare live GPS tracking web pages of your orienteering trainings or competitions.
+                                <b>Routechoices.com</b> live GPS tracking offers a multitude of benefits, including rapid analysis for the coaching staff, enhanced entertainement for the public, and increased safety for the runners.
                             </h3>
-                        {% endif %}
-                        <h3 class="frontpage_text mb-3">
-                            You can then provide a way to follow, live, from any device with a web browser, the participants carrying either a dedicated GPS trackers or a smartphone running our app. Purpose being entertainment, fast analysis, or safety.
-                        </h3>
-                        <h3 class="frontpage_text mb-4">
-                            After the event you can replay what happened as many time as you want for deeper analysis.
-                        </h3>
-                        {% if user.is_authenticated %}
                             <h3 class="frontpage_text mb-3">
-                                <a class="px-4 py-2 text-decoration-none engage-link"
-                                   href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
+                                After the event, replay the action as many times as you want and take advantage of advanced features like simulating virtual mass starts from any point on your map.
                             </h3>
-                        {% else %}
-                            <h3 class="frontpage_text mb-3">
-                                <a class="px-4 py-2 text-decoration-none engage-link"
-                                   href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
+                            <h3 class="frontpage_text mb-4">
+                                Additionally, our integrated, privacy-friendly analytics tool provides valuable insights into who visits your pages.
                             </h3>
-                        {% endif %}
+                        </div>
+                        <div class="row text-center">
+                            {% if user.is_authenticated %}
+                                <h3 class="frontpage_text mb-3">
+                                    <a class="px-4 py-2 text-decoration-none engage-link"
+                                       href="{% url 'dashboard:home_view' %}"><i class="fa-solid fa-compass"></i> Visit dashboard</a>
+                                </h3>
+                            {% else %}
+                                <h3 class="frontpage_text mb-3">
+                                    <a class="px-4 py-2 text-decoration-none engage-link"
+                                       href="{% host_url 'site:account_signup' host 'www' %}"><i class="fa-solid fa-compass"></i> Join now</a>
+                                </h3>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,44 +176,64 @@
                     </h2>
                     <div class="row">
                         <div class="col-12 col-md-6 align-self-center p-4 text-center">
-                            <img alt="edit a club"
-                                 width="573"
-                                 height="345"
-                                 style="width: 100%;
-                                        height: auto"
-                                 src="{% static 'img/example_edit_club.jpg' %}">
+                            <picture>
+                                <source type="image/webp"
+                                        srcset="{% static 'img/example_edit_club.webp' %}?v=2027070400" />
+                                <img alt="edit a club"
+                                     width="573"
+                                     height="345"
+                                     style="width: 100%;
+                                            height: auto"
+                                     src="{% static 'img/example_edit_club.jpg' %}">
+                            </picture>
                         </div>
                         <div class="col-12 col-md-6 align-self-center p-4 text-center">
-                            <img alt="event list"
-                                 width="573"
-                                 height="411"
-                                 style="width: 100%;
-                                        height: auto"
-                                 src="{% static 'img/example_list_event.jpg' %}">
+                            <picture>
+                                <source type="image/webp"
+                                        srcset="{% static 'img/example_list_event.webp' %}?v=2027070400" />
+                                <img alt="event list"
+                                     width="573"
+                                     height="411"
+                                     style="width: 100%;
+                                            height: auto"
+                                     src="{% static 'img/example_list_event.jpg' %}">
+                            </picture>
                         </div>
                         <div class="col-12 col-md-6 align-self-center p-4 text-center">
-                            <img alt="edit event"
-                                 width="661"
-                                 height="411"
-                                 style="width: 100%;
-                                        height: auto"
-                                 src="{% static 'img/example_edit_event.jpg' %}">
+                            <picture>
+                                <source type="image/webp"
+                                        srcset="{% static 'img/example_edit_event.webp' %}?v=2027070400" />
+                                <img alt="edit event"
+                                     width="661"
+                                     height="411"
+                                     style="width: 100%;
+                                            height: auto"
+                                     src="{% static 'img/example_edit_event.jpg' %}">
+                            </picture>
                         </div>
                         <div class="col-12 col-md-6 align-self-center p-4 text-center">
-                            <img alt="map calibration"
-                                 width="661"
-                                 height="425"
-                                 style="width: 100%;
-                                        height: auto"
-                                 src="{% static 'img/example_calib_map.jpg' %}">
+                            <picture>
+                                <source type="image/webp"
+                                        srcset="{% static 'img/example_calib_map.webp' %}?v=2027070400" />
+                                <img alt="map calibration"
+                                     width="661"
+                                     height="425"
+                                     style="width: 100%;
+                                            height: auto"
+                                     src="{% static 'img/example_calib_map.jpg' %}">
+                            </picture>
                         </div>
                         <div class="col-12 offset-md-3 col-md-6 align-self-center p-4 text-center">
-                            <img alt="event page"
-                                 width="654"
-                                 height="423"
-                                 style="width: 100%;
-                                        height: auto"
-                                 src="{% static 'img/example_event_page.jpg' %}">
+                            <picture>
+                                <source type="image/webp"
+                                        srcset="{% static 'img/example_event_page.webp' %}?v=2027070400" />
+                                <img alt="event page"
+                                     width="654"
+                                     height="423"
+                                     style="width: 100%;
+                                            height: auto"
+                                     src="{% static 'img/example_event_page.jpg' %}?v=20240902">
+                            </picture>
                         </div>
                     </div>
                 </div>
@@ -193,6 +241,7 @@
         </div>
     </div>
 {% endblock contentup %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/fittext-1.0/fittext.js' %}"></script>

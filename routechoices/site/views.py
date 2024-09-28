@@ -15,9 +15,8 @@ from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django_hosts.resolvers import reverse
-from rest_framework.exceptions import MethodNotAllowed
 
-from routechoices.core.models import Club, Event
+from routechoices.core.models import Club, Event, FrontPageFeedback
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 from routechoices.site.forms import ContactForm
 
@@ -27,11 +26,12 @@ def home_page(request):
 
 
 def landing_page(request):
-    club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")
+    club_featured = Club.objects.filter(frontpage_featured=True).order_by("?")[:6]
+    feedbacks = FrontPageFeedback.objects.order_by("?")[:6]
     return render(
         request,
         "site/home.html",
-        {"club_featured": club_featured},
+        {"club_featured": club_featured, "user_feedbacks": feedbacks},
     )
 
 
@@ -57,11 +57,16 @@ def pricing_page(request):
 @csrf_exempt
 def pay_view(request):
     if request.method != "POST":
-        raise MethodNotAllowed(request.method)
+        if request.user.is_authenticated:
+            return redirect(reverse("dashboard:upgrade"))
+        return redirect(reverse("site:pricing_view"))
     price = request.POST.get("price-per-month", "4.99")
-    price = max(Decimal(4.99), Decimal(price))
+    try:
+        price = max(Decimal("4.99"), Decimal(price))
+    except Exception:
+        price = Decimal("4.99")
     yearly_payment = request.POST.get("per-year", False) == "on"
-    final_price = price * Decimal(100)
+    final_price = price * Decimal("100")
     if yearly_payment:
         final_price *= 12
     variants = settings.LEMONSQUEEZY_PRODUCTS_VARIANTS

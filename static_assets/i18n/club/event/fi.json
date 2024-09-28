@@ -53,5 +53,6 @@
     "lap": "Kierros",
     "from": "Alkaen",
     "to": "Maali",
-    "start-list": "Aloituslista"
+    "start-list": "Aloituslista",
+    "icons-size": "Kuvakkeiden koko"
 }

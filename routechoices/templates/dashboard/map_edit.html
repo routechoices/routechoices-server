@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 compress hosts %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="{% static 'styles/dashboard/map_edit.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_sub_content %}
     <div class="row">
         <div id="main" class="col-12">
@@ -109,7 +110,7 @@
                     </div>
                 </div>
                 <div class="alert alert-info d-none" role="alert" id="three-points-helper">
-                    <span>You have set 3 matching reference points, this may be enough and you may continue to the next step, however we recommend you to set a 4th reference point.</span>
+                    <span>You have set 3 matching reference points, this may be enough and you may continue to the next step, however we recommend to set a 4th reference point particularly if your map image has been captured from a camera.</span>
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-1">
@@ -161,6 +162,7 @@
         </div>
     </div>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-api-root="{% host_url 'api_doc' host 'api' %}"></script>

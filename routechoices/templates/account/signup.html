@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load i18n django_bootstrap5 compress static %}
+{% load compress django_bootstrap5 i18n static %}
 {% block head_title %}
-    {% trans "Sign Up" %}
+    {% translate "Sign Up" %}
 {% endblock head_title %}
+
 {% block content %}
     <div class="container">
         <div class="row">
@@ -10,10 +11,10 @@
                 <div class="card border-0 shadow rounded-3 my-5">
                     <div class="card-body p-4 p-sm-5">
                         <h3 class="card-title text-center mb-5">
-                            <i class="fa-solid fa-user-plus"></i> {% trans "Sign Up" %}
+                            <i class="fa-solid fa-user-plus"></i> {% translate "Sign Up" %}
                         </h3>
                         <p>
-                            {% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">log in</a>.{% endblocktrans %}
+                            {% blocktranslate %}Already have an account? Then please <a href="{{ login_url }}">log in</a>.{% endblocktranslate %}
                         </p>
                         <form class="signup"
                               id="signup_form"
@@ -28,7 +29,7 @@
                             {% endif %}
                             <div class="d-grid">
                                 <button type="submit" class="primaryAction btn btn-primary" id="submit-btn">
-                                    <i class="fa-solid fa-user-plus"></i> {% trans "Sign Up" %}
+                                    <i class="fa-solid fa-user-plus"></i> {% translate "Sign Up" %}
                                 </button>
                             </div>
                         </form>
@@ -38,6 +39,7 @@
         </div>
     </div>
 {% endblock content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

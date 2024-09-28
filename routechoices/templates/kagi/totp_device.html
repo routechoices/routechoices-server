@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load django_bootstrap5 compress static %}
+{% load compress django_bootstrap5 static %}
 {% block sub_sub_content %}
     <h3>Add a TOTP (Authenticator) device</h3>
     <p>Scan this in your authenticator app:</p>
@@ -17,6 +17,7 @@
         <button class="btn btn-primary" value="backup" name="type" type="submit">Submit</button>
     </form>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     {{ block.super }}
     {% compress js %}

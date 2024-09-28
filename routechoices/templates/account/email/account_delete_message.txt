@@ -1,13 +1,13 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans with site_name=current_site.name  %}You're receiving this email because you requested your user account at {{ site_name }} to be deleted.{% endblocktrans %}
+{% blocktranslate with site_name=current_site.name %}You're receiving this email because you requested your user account at {{ site_name }} to be deleted.{% endblocktranslate %}
 
-{% trans "Please go to the following page to confirm your wish:" %}
+{% translate "Please go to the following page to confirm your wish:" %}
 {% block reset_link %}
 {{ account_deletion_url }}
-{% endblock %}
+{% endblock reset_link %}
 
-{% trans "Sad to see you go!" %}
+{% translate "Sad to see you go!" %}
 
-{% blocktrans with site_name=current_site.name %}The {{ site_name }} team{% endblocktrans %}
+{% blocktranslate with site_name=current_site.name %}The {{ site_name }} team{% endblocktranslate %}
 
 {% endautoescape %}

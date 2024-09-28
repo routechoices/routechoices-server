@@ -1,8 +1,9 @@
 {% extends "dashboard/home.html" %}
-{% load static account compress %}
+{% load account compress static %}
 {% block head_title %}
     Confirm Account Deletion
 {% endblock head_title %}
+
 {% block content %}
     <div class="container">
         <div class="row">
@@ -35,6 +36,7 @@
         </div>
     </div>
 {% endblock content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

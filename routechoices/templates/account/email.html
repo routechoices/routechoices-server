@@ -1,14 +1,15 @@
 {% extends "dashboard/account_edit.html" %}
-{% load i18n static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 i18n static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
         <link rel="stylesheet" href="{% static 'styles/account/email.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_sub_content %}
     {% if user_emailaddresses %}
-        <p>{% trans "The following e-mail addresses are associated with this account:" %}</p>
+        <p>{% translate "The following e-mail addresses are associated with this account:" %}</p>
         <table class="table table-striped mb-3">
             <thead>
                 <tr>
@@ -23,12 +24,12 @@
                         <td>{{ emailaddress.email }}</td>
                         <td>
                             {% if emailaddress.verified %}
-                                <span class="verified badge bg-success">{% trans "Verified" %}</span>
+                                <span class="verified badge bg-success">{% translate "Verified" %}</span>
                             {% else %}
-                                <span class="unverified badge bg-danger">{% trans "Unverified" %}</span>
+                                <span class="unverified badge bg-danger">{% translate "Unverified" %}</span>
                             {% endif %}
                             {% if emailaddress.primary %}
-                                <span class="primary badge bg-primary">{% trans "Primary" %}</span>
+                                <span class="primary badge bg-primary">{% translate "Primary" %}</span>
                             {% endif %}
                         </td>
                         <td {% if emailaddress.primary %}class="collapsed-none"{% endif %}>
@@ -41,7 +42,7 @@
                                 {% if not emailaddress.primary and emailaddress.verified %}
                                     <button class="secondaryAction btn btn-sm btn-primary mb-1 me-1"
                                             type="submit"
-                                            name="action_primary">{% trans "Make Primary" %}</button>
+                                            name="action_primary">{% translate "Make Primary" %}</button>
                                 {% endif %}
                                 {% if not emailaddress.verified %}
                                     <button class="secondaryAction btn btn-sm btn-secondary mb-1 me-1"
@@ -52,7 +53,7 @@
                                     <button class="primaryAction btn btn-sm btn-danger mb-1"
                                             type="submit"
                                             name="action_remove">
-                                        <i class="fa-solid fa-trash-can"></i> {% trans "Remove" %}
+                                        <i class="fa-solid fa-trash-can"></i> {% translate "Remove" %}
                                     </button>
                                 {% endif %}
                             </form>
@@ -63,19 +64,20 @@
         </table>
     {% else %}
         <p>
-            <strong>{% trans "Warning:" %}</strong> {% trans "No e-mail address set up. Add an e-mail address to receive notifications, reset password, etc." %}
+            <strong>{% translate "Warning:" %}</strong> {% translate "No e-mail address set up. Add an e-mail address to receive notifications, reset password, etc." %}
         </p>
     {% endif %}
     <br />
-    <h3>{% trans "Add E-mail Address" %}</h3>
+    <h3>{% translate "Add E-mail Address" %}</h3>
     <form method="post"
           action="{% url 'dashboard:account_emails' %}"
           class="add_email">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button name="action_add" class="btn btn-primary mb-1" type="submit">{% trans "Add E-mail" %}</button>
+        <button name="action_add" class="btn btn-primary mb-1" type="submit">{% translate "Add E-mail" %}</button>
     </form>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     {% compress js %}
         <script type="text/javascript" src="{% static '/scripts/account/email.js' %}""></script>

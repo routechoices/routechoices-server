@@ -7,6 +7,7 @@ import secrets
 import struct
 import time
 import urllib
+import urllib.request
 import zoneinfo
 from datetime import datetime
 from math import cos, pi, sin
@@ -15,6 +16,7 @@ from curl_cffi import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import is_aware, make_aware
+from PIL import ImageFile
 from user_sessions.templatetags.user_sessions import device as device_name
 
 from routechoices.lib.globalmaptiles import GlobalMercator
@@ -22,6 +24,24 @@ from routechoices.lib.random_strings import generate_random_string
 from routechoices.lib.validators import validate_nice_slug
 
 UTC_TZ = zoneinfo.ZoneInfo("UTC")
+
+
+def get_remote_image_sizes(uri):
+    # get file size *and* image size (None if not known)
+    with urllib.request.urlopen(uri) as file:
+        size = file.headers.get("content-length")
+        if size:
+            size = int(size)
+        p = ImageFile.Parser()
+        while 1:
+            data = file.read(1024)
+            if not data:
+                break
+            p.feed(data)
+            if p.image:
+                return size, p.image.size
+                break
+        return size, None
 
 
 class MySite:
@@ -51,10 +71,13 @@ def int_to_alpha(i, alphabet=None):
 
 
 def get_best_image_mime(request, default=None):
-    accepted_mimes = request.COOKIES.get(
-        "accept-image", request.META.get("HTTP_ACCEPT", "")
-    ).split(",")
-    for mime in ("image/avif", "image/jxl", "image/webp"):
+    accepted_mimes = request.COOKIES.get("accept-image", "").split(",")
+    accepted_mimes += request.META.get("HTTP_ACCEPT", "").split(",")
+    for mime in (
+        "image/webp",
+        "image/avif",
+        "image/jxl",
+    ):
         if mime in accepted_mimes:
             return mime
     return default
@@ -87,6 +110,12 @@ def safe64encode(b):
     return base64.urlsafe_b64encode(b).decode().rstrip("=")
 
 
+def safe32encode(b):
+    if isinstance(b, str):
+        b = b.encode("utf-8")
+    return base64.b32encode(b).decode().rstrip("=")
+
+
 def safe64encodedsha(txt):
     if isinstance(txt, str):
         txt = txt.encode("utf-8")
@@ -103,16 +132,16 @@ def safe64decode(b):
     return base64.urlsafe_b64decode(b.encode() + b"==")
 
 
-def int_base64(i):
+def int_base32(i):
     b = struct.pack(">Q", i)
     while b.startswith(b"\x00"):
         b = b[1:]
-    return safe64encode(b)
+    return safe32encode(b)
 
 
-def time_base64():
+def time_base32():
     t = int(time.time())
-    return int_base64(t)
+    return int_base32(t)
 
 
 def deg2rad(deg):

@@ -1,11 +1,12 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
         <link rel="stylesheet" href="{% static 'styles/dashboard/club_list.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
@@ -40,7 +41,7 @@
                 {% for club in clubs %}
                     <div class="card flex-row flex-no-wrap club-card mb-3">
                         <div class="border-0">
-                            <img class="card-img-left" style="border-radius: 0.375rem 0 0 0.375rem;" src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80px" width="80px" alt="Club {{ club.name }} Logo">
+                            <img class="card-img-left" style="border-radius: 0.375rem 0 0 0.375rem;" src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" height="80" width="80" alt="Club {{ club.name }} Logo">
                         </div>
                         <div class="card-body px-2 py-1" style="word-break: break-all">
                             <div class="d-flex flex-row bd-highlight justify-content-between">

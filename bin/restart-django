@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-systemctl --user reload routechoices-django
+systemctl --user restart routechoices-django

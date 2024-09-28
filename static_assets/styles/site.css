@@ -432,3 +432,11 @@ body {
 .totp-token.is-invalid {
   width: 9.7em;
 }
+
+.theme-selector > svg {
+  color: var(--bs-navbar-color);
+}
+
+.theme-selector:hover > svg {
+  color: var(--bs-navbar-hover-color);
+}

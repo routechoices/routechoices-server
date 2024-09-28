@@ -1,10 +1,10 @@
 {% extends "dashboard/home.html" %}
-{% load static compress django_bootstrap5 hosts %}
+{% load compress django_bootstrap5 hosts static %}
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
             <h1>
-                <img src="{% static "/img/avatar-default.png" %}" width="80px" height="80px" alt="Avatar {{ user }}" class="rounded">
+                <img src="{% static "/img/avatar-default.png" %}" width="80" height="80" alt="Avatar {{ user }}" class="rounded">
                 {{ user }}
             </h1>
         </div>
@@ -47,6 +47,7 @@
         </form>
     {% endblock sub_sub_content %}
 {% endblock sub_content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

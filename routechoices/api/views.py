@@ -1,11 +1,14 @@
+import bisect
 import logging
 import re
 import time
 import urllib.parse
 from io import BytesIO
+from operator import itemgetter
 from zipfile import ZipFile
 
 import arrow
+import gps_data_codec
 import orjson as json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -61,6 +64,7 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
+from routechoices.lib.third_party_downloader import GpsSeurantaNet
 from routechoices.lib.validators import (
     validate_imei,
     validate_latitude,
@@ -70,6 +74,11 @@ from routechoices.lib.validators import (
 
 logger = logging.getLogger(__name__)
 GLOBAL_MERCATOR = GlobalMercator()
+
+api_GET_view = api_view(["GET"])
+api_GET_HEAD_view = api_view(["GET", "HEAD"])
+api_POST_view = api_view(["POST"])
+api_GET_POST_view = api_view(["GET", "POST"])
 
 
 class PostDataThrottle(AnonRateThrottle):
@@ -130,7 +139,7 @@ mine_param = openapi.Parameter(
     auto_schema=None,
 )
 @login_required
-@api_view(["POST"])
+@api_POST_view
 def event_set_creation(request):
     club_slug = request.data.get("club_slug")
     name = request.data.get("name")
@@ -273,7 +282,7 @@ def event_set_creation(request):
         ),
     },
 )
-@api_view(["GET", "POST"])
+@api_GET_POST_view
 def event_list(request):
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -457,7 +466,7 @@ def event_list(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def club_list_view(request):
     only_yours = request.GET.get("mine")
     clubs = Club.objects.all()
@@ -535,7 +544,7 @@ def club_list_view(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def event_detail(request, event_id):
     event = (
         Event.objects.select_related("club", "notice", "map")
@@ -600,6 +609,7 @@ def event_detail(request, event_id):
                         kwargs={"event_id": event.aid},
                     )
                 ),
+                "wms": True,
             }
             output["maps"].append(map_data)
         for i, m in enumerate(event.map_assignations.all()):
@@ -619,6 +629,7 @@ def event_detail(request, event_id):
                         kwargs={"event_id": event.aid, "map_index": (i + 2)},
                     )
                 ),
+                "wms": True,
             }
             output["maps"].append(map_data)
 
@@ -678,7 +689,7 @@ def event_detail(request, event_id):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def event_register(request, event_id):
     event = Event.objects.select_related("club").filter(aid=event_id).first()
     if not event:
@@ -946,7 +957,7 @@ def competitor_api(request, competitor_id):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def competitor_route_upload(request, competitor_id):
     competitor = (
         Competitor.objects.select_related("event", "event__club", "device")
@@ -1063,7 +1074,7 @@ def competitor_route_upload(request, competitor_id):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_view
 def event_data(request, event_id):
     t0 = time.time()
     cache_key_found = None
@@ -1172,7 +1183,7 @@ def event_data(request, event_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def event_zip(request, event_id):
     event = (
         Event.objects.select_related("club")
@@ -1224,7 +1235,7 @@ def event_zip(request, event_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def ip_latlon(request):
     headers = {"Cache-Control": "Private"}
     try:
@@ -1294,7 +1305,7 @@ def ip_latlon(request):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 @throttle_classes([PostDataThrottle])
 def locations_api_gw(request):
     secret_provided = request.data.get(
@@ -1385,7 +1396,7 @@ class DataRenderer(renderers.BaseRenderer):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def get_version(request):
     return Response({"v": git_master_hash()})
 
@@ -1394,7 +1405,7 @@ def get_version(request):
     method="post",
     auto_schema=None,
 )
-@api_view(["POST"])
+@api_POST_view
 def get_device_id(request):
     device = Device.objects.create(user_agent=request.session.user_agent[:200])
     return Response({"status": "ok", "device_id": device.aid})
@@ -1433,7 +1444,7 @@ def get_device_id(request):
         ),
     },
 )
-@api_view(["POST"])
+@api_POST_view
 def create_device_id(request):
     imei = request.data.get("imei")
     if imei:
@@ -1475,7 +1486,7 @@ def create_device_id(request):
     method="post",
     auto_schema=None,
 )
-@api_view(["POST"])
+@api_POST_view
 def get_device_for_imei(request):
     imei = request.data.get("imei")
     if not imei:
@@ -1513,7 +1524,7 @@ def get_device_for_imei(request):
         ),
     },
 )
-@api_view(["GET"])
+@api_GET_POST_view
 def get_time(request):
     return Response({"time": time.time()}, headers={"Cache-Control": "no-cache"})
 
@@ -1522,7 +1533,7 @@ def get_time(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 @login_required
 def user_search(request):
     users = []
@@ -1538,7 +1549,7 @@ def user_search(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 @login_required
 def user_view(request):
     user = request.user
@@ -1554,7 +1565,7 @@ def user_view(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_search(request):
     devices = []
     q = request.GET.get("q")
@@ -1569,7 +1580,7 @@ def device_search(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_info(request, device_id):
     device = Device.objects.filter(aid=device_id, is_gpx=False).first()
     if not device:
@@ -1598,7 +1609,7 @@ def device_info(request, device_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def device_registrations(request, device_id):
     device = get_object_or_404(Device, aid=device_id, is_gpx=False)
     competitors = device.competitor_set.filter(event__end_date__gte=now())
@@ -1622,11 +1633,11 @@ def device_ownership_api_view(request, club_slug, device_id):
         nick = request.data.get("nickname", "")
         if nick and len(nick) > 12:
             raise ValidationError("Can not be more than 12 characters")
-
         ownership.nickname = nick
         ownership.save()
         return Response({"nickname": nick})
-    elif request.method == "DELETE":
+
+    if request.method == "DELETE":
         ownership.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
@@ -1635,7 +1646,7 @@ def device_ownership_api_view(request, club_slug, device_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def event_map_download(request, event_id, map_index="1"):
     event, raster_map, title = Event.get_public_map_at_index(
         request.user, event_id, map_index
@@ -1666,7 +1677,7 @@ def event_map_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def event_kmz_download(request, event_id, map_index="1"):
     event, raster_map, title = Event.get_public_map_at_index(
         request.user, event_id, map_index
@@ -1693,7 +1704,7 @@ def event_kmz_download(request, event_id, map_index="1"):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 @login_required
 def map_kmz_download(request, map_id, *args, **kwargs):
     club_list = Club.objects.filter(admins=request.user)
@@ -1714,7 +1725,7 @@ def map_kmz_download(request, map_id, *args, **kwargs):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET", "HEAD"])
+@api_GET_HEAD_view
 def competitor_gpx_download(request, competitor_id):
     competitor = get_object_or_404(
         Competitor.objects.select_related("event", "event__club", "device"),
@@ -1746,7 +1757,7 @@ def competitor_gpx_download(request, competitor_id):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def two_d_rerun_race_status(request):
     event_id = request.GET.get("eventid")
     if not event_id:
@@ -1820,7 +1831,7 @@ def two_d_rerun_race_status(request):
     method="get",
     auto_schema=None,
 )
-@api_view(["GET"])
+@api_GET_view
 def two_d_rerun_race_data(request):
     event_id = request.GET.get("eventid")
     if not event_id:
@@ -1880,3 +1891,137 @@ def two_d_rerun_race_data(request):
         content_type=content_type,
         headers=headers,
     )
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_GET_view
+def gpsseuranta_event(request, uid):
+    cache_key = f"gpsseuranta_detail:{uid}"
+    if cache.has_key(cache_key):
+        try:
+            data = cache.get(cache_key)
+        except Exception:
+            pass
+        else:
+            return Response(data, headers={"X-Cache-Hit": 1})
+
+    proxy = GpsSeurantaNet()
+    try:
+        proxy.parse_init_data(uid)
+    except Exception:
+        raise Http404()
+
+    event = proxy.get_event()
+    event.map = proxy.get_map()
+
+    output = {
+        "event": {
+            "id": event.aid,
+            "name": event.name,
+            "start_date": event.start_date,
+            "end_date": event.end_date,
+            "slug": event.slug,
+            "club": "GPS Seuranta",
+            "club_slug": "gpsseuranta",
+            "privacy": "secret",
+            "open_registration": False,
+            "open_route_upload": False,
+            "url": request.build_absolute_uri(event.get_absolute_url()),
+            "shortcut": "",
+            "backdrop": "blank",
+            "send_interval": event.send_interval,
+            "tail_length": event.tail_length,
+        },
+        "data_url": request.build_absolute_uri(event.get_api_data_url()),
+        "announcement": "",
+        "maps": [],
+    }
+    if event.map:
+        map_data = {
+            "title": "main",
+            "coordinates": event.map.bound,
+            "rotation": event.map.north_declination,
+            "hash": event.map.hash,
+            "max_zoom": event.map.max_zoom,
+            "modification_date": event.map.modification_date,
+            "default": True,
+            "id": uid,
+            "url": proxy.get_map_url(),
+            "wms": False,
+        }
+        output["maps"].append(map_data)
+
+    try:
+        cache.set(f"{cache_key}", output, 60)
+    except Exception:
+        pass
+    return Response(output)
+
+
+@swagger_auto_schema(
+    method="get",
+    auto_schema=None,
+)
+@api_GET_view
+def gpsseuranta_event_data(request, uid):
+    cache_key = f"gpsseuranta_data:{uid}"
+    if cache.has_key(cache_key):
+        try:
+            data = cache.get(cache_key)
+        except Exception:
+            pass
+        else:
+            return Response(data, headers={"X-Cache-Hit": 1})
+
+    proxy = GpsSeurantaNet()
+    try:
+        proxy.parse_init_data(uid)
+    except Exception:
+        raise Http404()
+
+    event = proxy.get_event()
+
+    dev_data = proxy.get_competitor_devices_data(uid)
+
+    from_ts = event.start_date.timestamp()
+    output = {"competitors": []}
+    for c_raw in proxy.init_data.get("COMPETITOR", []):
+        c_data = c_raw.strip().split("|")
+        start_time = None
+        start_time_raw = (
+            f"{c_data[1]}"
+            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+        )
+        try:
+            if len(start_time_raw) == 12:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+            else:
+                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+        except Exception:
+            pass
+        else:
+            start_time = start_time.shift(
+                minutes=-int(proxy.init_data.get("TIMEZONE", 0))
+            ).datetime
+
+        locs = dev_data.get(c_data[0], [])
+        locs = sorted(locs, key=itemgetter(0))
+        from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
+        locs = locs[from_idx:]
+        output["competitors"].append(
+            {
+                "id": c_data[0],
+                "encoded_data": gps_data_codec.encode(locs),
+                "name": c_data[3],
+                "short_name": c_data[4],
+                "start_time": start_time,
+            }
+        )
+    try:
+        cache.set(f"{cache_key}", output, 10)
+    except Exception:
+        pass
+    return Response(output)

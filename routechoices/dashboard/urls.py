@@ -122,20 +122,17 @@ urlpatterns = [
     ),
     re_path(r"^upgrade/?$", views.upgrade, name="upgrade"),
     re_path(
-        r"^media/maps/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
-        r"(?P<map_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        r"^media/maps/(?P<map_id>[-0-9a-zA-Z_]{11})$",
         views.dashboard_map_download,
         name="dashboard_map_download",
     ),
     re_path(
-        r"^media/logos/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
-        r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        r"^media/logos/(?P<club_id>[-0-9a-zA-Z_]{11})$",
         views.dashboard_logo_download,
         name="dashboard_logo_download",
     ),
     re_path(
-        r"^media/banners/(?P<hash>[-0-9a-zA-Z_])/(?P<hash2>[-0-9a-zA-Z_])/"
-        r"(?P<club_id>(?P=hash)(?P=hash2)[-0-9a-zA-Z_]{9})(\_\d+)?",
+        r"^media/banners/(?P<club_id>[-0-9a-zA-Z_]{11})$",
         views.dashboard_banner_download,
         name="dashboard_banner_download",
     ),

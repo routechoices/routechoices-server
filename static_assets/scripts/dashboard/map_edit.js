@@ -373,7 +373,7 @@ function enableBtnToPreview() {
     if (
       markersWorld.length >= 3 &&
       markersRaster.length >= 3 &&
-      !(markersWorld.length == 4 && markersRaster.length == 4)
+      !(markersWorld.length === 4 && markersRaster.length === 4)
     ) {
       show3pointsWarning();
     } else {
@@ -543,7 +543,7 @@ function enableBtnToPreview() {
   }
 
   function round5(x) {
-    return Math.round(x * 1e5) / 1e5;
+    return x.toFixed(5);
   }
 
   function buildCalibString(c) {
@@ -573,7 +573,7 @@ function enableBtnToPreview() {
     b.xy.y -= e;
     c.xy.x += e;
     c.xy.y += e;
-    x = solveAffineMatrix(
+    const x = solveAffineMatrix(
       a.xy.x,
       a.xy.y,
       a.latLonMeters.x,
@@ -584,7 +584,7 @@ function enableBtnToPreview() {
       c.xy.y,
       c.latLonMeters.x
     );
-    y = solveAffineMatrix(
+    const y = solveAffineMatrix(
       a.xy.x,
       a.xy.y,
       a.latLonMeters.y,

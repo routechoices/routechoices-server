@@ -41,7 +41,13 @@ POST_LOCATION_SECRETS = env.list("POST_LOCATION_SECRETS")
 BANNED_COUNTRIES = env.list("BANNED_COUNTRIES")
 
 DATABASES = {"default": env.db()}
-DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
+# DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+try:
+    DATABASES["default"]["OPTIONS"]["pool"] = True
+    DATABASES["default"]["OPTIONS"]["server_side_binding"] = True
+except Exception:
+    pass
 
 SHORTCUT_BASE_URL = env.str("SHORTCUT_BASE_URL", None)
 
@@ -113,6 +119,7 @@ MIDDLEWARE = [
     "routechoices.core.middleware.FilterCountriesIPsMiddleware",
     "routechoices.core.middleware.CorsMiddleware",
     "csp.middleware.CSPMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.middleware.common.CommonMiddleware",
     "routechoices.core.middleware.CsrfViewMiddleware",
@@ -315,6 +322,24 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_SSL_REDIRECT = True
 SECURE_REDIRECT_EXEMPT = [r"^\.well-known/acme-challenge/.+$"]
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+PERMISSIONS_POLICY = {
+    "accelerometer": [],
+    "ambient-light-sensor": [],
+    "autoplay": [],
+    "camera": [],
+    "display-capture": [],
+    "document-domain": [],
+    "encrypted-media": [],
+    "fullscreen": ["self"],
+    "geolocation": ["self"],
+    "gyroscope": [],
+    "interest-cohort": [],
+    "magnetometer": [],
+    "microphone": [],
+    "midi": [],
+    "payment": [],
+    "usb": [],
+}
 
 try:
     from .settings_overrides import *  # noqa: F403, F401

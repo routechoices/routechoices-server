@@ -1,11 +1,13 @@
 {% extends "club/base.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block head_title %}
     {{ event.name }} | Powered by {{ site.name }}
 {% endblock head_title %}
+
 {% block head_description %}
     GPS Tracking of {{ event.name }} by {{ event.club.name }}
 {% endblock head_description %}
+
 {% block extra_head %}
     <meta property="og:title" content="{{ event.name }}" />
     <meta property="og:type" content="website" />
@@ -35,7 +37,18 @@
               href="{% static '/vendor/leaflet-mapcentercoord-0.7/L.Control.MapCenterCoord.min.css' %}" />
         <link rel="stylesheet" href="{% static 'styles/club/event.css' %}" />
     {% endcompress %}
+    <link rel="preload"
+          href="{{ event.get_api_detail_url }}"
+          as="fetch"
+          type="application/json"
+          crossorigin="use-credentials" />
+    <link rel="preload"
+          href="{{ event.get_api_data_url }}"
+          as="fetch"
+          type="application/json"
+          crossorigin="use-credentials" />
 {% endblock extra_head %}
+
 {% block body %}
     <!-- Fixed navbar -->
     {% with is_event_page=True %}
@@ -95,7 +108,9 @@
                            href="https://www.routechoices.com"
                            style="line-height: 25px;
                                   color: var(--bs-primary-text);
-                                  margin-right: -3px"
+                                  margin-right: -3px;
+                                  user-select: none;
+                                  -webkit-user-select: none"
                            class="d-flex text-decoration-none fw-bold">
                             <div>Powered by</div>
                             <div class="pt-1">
@@ -105,9 +120,10 @@
                             <div>
                                 <img src="{% static 'img/logo.svg' %}"
                                      alt="Site logo"
-                                     height="25"
-                                     width="38"
-                                     style="vertical-align: top">
+                                     height="35"
+                                     width="35"
+                                     style="vertical-align: top;
+                                            transform: rotate(90deg)">
                             </div>
                         </a>
                     </div>
@@ -302,12 +318,13 @@
         </div>
     </div>
 {% endblock body %}
+
 {% block extra_body %}
     {{ block.super }}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
             data-club-name="{{ event.club.name }}"
-            data-event-id="{{event.aid}}"
-            data-event-url="{% host_url 'event_detail' event_id=event.aid host 'api' %}"
+            data-event-id="{{ event.aid }}"
+            data-event-url="{{ event.get_api_detail_url }}"
             data-server-clock-url="{% host_url 'time_api' host 'api' %}"
             data-static-root="{% static '' %}"
             data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"></script>
@@ -315,8 +332,7 @@
         <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-pl-sv"></script>
         <script src="{% static '/vendor/dayjs-1.11.7/duration.min.js' %}"></script>
         <script src="{% static '/vendor/banana-i18n-2.3.1/banana-i18n.js' %}"></script>
-        <script src="{% static '/vendor/server-clock-2023.01.21/server-clock.min.js' %}"></script>
-        <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+        <script src="{% static '/vendor/server-clock-2023.01.21/server-clock.js' %}"></script>
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
         <script src="{% static '/vendor/tinycolor-1.5.2/tinycolor.min.js' %}"></script>
         <script src="{% static '/vendor/iro-5.5.2/iro.min.js' %}"></script>
@@ -329,6 +345,7 @@
         <script src="{% static '/vendor/leaflet-rotate-0.2.8/leaflet-rotate.js' %}"></script>
         <script src="{% static '/vendor/leaflet-locate-control-0.79.0/L.Control.Locate.min.js' %}"></script>
         <script src="{% static '/vendor/jdbscan-20210913/jdbscan.min.js' %}"></script>
+        <script src="{% static '/vendor/leaflet-image-transform-2022.02.26/leaflet-image-transform.min.js' %}"></script>
         <script src="{% static '/vendor/bn-5.2.1/bn.min.js' %}"></script>
         <script src="{% static '/vendor/gps-encoding-2023.04.13/gps-encoding.js' %}"></script>
         <script src="{% static '/scripts/backdrop_maps.js' %}"></script>

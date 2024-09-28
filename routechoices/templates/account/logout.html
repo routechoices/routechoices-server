@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% load compress static i18n %}
+{% load compress i18n static %}
 {% block head_title %}
-    {% trans "Logout" %}
+    {% translate "Logout" %}
 {% endblock head_title %}
+
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                 <div class="card border-0 shadow rounded-3 my-5">
                     <div class="card-body p-4 p-sm-5">
-                        <h3 class="card-title text-center mb-5">{% trans "Confirm Logout?" %}</h3>
+                        <h3 class="card-title text-center mb-5">{% translate "Confirm Logout?" %}</h3>
                         <form method="post" action="{% url 'site:account_logout' %}">
                             {% csrf_token %}
                             {% if redirect_field_value %}
@@ -19,7 +20,7 @@
                             {% endif %}
                             <div class="d-grid">
                                 <button class="btn btn-danger" type="submit" id="submit-btn">
-                                    {% trans "Logout" %} <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                    {% translate "Logout" %} <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                 </button>
                             </div>
                         </form>
@@ -29,6 +30,7 @@
         </div>
     </div>
 {% endblock content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

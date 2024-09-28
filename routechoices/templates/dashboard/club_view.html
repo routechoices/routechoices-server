@@ -1,5 +1,5 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     {% compress css %}
@@ -8,11 +8,12 @@
         <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}" />
     {% endcompress %}
 {% endblock extra_head %}
+
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
             <h1>
-                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80px" height="80px" alt="Club {{ club.name }} Logo" class="rounded">
+                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80" height="80" alt="Club {{ club.name }} Logo" class="rounded">
                 {{ club.name }}
             </h1>
         </div>
@@ -92,9 +93,10 @@
         {% endif %}
     {% endblock sub_sub_content %}
 {% endblock sub_content %}
+
 {% block extra_body %}
     {% if request.resolver_match.view_name == 'dashboard:club_view' %}
-        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-slug="{{club.slug}}" data-club-nice-url="{{club.nice_url}}" data-club-has-analytics="{% if club.analytics_site %}1{% endif %}">
+        <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}" data-club-slug="{{ club.slug }}" data-club-nice-url="{{ club.nice_url }}" data-club-has-analytics="{% if club.analytics_site %}1{% endif %}">
         </script>
         {% compress js %}
             <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>

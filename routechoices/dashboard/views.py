@@ -180,7 +180,7 @@ def club_request_invite_view(request):
                 "club": club,
                 "send_invite_url": f"{url}?club={club.slug}&email={requester_email}",
             }
-            club_admins_ids = list(club.admins.all().values_list("id", flat=True))
+            club_admins_ids = list(club.admins.values_list("id", flat=True))
             emails = list(
                 EmailAddress.objects.filter(
                     user_id__in=club_admins_ids, primary=True
@@ -265,11 +265,14 @@ def account_delete_view(request):
             != allauth_settings.AuthenticationMethod.EMAIL
         ):
             context["username"] = user_username(user)
-        requester_email = (
-            EmailAddress.objects.filter(user_id=request.user.id, primary=True)
-            .first()
-            .email
-        )
+        requester_email = EmailAddress.objects.filter(
+            user_id=request.user.id, primary=True
+        ).first()
+        if requester_email:
+            requester_email = requester_email.email
+        else:
+            requester_email = request.user.email
+
         get_adapter(request).send_mail(
             "account/email/account_delete", requester_email, context
         )
@@ -998,7 +1001,7 @@ def event_create_view(request):
         for mform in extra_map_formset.forms:
             mform.fields["map"].queryset = map_list
         notice_form = NoticeForm()
-        dev_qs = club.devices.all().prefetch_related("club_ownerships")
+        dev_qs = club.devices.prefetch_related("club_ownerships")
         cd = [
             {
                 "full": (d.id, d.get_display_str(club)),
@@ -1046,11 +1049,11 @@ def event_edit_view(request, event_id):
         event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT
     )
     if use_competitor_formset:
-        comp_devices_id = event.competitors.all().values_list("device", flat=True)
+        comp_devices_id = event.competitors.values_list("device", flat=True)
     else:
         comp_devices_id = []
 
-    own_devices_id = club.devices.all().values_list("id", flat=True)
+    own_devices_id = club.devices.values_list("id", flat=True)
     all_devices_id = set(list(comp_devices_id) + list(own_devices_id))
 
     if request.method == "POST":
@@ -1205,7 +1208,7 @@ def event_competitors_view(request, event_id):
         raise Http404()
     comps = Competitor.objects.filter(id__in=[c.id for c in competitors.object_list])
     comp_devices_id = [c.device_id for c in competitors.object_list]
-    own_devices_id = club.devices.all().values_list("id", flat=True)
+    own_devices_id = club.devices.values_list("id", flat=True)
     all_devices_id = set(list(comp_devices_id) + list(own_devices_id))
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
@@ -1383,7 +1386,7 @@ def event_route_upload_view(request, event_id):
     event = get_object_or_404(
         Event.objects.prefetch_related("competitors"), aid=event_id
     )
-    competitors = event.competitors.all().order_by("name")
+    competitors = event.competitors.order_by("name")
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = UploadGPXForm(request.POST, request.FILES)
@@ -1485,7 +1488,7 @@ class CustomSessionDeleteOtherView(SessionDeleteOtherView):
 class CustomEmailView(EmailView):
     def get_context_data(self, **kwargs):
         ret = super().get_context_data(**kwargs)
-        ret["user_emailaddresses"] = self.request.user.emailaddress_set.all().order_by(
+        ret["user_emailaddresses"] = self.request.user.emailaddress_set.order_by(
             "-primary", "-verified", "email"
         )
         return ret

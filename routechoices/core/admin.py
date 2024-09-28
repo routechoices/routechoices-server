@@ -23,6 +23,7 @@ from routechoices.core.models import (
     DeviceClubOwnership,
     Event,
     EventSet,
+    FrontPageFeedback,
     ImeiDevice,
     Map,
     MapAssignation,
@@ -985,13 +986,13 @@ class WebAuthnKeyAdmin(admin.ModelAdmin):
     list_display = ("user", "key_name")
 
 
+@admin.register(FrontPageFeedback)
+class FrontPageFeedbackAdmin(admin.ModelAdmin):
+    list_display = ("name", "stars", "club_name")
+
+
 ADMIN_COMMAND_LIST = [
-    "import_from_gpsseuranta",
-    "import_from_livelox",
-    "import_from_loggator",
-    "import_from_otracker",
-    "import_from_sportrec",
-    "import_from_tractrac",
+    "import_event",
     "export_device_list",
     "export_email_list",
     "clean_admin_logs",

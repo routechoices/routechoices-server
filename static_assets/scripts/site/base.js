@@ -34,6 +34,9 @@ const getPreferredTheme = () => {
 };
 
 const getAbsTheme = (theme) => {
+  if (!window.matchMedia) {
+    return "light";
+  }
   if (theme === "auto") {
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -59,11 +62,13 @@ const setTheme = (theme) => {
   "use strict";
   setTheme(getPreferredTheme());
 
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", () => {
-      setTheme(getPreferredTheme());
-    });
+  if (window.matchMedia) {
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        setTheme(getPreferredTheme());
+      });
+  }
 
   const showActiveTheme = (theme) => {
     const svgOfActiveBtn = document.querySelector(".theme-selector-icon use");

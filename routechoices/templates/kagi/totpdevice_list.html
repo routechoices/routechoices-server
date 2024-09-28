@@ -1,5 +1,5 @@
 {% extends "kagi/base.html" %}
-{% load static compress %}
+{% load compress static %}
 {% block sub_sub_content %}
     <h1>TOTP (Authenticator) Devices</h1>
     {% if object_list %}
@@ -42,6 +42,7 @@
     {% endif %}
     <a class="btn btn-primary" href="{% url 'kagi:add-totp' %}">Add a TOTP (Authenticator) Device</a>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     {{ block.super }}
     {% compress js %}

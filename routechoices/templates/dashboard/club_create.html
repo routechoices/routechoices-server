@@ -1,16 +1,17 @@
 {% extends "dashboard/home.html" %}
-{% load static django_bootstrap5 hosts compress %}
+{% load compress django_bootstrap5 hosts static %}
 {% block extra_head %}
     {{ block.super }}
     <link rel="stylesheet"
           href="{% static '/vendor/tom-select-2.0.1/tom-select.bootstrap5.min.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/dashboard/grow.css' %}" />
 {% endblock extra_head %}
+
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
             <h1>
-                <img class="card-img-left" src="{% static "/img/club-default.png" %}" width="100px" height="100px" alt="Default club Logo">
+                <img class="card-img-left" src="{% static "/img/club-default.png" %}" width="100" height="100" alt="Default club Logo">
                 New Club
             </h1>
             <form action="" method="post" enctype="multipart/form-data">
@@ -23,6 +24,7 @@
         </div>
     </div>
 {% endblock sub_content %}
+
 {% block extra_body %}
     <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700" data-api-base-url="{% host_url 'api_doc' host 'api' %}">
     </script>

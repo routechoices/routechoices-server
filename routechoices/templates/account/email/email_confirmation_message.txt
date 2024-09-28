@@ -1,11 +1,11 @@
-{% load account i18n %}{% user_display user as user_display %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Hello from {{ site_name }}!
+{% load account i18n %}{% user_display user as user_display %}{% autoescape off %}{% blocktranslate with site_name=current_site.name site_domain=current_site.domain %}Hello from {{ site_name }}!
 
 You're receiving this e-mail because you or someone else has given yours as an e-mail address to connect their account.
 
 To confirm this is correct, click the link below:
 
 {{ activate_url }}
-{% endblocktrans %}
+{% endblocktranslate %}
 {% endautoescape %}
-{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Thank you from {{ site_name }}!
-{{ site_domain }}{% endblocktrans %}
+{% blocktranslate with site_name=current_site.name site_domain=current_site.domain %}Thank you from {{ site_name }}!
+{{ site_domain }}{% endblocktranslate %}

@@ -1,6 +1,14 @@
+import os.path
+
 import boto3
 import botocore
 from django.conf import settings
+
+
+def bytes_to_str(b):
+    if isinstance(b, str):
+        return b
+    return b.decode("utf-8")
 
 
 def get_s3_client():
@@ -31,3 +39,11 @@ def s3_delete_key(key, bucket):
         Bucket=bucket,
         Key=key,
     )
+
+
+def s3_rename_object(bucket, src, dest):
+    src = bytes_to_str(src)
+    dest = bytes_to_str(dest)
+    s3 = get_s3_client()
+    s3.copy_object(Bucket=bucket, CopySource=os.path.join(bucket, src), Key=dest)
+    s3.delete_object(Bucket=bucket, Key=src)

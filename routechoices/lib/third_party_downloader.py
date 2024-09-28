@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from curl_cffi import requests
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.utils.timezone import now
 from PIL import Image, ImageDraw
 
 from routechoices.core.models import (
@@ -24,6 +23,7 @@ from routechoices.core.models import (
 )
 from routechoices.lib.helpers import (
     epoch_to_datetime,
+    get_remote_image_sizes,
     initial_of_name,
     project,
     safe64encodedsha,
@@ -245,6 +245,11 @@ class Livelox(ThirdPartyTrackingSolution):
         )
         img_blob = ContentFile(r.content)
         map_obj.image.save("imported_image", img_blob)
+        im = Image.open(img_blob)
+        width, height = im.size
+        map_obj.width = width
+        map_obj.height = height
+        map_obj.save()
         upscale = 4
         with Image.open(img_blob).convert("RGBA") as img:
             map_drawing = Image.new(
@@ -272,63 +277,33 @@ class Livelox(ThirdPartyTrackingSolution):
             for i, ctrl in enumerate(ctrls[:-1]):
                 if ctrl[0] == ctrls[i + 1][0]:
                     ctrl[0] -= 0.0001
-                start_from_a = ctrl[0] < ctrls[i + 1][0]
-                pt_a = ctrl if start_from_a else ctrls[i + 1]
-                pt_b = ctrl if not start_from_a else ctrls[i + 1]
-                angle = math.atan((pt_b[1] - pt_a[1]) / (pt_b[0] - pt_a[0]))
+                pt = ctrl
+                next_pt = ctrls[i + 1]
+                angle = math.atan2(next_pt[1] - pt[1], next_pt[0] - pt[0])
                 if i == 0:
                     # draw start triangle
-                    pt_s = pt_a if start_from_a else pt_b
                     draw.line(
                         [
+                            int(pt[0] * upscale + circle_size * math.cos(angle)),
+                            int(pt[1] * upscale + circle_size * math.sin(angle)),
                             int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle)
+                                pt[0] * upscale
+                                + circle_size * math.cos(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle)
+                                pt[1] * upscale
+                                + circle_size * math.sin(angle + 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle + 2 * math.pi / 3)
+                                pt[0] * upscale
+                                + circle_size * math.cos(angle - 2 * math.pi / 3)
                             ),
                             int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle + 2 * math.pi / 3)
+                                pt[1] * upscale
+                                + circle_size * math.sin(angle - 2 * math.pi / 3)
                             ),
-                            int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle - 2 * math.pi / 3)
-                            ),
-                            int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle - 2 * math.pi / 3)
-                            ),
-                            int(
-                                pt_s[0] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.cos(angle)
-                            ),
-                            int(
-                                pt_s[1] * upscale
-                                - (-1 if start_from_a else 1)
-                                * circle_size
-                                * math.sin(angle)
-                            ),
+                            int(pt[0] * upscale + circle_size * math.cos(angle)),
+                            int(pt[1] * upscale + circle_size * math.sin(angle)),
                         ],
                         fill=line_color,
                         width=line_width,
@@ -337,35 +312,34 @@ class Livelox(ThirdPartyTrackingSolution):
                 # draw line between controls
                 draw.line(
                     [
-                        int(pt_a[0] * upscale + circle_size * math.cos(angle)),
-                        int(pt_a[1] * upscale + circle_size * math.sin(angle)),
-                        int(pt_b[0] * upscale - circle_size * math.cos(angle)),
-                        int(pt_b[1] * upscale - circle_size * math.sin(angle)),
+                        int(pt[0] * upscale + circle_size * math.cos(angle)),
+                        int(pt[1] * upscale + circle_size * math.sin(angle)),
+                        int(next_pt[0] * upscale - circle_size * math.cos(angle)),
+                        int(next_pt[1] * upscale - circle_size * math.sin(angle)),
                     ],
                     fill=line_color,
                     width=line_width,
                 )
                 # draw controls
-                pt_o = pt_b if start_from_a else pt_a
                 draw.ellipse(
                     [
-                        int(pt_o[0] * upscale - circle_size),
-                        int(pt_o[1] * upscale - circle_size),
-                        int(pt_o[0] * upscale + circle_size),
-                        int(pt_o[1] * upscale + circle_size),
+                        int(next_pt[0] * upscale - circle_size),
+                        int(next_pt[1] * upscale - circle_size),
+                        int(next_pt[0] * upscale + circle_size),
+                        int(next_pt[1] * upscale + circle_size),
                     ],
                     outline=line_color,
                     width=line_width,
                 )
-                # draw finnish
+                # draw finish
                 if i == (len(ctrls) - 2):
                     inner_circle_size = int(30 * map_resolution) * upscale
                     draw.ellipse(
                         [
-                            int(pt_o[0] * upscale - inner_circle_size),
-                            int(pt_o[1] * upscale - inner_circle_size),
-                            int(pt_o[0] * upscale + inner_circle_size),
-                            int(pt_o[1] * upscale + inner_circle_size),
+                            int(next_pt[0] * upscale - inner_circle_size),
+                            int(next_pt[1] * upscale - inner_circle_size),
+                            int(next_pt[0] * upscale + inner_circle_size),
+                            int(next_pt[1] * upscale + inner_circle_size),
                         ],
                         outline=line_color,
                         width=line_width,
@@ -380,6 +354,9 @@ class Livelox(ThirdPartyTrackingSolution):
         out_buffer.seek(0)
         f_new = ContentFile(out_buffer.read())
         map_obj.image.save("imported_image", f_new)
+        map_obj.width = out.width
+        map_obj.height = out.height
+        map_obj.save()
         return [map_obj]
 
     def get_or_create_event_competitors(self, event, uid):
@@ -403,24 +380,23 @@ class Livelox(ThirdPartyTrackingSolution):
                 short_name=c_sname,
                 event=event,
             )
-            lat = 0
-            lon = 0
-            t = -time_offset
             pts = []
             if not p.get("routeData"):
                 continue
-            p_data = p["routeData"][1:]
-            for i in range((len(p_data) - 1) // 3):
-                t += p_data[3 * i]
-                lon += p_data[3 * i + 1]
-                lat += p_data[3 * i + 2]
+            p_data64 = p["routeData"]
+            d = LiveloxBase64Reader(p_data64)
+            pts_raw = d.readWaypoints()
+            for pt in pts_raw:
                 if map_projection:
-                    px, py = project(matrix, lon / 10, lat / 10)
+                    px, py = project(matrix, pt[1] / 10, pt[2] / 10)
                     latlon = event.map.map_xy_to_wsg84(px, py)
-                    pts.append((int(t / 1e3), latlon["lat"], latlon["lon"]))
+                    pts.append(
+                        (int((pt[0] - time_offset) / 1e3), latlon["lat"], latlon["lon"])
+                    )
                 else:
-                    pts.append((int(t / 1e3), lat / 1e6, lon / 1e6))
-
+                    pts.append(
+                        (int((pt[0] - time_offset) / 1e3), pt[1] / 1e6, pt[2] / 1e6)
+                    )
             dev_obj, created = Device.objects.get_or_create(
                 aid="LLX_" + safe64encodedsha(f"{p['id']}:{uid}")[:8], is_gpx=True
             )
@@ -491,6 +467,11 @@ class SportRec(ThirdPartyTrackingSolution):
                 corners_coords += corner
             calib_string = ",".join(str(round(x, 5)) for x in corners_coords)
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
+            map_obj.image.update_dimension_fields(force=True)
             map_obj.corners_coordinates = calib_string
             map_obj.save()
         except Exception:
@@ -619,6 +600,10 @@ class OTracker(ThirdPartyTrackingSolution):
                 ]
             calib_string = ",".join(str(x) for x in corners_coords)
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
             map_obj.corners_coordinates = calib_string
             map_obj.save()
         except Exception:
@@ -692,6 +677,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
     slug = "gpsseuranta"
 
     def parse_init_data(self, uid):
+        self.uid = uid
         event_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/init.txt"
         r = requests.get(event_url)
         if r.status_code != 200:
@@ -708,51 +694,109 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 continue
         self.init_data = event_data
 
+    def is_live(self):
+        return self.init_data["LIVE"] == "1"
+
+    def get_start_time(self):
+        min_start_time = arrow.utcnow().shift(
+            minutes=int(self.init_data.get("TIMEZONE", 0))
+        )
+        for c_raw in self.init_data.get("COMPETITOR", []):
+            c_data = c_raw.strip().split("|")
+            start_time = None
+            start_time_raw = (
+                f"{c_data[1]}"
+                f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+            )
+            try:
+                if len(start_time_raw) == 12:
+                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+                else:
+                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+            except Exception:
+                continue
+            min_start_time = min(min_start_time, start_time)
+        return min_start_time.shift(
+            minutes=-int(self.init_data.get("TIMEZONE", 0))
+        ).datetime
+
+    def get_end_time(self):
+        if self.is_live():
+            return arrow.utcnow().shift(hours=1).datetime
+        return arrow.utcnow().datetime
+
+    def get_event(self):
+        event = Event()
+        event.slug = self.uid
+        event.club = self.club
+        event.name = self.init_data.get("RACENAME", self.uid)[:255]
+        event.start_date = self.get_start_time()
+        event.end_date = self.get_end_time()
+        event.send_interval = int(self.init_data.get("GRABINTERVAL", 10))
+        return event
+
     def get_or_create_event(self, uid):
-        event_name = self.init_data.get("RACENAME", uid)
+        event_tmp = self.get_event()
         event, _ = Event.objects.get_or_create(
             club=self.club,
-            slug=uid,
+            slug=event_tmp.slug,
             defaults={
-                "name": event_name[:255],
+                "name": event_tmp.name,
                 "privacy": PRIVACY_SECRET,
-                "start_date": now(),
-                "end_date": now(),
+                "start_date": event_tmp.start_date,
+                "end_date": event_tmp.end_date,
             },
         )
         return event
 
-    def get_or_create_event_maps(self, event, uid):
+    def get_map_url(self):
+        return f"{self.GPSSEURANTA_EVENT_URL}{self.uid}/map"
+
+    def get_map(self, download_map=False):
+        map_url = self.get_map_url()
+        try:
+            length, size = get_remote_image_sizes(map_url)
+        except Exception:
+            return None
+
         calibration_string = self.init_data.get("CALIBRATION")
+        if not size or not calibration_string:
+            return None
+
+        map_obj = Map()
+        map_obj.width = size[0]
+        map_obj.height = size[1]
+        corners = three_point_calibration_to_corners(
+            calibration_string, size[0], size[1]
+        )
+        coordinates = ",".join([str(round(x, 5)) for x in corners])
+        map_obj.corners_coordinates = coordinates
+
+        if download_map:
+            r = requests.get(map_url)
+            if r.status_code == 200:
+                map_file = ContentFile(r.content)
+                map_obj.image.save("map", map_file, save=False)
+        return map_obj
+
+    def get_or_create_event_maps(self, event, uid):
+        tmp_map = self.get_map(download_map=True)
+        if not tmp_map:
+            raise MapsImportError("Error importing map")
         map_obj, _ = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
+            defaults={
+                "image": tmp_map.image,
+                "width": tmp_map.width,
+                "height": tmp_map.height,
+                "corners_coordinates": tmp_map.corners_coordinates,
+            },
         )
-        map_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/map"
-        r = requests.get(map_url)
-        if r.status_code != 200:
-            map_obj.delete()
-            raise MapsImportError("API returned error code")
-        try:
-            map_file = ContentFile(r.content)
-            with Image.open(map_file) as img:
-                width, height = img.size
-            corners = three_point_calibration_to_corners(
-                calibration_string, width, height
-            )
-            coordinates = ",".join([str(round(x, 5)) for x in corners])
+        return [map_obj]
 
-            map_obj.image.save("imported_image", map_file, save=False)
-            map_obj.corners_coordinates = coordinates
-            map_obj.save()
-        except Exception:
-            map_obj.delete()
-            raise MapsImportError("Error importing map")
-        else:
-            return [map_obj]
-
-    def get_or_create_event_competitors(self, event, uid):
-        device_map = {}
+    def get_competitor_devices_data(self, uid):
+        devices_data = {}
         data_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/data.lst"
         r = requests.get(data_url)
         if r.status_code == 200:
@@ -765,15 +809,24 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 if "_" in dev_id:
                     dev_id, _ = dev_id.split("_", 1)
                 new_locations = self.decode_data_line(line_data[1:])
-                if not device_map.get(dev_id):
-                    dev_obj, created = Device.objects.get_or_create(
-                        aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
-                        defaults={"is_gpx": True},
-                    )
-                    if not created:
-                        dev_obj.locations_series = []
-                    device_map[dev_id] = dev_obj
-                device_map[dev_id].add_locations(new_locations, save=False)
+                if not devices_data.get(dev_id):
+                    devices_data[dev_id] = new_locations
+                else:
+                    devices_data[dev_id] += new_locations
+        return devices_data
+
+    def get_or_create_event_competitors(self, event, uid):
+        devices_data = self.get_competitor_devices_data(uid)
+        device_map = {}
+        for dev_id, locations in devices_data.items():
+            dev_obj, created = Device.objects.get_or_create(
+                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
+                defaults={"is_gpx": True},
+            )
+            if not created:
+                dev_obj.locations_series = []
+            dev_obj.add_locations(locations, save=False)
+            device_map[dev_id] = dev_obj
 
         competitors = []
         for c_raw in self.init_data.get("COMPETITOR"):
@@ -818,13 +871,21 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         o_pt = data[0].split("_")
         if o_pt[0] == "*" or o_pt[1] == "*" or o_pt[2] == "*":
             return []
-        t = int(o_pt[0]) + 1136073600
-        prev_loc = {
-            "lat": int(o_pt[2]) * 1.0 / 1e5,
-            "lon": int(o_pt[1]) * 2.0 / 1e5,
-            "ts": t,
-        }
-        loc_array = [(t, prev_loc["lat"], prev_loc["lon"])]
+        loc = [
+            int(o_pt[0]) + 1136073600,  # ts
+            int(o_pt[2]) / 1e5,  # lat
+            int(o_pt[1]) / 5e4,  # lon
+        ]
+        locs = [tuple(loc)]
+
+        def get_char_index(c):
+            ascii_index = ord(c)
+            if ascii_index < 65:
+                return ascii_index - 79
+            if ascii_index < 97:
+                return ascii_index - 86
+            return ascii_index - 92
+
         for p in data[1:]:
             if len(p) < 3:
                 continue
@@ -840,21 +901,14 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 dlon = int(pt[1])
                 dlat = int(pt[2])
             else:
-                chars = (
-                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz"
-                )
-                dt = chars.index(p[0]) - 31
-                dlon = chars.index(p[1]) - 31
-                dlat = chars.index(p[2]) - 31
-            t = prev_loc["ts"] + dt
-            prev_loc = {
-                "lat": ((prev_loc["lat"] * 1e5) + dlat) / 1e5,
-                "lon": ((prev_loc["lon"] * 5e4) + dlon) / 5e4,
-                "ts": t,
-            }
-            loc_array.append((t, prev_loc["lat"], prev_loc["lon"]))
-        return loc_array
+                dt = get_char_index(p[0])
+                dlon = get_char_index(p[1])
+                dlat = get_char_index(p[2])
+            loc[0] += dt
+            loc[1] += dlat / 1e5
+            loc[2] += dlon / 5e4
+            locs.append(tuple(loc))
+        return locs
 
 
 class Loggator(ThirdPartyTrackingSolution):
@@ -910,6 +964,10 @@ class Loggator(ThirdPartyTrackingSolution):
                 ]
             )
             map_obj.image.save("imported_image", map_file, save=False)
+            im = Image.open(map_file)
+            width, height = im.size
+            map_obj.width = width
+            map_obj.height = height
             map_obj.corners_coordinates = coordinates
             map_obj.save()
         except Exception:
@@ -1031,6 +1089,8 @@ class Tractrac(ThirdPartyTrackingSolution):
                 )
                 coordinates = ",".join([str(round(x, 5)) for x in corners])
                 map_obj.image.save("imported_image", map_file, save=False)
+                map_obj.width = width
+                map_obj.height = height
                 map_obj.corners_coordinates = coordinates
                 map_obj.save()
             except Exception:
@@ -1103,3 +1163,106 @@ class Tractrac(ThirdPartyTrackingSolution):
             competitor.save()
             competitors.append(competitor)
         return competitors
+
+
+class LiveloxBase64Reader:
+    base64util = {
+        "usableBitsPerByte": 6,
+        "headerBits": 8,
+        "numberToLetter": (
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+        ),
+        "pow2": [0] * 64,
+        "bitLengthMaxValues": [0] * 65,
+        "letterToNumber": {},
+    }
+    for i in range(64):
+        base64util["pow2"][i] = 2**i
+    for i in range(1, 65):
+        base64util["bitLengthMaxValues"][i] = (
+            base64util["bitLengthMaxValues"][i - 1] + base64util["pow2"][i - 1]
+        )
+    for i, letter in enumerate(base64util["numberToLetter"]):
+        base64util["letterToNumber"][letter] = i
+    base64util["letterToNumber"]["="] = 0
+
+    def __init__(self, data):
+        self.length = len(data)
+        self.byte_array = [0] * self.length
+        self.current_byte_pos = 0
+        self.current_bit_pos = 0
+        self.bits_read_in_current_byte = 0
+        self.next_bit_position = None
+        self.next_bits_read_in_current_byte = None
+        self.byte = None
+        self.value = None
+        self.bits_left_to_read = None
+        self.i = None
+        self.bytes_read = None
+        self.header = None
+
+        for i in range(self.length):
+            self.byte_array[i] = self.base64util["letterToNumber"][data[i]]
+
+    def read_n_bits(self, n):
+        self.value = 0
+        self.bits_left_to_read = self.bits_read_in_current_byte + n
+        self.bytes_read = 0
+        while self.bits_left_to_read > 0:
+            self.bits_left_to_read -= 6
+            self.bytes_read += 1
+        self.next_bit_position = self.current_bit_pos + n
+        self.next_bits_read_in_current_byte = self.next_bit_position % 6
+        self.i = 0
+        while self.i < self.bytes_read:
+            self.byte = self.byte_array[self.i + self.current_byte_pos]
+            if self.i == 0:
+                self.byte &= self.base64util["bitLengthMaxValues"][
+                    6 - self.bits_read_in_current_byte
+                ]
+            if self.i < self.bytes_read - 1:
+                self.value += (
+                    self.base64util["pow2"][
+                        (self.bytes_read - self.i - 1) * 6
+                        - (
+                            0
+                            if self.next_bits_read_in_current_byte == 0
+                            else (6 - self.next_bits_read_in_current_byte)
+                        )
+                    ]
+                    * self.byte
+                )
+            else:
+                if self.next_bits_read_in_current_byte > 0:
+                    self.byte >>= 6 - self.next_bits_read_in_current_byte
+                self.value += self.byte
+            self.i += 1
+        self.current_bit_pos = self.next_bit_position
+        self.bits_read_in_current_byte = self.next_bits_read_in_current_byte
+        self.current_byte_pos += (
+            self.bytes_read
+            if self.bits_read_in_current_byte == 0
+            else (self.bytes_read - 1)
+        )
+        return self.value
+
+    def read_value(self):
+        self.header = self.read_n_bits(8)
+        return (
+            (-1 if (self.header & 2) else 1)
+            * (1e3 if (self.header & 1) else 1)
+            * self.read_n_bits(self.header >> 2)
+        )
+
+    def readWaypoints(self):
+        k = self.read_value()
+        pts = []
+        t = 0
+        lat = 0
+        lng = 0
+        for _ in range(k):
+            t += self.read_value()
+            lat += self.read_value()
+            lng += self.read_value()
+            pts.append((t, lat, lng))
+        return pts

@@ -1,14 +1,14 @@
 {% extends "user_sessions/_base.html" %}
-{% load user_sessions i18n %}
+{% load i18n user_sessions %}
 {% block sub_sub_content %}
-    {% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}
-    {% trans "<em>unknown</em>" as unknown %}
+    {% translate "<em>unknown on unknown</em>" as unknown_on_unknown %}
+    {% translate "<em>unknown</em>" as unknown %}
     <table class="table">
         <thead>
             <tr>
-                <th>{% trans "Location" %}</th>
-                <th>{% trans "Device" %}</th>
-                <th>{% trans "Last Activity" %}</th>
+                <th>{% translate "Location" %}</th>
+                <th>{% translate "Device" %}</th>
+                <th>{% translate "Last Activity" %}</th>
             </tr>
         </thead>
         {% for object in object_list %}
@@ -19,9 +19,9 @@
                 <td>{{ object.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
                 <td>
                     {% if object.session_key == session_key %}
-                        {% blocktrans with time=object.last_activity|timesince %}{{ time }} ago (this session){% endblocktrans %}
+                        {% blocktranslate with time=object.last_activity|timesince %}{{ time }} ago (this session){% endblocktranslate %}
                     {% else %}
-                        {% blocktrans with time=object.last_activity|timesince %}{{ time }} ago{% endblocktrans %}
+                        {% blocktranslate with time=object.last_activity|timesince %}{{ time }} ago{% endblocktranslate %}
                     {% endif %}
                 </td>
             </tr>
@@ -32,10 +32,10 @@
               action="{% url 'dashboard:account_session_delete_other' %}">
             {% csrf_token %}
             <p>
-                {% blocktrans %}You can end all other sessions but the current.
-        This will log you out on all other devices.{% endblocktrans %}
+                {% blocktranslate %}You can end all other sessions but the current.
+        This will log you out on all other devices.{% endblocktranslate %}
             </p>
-            <button type="submit" class="btn btn-secondary btn-danger mb-1">{% trans "End All Other Sessions" %}</button>
+            <button type="submit" class="btn btn-secondary btn-danger mb-1">{% translate "End All Other Sessions" %}</button>
         </form>
     {% endif %}
 {% endblock sub_sub_content %}

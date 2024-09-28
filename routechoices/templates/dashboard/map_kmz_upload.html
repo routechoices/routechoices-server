@@ -1,5 +1,5 @@
 {% extends "dashboard/club_view.html" %}
-{% load static django_bootstrap5 compress %}
+{% load compress django_bootstrap5 static %}
 {% block sub_sub_content %}
     <div class="row">
         <div class="col-12">
@@ -48,10 +48,11 @@
         </div>
     </div>
 {% endblock sub_sub_content %}
+
 {% block extra_body %}
     {% compress js %}
         <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
-        <script src="{% static '/vendor/jszip-3.10.1/jszip.min.js'%}"></script>
+        <script src="{% static '/vendor/jszip-3.10.1/jszip.min.js' %}"></script>
         <script src="{% static '/scripts/dashboard/map_kmz_upload.js' %}"></script>
         <script src="{% static '/scripts/submit-form-commons.js' %}"></script>
     {% endcompress %}
