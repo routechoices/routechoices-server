@@ -1,32 +1,30 @@
 function RCEvent(infoURL, clockURL) {
-  var infoURL = infoURL;
-  var bgLayer = null;
-  var clock = ServerClock({ url: clockURL, burstSize: 1 });
+  let bgLayer = null;
+  const clock = ServerClock({ url: clockURL, burstSize: 1 });
   setTimeout(clock.stopRefreshes, 1000);
-  var eventStart = null;
-  var eventEnd = null;
-  var map = null;
-  var showControls = false;
-  var locateControl;
-  var eventStateControl;
-  var coordsControl;
-  var panControl;
-  var zoomControl;
-  var rotateControl;
-  var scaleControl;
-  var runnerIconScale = 1;
-  var isLive = false;
-  var isLiveEvent = false;
-  var shortcutURL = "";
-  var dataURL;
-  var sendInterval = 5;
-  var tailLength = 60;
-  var previousFetchMapData = null;
-  var previousFetchAnouncement = null;
-  var zoomOnRunners = false;
-  var rasterMapLayer;
-  var mapOpacity = 1;
-  var toastAnouncement = new bootstrap.Toast(
+  let eventStart = null;
+  let eventEnd = null;
+  let map = null;
+  let locateControl;
+  let eventStateControl;
+  let coordsControl;
+  let panControl;
+  let zoomControl;
+  let rotateControl;
+  let scaleControl;
+  let runnerIconScale = 1;
+  let isLive = false;
+  let isLiveEvent = false;
+  let shortcutURL = "";
+  let dataURL;
+  let sendInterval = 5;
+  let tailLength = 60;
+  let previousFetchMapData = null;
+  let previousFetchAnouncement = null;
+  let zoomOnRunners = false;
+  let rasterMapLayer;
+  let mapOpacity = 1;
+  const toastAnouncement = new bootstrap.Toast(
     document.getElementById("text-alert"),
     {
       animation: true,
@@ -35,50 +33,50 @@ function RCEvent(infoURL, clockURL) {
   );
   toastAnouncement.hide();
 
-  var isRealTime = true;
-  var isCustomStart = false;
-  var competitorList = {};
-  var competitorRoutes = {};
-  var competitorBatteyLevels = {};
-  var routesLastFetched = -Infinity;
-  var fetchPositionInterval = 10;
-  var playbackRate = 8;
-  var playbackPaused = true;
-  var prevDisplayRefresh = 0;
-  var prevMeterDisplayRefresh = 0;
-  var isCurrentlyFetchingRoutes = false;
-  var currentTime = 0;
-  var optionDisplayed = false;
-  var searchText = null;
-  var resetMassStartContextMenuItem = null;
-  var setMassStartContextMenuItem = null;
-  var clusters = {};
-  var splitLineCount = 0;
-  var splitTimes = [];
-  var startLineCrosses = [];
-  var splitLinesPoints = [];
-  var splitLinesLine = [];
-  var splitLinesLabel = [];
-  var removeSplitLinesContextMenuItem = [];
-  var rankingFromLap = 1;
-  var rankingFromSplit = null;
-  var rankingToLap = 1;
-  var rankingToSplit = null;
-  var showClusters = false;
-  var showControls = false;
-  var colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
-  var mapSelectorLayer = null;
-  var sidebarShown = true;
-  var isMapMoving = false;
-  var intersectionCheckZoom = 18;
-  var showUserLocation = false;
-  var showAll = true;
-  var rankControl = null;
-  var competitorsMinCustomOffset = null;
+  let isRealTime = true;
+  let isCustomStart = false;
+  let competitorList = {};
+  let competitorRoutes = {};
+  let competitorBatteyLevels = {};
+  let routesLastFetched = -Infinity;
+  let fetchPositionInterval = 10;
+  let playbackRate = 8;
+  let playbackPaused = true;
+  let prevDisplayRefresh = 0;
+  let prevMeterDisplayRefresh = 0;
+  let isCurrentlyFetchingRoutes = false;
+  let currentTime = 0;
+  let optionDisplayed = false;
+  let searchText = null;
+  let resetMassStartContextMenuItem = null;
+  let setMassStartContextMenuItem = null;
+  let clusters = {};
+  let splitLineCount = 0;
+  let splitTimes = [];
+  let startLineCrosses = [];
+  let splitLinesPoints = [];
+  let splitLinesLine = [];
+  let splitLinesLabel = [];
+  let removeSplitLinesContextMenuItem = [];
+  let rankingFromLap = 1;
+  let rankingFromSplit = null;
+  let rankingToLap = 1;
+  let rankingToSplit = null;
+  let showClusters = false;
+  let showControls = false;
+  const colorModal = new bootstrap.Modal(document.getElementById("colorModal"));
+  let mapSelectorLayer = null;
+  let sidebarShown = true;
+  let isMapMoving = false;
+  let intersectionCheckZoom = 18;
+  let showUserLocation = false;
+  let showAll = true;
+  let rankControl = null;
+  let competitorsMinCustomOffset = null;
 
   L.Control.Ranking = L.Control.extend({
     onAdd: function () {
-      var back = L.DomUtil.create(
+      const back = L.DomUtil.create(
         "div",
         "leaflet-bar leaflet-control leaflet-control-ranking"
       );
@@ -114,7 +112,7 @@ function RCEvent(infoURL, clockURL) {
     },
 
     setSplitSelectors: function () {
-      var out =
+      const out =
         '<div class="d-flex flex-row">' +
         '<div class="me-1">' +
         "<label>" +
@@ -203,14 +201,14 @@ function RCEvent(infoURL, clockURL) {
     },
 
     setValues: function (ranking) {
-      var el = u(".leaflet-control-ranking").find(".result-name-list");
-      var innerOut = u('<div class="result-name-list"/>');
+      const el = u(".leaflet-control-ranking").find(".result-name-list");
+      const innerOut = u('<div class="result-name-list"/>');
       if (ranking.length > 0) {
         ranking.sort(function (a, b) {
           return a.time - b.time;
         });
       }
-      var relativeTime = rankingFromSplit == null;
+      const relativeTime = rankingFromSplit == null;
       ranking.forEach(function (c, i) {
         innerOut.append(
           '<div class="text-nowrap overflow-hidden text-truncate" style="clear: both; width: 200px;"><span class="text-nowrap d-inline-block float-start overflow-hidden text-truncate" style="width: 135px;">' +
@@ -234,7 +232,7 @@ function RCEvent(infoURL, clockURL) {
       }
       u(".leaflet-control-ranking #dl-ranking-btn").off("click");
       u(".leaflet-control-ranking #dl-ranking-btn").on("click", function () {
-        var out = "";
+        let out = "";
         ranking.forEach(function (c, i) {
           out +=
             c.competitor.name +
@@ -242,7 +240,7 @@ function RCEvent(infoURL, clockURL) {
             myEvent.getProgressBarText(c.time, false, false, relativeTime) +
             "\n";
         });
-        var element = document.createElement("a");
+        const element = document.createElement("a");
         element.setAttribute(
           "href",
           "data:text/plain;charset=utf-8," + encodeURIComponent(out)
@@ -285,14 +283,14 @@ function RCEvent(infoURL, clockURL) {
         competitor.color = getColor(i);
         competitor.isColorDark = getContrastYIQ(competitor.color);
       }
-      var div = u("<div/>");
+      const div = u("<div/>");
       div.addClass("card-body", "px-1", "pt-1", "pb-0", "competitor-card");
       {
-        var firstLine = u("<div/>")
+        const firstLine = u("<div/>")
           .addClass("text-nowrap", "text-truncate", "overflow-hidden")
           .css({ lineHeight: "1.13rem" });
 
-        var colorTag = u("<span/>")
+        const colorTag = u("<span/>")
           .addClass("color-tag", "me-1")
           .css({ cursor: "pointer" });
 
@@ -302,7 +300,7 @@ function RCEvent(infoURL, clockURL) {
           });
         }
 
-        var colorTagIcon = u("<i/>")
+        const colorTagIcon = u("<i/>")
           .addClass(
             "media-object",
             "fa-3x",
@@ -326,7 +324,7 @@ function RCEvent(infoURL, clockURL) {
           });
         }
 
-        var nameDiv = u("<span/>")
+        const nameDiv = u("<span/>")
           .addClass("overflow-hidden", "ps-0", "text-truncate", "fw-bold")
           .text(competitor.name);
 
@@ -336,7 +334,7 @@ function RCEvent(infoURL, clockURL) {
         div.append(firstLine);
       }
       {
-        var secondLine = u("<div/>").addClass(
+        const secondLine = u("<div/>").addClass(
           "text-nowrap",
           "text-truncate",
           "overflow-hidden",
@@ -345,7 +343,7 @@ function RCEvent(infoURL, clockURL) {
         );
 
         {
-          var competitorSwitch = u("<div/>")
+          const competitorSwitch = u("<div/>")
             .addClass(
               "form-check",
               "form-switch",
@@ -359,7 +357,7 @@ function RCEvent(infoURL, clockURL) {
               "aria-label": "toggle competitor",
             });
 
-          var competitorSwitchInput = u("<input/>")
+          const competitorSwitchInput = u("<input/>")
             .addClass("form-check-input", "competitor-switch")
             .css({ boxShadow: "none" })
             .attr({
@@ -367,7 +365,7 @@ function RCEvent(infoURL, clockURL) {
               checked: !!competitor.isShown,
             })
             .on("click", function (e) {
-              var commonDiv = u(this).parent().parent();
+              const commonDiv = u(this).parent().parent();
               if (!e.target.checked) {
                 competitor.isShown = false;
                 competitor.focused = false;
@@ -385,7 +383,7 @@ function RCEvent(infoURL, clockURL) {
                   .removeClass("route-displayed")
                   .addClass("route-not-displayed");
 
-                var colorTag = commonDiv.parent().find(".color-tag");
+                const colorTag = commonDiv.parent().find(".color-tag");
                 colorTag
                   .find("i.fa-circle")
                   .css({ color: "rgba(250, 250, 250, 0.9)" });
@@ -419,7 +417,7 @@ function RCEvent(infoURL, clockURL) {
                     .addClass("if-live");
                 }
 
-                var colorTag = commonDiv.parent().find(".color-tag");
+                const colorTag = commonDiv.parent().find(".color-tag");
                 colorTag.find("i.fa-circle").css({ color: competitor.color });
                 colorTag.on("click", function () {
                   onChangeCompetitorColor(competitor);
@@ -434,7 +432,7 @@ function RCEvent(infoURL, clockURL) {
         }
 
         {
-          var competitorCenterBtn = u("<button/>")
+          const competitorCenterBtn = u("<button/>")
             .addClass("btn", "btn-default", "btn-sm", "p-0", "ms-1", "me-0")
             .attr({
               type: "button",
@@ -447,7 +445,7 @@ function RCEvent(infoURL, clockURL) {
               zoomOnCompetitor(competitor);
             });
 
-          var competitorCenterIcon = u("<i/>").addClass(
+          const competitorCenterIcon = u("<i/>").addClass(
             "fa-solid",
             "fa-location-dot"
           );
@@ -457,7 +455,7 @@ function RCEvent(infoURL, clockURL) {
         }
 
         {
-          var competitorFollowBtn = u("<button/>")
+          const competitorFollowBtn = u("<button/>")
             .addClass(
               "btn",
               "btn-default",
@@ -502,7 +500,7 @@ function RCEvent(infoURL, clockURL) {
               }
             });
 
-          var competitorFollowBtnIcon = u("<i/>").addClass(
+          const competitorFollowBtnIcon = u("<i/>").addClass(
             "fa-solid",
             "fa-crosshairs"
           );
@@ -512,7 +510,7 @@ function RCEvent(infoURL, clockURL) {
         }
 
         {
-          var competitorHighlightBtn = u("<button/>")
+          const competitorHighlightBtn = u("<button/>")
             .addClass(
               "btn",
               "btn-default",
@@ -534,7 +532,7 @@ function RCEvent(infoURL, clockURL) {
               toggleHighlightCompetitor(competitor);
             });
 
-          var competitorHighlightIcon = u("<i/>").addClass(
+          const competitorHighlightIcon = u("<i/>").addClass(
             "fa-solid",
             "fa-highlighter"
           );
@@ -544,7 +542,7 @@ function RCEvent(infoURL, clockURL) {
         }
 
         {
-          var competitorFullRouteBtn = u("<button/>")
+          const competitorFullRouteBtn = u("<button/>")
             .addClass(
               "btn",
               "btn-default",
@@ -566,7 +564,7 @@ function RCEvent(infoURL, clockURL) {
               toggleCompetitorFullRoute(competitor);
             });
 
-          var competitorFullRouteBtnIcon = u("<svg/>")
+          const competitorFullRouteBtnIcon = u("<svg/>")
             .addClass("full-route-icon")
             .attr({
               fill: competitor.displayFullRoute
@@ -587,7 +585,7 @@ function RCEvent(infoURL, clockURL) {
         }
 
         if (competitorBatteyLevels.hasOwnProperty(competitor.id)) {
-          var batteryLevelDiv = u("<div/>").addClass(
+          const batteryLevelDiv = u("<div/>").addClass(
             "float-end",
             "d-inline-blockv",
             "text-end",
@@ -596,7 +594,7 @@ function RCEvent(infoURL, clockURL) {
             !isLive || !competitor.isShown ? "d-none" : ""
           );
 
-          var batterySpan = u("<span/>").attr({
+          const batterySpan = u("<span/>").attr({
             "data-bs-toggle": "tooltip",
             "data-bs-custom-class": "higher-z-index",
             "data-bs-title":
@@ -605,7 +603,7 @@ function RCEvent(infoURL, clockURL) {
                 : banana.i18n("unknown"),
           });
 
-          var batteryIcon = u("<i/>").addClass(
+          const batteryIcon = u("<i/>").addClass(
             "fa-solid",
             "fa-rotate-270",
             `fa-battery-${batteryIconName(
@@ -620,13 +618,13 @@ function RCEvent(infoURL, clockURL) {
         }
 
         {
-          var metersDiv = u("<div/>")
+          const metersDiv = u("<div/>")
             .addClass("float-end d-inline-block text-end")
             .css({ lineHeight: "10px" });
-          var speedometer = u("<span/>")
+          const speedometer = u("<span/>")
             .addClass("speedometer")
             .text(!competitor.isShown ? "" : competitor.speedometerValue || "");
-          var odometer = u("<span/>")
+          const odometer = u("<span/>")
             .addClass("odometer")
             .text(!competitor.isShown ? "" : competitor.odometerValue || "");
           metersDiv.append(speedometer).append("<br/>").append(odometer);
@@ -640,7 +638,7 @@ function RCEvent(infoURL, clockURL) {
       competitor.speedometer = div.find(".speedometer").first();
       competitor.odometer = div.find(".odometer").first();
 
-      var divOneUp = u(
+      const divOneUp = u(
         '<div class="card mb-1" style="background-color:transparent;"/>'
       ).append(div);
 
@@ -751,7 +749,7 @@ function RCEvent(infoURL, clockURL) {
     map.doubleClickZoom.disable();
     map.on("dblclick", onPressCustomMassStart);
 
-    var progressBarSlider = document.querySelector("#full_progress_bar");
+    const progressBarSlider = document.querySelector("#full_progress_bar");
     progressBarSlider.onmousedown = function (event) {
       event.preventDefault();
       document.addEventListener("mousemove", pressProgressBar);
@@ -769,14 +767,14 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function fitRasterMapLayerBounds(bounds) {
-    var bLat = bounds.map((coord) => coord[0]).sort(sortingFunction);
-    var bLon = bounds.map((coord) => coord[1]).sort(sortingFunction);
-    var s = (bLat[0] + bLat[1]) / 2;
-    var n = (bLat[2] + bLat[3]) / 2;
-    var w = (bLon[0] + bLon[1]) / 2;
-    var e = (bLon[2] + bLon[3]) / 2;
+    const bLat = bounds.map((coord) => coord[0]).sort(sortingFunction);
+    const bLon = bounds.map((coord) => coord[1]).sort(sortingFunction);
+    const s = (bLat[0] + bLat[1]) / 2;
+    const n = (bLat[2] + bLat[3]) / 2;
+    const w = (bLon[0] + bLon[1]) / 2;
+    const e = (bLon[2] + bLon[3]) / 2;
 
-    var newBounds = [
+    const newBounds = [
       [n, e],
       [n, w],
       [s, w],
@@ -841,28 +839,32 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function CountDown() {
-    var duration = dayjs.duration(dayjs(eventStart).diff(dayjs()));
-    var durationInSeconds = Math.max(duration.asSeconds(), 0);
-    var days = Math.floor(durationInSeconds / (24 * 3600));
+    const duration = dayjs.duration(dayjs(eventStart).diff(dayjs()));
+    const durationInSeconds = Math.max(duration.asSeconds(), 0);
+    const days = Math.floor(durationInSeconds / (24 * 3600));
     durationInSeconds -= days * (24 * 3600);
-    var hours = Math.floor(durationInSeconds / 3600);
+    const hours = Math.floor(durationInSeconds / 3600);
     durationInSeconds -= hours * 3600;
-    var minutes = Math.floor(durationInSeconds / 60);
+    const minutes = Math.floor(durationInSeconds / 60);
     durationInSeconds -= minutes * 60;
-    var seconds = Math.floor(durationInSeconds);
+    const seconds = Math.floor(durationInSeconds);
 
-    var daysText = dayjs.duration(2, "days").humanize().replace("2", "").trim();
-    var hoursText = dayjs
+    const daysText = dayjs
+      .duration(2, "days")
+      .humanize()
+      .replace("2", "")
+      .trim();
+    const hoursText = dayjs
       .duration(2, "hours")
       .humanize()
       .replace("2", "")
       .trim();
-    var minutesText = dayjs
+    const minutesText = dayjs
       .duration(2, "minutes")
       .humanize()
       .replace("2", "")
       .trim();
-    var secondsText = dayjs
+    const secondsText = dayjs
       .duration(2, "seconds")
       .humanize()
       .replace("2", "")
@@ -900,7 +902,7 @@ function RCEvent(infoURL, clockURL) {
       if (document.fullscreenElement != null) {
         document.exitFullscreen();
       } else {
-        var elem = document.getElementById("main-div");
+        const elem = document.getElementById("main-div");
         if (elem.requestFullscreen) {
           elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) {
@@ -928,14 +930,14 @@ function RCEvent(infoURL, clockURL) {
         if (response.event.backdrop === "blank") {
           u("#map").css({ background: "#fff" });
         } else {
-          var layer = backdropMaps?.[response.event.backdrop];
+          const layer = backdropMaps?.[response.event.backdrop];
           if (layer) {
             layer.addTo(map);
             layer.nickname = response.event.backdrop;
             bgLayer = layer;
           }
         }
-        var now = clock.now();
+        const now = clock.now();
         eventStart = new Date(response.event.start_date);
 
         setInterval(function () {
@@ -956,7 +958,7 @@ function RCEvent(infoURL, clockURL) {
           u("#export-nav-item").remove();
           hideSidebar();
           u("#map").removeClass("no-sidebar");
-          var preRaceModal = new bootstrap.Modal(
+          const preRaceModal = new bootstrap.Modal(
             document.getElementById("eventNotStartedModal"),
             { backdrop: "static", keyboard: false }
           );
@@ -1114,14 +1116,14 @@ function RCEvent(infoURL, clockURL) {
       currentTime =
         +clock.now() - (fetchPositionInterval + 5 + sendInterval + 5) * 1e3; // 25sec // Delay includes by the fetch interval (10s) + the cache interval (5sec) + the send interval (default 5sec) + smoothness delay (5sec)
       if (ts - prevDisplayRefresh > 100) {
-        var refreshMeters = ts - prevMeterDisplayRefresh > 500;
-        drawCompetitors(refreshMeters);
+        const mustRefreshMeters = ts - prevMeterDisplayRefresh > 500;
+        drawCompetitors(mustRefreshMeters);
         prevDisplayRefresh = ts;
-        if (refreshMeters) {
+        if (mustRefreshMeters) {
           prevMeterDisplayRefresh = ts;
         }
       }
-      var isStillLive = eventEnd >= clock.now();
+      const isStillLive = eventEnd >= clock.now();
       if (!isStillLive) {
         onSwitchToReplay();
       }
@@ -1133,8 +1135,8 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function getCompetitionStartDate(nullIfNone = false) {
-    var res = +clock.now();
-    var found = false;
+    let res = +clock.now();
+    let found = false;
     Object.values(competitorRoutes).forEach(function (route) {
       if (route) {
         if (res > route.getByIndex(0).timestamp) {
@@ -1150,10 +1152,10 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function getCompetitionEndDate() {
-    var res = new Date(0);
+    let res = new Date(0);
     Object.values(competitorRoutes).forEach(function (route) {
       if (route) {
-        var idx = route.getPositionsCount() - 1;
+        const idx = route.getPositionsCount() - 1;
         res =
           res < route.getByIndex(idx).timestamp
             ? route.getByIndex(idx).timestamp
@@ -1167,12 +1169,12 @@ function RCEvent(infoURL, clockURL) {
     if (customOffset === undefined) {
       customOffset = false;
     }
-    var res = 0;
+    let res = 0;
     Object.values(competitorList).forEach(function (competitor) {
-      var route = competitorRoutes[competitor.id];
+      const route = competitorRoutes[competitor.id];
       if (route) {
-        var idx = route.getPositionsCount() - 1;
-        var dur =
+        const idx = route.getPositionsCount() - 1;
+        const dur =
           route.getByIndex(idx).timestamp -
           ((customOffset
             ? competitor.custom_offset
@@ -1232,8 +1234,8 @@ function RCEvent(infoURL, clockURL) {
       splitLinesPoints[splitLineCount],
       { color: "purple" }
     );
-    var splitLineIcon = getSplitLineMarker("" + (splitLineCount + 1));
-    var coordinates = splitLinesPoints[splitLineCount].sort(function (a, b) {
+    const splitLineIcon = getSplitLineMarker("" + (splitLineCount + 1));
+    const coordinates = splitLinesPoints[splitLineCount].sort(function (a, b) {
       return a.lat - b.lat;
     })[0];
     splitLinesLabel[splitLineCount] = L.marker(coordinates, {
@@ -1310,7 +1312,7 @@ function RCEvent(infoURL, clockURL) {
         eventEnd = new Date(response.event.end_date);
 
         if (new Date(response.event.start_date) != eventStart) {
-          var oldStart = eventStart;
+          const oldStart = eventStart;
           eventStart = new Date(response.event.start_date);
           // user changed the event start from past to in the future
           if (oldStart < clock.now() && eventStart > clock.now()) {
@@ -1338,7 +1340,7 @@ function RCEvent(infoURL, clockURL) {
         this.removeEventListener("hidden.bs.toast", onHidden);
         showToast();
       }
-      var isHidden = u("#text-alert").hasClass("show");
+      const isHidden = u("#text-alert").hasClass("show");
       if (isHidden) {
         document
           .getElementById("text-alert")
@@ -1354,33 +1356,34 @@ function RCEvent(infoURL, clockURL) {
   function displayMaps(maps, init = false) {
     if (Array.isArray(maps) && JSON.stringify(maps) !== previousFetchMapData) {
       previousFetchMapData = JSON.stringify(maps);
-      var currentMapUpdated = maps.find(function (m) {
+      const currentMapUpdated = maps.find(function (m) {
         return (
           rasterMapLayer &&
           m.id === rasterMapLayer.data.id &&
           m.modification_date !== rasterMapLayer.data.modification_date
         );
       });
-      var currentMap = maps.find(function (m) {
+      const currentMap = maps.find(function (m) {
         return rasterMapLayer && m.id === rasterMapLayer.data.id;
       });
       if (rasterMapLayer && (currentMapUpdated || maps.length <= 1)) {
         rasterMapLayer.remove();
       }
       if (maps.length) {
-        var mapChoices = {};
-        for (var i = 0; i < maps.length; i++) {
-          var mapData = maps[i];
+        const mapChoices = {};
+        for (let i = 0; i < maps.length; i++) {
+          const mapData = maps[i];
           mapData.title =
             !mapData.title && mapData.default
               ? '<i class="fa-solid fa-star"></i> Main Map'
               : u("<i/>").text(mapData.title).text();
-          var layer = addRasterMapLayer(mapData, i);
+          const layer = addRasterMapLayer(mapData, i);
           mapChoices[mapData.title] = layer;
 
-          var isSingleMap = maps.length === 1;
-          var isCurrentMap = currentMap?.id === mapData.id;
-          var isItNewDefaultWhenCurrentDeleted = !currentMap && mapData.default;
+          const isSingleMap = maps.length === 1;
+          const isCurrentMap = currentMap?.id === mapData.id;
+          const isItNewDefaultWhenCurrentDeleted =
+            !currentMap && mapData.default;
           if (isSingleMap || isCurrentMap || isItNewDefaultWhenCurrentDeleted) {
             setRasterMap(layer, currentMapUpdated || isSingleMap || init);
           }
@@ -1453,7 +1456,7 @@ function RCEvent(infoURL, clockURL) {
       ) {
         fetchCompetitorRoutes();
       }
-      var actualPlaybackRate = playbackPaused ? 0 : playbackRate;
+      const actualPlaybackRate = playbackPaused ? 0 : playbackRate;
       if (getCompetitionStartDate(true) === null) {
         currentTime = 0;
         maxCTime = 0;
@@ -1462,10 +1465,12 @@ function RCEvent(infoURL, clockURL) {
           getCompetitionStartDate(),
           prevShownTime + (ts - prevDisplayRefresh) * actualPlaybackRate
         );
-        var maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
+        let maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
         if (isCustomStart) {
           maxCTime =
             getCompetitorsMinCustomOffset() + getCompetitorsMaxDuration(true);
+        } else {
+          maxCTime = getCompetitionStartDate() + getCompetitorsMaxDuration();
         }
         if (isRealTime) {
           maxCTime =
@@ -1474,7 +1479,7 @@ function RCEvent(infoURL, clockURL) {
               getCompetitionStartDate());
         }
         currentTime = Math.min(+clock.now(), currentTime, maxCTime);
-        var liveTime =
+        const liveTime =
           +clock.now() - (fetchPositionInterval + 5 + sendInterval + 5) * 1e3;
 
         if (getCompetitionStartDate(true) !== null && currentTime > liveTime) {
@@ -1483,17 +1488,17 @@ function RCEvent(infoURL, clockURL) {
         }
       }
       if (ts - prevDisplayRefresh > 100) {
-        var refreshMeters = ts - prevMeterDisplayRefresh > 500;
-        drawCompetitors(refreshMeters);
-        if (refreshMeters) {
+        const mustRefreshMeters = ts - prevMeterDisplayRefresh > 500;
+        drawCompetitors(mustRefreshMeters);
+        if (mustRefreshMeters) {
           prevMeterDisplayRefresh = ts;
         }
         prevDisplayRefresh = ts;
         prevShownTime = currentTime;
       }
 
-      var isStillLive = isLiveEvent && eventEnd >= clock.now();
-      var isBackLive = !isLiveEvent && eventEnd >= clock.now();
+      const isStillLive = isLiveEvent && eventEnd >= clock.now();
+      const isBackLive = !isLiveEvent && eventEnd >= clock.now();
       if (!isStillLive) {
         u("#live_button")
           .off("click")
@@ -1525,7 +1530,7 @@ function RCEvent(infoURL, clockURL) {
   function addRasterMapLayer(mapData, indexEventMap) {
     const bounds = ["topLeft", "topRight", "bottomRight", "bottomLeft"].map(
       function (corner) {
-        var cornerCoords = mapData.coordinates[corner];
+        const cornerCoords = mapData.coordinates[corner];
         return [cornerCoords.lat, cornerCoords.lon];
       }
     );
@@ -1563,7 +1568,7 @@ function RCEvent(infoURL, clockURL) {
       "--navbar-size",
       document.fullscreenElement != null ? "0px" : "46px"
     );
-    var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+    const width = window.innerWidth > 0 ? window.innerWidth : screen.width;
     if (
       u("#sidebar").hasClass("d-sm-block") &&
       u("#sidebar").hasClass("d-none")
@@ -1611,8 +1616,8 @@ function RCEvent(infoURL, clockURL) {
       return;
     }
     optionDisplayed = false;
-    var scrollTopDiv = u("#competitorList").first()?.scrollTop;
-    var listDiv = u("<div/>");
+    const scrollTopDiv = u("#competitorList").first()?.scrollTop;
+    const listDiv = u("<div/>");
     listDiv.addClass("mt-1");
     listDiv.attr({ id: "competitorList", "data-bs-theme": getCurrentTheme() });
 
@@ -1622,15 +1627,14 @@ function RCEvent(infoURL, clockURL) {
         searchText === "" ||
         competitor.name.toLowerCase().search(searchText) != -1
       ) {
-        var div = u(
-          `<competitor-sidebar-el index="${i}"competitor-id="${competitor.id}"/>`
+        listDiv.append(
+          `<competitor-sidebar-el index="${i}" competitor-id="${competitor.id}"/>`
         );
-        listDiv.append(div);
       }
     });
 
     if (Object.keys(competitorList).length === 0) {
-      var div = u(
+      const div = u(
         '<div class="no-competitor-warning text-center d-flex justify-content-center align-items-center"/>'
       );
       div.append(
@@ -1642,13 +1646,13 @@ function RCEvent(infoURL, clockURL) {
       listDiv.append(div);
     }
     if (!searchText) {
-      var mainDiv = u(
+      const mainDiv = u(
         '<div id="competitorSidebar" class="d-flex flex-column"/>'
       );
-      var topDiv = u("<div/>");
-      var searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
+      const topDiv = u("<div/>");
+      const searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
       if (Object.keys(competitorList).length) {
-        var toggleAllContent = u("<div/>")
+        const toggleAllContent = u("<div/>")
           .addClass(
             "form-group",
             "form-check",
@@ -1663,7 +1667,7 @@ function RCEvent(infoURL, clockURL) {
           .attr({
             "aria-label": "toggle all competitors",
           });
-        var toggleAllInput = u("<input/>")
+        const toggleAllInput = u("<input/>")
           .addClass("form-check-input")
           .attr({
             id: "toggleAllSwitch",
@@ -1714,8 +1718,7 @@ function RCEvent(infoURL, clockURL) {
       u("#sidebar").append(mainDiv);
     } else {
       u("#competitorList").remove();
-      var mainDiv = u("#competitorSidebar");
-      mainDiv.append(listDiv);
+      u("#competitorSidebar").append(listDiv);
     }
     if (Object.keys(competitorList).length == 0) {
       listDiv.addClass("without-competitor");
@@ -1733,13 +1736,13 @@ function RCEvent(infoURL, clockURL) {
   function setCustomStart(latlng) {
     competitorsMinCustomOffset = +clock.now();
     Object.values(competitorList).forEach(function (competitor) {
-      var minDist = Infinity;
-      var minDistT = null;
-      var route = competitorRoutes[competitor.id];
+      let minDist = Infinity;
+      let minDistT = null;
+      const route = competitorRoutes[competitor.id];
 
       if (route) {
-        var length = route.getPositionsCount();
-        for (var i = 0; i < length; i++) {
+        const length = route.getPositionsCount();
+        for (let i = 0; i < length; i++) {
           dist = route.getByIndex(i).distance({
             coords: { latitude: latlng.lat, longitude: latlng.lng },
           });
@@ -1759,7 +1762,7 @@ function RCEvent(infoURL, clockURL) {
 
   function toggleCompetitorList(e) {
     e.preventDefault();
-    var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+    const width = window.innerWidth > 0 ? window.innerWidth : screen.width;
     if (
       sidebarShown &&
       !optionDisplayed &&
@@ -1809,7 +1812,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function pressProgressBar(e) {
-    var perc =
+    const perc =
       (e.pageX - document.getElementById("full_progress_bar").offsetLeft) /
       u("#full_progress_bar").size().width;
     onMoveProgressBar(perc);
@@ -1821,7 +1824,7 @@ function RCEvent(infoURL, clockURL) {
 
   function shareURL(e) {
     e.preventDefault();
-    var shareData = {
+    const shareData = {
       title: u('meta[property="og:title"]').attr("content"),
       text: u('meta[property="og:description"]').attr("content"),
       url: shortcutURL,
@@ -1873,8 +1876,8 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function touchProgressBar(e) {
-    var touchLocation = e.targetTouches[0];
-    var perc =
+    const touchLocation = e.targetTouches[0];
+    const perc =
       (touchLocation.pageX -
         document.getElementById("full_progress_bar").offsetLeft) /
       u("#full_progress_bar").size().width;
@@ -1899,17 +1902,17 @@ function RCEvent(infoURL, clockURL) {
           cb && cb();
           return;
         }
-        var runnerPoints = [];
+        const runnerPoints = [];
 
         response.competitors.forEach(function (competitor) {
-          var route = null;
+          let route = null;
           if (competitor.encoded_data) {
             route = PositionArchive.fromEncoded(competitor.encoded_data);
             competitorRoutes[competitor.id] = route;
             if (zoomOnRunners) {
-              var length = route.getPositionsCount();
-              for (var i = 0; i < length; i++) {
-                var pt = route.getByIndex(i);
+              const length = route.getPositionsCount();
+              for (let i = 0; i < length; i++) {
+                const pt = route.getByIndex(i);
                 runnerPoints.push(
                   L.latLng([pt.coords.latitude, pt.coords.longitude])
                 );
@@ -1947,12 +1950,12 @@ function RCEvent(infoURL, clockURL) {
       return;
     }
     competitor.focusing = true;
-    var route = competitorRoutes[competitor.id];
+    const route = competitorRoutes[competitor.id];
     if (!route) {
       competitor.focusing = false;
       return;
     }
-    var timeT = currentTime;
+    let timeT = currentTime;
     if (!isRealTime) {
       if (isCustomStart) {
         timeT += competitor.custom_offset - getCompetitionStartDate();
@@ -1960,7 +1963,7 @@ function RCEvent(infoURL, clockURL) {
         timeT += +new Date(competitor.start_time) - getCompetitionStartDate();
       }
     }
-    var loc = route.getByTime(timeT);
+    const loc = route.getByTime(timeT);
     map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
       animate: true,
     });
@@ -1970,15 +1973,15 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function redrawCompetitorMarker(competitor, location, faded) {
-    var coordinates = [location.coords.latitude, location.coords.longitude];
-    var redraw =
+    const coordinates = [location.coords.latitude, location.coords.longitude];
+    const redraw =
       competitor.mapMarker && competitor.iconScale != runnerIconScale;
     if (redraw) {
       map.removeLayer(competitor.mapMarker);
       competitor.mapMarker = null;
     }
     if (!competitor.mapMarker) {
-      var runnerIcon = getRunnerIcon(
+      const runnerIcon = getRunnerIcon(
         competitor.color,
         faded,
         competitor.highlighted,
@@ -1993,11 +1996,11 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function redrawCompetitorNametag(competitor, location, faded) {
-    var coordinates = [location.coords.latitude, location.coords.longitude];
-    var pointX = map.latLngToContainerPoint(coordinates).x;
-    var mapMiddleX = map.getSize().x / 2;
-    var nametagOnRightSide = pointX > mapMiddleX;
-    var nametagChangeSide =
+    const coordinates = [location.coords.latitude, location.coords.longitude];
+    const pointX = map.latLngToContainerPoint(coordinates).x;
+    const mapMiddleX = map.getSize().x / 2;
+    const nametagOnRightSide = pointX > mapMiddleX;
+    const nametagChangeSide =
       competitor.nameMarker &&
       (competitor.scale != runnerIconScale ||
         (competitor.isNameOnRight && !nametagOnRightSide) ||
@@ -2008,7 +2011,7 @@ function RCEvent(infoURL, clockURL) {
     }
     if (!competitor.nameMarker) {
       competitor.isNameOnRight = nametagOnRightSide;
-      var runnerIcon = getRunnerNameMarker(
+      const runnerIcon = getRunnerNameMarker(
         competitor.short_name,
         competitor.color,
         competitor.isColorDark,
@@ -2026,8 +2029,8 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function redrawCompetitorTail(competitor, route, time) {
-    var tail = null;
-    var hasPointInTail = false;
+    let tail = null;
+    let hasPointInTail = false;
     if (competitor.displayFullRoute) {
       tail = route.extractInterval(-Infinity, time);
       hasPointInTail = route.hasPointInInterval(-Infinity, time);
@@ -2041,7 +2044,7 @@ function RCEvent(infoURL, clockURL) {
       }
       competitor.tail = null;
     } else {
-      var tailLatLng = tail
+      const tailLatLng = tail
         .getArray()
         .filter(function (pos) {
           return !isNaN(pos.coords.latitude);
@@ -2091,7 +2094,7 @@ function RCEvent(infoURL, clockURL) {
     });
   }
   function onChangeCompetitorColor(competitor) {
-    var color = competitor.color;
+    const color = competitor.color;
     u("#colorModalLabel").text(
       banana.i18n("select-color-for", competitor.name)
     );
@@ -2118,8 +2121,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function filterCompetitorList(e) {
-    var inputVal = u(e.target).val();
-    searchText = inputVal.toLowerCase();
+    searchText = u(e.target).val().toLowerCase();
     displayCompetitorList();
   }
 
@@ -2132,7 +2134,7 @@ function RCEvent(infoURL, clockURL) {
       displayCompetitorList();
       return;
     }
-    var width = window.innerWidth > 0 ? window.innerWidth : screen.width;
+    const width = window.innerWidth > 0 ? window.innerWidth : screen.width;
     // show sidebar
     if (!sidebarShown || (u("#sidebar").hasClass("d-none") && width <= 576)) {
       showSidebar();
@@ -2141,7 +2143,7 @@ function RCEvent(infoURL, clockURL) {
     u("#options_show_button").addClass("active");
     optionDisplayed = true;
     searchText = null;
-    var optionsSidebar = u("<div/>");
+    const optionsSidebar = u("<div/>");
     optionsSidebar.css({
       "overflow-y": "auto",
       "overflow-x": "hidden",
@@ -2152,19 +2154,19 @@ function RCEvent(infoURL, clockURL) {
     });
 
     {
-      var tailLenWidget = u("<div/>").addClass("mb-2");
+      const tailLenWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("tails"))
         .addClass("text-nowrap");
 
-      var widgetContent = u("<div/>").addClass("form-group");
+      const widgetContent = u("<div/>").addClass("form-group");
 
-      var tailLenLabel = u("<label/>").text(banana.i18n("length-in-seconds"));
+      const tailLenLabel = u("<label/>").text(banana.i18n("length-in-seconds"));
 
-      var tailLenFormDiv = u("<div/>").addClass("row", "g-1");
+      const tailLenFormDiv = u("<div/>").addClass("row", "g-1");
 
-      var hourInput = u("<input/>")
+      const hourInput = u("<input/>")
         .addClass("d-inline-block")
         .addClass("form-control", "tailLengthControl")
         .css({ width: "85px" })
@@ -2176,12 +2178,12 @@ function RCEvent(infoURL, clockURL) {
         })
         .val(Math.floor(tailLength / 3600));
 
-      var hourDiv = u("<div/>")
+      const hourDiv = u("<div/>")
         .addClass("col-auto")
         .append(hourInput)
         .append("<span> : </span>");
 
-      var minuteInput = u("<input/>")
+      const minuteInput = u("<input/>")
         .addClass("d-inline-block")
         .addClass("form-control", "tailLengthControl")
         .css({ width: "65px" })
@@ -2193,12 +2195,12 @@ function RCEvent(infoURL, clockURL) {
         })
         .val(Math.floor(tailLength / 60) % 60);
 
-      var minuteDiv = u("<div/>")
+      const minuteDiv = u("<div/>")
         .addClass("col-auto")
         .append(minuteInput)
         .append("<span> : </span>");
 
-      var secondInput = u("<input/>")
+      const secondInput = u("<input/>")
         .addClass("d-inline-block")
         .addClass("form-control", "tailLengthControl")
         .css({ width: "65px" })
@@ -2210,19 +2212,19 @@ function RCEvent(infoURL, clockURL) {
         })
         .val(tailLength % 60);
 
-      var secondDiv = u("<div/>").addClass("col-auto").append(secondInput);
+      const secondDiv = u("<div/>").addClass("col-auto").append(secondInput);
 
       tailLenFormDiv.append(hourDiv).append(minuteDiv).append(secondDiv);
 
       tailLenFormDiv.find(".tailLengthControl").on("input", function (e) {
-        var commonDiv = u(e.target).parent().parent();
-        var hourInput = commonDiv.find('input[name="hours"]');
-        var minInput = commonDiv.find('input[name="minutes"]');
-        var secInput = commonDiv.find('input[name="seconds"]');
-        var h = parseInt(hourInput.val() || 0);
-        var m = parseInt(minInput.val() || 0);
-        var s = parseInt(secInput.val() || 0);
-        var v = 3600 * h + 60 * m + s;
+        const commonDiv = u(e.target).parent().parent();
+        const hourInput = commonDiv.find('input[name="hours"]');
+        const minInput = commonDiv.find('input[name="minutes"]');
+        const secInput = commonDiv.find('input[name="seconds"]');
+        const h = parseInt(hourInput.val() || 0);
+        const m = parseInt(minInput.val() || 0);
+        const s = parseInt(secInput.val() || 0);
+        const v = 3600 * h + 60 * m + s;
         if (isNaN(v)) {
           return;
         }
@@ -2275,20 +2277,20 @@ function RCEvent(infoURL, clockURL) {
     }
 
     {
-      var ctrlWidget = u("<div/>").addClass("mb-2");
+      const ctrlWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("map-controls"))
         .addClass("text-nowrap");
 
-      var widgetContent = u("<div/>").addClass(
+      const widgetContent = u("<div/>").addClass(
         "form-check",
         "form-switch",
         "d-inline-block",
         "ms-1"
       );
 
-      var widgetInput = u("<input/>")
+      const widgetInput = u("<input/>")
         .addClass("form-check-input")
         .attr({
           id: "toggleControlsSwitch",
@@ -2308,7 +2310,7 @@ function RCEvent(infoURL, clockURL) {
             showControls = true;
           }
         });
-      var widgetLabel = u("<label/>")
+      const widgetLabel = u("<label/>")
         .addClass("form-check-label")
         .attr({ for: "toggleControlsSwitch" })
         .text(banana.i18n("show-map-controls"));
@@ -2320,20 +2322,20 @@ function RCEvent(infoURL, clockURL) {
       optionsSidebar.append(ctrlWidget);
     }
     {
-      var groupWidget = u("<div/>").addClass("mb-2");
+      const groupWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("groupings"))
         .addClass("text-nowrap");
 
-      var widgetContent = u("<div/>").addClass(
+      const widgetContent = u("<div/>").addClass(
         "form-check",
         "form-switch",
         "d-inline-block",
         "ms-1"
       );
 
-      var widgetInput = u("<input/>")
+      const widgetInput = u("<input/>")
         .addClass("form-check-input")
         .attr({
           id: "toggleClusterSwitch",
@@ -2344,7 +2346,7 @@ function RCEvent(infoURL, clockURL) {
           if (!e.target.checked) {
             showClusters = false;
             groupControl.remove();
-            for (var [key, cluster] of Object.entries(clusters)) {
+            for (const [key, cluster] of Object.entries(clusters)) {
               ["mapMarker", "nameMarker"].forEach(function (layerName) {
                 if (cluster[layerName]) {
                   cluster[layerName]?.remove();
@@ -2359,7 +2361,7 @@ function RCEvent(infoURL, clockURL) {
             showClusters = true;
           }
         });
-      var widgetLabel = u("<label/>")
+      const widgetLabel = u("<label/>")
         .addClass("form-check-label")
         .attr({ for: "toggleClusterSwitch" })
         .text(banana.i18n("show-groupings"));
@@ -2371,15 +2373,15 @@ function RCEvent(infoURL, clockURL) {
       optionsSidebar.append(groupWidget);
     }
     {
-      var langWidget = u("<div/>").addClass("mb-2");
+      const langWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .addClass("text-nowrap")
         .html(
           `<i class="fa-solid fa-language"></i> ${banana.i18n("language")}`
         );
 
-      var langSelector = u("<select/>")
+      const langSelector = u("<select/>")
         .addClass("form-select")
         .attr({ ariaLabel: "Language" })
         .on("change", function (e) {
@@ -2388,7 +2390,7 @@ function RCEvent(infoURL, clockURL) {
         });
 
       Object.keys(supportedLanguages).forEach(function (lang) {
-        var option = u("<option/>");
+        const option = u("<option/>");
         option.attr({ value: lang });
         option.html(supportedLanguages[lang]);
         if (locale === lang) {
@@ -2402,20 +2404,20 @@ function RCEvent(infoURL, clockURL) {
       optionsSidebar.append(langWidget);
     }
     {
-      var locWidget = u("<div/>").addClass("mb-2");
+      const locWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("location"))
         .addClass("text-nowrap");
 
-      var widgetContent = u("<div/>").addClass(
+      const widgetContent = u("<div/>").addClass(
         "form-check",
         "form-switch",
         "d-inline-block",
         "ms-1"
       );
 
-      var widgetInput = u("<input/>")
+      const widgetInput = u("<input/>")
         .addClass("form-check-input")
         .attr({
           id: "toggleLocationSwitch",
@@ -2430,7 +2432,7 @@ function RCEvent(infoURL, clockURL) {
             locateControl.start();
           }
         });
-      var widgetLabel = u("<label/>")
+      const widgetLabel = u("<label/>")
         .addClass("form-check-label")
         .attr({ for: "toggleLocationSwitch" })
         .text(banana.i18n("show-location"));
@@ -2443,20 +2445,20 @@ function RCEvent(infoURL, clockURL) {
     }
 
     if (rasterMapLayer) {
-      var toggleMapWidget = u("<div/>").addClass("mb-2");
+      const toggleMapWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("map"))
         .addClass("text-nowrap");
 
-      var widgetContent = u("<div/>").addClass(
+      const widgetContent = u("<div/>").addClass(
         "form-check",
         "form-switch",
         "d-inline-block",
         "ms-1"
       );
 
-      var widgetInput = u("<input/>")
+      const widgetInput = u("<input/>")
         .addClass("form-check-input")
         .attr({
           id: "toggleMapSwitch",
@@ -2471,7 +2473,7 @@ function RCEvent(infoURL, clockURL) {
           }
           rasterMapLayer?.setOpacity(mapOpacity);
         });
-      var widgetLabel = u("<label/>")
+      const widgetLabel = u("<label/>")
         .addClass("form-check-label")
         .attr({ for: "toggleMapSwitch" })
         .text(banana.i18n("hide-map"));
@@ -2484,13 +2486,13 @@ function RCEvent(infoURL, clockURL) {
     }
 
     {
-      var bgMapWidget = u("<div/>").addClass("mb-2");
+      const bgMapWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("background-map"))
         .addClass("text-nowrap");
 
-      var mapSelector = u("<select/>")
+      const mapSelector = u("<select/>")
         .addClass("form-select")
         .attr({ ariaLabel: "Background map" })
         .on("change", function (e) {
@@ -2502,7 +2504,7 @@ function RCEvent(infoURL, clockURL) {
             u("#map").css({ background: "#fff" });
           } else {
             u("#map").css({ background: "#ddd" });
-            var layer = cloneLayer(backdropMaps[e.target.value]);
+            const layer = cloneLayer(backdropMaps[e.target.value]);
             layer.nickname = e.target.value;
             layer.setZIndex(-1);
             layer.addTo(map);
@@ -2510,7 +2512,7 @@ function RCEvent(infoURL, clockURL) {
           }
         });
 
-      var blankOption = u("<option/>");
+      const blankOption = u("<option/>");
       blankOption.attr({ value: "blank" });
       blankOption.text("Blank");
       if (!bgLayer) {
@@ -2519,7 +2521,7 @@ function RCEvent(infoURL, clockURL) {
       mapSelector.append(blankOption);
 
       Object.entries(backgroundMapTitles).forEach(function (kv) {
-        var option = u("<option/>");
+        const option = u("<option/>");
         option.attr({ value: kv[0] });
         option.text(kv[1]);
         if (bgLayer?.nickname === kv[0]) {
@@ -2534,7 +2536,7 @@ function RCEvent(infoURL, clockURL) {
     }
 
     if (shortcutURL) {
-      var qr = new QRious();
+      const qr = new QRious();
       qr.set({
         background: "#f5f5f5",
         foreground: "black",
@@ -2543,22 +2545,22 @@ function RCEvent(infoURL, clockURL) {
         size: 138,
       });
 
-      var qrWidget = u("<div/>").addClass("mb-2");
+      const qrWidget = u("<div/>").addClass("mb-2");
 
-      var widgetTitle = u("<h4/>")
+      const widgetTitle = u("<h4/>")
         .text(banana.i18n("qr-link"))
         .addClass("text-nowrap");
 
       qrWidget.append(widgetTitle);
 
-      var widgetContent = u("<p/>").addClass("text-center");
+      const widgetContent = u("<p/>").addClass("text-center");
 
-      var qrImage = u("<img/>").attr({
+      const qrImage = u("<img/>").attr({
         src: qr.toDataURL(),
         alt: "QR code for this event",
       });
 
-      var qrText = u("<a/>")
+      const qrText = u("<a/>")
         .addClass("small", "fw-bold")
         .css({ wordBreak: "break-all" })
         .attr({ href: shortcutURL })
@@ -2576,7 +2578,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function keepFocusOnCompetitor(competitor, location) {
-    var coordinates = [location.coords.latitude, location.coords.longitude];
+    const coordinates = [location.coords.latitude, location.coords.longitude];
     const mapSize = map.getSize();
     const placeXY = map.latLngToContainerPoint(coordinates);
     if (
@@ -2592,7 +2594,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function getRelativeTime(currentTime) {
-    var viewedTime = currentTime;
+    let viewedTime = currentTime;
     if (isCustomStart) {
       viewedTime -= getCompetitorsMinCustomOffset();
     } else {
@@ -2608,11 +2610,11 @@ function RCEvent(infoURL, clockURL) {
     date = false,
     relative = true
   ) {
-    var result = "";
+    let result = "";
     if (bg && isLive) {
       return "";
     }
-    var viewedTime = currentTime;
+    let viewedTime = currentTime;
     if (!isRealTime || !relative) {
       if (currentTime === 0) {
         return "00:00:00";
@@ -2624,7 +2626,7 @@ function RCEvent(infoURL, clockURL) {
           viewedTime -= getCompetitionStartDate();
         }
       }
-      var t = viewedTime / 1e3;
+      const t = viewedTime / 1e3;
 
       function to2digits(x) {
         return ("0" + Math.floor(x)).slice(-2);
@@ -2632,7 +2634,7 @@ function RCEvent(infoURL, clockURL) {
       result += t > 3600 || bg ? Math.floor(t / 3600) + ":" : "";
       result += to2digits((t / 60) % 60) + ":" + to2digits(t % 60);
     } else {
-      var t = Math.round(viewedTime / 1e3);
+      const t = Math.round(viewedTime / 1e3);
       if (t === 0) {
         return "00:00:00";
       }
@@ -2656,8 +2658,8 @@ function RCEvent(infoURL, clockURL) {
   this.getProgressBarText = getProgressBarText;
 
   function formatSpeed(s) {
-    var min = Math.floor(s / 60);
-    var sec = Math.floor(s % 60);
+    const min = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
     if (min > 99) {
       return "--'--\"/km";
     }
@@ -2668,7 +2670,7 @@ function RCEvent(infoURL, clockURL) {
     if (!sidebarShown) {
       return false;
     }
-    var bcr = elem.getBoundingClientRect();
+    const bcr = elem.getBoundingClientRect();
     const elemCenter = {
       x: bcr.left + elem.offsetWidth / 2,
       y: bcr.top + elem.offsetHeight / 2,
@@ -2697,19 +2699,21 @@ function RCEvent(infoURL, clockURL) {
   function drawCompetitors(refreshMeters) {
     // play/pause button
     if (playbackPaused) {
-      var html = '<i class="fa-solid fa-play fa-fw"></i> x' + playbackRate;
-      if (u("#play_pause_button").html() != html) {
-        u("#play_pause_button").html(html);
+      const playButton =
+        '<i class="fa-solid fa-play fa-fw"></i> x' + playbackRate;
+      if (u("#play_pause_button").html() != playButton) {
+        u("#play_pause_button").html(playButton);
       }
     } else {
-      var html = '<i class="fa-solid fa-pause fa-fw"></i> x' + playbackRate;
-      if (u("#play_pause_button").html() != html) {
-        u("#play_pause_button").html(html);
+      const pauseButton =
+        '<i class="fa-solid fa-pause fa-fw"></i> x' + playbackRate;
+      if (u("#play_pause_button").html() != pauseButton) {
+        u("#play_pause_button").html(pauseButton);
       }
     }
     onAppResize();
     // progress bar
-    var perc = 0;
+    let perc = 0;
     if (isRealTime) {
       perc = isLive
         ? 100
@@ -2749,9 +2753,9 @@ function RCEvent(infoURL, clockURL) {
       if (!competitor.isShown) {
         return;
       }
-      var route = competitorRoutes[competitor.id];
+      const route = competitorRoutes[competitor.id];
       if (route !== undefined) {
-        var viewedTime = currentTime;
+        let viewedTime = currentTime;
         if (!isLive && !isRealTime && !isCustomStart && competitor.start_time) {
           viewedTime +=
             new Date(competitor.start_time) - getCompetitionStartDate();
@@ -2766,8 +2770,8 @@ function RCEvent(infoURL, clockURL) {
             competitor.custom_offset - getCompetitorsMinCustomOffset()
           );
         }
-        var loc = route.getByTime(viewedTime);
-        var hasRecentPoints = route.hasPointInInterval(
+        const loc = route.getByTime(viewedTime);
+        const hasRecentPoints = route.hasPointInInterval(
           viewedTime - (sendInterval * 4 + fetchPositionInterval) * 1e3, //kayak
           viewedTime
         );
@@ -2775,12 +2779,12 @@ function RCEvent(infoURL, clockURL) {
           keepFocusOnCompetitor(competitor, loc);
         }
 
-        var beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
+        const beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
         if (beforeFirstPoint) {
           clearCompetitorLayers(competitor);
         }
 
-        var isIdle =
+        const isIdle =
           viewedTime > route.getByIndex(0).timestamp && !hasRecentPoints;
         if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
           competitor.idle = isIdle;
@@ -2793,7 +2797,7 @@ function RCEvent(infoURL, clockURL) {
         redrawCompetitorTail(competitor, route, viewedTime);
         if (refreshMeters) {
           // odometer and speedometer
-          var hasPointInTail = route.hasPointInInterval(
+          const hasPointInTail = route.hasPointInInterval(
             viewedTime - 30 * 1e3,
             viewedTime
           );
@@ -2802,9 +2806,9 @@ function RCEvent(infoURL, clockURL) {
             competitor.speedometer.textContent = competitor.speedometerValue;
           } else {
             if (checkVisible(competitor.speedometer)) {
-              var distance = 0;
-              var prevPos = null;
-              var tail30s = route.extractInterval(
+              let distance = 0;
+              let prevPos = null;
+              const tail30s = route.extractInterval(
                 viewedTime - 30 * 1e3,
                 viewedTime
               );
@@ -2814,13 +2818,13 @@ function RCEvent(infoURL, clockURL) {
                 }
                 prevPos = pos;
               });
-              var speed = (30 / distance) * 1000;
+              const speed = (30 / distance) * 1000;
               competitor.speedometerValue = formatSpeed(speed);
               competitor.speedometer.textContent = competitor.speedometerValue;
             }
           }
           if (checkVisible(competitor.odometer)) {
-            var totalDistance = route.distanceUntil(viewedTime);
+            const totalDistance = route.distanceUntil(viewedTime);
             competitor.odometerValue = (totalDistance / 1000).toFixed(1) + "km";
             competitor.odometer.textContent = competitor.odometerValue;
           }
@@ -2832,12 +2836,12 @@ function RCEvent(infoURL, clockURL) {
               return !!a;
             })
           ) {
-            var allPoints = route.getArray();
-            var crossCount = 0;
-            var startPointIdx = null;
-            for (var i = 1; i < allPoints.length; i++) {
-              var prevPoint = allPoints[i - 1];
-              var currPoint = allPoints[i];
+            const allPoints = route.getArray();
+            let crossCount = 0;
+            let startPointIdx = null;
+            for (let i = 1; i < allPoints.length; i++) {
+              const prevPoint = allPoints[i - 1];
+              const currPoint = allPoints[i];
               if (
                 !isLive &&
                 !isRealTime &&
@@ -2851,25 +2855,25 @@ function RCEvent(infoURL, clockURL) {
                 break;
               }
               if (rankingFromSplit != null) {
-                var prevXY = map.project(
+                const prevXY = map.project(
                   L.latLng([
                     prevPoint.coords.latitude,
                     prevPoint.coords.longitude,
                   ]),
                   intersectionCheckZoom
                 );
-                var currXY = map.project(
+                const currXY = map.project(
                   L.latLng([
                     currPoint.coords.latitude,
                     currPoint.coords.longitude,
                   ]),
                   intersectionCheckZoom
                 );
-                var lineAXY = map.project(
+                const lineAXY = map.project(
                   splitLinesPoints[rankingFromSplit][0],
                   intersectionCheckZoom
                 );
-                var lineBXY = map.project(
+                const lineBXY = map.project(
                   splitLinesPoints[rankingFromSplit][1],
                   intersectionCheckZoom
                 );
@@ -2878,7 +2882,7 @@ function RCEvent(infoURL, clockURL) {
                 ) {
                   crossCount++;
                   if (crossCount == rankingFromLap) {
-                    var competitorTime =
+                    let competitorTime =
                       prevPoint.timestamp +
                       intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
                         (currPoint.timestamp - prevPoint.timestamp);
@@ -2926,31 +2930,31 @@ function RCEvent(infoURL, clockURL) {
             }
             crossCount = 0;
             if (startPointIdx != null) {
-              for (var i = startPointIdx; i < allPoints.length; i++) {
-                var prevPoint = allPoints[i - 1];
-                var currPoint = allPoints[i];
+              for (let i = startPointIdx; i < allPoints.length; i++) {
+                const prevPoint = allPoints[i - 1];
+                const currPoint = allPoints[i];
                 if (viewedTime < currPoint.timestamp) {
                   break;
                 }
-                var prevXY = map.project(
+                const prevXY = map.project(
                   L.latLng([
                     prevPoint.coords.latitude,
                     prevPoint.coords.longitude,
                   ]),
                   intersectionCheckZoom
                 );
-                var currXY = map.project(
+                const currXY = map.project(
                   L.latLng([
                     currPoint.coords.latitude,
                     currPoint.coords.longitude,
                   ]),
                   intersectionCheckZoom
                 );
-                var lineAXY = map.project(
+                const lineAXY = map.project(
                   splitLinesPoints[rankingToSplit][0],
                   intersectionCheckZoom
                 );
-                var lineBXY = map.project(
+                const lineBXY = map.project(
                   splitLinesPoints[rankingToSplit][1],
                   intersectionCheckZoom
                 );
@@ -2959,7 +2963,7 @@ function RCEvent(infoURL, clockURL) {
                 ) {
                   crossCount++;
                   if (crossCount == rankingToLap) {
-                    var competitorTime =
+                    let competitorTime =
                       prevPoint.timestamp +
                       intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
                         (currPoint.timestamp - prevPoint.timestamp);
@@ -3016,12 +3020,12 @@ function RCEvent(infoURL, clockURL) {
     });
     // Create cluster
     if (showClusters) {
-      var competitorsWithMarker = [];
-      var competitorsLocations = [];
+      const competitorsWithMarker = [];
+      const competitorsLocations = [];
       Object.values(competitorList).forEach(function (competitor) {
         if (competitor.mapMarker) {
           competitorsWithMarker.push(competitor);
-          var latLon = competitor.mapMarker.getLatLng();
+          const latLon = competitor.mapMarker.getLatLng();
           competitorsLocations.push({
             location: {
               accuracy: 0,
@@ -3031,13 +3035,13 @@ function RCEvent(infoURL, clockURL) {
           });
         }
       });
-      var dbscanner = jDBSCAN()
+      const dbscanner = jDBSCAN()
         .eps(0.015)
         .minPts(1)
         .distance("HAVERSINE")
         .data(competitorsLocations);
-      var competitorClusters = dbscanner();
-      var clustersCenter = dbscanner.getClusters();
+      const competitorClusters = dbscanner();
+      const clustersCenter = dbscanner.getClusters();
 
       Object.keys(clusters).forEach(function (key) {
         if (competitorClusters.indexOf(key) === -1) {
@@ -3052,14 +3056,14 @@ function RCEvent(infoURL, clockURL) {
 
       competitorClusters.forEach(function (d, i) {
         if (d != 0) {
-          var cluster = clusters[d] || {};
-          var clusterCenter = clustersCenter[d - 1];
+          const cluster = clusters[d] || {};
+          const clusterCenter = clustersCenter[d - 1];
           if (!cluster.color) {
             cluster.color = getColor(d - 1);
             cluster.isColorDark = getContrastYIQ(cluster.color);
           }
           clustersCenter[d - 1].color = cluster.color;
-          var competitorInCluster = competitorsWithMarker[i];
+          const competitorInCluster = competitorsWithMarker[i];
           ["mapMarker", "nameMarker"].forEach(function (layerName) {
             if (competitorInCluster[layerName]) {
               map.removeLayer(competitorInCluster[layerName]);
@@ -3068,7 +3072,7 @@ function RCEvent(infoURL, clockURL) {
           });
           cluster.name = `${banana.i18n("group")} ${alphabetizeNumber(d - 1)}`;
           cluster.short_name = cluster.name;
-          var clusterLoc = { coords: clusterCenter.location };
+          const clusterLoc = { coords: clusterCenter.location };
           redrawCompetitorMarker(cluster, clusterLoc, false);
           redrawCompetitorNametag(cluster, clusterLoc, false);
           clusters[d] = cluster;
@@ -3150,7 +3154,7 @@ function RCEvent(infoURL, clockURL) {
     document
       .querySelector("#sidebar")
       .addEventListener("touchmove", function (e) {
-        var path = e.composedPath();
+        const path = e.composedPath();
         if (
           !path.find(function (el) {
             return (

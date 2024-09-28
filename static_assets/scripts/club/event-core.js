@@ -1,4 +1,4 @@
-var COLORS = [
+const COLORS = [
   "#e6194B",
   "#3cb44b",
   "#4363d8",
@@ -17,7 +17,7 @@ var COLORS = [
   "#a9a9a9",
   "#000000",
 ];
-var supportedLanguages = {
+const supportedLanguages = {
   en: "English",
   es: "Espa&ntilde;ol",
   fr: "Fran&ccedil;ais",
@@ -27,20 +27,20 @@ var supportedLanguages = {
   sv: "Svenska",
 };
 
-var myEvent = null;
-var banana = null;
-var locale = null;
+let myEvent = null;
+let banana = null;
+let locale = null;
 
-var printTime = function (t) {
-  var prependZero = function (x) {
+const printTime = function (t) {
+  const prependZero = function (x) {
     return ("0" + x).slice(-2);
   };
   t = Math.round(t);
-  var h = Math.floor(t / 3600),
+  const h = Math.floor(t / 3600),
     m = Math.floor((t % 3600) / 60),
     s = t % 60;
   if (h === 0) {
-    var text = "";
+    let text = "";
     if (m == 0) {
       return s + "s";
     }
@@ -50,7 +50,7 @@ var printTime = function (t) {
     }
     return text + prependZero(s) + "s";
   }
-  var text = h + "h";
+  let text = h + "h";
   if (m === 0 && s === 0) {
     return text;
   }
@@ -75,7 +75,7 @@ L.Control.EventState = L.Control.extend({
   },
 
   onAdd: function (map) {
-    var div = L.DomUtil.create("div");
+    const div = L.DomUtil.create("div");
     div.style.userSelect = "none";
     div.style["-webkit-user-select"] = "none";
     this._div = div;
@@ -143,7 +143,7 @@ L.control.eventState = function (opts) {
 
 L.Control.Grouping = L.Control.extend({
   onAdd: function (map) {
-    var back = L.DomUtil.create(
+    const back = L.DomUtil.create(
       "div",
       "leaflet-bar leaflet-control leaflet-control-grouping"
     );
@@ -165,8 +165,8 @@ L.Control.Grouping = L.Control.extend({
   },
 
   setValues: function (c, cl) {
-    var el = u(".leaflet-control-grouping");
-    var out = "";
+    const el = u(".leaflet-control-grouping");
+    let out = "";
     cl.forEach(function (k, i) {
       if (i !== 0) {
         out += "<br>";
@@ -191,7 +191,7 @@ L.Control.Grouping = L.Control.extend({
     if (out === "") {
       out = "<h6>" + banana.i18n("no-group") + "</h6>";
     }
-    var testOut = u("<div>").html(out);
+    const testOut = u("<div>").html(out);
     if (el.html() !== testOut.html()) {
       el.html(out);
     }
@@ -217,25 +217,25 @@ function getColor(i) {
 
 function getContrastYIQ(hexcolor) {
   hexcolor = hexcolor.replace("#", "");
-  var hexSize = 0x10;
-  var r = parseInt(hexcolor.substr(0, 2), hexSize);
-  var g = parseInt(hexcolor.substr(2, 2), hexSize);
-  var b = parseInt(hexcolor.substr(4, 2), hexSize);
-  var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  const hexSize = 0x10;
+  const r = parseInt(hexcolor.substr(0, 2), hexSize);
+  const g = parseInt(hexcolor.substr(2, 2), hexSize);
+  const b = parseInt(hexcolor.substr(4, 2), hexSize);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1e3;
   return yiq <= 168;
 }
 
 function getRunnerIcon(color, faded = false, focused = false, scale = 2) {
-  var iconSize = 16 * scale;
-  var liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
-  var svgRect = `<svg viewBox="0 0 ${iconSize + 4} ${
+  const iconSize = 16 * scale;
+  const liveColor = tinycolor(color).setAlpha(faded ? 0.4 : 0.75);
+  const svgRect = `<svg viewBox="0 0 ${iconSize + 4} ${
     iconSize + 4
   }" xmlns="http://www.w3.org/2000/svg"><circle fill="${liveColor.toRgbString()}" stroke="black" stroke-width="${
     focused ? 3 : 2
   }px" cx="${iconSize / 2 + 2}" cy="${iconSize / 2 + 2}" r="${
     (iconSize - 1) / 2
   }"/></svg>`;
-  var runnerIcon = L.icon({
+  const runnerIcon = L.icon({
     iconUrl: encodeURI("data:image/svg+xml," + svgRect),
     iconSize: [iconSize, iconSize],
     shadowSize: [iconSize, iconSize],
@@ -261,27 +261,27 @@ function getRunnerNameMarker(
   focused = false,
   scale = 2
 ) {
-  var iconStyle = `color: ${color};opacity: ${faded ? 0.4 : 0.75};${
+  const iconStyle = `color: ${color};opacity: ${faded ? 0.4 : 0.75};${
     focused ? `padding-bottom: 0px;border-bottom: 4px solid ${color};` : ""
   }`;
-  var iconHtml = `<span style="${iconStyle}">${u("<span/>")
+  const iconHtml = `<span style="${iconStyle}">${u("<span/>")
     .text(name)
     .text()}</span>`;
-  var iconClass = `runner-icon runner-icon-${isDark ? "dark" : "light"}${
+  const iconClass = `runner-icon runner-icon-${isDark ? "dark" : "light"}${
     needFlagsEmojiPolyfill ? " flags-polyfill" : ""
   }${focused ? " icon-focused" : ""}`;
 
   // mesure tagname width
-  var tmpIconClass = `${iconClass} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
-  var nameTagEl = document.createElement("div");
+  const tmpIconClass = `${iconClass} leaflet-marker-icon leaflet-zoom-animated leaflet-interactive`;
+  const nameTagEl = document.createElement("div");
   nameTagEl.className = tmpIconClass;
   nameTagEl.innerHTML = iconHtml;
-  var mapEl = document.getElementById("map");
+  const mapEl = document.getElementById("map");
   mapEl.appendChild(nameTagEl);
-  var nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
+  const nameTagWidth = nameTagEl.childNodes[0].getBoundingClientRect().width;
   mapEl.removeChild(nameTagEl);
 
-  var runnerIcon = L.divIcon({
+  const runnerIcon = L.divIcon({
     className: iconClass,
     html: iconHtml,
     iconAnchor: [
@@ -295,12 +295,12 @@ function getRunnerNameMarker(
 }
 
 function getSplitLineMarker(name, color = "purple") {
-  var iconStyle = `color: ${color};opacity: 0.75;`;
-  var iconHtml = `<span style="${iconStyle}">${u("<span/>")
+  const iconStyle = `color: ${color};opacity: 0.75;`;
+  const iconHtml = `<span style="${iconStyle}">${u("<span/>")
     .text(name)
     .text()}</span>`;
-  var iconClass = "runner-icon runner-icon-dark";
-  var icon = L.divIcon({
+  const iconClass = "runner-icon runner-icon-dark";
+  const icon = L.divIcon({
     className: iconClass,
     html: iconHtml,
     iconAnchor: [10, 0],
@@ -323,7 +323,7 @@ function alphabetizeNumber(integer) {
 
 function batteryIconName(perc) {
   if (perc === null) return "half";
-  var level = Math.min(4, Math.round((perc - 5) / 20));
+  const level = Math.min(4, Math.round((perc - 5) / 20));
   return ["empty", "quarter", "half", "three-quarters", "full"][level];
 }
 
@@ -348,7 +348,7 @@ function sortingFunction(a, b) {
 
 function updateText() {
   banana.setLocale(locale);
-  var langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
+  const langFile = `${window.local.staticRoot}i18n/club/event/${locale}.json`;
   return fetch(`${langFile}?v=2024090100`)
     .then((response) => response.json())
     .then((messages) => {
