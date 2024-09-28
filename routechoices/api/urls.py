@@ -117,12 +117,12 @@ urlpatterns = [
         name="2d_rerun_race_data",
     ),
     re_path(
-        r"^gpsseuranta/(?P<uid>[^/]+)$",
+        r"^gpsseuranta/(?P<uid>[^/]+)/?$",
         views.gpsseuranta_event,
         name="gpsseuranta_event_detail",
     ),
     re_path(
-        r"^gpsseuranta/(?P<uid>[^/]+)/data$",
+        r"^gpsseuranta/(?P<uid>[^/]+)/data/?$",
         views.gpsseuranta_event_data,
         name="gpsseuranta_event_data",
     ),
