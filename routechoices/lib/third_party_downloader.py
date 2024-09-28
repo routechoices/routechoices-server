@@ -677,6 +677,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
     slug = "gpsseuranta"
 
     def parse_init_data(self, uid):
+        self.uid = uid
         event_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/init.txt"
         r = requests.get(event_url)
         if r.status_code != 200:
@@ -692,6 +693,47 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             except ValueError:
                 continue
         self.init_data = event_data
+
+    def is_live(self):
+        return self.init_data["LIVE"] == "1"
+
+    def get_start_time(self):
+        min_start_time = arrow.utcnow().shift(
+            minutes=int(self.init_data.get("TIMEZONE", 0))
+        )
+        for c_raw in self.init_data.get("COMPETITOR", []):
+            c_data = c_raw.strip().split("|")
+            start_time = None
+            start_time_raw = (
+                f"{c_data[1]}"
+                f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
+            )
+            try:
+                if len(start_time_raw) == 12:
+                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
+                else:
+                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
+            except Exception:
+                continue
+            min_start_time = min(min_start_time, start_time)
+        return min_start_time.shift(
+            minutes=-int(self.init_data.get("TIMEZONE", 0))
+        ).datetime
+
+    def get_end_time(self):
+        if self.is_live():
+            return arrow.utcnow().shift(hours=1).datetime
+        return arrow.utcnow().datetime
+
+    def get_event(self):
+        event = Event()
+        event.slug = self.uid
+        event.club = self.club
+        event.name = self.init_data.get("RACENAME", self.uid)[:255]
+        event.start_date = self.get_start_time()
+        event.end_date = self.get_end_time()
+        event.send_interval = int(self.init_data.get("GRABINTERVAL", 10))
+        return event
 
     def get_or_create_event(self, uid):
         event_name = self.init_data.get("RACENAME", uid)
@@ -815,7 +857,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         if o_pt[0] == "*" or o_pt[1] == "*" or o_pt[2] == "*":
             return []
         loc = [
-            int(o_pt[0]) + 1136073600, # ts
+            int(o_pt[0]) + 1136073600,  # ts
             int(o_pt[2]) / 1e5,  # lat
             int(o_pt[1]) / 5e4,  # lon
         ]

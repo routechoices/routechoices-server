@@ -1901,10 +1901,6 @@ def two_d_rerun_race_data(request):
 )
 @api_GET_view
 def gpsseuranta_event(request, uid):
-    event = Event()
-    event.slug = uid
-    club = Club(slug="gpsseuranta")
-    event.club = club
     cache_key = f"gpsseuranta_detail:{uid}"
     if cache.has_key(cache_key):
         try:
@@ -1913,41 +1909,13 @@ def gpsseuranta_event(request, uid):
             pass
         else:
             return Response(data, headers={"X-Cache-Hit": 1})
+
     proxy = GpsSeurantaNet()
     try:
         proxy.parse_init_data(uid)
     except Exception:
         raise Http404()
-
-    min_start_time = None
-    for c_raw in proxy.init_data.get("COMPETITOR", []):
-        c_data = c_raw.strip().split("|")
-        start_time = None
-        start_time_raw = (
-            f"{c_data[1]}"
-            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
-        )
-        try:
-            if len(start_time_raw) == 12:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
-            else:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
-        except Exception:
-            continue
-        if min_start_time:
-            min_start_time = min(min_start_time, start_time)
-        else:
-            min_start_time = start_time
-    event.start_date = min_start_time.shift(
-        minutes=-int(proxy.init_data.get("TIMEZONE", 0))
-    ).datetime
-    is_live = proxy.init_data["LIVE"] == "1"
-    if is_live:
-        event.end_date = arrow.utcnow().shift(hours=1).datetime
-    else:
-        event.end_date = arrow.utcnow().datetime
-    event.send_interval = int(proxy.init_data.get("GRABINTERVAL", 10))
-    event.name = proxy.init_data.get("RACENAME")
+    event = proxy.get_event()
 
     rmap = Map()
     map_url = f"https://tulospalvelu.fi/gps/{uid}/map"
@@ -1965,6 +1933,7 @@ def gpsseuranta_event(request, uid):
         coordinates = ",".join([str(round(x, 5)) for x in corners])
         rmap.corners_coordinates = coordinates
         event.map = rmap
+
     output = {
         "event": {
             "id": event.aid,
@@ -2001,11 +1970,11 @@ def gpsseuranta_event(request, uid):
             "wms": False,
         }
         output["maps"].append(map_data)
+
     try:
         cache.set(f"{cache_key}", output, 60)
     except Exception:
         pass
-
     return Response(output)
 
 
@@ -2015,11 +1984,6 @@ def gpsseuranta_event(request, uid):
 )
 @api_GET_view
 def gpsseuranta_event_data(request, uid):
-    event = Event()
-    event.slug = uid
-    club = Club(slug="gpsseuranta")
-    event.club = club
-
     cache_key = f"gpsseuranta_data:{uid}"
     if cache.has_key(cache_key):
         try:
@@ -2034,34 +1998,13 @@ def gpsseuranta_event_data(request, uid):
         proxy.parse_init_data(uid)
     except Exception:
         raise Http404()
-    min_start_time = None
-    for c_raw in proxy.init_data.get("COMPETITOR", []):
-        c_data = c_raw.strip().split("|")
-        start_time = None
-        start_time_raw = (
-            f"{c_data[1]}"
-            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
-        )
-        try:
-            if len(start_time_raw) == 12:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
-            else:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
-        except Exception:
-            continue
-        if min_start_time:
-            min_start_time = min(min_start_time, start_time)
-        else:
-            min_start_time = start_time
-    from_ts = int(
-        min_start_time.shift(
-            minutes=-int(proxy.init_data.get("TIMEZONE", 0))
-        ).timestamp()
-    )
+
+    event = proxy.get_event()
 
     dev_data = proxy.get_competitor_devices_data(uid)
-    output = {"competitors": []}
 
+    from_ts = event.start_date.timestamp()
+    output = {"competitors": []}
     for c_raw in proxy.init_data.get("COMPETITOR", []):
         c_data = c_raw.strip().split("|")
         start_time = None
@@ -2080,6 +2023,7 @@ def gpsseuranta_event_data(request, uid):
             start_time = start_time.shift(
                 minutes=-int(proxy.init_data.get("TIMEZONE", 0))
             ).datetime
+
         locs = dev_data.get(c_data[0], [])
         locs = sorted(locs, key=itemgetter(0))
         from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
