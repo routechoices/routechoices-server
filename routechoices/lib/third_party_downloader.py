@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from curl_cffi import requests
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.utils.timezone import now
 from PIL import Image, ImageDraw
 
 from routechoices.core.models import (
@@ -24,6 +23,7 @@ from routechoices.core.models import (
 )
 from routechoices.lib.helpers import (
     epoch_to_datetime,
+    get_remote_image_sizes,
     initial_of_name,
     project,
     safe64encodedsha,
@@ -736,49 +736,64 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         return event
 
     def get_or_create_event(self, uid):
-        event_name = self.init_data.get("RACENAME", uid)
+        event_tmp = self.get_event()
         event, _ = Event.objects.get_or_create(
             club=self.club,
-            slug=uid,
+            slug=event_tmp.slug,
             defaults={
-                "name": event_name[:255],
+                "name": event_tmp.name,
                 "privacy": PRIVACY_SECRET,
-                "start_date": now(),
-                "end_date": now(),
+                "start_date": event_tmp.start_date,
+                "end_date": event_tmp.end_date,
             },
         )
         return event
 
-    def get_or_create_event_maps(self, event, uid):
+    def get_map_url(self):
+        return f"{self.GPSSEURANTA_EVENT_URL}{self.uid}/map"
+
+    def get_map(self, download_map=False):
+        map_url = self.get_map_url()
+        try:
+            length, size = get_remote_image_sizes(map_url)
+        except Exception:
+            return None
+
         calibration_string = self.init_data.get("CALIBRATION")
+        if not size or not calibration_string:
+            return None
+
+        map_obj = Map()
+        map_obj.width = size[0]
+        map_obj.height = size[1]
+        corners = three_point_calibration_to_corners(
+            calibration_string, size[0], size[1]
+        )
+        coordinates = ",".join([str(round(x, 5)) for x in corners])
+        map_obj.corners_coordinates = coordinates
+
+        if download_map:
+            r = requests.get(map_url)
+            if r.status_code == 200:
+                map_file = ContentFile(r.content)
+                map_obj.image.save("map", map_file, save=False)
+        return map_obj
+
+    def get_or_create_event_maps(self, event, uid):
+        tmp_map = self.get_map(download_map=True)
+        if not tmp_map:
+            raise MapsImportError("Error importing map")
         map_obj, _ = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
+            defaults={
+                "image": tmp_map.image,
+                "width": tmp_map.width,
+                "height": tmp_map.height,
+                "corners_coordinates": tmp_map.corners_coordinates,
+            },
         )
-        map_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/map"
-        r = requests.get(map_url)
-        if r.status_code != 200:
-            map_obj.delete()
-            raise MapsImportError("API returned error code")
-        try:
-            map_file = ContentFile(r.content)
-            with Image.open(map_file) as img:
-                width, height = img.size
-            corners = three_point_calibration_to_corners(
-                calibration_string, width, height
-            )
-            coordinates = ",".join([str(round(x, 5)) for x in corners])
-
-            map_obj.image.save("imported_image", map_file, save=False)
-            map_obj.width = width
-            map_obj.height = height
-            map_obj.corners_coordinates = coordinates
-            map_obj.save()
-        except Exception:
-            map_obj.delete()
-            raise MapsImportError("Error importing map")
-        else:
-            return [map_obj]
+        return [map_obj]
 
     def get_competitor_devices_data(self, uid):
         devices_data = {}

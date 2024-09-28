@@ -54,7 +54,6 @@ from routechoices.core.models import (
 from routechoices.lib.globalmaptiles import GlobalMercator
 from routechoices.lib.helpers import (
     epoch_to_datetime,
-    get_remote_image_sizes,
     git_master_hash,
     initial_of_name,
     random_device_id,
@@ -62,7 +61,6 @@ from routechoices.lib.helpers import (
     set_content_disposition,
     short_random_key,
     short_random_slug,
-    three_point_calibration_to_corners,
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
@@ -1915,24 +1913,9 @@ def gpsseuranta_event(request, uid):
         proxy.parse_init_data(uid)
     except Exception:
         raise Http404()
-    event = proxy.get_event()
 
-    rmap = Map()
-    map_url = f"https://tulospalvelu.fi/gps/{uid}/map"
-    try:
-        length, size = get_remote_image_sizes(map_url)
-    except Exception:
-        rmap = None
-    else:
-        rmap.width = size[0]
-        rmap.height = size[1]
-        calibration_string = proxy.init_data.get("CALIBRATION")
-        corners = three_point_calibration_to_corners(
-            calibration_string, size[0], size[1]
-        )
-        coordinates = ",".join([str(round(x, 5)) for x in corners])
-        rmap.corners_coordinates = coordinates
-        event.map = rmap
+    event = proxy.get_event()
+    event.map = proxy.get_map()
 
     output = {
         "event": {
@@ -1958,7 +1941,7 @@ def gpsseuranta_event(request, uid):
     }
     if event.map:
         map_data = {
-            "title": "-",
+            "title": "main",
             "coordinates": event.map.bound,
             "rotation": event.map.north_declination,
             "hash": event.map.hash,
@@ -1966,7 +1949,7 @@ def gpsseuranta_event(request, uid):
             "modification_date": event.map.modification_date,
             "default": True,
             "id": uid,
-            "url": map_url,
+            "url": proxy.get_map_url(),
             "wms": False,
         }
         output["maps"].append(map_data)
