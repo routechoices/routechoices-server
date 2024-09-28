@@ -1106,7 +1106,7 @@ function RCEvent(infoURL, clockURL) {
     u("#replay_control_buttons").hide();
     onAppResize();
 
-    function whileLive(ts) {
+    function renderLive(ts) {
       if (
         ts - routesLastFetched > fetchPositionInterval * 1e3 &&
         !isCurrentlyFetchingRoutes
@@ -1127,6 +1127,10 @@ function RCEvent(infoURL, clockURL) {
       if (!isStillLive) {
         onSwitchToReplay();
       }
+    }
+
+    function whileLive(ts) {
+      renderLive(ts);
       if (isLive) {
         window.requestAnimationFrame(whileLive);
       }
@@ -1448,7 +1452,8 @@ function RCEvent(infoURL, clockURL) {
     prevMeterDisplayRefresh = performance.now();
     prevShownTime = getCompetitionStartDate();
     playbackRate = 8;
-    function whileReplay(ts) {
+
+    function renderReplay(ts) {
       if (
         isLiveEvent &&
         ts - routesLastFetched > fetchPositionInterval * 1e3 &&
@@ -1515,12 +1520,15 @@ function RCEvent(infoURL, clockURL) {
           .addClass("btn-secondary");
         isLiveEvent = true;
       }
+    }
 
+    function whileReplay(ts) {
+      renderReplay(ts);
       if (!isLive) {
         window.requestAnimationFrame(whileReplay);
       }
     }
-    whileReplay(performance.now());
+    window.requestAnimationFrame(whileReplay);
   }
 
   this.getTailLength = function () {
