@@ -2102,7 +2102,7 @@ function RCEvent(infoURL, clockURL) {
     });
   }
   function onChangeCompetitorColor(competitor) {
-    const color = competitor.color;
+    let color = competitor.color;
     u("#colorModalLabel").text(
       banana.i18n("select-color-for", competitor.name)
     );
