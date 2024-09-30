@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0077_competitor_user_usersetting'),
+        ("core", "0077_competitor_user_usersetting"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='UserSetting',
-            new_name='UserSettings',
+            old_name="UserSetting",
+            new_name="UserSettings",
         ),
     ]
