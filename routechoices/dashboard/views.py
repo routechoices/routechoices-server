@@ -1596,3 +1596,18 @@ class MyReleaseUserView(ReleaseUserView):
             allowed_hosts=settings.REDIRECT_ALLOWED_DOMAINS,
         )
         return redirect_to if url_is_safe else ""
+
+
+@login_required
+def participations_view(request):
+    participations = request.user.participations.select_related(
+        "event", "event__club"
+    ).order_by("-event__start_date")
+    return render(
+        request,
+        "dashboard/participations.html",
+        {
+            "user": request.user,
+            "participations": participations,
+        },
+    )

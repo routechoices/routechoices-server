@@ -2436,6 +2436,13 @@ class Competitor(models.Model):
     start_time = models.DateTimeField(
         verbose_name="Start time (UTC)", null=True, blank=True
     )
+    user = models.ForeignKey(
+        User,
+        related_name="participations",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ["start_time", "name"]
@@ -2618,3 +2625,23 @@ class FrontPageFeedback(models.Model):
 
     def __str__(self):
         return f"Feedback from {self.name} ({self.club_name})"
+
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    default_device = models.ForeignKey(
+        Device,
+        related_name="default_user_set",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    default_name = models.CharField(max_length=64, null=True, blank=True)
+    default_short_name = models.CharField(max_length=32, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "user settings"
+        verbose_name_plural = "user settings"
+
+
+User.settings = property(lambda u: UserSettings.objects.get_or_create(user=u)[0])

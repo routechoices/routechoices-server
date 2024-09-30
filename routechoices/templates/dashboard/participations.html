@@ -1,0 +1,129 @@
+{% extends "dashboard/home.html" %}
+{% load compress django_bootstrap5 hosts static %}
+{% block sub_content %}
+    {% if participations %}
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <table class="table table-striped mb-3">
+                        <thead>
+                            <tr>
+                                <th>Participations</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in participations %}
+                                <tr>
+                                    <td>{{ p.event.name }} by {{ p.event.club.name }} as {{ p.name }} ({{ p.short_name }})</td>
+                                    <td>
+                                        <button data-competitor-name="{{ p.name }}"
+                                                data-competitor-short-name="{{ p.short_name }}"
+                                                data-competitor-id="{{ p.aid }}"
+                                                class="btn btn-secondary edit-name-btn">Edit name</button>
+                                        {% if p.event.allow_route_upload %}
+                                            <button data-competitor-id="{{ p.aid }}"
+                                                    class="ms-2 btn btn-secondary open-upload-btn">
+                                                Submit new GPS
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p>You do not have any participations linked to this account.</p>
+        </div>
+    {% endif %}
+    <div class="modal" tabindex="-1" id="editNameModal" style="top: 100px">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="name-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Name</h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="id_name">Name</label>
+                            <input class="form-control"
+                                   id="id_name"
+                                   maxlength="64"
+                                   name="name"
+                                   placeholder="Name"
+                                   required="">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="id_short_name">Short name</label>
+                            <input placeholder="Short name"
+                                   class="form-control"
+                                   id="id_short_name"
+                                   maxlength="32"
+                                   name="short_name">
+                        </div>
+                        <input type="hidden" id="id_id" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal"
+         id="uploadRouteModal"
+         style="top: 100px;
+                display: none"
+         tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="upload-form" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload GPX</h5>
+                        <button aria-label="Close"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="id_competitor_aid" name="competitor_aid" />
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="id_gpx_file">GPX File</label>
+                            <input class="form-control"
+                                   id="id_gpx_file"
+                                   name="gpx_file"
+                                   required=""
+                                   type="file"
+                                   accept=".gpx">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                        <button class="btn btn-primary disabled upload-btn">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock sub_content %}
+
+{% block extra_body %}
+    <script src="{% static '/scripts/load-local-variables.js' %}?_=2023112700"
+            data-csrf-token="{{ csrf_token }}"
+            data-api-base-url="{% host_url 'api_doc' host 'api' %}"></script>
+    {% compress js %}
+        <script src="{% static '/vendor/umbrella-3.3.1/umbrella.min.js' %}"></script>
+        <script src="{% static '/vendor/reqwest-2.0.5/reqwest.min.js' %}"></script>
+        <script src="{% static '/scripts/dashboard/participations.js' %}"></script>
+    {% endcompress %}
+{% endblock extra_body %}

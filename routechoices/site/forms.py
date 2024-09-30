@@ -13,7 +13,7 @@ from routechoices.core.models import Device
 
 class RegisterForm(Form):
     name = CharField(max_length=64, required=True)
-    short_name = CharField(max_length=64, required=False)
+    short_name = CharField(max_length=32, required=False)
     device_id = ModelChoiceField(
         required=False, queryset=Device.objects.none(), label="Device ID"
     )

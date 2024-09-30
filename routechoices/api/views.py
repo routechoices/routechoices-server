@@ -849,12 +849,17 @@ def event_register(request, event_id):
     if errs:
         raise ValidationError(errs)
 
+    user = None
+    if request.user.is_authenticated:
+        user = request.user
+
     comp = Competitor.objects.create(
         name=name,
         event=event,
         short_name=short_name,
         start_time=start_time,
         device=device,
+        user=user,
     )
 
     output = {
@@ -887,7 +892,7 @@ def event_register(request, event_id):
         ),
     },
 )
-@api_view(["DELETE"])
+@api_view(["DELETE", "PATCH"])
 @login_required
 def competitor_api(request, competitor_id):
     competitor = (
@@ -902,11 +907,27 @@ def competitor_api(request, competitor_id):
     event = competitor.event
 
     is_user_event_admin = event.club.admins.filter(id=request.user.id).exists()
-    if not is_user_event_admin:
+    if not is_user_event_admin and competitor.user != request.user:
         raise PermissionDenied()
 
-    competitor.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    if request.method == "DELETE":
+        competitor.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    new_name = request.data.get("name")
+    if new_name:
+        competitor.name = new_name[:64]
+
+    new_short_name = request.data.get("short_name")
+    if new_short_name:
+        competitor.short_name = new_short_name[:32]
+
+    if new_short_name == "":
+        competitor.short_name = initial_of_name(competitor.name)[:32]
+
+    if new_name or new_short_name:
+        competitor.save()
+        return Response({"status": "ok"})
 
 
 @swagger_auto_schema(
@@ -967,9 +988,9 @@ def competitor_route_upload(request, competitor_id):
         return Response(res)
     event = competitor.event
 
-    is_user_event_admin = (
-        request.user.is_authenticated
-        and event.club.admins.filter(id=request.user.id).exists()
+    is_user_event_admin = request.user.is_authenticated and (
+        event.club.admins.filter(id=request.user.id).exists()
+        or request.user == competitor.user
     )
 
     if not event.allow_route_upload:

@@ -125,9 +125,11 @@ document.getElementById("form2").onsubmit = function (ev) {
     window.local.apiRoot + "events/" + ev_id + "/register/?lang=" + locale,
     {
       method: "POST",
-      credentials: "omit",
+      credentials: "include",
+      mode: "cors",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": window.local.csrfToken,
       },
       body: JSON.stringify(data),
     }
