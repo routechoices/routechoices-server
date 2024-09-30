@@ -1982,9 +1982,9 @@ def gpsseuranta_event_data(request, uid):
 
     event = proxy.get_event()
     dev_data = proxy.get_competitor_devices_data(uid, event)
-    competitors_data = proxy.get_competiors_data()
+    competitors_data = proxy.get_competitors_data()
     output = {"competitors": []}
-    for c_id, competitor in competitors_data:
+    for c_id, competitor in competitors_data.items():
         locs = dev_data.get(c_id, [])
         output["competitors"].append(
             {

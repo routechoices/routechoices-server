@@ -703,7 +703,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         min_start_time = arrow.utcnow().shift(
             minutes=int(self.init_data.get("TIMEZONE", 0))
         )
-        for c_id, c in self.get_competiors_data():
+        for c_id, c in self.get_competitors_data().items():
             if c.start_time:
                 min_start_time = min(min_start_time, c.start_time)
         return min_start_time
@@ -811,7 +811,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
 
         return cropped_devices_data
 
-    def get_competiors_data(self):
+    def get_competitors_data(self):
         competitors = {}
         for c_raw in self.init_data.get("COMPETITOR", []):
             c_data = c_raw.strip().split("|")
@@ -836,6 +836,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 short_name=c_data[4],
                 start_time=start_time,
             )
+        return competitors
 
     def get_or_create_event_competitors(self, event, uid):
         devices_data = self.get_competitor_devices_data(uid, event)
@@ -850,7 +851,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             dev_obj.locations_series = locations
             device_map[dev_id] = dev_obj
 
-        competitors = self.get_competiors_data()
+        competitors = self.get_competitors_data()
         for cid, tmp_competitor in competitors.items():
             competitor, _ = Competitor.objects.get_or_create(
                 name=tmp_competitor.name,
