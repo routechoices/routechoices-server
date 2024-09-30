@@ -37,6 +37,18 @@
               href="{% static '/vendor/leaflet-mapcentercoord-0.7/L.Control.MapCenterCoord.min.css' %}" />
         <link rel="stylesheet" href="{% static 'styles/club/event.css' %}" />
     {% endcompress %}
+    {% if event.privacy != "PRIVATE" %}
+        <link rel="preload"
+              href="{{ event.get_api_detail_url }}"
+              as="fetch"
+              type="application/json"
+              crossorigin="use-credentials" />
+        <link rel="preload"
+              href="{{ event.get_api_data_url }}"
+              as="fetch"
+              type="application/json"
+              crossorigin="use-credentials" />
+    {% endif %}
 {% endblock extra_head %}
 
 {% block body %}
@@ -317,7 +329,8 @@
             data-event-url="{{ event.get_api_detail_url }}"
             data-server-clock-url="{% host_url 'time_api' host 'api' %}"
             data-static-root="{% static '' %}"
-            data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"></script>
+            data-wms-service-url="{% host_url 'wms_service' host 'wms' %}"
+            data-is-private="{% if event.privacy == 'PRIVATE' %}1{% else %}{% endif %}"></script>
     {% compress js %}
         <script src="{% static '/vendor/dayjs-1.11.7/dayjs.min.js' %}?langs=en-es-fi-fr-nl-pl-sv"></script>
         <script src="{% static '/vendor/dayjs-1.11.7/duration.min.js' %}"></script>
