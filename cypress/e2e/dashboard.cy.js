@@ -40,7 +40,7 @@ context("Dashboard actions", () => {
     cy.get(".upload-btn:not(.disabled)").click();
     cy.contains("Data uploaded!");
   });
-  /*
+
   it("Manage devices", function () {
     cy.login();
     cy.contains("Halden SK").click();
@@ -265,5 +265,4 @@ context("Dashboard actions", () => {
     cy.contains("Map assigned more than once in this event");
     cy.contains("Map title given more than once in this event");
   });
-  */
 });
