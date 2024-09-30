@@ -928,6 +928,8 @@ def competitor_api(request, competitor_id):
     if new_name or new_short_name:
         competitor.save()
         return Response({"status": "ok"})
+    else:
+        raise ValidationError("No name given")
 
 
 @swagger_auto_schema(
