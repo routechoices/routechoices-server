@@ -1,9 +1,11 @@
+import bisect
 import json
 import math
 import re
 import tempfile
 import urllib.parse
 from io import BytesIO
+from operator import itemgetter
 
 import arrow
 from bs4 import BeautifulSoup
@@ -701,24 +703,10 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         min_start_time = arrow.utcnow().shift(
             minutes=int(self.init_data.get("TIMEZONE", 0))
         )
-        for c_raw in self.init_data.get("COMPETITOR", []):
-            c_data = c_raw.strip().split("|")
-            start_time = None
-            start_time_raw = (
-                f"{c_data[1]}"
-                f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
-            )
-            try:
-                if len(start_time_raw) == 12:
-                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
-                else:
-                    start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
-            except Exception:
-                continue
-            min_start_time = min(min_start_time, start_time)
-        return min_start_time.shift(
-            minutes=-int(self.init_data.get("TIMEZONE", 0))
-        ).datetime
+        for c_id, c in self.get_competiors_data():
+            if c.start_time:
+                min_start_time = min(min_start_time, c.start_time)
+        return min_start_time
 
     def get_end_time(self):
         if self.is_live():
@@ -736,15 +724,15 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         return event
 
     def get_or_create_event(self, uid):
-        event_tmp = self.get_event()
+        tmp_event = self.get_event()
         event, _ = Event.objects.get_or_create(
             club=self.club,
-            slug=event_tmp.slug,
+            slug=tmp_event.slug,
             defaults={
-                "name": event_tmp.name,
+                "name": tmp_event.name,
                 "privacy": PRIVACY_SECRET,
-                "start_date": event_tmp.start_date,
-                "end_date": event_tmp.end_date,
+                "start_date": tmp_event.start_date,
+                "end_date": tmp_event.end_date,
             },
         )
         return event
@@ -795,7 +783,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         )
         return [map_obj]
 
-    def get_competitor_devices_data(self, uid):
+    def get_competitor_devices_data(self, uid, event):
         devices_data = {}
         data_url = f"{self.GPSSEURANTA_EVENT_URL}{uid}/data.lst"
         r = requests.get(data_url)
@@ -813,30 +801,20 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                     devices_data[dev_id] = new_locations
                 else:
                     devices_data[dev_id] += new_locations
-        return devices_data
 
-    def get_or_create_event_competitors(self, event, uid):
-        devices_data = self.get_competitor_devices_data(uid)
-        device_map = {}
+        cropped_devices_data = {}
+        from_ts = event.start_date.timestamp()
         for dev_id, locations in devices_data.items():
-            dev_obj, created = Device.objects.get_or_create(
-                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
-                defaults={"is_gpx": True},
-            )
-            if not created:
-                dev_obj.locations_series = []
-            dev_obj.add_locations(locations, save=False)
-            device_map[dev_id] = dev_obj
+            locations = sorted(locations, key=itemgetter(0))
+            from_idx = bisect.bisect_left(locations, from_ts, key=itemgetter(0))
+            locations = locations[from_idx:]
 
-        competitors = []
-        for c_raw in self.init_data.get("COMPETITOR"):
+        return cropped_devices_data
+
+    def get_competiors_data(self):
+        competitors = {}
+        for c_raw in self.init_data.get("COMPETITOR", []):
             c_data = c_raw.strip().split("|")
-            competitor, _ = Competitor.objects.get_or_create(
-                name=c_data[3],
-                short_name=c_data[4],
-                event=event,
-            )
-
             start_time = None
             start_time_raw = (
                 f"{c_data[1]}"
@@ -853,9 +831,33 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                 start_time = start_time.shift(
                     minutes=-int(self.init_data.get("TIMEZONE", 0))
                 ).datetime
-                competitor.start_time = start_time
+            competitors[c_data[0]] = Competitor(
+                name=c_data[3],
+                short_name=c_data[4],
+                start_time=start_time,
+            )
 
-            device = device_map.get(c_data[0])
+    def get_or_create_event_competitors(self, event, uid):
+        devices_data = self.get_competitor_devices_data(uid, event)
+        device_map = {}
+        for dev_id, locations in devices_data.items():
+            dev_obj, created = Device.objects.get_or_create(
+                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
+                defaults={"is_gpx": True},
+            )
+            if not created:
+                dev_obj.locations_series = []
+            dev_obj.locations_series = locations
+            device_map[dev_id] = dev_obj
+
+        competitors = self.get_competiors_data()
+        for cid, tmp_competitor in competitors.items():
+            competitor, _ = Competitor.objects.get_or_create(
+                name=tmp_competitor.name,
+                short_name=tmp_competitor.short_name,
+                event=event,
+            )
+            device = device_map.get(cid)
             if device:
                 device.save()
                 competitor.device = device

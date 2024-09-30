@@ -1,10 +1,8 @@
-import bisect
 import logging
 import re
 import time
 import urllib.parse
 from io import BytesIO
-from operator import itemgetter
 from zipfile import ZipFile
 
 import arrow
@@ -1983,41 +1981,18 @@ def gpsseuranta_event_data(request, uid):
         raise Http404()
 
     event = proxy.get_event()
-
-    dev_data = proxy.get_competitor_devices_data(uid)
-
-    from_ts = event.start_date.timestamp()
+    dev_data = proxy.get_competitor_devices_data(uid, event)
+    competitors_data = proxy.get_competiors_data()
     output = {"competitors": []}
-    for c_raw in proxy.init_data.get("COMPETITOR", []):
-        c_data = c_raw.strip().split("|")
-        start_time = None
-        start_time_raw = (
-            f"{c_data[1]}"
-            f"{c_data[2].zfill(4) if len(c_data[2]) < 5 else c_data[2].zfill(6)}"
-        )
-        try:
-            if len(start_time_raw) == 12:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmm")
-            else:
-                start_time = arrow.get(start_time_raw, "YYYYMMDDHHmmss")
-        except Exception:
-            pass
-        else:
-            start_time = start_time.shift(
-                minutes=-int(proxy.init_data.get("TIMEZONE", 0))
-            ).datetime
-
-        locs = dev_data.get(c_data[0], [])
-        locs = sorted(locs, key=itemgetter(0))
-        from_idx = bisect.bisect_left(locs, from_ts, key=itemgetter(0))
-        locs = locs[from_idx:]
+    for c_id, competitor in competitors_data:
+        locs = dev_data.get(c_id, [])
         output["competitors"].append(
             {
-                "id": c_data[0],
+                "id": c_id,
                 "encoded_data": gps_data_codec.encode(locs),
-                "name": c_data[3],
-                "short_name": c_data[4],
-                "start_time": start_time,
+                "name": competitor.name,
+                "short_name": competitor.short_name,
+                "start_time": competitor.start_time,
             }
         )
     try:
