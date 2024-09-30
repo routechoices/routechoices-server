@@ -1603,6 +1603,12 @@ def participations_view(request):
     participations = request.user.participations.select_related(
         "event", "event__club"
     ).order_by("-event__start_date")
+
+    if request.GET.get("name-edited", None):
+        messages.success(request, "Name updated!")
+    if request.GET.get("route-uploaded", None):
+        messages.success(request, "Data uploaded!")
+
     return render(
         request,
         "dashboard/participations.html",

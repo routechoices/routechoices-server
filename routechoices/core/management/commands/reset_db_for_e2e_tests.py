@@ -42,6 +42,15 @@ class Command(BaseCommand):
         )
         Event.objects.create(
             club=club,
+            name="My event with open registration and upload allowed",
+            slug="open-registration-upload-allowed",
+            start_date=arrow.get("2019-06-15T20:00:00Z").datetime,
+            end_date=arrow.now().shift(days=3).datetime,
+            open_registration=True,
+            allow_route_upload=True,
+        )
+        Event.objects.create(
+            club=club,
             name="My future event with upload allowed",
             slug="future-upload-allowed",
             start_date=arrow.now().shift(days=2).datetime,

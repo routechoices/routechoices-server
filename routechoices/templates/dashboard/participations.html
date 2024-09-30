@@ -20,12 +20,10 @@
                                         <button data-competitor-name="{{ p.name }}"
                                                 data-competitor-short-name="{{ p.short_name }}"
                                                 data-competitor-id="{{ p.aid }}"
-                                                class="btn btn-secondary edit-name-btn">Edit name</button>
+                                                class="me-2 mb-1 btn btn-secondary edit-name-btn">Edit name</button>
                                         {% if p.event.allow_route_upload %}
                                             <button data-competitor-id="{{ p.aid }}"
-                                                    class="ms-2 btn btn-secondary open-upload-btn">
-                                                Submit new GPS
-                                            </button>
+                                                    class="btn btn-secondary open-upload-btn">Submit new GPS</button>
                                         {% endif %}
                                     </td>
                                 </tr>

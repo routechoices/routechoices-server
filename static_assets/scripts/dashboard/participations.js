@@ -121,6 +121,14 @@ function parseGpx(xmlstr) {
 }
 
 (function () {
+  var thisUrl = window.location.href;
+  if (
+    thisUrl.includes("name-edited=1") ||
+    thisUrl.includes("route-uploaded=1")
+  ) {
+    window.history.pushState("-", null, window.location.pathname);
+  }
+
   const editModal = new bootstrap.Modal(
     document.getElementById("editNameModal")
   );
@@ -157,6 +165,7 @@ function parseGpx(xmlstr) {
   u(".open-upload-btn").on("click", function (e) {
     const el = u(e.target);
     u("#id_competitor_aid").val(el.attr("data-competitor-id"));
+    u("#id_gpx_file").val("");
     uploadModal.show();
   });
 
@@ -177,8 +186,8 @@ function parseGpx(xmlstr) {
         name,
         short_name: shortName,
       },
-      success: (response) => {
-        if (!response.error) window.location.reload();
+      success: () => {
+        window.location.href = window.location.href + "?name-edited=1";
       },
       error: (e) => {
         swal({
@@ -204,10 +213,8 @@ function parseGpx(xmlstr) {
       headers: {
         "X-CSRFToken": window.local.csrfToken,
       },
-      success: function (response) {
-        if (!response.error) {
-          window.location.reload();
-        }
+      success: function () {
+        window.location.href = window.location.href + "?route-uploaded=1";
       },
       error: function (err) {
         if (err.status == 400) {

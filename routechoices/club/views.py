@@ -560,7 +560,7 @@ def event_contribute_view(request, slug, **kwargs):
         return redirect(f"{event.club.nice_url}{event.slug}/contribute")
 
     if request.GET.get("competitor-added", None):
-        messages.success(request, "Competitor Added!")
+        messages.success(request, "Competitor added!")
     if request.GET.get("route-uploaded", None):
         messages.success(request, "Data uploaded!")
 

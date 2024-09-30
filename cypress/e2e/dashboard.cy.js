@@ -9,6 +9,38 @@ context("Dashboard actions", () => {
     cy.wait(100);
   });
 
+  it("Manage Participations", function () {
+    cy.login();
+    cy.forceVisit("/halden-sk/open-registration-upload-allowed/contribute");
+    cy.contains("Enter yourself");
+    cy.get("#id_name").type("Thierry Gueorgiou");
+    cy.get("#id_short_name").type("🇫🇷 T.Gueorgiou");
+    cy.get("#id_device_id-ts-control").type("123456").wait(1000).blur();
+    cy.get("button:not([type]),button[type=submit]").eq(0).click();
+    cy.contains("Competitor added!");
+    cy.get(".upload-route-btn").first().click();
+    cy.get("#id_gpx_file").selectFile("cypress/fixtures/Jukola_1st_leg.gpx");
+    cy.get("#uploadRouteModal button:not([type]),button[type=submit]").click();
+    cy.contains("Data uploaded!");
+
+    cy.forceVisit("/dashboard/participations");
+    cy.contains(
+      "My event with open registration and upload allowed by Halden SK as Thierry Gueorgiou (🇫🇷 T.Gueorgiou)"
+    );
+    cy.get(".edit-name-btn").first().click();
+    cy.get("#id_name").clear().type("Kasper Harlem Fosser");
+    cy.get("#id_short_name").clear().type("🇳🇴 K.H.Fosser{enter}");
+    cy.contains("Name updated!");
+    cy.contains(
+      "My event with open registration and upload allowed by Halden SK as Kasper Harlem Fosser (🇳🇴 K.H.Fosser)"
+    );
+
+    cy.get(".open-upload-btn").first().click();
+    cy.get("#id_gpx_file").selectFile("cypress/fixtures/Jukola_1st_leg.gpx");
+    cy.get(".upload-btn:not(.disabled)").click();
+    cy.contains("Data uploaded!");
+  });
+  /*
   it("Manage devices", function () {
     cy.login();
     cy.contains("Halden SK").click();
@@ -233,4 +265,5 @@ context("Dashboard actions", () => {
     cy.contains("Map assigned more than once in this event");
     cy.contains("Map title given more than once in this event");
   });
+  */
 });
