@@ -700,9 +700,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
         return self.init_data["LIVE"] == "1"
 
     def get_start_time(self):
-        min_start_time = arrow.utcnow().shift(
-            minutes=int(self.init_data.get("TIMEZONE", 0))
-        )
+        min_start_time = arrow.utcnow()
         for c_id, c in self.get_competitors_data().items():
             if c.start_time:
                 min_start_time = min(min_start_time, c.start_time)
@@ -808,6 +806,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             locations = sorted(locations, key=itemgetter(0))
             from_idx = bisect.bisect_left(locations, from_ts, key=itemgetter(0))
             locations = locations[from_idx:]
+            cropped_devices_data[dev_id] = locations
 
         return cropped_devices_data
 
