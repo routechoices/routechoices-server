@@ -37,16 +37,6 @@
               href="{% static '/vendor/leaflet-mapcentercoord-0.7/L.Control.MapCenterCoord.min.css' %}" />
         <link rel="stylesheet" href="{% static 'styles/club/event.css' %}" />
     {% endcompress %}
-    <link rel="preload"
-          href="{{ event.get_api_detail_url }}"
-          as="fetch"
-          type="application/json"
-          crossorigin="use-credentials" />
-    <link rel="preload"
-          href="{{ event.get_api_data_url }}"
-          as="fetch"
-          type="application/json"
-          crossorigin="use-credentials" />
 {% endblock extra_head %}
 
 {% block body %}

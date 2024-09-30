@@ -922,7 +922,7 @@ function RCEvent(infoURL, clockURL) {
     initializeMap();
     fetch(infoURL, {
       method: "GET",
-      credentials: "same-origin",
+      credentials: "include",
       mode: "cors",
     })
       .then((r) => r.json())
@@ -1302,7 +1302,7 @@ function RCEvent(infoURL, clockURL) {
   function refreshData() {
     fetch(infoURL, {
       method: "GET",
-      credentials: "same-origin",
+      credentials: "include",
       mode: "cors",
     })
       .then((r) => r.json())
@@ -1897,7 +1897,7 @@ function RCEvent(infoURL, clockURL) {
     isCurrentlyFetchingRoutes = true;
     fetch(dataURL, {
       method: "GET",
-      credentials: "same-origin",
+      credentials: "include",
       mode: "cors",
     })
       .then((r) => r.json())
