@@ -66,7 +66,10 @@ class WebHookTestCase(EssentialApiBase):
         )
         res = self.ls_client.post(
             url,
-            {"data": {"id": "abc123"}, "meta": {"custom_data": {"club": "kiilat"}}},
+            {
+                "data": {"id": "abc123", "attributes": {"variant_id": 154372}},
+                "meta": {"custom_data": {"club": "kiilat"}},
+            },
             HTTP_X_EVENT_NAME="order_created",
             content_type="json",
         )
@@ -84,7 +87,7 @@ class WebHookTestCase(EssentialApiBase):
         self.club.save()
         res = self.ls_client.post(
             url,
-            {"data": {"attributes": {"order_id": "abc123"}}},
+            {"data": {"attributes": {"order_id": "abc123", "variant_id": 154372}}},
             HTTP_X_EVENT_NAME="subscription_expired",
             content_type="json",
         )
