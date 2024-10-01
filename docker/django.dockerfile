@@ -15,7 +15,6 @@ ENV PATH="/root/.cargo/bin:$PATH"
 
 ARG TARGETARCH
 
-
 COPY requirements.txt .
 RUN python -m venv /opt/venv
 ENV VIRTUAL_ENV="/opt/venv/"
@@ -23,20 +22,32 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
     pip install cmake>=3.5 && \
-    git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules && \
-    cd libjxl* && \
-    git checkout v0.10.3 && \
-    mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_BENCHMARK=OFF -DJPEGXL_ENABLE_TOOLS=OFF -DJPEGXL_ENABLE_DEVTOOLS=OFF .. && \
-    cmake --build . -- -j$(nproc) && \
-    cmake --install . && \
-    cp ./third_party/brotli/*.so* /usr/local/lib; \
+    git clone --recurse-submodules --depth 1 -b v0.11.0 https://github.com/libjxl/libjxl.git && \
+    cd libjxl && \
+    cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+        -DJPEGXL_ENABLE_TOOLS=OFF -DJPEGXL_ENABLE_DOXYGEN=OFF -DJPEGXL_ENABLE_MANPAGES=OFF \
+        -DJPEGXL_ENABLE_BENCHMARKS=OFF -DJPEGXL_ENABLE_EXAMPLES=OFF -DJPEGXL_ENABLE_JNI=OFF \
+        -DJPEGXL_ENABLE_SJPEG=OFF -DJPEGXL_ENABLE_OPENEXR=OFF && \
+    cmake --build build && \
+    cmake --install build && \
+    cd .. ;\
     fi
 
-ENV LD_LIBRARY_PATH=/usr/local/lib
-RUN pip install uv
-RUN uv pip install -r requirements.txt
-
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/opt/lib/
+RUN . /opt/venv/bin/activate
+ENV VIRTUAL_ENV="/opt/venv/"
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+pip install maturin && \
+git clone https://github.com/Isotr0py/pillow-jpegxl-plugin && \
+cd pillow-jpegxl-plugin && \
+maturin build --release --features vendored && \
+cd ..; \
+pip install wheel && \
+pip install ./pillow-jpegxl-plugin/target/wheels/pillow_jxl_plugin-*.whl && \
+rm -rf pillow-jpegxl-plugin; \
+fi
+RUN
+RUN pip install -r requirements.txt
 # final stage
 FROM python:3.12-slim
 RUN apt-get update -qq && \
