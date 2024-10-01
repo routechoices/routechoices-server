@@ -31,7 +31,10 @@ def lemonsqueezy_webhook(request):
         pass
 
     # Club Upgrade
-    if "order_created" in request.META.get("HTTP_X_EVENT_NAME", "") and variant_id in settings.LEMONSQUEEZY_PRODUCTS_VARIANTS:
+    if (
+        "order_created" in request.META.get("HTTP_X_EVENT_NAME", "")
+        and variant_id in settings.LEMONSQUEEZY_PRODUCTS_VARIANTS
+    ):
         club = None
         try:
             slug = str(data["meta"]["custom_data"]["club"])
@@ -49,7 +52,10 @@ def lemonsqueezy_webhook(request):
         return HttpResponse(f"Upgraded {club}")
 
     # Club Downgrade
-    if "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", "") and variant_id in settings.LEMONSQUEEZY_PRODUCTS_VARIANTS:
+    if (
+        "subscription_expired" in request.META.get("HTTP_X_EVENT_NAME", "")
+        and variant_id in settings.LEMONSQUEEZY_PRODUCTS_VARIANTS
+    ):
         club = None
         try:
             order_id = data["data"]["attributes"]["order_id"]
