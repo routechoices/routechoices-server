@@ -2,13 +2,13 @@
 var ServerClock = function (opts) {
   if (!(this instanceof ServerClock)) return new ServerClock(opts);
 
-  var defaultOptions = { url: null, interval: 300000, burstSize: 3, burstInterval: 0.5 },
-    options = { ...defaultOptions, ...opts },
-    drifts = [],
-    refreshTimeout = null;
+  const defaultOptions = { url: null, interval: 300000, burstSize: 3, burstInterval: 0.5 };
+  const options = { ...defaultOptions, ...opts };
+  let drifts = [];
+  let refreshTimeout = null;
 
   function getAverageDrift() {
-    var total_drift = 0;
+    let total_drift = 0;
     for (var i = 0; i < drifts.length; i++) {
       total_drift += drifts[i];
     }
@@ -17,9 +17,9 @@ var ServerClock = function (opts) {
 
   function onServerResponse(requestTime) {
     return function (response) {
-      var now = +new Date(),
-        serverTime = response.time * 1e3,
-        drift = serverTime - (now + requestTime) / 2;
+      const now = +new Date();
+      const serverTime = response.time * 1e3;
+      const drift = serverTime - (now + requestTime) / 2;
       drifts.push(drift);
     };
   }
@@ -38,7 +38,7 @@ var ServerClock = function (opts) {
       drifts = [];
       (function fetchServerTime() {
         if (drifts.length < options.burstSize) {
-          var clientRequestTime = +new Date();
+          const clientRequestTime = +new Date();
           fetch(options.url, {
             method: "POST",
             mode: "cors",

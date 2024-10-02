@@ -1,4 +1,4 @@
-var backdropMaps = {
+const backdropMaps = {
   osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
       'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -97,9 +97,9 @@ var backdropMaps = {
 
 function cloneLayer(layer) {
   function cloneOptions(options) {
-    var ret = {};
-    for (var i in options) {
-      var item = options[i];
+    const ret = {};
+    for (const i in options) {
+      const item = options[i];
       if (item && item.clone) {
         ret[i] = item.clone();
       } else if (item instanceof L.Layer) {
@@ -112,31 +112,19 @@ function cloneLayer(layer) {
   }
 
   function cloneInnerLayers(layer) {
-    var layers = [];
+    const layers = [];
     layer.eachLayer(function (inner) {
       layers.push(cloneLayer(inner));
     });
     return layers;
   }
-  var options = cloneOptions(layer.options);
+  const options = cloneOptions(layer.options);
   // Renderers
   if (layer instanceof L.SVG) {
     return L.svg(options);
   }
   if (layer instanceof L.Canvas) {
     return L.canvas(options);
-  }
-  // GoogleMutant GridLayer
-  if (L.GridLayer.GoogleMutant && layer instanceof L.GridLayer.GoogleMutant) {
-    var googleLayer = L.gridLayer.googleMutant(options);
-    layer._GAPIPromise.then(function () {
-      var subLayers = Object.keys(layer._subLayers);
-
-      for (var i in subLayers) {
-        googleLayer.addGoogleLayer(subLayers[i]);
-      }
-    });
-    return googleLayer;
   }
   // Tile layers
   if (layer instanceof L.TileLayer.WMS) {
@@ -179,7 +167,7 @@ function cloneLayer(layer) {
   throw "Unknown layer, cannot clone this layer. Leaflet-version: " + L.version;
 }
 
-var backgroundMapTitles = {
+const backgroundMapTitles = {
   osm: "Open Street Map",
   "gmap-street": "Google Map Street",
   "gmap-hybrid": "Google Map Satellite",
@@ -198,8 +186,8 @@ var backgroundMapTitles = {
 };
 
 function getBaseLayers() {
-  var entries = {};
-  for (var [key, value] of Object.entries(backgroundMapTitles)) {
+  const entries = {};
+  for (const [key, value] of Object.entries(backgroundMapTitles)) {
     entries[value] = cloneLayer(backdropMaps[key]);
   }
   return entries;
