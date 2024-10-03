@@ -28,9 +28,9 @@
                 <h1>Routechoices.com</h1>
                 {% if not request.user.is_authenticated %}
                     <div class="alert alert-danger" role="alert">
-                        You are not signed up!
+                        You are not logged in!
                         <br />
-                        <a href="https://www.routechoices.com/signup">Sign-Up to Routechoices.com</a> to be able to manage your participations later on.
+                        <a href="https://www.routechoices.com/signup">Sign-Up</a> or <a href="https://www.routechoices.com/login">Log-In</a> to be able to manage your participations later on.
                     </div>
                 {% endif %}
                 <h3 id="register-title">Register to an event</h3>
