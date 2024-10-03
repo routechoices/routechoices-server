@@ -13,7 +13,11 @@
     <div class="row">
         <div class="col-12">
             <h1>
-                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static "/img/club-default.png" %}{% endif %}" width="80" height="80" alt="Club {{ club.name }} Logo" class="rounded">
+                <img src="{% if club.logo %}{{ club.logo_url }}{% else %}{% static '/img/club-default.png' %}{% endif %}"
+                     width="80"
+                     height="80"
+                     alt="Club {{ club.name }} Logo"
+                     class="rounded">
                 {{ club.name }}
             </h1>
         </div>
@@ -32,6 +36,16 @@
             <a href="{% url 'dashboard:upgrade' %}"
                style="color:var(--bs-info)"
                class="fw-bold">Upgrade to our paid plan!</a>
+        </p>
+    {% endif %}
+    {% if not club.upgraded and club.o_club %}
+        <p class="p-1 text-center"
+           style="color: #000;
+                  background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
+            You are registered as an orienteering club, you can enjoy the site for free.
+            <a href="{% url 'dashboard:upgrade' %}"
+               style="color:var(--bs-info)"
+               class="fw-bold">Upgrade to our paid plan</a> to help the site running!
         </p>
     {% endif %}
     <ul class="nav nav-tabs mb-3">
