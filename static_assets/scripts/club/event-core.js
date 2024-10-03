@@ -335,7 +335,7 @@ function toggleCompetitorFullRoute(competitor) {
     competitor.displayFullRoute = null;
     competitor.sidebarCard
       ?.find(".full-route-icon")
-      .attr({ fill: "var(--bs-body-color)" });
+      .attr({ fill: "share_button(--bs-body-color)" });
   } else {
     competitor.displayFullRoute = true;
     competitor.sidebarCard?.find(".full-route-icon").attr({ fill: "#20c997" });

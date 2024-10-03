@@ -3101,10 +3101,6 @@ function RCEvent(infoURL, clockURL) {
 }
 
 (function () {
-  if (!navigator.canShare) {
-    document.getElementById("share_buttons").remove();
-  }
-
   (async () => {
     try {
       await navigator.wakeLock.request("screen");
