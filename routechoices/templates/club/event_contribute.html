@@ -114,6 +114,13 @@
                     <h4 class="padded-multiline">
                         <span>Enter yourself</span>
                     </h4>
+                    {% if not request.user.is_authenticated %}
+                        <div class="alert alert-danger" role="alert">
+                            You are not signed up!
+                            <br />
+                            <a href="https://www.routechoices.com/signup">Sign-Up to Routechoices.com</a> to be able to manage your participations later on.
+                        </div>
+                    {% endif %}
                     <div class="mb-3">
                         <form action="" method="post" id="registration-form">
                             {% csrf_token %}
