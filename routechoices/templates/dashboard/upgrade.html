@@ -4,7 +4,7 @@
     <content>
         <h4>Hey {{ club.name }}!</h4>
         {% if not club.upgraded and club.o_club %}
-            <h4>You are registered as an orienteering club. You can enjoy {{ site.name }}'s for free!</h4>
+            <h4>You are registered as an orienteering club. You can enjoy {{ site.name }} for free!</h4>
             <p class="fw-bold">However, if you want, you can upgrade to our paid plan and help the site running.</p>
         {% endif %}
         {% if not club.upgraded %}
@@ -12,7 +12,13 @@
                 {{ site.name }} will never sell your data, or display ads.
                 <br>
                 <br>
-                To keep the servers running, {% if not club.o_club %}we need you to{% else %}you can generously{% endif %} contribute to their running cost.
+                To keep the servers running,
+                {% if not club.o_club %}
+                    we need you to
+                {% else %}
+                    you can generously
+                {% endif %}
+                contribute to their running cost.
             </p>
             <p>
                 <b>
@@ -107,7 +113,7 @@
                 </div>
             </div>
         {% elif club.upgraded %}
-            <h4>You are already using {{ site.name }}'s Paid plan. We thank you sincerly!</h4>
+            <h4>You are already using {{ site.name }} Paid plan. We thank you sincerly!</h4>
         {% endif %}
     </content>
 {% endblock sub_content %}

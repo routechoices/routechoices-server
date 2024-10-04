@@ -41,7 +41,7 @@ pip install maturin && \
 git clone https://github.com/Isotr0py/pillow-jpegxl-plugin && \
 cd pillow-jpegxl-plugin && \
 maturin build --release --features vendored && \
-cd ..; \
+cd .. && \
 pip install wheel && \
 pip install ./pillow-jpegxl-plugin/target/wheels/pillow_jxl_plugin-*.whl && \
 rm -rf pillow-jpegxl-plugin; \
