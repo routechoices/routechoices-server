@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
     <trkseg>`;
     posArray.forEach(function (point) {
       result += `
-      <trkpt lat="${point.coords.latitude}" lon="${
-        point.coords.longitude
-      }"><time>${new Date(point.timestamp).toISOString()}</time></trkpt>`;
+      <trkpt lat="${point[1]}" lon="${point[2]}"><time>${new Date(
+        point[0]
+      ).toISOString()}</time></trkpt>`;
     });
     result += `
     </trkseg>

@@ -58,39 +58,22 @@ var intValCodec = (function () {
   };
 })();
 
-const Coordinates = function (lat, lon) {
-  this.latitude = lat;
-  this.longitude = lon;
-  this.distance = function (c) {
-    const C = Math.PI / 180;
-    const dlat = this.latitude - c.latitude;
-    const dlon = this.longitude - c.longitude;
-    const a = Math.sin((C * dlat) / 2) * Math.sin((C * dlat) / 2) + Math.cos(C * this.latitude) * Math.cos(C * c.latitude) * Math.sin((C * dlon) / 2) * Math.sin((C * dlon) / 2);
-    return 12756274 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  };
+const positionTowardAtTimestamp = function(a, b, timestamp) {
+  const r = (timestamp - a[0]) / (b[0] - a[0]);
+  const r_ = 1 - r;
+  return [timestamp, b[1] * r + r_ * a[1], b[2] * r + r_ * a[2]];
+}
+
+distance = function (a, c) {
+  const C = Math.PI / 180;
+  const dlat = a[1] - c[1];
+  const dlon = a[2] - c[2];
+  const d = Math.sin((C * dlat) / 2) * Math.sin((C * dlat) / 2) + Math.cos(C * a[1]) * Math.cos(C * c[1]) * Math.sin((C * dlon) / 2) * Math.sin((C * dlon) / 2);
+  return 12756274 * Math.atan2(Math.sqrt(d), Math.sqrt(1 - d));
 };
 
-const Position = function (t, lat, lon) {
-  this.timestamp = t;
-  this.coords = new Coordinates(lat, lon);
-  this.distance = function (p) {
-    return this.coords.distance(p.coords);
-  };
-  this.speed = function (p) {
-    return this.distance(p) / Math.abs(this.timestamp - p.timestamp);
-  };
-  this.positionTowardAtTimestamp = function (p, timestamp) {
-    const $t = this;
-    const $tc = $t.coords;
-    const pc = p.coords;
-    const r = (timestamp - $t.timestamp) / (p.timestamp - $t.timestamp);
-    const r_ = 1 - r;
-    return new Position(timestamp, Math.round((pc.latitude * r + r_ * $tc.latitude) * 1e6) / 1e6, Math.round((pc.longitude * r + r_ * $tc.longitude) * 1e6) / 1e6);
-  };
-};
-
-const PositionArchive = function (k) {
-  let positions = new Array(k);
+const PositionArchive = function () {
+  let positions = [];
   const _locationOf = function (element, start, end) {
       start = typeof start !== "undefined" ? start : 0;
       end = typeof end !== "undefined" ? end : positions.length - 1;
@@ -98,46 +81,46 @@ const PositionArchive = function (k) {
       if (end - start < 0) {
         return start;
       }
-      if (positions[start].timestamp >= element.timestamp) {
+      if (positions[start][0] >= element) {
         return start;
       }
-      if (positions[end].timestamp <= element.timestamp) {
+      if (positions[end][0] <= element) {
         return end + 1;
       }
-      if (positions[pivot].timestamp == element.timestamp) {
+      if (positions[pivot][0] == element) {
         return pivot;
       }
       if (end - start <= 1) {
         return start + 1;
       }
-      if (element.timestamp > positions[pivot].timestamp) {
+      if (element > positions[pivot][0]) {
         return _locationOf(element, pivot, end);
       } else {
         return _locationOf(element, start, pivot - 1);
       }
   };
   this.slice = function(start, end) {
-    return (new PositionArchive(0)).setData(positions.slice(start, end));
+    return (new PositionArchive()).setData(positions.slice(start, end));
   }
   this.setData = function(d) {
     positions = d;
     return this;
   }
   this.add = function (pos) {
-    if (pos.timestamp === null) {
+    if (pos === null) {
       return;
     }
     const index = _locationOf(pos);
     if (
       positions.length > 0 &&
       index < positions.length &&
-      positions[index].timestamp === pos.timestamp
+      positions[index][0] === pos[0]
     ) {
       positions[index] = pos;
     } else if (
       positions.length > 0 &&
       index >= positions.length &&
-      positions[positions.length - 1].timestamp === pos.timestamp
+      positions[positions.length - 1][0] === pos[0]
     ) {
       positions[positions.length - 1] = pos;
     } else {
@@ -150,21 +133,21 @@ const PositionArchive = function (k) {
     positions.push(pos);
   };
   this.setIndex = function (i, pos) {
-    positions[i]= pos;
+    positions[i] = pos;
   };
   this.setLength = function (l) {
-    positions.length = l;
+    positions = positions.slice(0, l);
   };
 
   this.eraseInterval = function (start, end) {
-    let indexS = _locationOf({ timestamp: start });
-    let indexE = _locationOf({ timestamp: end });
-    while (indexS > 0 && positions[indexS - 1].timestamp >= start) {
+    let indexS = _locationOf(start);
+    let indexE = _locationOf(end);
+    while (indexS > 0 && positions[indexS - 1][0] >= start) {
       indexS--;
     }
     while (
       indexE < positions.length - 1 &&
-      positions[indexE].timestamp <= end
+      positions[indexE][0] <= end
     ) {
       indexE++;
     }
@@ -184,24 +167,25 @@ const PositionArchive = function (k) {
     return positions;
   };
   this.getByTime = function (t) {
-    const index = _locationOf({ timestamp: t });
+    const index = _locationOf(t);
     if (index === 0) {
       return positions[0];
     }
     if (index > positions.length - 1) {
       return positions[positions.length - 1];
     }
-    if (positions[index].timestamp === t) {
+    if (positions[index][0] === t) {
       return positions[index];
     } else {
-      return positions[index - 1].positionTowardAtTimestamp(
+      return positionTowardAtTimestamp(
+        positions[index - 1],
         positions[index],
         t
       );
     }
   };
   this.extractInterval = function (t1, t2) {
-    let index = _locationOf({ timestamp: t1 });
+    let index = _locationOf(t1);
     let i1;
     let i2;
     let result;
@@ -211,18 +195,18 @@ const PositionArchive = function (k) {
       i1 = 0;
     } else if (index > positions.length - 1) {
       i1 = positions.length - 1;
-    } else if (positions[index].timestamp === t1) {
+    } else if (positions[index][0] === t1) {
       i1 = index;
     } else {
       i1B = true;
       i1 = index;
     }
-    index = _locationOf({ timestamp: t2 });
+    index = _locationOf(t2);
     if (index === 0) {
       i2 = 0;
     } else if (index > positions.length - 1) {
       i2 = positions.length - 1;
-    } else if (positions[index].timestamp === t2) {
+    } else if (positions[index][0] === t2) {
       i2 = index;
     } else {
       i2B = true;
@@ -232,26 +216,34 @@ const PositionArchive = function (k) {
     result = this.slice(i1, i2 + 1);
     if (i1B) {
       result.add(
-        positions[i1 - 1].positionTowardAtTimestamp(positions[i1], t1)
+        positionTowardAtTimestamp(
+          positions[i1 - 1],
+          positions[i1],
+          t1
+        )
       );
     }
     if (i2B) {
       result.add(
-        positions[i2].positionTowardAtTimestamp(positions[i2 + 1], t2)
+        positionTowardAtTimestamp(
+          positions[i2],
+          positions[i2 + 1],
+          t2
+        )
       );
     }
     return result;
   };
   this.hasPointInInterval = function (t1, t2) {
-    const i1 = _locationOf({ timestamp: t1 });
-    const i2 = _locationOf({ timestamp: t2 });
+    const i1 = _locationOf(t1);
+    const i2 = _locationOf(t2);
     return i1 !== i2;
   };
   this.getDuration = function () {
     if (positions.length <= 1) {
       return 0;
     } else {
-      return positions[positions.length - 1].timestamp - positions[0].timestamp;
+      return positions[positions.length - 1][0] - positions[0][0];
     }
   };
   this.getAge = function (now) {
@@ -259,7 +251,7 @@ const PositionArchive = function (k) {
     if (positions.length === 0) {
       return 0;
     } else {
-      return now - positions[0].timestamp;
+      return now - positions[0][0];
     }
   };
   this.distanceUntil = function (t) {
@@ -267,10 +259,10 @@ const PositionArchive = function (k) {
     if (this.getPositionsCount() === 0) {
       return 0;
     }
-    const npositions = this.extractInterval(positions[0].timestamp, +t);
+    const npositions = this.extractInterval(positions[0][0], +t);
     const nn = npositions.getPositionsCount();
     for (let i = 0; i < nn - 1; i++) {
-      result += npositions.getByIndex(i).distance(npositions.getByIndex(i + 1));
+      result += distance(npositions.getByIndex(i), npositions.getByIndex(i + 1));
     }
     return result;
   };
@@ -281,11 +273,10 @@ PositionArchive.fromEncoded = function (encoded) {
   const vals = [];
   const prev_vals = [YEAR2010, 0, 0];
   const enc_len = encoded.length;
-  const pts = new PositionArchive(Math.floor(enc_len/3));
+  const pts = new PositionArchive();
   let r;
   let is_first = true;
   let offset = 0;
-  let k = 0;
 
   while (offset < enc_len) {
     for (let i = 0; i < 3; i++) {
@@ -304,9 +295,7 @@ PositionArchive.fromEncoded = function (encoded) {
       vals[i] = new_val;
       prev_vals[i] = new_val;
     }
-    pts.setIndex(k, new Position(vals[0] * 1e3, vals[1] / 1e5, vals[2] / 1e5));
-    k++;
+    pts.push([vals[0] * 1e3, vals[1] / 1e5, vals[2] / 1e5]);
   }
-  pts.setLength(k)
   return pts;
 };

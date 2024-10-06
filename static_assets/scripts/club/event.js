@@ -1143,8 +1143,8 @@ function RCEvent(infoURL, clockURL) {
     let found = false;
     Object.values(competitorRoutes).forEach(function (route) {
       if (route) {
-        if (res > route.getByIndex(0).timestamp) {
-          res = route.getByIndex(0).timestamp;
+        if (res > route.getByIndex(0)[0]) {
+          res = route.getByIndex(0)[0];
           found = true;
         }
       }
@@ -1160,10 +1160,7 @@ function RCEvent(infoURL, clockURL) {
     Object.values(competitorRoutes).forEach(function (route) {
       if (route) {
         const idx = route.getPositionsCount() - 1;
-        res =
-          res < route.getByIndex(idx).timestamp
-            ? route.getByIndex(idx).timestamp
-            : res;
+        res = res < route.getByIndex(idx)[0] ? route.getByIndex(idx)[0] : res;
       }
     });
     return res;
@@ -1179,7 +1176,7 @@ function RCEvent(infoURL, clockURL) {
       if (route) {
         const idx = route.getPositionsCount() - 1;
         const dur =
-          route.getByIndex(idx).timestamp -
+          route.getByIndex(idx)[0] -
           ((customOffset
             ? competitor.custom_offset
             : +new Date(competitor.start_time)) || getCompetitionStartDate());
@@ -1751,12 +1748,10 @@ function RCEvent(infoURL, clockURL) {
       if (route) {
         const length = route.getPositionsCount();
         for (let i = 0; i < length; i++) {
-          dist = route.getByIndex(i).distance({
-            coords: { latitude: latlng.lat, longitude: latlng.lng },
-          });
+          dist = distance(route.getByIndex(i), [0, latlng.lat, atlng.lng]);
           if (dist < minDist) {
             minDist = dist;
-            minDistT = route.getByIndex(i).timestamp;
+            minDistT = route.getByIndex(i)[0];
           }
         }
         competitor.custom_offset = minDistT;
@@ -1921,16 +1916,14 @@ function RCEvent(infoURL, clockURL) {
               const length = route.getPositionsCount();
               for (let i = 0; i < length; i++) {
                 const pt = route.getByIndex(i);
-                runnerPoints.push(
-                  L.latLng([pt.coords.latitude, pt.coords.longitude])
-                );
+                runnerPoints.push(L.latLng([pt[1], pt[2]]));
               }
             }
           }
           // if last position is not older than 30 minutes
           if (
             route &&
-            route.getLastPosition().timestamp > +new Date() - 30 * 60 * 1e3
+            route.getLastPosition()[0] > +new Date() - 30 * 60 * 1e3
           ) {
             competitorBatteyLevels[competitor.id] = competitor.battery_level;
           } else {
@@ -1972,7 +1965,7 @@ function RCEvent(infoURL, clockURL) {
       }
     }
     const loc = route.getByTime(timeT);
-    map.setView([loc.coords.latitude, loc.coords.longitude], map.getZoom(), {
+    map.setView([loc[1], loc[2]], map.getZoom(), {
       animate: true,
     });
     setTimeout(function () {
@@ -1981,7 +1974,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function redrawCompetitorMarker(competitor, location, faded) {
-    const coordinates = [location.coords.latitude, location.coords.longitude];
+    const coordinates = [location[1], location[2]];
     const redraw =
       competitor.mapMarker && competitor.iconScale != runnerIconScale;
     if (redraw) {
@@ -2004,7 +1997,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function redrawCompetitorNametag(competitor, location, faded) {
-    const coordinates = [location.coords.latitude, location.coords.longitude];
+    const coordinates = [location[1], location[2]];
     const pointX = map.latLngToContainerPoint(coordinates).x;
     const mapMiddleX = map.getSize().x / 2;
     const nametagOnRightSide = pointX > mapMiddleX;
@@ -2055,10 +2048,10 @@ function RCEvent(infoURL, clockURL) {
       const tailLatLng = tail
         .getArray()
         .filter(function (pos) {
-          return !isNaN(pos.coords.latitude);
+          return !isNaN(pos[1]);
         })
         .map(function (pos) {
-          return [pos.coords.latitude, pos.coords.longitude];
+          return [pos[1], pos[2]];
         });
 
       const redraw = competitor.tail && competitor.tailScale != runnerIconScale;
@@ -2586,7 +2579,7 @@ function RCEvent(infoURL, clockURL) {
   }
 
   function keepFocusOnCompetitor(competitor, location) {
-    const coordinates = [location.coords.latitude, location.coords.longitude];
+    const coordinates = [location[1], location[2]];
     const mapSize = map.getSize();
     const placeXY = map.latLngToContainerPoint(coordinates);
     if (
@@ -2787,18 +2780,17 @@ function RCEvent(infoURL, clockURL) {
           keepFocusOnCompetitor(competitor, loc);
         }
 
-        const beforeFirstPoint = route.getByIndex(0).timestamp > viewedTime;
+        const beforeFirstPoint = route.getByIndex(0)[0] > viewedTime;
         if (beforeFirstPoint) {
           clearCompetitorLayers(competitor);
         }
 
-        const isIdle =
-          viewedTime > route.getByIndex(0).timestamp && !hasRecentPoints;
+        const isIdle = viewedTime > route.getByIndex(0)[0] && !hasRecentPoints;
         if ((isIdle && !competitor.idle) || (!isIdle && competitor.idle)) {
           competitor.idle = isIdle;
           clearCompetitorLayers(competitor);
         }
-        if (!beforeFirstPoint && loc && !isNaN(loc.coords.latitude)) {
+        if (!beforeFirstPoint && loc && !isNaN(loc[1])) {
           redrawCompetitorMarker(competitor, loc, isIdle);
           redrawCompetitorNametag(competitor, loc, isIdle);
         }
@@ -2814,19 +2806,19 @@ function RCEvent(infoURL, clockURL) {
             competitor.speedometer.textContent = competitor.speedometerValue;
           } else {
             if (checkVisible(competitor.speedometer)) {
-              let distance = 0;
+              let dist = 0;
               let prevPos = null;
               const tail30s = route.extractInterval(
                 viewedTime - 30 * 1e3,
                 viewedTime
               );
               tail30s.getArray().forEach(function (pos) {
-                if (prevPos && !isNaN(pos.coords.latitude)) {
-                  distance += pos.distance(prevPos);
+                if (prevPos && !isNaN(pos[1])) {
+                  dist += distance(pos, prevPos);
                 }
                 prevPos = pos;
               });
-              const speed = (30 / distance) * 1000;
+              const speed = (30 / dist) * 1000;
               competitor.speedometerValue = formatSpeed(speed);
               competitor.speedometer.textContent = competitor.speedometerValue;
             }
@@ -2855,26 +2847,20 @@ function RCEvent(infoURL, clockURL) {
                 !isRealTime &&
                 isCustomStart &&
                 competitor.custom_offset &&
-                currPoint.timestamp < competitor.custom_offset
+                currPoint[0] < competitor.custom_offset
               ) {
                 continue;
               }
-              if (viewedTime < currPoint.timestamp) {
+              if (viewedTime < currPoint[0]) {
                 break;
               }
               if (rankingFromSplit != null) {
                 const prevXY = map.project(
-                  L.latLng([
-                    prevPoint.coords.latitude,
-                    prevPoint.coords.longitude,
-                  ]),
+                  L.latLng([prevPoint[1], prevPoint[2]]),
                   intersectionCheckZoom
                 );
                 const currXY = map.project(
-                  L.latLng([
-                    currPoint.coords.latitude,
-                    currPoint.coords.longitude,
-                  ]),
+                  L.latLng([currPoint[1], currPoint[2]]),
                   intersectionCheckZoom
                 );
                 const lineAXY = map.project(
@@ -2891,9 +2877,9 @@ function RCEvent(infoURL, clockURL) {
                   crossCount++;
                   if (crossCount == rankingFromLap) {
                     let competitorTime =
-                      prevPoint.timestamp +
+                      prevPoint[0] +
                       intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
-                        (currPoint.timestamp - prevPoint.timestamp);
+                        (currPoint[0] - prevPoint[0]);
                     if (
                       !isLive &&
                       !isRealTime &&
@@ -2941,21 +2927,15 @@ function RCEvent(infoURL, clockURL) {
               for (let i = startPointIdx; i < allPoints.length; i++) {
                 const prevPoint = allPoints[i - 1];
                 const currPoint = allPoints[i];
-                if (viewedTime < currPoint.timestamp) {
+                if (viewedTime < currPoint[0]) {
                   break;
                 }
                 const prevXY = map.project(
-                  L.latLng([
-                    prevPoint.coords.latitude,
-                    prevPoint.coords.longitude,
-                  ]),
+                  L.latLng([prevPoint[1], prevPoint[2]]),
                   intersectionCheckZoom
                 );
                 const currXY = map.project(
-                  L.latLng([
-                    currPoint.coords.latitude,
-                    currPoint.coords.longitude,
-                  ]),
+                  L.latLng([currPoint[1], currPoint[2]]),
                   intersectionCheckZoom
                 );
                 const lineAXY = map.project(
@@ -2972,9 +2952,9 @@ function RCEvent(infoURL, clockURL) {
                   crossCount++;
                   if (crossCount == rankingToLap) {
                     let competitorTime =
-                      prevPoint.timestamp +
+                      prevPoint[0] +
                       intersectRatio(prevXY, currXY, lineAXY, lineBXY) *
-                        (currPoint.timestamp - prevPoint.timestamp);
+                        (currPoint[0] - prevPoint[0]);
                     if (
                       !isLive &&
                       !isRealTime &&
