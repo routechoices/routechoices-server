@@ -110,7 +110,7 @@ const PositionArchive = function () {
     if (pos === null) {
       return;
     }
-    const index = _locationOf(pos);
+    const index = _locationOf(pos[0]);
     if (
       positions.length > 0 &&
       index < positions.length &&
