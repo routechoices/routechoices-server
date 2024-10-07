@@ -1748,7 +1748,7 @@ function RCEvent(infoURL, clockURL) {
       if (route) {
         const length = route.getPositionsCount();
         for (let i = 0; i < length; i++) {
-          dist = distance(route.getByIndex(i), [0, latlng.lat, atlng.lng]);
+          dist = distance(route.getByIndex(i), [0, latlng.lat, latlng.lng]);
           if (dist < minDist) {
             minDist = dist;
             minDistT = route.getByIndex(i)[0];
