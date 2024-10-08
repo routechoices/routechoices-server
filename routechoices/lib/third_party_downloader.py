@@ -1002,7 +1002,10 @@ class Loggator(ThirdPartyTrackingSolution):
         device_data = {}
         r = requests.get(self.init_data["tracks"], timeout=20)
         if r.status_code == 200:
-            tracks_raw = r.json()["data"]
+            try:
+                tracks_raw = r.json()["data"]
+            except Exception:
+                return {}
             tracks_pts = tracks_raw.split(";")
             for pt in tracks_pts:
                 d = pt.split(",")
@@ -1029,7 +1032,7 @@ class Loggator(ThirdPartyTrackingSolution):
         device_map = {}
         for dev_id, locations in devices_data.items():
             dev_obj, created = Device.objects.get_or_create(
-                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
+                aid="LOG_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
                 defaults={"is_gpx": True},
             )
             if not created:
