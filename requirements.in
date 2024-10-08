@@ -27,7 +27,7 @@ djangorestframework
 drf-orjson-renderer
 drf-yasg
 geoip2
-gps-data-codec @ git+https://github.com/routechoices/gps-data-codec@6adb4d361f4d92cd8096625391a3d1ddeda3af74
+gps-data-codec @ git+https://github.com/routechoices/gps-data-codec@06fb8d5f49e51dc35c0efb7458a566834ebbcf8e
 gpxpy
 pillow-jxl-plugin
 kagi @ git+https://github.com/rphlo/kagi@9d02f068abf0963575819455f2e3f05888726153
