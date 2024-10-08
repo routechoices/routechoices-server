@@ -999,7 +999,7 @@ class Loggator(ThirdPartyTrackingSolution):
         return [map_obj]
 
     def get_competitor_devices_data(self, uid, event):
-        device_data = {}
+        devices_data = {}
         r = requests.get(self.init_data["tracks"], timeout=20)
         if r.status_code == 200:
             try:
@@ -1010,10 +1010,16 @@ class Loggator(ThirdPartyTrackingSolution):
             for pt in tracks_pts:
                 d = pt.split(",")
                 dev_id = str(int(d[0]))
-                if not device_data.get(dev_id):
-                    device_data[dev_id] = []
-                device_data[dev_id].append((int(d[4]), float(d[1]), float(d[2])))
-        return device_data
+                if not devices_data.get(dev_id):
+                    devices_data[dev_id] = []
+                devices_data[dev_id].append((int(d[4]), float(d[1]), float(d[2])))
+
+        cropped_devices_data = {}
+        for dev_id, locations in devices_data.items():
+            locations = sorted(locations, key=itemgetter(0))
+            cropped_devices_data[dev_id] = locations
+
+        return cropped_devices_data
 
     def get_competitors_data(self):
         competitors = {}
