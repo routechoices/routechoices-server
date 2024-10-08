@@ -62,7 +62,7 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.s3 import s3_object_url
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
-from routechoices.lib.third_party_downloader import GpsSeurantaNet
+from routechoices.lib.third_party_downloader import GpsSeurantaNet, Loggator
 from routechoices.lib.validators import (
     validate_imei,
     validate_latitude,
@@ -1919,8 +1919,8 @@ def two_d_rerun_race_data(request):
     auto_schema=None,
 )
 @api_GET_view
-def gpsseuranta_event(request, uid):
-    cache_key = f"gpsseuranta_detail:{uid}"
+def third_party_event(request, provider, uid):
+    cache_key = f"3rd_party_event_detail:{uid}"
     if cache.has_key(cache_key):
         try:
             data = cache.get(cache_key)
@@ -1929,7 +1929,10 @@ def gpsseuranta_event(request, uid):
         else:
             return Response(data, headers={"X-Cache-Hit": 1})
 
-    proxy = GpsSeurantaNet()
+    if provider == "gpsseuranta":
+        proxy = GpsSeurantaNet()
+    else:
+        proxy = Loggator()
     try:
         proxy.parse_init_data(uid)
     except Exception:
@@ -1946,7 +1949,7 @@ def gpsseuranta_event(request, uid):
             "end_date": event.end_date,
             "slug": event.slug,
             "club": "GPS Seuranta",
-            "club_slug": "gpsseuranta",
+            "club_slug": provider,
             "privacy": "secret",
             "open_registration": False,
             "open_route_upload": False,
@@ -1987,8 +1990,8 @@ def gpsseuranta_event(request, uid):
     auto_schema=None,
 )
 @api_GET_view
-def gpsseuranta_event_data(request, uid):
-    cache_key = f"gpsseuranta_data:{uid}"
+def third_party_event_data(request, provider, uid):
+    cache_key = f"3rd_party_event_data:{uid}"
     if cache.has_key(cache_key):
         try:
             data = cache.get(cache_key)
@@ -1997,7 +2000,10 @@ def gpsseuranta_event_data(request, uid):
         else:
             return Response(data, headers={"X-Cache-Hit": 1})
 
-    proxy = GpsSeurantaNet()
+    if provider == "gpsseuranta":
+        proxy = GpsSeurantaNet()
+    else:
+        proxy = Loggator()
     try:
         proxy.parse_init_data(uid)
     except Exception:

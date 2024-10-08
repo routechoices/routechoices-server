@@ -1,4 +1,4 @@
-FROM python:3.12 as builder
+FROM python:3.13 as builder
 
 WORKDIR /app
 
@@ -49,7 +49,7 @@ fi
 RUN
 RUN pip install -r requirements.txt
 # final stage
-FROM python:3.12-slim
+FROM python:3.13-slim
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libmagic1 libgdal32 && \
     apt-get clean -y && \

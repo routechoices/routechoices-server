@@ -237,10 +237,10 @@ def event_view(request, slug, **kwargs):
     if not club_slug:
         club_slug = request.club_slug
 
-    if club_slug == "gpsseuranta":
+    if club_slug in ("gpsseuranta", "loggator"):
         event = Event()
         event.slug = slug
-        club = Club.objects.get(slug="gpsseuranta")
+        club = Club.objects.get(slug=club_slug)
         event.club = club
     else:
         event = (

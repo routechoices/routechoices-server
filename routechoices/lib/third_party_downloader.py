@@ -796,9 +796,8 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
                     dev_id, _ = dev_id.split("_", 1)
                 new_locations = self.decode_data_line(line_data[1:])
                 if not devices_data.get(dev_id):
-                    devices_data[dev_id] = new_locations
-                else:
-                    devices_data[dev_id] += new_locations
+                    devices_data[dev_id] = []
+                devices_data[dev_id] += new_locations
 
         cropped_devices_data = {}
         from_ts = event.start_date.timestamp()
@@ -855,6 +854,7 @@ class GpsSeurantaNet(ThirdPartyTrackingSolution):
             competitor, _ = Competitor.objects.get_or_create(
                 name=tmp_competitor.name,
                 short_name=tmp_competitor.short_name,
+                start_time=tmp_competitor.start_time,
                 event=event,
             )
             device = device_map.get(cid)
@@ -925,100 +925,133 @@ class Loggator(ThirdPartyTrackingSolution):
             raise EventImportError("API returned error code")
         self.init_data = r.json()
 
+    def get_event(self):
+        event = Event()
+        event.slug = self.init_data["event"]["slug"]
+        event.club = self.club
+        event.name = self.init_data["event"]["name"][:255]
+        event.start_date = arrow.get(self.init_data["event"]["start_date"]).datetime
+        event.end_date = arrow.get(self.init_data["event"]["end_date"]).datetime
+        event.send_interval = 10
+        return event
+
     def get_or_create_event(self, uid):
-        event, created = Event.objects.get_or_create(
+        tmp_event = self.get_event()
+        event, _ = Event.objects.get_or_create(
             club=self.club,
-            slug=self.init_data["event"]["slug"],
+            slug=tmp_event.slug,
             defaults={
-                "name": self.init_data["event"]["name"][:255],
+                "name": tmp_event.name,
                 "privacy": PRIVACY_SECRET,
-                "start_date": arrow.get(self.init_data["event"]["start_date"]).datetime,
-                "end_date": arrow.get(self.init_data["event"]["end_date"]).datetime,
+                "start_date": tmp_event.start_date,
+                "end_date": tmp_event.end_date,
             },
         )
         return event
 
-    def get_or_create_event_maps(self, event, uid):
+    def get_map_url(self):
+        return self.init_data.get("map")["url"]
+
+    def get_map(self, download_map=False):
         map_data = self.init_data.get("map")
-        if not map_data:
-            return []
-        map_obj, created = Map.objects.get_or_create(
+        try:
+            length, size = get_remote_image_sizes(map_data["url"])
+        except Exception:
+            return None
+
+        map_obj = Map()
+        map_obj.width = size[0]
+        map_obj.height = size[1]
+        map_obj.corners_coordinates = ",".join(
+            [
+                str(map_data["coordinates"]["topLeft"]["lat"]),
+                str(map_data["coordinates"]["topLeft"]["lng"]),
+                str(map_data["coordinates"]["topRight"]["lat"]),
+                str(map_data["coordinates"]["topRight"]["lng"]),
+                str(map_data["coordinates"]["bottomRight"]["lat"]),
+                str(map_data["coordinates"]["bottomRight"]["lng"]),
+                str(map_data["coordinates"]["bottomLeft"]["lat"]),
+                str(map_data["coordinates"]["bottomLeft"]["lng"]),
+            ]
+        )
+
+        if download_map:
+            r = requests.get(map_data["url"])
+            if r.status_code == 200:
+                map_file = ContentFile(r.content)
+                map_obj.image.save("map", map_file, save=False)
+        return map_obj
+
+    def get_or_create_event_maps(self, event, uid):
+        tmp_map = self.get_map(download_map=True)
+        if not tmp_map:
+            raise MapsImportError("Error importing map")
+        map_obj, _ = Map.objects.get_or_create(
             name=event.name,
             club=self.club,
+            defaults={
+                "image": tmp_map.image,
+                "width": tmp_map.width,
+                "height": tmp_map.height,
+                "corners_coordinates": tmp_map.corners_coordinates,
+            },
         )
-        map_url = map_data["url"]
-        r = requests.get(map_url)
-        if r.status_code != 200:
-            map_obj.delete()
-            raise MapsImportError("API returned error code")
-        try:
-            map_file = ContentFile(r.content)
-            coordinates = ",".join(
-                [
-                    str(map_data["coordinates"]["topLeft"]["lat"]),
-                    str(map_data["coordinates"]["topLeft"]["lng"]),
-                    str(map_data["coordinates"]["topRight"]["lat"]),
-                    str(map_data["coordinates"]["topRight"]["lng"]),
-                    str(map_data["coordinates"]["bottomRight"]["lat"]),
-                    str(map_data["coordinates"]["bottomRight"]["lng"]),
-                    str(map_data["coordinates"]["bottomLeft"]["lat"]),
-                    str(map_data["coordinates"]["bottomLeft"]["lng"]),
-                ]
-            )
-            map_obj.image.save("imported_image", map_file, save=False)
-            im = Image.open(map_file)
-            width, height = im.size
-            map_obj.width = width
-            map_obj.height = height
-            map_obj.corners_coordinates = coordinates
-            map_obj.save()
-        except Exception:
-            map_obj.delete()
-            raise MapsImportError("Error importing map")
-        else:
-            return [map_obj]
+        return [map_obj]
 
-    def get_or_create_event_competitors(self, event, uid):
-        device_map = {}
-        locations_by_device_id = {}
+    def get_competitor_devices_data(self, uid, event):
+        device_data = {}
         r = requests.get(self.init_data["tracks"])
         if r.status_code == 200:
             tracks_raw = r.json()["data"]
             tracks_pts = tracks_raw.split(";")
             for pt in tracks_pts:
                 d = pt.split(",")
-                dev_id = f"{int(d[0])}"
-                if not device_map.get(dev_id):
-                    dev_obj, created = Device.objects.get_or_create(
-                        aid="LOG_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
-                        defaults={
-                            "is_gpx": True,
-                        },
-                    )
-                    if not created:
-                        dev_obj.locations_series = []
-                    device_map[dev_id] = dev_obj
-                    locations_by_device_id[dev_id] = []
-                locations_by_device_id[dev_id].append(
-                    (int(d[4]), float(d[1]), float(d[2]))
-                )
+                dev_id = str(int(d[0]))
+                if not device_data.get(dev_id):
+                    device_data[dev_id] = []
+                device_data[dev_id].append((int(d[4]), float(d[1]), float(d[2])))
+        return device_data
 
-        competitors = []
+    def get_competitors_data(self):
+        competitors = {}
         for c_data in self.init_data["competitors"]:
-            competitor, _ = Competitor.objects.get_or_create(
+            competitor = Competitor(
                 name=c_data["name"],
                 short_name=c_data["shortname"],
+                start_time=arrow.get(c_data["start_time"]).datetime,
+            )
+            device_id = f"{c_data['device_id']}"
+            competitors[device_id] = competitor
+        return competitors
+
+    def get_or_create_event_competitors(self, event, uid):
+        devices_data = self.get_competitor_devices_data(uid, event)
+        device_map = {}
+        for dev_id, locations in devices_data.items():
+            dev_obj, created = Device.objects.get_or_create(
+                aid="SEU_" + safe64encodedsha(f"{dev_id}:{uid}")[:8],
+                defaults={"is_gpx": True},
+            )
+            if not created:
+                dev_obj.locations_series = []
+            dev_obj.locations_series = locations
+            device_map[dev_id] = dev_obj
+
+        competitors = self.get_competitors_data()
+        for cid, tmp_competitor in competitors.items():
+            competitor, _ = Competitor.objects.get_or_create(
+                name=tmp_competitor.name,
+                short_name=tmp_competitor.short_name,
+                start_time=tmp_competitor.start_time,
                 event=event,
             )
-            competitor.start_time = arrow.get(c_data["start_time"]).datetime
-            device_id = f"{c_data['device_id']}"
-            device = device_map.get(device_id)
+            device = device_map.get(cid)
             if device:
-                device.add_locations(locations_by_device_id[device_id])
                 device.save()
                 competitor.device = device
             competitor.save()
             competitors.append(competitor)
+
         return competitors
 
 

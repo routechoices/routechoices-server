@@ -672,13 +672,19 @@ class EventApiTestCase(EssentialApiBase):
     def test_gpsseuranta_proxy(self):
         uid = "20240911AVPR"
         url = self.reverse_and_check(
-            "gpsseuranta_event_detail", f"/gpsseuranta/{uid}", "api", {"uid": uid}
+            "third_party_event_detail",
+            f"/gpsseuranta/{uid}",
+            "api",
+            {"provider": "gpsseuranta", "uid": uid},
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         url = self.reverse_and_check(
-            "gpsseuranta_event_data", f"/gpsseuranta/{uid}/data", "api", {"uid": uid}
+            "third_party_event_data",
+            f"/gpsseuranta/{uid}/data",
+            "api",
+            {"provider": "gpsseuranta", "uid": uid},
         )
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
