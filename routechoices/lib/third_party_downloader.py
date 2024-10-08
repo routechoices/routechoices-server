@@ -1000,7 +1000,7 @@ class Loggator(ThirdPartyTrackingSolution):
 
     def get_competitor_devices_data(self, uid, event):
         device_data = {}
-        r = requests.get(self.init_data["tracks"])
+        r = requests.get(self.init_data["tracks"], timeout=20)
         if r.status_code == 200:
             tracks_raw = r.json()["data"]
             tracks_pts = tracks_raw.split(";")
