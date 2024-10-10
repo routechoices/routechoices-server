@@ -7,7 +7,7 @@ context("Events in future", () => {
   it("Can not see Event as in future", function () {
     cy.forceVisit("/halden-sk/future-default");
     cy.contains("Event has not yet started.");
-    cy.contains("Starting in");
+    cy.contains("Starting in").should("be.visible");
   });
 
   it("Can not register or upload to Event as registration not open", function () {
