@@ -19,4 +19,5 @@ module.exports = defineConfig({
   hosts: {
     "*.routechoices.dev": "127.0.0.1",
   },
+  pageLoadTimeout: 10000,
 });
