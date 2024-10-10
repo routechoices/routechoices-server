@@ -1,4 +1,12 @@
 context("Events in future", () => {
+  before(() => {
+    cy.visit("/");
+  });
+
+  after(() => {
+    cy.wait(100);
+  });
+
   it("Future events are not listed", function () {
     cy.forceVisit("/halden-sk/");
     cy.contains("My Future").should("not.exist");

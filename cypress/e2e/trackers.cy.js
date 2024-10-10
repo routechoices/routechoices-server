@@ -1,4 +1,12 @@
 context("IMEI device id generation", () => {
+  before(() => {
+    cy.visit("/");
+  });
+
+  after(() => {
+    cy.wait(100);
+  });
+
   it("Create an Device Id", function () {
     cy.visit("/trackers");
     cy.get("#hardware-tab-btn").click();
