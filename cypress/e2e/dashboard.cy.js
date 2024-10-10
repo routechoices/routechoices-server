@@ -216,7 +216,7 @@ context("Dashboard actions", () => {
       .contains("61.4359")
       .contains("24.2143");
     cy.get('[aria-label="Center"]').eq(1).click();
-
+    cy.wait(200);
     cy.get("#map .leaflet-control-mapcentercoord")
       .contains("61.4255")
       .contains("24.1945");
