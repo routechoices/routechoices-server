@@ -1,6 +1,5 @@
 context("Dashboard actions", () => {
   before(() => {
-    // https://on.cypress.io/visit
     cy.getDeviceId();
     cy.visit("/");
   });
