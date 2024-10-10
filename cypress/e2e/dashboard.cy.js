@@ -196,6 +196,7 @@ context("Dashboard actions", () => {
     cy.forceVisit("/halden-sk/Jukola-2019-1st-leg");
     cy.contains("Olav Lundanes", { timeout: 20000 }); // in competitor list
 
+    cy.wait(1000);
     // toggle competitor
     cy.contains("#map", "KooVee");
     cy.get(".competitor-switch").eq(1).uncheck();
