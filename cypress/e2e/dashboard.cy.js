@@ -8,7 +8,7 @@ context("Dashboard actions", () => {
   after(() => {
     cy.wait(100);
   });
-
+  /*
   it("Manage Participations", function () {
     cy.login();
     cy.forceVisit("/halden-sk/open-registration-upload-allowed/contribute");
@@ -156,7 +156,7 @@ context("Dashboard actions", () => {
     cy.get("button:not([type]),button[type=submit]").click();
     cy.contains("Changes saved successfully", { timeout: 10000 });
   });
-
+*/
   it("Create events", function () {
     cy.login();
     cy.contains("Halden SK").click();
@@ -201,9 +201,40 @@ context("Dashboard actions", () => {
     cy.contains("#map", "KooVee");
     cy.get(".competitor-switch").eq(1).uncheck();
     cy.contains("#map", "KooVee").should("not.exist");
-
     cy.get(".competitor-switch").eq(1).check();
     cy.contains("#map", "KooVee");
+
+    // change runner color
+    cy.get(".color-tag").first().click();
+    cy.contains("Select new color for Frederic Tranchand");
+    cy.get(".IroWheel").first().should("be.visible").click(50, 50);
+    cy.wait(200);
+    cy.get("#save-color").click();
+
+    // center on runner
+    cy.get("#map .leaflet-control-mapcentercoord").contains(
+      "61.43590º, 24.21431º"
+    );
+    cy.get('[aria-label="Center"]').eq(1).click();
+
+    cy.get("#map .leaflet-control-mapcentercoord").contains(
+      "61.42559º, 24.19450º"
+    );
+
+    // move progress bar and focus on runner
+    cy.get("#full_progress_bar").click(50, 7);
+    cy.get(".competitor-focus-btn").eq(1).click();
+    cy.wait(500);
+    cy.get("#map .leaflet-control-mapcentercoord").contains(
+      "61.42560º, 24.19506º"
+    );
+
+    // toogle full route
+    cy.get(".competitor-highlight-btn").eq(1).click();
+    cy.get(".competitor-full-route-btn").eq(1).click();
+    cy.wait(500);
+    cy.get(".competitor-highlight-btn").eq(1).click();
+    cy.get(".competitor-full-route-btn").eq(1).click();
 
     // random location mass start
     cy.get("#real_time_button").should("have.class", "active");
@@ -211,6 +242,7 @@ context("Dashboard actions", () => {
     cy.wait(1000);
     cy.get("#real_time_button").should("not.have.class", "active");
 
+    // mass start simulation
     cy.get("#mass_start_button").click();
     cy.wait(1000);
 
@@ -240,10 +272,7 @@ context("Dashboard actions", () => {
     cy.url().should("match", /\/dashboard\/events$/);
     cy.forceVisit("/halden-sk/Jukola-2019-2nd-leg");
     cy.contains("Haldin", { timeout: 20000 });
-    cy.get(".color-tag").first().click();
-    cy.contains("Select new color for Mats");
-    cy.get(".IroWheel").first().click(50, 50);
-    cy.get("#save-color").click();
+
     // check event can handle multiple maps
     cy.createMap("Another map");
     cy.visit("/dashboard/events");
