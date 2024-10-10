@@ -63,6 +63,7 @@ jobs:
     resource_class: large
     steps:
       - prepare-docker
+      - run: echo "SECURE_SSL_REDIRECT = True" > ./routechoices/settings_overrides.py
       - run: ./dc stop django
       - run:
           command: ./dc up -d
