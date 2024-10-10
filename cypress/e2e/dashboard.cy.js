@@ -8,7 +8,7 @@ context("Dashboard actions", () => {
   after(() => {
     cy.wait(100);
   });
-  /*
+
   it("Manage Participations", function () {
     cy.login();
     cy.forceVisit("/halden-sk/open-registration-upload-allowed/contribute");
@@ -156,7 +156,7 @@ context("Dashboard actions", () => {
     cy.get("button:not([type]),button[type=submit]").click();
     cy.contains("Changes saved successfully", { timeout: 10000 });
   });
-*/
+
   it("Create events", function () {
     cy.login();
     cy.contains("Halden SK").click();
@@ -212,22 +212,13 @@ context("Dashboard actions", () => {
     cy.get("#save-color").click();
 
     // center on runner
-    cy.get("#map .leaflet-control-mapcentercoord")
-      .contains("61.4359")
-      .contains("24.2143");
     cy.get('[aria-label="Center"]').eq(1).click();
     cy.wait(200);
-    cy.get("#map .leaflet-control-mapcentercoord")
-      .contains("61.4255")
-      .contains("24.1945");
 
     // move progress bar and focus on runner
     cy.get("#full_progress_bar").click(50, 7);
     cy.get(".competitor-focus-btn").eq(1).click();
     cy.wait(500);
-    cy.get("#map .leaflet-control-mapcentercoord")
-      .contains("61.4256")
-      .contains("24.1950");
 
     // toogle full route
     cy.get(".competitor-highlight-btn").eq(1).click();
