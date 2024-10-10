@@ -97,26 +97,10 @@ context("Dashboard actions", () => {
     cy.get("#django-messages").contains("The import of the map was successful");
   });
 
-  it("Create an Event", function () {
+  it("Create Map from Image", function () {
     cy.login();
-    cy.url().should("match", /\/dashboard\/clubs\?next=\/dashboard\/$/);
+    cy.contains("Halden SK").click();
 
-    // Create club
-    cy.createClub();
-
-    cy.contains("Kangasala SK");
-
-    // modify club
-    cy.url().should("match", /\/dashboard\/club$/);
-    cy.get("#id_website").type("https://www.kangasalask.fi");
-    cy.get("#id_description")
-      .clear()
-      .type("## Kangasala SK  \n## GPS Tracking");
-    cy.get("button:not([type]),button[type=submit]").click();
-
-    cy.contains("Changes saved successfully", { timeout: 10000 });
-
-    // Calibrate a map
     cy.visit("/dashboard/maps/new");
 
     cy.get("#id_name").type("Jukola 2019 - 1st Leg (manual calibration)");
@@ -145,6 +129,37 @@ context("Dashboard actions", () => {
       .then((val) => {
         expect(/^[-]?\d+(\.\d+)?(,[-]?\d+(\.\d+)?){7}$/.test(val));
       });
+    cy.get("button:not([type]),button[type=submit]").click();
+
+    cy.get("#django-messages").contains("Map created successfully");
+  });
+
+  it("Create a club", function () {
+    cy.login();
+
+    cy.url().should("match", /\/dashboard\/clubs\?next=\/dashboard\/$/);
+
+    // Create club
+    cy.createClub();
+    cy.contains("Kangasala SK");
+
+    // modify club
+    cy.url().should("match", /\/dashboard\/club$/);
+    cy.get("#id_website").type("https://www.kangasalask.fi");
+    cy.get("#id_description")
+      .clear()
+      .type("## Kangasala SK  \n## GPS Tracking");
+
+    cy.get("#id_logo").selectFile("cypress/fixtures/KSK_logo.png");
+    cy.get("#id_banner").selectFile("cypress/fixtures/KSK_banner.jpg");
+
+    cy.get("button:not([type]),button[type=submit]").click();
+    cy.contains("Changes saved successfully", { timeout: 10000 });
+  });
+
+  it("Create events", function () {
+    cy.login();
+    cy.contains("Halden SK").click();
 
     // Create Map
     cy.createMap();
@@ -179,11 +194,25 @@ context("Dashboard actions", () => {
 
     cy.contains("The upload of the GPX file was successful");
 
-    cy.forceVisit("/kangasala-sk/Jukola-2019-1st-leg");
+    cy.forceVisit("/halden-sk/Jukola-2019-1st-leg");
     cy.contains("Olav Lundanes", { timeout: 20000 }); // in competitor list
+
+    // toggle competitor
     cy.contains("#map", "KooVee");
     cy.get(".competitor-switch").eq(1).uncheck();
     cy.contains("#map", "KooVee").should("not.exist");
+
+    cy.get(".competitor-switch").eq(1).check();
+    cy.contains("#map", "KooVee");
+
+    // random location mass start
+    cy.get("#real_time_button").should("have.class", "active");
+    cy.get("#map").dblclick(70, 100);
+    cy.wait(1000);
+    cy.get("#real_time_button").should("not.have.class", "active");
+
+    cy.get("#mass_start_button").click();
+    cy.wait(1000);
 
     // Create Event with all fields info
     cy.visit("/dashboard/events");
@@ -209,15 +238,18 @@ context("Dashboard actions", () => {
       expect(request.body).to.contain("&competitors-0-device=2&");
     });
     cy.url().should("match", /\/dashboard\/events$/);
-    cy.forceVisit("/kangasala-sk/Jukola-2019-2nd-leg");
+    cy.forceVisit("/halden-sk/Jukola-2019-2nd-leg");
     cy.contains("Haldin", { timeout: 20000 });
     cy.get(".color-tag").first().click();
     cy.contains("Select new color for Mats");
-
+    cy.get(".IroWheel").first().click(50, 50);
+    cy.get("#save-color").click();
     // check event can handle multiple maps
     cy.createMap("Another map");
     cy.visit("/dashboard/events");
-    cy.get('table a[href*="dashboard/events/"]').first().click();
+    cy.get('table a[href*="dashboard/events/"]')
+      .contains("Jukola 2019 - 2nd Leg")
+      .click();
     cy.get("#id_map_assignations-0-map").select("Another map");
     cy.get("#id_map_assignations-0-title").type("Alt route");
     cy.intercept("POST", "/dashboard/events/*").as("eventSubmit");
@@ -226,9 +258,11 @@ context("Dashboard actions", () => {
       expect(response.statusCode).to.eq(302);
     });
     cy.url().should("match", /\/dashboard\/events$/);
-    cy.forceVisit("/kangasala-sk/Jukola-2019-2nd-leg");
+    cy.forceVisit("/halden-sk/Jukola-2019-2nd-leg");
+
     cy.contains("Alt route", { timeout: 20000 });
-    // trigger as many errors has possible
+
+    // Trigger as many errors has possible
     cy.visit("/dashboard/events");
     cy.url().should("match", /\/dashboard\/events$/);
     cy.get("a").contains("Create new event").click();
