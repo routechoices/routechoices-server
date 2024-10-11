@@ -244,7 +244,7 @@ def event_view(request, slug, **kwargs):
         else:
             proxy = Loggator()
         try:
-            proxy.parse_init_data(uid)
+            proxy.parse_init_data(slug)
         except Exception:
             raise Http404()
         event = proxy.get_event()
@@ -388,7 +388,7 @@ def event_export_view(request, slug, **kwargs):
         return render(
             request,
             "club/404_event.html",
-            {"club": club},
+            {"club": club},ƒ
             status=status.HTTP_404_NOT_FOUND,
         )
     # If event is private, page needs to be sent with cookies to prove identity,
