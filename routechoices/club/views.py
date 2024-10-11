@@ -31,6 +31,7 @@ from routechoices.lib.helpers import (
 )
 from routechoices.lib.s3 import get_s3_client
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
+from routechoices.lib.third_party_downloader import GpsSeurantaNet, Loggator
 from routechoices.site.forms import CompetitorUploadGPXForm, RegisterForm
 
 
@@ -238,10 +239,15 @@ def event_view(request, slug, **kwargs):
         club_slug = request.club_slug
 
     if club_slug in ("gpsseuranta", "loggator"):
-        event = Event()
-        event.slug = slug
-        club = Club.objects.get(slug=club_slug)
-        event.club = club
+        if club_slug == "gpsseuranta":
+            proxy = GpsSeurantaNet()
+        else:
+            proxy = Loggator()
+        try:
+            proxy.parse_init_data(uid)
+        except Exception:
+            raise Http404()
+        event = proxy.get_event()
     else:
         event = (
             Event.objects.all()
