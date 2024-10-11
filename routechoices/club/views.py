@@ -388,7 +388,7 @@ def event_export_view(request, slug, **kwargs):
         return render(
             request,
             "club/404_event.html",
-            {"club": club},ƒ
+            {"club": club},
             status=status.HTTP_404_NOT_FOUND,
         )
     # If event is private, page needs to be sent with cookies to prove identity,
