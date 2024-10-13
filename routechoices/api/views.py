@@ -1021,11 +1021,8 @@ def competitor_route_upload(request, competitor_id):
 
     loc_array = []
     start_time = None
-    for i, _ in enumerate(times):
-        if times[i] and lats[i] and lons[i]:
-            lat = lats[i]
-            lon = lons[i]
-            tim = times[i]
+    for tim, lat, lon in zip(times, lats, lons):
+        if tim and lat and lon:
             try:
                 validate_longitude(lon)
             except Exception:
@@ -1364,11 +1361,8 @@ def locations_api_gw(request):
             "Latitudes, longitudes, and timestamps, should have same amount of points"
         )
     loc_array = []
-    for i, _ in enumerate(times):
-        if times[i] and lats[i] and lons[i]:
-            lat = lats[i]
-            lon = lons[i]
-            tim = times[i]
+    for tim, lat, lon in zip(times, lats, lons):
+        if tim and lat and lon:
             try:
                 validate_longitude(lon)
             except DjangoValidationError:

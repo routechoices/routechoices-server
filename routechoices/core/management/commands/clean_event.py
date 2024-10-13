@@ -32,7 +32,7 @@ class Command(BaseCommand):
             total_distance = 0
             all_locations = competitor.device.locations_series
             crop_starttime = None
-            for i, point in enumerate(all_locations):
+            for point in all_locations:
                 if start.timestamp() > point[0]:
                     continue
                 if point[0] > end.timestamp():

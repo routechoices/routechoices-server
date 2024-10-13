@@ -1039,7 +1039,7 @@ class Map(models.Model):
                 line_color,
             ]
 
-            for i, w in enumerate(widths):
+            for w, color, thickness, fill in zip(widths, colors, thicknesses, fills):
                 wr = w * res_scale
                 draw.ellipse(
                     (
@@ -1048,9 +1048,9 @@ class Map(models.Model):
                         map_pt[0] + wr,
                         map_pt[1] + wr,
                     ),
-                    outline=colors[i],
-                    fill=fills[i],
-                    width=int(thicknesses[i] * res_scale),
+                    outline=color,
+                    fill=fill,
+                    width=int(thickness * res_scale),
                 )
 
         im = im.resize((int(width), int(height)), resample=Image.Resampling.BICUBIC)
