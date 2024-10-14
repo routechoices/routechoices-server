@@ -46,7 +46,9 @@ context("Events in future", () => {
   });
 
   it("Can only add competitor and not upload route to an Event even if everything allowed since it is not yet started", function () {
-    cy.forceVisit("/halden-sk/future-open-registration-upload-allowed/contribute");
+    cy.forceVisit(
+      "/halden-sk/future-open-registration-upload-allowed/contribute"
+    );
     cy.get("#registration-form").should("exist");
     cy.get("#upload-form").should("not.exist");
   });
