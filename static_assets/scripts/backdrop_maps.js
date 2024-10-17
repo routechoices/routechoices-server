@@ -35,7 +35,7 @@ const backdropMaps = {
     }
   ),
   "topo-no": L.tileLayer(
-    "https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
+    "https://cache.kartverket.no/v1/wmts/1.0.0/toporaster/default/webmercator/{z}/{y}/{x}.png",
     {
       attribution: "",
       className: "wms256",
