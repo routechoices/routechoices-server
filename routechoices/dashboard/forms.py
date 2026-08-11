@@ -35,6 +35,7 @@ from django.utils.timezone import is_naive, make_aware
 from PIL import Image
 
 from routechoices.core.models import (
+    PRIVACY_PRIVATE,
     WEBP_MAX_SIZE,
     Club,
     Competitor,
@@ -429,6 +430,12 @@ class EventForm(ModelForm):
         self.fields["end_date"].help_text = '<span class="local_time"></span>'
         self.fields["send_interval"].widget.attrs["min"] = 1
         self.instance.club = self.club
+        if self.instance.external_id:
+            self.fields["start_date"].disabled = True
+            self.fields["end_date"].disabled = True
+            self.fields["allow_route_upload"].disabled = True
+            self.fields["open_registration"].disabled = True
+            self.fields["event_set"].disabled = True
 
     timezone = ChoiceField(choices=get_timezone_choices)
 
@@ -492,11 +499,36 @@ class EventForm(ModelForm):
                 )
 
         if self.instance.external_id:
-            self.add_error(
-                None,
-                "You can not edit this event as it is externally managed.",
-            )
-            return
+            if "event_set" in self.changed_data:
+                self.add_error(
+                    "event_set",
+                    "You can not edit this event bundle as it is externally managed.",
+                )
+            if "start_date" in self.changed_data:
+                self.add_error(
+                    "start_date",
+                    "You can not edit this event schedule as it is externally managed.",
+                )
+            if "end_date" in self.changed_data:
+                self.add_error(
+                    "end_date",
+                    "You can not edit this event schedule as it is externally managed.",
+                )
+            if "open_registration" in self.changed_data:
+                self.add_error(
+                    "open_registration",
+                    "You can not edit this access to registration as it is externally managed.",
+                )
+            if "allow_route_upload" in self.changed_data:
+                self.add_error(
+                    "allow_route_upload",
+                    "You can not edit this access to route upload as it is externally managed.",
+                )
+            if self.cleaned_data.get("privacy") == PRIVACY_PRIVATE:
+                self.add_error(
+                    "privacy",
+                    'Externally managed event can not be "Staff Only".',
+                )
 
         # Check that start date is before end date
         start_date = self.cleaned_data.get("start_date")

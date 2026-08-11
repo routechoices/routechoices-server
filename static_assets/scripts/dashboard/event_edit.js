@@ -523,6 +523,9 @@ function showLocalTime(el) {
 
 	// next line must come after formset initialization
 	u(".datetimepicker").each((el) => {
+		if (el.attr("disabled")) {
+			return;
+		}
 		makeTimeFieldClearable(el);
 		makeFieldNowable(el);
 		new tempusDominus.TempusDominus(el);

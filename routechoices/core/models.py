@@ -1544,6 +1544,7 @@ class EventSet(models.Model):
         null=False,
         db_index=True,
     )
+    external_metadata = models.JSONField(editable=False, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
