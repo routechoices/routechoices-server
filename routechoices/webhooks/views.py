@@ -116,7 +116,6 @@ def rastilippu_webhook(request):
         }
         bundle.save()
 
-        # TODO: make sure event's date in externally managed event_set cannot be edited by user
         if not created:
             for event in bundle.events.all():
                 event.start_date = start_date
