@@ -523,22 +523,23 @@ function showLocalTime(el) {
 
 	// next line must come after formset initialization
 	u(".datetimepicker").each((el) => {
-		if (el.attr("disabled")) {
-			return;
+		console.log(el);
+		if (!el.disabled) {
+			makeTimeFieldClearable(el);
+			makeFieldNowable(el);
+			new tempusDominus.TempusDominus(el);
+			el.autocomplete = "off";
+			u(el).on([tempusDominus.Namespace.events.change, "change"], (e) => {
+				const value = dayjs(e.target.value).local().format("YYYY-MM-DD HH:mm:ss");
+				if (value === "Invalid Date") {
+					e.target.value = "";
+					return;
+				}
+				e.target.value = value;
+				showLocalTime(e.target);
+			});
 		}
-		makeTimeFieldClearable(el);
-		makeFieldNowable(el);
-		new tempusDominus.TempusDominus(el);
-		el.autocomplete = "off";
-		u(el).on([tempusDominus.Namespace.events.change, "change"], (e) => {
-			const value = dayjs(e.target.value).local().format("YYYY-MM-DD HH:mm:ss");
-			if (value === "Invalid Date") {
-				e.target.value = "";
-				return;
-			}
-			e.target.value = value;
-			showLocalTime(e.target);
-		});
+		
 		showLocalTime(el);
 	});
 	const originalEventStart = u("#id_start_date").val();
