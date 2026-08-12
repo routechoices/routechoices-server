@@ -523,7 +523,6 @@ function showLocalTime(el) {
 
 	// next line must come after formset initialization
 	u(".datetimepicker").each((el) => {
-		console.log(el);
 		if (!el.disabled) {
 			makeTimeFieldClearable(el);
 			makeFieldNowable(el);
