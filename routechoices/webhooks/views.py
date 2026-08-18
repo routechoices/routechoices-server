@@ -94,6 +94,7 @@ def rastilippu_webhook(request):
 
         club = Club.objects.filter(
             slug=club_slug,
+            upgraded=True,
             order_id__startswith=RASTILIPPU_PREFIX,
         ).first()
         if not club:
