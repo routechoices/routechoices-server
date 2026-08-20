@@ -2,7 +2,9 @@ import hashlib
 import hmac
 from datetime import timedelta
 
+from allauth.account.models import EmailAddress
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test.client import MULTIPART_CONTENT
 from django.utils.timezone import now
 from rest_framework import status
@@ -505,3 +507,89 @@ class RLWebHookTestCase(EssentialApiBase):
 
         # No event sets should have been created
         self.assertEqual(EventSet.objects.count(), 0)
+
+    def test_retrieve_clubs(self):
+        url = self.reverse_and_check(
+            "webhooks:rastilippu_webhook", "/webhooks/rastilippu"
+        )
+        other_user = User.objects.create_user("bob", "bob@example.com", "pa$$word123")
+        other_club = Club.objects.create(name="Kalevan Rasti", slug="kr", upgraded=True)
+        other_club.creation_date = now() - timedelta(days=14)
+        other_club.admins.set([other_user])
+
+        EmailAddress.objects.create(
+            email="kiila@kiilat.com", user=self.user, verified=True, primary=True
+        )
+        EmailAddress.objects.create(
+            email=self.user.email, user=self.user, verified=True
+        )
+        EmailAddress.objects.create(
+            email=other_user.email, user=other_user, verified=True, primary=True
+        )
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "retrieve_clubs",
+                "data": {},
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "retrieve_clubs",
+                "data": {"email": self.user.email},
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        data = res.json()
+        self.assertEqual(len(data["clubs"]), data["count"], 1)
+        self.assertEqual(
+            data["clubs"],
+            [
+                {
+                    "slug": "kiilat",
+                    "name": "Kemiön Kiilat",
+                    "is_upgraded": False,
+                }
+            ],
+        )
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "retrieve_clubs",
+                "data": {"email": other_user.email},
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        data = res.json()
+        self.assertEqual(len(data["clubs"]), data["count"], 1)
+        self.assertEqual(
+            data["clubs"],
+            [
+                {
+                    "slug": "kr",
+                    "name": "Kalevan Rasti",
+                    "is_upgraded": True,
+                }
+            ],
+        )
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "retrieve_clubs",
+                "data": {"email": "unknown or invalid email"},
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        data = res.json()
+        self.assertEqual(len(data["clubs"]), data["count"], 0)
+        self.assertEqual(data["clubs"], [])

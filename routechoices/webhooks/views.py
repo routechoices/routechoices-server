@@ -3,6 +3,7 @@ import hmac
 import json
 
 import arrow
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.core.exceptions import BadRequest
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
@@ -32,6 +33,26 @@ def rastilippu_webhook(request):
 
     action = data.get("action")
     data = data.get("data")
+
+    if action == "retrieve_clubs":
+        clubs = []
+        try:
+            email_raw = data["email"]
+        except KeyError:
+            raise BadRequest("Missing order_id")
+        email = (
+            EmailAddress.objects.prefetch_related("user")
+            .filter(email__iexact=email_raw, verified=True)
+            .first()
+        )
+        if email:
+            user = email.user
+            clubs = Club.objects.filter(admins=user)
+        result = [
+            {"slug": club.slug, "name": club.name, "is_upgraded": club.upgraded}
+            for club in clubs
+        ]
+        return JsonResponse({"clubs": result, "count": len(result)})
     if action == "enable":
         try:
             order_id = data["order_id"]
