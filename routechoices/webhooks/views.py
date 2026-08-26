@@ -100,6 +100,7 @@ def rastilippu_webhook(request):
             club_slug = data["club_slug"]
             name = data["name"][:255]
             irma_id = data["irma_id"]
+            event_uuid = data["uuid"]
             start_date_raw = data["start_datetime"]
             end_date_raw = data["end_datetime"]
         except KeyError:
@@ -135,6 +136,7 @@ def rastilippu_webhook(request):
         bundle.external_metadata = {
             "start_date": start_date.isoformat(),
             "end_date": end_date.isoformat(),
+            "uuid": event_uuid,
         }
         bundle.save()
 

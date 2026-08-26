@@ -336,6 +336,7 @@ class RLWebHookTestCase(EssentialApiBase):
                     "club_slug": "kiilat",
                     "name": "Turku Rastit 12.08.2026",
                     "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
                     "start_datetime": "2026-08-12T13:00:00Z",
                     "end_datetime": "2026-08-12T19:00:00Z",
                 },
@@ -351,6 +352,9 @@ class RLWebHookTestCase(EssentialApiBase):
         )
         self.assertEqual(
             event_set.external_metadata["end_date"], "2026-08-12T19:00:00+00:00"
+        )
+        self.assertEqual(
+            event_set.external_metadata["uuid"], "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23"
         )
         self.assertEqual(
             event_set.url,
@@ -370,6 +374,7 @@ class RLWebHookTestCase(EssentialApiBase):
                     "club_slug": "kiilat",
                     "name": "Turku Rastit - 12.08.2026",
                     "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
                     "start_datetime": "2026-08-12T14:00:00Z",
                     "end_datetime": "2026-08-12T19:00:00Z",
                 },
@@ -383,6 +388,9 @@ class RLWebHookTestCase(EssentialApiBase):
         )
         self.assertEqual(
             event_set.external_metadata["end_date"], "2026-08-12T19:00:00+00:00"
+        )
+        self.assertEqual(
+            event_set.external_metadata["uuid"], "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23"
         )
         self.assertEqual(
             event_set.name,
@@ -402,6 +410,7 @@ class RLWebHookTestCase(EssentialApiBase):
         correct_data = {
             "name": "Turku Rastit 12.08.2026",
             "irma_id": "1234",
+            "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
             "start_datetime": "2026-08-12T13:00:00Z",
             "end_datetime": "2026-08-12T19:00:00Z",
         }
@@ -423,6 +432,20 @@ class RLWebHookTestCase(EssentialApiBase):
         # Missing irma_id
         wrong_data = correct_data
         del wrong_data["irma_id"]
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": wrong_data,
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Missing uuid
+        wrong_data = correct_data
+        del wrong_data["uuid"]
 
         res = self.webhook_client.post(
             url,
