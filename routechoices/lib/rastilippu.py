@@ -8,6 +8,7 @@ from curl_cffi import requests
 from django.conf import settings
 
 from routechoices.core.models import Event, EventSet
+from routechoices.lib.helpers import short_random_slug
 
 RASTILIPPU_PREFIX = "RL-"
 RASTILIPPU_WEBHOOK_URL = (
@@ -91,7 +92,7 @@ def sync_courses_data(uuid):
             club_id=bundle.club_id,
             defaults={
                 "name": name,
-                "slug": slugify.slugify(name),
+                "slug": slugify.slugify(f"{name} {short_random_slug()}"),
                 "start_date": arrow.get(
                     bundle.external_metadata["start_date"]
                 ).datetime,

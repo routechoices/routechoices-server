@@ -1900,7 +1900,7 @@ class Event(models.Model, SomewhereOnEarth):
         send_to_rastilippu = False
         if self.external_id.startswith(RASTILIPPU_PREFIX) and self.pk:
             original = Event.objects.get(id=self.pk)
-            if original.map_id != self.map_id:
+            if original.map_id != self.map_id or original.slug != self.slug:
                 send_to_rastilippu = True
 
         self.invalidate_cache()

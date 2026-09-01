@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 
 from routechoices.core.models import Club, Event, EventSet
+from routechoices.lib.helpers import short_random_slug
 from routechoices.lib.lemonsqueezy import LEMONSQUEEZY_PREFIX
 from routechoices.lib.rastilippu import RASTILIPPU_PREFIX, sync_courses_data
 
@@ -127,7 +128,7 @@ def rastilippu_webhook(request):
             defaults={
                 "club": club,
                 "name": name,
-                "slug": slugify.slugify(name),
+                "slug": slugify.slugify(f"{name} {short_random_slug()}"),
                 "create_page": True,
                 "external_metadata": {
                     "start_date": start_date.isoformat(),
