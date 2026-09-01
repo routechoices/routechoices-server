@@ -3,7 +3,7 @@ import urllib.parse
 
 from background_task import background
 
-from routechoices.core.models import Club
+from routechoices.core.models import Club, Event
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
 from routechoices.lib.other_gps_services.loggator import Loggator
@@ -11,6 +11,7 @@ from routechoices.lib.other_gps_services.otracker import OTracker
 from routechoices.lib.other_gps_services.sportrec import SportRec
 from routechoices.lib.other_gps_services.tractrac import Tractrac
 from routechoices.lib.other_gps_services.virekunnas import GpsVirekunnasFi
+from routechoices.lib.rastilippu import update_event_url as rl_update_event_url
 
 
 class EventImportError(Exception):
@@ -104,3 +105,11 @@ def import_single_event_from_livelox(event_id, club=None):
         solution.club = Club.objects.get(slug=club)
     event = solution.import_event(event_id)
     return event
+
+
+@background(schedule=0)
+def rastilippu_update_event_url(event_id):
+    event = Event.objects.select_related("club", "event_set").get(id=event_id)
+    if not rl_update_event_url(event):
+        print("sdsds")
+        raise Exception("Couldn't reach rastilippu service")

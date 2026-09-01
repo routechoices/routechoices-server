@@ -11,11 +11,10 @@ from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 
-from routechoices.core.models import Club, EventSet
+from routechoices.core.models import Club, Event, EventSet
 from routechoices.lib.helpers import short_random_slug
 from routechoices.lib.lemonsqueezy import LEMONSQUEEZY_PREFIX
-
-RASTILIPPU_PREFIX = "RL-"
+from routechoices.lib.rastilippu import RASTILIPPU_PREFIX, sync_courses_data
 
 
 @csrf_exempt
@@ -103,6 +102,7 @@ def rastilippu_webhook(request):
             event_uuid = data["uuid"]
             start_date_raw = data["start_datetime"]
             end_date_raw = data["end_datetime"]
+            course_id_set = set(data["courses"])
         except KeyError:
             raise BadRequest("Missing data")
 
@@ -127,30 +127,69 @@ def rastilippu_webhook(request):
             defaults={
                 "club": club,
                 "name": name,
-                "slug": short_random_slug(),
+                "slug": short_random_slug(),  # TODO: generate nice slugs
                 "create_page": True,
+                "external_metadata": {
+                    "start_date": start_date.isoformat(),
+                    "end_date": end_date.isoformat(),
+                    "uuid": event_uuid,
+                },
             },
         )
 
-        bundle.name = name
-        bundle.external_metadata = {
-            "start_date": start_date.isoformat(),
-            "end_date": end_date.isoformat(),
-            "uuid": event_uuid,
-        }
-        bundle.save()
+        bundle.dirty = False
 
-        if not created:
-            for event in bundle.events.all():
-                event.start_date = start_date
-                event.end_date = end_date
-                event.save()
+        if name != bundle.name:
+            bundle.name = name
+            bundle.dirty = True
 
+        if bundle.external_metadata and (
+            bundle.external_metadata.get("start_date") != start_date.isoformat()
+            or bundle.external_metadata.get("end_date") != end_date.isoformat()
+        ):
+            bundle.external_metadata = {
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "uuid": event_uuid,
+            }
+            bundle.dirty = True
+            bundle.save()
+            Event.objects.filter(event_set_id=bundle.id).update(
+                start_date=start_date,
+                end_date=end_date,
+            )
+
+        if bundle.dirty:
+            bundle.save()
+
+        if course_id_set:
+            try:
+                sync_courses_data(event_uuid)
+            except Exception:
+                raise HttpResponse(
+                    "Rastilippu did not answer",
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+        else:
+            bundle.events.all().delete()
+
+        courses_data = []
+        for event in Event.objects.filter(event_set_id=bundle.id).select_related(
+            "club"
+        ):
+            courses_data.append(
+                {
+                    "irma_id": event.external_id[len(RASTILIPPU_PREFIX) :],
+                    "id": event.aid,
+                    "map_upload_url": event.map_upload_url,
+                }
+            )
         return JsonResponse(
             {
                 "name": bundle.name,
                 "slug": bundle.slug,
                 "url": bundle.url,
+                "courses": courses_data,
             },
             status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED,
         )

@@ -1,7 +1,10 @@
 import hashlib
 import hmac
+import json
 from datetime import timedelta
+from unittest.mock import MagicMock, patch
 
+import arrow
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,7 +14,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
-from routechoices.core.models import Club, EventSet
+from routechoices.core.bg_tasks import rastilippu_update_event_url
+from routechoices.core.models import Club, Event, EventSet, Map
 
 
 class WebhookConsumer(APIClient):
@@ -320,7 +324,8 @@ class RLWebHookTestCase(EssentialApiBase):
         self.assertEqual(self.club.order_id, "RL-1234")
         self.assertTrue(self.club.can_modify_events)
 
-    def test_create_event(self):
+    @patch("routechoices.lib.rastilippu.requests")
+    def test_create_event(self, mock_requests):
         url = self.reverse_and_check(
             "webhooks:rastilippu_webhook", "/webhooks/rastilippu"
         )
@@ -339,6 +344,7 @@ class RLWebHookTestCase(EssentialApiBase):
                     "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
                     "start_datetime": "2026-08-12T13:00:00Z",
                     "end_datetime": "2026-08-12T19:00:00Z",
+                    "courses": [],
                 },
             },
             content_type="json",
@@ -377,6 +383,7 @@ class RLWebHookTestCase(EssentialApiBase):
                     "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
                     "start_datetime": "2026-08-12T14:00:00Z",
                     "end_datetime": "2026-08-12T19:00:00Z",
+                    "courses": [],
                 },
             },
             content_type="json",
@@ -397,7 +404,349 @@ class RLWebHookTestCase(EssentialApiBase):
             res.json()["name"],
             "Turku Rastit - 12.08.2026",
         )
-        # TODO: test sub events are updated too
+
+        # Create courses
+        # We need to mock Rastilippu API response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [
+            {
+                "id": "1514276621",
+                "name": "A-rata",
+                "length": 3100,
+                "controls": [
+                    "75",
+                    "69",
+                    "52",
+                    "50",
+                    "40",
+                    "61",
+                    "51",
+                    "42",
+                    "43",
+                    "44",
+                    "53",
+                    "45",
+                    "60",
+                    "54",
+                    "64",
+                    "63",
+                    "46",
+                    "47",
+                    "49",
+                    "70",
+                    "77",
+                ],
+                "order": 1,
+            },
+            {
+                "id": "1514276622",
+                "name": "B-rata",
+                "length": 3100,
+                "controls": [
+                    "67",
+                    "55",
+                    "52",
+                    "71",
+                    "40",
+                    "61",
+                    "41",
+                    "51",
+                    "43",
+                    "44",
+                    "56",
+                    "45",
+                    "60",
+                    "54",
+                    "59",
+                    "46",
+                    "48",
+                    "47",
+                    "49",
+                    "70",
+                    "77",
+                ],
+                "order": 2,
+            },
+            {
+                "id": "1514276623",
+                "name": "C-rata",
+                "length": 2700,
+                "controls": [
+                    "75",
+                    "52",
+                    "71",
+                    "61",
+                    "41",
+                    "53",
+                    "45",
+                    "60",
+                    "43",
+                    "64",
+                    "63",
+                    "65",
+                    "57",
+                    "48",
+                    "47",
+                    "70",
+                    "77",
+                ],
+                "order": 3,
+            },
+            {
+                "id": "1514276624",
+                "name": "D-rata",
+                "length": 2700,
+                "controls": [
+                    "67",
+                    "52",
+                    "50",
+                    "61",
+                    "41",
+                    "56",
+                    "45",
+                    "44",
+                    "43",
+                    "42",
+                    "54",
+                    "59",
+                    "57",
+                    "48",
+                    "47",
+                    "70",
+                    "77",
+                ],
+                "order": 4,
+            },
+        ]
+        mock_requests.get.return_value = mock_response
+
+        # Add courses to the event set
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": "kiilat",
+                    "name": "Turku Rastit - 12.08.2026",
+                    "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-12T14:00:00Z",
+                    "end_datetime": "2026-08-12T19:00:00Z",
+                    "courses": [
+                        "1514276621",
+                        "1514276622",
+                        "1514276623",
+                        "1514276624",
+                    ],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res_data = res.json()
+        self.assertIn("courses", res_data)
+        self.assertEqual(len(res_data["courses"]), 4)
+        self.assertEqual(res_data["courses"][0]["irma_id"], "1514276621")
+        self.assertIn("map_upload_url", res_data["courses"][0])
+
+        event_set.refresh_from_db()
+        self.assertEqual(event_set.events.count(), 4)
+        for event in event_set.events.all():
+            self.assertEqual(
+                event.start_date, arrow.get("2026-08-12T14:00:00Z").datetime
+            )
+            self.assertEqual(event.end_date, arrow.get("2026-08-12T19:00:00Z").datetime)
+
+        # Change bundle date changes all events schedules
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": "kiilat",
+                    "name": "Turku Rastit - 12.08.2026",
+                    "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [
+                        "1514276621",
+                        "1514276622",
+                        "1514276623",
+                        "1514276624",
+                    ],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        event_set.refresh_from_db()
+        self.assertEqual(event_set.events.count(), 4)
+        for event in event_set.events.all():
+            self.assertEqual(
+                event.start_date, arrow.get("2026-08-11T14:00:00Z").datetime
+            )
+            self.assertEqual(event.end_date, arrow.get("2026-08-11T19:00:00Z").datetime)
+
+        # Adding a course
+        mock_response.json.return_value.append({"id": "abc", "name": "RR"})
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": "kiilat",
+                    "name": "Turku Rastit - 12.08.2026",
+                    "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [
+                        "1514276621",
+                        "1514276622",
+                        "1514276623",
+                        "1514276624",
+                        "abc",
+                    ],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        event_set.refresh_from_db()
+        self.assertEqual(event_set.events.count(), 5)
+        self.assertTrue(event_set.events.filter(external_id="RL-abc").exists())
+
+        # Removing a course
+        mock_response.json.return_value.pop()
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": "kiilat",
+                    "name": "Turku Rastit - 12.08.2026",
+                    "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [
+                        "1514276621",
+                        "1514276622",
+                        "1514276623",
+                        "1514276624",
+                    ],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        event_set.refresh_from_db()
+        self.assertEqual(event_set.events.count(), 4)
+        self.assertFalse(event_set.events.filter(external_id="RL-abc").exists())
+        # Removing all courses
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": "kiilat",
+                    "name": "Turku Rastit - 12.08.2026",
+                    "irma_id": "1234",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        event_set.refresh_from_db()
+        self.assertEqual(event_set.events.count(), 0)
+
+    @patch("routechoices.lib.rastilippu.requests")
+    def test_update_event_url_hook(self, mock_requests):
+        self.club.upgraded = True
+        self.club.order_id = "RL-1234"
+        self.club.save()
+
+        bundle = EventSet.objects.create(
+            name="Test Bundle", slug="abc123", club=self.club, external_id="RL-6353"
+        )
+        event = Event.objects.create(
+            name="RR",
+            slug="rr",
+            club=self.club,
+            event_set=bundle,
+            external_id="RL-1514276621",
+            start_date=arrow.get("2026-08-11T14:00:00Z").datetime,
+            end_date=arrow.get("2026-08-11T19:00:00Z").datetime,
+        )
+        event.save()
+
+        raster_map = Map.objects.create(
+            club=self.club,
+            name="Test map",
+            calibration_string_raw=(
+                "61.45075,24.18994,61.44656,24.24721,"
+                "61.42094,24.23851,61.42533,24.18156"
+            ),
+            width=1,
+            height=1,
+        )
+        raster_map.data_uri = (
+            "data:image/png;base64,"
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6Q"
+            "AAAA1JREFUGFdjED765z8ABZcC1M3x7TQAAAAASUVORK5CYII="
+        )
+        raster_map.save()
+
+        mock_response = MagicMock()
+        mock_response.status_code = 204
+        mock_requests.post.return_value = mock_response
+
+        with patch(
+            "routechoices.core.bg_tasks.rastilippu_update_event_url"
+        ) as mock_rl_update:
+            event.map = raster_map
+            event.save()
+            mock_rl_update.assert_called_once_with(event.id)
+            event.save()
+            self.assertEqual(mock_rl_update.call_count, 1)
+
+        mock_requests.post.assert_not_called()
+        rastilippu_update_event_url.now(event.id)
+        mock_requests.post.assert_called_once()
+
+        data_sent = json.loads(mock_requests.post.call_args.kwargs["data"])
+        self.assertEqual(data_sent["action"], "update_courses_gps_replay_pages")
+        self.assertEqual(data_sent["data"]["irma_id"], "6353")
+        self.assertEqual(data_sent["data"]["courses"][0]["course_id"], "1514276621")
+        self.assertEqual(
+            data_sent["data"]["courses"][0]["gps_replay_url"],
+            "https://kiilat.routechoices.dev/rr",
+        )
+
+        with patch(
+            "routechoices.core.bg_tasks.rastilippu_update_event_url"
+        ) as mock_rl_update:
+            event.map = None
+            event.save()
+            mock_rl_update.assert_called_once_with(event.id)
+            event.save()
+            self.assertEqual(mock_rl_update.call_count, 1)
+
+        self.assertEqual(mock_requests.post.call_count, 1)
+        rastilippu_update_event_url.now(event.id)
+        self.assertEqual(mock_requests.post.call_count, 2)
+
+        data_sent = json.loads(mock_requests.post.call_args.kwargs["data"])
+        self.assertEqual(data_sent["action"], "update_courses_gps_replay_pages")
+        self.assertEqual(data_sent["data"]["irma_id"], "6353")
+        self.assertEqual(data_sent["data"]["courses"][0]["course_id"], "1514276621")
+        self.assertEqual(data_sent["data"]["courses"][0]["gps_replay_url"], "")
 
     def test_create_event_fails(self):
         url = self.reverse_and_check(
