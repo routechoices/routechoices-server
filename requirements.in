@@ -44,6 +44,7 @@ psutil
 psycopg[binary,pool]
 pyproj
 python-magic
+python-slugify[unidecode] @ git+https://github.com/un33k/python-slugify@7b6d5d96c1995e6dccb39a19a13ba78d7d0a3ee4
 reverse-geocode
 sentry-sdk[django]
 setuptools
