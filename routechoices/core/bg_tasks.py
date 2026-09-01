@@ -111,5 +111,4 @@ def import_single_event_from_livelox(event_id, club=None):
 def rastilippu_update_event_url(event_id):
     event = Event.objects.select_related("club", "event_set").get(id=event_id)
     if not rl_update_event_url(event):
-        print("sdsds")
         raise Exception("Couldn't reach rastilippu service")
