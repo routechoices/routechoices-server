@@ -3,11 +3,11 @@ import hmac
 
 import arrow
 import orjson as json
+import slugify
 from curl_cffi import requests
 from django.conf import settings
 
 from routechoices.core.models import Event, EventSet
-from routechoices.lib.helpers import short_random_slug
 
 RASTILIPPU_PREFIX = "RL-"
 RASTILIPPU_WEBHOOK_URL = (
@@ -84,13 +84,14 @@ def sync_courses_data(uuid):
 
     # here course_id_set should contain only ids that are not yet created
     for course in course_data_by_id.values():
+        name = f"{bundle.name} - {course["name"]}"
         event, _ = Event.objects.get_or_create(
             external_id=f"{RASTILIPPU_PREFIX}{course["id"]}",
             event_set_id=bundle.id,
             club_id=bundle.club_id,
             defaults={
-                "name": f"{bundle.name} - {course["name"]}",
-                "slug": short_random_slug(),  # TODO: generate nice slugs
+                "name": name,
+                "slug": slugify.slugify(name),
                 "start_date": arrow.get(
                     bundle.external_metadata["start_date"]
                 ).datetime,

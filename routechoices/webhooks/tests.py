@@ -353,6 +353,7 @@ class RLWebHookTestCase(EssentialApiBase):
 
         event_set = EventSet.objects.get(external_id="RL-1234")
         self.assertTrue(event_set.create_page)
+        self.assertEqual(event_set.slug, "turku-rastit-12-08-2026")
         self.assertEqual(
             event_set.external_metadata["start_date"], "2026-08-12T13:00:00+00:00"
         )
@@ -549,6 +550,15 @@ class RLWebHookTestCase(EssentialApiBase):
         self.assertEqual(len(res_data["courses"]), 4)
         self.assertEqual(res_data["courses"][0]["irma_id"], "1514276621")
         self.assertIn("map_upload_url", res_data["courses"][0])
+
+        first_course = event_set.events.get(external_id="RL-1514276621")
+        self.assertEqual(res_data["courses"][0]["id"], first_course.aid)
+        self.assertEqual(
+            res_data["courses"][0]["map_upload_url"],
+            f"https://dashboard.routechoices.dev/clubs/kiilat/events/{first_course.aid}/map",
+        )
+        self.assertEqual(first_course.name, "Turku Rastit - 12.08.2026 - A-rata")
+        self.assertEqual(first_course.slug, "turku-rastit-12-08-2026-a-rata")
 
         event_set.refresh_from_db()
         self.assertEqual(event_set.events.count(), 4)
