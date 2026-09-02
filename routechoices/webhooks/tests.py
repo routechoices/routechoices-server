@@ -550,7 +550,7 @@ class RLWebHookTestCase(EssentialApiBase):
         self.assertEqual(len(res_data["courses"]), 4)
         self.assertEqual(res_data["courses"][0]["irma_id"], "1514276621")
         self.assertIn("map_upload_url", res_data["courses"][0])
-
+        mock_requests.get.assert_called_once()
         first_course = event_set.events.get(external_id="RL-1514276621")
         self.assertEqual(res_data["courses"][0]["id"], first_course.aid)
         self.assertEqual(
@@ -591,6 +591,7 @@ class RLWebHookTestCase(EssentialApiBase):
             content_type="json",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        mock_requests.get.assert_called_once()  # means it hasn't been called this time
         event_set.refresh_from_db()
         self.assertEqual(event_set.events.count(), 4)
         for event in event_set.events.all():
