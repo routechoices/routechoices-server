@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0119_add_order_number_prefix'),
+        ("core", "0119_add_order_number_prefix"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='deviceclubownership',
-            name='club',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='device_ownerships', to='core.club'),
+            model_name="deviceclubownership",
+            name="club",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="device_ownerships",
+                to="core.club",
+            ),
         ),
     ]

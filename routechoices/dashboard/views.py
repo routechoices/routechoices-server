@@ -27,11 +27,11 @@ from django.utils.timezone import now
 from django.views.decorators.cache import cache_page
 from django_hosts.resolvers import reverse
 from hijack.views import ReleaseUserView
-from invitations.forms import InviteForm
 from kagi.views.backup_codes import BackupCodesView
 from oauth2_provider.models import AccessToken
 from user_sessions.views import SessionDeleteOtherView
 
+from invitations.forms import InviteForm
 from routechoices.api.views import device_ownership_api_view
 from routechoices.core.models import (
     PRIVACY_SECRET,
