@@ -91,8 +91,8 @@ def sync_courses_data(uuid):
             event_set_id=bundle.id,
             club_id=bundle.club_id,
             defaults={
-                "name": name,
-                "slug": slugify.slugify(f"{name} {short_random_slug()}"),
+                "name": name[:255],
+                "slug": f"{slugify.slugify(name)[:43]}-{short_random_slug()}",
                 "start_date": arrow.get(
                     bundle.external_metadata["start_date"]
                 ).datetime,

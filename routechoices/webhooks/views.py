@@ -127,8 +127,8 @@ def rastilippu_webhook(request):
             external_id=f"{RASTILIPPU_PREFIX}{irma_id}",
             defaults={
                 "club": club,
-                "name": name,
-                "slug": slugify.slugify(f"{name} {short_random_slug()}"),
+                "name": name[255],
+                "slug": f"{slugify.slugify(name)[:43]}-{short_random_slug()}",
                 "create_page": True,
                 "external_metadata": {
                     "start_date": start_date.isoformat(),
@@ -170,7 +170,7 @@ def rastilippu_webhook(request):
                 try:
                     sync_courses_data(event_uuid)
                 except Exception:
-                    raise HttpResponse(
+                    return HttpResponse(
                         "Rastilippu did not answer",
                         status=status.HTTP_503_SERVICE_UNAVAILABLE,
                     )
