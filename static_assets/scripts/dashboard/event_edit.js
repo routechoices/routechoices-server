@@ -529,7 +529,9 @@ function showLocalTime(el) {
 			new tempusDominus.TempusDominus(el);
 			el.autocomplete = "off";
 			u(el).on([tempusDominus.Namespace.events.change, "change"], (e) => {
-				const value = dayjs(e.target.value).local().format("YYYY-MM-DD HH:mm:ss");
+				const value = dayjs(e.target.value)
+					.local()
+					.format("YYYY-MM-DD HH:mm:ss");
 				if (value === "Invalid Date") {
 					e.target.value = "";
 					return;
@@ -538,7 +540,7 @@ function showLocalTime(el) {
 				showLocalTime(e.target);
 			});
 		}
-		
+
 		showLocalTime(el);
 	});
 	const originalEventStart = u("#id_start_date").val();

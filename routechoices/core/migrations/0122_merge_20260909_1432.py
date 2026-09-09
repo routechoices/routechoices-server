@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0120_eventset_external_metadata'),
-        ('core', '0121_usersettings_third_party_oauth_credentials'),
+        ("core", "0120_eventset_external_metadata"),
+        ("core", "0121_usersettings_third_party_oauth_credentials"),
     ]
 
-    operations = [
-    ]
+    operations = []
