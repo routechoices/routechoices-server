@@ -127,7 +127,7 @@ def rastilippu_webhook(request):
             external_id=f"{RASTILIPPU_PREFIX}{irma_id}",
             defaults={
                 "club": club,
-                "name": name[255],
+                "name": name[:255],
                 "slug": f"{slugify.slugify(name)[:43]}-{short_random_slug()}",
                 "create_page": True,
                 "external_metadata": {
