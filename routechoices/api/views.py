@@ -1792,10 +1792,8 @@ def device_ownership_api_view(request, club_slug, device_id):
         activate_gpsseuranta = request.data.get("activate-gpsseuranta-relay")
         deactivate_gpsseuranta = request.data.get("deactivate-gpsseuranta-relay")
         if (
-            activate_gpsseuranta
-            or deactivate_gpsseuranta
-            and not device.gpsseuranta_known
-        ):
+            activate_gpsseuranta or deactivate_gpsseuranta
+        ) and not device.gpsseuranta_known:
             raise ValidationError("Device is not known by GPSSeuranta.net")
 
         if activate_gpsseuranta:

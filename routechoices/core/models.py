@@ -3321,6 +3321,11 @@ class UserSettings(models.Model):
     )
     default_name = models.CharField(max_length=64, null=True, blank=True)
     default_short_name = models.CharField(max_length=32, null=True, blank=True)
+    third_party_oauth_credentials = models.JSONField(
+        null=False,
+        blank=False,
+        default=dict,
+    )
 
     class Meta:
         verbose_name = "user settings"
