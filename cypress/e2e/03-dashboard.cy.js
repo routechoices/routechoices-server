@@ -84,9 +84,25 @@ context("Dashboard actions", () => {
 		cy.get("#id_nickname").clear().type("Dev1").wait(500).type("{enter}");
 		cy.contains("Dev1");
 		cy.contains("MyDevice").should("not.exist");
+
+		cy.contains("GPSSeuranta.net Proxy").click();
+		const tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		cy.contains("(Until " + tomorrow.toISOString().slice(0, 10) + " ");
+		cy.contains("GPSSeuranta.net Proxy").click();
+		cy.get("body").should(
+			"not.contain",
+			"(Until " + tomorrow.toISOString().slice(0, 10) + " ",
+		);
+
 		cy.contains("Delete").first().click();
-		// cy.get("button.confirm").click();
+		cy.get("#type-confirmation").type("DELETE");
+		cy.get("#submit-btn").click();
 		// TODO: confirm the action, check MyDevice is not there no more
+		cy.contains("Add Tracker").click();
+		cy.get("#csv_input").selectFile(`cypress/fixtures/IMEI.csv`);
+		cy.get("input").contains("Import").click();
+		cy.contains("4 devices imported");
 	});
 
 	it("Upgrade account", () => {
