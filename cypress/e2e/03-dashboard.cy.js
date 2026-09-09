@@ -96,9 +96,11 @@ context("Dashboard actions", () => {
 		);
 
 		cy.contains("Delete").first().click();
+		cy.contains("Delete tracker Dev1?");
 		cy.get("#type-confirmation").type("DELETE");
 		cy.get("#submit-btn").click();
-		// TODO: confirm the action, check MyDevice is not there no more
+		cy.contains("Tracker deleted");
+
 		cy.contains("Add Tracker").click();
 		cy.get("#csv_input").selectFile(`cypress/fixtures/IMEI.csv`);
 		cy.get("input").contains("Import").click();
@@ -350,7 +352,7 @@ context("Dashboard actions", () => {
 		cy.get("#id_map").select("Jukola 2019 - 1st Leg"); // doesnt matter
 		cy.get("#id_map_assignations-0-map").select("Another map");
 		cy.get("#id_map_assignations-0-title").type("Another map");
-		cy.get("#id_competitors-0-device-ts-control").type("@").wait(500);
+		cy.get("#id_competitors-0-device-ts-control").type("10000000").wait(500);
 		cy.get("#id_competitors-0-device-ts-dropdown > .option")
 			.eq(0)
 			.click()
