@@ -2,14 +2,202 @@ import hashlib
 import hmac
 import json
 
+import arrow
+import slugify
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.core.exceptions import BadRequest
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 
-from routechoices.core.models import Club
+from routechoices.core.models import Club, Event, EventSet
+from routechoices.lib.helpers import short_random_slug
 from routechoices.lib.lemonsqueezy import LEMONSQUEEZY_PREFIX
+from routechoices.lib.rastilippu import RASTILIPPU_PREFIX, sync_courses_data
+
+
+@csrf_exempt
+def rastilippu_webhook(request):
+    digest = hmac.new(
+        settings.RASTILIPPU_SIGNATURE.encode("utf-8"),
+        msg=request.body,
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    if request.META.get("HTTP_X_SIGNATURE") != digest:
+        return HttpResponseBadRequest("Invalid signature")
+
+    data = json.loads(request.body, strict=False)
+
+    action = data.get("action")
+    data = data.get("data")
+
+    if action == "retrieve_clubs":
+        clubs = []
+        try:
+            email_raw = data["email"]
+        except KeyError:
+            raise BadRequest("Missing order_id")
+        email = (
+            EmailAddress.objects.prefetch_related("user")
+            .filter(email__iexact=email_raw, verified=True)
+            .first()
+        )
+        if email:
+            user = email.user
+            clubs = Club.objects.filter(admins=user)
+        result = [
+            {"slug": club.slug, "name": club.name, "is_upgraded": club.upgraded}
+            for club in clubs
+        ]
+        return JsonResponse({"clubs": result, "count": len(result)})
+    if action == "enable":
+        try:
+            order_id = data["order_id"]
+        except KeyError:
+            raise BadRequest("Missing order_id")
+
+        try:
+            slug = str(data["club_slug"])
+        except KeyError:
+            raise BadRequest("Missing clug_slug")
+
+        club = Club.objects.filter(slug__iexact=slug, upgraded=False).first()
+        if not club:
+            raise BadRequest("No club without subscriptions found")
+
+        club.upgraded = True
+        club.upgraded_date = now()
+        club.order_id = f"{RASTILIPPU_PREFIX}{order_id}"
+        club.save()
+        return JsonResponse(
+            {
+                "order_id": order_id,
+                "club_slug": club.slug,
+            }
+        )
+
+    if action == "disable":
+        try:
+            order_id = data["order_id"]
+        except KeyError:
+            raise BadRequest("Missing order_id")
+
+        club = Club.objects.filter(order_id=f"{RASTILIPPU_PREFIX}{order_id}").first()
+        if not club:
+            raise BadRequest("No matching club with this order_id")
+
+        club.upgraded = False
+        club.upgraded_date = None
+        club.order_id = ""
+        club.save()
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+    if action == "update_event":
+        try:
+            club_slug = data["club_slug"]
+            name = data["name"][:255]
+            irma_id = data["irma_id"]
+            event_uuid = data["uuid"]
+            start_date_raw = data["start_datetime"]
+            end_date_raw = data["end_datetime"]
+            course_id_set = set(data["courses"])
+        except KeyError:
+            raise BadRequest("Missing data")
+
+        try:
+            start_date = arrow.get(start_date_raw).datetime
+            end_date = arrow.get(end_date_raw).datetime
+            if end_date <= start_date:
+                raise Exception("Start should be before end")
+        except Exception:
+            raise BadRequest("Invalid dates")
+
+        club = Club.objects.filter(
+            slug=club_slug,
+            upgraded=True,
+            order_id__startswith=RASTILIPPU_PREFIX,
+        ).first()
+        if not club:
+            raise BadRequest("No matching club")
+
+        bundle, created = EventSet.objects.get_or_create(
+            external_id=f"{RASTILIPPU_PREFIX}{irma_id}",
+            defaults={
+                "club": club,
+                "name": name[:255],
+                "slug": f"{slugify.slugify(name)[:43]}-{short_random_slug()}",
+                "create_page": True,
+                "external_metadata": {
+                    "start_date": start_date.isoformat(),
+                    "end_date": end_date.isoformat(),
+                    "uuid": event_uuid,
+                },
+            },
+        )
+
+        bundle.dirty = False
+
+        if name != bundle.name:
+            bundle.name = name
+            bundle.dirty = True
+
+        if bundle.external_metadata and (
+            bundle.external_metadata.get("start_date") != start_date.isoformat()
+            or bundle.external_metadata.get("end_date") != end_date.isoformat()
+        ):
+            bundle.external_metadata = {
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "uuid": event_uuid,
+            }
+            bundle.dirty = True
+            bundle.save()
+            Event.objects.filter(event_set_id=bundle.id).update(
+                start_date=start_date,
+                end_date=end_date,
+            )
+
+        if bundle.dirty:
+            bundle.save()
+
+        if course_id_set:
+            external_ids = bundle.events.all().values_list("external_id", flat=True)
+            external_ids = {ext_id[len(RASTILIPPU_PREFIX) :] for ext_id in external_ids}
+            if course_id_set.symmetric_difference(external_ids):
+                try:
+                    sync_courses_data(event_uuid)
+                except Exception:
+                    return HttpResponse(
+                        "Rastilippu did not answer",
+                        status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    )
+        else:
+            bundle.events.all().delete()
+
+        courses_data = []
+        for event in Event.objects.filter(event_set_id=bundle.id).select_related(
+            "club"
+        ):
+            courses_data.append(
+                {
+                    "irma_id": event.external_id[len(RASTILIPPU_PREFIX) :],
+                    "id": event.aid,
+                    "map_upload_url": event.map_upload_url,
+                }
+            )
+        return JsonResponse(
+            {
+                "name": bundle.name,
+                "slug": bundle.slug,
+                "url": bundle.url,
+                "courses": courses_data,
+            },
+            status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED,
+        )
+    return HttpResponse("Valid webhook call with no action taken")
 
 
 @csrf_exempt

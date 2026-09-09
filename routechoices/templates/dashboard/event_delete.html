@@ -1,6 +1,17 @@
 {% extends "dashboard/home.html" %}
 {% load compress static %}
 {% block sub_content %}
+    {% if event.external_id %}
+    <div class="row">
+        <div class="col-12">
+            <h3>
+                <i class="fa-solid fa-triangle-exclamation"></i> You can not delete event <i>{{ event.name }} as it is externally managed</i>
+            </h3>
+            <a class="btn btn-primary dashboard-link float-end" role="button" href="./">
+                <i class="fa-regular fa-circle-left"></i> <span>Return</span></a>
+        </div>
+    </div>
+    {% else %}
     <div class="row">
         <div class="col-12">
             <h1>
@@ -23,6 +34,7 @@
             </form>
         </div>
     </div>
+    {% endif %}
 {% endblock sub_content %}
 
 {% block extra_body %}

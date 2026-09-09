@@ -1544,6 +1544,7 @@ class EventSet(models.Model):
         null=False,
         db_index=True,
     )
+    external_metadata = models.JSONField(editable=False, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     modification_date = models.DateTimeField(auto_now=True)
     club = models.ForeignKey(
@@ -1891,10 +1892,23 @@ class Event(models.Model, SomewhereOnEarth):
         return self.name
 
     def save(self, *args, **kwargs):
+        from routechoices.lib.rastilippu import RASTILIPPU_PREFIX
+
         if self.privacy != PRIVACY_PUBLIC:
             self.featured = False
+
+        send_to_rastilippu = False
+        if self.external_id.startswith(RASTILIPPU_PREFIX) and self.pk:
+            original = Event.objects.get(id=self.pk)
+            if original.map_id != self.map_id or original.slug != self.slug:
+                send_to_rastilippu = True
+
         self.invalidate_cache()
         super().save(*args, **kwargs)
+        if send_to_rastilippu:
+            from .bg_tasks import rastilippu_update_event_url
+
+            rastilippu_update_event_url(self.id)
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
@@ -2220,6 +2234,15 @@ class Event(models.Model, SomewhereOnEarth):
                 "December",
             ],
         }
+
+    @property
+    def map_upload_url(self):
+        return reverse(
+            "dashboard_club:event:map_edit_view",
+            host="dashboard",
+            kwargs={"event_id": self.aid, "club_slug": self.club.slug},
+            scheme="https",
+        )
 
     def get_absolute_url(self):
         return f"{self.club.nice_url}{self.slug}"

@@ -1,10 +1,21 @@
 {% extends "dashboard/home.html" %}
 {% load compress static %}
 {% block sub_content %}
+{% if event_set.external_id %}
+<div class="row">
+    <div class="col-12">
+        <h3>
+            <i class="fa-solid fa-triangle-exclamation"></i> You can not delete bundle <i>{{ event_set.name }} as it is externally managed</i>
+        </h3>
+        <a class="btn btn-primary dashboard-link float-end" role="button" href="./">
+            <i class="fa-regular fa-circle-left"></i> <span>Return</span></a>
+    </div>
+</div>
+{% else %}
     <div class="row">
         <div class="col-12">
             <h1>
-                <i class="fa-solid fa-triangle-exclamation	"></i> Delete Bundle <i>{{ event_set.name }}</i>?
+                <i class="fa-solid fa-triangle-exclamation	"></i> Delete bundle <i>{{ event_set.name }}</i>?
             </h1>
             <p>This will delete this bundle, however its events will not be deleted.</p>
             <form action="" method="post">
@@ -22,6 +33,7 @@
             </form>
         </div>
     </div>
+{% endif %}
 {% endblock sub_content %}
 
 {% block extra_body %}

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0120_alter_deviceclubownership_club'),
+        ("core", "0120_alter_deviceclubownership_club"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usersettings',
-            name='third_party_oauth_credentials',
+            model_name="usersettings",
+            name="third_party_oauth_credentials",
             field=models.JSONField(default=dict),
         ),
     ]

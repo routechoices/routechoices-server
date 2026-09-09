@@ -653,6 +653,8 @@ def event_detail(request, event_id):
     if request.method == "DELETE":
         if not is_event_admin:
             raise PermissionDenied()
+        if event.external_id:
+            raise PermissionDenied()
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

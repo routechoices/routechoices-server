@@ -903,11 +903,14 @@ def event_set_edit_view(request, event_set_id):
 @requires_club_in_session
 def event_set_delete_view(request, *args, **kwargs):
     if request.method == "POST":
-        request.object.delete()
-        messages.success(request, "Bundle deleted")
-        return redirect(
-            "dashboard_club:event_set:list_view", club_slug=request.club.slug
-        )
+        if request.object.external_id:
+            messages.success(request, "Externally managed bundles cannot be deleted")
+        else:
+            request.object.delete()
+            messages.success(request, "Bundle deleted")
+            return redirect(
+                "dashboard_club:event_set:list_view", club_slug=request.club.slug
+            )
     return render(
         request,
         "dashboard/event_set_delete.html",
@@ -1055,7 +1058,11 @@ def event_edit_view(request, event_id):
     )
 
     map_list = Map.objects.filter(club=club)
-    event_set_list = EventSet.objects.filter(club=club)
+    allowed_sets = Q(external_id="")
+    if event.external_id and (own_event_set := event.event_set_id):
+        allowed_sets = Q(id=own_event_set)
+
+    event_set_list = EventSet.objects.filter(club=club).filter(allowed_sets)
 
     use_competitor_formset = (
         event.competitors.count() < MAX_COMPETITORS_DISPLAYED_IN_EVENT
@@ -1075,6 +1082,7 @@ def event_edit_view(request, event_id):
 
         form = EventForm(request.POST, request.FILES, instance=event_copy, club=club)
         form.fields["map"].queryset = map_list
+
         form.fields["event_set"].queryset = event_set_list
 
         extra_maps_formset = ExtraMapFormSet(request.POST, instance=event_copy)
@@ -1443,9 +1451,14 @@ def event_delete_view(request, event_id):
     event = get_object_or_404(Event, aid=event_id)
 
     if request.method == "POST":
-        event.delete()
-        messages.success(request, "Event deleted")
-        return redirect("dashboard_club:event:list_view", club_slug=request.club.slug)
+        if request.object.external_id:
+            messages.success(request, "Externally managed events cannot be deleted")
+        else:
+            event.delete()
+            messages.success(request, "Event deleted")
+            return redirect(
+                "dashboard_club:event:list_view", club_slug=request.club.slug
+            )
 
     return render(
         request,

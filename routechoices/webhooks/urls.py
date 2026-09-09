@@ -1,9 +1,16 @@
-from django.urls import re_path
+from django.urls import path
 
 from routechoices.webhooks import views
 
 urlpatterns = [
-    re_path(
-        r"^lemonsqueezy/?$", views.lemonsqueezy_webhook, name="lemonsqueezy_webhook"
+    path(
+        "lemonsqueezy",
+        views.lemonsqueezy_webhook,
+        name="lemonsqueezy_webhook",
+    ),
+    path(
+        "rastilippu",
+        views.rastilippu_webhook,
+        name="rastilippu_webhook",
     ),
 ]

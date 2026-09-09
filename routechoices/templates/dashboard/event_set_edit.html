@@ -28,15 +28,16 @@
                     New Bundle
                 {% endif %}
             </h2>
-            <form action="" method="post">
+            <form action="" method="post" {% if event_set.external_id %}inert{% endif %}>
+                {% if event_set.external_id %}<span class="text-danger">You can not edit this bundle as it is externally managed.</span>{% endif %}
                 {% csrf_token %}
                 {% bootstrap_form form %}
-                <button type="submit" class="save btn btn-primary dashboard-link float-end" id="submit-btn">
-                    <i class="fa-solid fa-floppy-disk"></i> <span>Save</span>
+                <button type="submit" class="save btn btn-primary dashboard-link float-end" id="submit-btn" {% if event_set.external_id %}disabled{% endif %}>
+                    <i class="fa-solid fa-floppy-disk" ></i> <span>Save</span>
                 </button>
                 {% if context == 'edit' %}
                     <a href="{% url 'dashboard_club:event_set:delete_view' event_set_id=event_set.aid club_slug=request.club.slug %}"
-                       class="btn btn-danger dashboard-link"><i class="fa-solid fa-trash"></i> <span>Delete</span></a>
+                       class="btn btn-danger dashboard-link {% if event_set.external_id %}disabled{% endif %}"><i class="fa-solid fa-trash"></i> <span>Delete</span></a>
                 {% endif %}
             </form>
         </div>
