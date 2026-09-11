@@ -615,6 +615,7 @@ class ClubAdmin(admin.ModelAdmin):
             .annotate(
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
+                device_count=Count("devices", distinct=True),
                 geojson_count=Count(
                     "events",
                     filter=~(
@@ -623,7 +624,6 @@ class ClubAdmin(admin.ModelAdmin):
                     ),
                     distinct=True,
                 ),
-                device_count=Count("device_ownerships", distinct=True),
             )
         )
 
