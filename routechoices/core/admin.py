@@ -618,7 +618,7 @@ class ClubAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .prefetch_related("admins")
             .annotate(
-                device_count=Count("device_ownerships", distinct=True),
+                device_count=Count("devices", distinct=True),
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
                 geojson_count=Count(
