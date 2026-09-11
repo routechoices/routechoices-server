@@ -569,6 +569,9 @@ class EventSetAdmin(admin.ModelAdmin):
 
     club_link.short_description = "Club"
 
+device_subquery = DeviceClubOwnership.objects.filter(
+    club_id=OuterRef("pk")
+).order_by()
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
@@ -615,9 +618,7 @@ class ClubAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .prefetch_related("admins")
             .annotate(
-                device_count=Coalesce(
-                    Count("device_ownerships", distinct=True), Value(0)
-                ),
+                device_count=Count("device_ownerships", distinct=True),
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
                 geojson_count=Count(
