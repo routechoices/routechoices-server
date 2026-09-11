@@ -16,8 +16,11 @@ from django.db.models import (
     OuterRef,
     Prefetch,
     Q,
+    Subquery,
+    Value,
     When,
 )
+from django.db.models.functions import Coalesce
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -615,7 +618,20 @@ class ClubAdmin(admin.ModelAdmin):
             .annotate(
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
-                device_count=Count("devices", distinct=True),
+                device_count=Case(
+                    When(
+                        Exists(
+                            DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
+                        ),
+                        then=Subquery(
+                            DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
+                            .values("club_id")
+                            .annotate(count=Coalesce(Count("id"), Value(0)))
+                            .values("count")
+                        ),
+                    ),
+                    default=Value(0),
+                ),
                 geojson_count=Count(
                     "events",
                     filter=~(
