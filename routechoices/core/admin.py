@@ -16,10 +16,10 @@ from django.db.models import (
     OuterRef,
     Prefetch,
     Q,
+    Subquery,
     Value,
     When,
 )
-from django.db.models.functions import Coalesce
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -615,7 +615,13 @@ class ClubAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .prefetch_related("admins")
             .annotate(
-                device_count=Count("device_ownerships", distinct=True),
+                device_count=Subquery(
+                    DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
+                    .order_by()
+                    .values("club_id")
+                    .annotate(count=Count("club_id"))
+                    .values("count")
+                ),
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
                 geojson_count=Count(
