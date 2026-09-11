@@ -13,6 +13,7 @@ from django.db.models import (
     Count,
     Exists,
     F,
+    IntegerField,
     OuterRef,
     Prefetch,
     Q,
@@ -501,7 +502,7 @@ class DeviceBrandFilter(admin.SimpleListFilter):
 class ClubDeviceOwnershipInline(admin.TabularInline):
     model = DeviceClubOwnership
     fields = ("device_link", "nickname")
-    ordering = ("creation_date",)
+    ordering = ("pk",)
     readonly_fields = ["device_link"]
     extra = 0
 
@@ -521,7 +522,7 @@ class ClubDeviceOwnershipInline(admin.TabularInline):
 class DeviceOwnershipInline(admin.TabularInline):
     model = DeviceClubOwnership
     fields = ("club", "nickname")
-    ordering = ("creation_date",)
+    ordering = ("pk",)
     readonly_fields = ["club"]
     extra = 0
 
@@ -599,6 +600,7 @@ class ClubAdmin(admin.ModelAdmin):
     inlines = [ClubDeviceOwnershipInline]
     show_facets = False
     search_fields = ("name",)
+    show_full_result_count = False
 
     @admin.display(boolean=True)
     def can_modify_events_bool(self, obj):
@@ -608,7 +610,7 @@ class ClubAdmin(admin.ModelAdmin):
 
     def get_ordering(self, request):
         if request.resolver_match.url_name == "core_club_changelist":
-            return ("-creation_date",)
+            return ("-pk",)
 
     def get_queryset(self, request):
         return (
@@ -618,19 +620,15 @@ class ClubAdmin(admin.ModelAdmin):
             .annotate(
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
-                device_count=Case(
-                    When(
-                        Exists(
-                            DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
-                        ),
-                        then=Subquery(
-                            DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
-                            .values("club_id")
-                            .annotate(count=Coalesce(Count("id"), Value(0)))
-                            .values("count")
-                        ),
+                device_count=Coalesce(
+                    Subquery(
+                        DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
+                        .values("club_id")
+                        .annotate(cnt=Count("id"))
+                        .values("cnt"),
+                        output_field=IntegerField(null=False, default=0),
                     ),
-                    default=Value(0),
+                    Value(0),
                 ),
                 geojson_count=Count(
                     "events",
@@ -659,7 +657,7 @@ class ClubAdmin(admin.ModelAdmin):
 
     def device_count(self, obj):
         return format_html(
-            '<a href="/admin/core/deviceclubownership/?club__id__exact={}">{}</a>',
+            '<a href="/admin/core/club/{}/change/#device_ownerships-heading">{}</a>',
             obj.pk,
             obj.device_count,
         )
