@@ -659,9 +659,10 @@ class ClubAdmin(admin.ModelAdmin):
                         .order_by()
                         .values("club_id")
                         .annotate(count=Count("club_id"))
-                        .values("count")
+                        .values("count"),
+                        distinct=True
                     ),
-                    0,
+                    0
                 ),
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
