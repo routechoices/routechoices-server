@@ -20,6 +20,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.functions import Coalesce
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
@@ -619,7 +620,7 @@ class ClubAdmin(admin.ModelAdmin):
                     DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
                     .order_by()
                     .values("club_id")
-                    .annotate(count=Count("club_id"))
+                    .annotate(count=Coalesce(Count("club_id"), Value(0)))
                     .values("count")
                 ),
                 event_count=Count("events", distinct=True),
