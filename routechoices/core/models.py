@@ -3059,6 +3059,9 @@ class DeviceClubOwnership(models.Model):
                 fields=("device", "club"),
             )
         ]
+        indexes = [
+            models.Index(fields=['club', 'device']),
+        ]
         verbose_name = "Device ownership"
         verbose_name_plural = "Device ownerships"
 
