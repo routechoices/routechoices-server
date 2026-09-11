@@ -16,7 +16,6 @@ from django.db.models import (
     OuterRef,
     Prefetch,
     Q,
-    Subquery,
     Value,
     When,
 )
@@ -617,15 +616,7 @@ class ClubAdmin(admin.ModelAdmin):
             .prefetch_related("admins")
             .annotate(
                 device_count=Coalesce(
-                    Subquery(
-                        DeviceClubOwnership.objects.filter(club_id=OuterRef("pk"))
-                        .order_by()
-                        .values("club_id")
-                        .annotate(count=Count("club_id"))
-                        .values("count"),
-                        distinct=True
-                    ),
-                    0
+                    Count("device_ownerships", distinct=True), Value(0)
                 ),
                 event_count=Count("events", distinct=True),
                 map_count=Count("maps", distinct=True),
