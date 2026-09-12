@@ -685,7 +685,7 @@ class RLWebHookTestCase(EssentialApiBase):
         )
         new_eventsets = [
             EventSet(
-                name=f"Test Bundle Name Exists {i+2}",
+                name=f"Test Bundle Name Exists 2026-{i+2}",
                 slug=f"abc123-{i}",
                 club=self.club,
                 external_id="RL-6353{i}",
@@ -731,7 +731,7 @@ class RLWebHookTestCase(EssentialApiBase):
             content_type="json",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(res.json().get("name"), "Test Bundle Name Exists 102")
+        self.assertEqual(res.json().get("name"), "Test Bundle Name Exists 2026-102")
 
     @patch("routechoices.lib.rastilippu.requests")
     def test_update_event_url_hook(self, mock_requests):
