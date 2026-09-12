@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import json
+import math
+import re
 
 import arrow
 import slugify
@@ -123,11 +125,39 @@ def rastilippu_webhook(request):
         if not club:
             raise BadRequest("No matching club")
 
+        external_id = f"{RASTILIPPU_PREFIX}{irma_id}"
+
+        # Check name colisions
+        bundle_matching_names = EventSet.objects.filter(
+            club=club, name__iexact=name
+        ).exclude(external_id=external_id)
+        if bundle_matching_names.exists():
+            name_original = name
+            name_safe = re.escape(name)
+            pattern = rf"^{name_safe} (\d+)"
+            bundle_matching_names = {
+                n.upper()
+                for n in EventSet.objects.filter(club=club, name__iregex=pattern)
+                .exclude(external_id=external_id)
+                .values_list("name", flat=True)
+            }
+            # first try the year
+            iteration = start_date.isoformat()[:4]
+            name = f"{name_original[:250]} {iteration}"
+            if name.upper() in bundle_matching_names:
+                iteration = 2
+                while True:
+                    suffix_len = int(math.log10(iteration)) + 2
+                    name = f"{name_original[:255 - suffix_len]} {iteration}"
+                    if name.upper() not in bundle_matching_names:
+                        break
+                    iteration += 1
+
         bundle, created = EventSet.objects.get_or_create(
-            external_id=f"{RASTILIPPU_PREFIX}{irma_id}",
+            external_id=external_id,
             defaults={
                 "club": club,
-                "name": name[:255],
+                "name": name,
                 "slug": f"{slugify.slugify(name)[:43]}-{short_random_slug()}",
                 "create_page": True,
                 "external_metadata": {
@@ -139,7 +169,6 @@ def rastilippu_webhook(request):
         )
 
         bundle.dirty = False
-
         if name != bundle.name:
             bundle.name = name
             bundle.dirty = True

@@ -677,6 +677,62 @@ class RLWebHookTestCase(EssentialApiBase):
         event_set.refresh_from_db()
         self.assertEqual(event_set.events.count(), 0)
 
+        EventSet.objects.create(
+            name="Test Bundle Name Exists",
+            slug="abc123",
+            club=self.club,
+            external_id="RL-6353",
+        )
+        new_eventsets = [
+            EventSet(
+                name=f"Test Bundle Name Exists {i+2}",
+                slug=f"abc123-{i}",
+                club=self.club,
+                external_id="RL-6353{i}",
+            )
+            for i in range(100)
+        ]
+
+        EventSet.objects.bulk_create(new_eventsets)
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": self.club.slug,
+                    "name": "Test Bundle Name Exists",
+                    "irma_id": "12345",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.json().get("name"), "Test Bundle Name Exists 2026")
+
+        res = self.webhook_client.post(
+            url,
+            {
+                "action": "update_event",
+                "data": {
+                    "club_slug": self.club.slug,
+                    "name": "Test Bundle Name Exists",
+                    "irma_id": "2345",
+                    "uuid": "9fd89ce9-14cf-4a4d-93b3-1c3201c75e23",
+                    "start_datetime": "2026-08-11T14:00:00Z",
+                    "end_datetime": "2026-08-11T19:00:00Z",
+                    "courses": [],
+                },
+            },
+            content_type="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.json().get("name"), "Test Bundle Name Exists 102")
+
     @patch("routechoices.lib.rastilippu.requests")
     def test_update_event_url_hook(self, mock_requests):
         self.club.upgraded = True
