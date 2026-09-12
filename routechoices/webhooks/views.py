@@ -142,7 +142,7 @@ def rastilippu_webhook(request):
                 # We start counting
                 name_original = name
                 name_safe = re.escape(name)
-                pattern = rf"^{name_safe}-(\d+)"
+                pattern = rf"^{name_safe}-(\d+)$"
                 bundle_matching_names = {
                     n.upper()
                     for n in EventSet.objects.filter(club=club, name__iregex=pattern)
