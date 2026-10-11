@@ -499,11 +499,11 @@ class Club(models.Model):
 
     @property
     def url_protocol(self):
-        return f"http{'s' if self.use_https else ''}"
+        return "https"
 
     @cached_property
     def nice_url(self):
-        if self.domain:
+        if self.domain and self.is_secure:
             return f"{self.url_protocol}://{self.domain}/"
         path = reverse(
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
