@@ -503,7 +503,7 @@ class Club(models.Model):
 
     @cached_property
     def nice_url(self):
-        if self.domain and self.is_secure:
+        if self.domain and self.use_https:
             return f"{self.url_protocol}://{self.domain}/"
         path = reverse(
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
