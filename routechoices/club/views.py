@@ -421,7 +421,7 @@ def event_kmz_view(request, slug, index="1"):
             {"club": club},
             status=status.HTTP_404_NOT_FOUND,
         )
-    if event.club.domain and is_custom_ssl_cert_active(event.club.domain) not request.use_cname:
+    if event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
         return redirect(
             f"{event.club.nice_url}{event.slug}/kmz{('-' + index) if index != '1' else ''}"
         )
