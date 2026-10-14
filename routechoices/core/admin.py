@@ -864,7 +864,7 @@ class EventAdmin(admin.ModelAdmin):
     map_count.admin_order_field = "map_count"
 
     def link(self, obj):
-        link = obj.shortcut or obj.get_absolute_url()
+        link = obj.get_absolute_url()
         return format_html('<a href="{}">Open</a>', link)
 
     def competitor_count(self, obj):
