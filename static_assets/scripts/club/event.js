@@ -2335,6 +2335,7 @@ function RCEvent(infoURL, clockURL, locale) {
 		const headers = {};
 		if (window.local.token) {
 			 headers["authorization"] = `Bearer ${window.local.token}`;
+		}
 		fetch(targetURL, {
 			method: "GET",
 			credentials: window.local.isPrivate ? "include" : "same-origin",
