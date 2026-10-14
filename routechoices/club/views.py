@@ -29,7 +29,7 @@ def club_view(request):
     club_slug = request.club_slug
     club = get_object_or_404(Club, slug__iexact=club_slug)
 
-    if club.domain and not request.use_cname:
+    if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
         return redirect(club.nice_url)
 
     event_list = Event.extract_event_lists(request, club)
