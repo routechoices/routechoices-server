@@ -2348,15 +2348,12 @@ function RCEvent(infoURL, clockURL, locale) {
 					setTimeout(() => {
 						isCurrentlyFetchingRoutes = false;
 					}, 1000);
-					if (cb) {
-						 cb.();
-					}
 					return;
 				}
 				liveDataNextUrl = response.next;
 				isCurrentlyFetchingRoutes = false;
 				const runnerPoints = [];
-				for (const competitor of response.competitors || []) {
+				for (const competitor of (response.competitors || [])) {
 					let route = null;
 					if (competitor.encoded_data) {
 						route = PositionArchive.fromEncoded(competitor.encoded_data);
@@ -2377,18 +2374,6 @@ function RCEvent(infoURL, clockURL, locale) {
 							}
 						}
 					}
-					// Show battery if last position is not older than 30 minutes
-					/* Disabled, always show last battery level known.
-					let lastTS;
-					if (route) {
-						lastTS = route.getLastPosition()[0];
-					}
-					if (route && lastTS > +new Date() - 1800000) {
-						competitorBatteyLevels[competitor.id] = competitor.battery_level;
-					} else {
-						competitorBatteyLevels[competitor.id] = null;
-					}
-					*/
 					if (competitor.battery_level != null) {
 						competitorBatteyLevels[competitor.id] = route
 							? competitor.battery_level
@@ -2408,14 +2393,15 @@ function RCEvent(infoURL, clockURL, locale) {
 					zoomOnRunners = false;
 				}
 				computeSplitTimes();
-				cb?.();
 			})
 			.catch(() => {
 				liveDataNextUrl = null;
 				setTimeout(() => {
 					isCurrentlyFetchingRoutes = false;
 				}, 1000);
-			});
+			}).finally(() => {
+				if (cb) cb(); return;
+			);
 	}
 
 	function zoomOnCompetitor(competitor) {
