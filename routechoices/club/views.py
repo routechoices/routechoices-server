@@ -14,6 +14,7 @@ from rest_framework import status
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
 from routechoices.lib import cache
+from routechoices.lib.ssl_certificates import is_custom_ssl_cert_active
 from routechoices.lib.helpers import (
     get_best_image_mime,
     get_current_site,
