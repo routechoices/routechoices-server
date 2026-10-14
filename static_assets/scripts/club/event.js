@@ -2332,13 +2332,14 @@ function RCEvent(infoURL, clockURL, locale) {
 			targetURL = liveDataNextUrl;
 		}
 		targetURL += fetchDataUrlSuffix;
+		const headers = {};
+		if (window.local.token) {
+			 headers["authorization"] = `Bearer ${window.local.token}`;
 		fetch(targetURL, {
 			method: "GET",
 			credentials: window.local.isPrivate ? "include" : "same-origin",
 			mode: "cors",
-			headers: {
-				authorization: `Bearer ${window.local.token}`,
-			},
+			headers,
 		})
 			.then((r) => r.json())
 			.then((response) => {
@@ -2348,12 +2349,13 @@ function RCEvent(infoURL, clockURL, locale) {
 					setTimeout(() => {
 						isCurrentlyFetchingRoutes = false;
 					}, 1000);
+					if (cb) cb();
 					return;
 				}
 				liveDataNextUrl = response.next;
 				isCurrentlyFetchingRoutes = false;
 				const runnerPoints = [];
-				for (const competitor of (response?.competitors || [])) {
+				for (const competitor of response.competitors)) {
 					let route = null;
 					if (competitor.encoded_data) {
 						route = PositionArchive.fromEncoded(competitor.encoded_data);
@@ -2384,6 +2386,8 @@ function RCEvent(infoURL, clockURL, locale) {
 							competitorsTags.add(tag);
 						}
 					}
+				 if (cb) cb();
+					return;
 				}
 				updateCompetitorList(response.competitors);
 				displayCompetitorList();
@@ -2399,9 +2403,7 @@ function RCEvent(infoURL, clockURL, locale) {
 				setTimeout(() => {
 					isCurrentlyFetchingRoutes = false;
 				}, 1000);
-			}).finally(() => {
-				if (cb) cb(); return;
-			);
+			})
 	}
 
 	function zoomOnCompetitor(competitor) {
