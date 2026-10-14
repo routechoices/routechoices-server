@@ -199,7 +199,7 @@ def event_view(request, slug):
                 kwargs={"club_slug": club_slug, "event_id": event.aid},
             )
         )
-    elif event.club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+    elif event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}")
 
     event.check_user_permission(request.user)
