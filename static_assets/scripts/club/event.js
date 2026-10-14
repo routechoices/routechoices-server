@@ -2353,7 +2353,7 @@ function RCEvent(infoURL, clockURL, locale) {
 				liveDataNextUrl = response.next;
 				isCurrentlyFetchingRoutes = false;
 				const runnerPoints = [];
-				for (const competitor of (response.competitors || [])) {
+				for (const competitor of (response?.competitors || [])) {
 					let route = null;
 					if (competitor.encoded_data) {
 						route = PositionArchive.fromEncoded(competitor.encoded_data);
