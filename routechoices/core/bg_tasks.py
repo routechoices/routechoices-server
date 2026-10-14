@@ -112,3 +112,8 @@ def rastilippu_update_event_url(event_id):
     event = Event.objects.select_related("club", "event_set").get(id=event_id)
     if not rl_update_event_url(event):
         raise Exception("Couldn't reach rastilippu service")
+
+@background(schedule=0)
+def provision_ssl_certificate(domain):
+    # TODO: implement function that provision the ssl certificates as bg task
+    ...

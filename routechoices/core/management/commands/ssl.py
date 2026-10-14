@@ -92,9 +92,12 @@ class Command(BaseCommand):
                 club.domain = ""
                 club.save()
                 continue
-
-            acct_key = AcmeAccount.create("secp256r1")
-            write_account_ssl_key(domain, acct_key)
+            
+            try:
+                acct_key = AcmeAccount.create("secp256r1")
+                write_account_ssl_key(domain, acct_key)
+            except Exception as e:
+                print(f"Could not generate account key ({str(e)})")
 
             client = sewer.client.Client(
                 domain_name=domain,
@@ -108,30 +111,27 @@ class Command(BaseCommand):
             Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").touch()
             try:
                 certificate = client.get_certificate()
-            except Exception:
-                self.stderr.write("Failed to create certificate...")
+            except Exception as e:
+                self.stderr.write(f"Failed to create certificate... ({str(e)})")
                 continue
             finally:
                 Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
 
             cert_key = client.cert_key
 
-            cert_filename = os.path.join(
-                settings.BASE_DIR, "nginx", "certs", f"{domain}.crt"
-            )
-            cert_key_filename = os.path.join(
-                settings.BASE_DIR, "nginx", "certs", f"{domain}.key"
-            )
+            cert_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.crt")
+            cert_key_filename = Path((f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
 
-            with open(cert_filename, "w", encoding="utf_8") as fp:
+            with open(cert_filename, "w", encoding="ascii") as fp:
                 fp.write(certificate)
-            cert_key.write_pem(cert_key_filename)
-
             os.chmod(cert_filename, 0o600)
+
+            cert_key.write_pem(cert_key_filename)
             os.chmod(cert_key_filename, 0o600)
 
             write_nginx_conf(domain)
             nginx_need_restart = True
+        
         if nginx_need_restart:
             print("Reload nginx for changes to take effect...")
             if options["post-hook"]:
@@ -156,7 +156,7 @@ class Command(BaseCommand):
             domains = Club.objects.exclude(domain="").values_list("domain", flat=True)
 
         for domain in domains:
-            self.stdout.write(f"Processing {domain} ...")
+            self.stdout.write(f"Renewing SSL certificate for {domain} ...")
             club = Club.objects.filter(domain=domain).first()
             if not club:
                 self.stderr.write("No club with this domain")
@@ -219,11 +219,9 @@ class Command(BaseCommand):
 
             with open(cert_filename, "w", encoding="utf_8") as fp:
                 fp.write(certificate)
-            cert_key.write_pem(cert_key_filename)
-
             os.chmod(cert_filename, 0o600)
+            cert_key.write_pem(cert_key_filename)
             os.chmod(cert_key_filename, 0o600)
-
             nginx_need_restart = True
             self.stdout.write("Certificate renewed.")
         if nginx_need_restart:
