@@ -7,6 +7,16 @@ from django.conf import settings
 from sewer.auth import ProviderBase
 
 
+def is_custom_ssl_cert_active(domain):
+    cert_path = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt")
+    if not os.path.exists(cert_path):
+        return False
+    with open(cert_path, "rb") as fp:
+        data = fp.read()
+    cert = x509.load_pem_x509_certificate(data)
+    return arrow.get(cert.not_valid_after_utc) < arrow.utcnow()
+
+
 def is_account_ssl_expirying(domain):
     cert_path = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt")
     if not os.path.exists(cert_path):
