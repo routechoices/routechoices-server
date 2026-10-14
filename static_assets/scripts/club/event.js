@@ -2388,7 +2388,6 @@ function RCEvent(infoURL, clockURL, locale) {
 						}
 					}
 				 if (cb) cb();
-					return;
 				}
 				updateCompetitorList(response.competitors);
 				displayCompetitorList();
