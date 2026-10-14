@@ -249,7 +249,7 @@ def event_startlist_view(request, slug):
                     host_kwargs={"club_slug": club_slug},
                 )
             )
-    elif event.club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+    elif event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
         return redirect(f"{event.club.nice_url}{event.slug}/startlist")
 
     event.check_user_permission(request.user)
