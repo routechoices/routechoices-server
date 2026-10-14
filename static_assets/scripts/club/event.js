@@ -2355,7 +2355,7 @@ function RCEvent(infoURL, clockURL, locale) {
 				liveDataNextUrl = response.next;
 				isCurrentlyFetchingRoutes = false;
 				const runnerPoints = [];
-				for (const competitor of response.competitors)) {
+				for (const competitor of response.competitors) {
 					let route = null;
 					if (competitor.encoded_data) {
 						route = PositionArchive.fromEncoded(competitor.encoded_data);
@@ -3476,6 +3476,7 @@ function RCEvent(infoURL, clockURL, locale) {
 		} catch {
 			console.log("Wake Lock Screen failed");
 		}
+		return;
 	})();
 	document.addEventListener("visibilitychange", async () => {
 		if (document.visibilityState === "visible") {
@@ -3485,6 +3486,7 @@ function RCEvent(infoURL, clockURL, locale) {
 				console.log("Wake Lock Screen failed");
 			}
 		}
+		return;
 	});
 
 	const queryString = window.location.search;
