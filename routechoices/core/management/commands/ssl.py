@@ -120,7 +120,7 @@ class Command(BaseCommand):
             cert_key = client.cert_key
 
             cert_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.crt")
-            cert_key_filename = Path((f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
+            cert_key_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
 
             with open(cert_filename, "w", encoding="ascii") as fp:
                 fp.write(certificate)
