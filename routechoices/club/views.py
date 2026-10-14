@@ -53,7 +53,7 @@ def club_favicon(request, icon_name):
     club = get_object_or_404(
         Club.objects.only("logo", "domain", "slug"), slug__iexact=club_slug
     )
-    if club.domain and is_custom_ssl_cert_active(club.domain) not request.use_cname:
+    if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
         return redirect(f"{club.nice_url}{icon_name}")
     if not club.logo:
         with open(f"{settings.BASE_DIR}/static_assets/{icon_name}", "rb") as fp:
