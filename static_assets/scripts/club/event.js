@@ -1233,7 +1233,7 @@ function RCEvent(infoURL, clockURL, locale) {
 			.catch((e) => {
 				console.log(e);
 				u("#loading-event-modal").remove();
-				swal({ text: "Something went wrong", title: "error", type: "error" });
+				swal({ text: "Something went wrong:" + e, title: "error", type: "error" });
 			});
 	})();
 
