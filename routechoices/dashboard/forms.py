@@ -303,7 +303,7 @@ class ClubDomainForm(ModelForm):
         matching_clubs = Club.objects.filter(domain__iexact=domain)
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
-            if self.instance.domain and not self.has_ssl_certificate:
+            if self.instance.domain and not self.instance.has_ssl_certificate:
                 self.add_error("domain", f'"{domain}" HTTPS certificate provisioning in progress.')
         if matching_clubs.exists():
             self.add_error("domain", f'Domain "{domain}" already used by another club.')
