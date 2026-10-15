@@ -194,7 +194,7 @@ function cloneLayer(layer) {
 
 const backgroundMapTitles = {
 	osm: "Open Street Map",
-	"gmap-street": "Google Map Street",
+	/* "gmap-street": "Google Map Street",
 	"gmap-hybrid": "Google Map Satellite",
 	"gmap-terrain": "Google Map Terrain",
 	"mapant-ee": "Mapant Estonia",
@@ -203,13 +203,13 @@ const backgroundMapTitles = {
 	"mapant-no": "Mapant Norway",
 	"mapant-es": "Mapant Spain",
 	"mapant-se": "Mapant Sweden",
-	"mapant-ch": "Mapant Switzerland",
+	"mapant-ch": "Mapant Switzerland", */
 	"topo-fi": "Topo Finland",
 	"topo-fr": "Topo France",
 	"topo-no": "Topo Norway",
 	"topo-uk": "Topo UK",
-	"topo-world": "Topo World (OpenTopo)",
-	"topo-world-alt": "Topo World (ArcGIS)",
+	"topo-world": "OpenTopo",
+	"topo-world-alt": "ArcGIS",
 };
 
 function getBaseLayers() {
