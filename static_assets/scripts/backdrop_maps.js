@@ -5,7 +5,6 @@ const backdropMaps = {
 		className: "wms256",
 		referrerPolicy: "origin",
 	}),
-	/*
 	"gmap-street": L.tileLayer("https://mt0.google.com/vt/x={x}&y={y}&z={z}", {
 		attribution: "Map data &copy; Google",
 		className: "wms256",
@@ -24,13 +23,11 @@ const backdropMaps = {
 			className: "wms256",
 		},
 	),
-*/
 	"topo-fi": L.tileLayer.wms("https://tiles.kartat.kapsi.fi/peruskartta", {
 		attribution: "Map data &copy; National Land Survey of Finland",
 		className: "wms256",
 		layers: "peruskartta",
 	}),
-	/*
 	"mapant-ee": L.tileLayer(
 		"https://tiles.routechoices.com/proxy/ee/{z}/{x}/{y}.webp",
 		{
@@ -54,7 +51,6 @@ const backdropMaps = {
 			className: "wms256",
 		},
 	),
-*/
 	"topo-uk": L.tileLayer(
 		"https://tiles.routechoices.com/proxy/uk/{z}/{x}/{y}.webp",
 		{
@@ -68,7 +64,6 @@ const backdropMaps = {
 			],
 		},
 	),
-	/*
 	"mapant-no": L.tileLayer("https://mapant.no/osm-tiles/{z}/{x}/{y}.png", {
 		attribution: "Map data &copy; MapAnt.no",
 		className: "wms256",
@@ -95,7 +90,6 @@ const backdropMaps = {
 			className: "wms256",
 		},
 	),
-*/
 	"topo-fr": L.tileLayer(
 		"https://data.geopf.fr/private/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image%2Fjpeg&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&APIKEY=ign_scan_ws",
 		{
@@ -105,7 +99,6 @@ const backdropMaps = {
 			maxNativeZoom: 16,
 		},
 	),
-	/*
 	"mapant-es": L.tileLayer.wms("https://mapant.es/wms", {
 		layers: "mapant.es",
 		format: "image/png",
@@ -114,7 +107,6 @@ const backdropMaps = {
 		attribution: "Map data &copy; MapAnt.es",
 		className: "wms256",
 	}),
-*/
 	"topo-world": L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
 		attribution: "Map data &copy; OpenTopoMap (CC-BY-SA)",
 		className: "wms256",
@@ -202,7 +194,7 @@ function cloneLayer(layer) {
 
 const backgroundMapTitles = {
 	osm: "Open Street Map",
-	/* "gmap-street": "Google Map Street",
+	"gmap-street": "Google Map Street",
 	"gmap-hybrid": "Google Map Satellite",
 	"gmap-terrain": "Google Map Terrain",
 	"mapant-ee": "Mapant Estonia",
@@ -210,8 +202,8 @@ const backgroundMapTitles = {
 	"mapant-fr": "Mapant France",
 	"mapant-no": "Mapant Norway",
 	"mapant-es": "Mapant Spain",
-	"mapant-se": "Mapant Sweden",
-	"mapant-ch": "Mapant Switzerland", */
+	// "mapant-se": "Mapant Sweden",
+	"mapant-ch": "Mapant Switzerland",
 	"topo-fi": "Topo Finland",
 	"topo-fr": "Topo France",
 	"topo-no": "Topo Norway",
