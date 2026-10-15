@@ -4,6 +4,8 @@ import urllib.parse
 from background_task import background
 from pathlib import Path
 
+from django.conf import settings
+
 from routechoices.core.models import Club, Event
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
