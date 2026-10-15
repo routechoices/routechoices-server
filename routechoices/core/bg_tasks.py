@@ -115,5 +115,43 @@ def rastilippu_update_event_url(event_id):
 
 @background(schedule=0)
 def provision_ssl_certificate(domain):
-    # TODO: implement function that provision the ssl certificates as bg task
-    ...
+    club = Club.objects.get(domain=domain)
+    if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").exists():
+        self.stderr.write(f'Certificate creation for the domain "{domain}" already in progress')
+        return
+    if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
+        self.stderr.write(f'Certificate for the domain "{domain}" already exists')
+        return
+    if not check_dns_records(domain):
+        self.stderr.write(f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore')
+        club.domain = ""
+        club.save()
+        return
+
+    acct_key = AcmeAccount.create("secp256r1")
+    write_account_ssl_key(domain, acct_key)
+    client = sewer.client.Client(
+        domain_name=domain,
+        provider=ClubAcmeProvider(club),
+        account=acct_key,
+        cert_key=AcmeKey.create("secp256r1"),
+        is_new_acct=True,
+        contact_email="raphael@routechoices.com",
+    )
+
+    Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").touch()
+    certificate = client.get_certificate()
+    Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
+
+    cert_key = client.cert_key
+
+    cert_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.crt")
+    cert_key_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
+
+    with open(cert_filename, "w", encoding="ascii") as fp:
+        fp.write(certificate)
+    os.chmod(cert_filename, 0o600)
+
+    cert_key.write_pem(cert_key_filename)
+    os.chmod(cert_key_filename, 0o600)
+    write_nginx_conf(domain)

@@ -96,8 +96,8 @@
         </ul>
         {% block sub_sub_content %}
             <p>
-                <!-- <a class="btn btn-info mb-1 me-1"
-                   href="{% url 'dashboard_club:custom_domain_view' club_slug=request.club.slug %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a> -->
+                <a class="btn btn-info mb-1 me-1"
+                   href="{% url 'dashboard_club:custom_domain_view' club_slug=request.club.slug %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
                 {% if club.analytics_site %}
                     <a href="{{ club.analytics_site }}" class="btn btn-info mb-1"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a>
                 {% endif %}

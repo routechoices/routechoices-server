@@ -6,8 +6,8 @@
         <p>
             Your club's pages are accessible at your custom domain <a href="{{ club.nice_url }}">{{ club.nice_url }}</a>
         </p>
-        {% if not club.use_https %}
-            <p>Our server is in process of issuing you a SSL certificate, it might take a couple of minutes.</p>
+        {% if club.domain not club.has_ssl_certificate %}
+            <p>Our server is in process of providing you a HTTPS certificate, it might take a while...</p>
         {% endif %}
         <form method="post" class="post-form">
             {% csrf_token %}

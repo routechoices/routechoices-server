@@ -101,9 +101,9 @@ class PlausibleTestCase(TestCase):
 
 class HelperTestCase(TestCase):
     def test_check_dns(self):
-        self.assertTrue(check_dns_records("latlong.uk"))
         self.assertTrue(check_dns_records("where.rapha.run"))
         self.assertFalse(check_dns_records("doesnotexist.kiilat.com"))
+        self.assertTrue(check_dns_records("live.kiilat.com"))
         self.assertFalse(check_dns_records("kiilat.com"))
 
     def test_slippy_map(self):

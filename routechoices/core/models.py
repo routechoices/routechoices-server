@@ -367,8 +367,7 @@ class Club(models.Model):
         blank=True,
         default="",
         validators=[
-            validate_domain_name,
-        ],
+            validate_domain_name,],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
     website = models.URLField(max_length=200, blank=True)
@@ -425,19 +424,17 @@ class Club(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            if self.domain:
-                self.domain = self.domain.lower()
-            old_self = Club.objects.get(pk=self.pk)
-            old_domain = old_self.domain
-            if old_domain and old_domain != self.domain:
-                delete_domain(old_domain)
-            if old_self.slug != self.slug:
-                self.slug_changed_from = old_self.slug
+            pre_save_self = Club.objects.get(pk=self.pk)
+            if requested_domain := self.domain.upper():
+                pre_save_domain = pre_save_self.domain.upper()
+            if pre_save_domain and self.domain != pre_save_domain:
+                delete_domain(pre_save_domain)
+            if pre_save_self.slug != self.slug:
+                self.slug_changed_from = pre_save_self.slug
                 self.slug_changed_at = now()
-
                 if self.analytics_site:
                     plausible.change_domain(
-                        old_self.analytics_domain, self.analytics_domain
+                        pre_save_self.analytics_domain, self.analytics_domain
                     )
                     self.analytics_site = ""
 
@@ -449,6 +446,9 @@ class Club(models.Model):
             if created:
                 self.analytics_site = analytics_site
         super().save(*args, **kwargs)
+        if self.domain:
+            from .bg_tasks import provision_ssl_certificate
+            provision_ssl_certificate(self.domain.lower())
 
     def is_admin(self, user):
         return user.is_authenticated and self.admins.filter(id=user.id).exists()
@@ -488,14 +488,11 @@ class Club(models.Model):
         return f"{self.slug}.{settings.PARENT_HOST}"
 
     @property
-    def use_https(self):
-        is_secure = True
-        if self.domain:
-            cert_path = os.path.join(
-                settings.BASE_DIR, "nginx", "certs", f"{self.domain}.crt"
-            )
-            is_secure = os.path.exists(cert_path)
-        return is_secure
+    def has_ssl_certificate(self):
+        cert_path = os.path.join(
+            settings.BASE_DIR, "nginx", "certs", f"{self.domain}.crt"
+        )
+        return self.domain and os.path.exists(cert_path)   
 
     @property
     def url_protocol(self):
@@ -503,7 +500,7 @@ class Club(models.Model):
 
     @cached_property
     def nice_url(self):
-        if self.domain and self.use_https:
+        if self.domain and self.has_ssl_certificate:
             return f"{self.url_protocol}://{self.domain}/"
         path = reverse(
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}

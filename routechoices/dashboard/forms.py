@@ -282,7 +282,7 @@ class ClubDomainForm(ModelForm):
     domain = CharField(
         max_length=128,
         label="Custom domain",
-        help_text="eg: 'example.com'",
+        help_text="eg: 'gps.example.com'",
         validators=[validate_domain_name],
         required=False,
     )
@@ -303,8 +303,10 @@ class ClubDomainForm(ModelForm):
         matching_clubs = Club.objects.filter(domain__iexact=domain)
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
+            if self.instance.domain and not self.has_ssl_certificate:
+                self.add_error("domain", f'"{domain}" HTTPS certificate provisioning in progress.')
         if matching_clubs.exists():
-            self.add_error("domain", f"Domain '{domain}' already used by another club.")
+            self.add_error("domain", f'Domain "{domain}" already used by another club.')
         return domain.lower()
 
 
