@@ -11,7 +11,6 @@ from routechoices.lib.tile_proxies import (
     mapant_ch_proxy,
     mapant_ee_proxy,
     mapant_fr_proxy,
-    mapant_se_proxy,
 )
 
 GLOBAL_MERCATOR = GlobalMercator()
@@ -153,8 +152,6 @@ def serve_tile_proxy(request, country, z, x, y):
         proxy = mapant_ee_proxy
     elif country == "fr":
         proxy = mapant_fr_proxy
-    elif country == "se":
-        proxy = mapant_se_proxy
     elif country == "uk":
         proxy = leisure_uk_proxy
     tile_data = proxy.get_tile(int(z), int(x), int(y))
