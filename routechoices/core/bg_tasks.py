@@ -2,6 +2,7 @@ import re
 import urllib.parse
 
 from background_task import background
+from pathlib import Path
 
 from routechoices.core.models import Club, Event
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
