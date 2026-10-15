@@ -7,6 +7,7 @@ from pathlib import Path
 from django.conf import settings
 
 from routechoices.core.models import Club, Event
+from routechoices.lib.helpers import check_dns_record
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
 from routechoices.lib.other_gps_services.loggator import Loggator
