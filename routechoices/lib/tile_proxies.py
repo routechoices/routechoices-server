@@ -320,16 +320,6 @@ mapant_fr_proxy = CustomCrsWmts2WebMercatorWmtsProxy(
     "https://mapant.fr/api/tiles/{z}/{x}/{y}.webp",
 )
 
-mapant_se_proxy = CustomCrsWmts2WebMercatorWmtsProxy(
-    "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs",
-    256,
-    16384,
-    265000,
-    7680000,
-    2,
-    "https://kartor.gokartor.se/Master/{z}/{y}/{x}.png",
-)
-
 leisure_uk_proxy = CustomCrsWmts2WebMercatorWmtsProxy(
     "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=370,-108,434,0,0,0,0 +units=m +no_defs +type=crs",
     256,
