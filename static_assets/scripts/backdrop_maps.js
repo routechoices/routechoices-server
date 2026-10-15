@@ -84,7 +84,7 @@ const backdropMaps = {
 		},
 	),
 	"mapant-se": L.tileLayer(
-		"https://tiles.routechoices.com/proxy/se/{z}/{x}/{y}.webp",
+		"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E",
 		{
 			attribution: "Map data &copy; gokartor.se",
 			className: "wms256",
