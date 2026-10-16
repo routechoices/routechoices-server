@@ -140,7 +140,7 @@ def rastilippu_webhook(request):
             ).exclude(external_id=external_id)
             if bundle_matching_names.exists():
                 # We start counting
-                # TODO: improve algorythm for very long names
+                # TODO: improve algorhythm for very long names
                 name_original = name
                 name_safe = re.escape(name)
                 pattern = rf"^{name_safe}-(\d+)$"
@@ -203,9 +203,9 @@ def rastilippu_webhook(request):
             if course_id_set.symmetric_difference(external_ids):
                 try:
                     sync_courses_data(event_uuid)
-                except Exception:
+                except Exception as e:
                     return HttpResponse(
-                        "Rastilippu did not answer",
+                        f"Rastilippu did not answer ({str(e)})",
                         status=status.HTTP_503_SERVICE_UNAVAILABLE,
                     )
         else:
