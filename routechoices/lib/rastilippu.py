@@ -79,8 +79,10 @@ def sync_courses_data(uuid):
         r.raise_for_status()
     except Exception:
         return
-    courses = r.json()
-
+    try:
+        courses = r.json()
+    except Exception as e:
+        raise Exception(f"{r.status}, {r.text}")
     course_data_by_id = {c.get("id"): c for c in courses}
     # Remove courses that do not exists anymore
     existing_events = bundle.events.all()
