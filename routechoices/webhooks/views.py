@@ -64,7 +64,7 @@ def rastilippu_webhook(request):
         try:
             slug = str(data["club_slug"])
         except KeyError:
-            raise BadRequest("Missing clug_slug")
+            raise BadRequest("Missing club_slug")
 
         club = Club.objects.filter(slug__iexact=slug, upgraded=False).first()
         if not club:
