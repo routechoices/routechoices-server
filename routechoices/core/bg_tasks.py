@@ -1,13 +1,15 @@
 import re
+import os
 import urllib.parse
 
 from background_task import background
 from pathlib import Path
 
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from routechoices.core.models import Club, Event
-from routechoices.lib.helpers import check_dns_record
+from routechoices.lib.helpers import check_dns_records
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
 from routechoices.lib.other_gps_services.loggator import Loggator
@@ -16,7 +18,22 @@ from routechoices.lib.other_gps_services.sportrec import SportRec
 from routechoices.lib.other_gps_services.tractrac import Tractrac
 from routechoices.lib.other_gps_services.virekunnas import GpsVirekunnasFi
 from routechoices.lib.rastilippu import update_event_url as rl_update_event_url
+from routechoices.lib.ssl_certificates import (
+    ClubAcmeProvider,
+    write_account_ssl_key,
+)
 
+import sewer.client
+from sewer.crypto import AcmeAccount, AcmeKey
+
+
+def write_nginx_conf(domain):
+    conf_file = render_to_string(
+        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
+        conf_file
+    )
 
 class EventImportError(Exception):
     pass
@@ -121,13 +138,13 @@ def rastilippu_update_event_url(event_id):
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)
     if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").exists():
-        self.stderr.write(f'Certificate creation for the domain "{domain}" already in progress')
+        print(f'Certificate creation for the domain "{domain}" already in progress')
         return
     if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
-        self.stderr.write(f'Certificate for the domain "{domain}" already exists')
+        print(f'Certificate for the domain "{domain}" already exists')
         return
     if not check_dns_records(domain):
-        self.stderr.write(f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore')
+        print(f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore')
         club.domain = ""
         club.save()
         return

@@ -21,6 +21,8 @@ import gpxpy.gpx
 import magic
 import numpy as np
 import orjson as json
+
+import sewer.client
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
@@ -425,9 +427,11 @@ class Club(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             pre_save_self = Club.objects.get(pk=self.pk)
-            if requested_domain := self.domain.upper():
-                pre_save_domain = pre_save_self.domain.upper()
-            if pre_save_domain and self.domain != pre_save_domain:
+            if (
+                (requested_domain := self.domain.upper().lower())
+                and (pre_save_domain := pre_save_self.domain.upper().lower())
+                and requested_domain != pre_save_domain
+            ):
                 delete_domain(pre_save_domain)
             if pre_save_self.slug != self.slug:
                 self.slug_changed_from = pre_save_self.slug
