@@ -66,7 +66,7 @@ def update_event_url(event):
 
 
 @retry_with_backoff(
-    retry_on=(requests.exceptions.HTTPError, json.JSONDecodeError)
+    retry_on=(requests.exceptions.HTTPError, requests.exceptions.Timeout, json.JSONDecodeError)
 )
 def sync_courses_data(event_uuid):
     bundle = EventSet.objects.prefetch_related("events").get(
