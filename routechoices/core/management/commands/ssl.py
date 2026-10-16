@@ -18,6 +18,8 @@ from routechoices.lib.ssl_certificates import (
     read_account_ssl_key,
     write_account_ssl_key,
 )
+
+
 def write_nginx_conf(domain):
     conf_file = render_to_string(
         "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
@@ -90,12 +92,12 @@ class Command(BaseCommand):
                 club.domain = ""
                 club.save()
                 continue
-            
+
             try:
                 acct_key = AcmeAccount.create("secp256r1")
                 write_account_ssl_key(domain, acct_key)
             except Exception as e:
-                print(f"Could not generate account key ({str(e)})")
+                print(f"Could not generate account key ({e!s})")
 
             client = sewer.client.Client(
                 domain_name=domain,
@@ -110,7 +112,7 @@ class Command(BaseCommand):
             try:
                 certificate = client.get_certificate()
             except Exception as e:
-                self.stderr.write(f"Failed to create certificate... ({str(e)})")
+                self.stderr.write(f"Failed to create certificate... ({e!s})")
                 continue
             finally:
                 Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
@@ -129,7 +131,7 @@ class Command(BaseCommand):
 
             write_nginx_conf(domain)
             nginx_need_restart = True
-        
+
         if nginx_need_restart:
             print("Reload nginx for changes to take effect...")
             if options["post-hook"]:

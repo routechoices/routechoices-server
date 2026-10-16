@@ -81,7 +81,7 @@ def sync_courses_data(uuid):
         return
     try:
         courses = r.json()
-    except Exception as e:
+    except Exception:
         raise Exception(f"{r.status_code}, {r.text}")
     course_data_by_id = {c.get("id"): c for c in courses}
     # Remove courses that do not exists anymore

@@ -1,12 +1,13 @@
-import re
 import os
+import re
 import urllib.parse
-
-from background_task import background
 from pathlib import Path
 
+import sewer.client
+from background_task import background
 from django.conf import settings
 from django.template.loader import render_to_string
+from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club, Event
 from routechoices.lib.helpers import check_dns_records
@@ -23,9 +24,6 @@ from routechoices.lib.ssl_certificates import (
     write_account_ssl_key,
 )
 
-import sewer.client
-from sewer.crypto import AcmeAccount, AcmeKey
-
 
 def write_nginx_conf(domain):
     conf_file = render_to_string(
@@ -34,6 +32,7 @@ def write_nginx_conf(domain):
     Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
         conf_file
     )
+
 
 class EventImportError(Exception):
     pass
@@ -134,6 +133,7 @@ def rastilippu_update_event_url(event_id):
     if not rl_update_event_url(event):
         raise Exception("Couldn't reach rastilippu service")
 
+
 @background(schedule=0)
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)
@@ -144,7 +144,9 @@ def provision_ssl_certificate(domain):
         print(f'Certificate for the domain "{domain}" already exists')
         return
     if not check_dns_records(domain):
-        print(f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore')
+        print(
+            f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore'
+        )
         club.domain = ""
         club.save()
         return

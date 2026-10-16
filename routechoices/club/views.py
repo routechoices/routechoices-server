@@ -14,7 +14,6 @@ from rest_framework import status
 from routechoices.club import feeds
 from routechoices.core.models import PRIVACY_PRIVATE, Club, Event, EventSet
 from routechoices.lib import cache
-from routechoices.lib.ssl_certificates import is_custom_ssl_cert_active
 from routechoices.lib.helpers import (
     get_best_image_mime,
     get_current_site,
@@ -23,6 +22,7 @@ from routechoices.lib.helpers import (
     safe64encodedsha,
 )
 from routechoices.lib.s3 import serve_image_from_s3
+from routechoices.lib.ssl_certificates import is_custom_ssl_cert_active
 from routechoices.lib.streaming_response import StreamingHttpRangeResponse
 
 
@@ -175,7 +175,11 @@ def event_view(request, slug):
         )
         if not event_set:
             club = get_object_or_404(Club, slug__iexact=club_slug)
-            if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+            if (
+                club.domain
+                and is_custom_ssl_cert_active(club.domain)
+                and not request.use_cname
+            ):
                 return redirect(f"{club.nice_url}{slug}")
             return render(
                 request,
@@ -183,7 +187,11 @@ def event_view(request, slug):
                 {"club": club},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        if event_set.club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            event_set.club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(f"{event_set.club.nice_url}{slug}")
         return render(
             request, "site/event_list.html", event_set.extract_event_lists(request)
@@ -199,7 +207,11 @@ def event_view(request, slug):
                 kwargs={"club_slug": club_slug, "event_id": event.aid},
             )
         )
-    elif event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
+    elif (
+        event.club.domain
+        and is_custom_ssl_cert_active(event.club.domain)
+        and not request.use_cname
+    ):
         return redirect(f"{event.club.nice_url}{event.slug}")
 
     event.check_user_permission(request.user)
@@ -231,7 +243,11 @@ def event_startlist_view(request, slug):
     )
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(f"{club.nice_url}{slug}/export")
         return render(
             request,
@@ -249,7 +265,11 @@ def event_startlist_view(request, slug):
                     host_kwargs={"club_slug": club_slug},
                 )
             )
-    elif event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
+    elif (
+        event.club.domain
+        and is_custom_ssl_cert_active(event.club.domain)
+        and not request.use_cname
+    ):
         return redirect(f"{event.club.nice_url}{event.slug}/startlist")
 
     event.check_user_permission(request.user)
@@ -280,7 +300,11 @@ def event_export_view(request, slug):
     )
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(f"{club.nice_url}{slug}/export")
         return render(
             request,
@@ -300,7 +324,11 @@ def event_export_view(request, slug):
                     host_kwargs={"club_slug": club_slug},
                 )
             )
-    elif event.club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+    elif (
+        event.club.domain
+        and is_custom_ssl_cert_active(club.domain)
+        and not request.use_cname
+    ):
         return redirect(f"{event.club.nice_url}{event.slug}/export")
 
     event.check_user_permission(request.user)
@@ -330,7 +358,11 @@ def event_zip_view(request, slug):
     )
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(f"{club.nice_url}{slug}/zip")
         return render(
             request,
@@ -338,7 +370,11 @@ def event_zip_view(request, slug):
             {"club": club},
             status=status.HTTP_404_NOT_FOUND,
         )
-    if event.club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+    if (
+        event.club.domain
+        and is_custom_ssl_cert_active(club.domain)
+        and not request.use_cname
+    ):
         return redirect(f"{event.club.nice_url}{event.slug}/zip")
 
     event.check_user_permission(request.user)
@@ -363,7 +399,11 @@ def event_map_view(request, slug, index="1", extension=None):
     )
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(
                 f"{club.nice_url}{slug}/map{('-' + index) if index != '1' else ''}"
             )
@@ -411,7 +451,11 @@ def event_kmz_view(request, slug, index="1"):
     )
     if not event:
         club = get_object_or_404(Club, slug__iexact=club_slug)
-        if club.domain and is_custom_ssl_cert_active(club.domain) and not request.use_cname:
+        if (
+            club.domain
+            and is_custom_ssl_cert_active(club.domain)
+            and not request.use_cname
+        ):
             return redirect(
                 f"{club.nice_url}{slug}/kmz{('-' + index) if index != '1' else ''}"
             )
@@ -421,7 +465,11 @@ def event_kmz_view(request, slug, index="1"):
             {"club": club},
             status=status.HTTP_404_NOT_FOUND,
         )
-    if event.club.domain and is_custom_ssl_cert_active(event.club.domain) and not request.use_cname:
+    if (
+        event.club.domain
+        and is_custom_ssl_cert_active(event.club.domain)
+        and not request.use_cname
+    ):
         return redirect(
             f"{event.club.nice_url}{event.slug}/kmz{('-' + index) if index != '1' else ''}"
         )
