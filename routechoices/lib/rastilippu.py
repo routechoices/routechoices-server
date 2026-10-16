@@ -9,7 +9,7 @@ from django.conf import settings
 from django_hosts.resolvers import reverse
 
 from routechoices.core.models import Event, EventSet
-from routechoices.lib.helpers import short_random_slug
+from routechoices.lib.helpers import short_random_slug, retry_with_backoff
 
 RASTILIPPU_PREFIX = "RL-"
 RASTILIPPU_WEBHOOK_URL = (
@@ -65,24 +65,21 @@ def update_event_url(event):
     # TODO: check why not 204, log it
 
 
-def sync_courses_data(uuid):
+@retry_with_backoff(
+    retry_on=(requests.exceptions.HTTPError, json.JSONDecodeError)
+)
+def sync_courses_data(event_uuid):
     bundle = EventSet.objects.prefetch_related("events").get(
-        external_metadata__uuid=uuid
+        external_metadata__uuid=event_uuid
     )
-
     r = requests.get(
-        f"{settings.RASTILIPPU_API_ROOT}integration/event/{uuid}/courses",
+        f"{settings.RASTILIPPU_API_ROOT}integration/event/{event_uuid}/courses",
         headers={"X-Authorization-rs": settings.RASTILIPPU_API_KEY},
-        timeout=10,
+        timeout=5,
     )
-    try:
-        r.raise_for_status()
-    except Exception:
-        return
-    try:
-        courses = r.json()
-    except Exception as e:
-        raise Exception(f"{r.status_code}, {r.text}")
+    r.raise_for_status()
+    courses = r.json()
+    
     course_data_by_id = {c.get("id"): c for c in courses}
     # Remove courses that do not exists anymore
     existing_events = bundle.events.all()

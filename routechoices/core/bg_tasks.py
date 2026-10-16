@@ -134,6 +134,7 @@ def rastilippu_update_event_url(event_id):
     if not rl_update_event_url(event):
         raise Exception("Couldn't reach rastilippu service")
 
+
 @background(schedule=0)
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)

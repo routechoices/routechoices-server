@@ -9,6 +9,7 @@ from .helpers import (
     check_dns_records,
     get_device_name,
     get_image_mime_from_request,
+    retry_with_backoff,
     simplify_periods,
 )
 from .kmz import extract_ground_overlays_info
@@ -100,6 +101,32 @@ class PlausibleTestCase(TestCase):
 
 
 class HelperTestCase(TestCase):
+    @patch("routechoices.lib.helpers.time.sleep")
+    def test_retry_with_backoff_retries_configured_errors(self, mock_sleep):
+        action = Mock(side_effect=[ValueError("temporary"), "ok"])
+
+        @retry_with_backoff(retry_on=(ValueError,), max_retries=2)
+        def run_action():
+            return action()
+
+        self.assertEqual(run_action(), "ok")
+        self.assertEqual(action.call_count, 2)
+        mock_sleep.assert_called_once_with(1)
+
+    @patch("routechoices.lib.helpers.time.sleep")
+    def test_retry_with_backoff_does_not_retry_other_errors(self, mock_sleep):
+        action = Mock(side_effect=RuntimeError("permanent"))
+
+        @retry_with_backoff(retry_on=(ValueError,), max_retries=3)
+        def run_action():
+            return action()
+
+        with self.assertRaises(RuntimeError):
+            run_action()
+
+        action.assert_called_once()
+        mock_sleep.assert_not_called()
+
     def test_check_dns(self):
         self.assertTrue(check_dns_records("where.rapha.run"))
         self.assertFalse(check_dns_records("doesnotexist.kiilat.com"))

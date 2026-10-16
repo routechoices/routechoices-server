@@ -10,6 +10,7 @@ import time
 import urllib
 import zoneinfo
 from datetime import datetime
+from functools import wraps
 from math import cos, pi, sin, sqrt
 
 import reverse_geocode
@@ -691,23 +692,24 @@ def triangle_area(side_length):
     return (((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c)) ** 0.5) / 4
 
 
-def retry_with_backoff(func, *args, **kwargs):
-    result = None
-    max_retries = 3
-    if kwargs.get("max_retries"):
-        max_retries = kwargs.pop("max_retries")
-    attempt = 0
-    while attempt < max_retries:
-        last_exception = None
-        try:
-            result = func(*args, **kwargs)
-        except Exception as e:
-            last_exception = e
-        else:
-            return result
-        time.sleep(2**attempt)
-        attempt += 1
-    raise last_exception
+def retry_with_backoff(*, retry_on, max_retries=3):
+    if max_retries < 1:
+        raise ValueError("max_retries must be at least 1")
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except retry_on:
+                    if attempt == max_retries - 1:
+                        raise
+                    time.sleep(2**attempt)
+
+        return wrapper
+
+    return decorator
 
 
 def validate_cf_turnstile(token, remoteip=None):
