@@ -121,7 +121,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "routechoices.core.ACMEAwareSSLRedirectMiddleware",
+    "routechoices.core.middleware.ACMEAwareSSLRedirectMiddleware",
     "routechoices.core.middleware.XForwardedForMiddleware",
     "routechoices.core.middleware.FilterCountriesIPsMiddleware",
     "routechoices.core.middleware.HostsRequestMiddleware",
