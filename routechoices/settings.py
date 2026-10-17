@@ -318,12 +318,16 @@ CSP_CHILD_SRC = ("'self'", "blob:")
 CSRF_USE_SESSIONS = True
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
-SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 31536000
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+# Disable the global built-in redirect
+SECURE_SSL_REDIRECT = False
+# Keep your HSTS settings active
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_SSL_REDIRECT = True
-SECURE_REDIRECT_EXEMPT = [r"^\.well-known/acme-challenge/.+$"]
+
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 PERMISSIONS_POLICY = {
     "accelerometer": [],
