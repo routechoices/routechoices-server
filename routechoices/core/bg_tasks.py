@@ -126,6 +126,7 @@ def rastilippu_update_event_url(event_id):
 @background(schedule=0)
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)
+    print(f"Provisining certificate for {club.name}")
     keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
     if keyfile.exists():
         raise ValueError(f'Certificate for the domain "{domain}" already exists')
@@ -142,7 +143,6 @@ def provision_ssl_certificate(domain):
     )
 
     certificate = client.get_certificate()
-    keyfile.unlink()
 
     cert_key = client.cert_key
 
@@ -157,4 +157,3 @@ def provision_ssl_certificate(domain):
     os.chmod(cert_key_filename, 0o600)
 
     write_nginx_ssl_conf(domain)
-

@@ -28,7 +28,7 @@ function RCEvent(infoURL, clockURL, locale) {
 	let rasterMapLayer;
 	let mapOpacity = 1;
 	const metersInMile = 1609.344;
-
+	let hasData = false;
 	let prefUnit = "metric";
 
 	let isRealTime = true;
@@ -2348,7 +2348,8 @@ function RCEvent(infoURL, clockURL, locale) {
 		})
 			.then((r) => r.json())
 			.then((response) => {
-				if (!response?.competitors) {
+				const hasCompetitors = !!response?.competitors;
+				if (!hasCompetitors) {
 					// Prevent fetching competitor data for 1 second
 					liveDataNextUrl = null;
 					setTimeout(() => {
@@ -2389,6 +2390,12 @@ function RCEvent(infoURL, clockURL, locale) {
 					if (competitor.categories) {
 						for (const tag of competitor.categories) {
 							competitorsTags.add(tag);
+						}
+					}
+					for (const r of Object.values(competitorRoutes)) {
+						if (r) {
+							hasData = true;
+							break;
 						}
 					}
 					if (cb) cb();
