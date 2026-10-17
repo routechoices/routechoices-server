@@ -52,9 +52,9 @@ class Command(BaseCommand):
         if not domains:
             clubs_w_domain = (
                 Club.objects
-                .exclude(domain__isblank=True)
+                .exclude(domain="")
                 .exclude(domain__isnull=True)
-                .exclude(acme_challenge__isblank=True)
+                .exclude(acme_challenge="")
                 .exclude(acme_challenge__isnull=True)
             )
             for club in clubs_w_domain:
