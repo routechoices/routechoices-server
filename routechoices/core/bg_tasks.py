@@ -1,12 +1,13 @@
-import re
 import os
+import re
 import urllib.parse
-
-from background_task import background
 from pathlib import Path
 
+import sewer.client
+from background_task import background
 from django.conf import settings
 from django.template.loader import render_to_string
+from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club, Event
 from routechoices.lib.helpers import check_dns_records
@@ -23,17 +24,6 @@ from routechoices.lib.ssl_certificates import (
     write_account_ssl_key,
 )
 
-import sewer.client
-from sewer.crypto import AcmeAccount, AcmeKey
-
-
-def write_nginx_conf(domain):
-    conf_file = render_to_string(
-        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
-    )
-    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
-        conf_file
-    )
 
 class EventImportError(Exception):
     pass
@@ -132,23 +122,20 @@ def import_single_event_from_livelox(event_id, club=None):
 def rastilippu_update_event_url(event_id):
     event = Event.objects.select_related("club", "event_set").get(id=event_id)
     if not rl_update_event_url(event):
-        raise Exception("Couldn't reach rastilippu service")
+        raise OSError("Couldn't reach rastilippu service")
 
 
 @background(schedule=0)
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)
-    if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").exists():
-        print(f'Certificate creation for the domain "{domain}" already in progress')
-        return
-    if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
-        print(f'Certificate for the domain "{domain}" already exists')
-        return
-    if not check_dns_records(domain):
-        print(f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore')
-        club.domain = ""
-        club.save()
-        return
+    lockfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock")
+    keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
+    if lockfile.exists():
+        raise ValueError(
+            f'Certificate creation for the domain "{domain}" already in progress…'
+        )
+    if keyfile.exists():
+        raise ValueError(f'Certificate for the domain "{domain}" already exists')
 
     acct_key = AcmeAccount.create("secp256r1")
     write_account_ssl_key(domain, acct_key)
@@ -161,9 +148,16 @@ def provision_ssl_certificate(domain):
         contact_email="raphael@routechoices.com",
     )
 
-    Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").touch()
+    if not check_dns_records(domain):
+        club.domain = ""
+        club.save()
+        raise (
+            f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore'
+        )
+
+    lockfile.touch()
     certificate = client.get_certificate()
-    Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
+    keyfile.unlink()
 
     cert_key = client.cert_key
 
@@ -176,4 +170,9 @@ def provision_ssl_certificate(domain):
 
     cert_key.write_pem(cert_key_filename)
     os.chmod(cert_key_filename, 0o600)
-    write_nginx_conf(domain)
+
+    conf_file_data = render_to_string(
+        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    conf_file = Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf")
+    conf_file.write_text(conf_file_data)
