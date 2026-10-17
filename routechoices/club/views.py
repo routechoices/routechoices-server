@@ -458,7 +458,7 @@ def event_map_thumbnail(request, slug, extension=None):
 
 
 @x_robots_tag
-def acme_challenge(request, challenge):
+def acme_challenge(request, challenge, check):
     if not request.use_cname:
         raise Http404()
     club_slug = request.club_slug

@@ -73,7 +73,7 @@ urlpatterns = [
         name="club_favicon",
     ),
     re_path(
-        r"\.well-known/acme-challenge/(?P<challenge>.+)$",
+        r"\.well-known/acme-challenge/(?P<challenge>[^.]+)\.(?P<check>.+)$",
         views.acme_challenge,
         name="acme_challenge",
     ),
