@@ -135,10 +135,10 @@ body {
 }
 
 .time_bar {
-	position: absolute;
+	position: fixed;
 	padding-top: 5px;
-	bottom: 0px;
-	left: 0px;
+	bottom: 0;
+	left: 0;
 	height: calc(var(--footer-size) + var(--ctrl-height));
 	background-color: var(--bs-secondary-bg);
 	border-top: 1px solid rgba(0, 0, 0, 0.125);
@@ -469,4 +469,12 @@ body {
 
 .logo {
 	background-color: rgba(255, 255, 255, 0.7);
+}
+
+body {
+	position: fixed;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
 }

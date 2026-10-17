@@ -1233,7 +1233,11 @@ function RCEvent(infoURL, clockURL, locale) {
 			.catch((e) => {
 				console.log(e);
 				u("#loading-event-modal").remove();
-				swal({ text: "Something went wrong: " + e, title: "error", type: "error" });
+				swal({
+					text: "Something went wrong: " + e,
+					title: "error",
+					type: "error",
+				});
 			});
 	})();
 
@@ -2334,7 +2338,7 @@ function RCEvent(infoURL, clockURL, locale) {
 		targetURL += fetchDataUrlSuffix;
 		const headers = {};
 		if (window.local.token) {
-			 headers["authorization"] = `Bearer ${window.local.token}`;
+			headers["authorization"] = `Bearer ${window.local.token}`;
 		}
 		fetch(targetURL, {
 			method: "GET",
@@ -2387,7 +2391,7 @@ function RCEvent(infoURL, clockURL, locale) {
 							competitorsTags.add(tag);
 						}
 					}
-				 if (cb) cb();
+					if (cb) cb();
 				}
 				updateCompetitorList(response.competitors);
 				displayCompetitorList();
@@ -2403,7 +2407,7 @@ function RCEvent(infoURL, clockURL, locale) {
 				setTimeout(() => {
 					isCurrentlyFetchingRoutes = false;
 				}, 1000);
-			})
+			});
 	}
 
 	function zoomOnCompetitor(competitor) {
