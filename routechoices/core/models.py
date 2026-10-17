@@ -21,8 +21,6 @@ import gpxpy.gpx
 import magic
 import numpy as np
 import orjson as json
-
-import sewer.client
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
@@ -369,7 +367,8 @@ class Club(models.Model):
         blank=True,
         default="",
         validators=[
-            validate_domain_name,],
+            validate_domain_name,
+        ],
     )
     acme_challenge = models.CharField(max_length=128, blank=True)
     website = models.URLField(max_length=200, blank=True)
@@ -450,8 +449,10 @@ class Club(models.Model):
             if created:
                 self.analytics_site = analytics_site
         super().save(*args, **kwargs)
-        if self.domain:
+        self.refresh_from_db()
+        if self.domain != "":
             from .bg_tasks import provision_ssl_certificate
+
             provision_ssl_certificate(self.domain.lower())
 
     def is_admin(self, user):
@@ -496,7 +497,7 @@ class Club(models.Model):
         cert_path = os.path.join(
             settings.BASE_DIR, "nginx", "certs", f"{self.domain}.crt"
         )
-        return self.domain and os.path.exists(cert_path)   
+        return self.domain and os.path.exists(cert_path)
 
     @property
     def url_protocol(self):
