@@ -8,7 +8,7 @@ from background_task import background
 from django.conf import settings
 from sewer.crypto import AcmeAccount, AcmeKey
 
-from routechoices.core.models import Club, Event
+from routechoices.core.models import Club, Event, write_nginx_ssl_conf
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
 from routechoices.lib.other_gps_services.loggator import Loggator
@@ -155,4 +155,6 @@ def provision_ssl_certificate(domain):
 
     cert_key.write_pem(cert_key_filename)
     os.chmod(cert_key_filename, 0o600)
+
+    write_nginx_ssl_conf(domain)
 

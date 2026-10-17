@@ -120,9 +120,18 @@ GLOBAL_MERCATOR = GlobalMercator()
 from django.template.loader import render_to_string
 def write_nginx_conf(domain):
     conf_file = render_to_string(
-        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+        "nginx_domain_ssl.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
     )
     Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
+        conf_file
+    )
+
+
+def write_nginx_ssl_conf(domain):
+    conf_file = render_to_string(
+        "nginx_domain_ssl.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.ssl.conf").write_text(
         conf_file
     )
 

@@ -2,7 +2,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand
 
-from routechoices.core.models import Club, write_nginx_conf
+from routechoices.core.models import Club, write_nginx_conf, write_nginx_ssl_conf
 
 
 class Command(BaseCommand):
@@ -28,6 +28,7 @@ class Command(BaseCommand):
                 self.stderr.write(f"No club with this domain ({domain})")
                 continue
             write_nginx_conf(domain)
+            write_nginx_ssl_conf(domain)
             nginx_need_restart = True
         # TODO: erase extra leftover configs
         if nginx_need_restart:
