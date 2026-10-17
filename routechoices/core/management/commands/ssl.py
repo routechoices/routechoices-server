@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from sewer.crypto import AcmeAccount, AcmeKey
 
-from routechoices.core.bg_tasks import provision_ssl_certificate
 from routechoices.core.models import Club
 from routechoices.lib.helpers import check_dns_records
 from routechoices.lib.ssl_certificates import (
@@ -98,6 +97,7 @@ class Command(BaseCommand):
                 club.save()
                 continue
 
+            from routechoices.core.bg_tasks import provision_ssl_certificate
             provision_ssl_certificate(domain).now()
             nginx_need_restart = True
         
