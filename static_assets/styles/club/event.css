@@ -279,8 +279,9 @@ body {
 .modal-backdrop,
 #future-event-modal,
 #loading-event-modal,
+#no-data-modal,
 #color-modal {
-	top: var(--navbar-size);
+	top: calc(var(--navbar-size));
 }
 
 .navbar {

@@ -13,6 +13,7 @@ function RCEvent(infoURL, clockURL, locale) {
 	let panControl;
 	let zoomControl;
 	let rotateControl;
+	let noDataModal;
 	// let scaleControl;
 	let runnerIconScale = 1;
 	let isLive = false;
@@ -913,7 +914,10 @@ function RCEvent(infoURL, clockURL, locale) {
 		if (urlParams.get("embedded")) {
 			u("#event-navbar").addClass("d-none");
 		}
-
+		noDataModal = new bootstrap.Modal(
+			document.getElementById("no-data-modal"),
+			{ backdrop: "static", keyboard: false },
+		);
 		window.addEventListener("resize", onAppResize);
 		window.addEventListener("fullscreenchange", () => {
 			onAppResize();
@@ -2392,11 +2396,23 @@ function RCEvent(infoURL, clockURL, locale) {
 							competitorsTags.add(tag);
 						}
 					}
+					hasData = false;
 					for (const r of Object.values(competitorRoutes)) {
 						if (r) {
 							hasData = true;
 							break;
 						}
+					}
+					if (!hasData) {
+						noDataModal.show();
+						if (isLiveEvent && eventEnd >= clock.now()) {
+							u("#wait-for-data-text").text("Waiting for data...");
+						} else {
+							u("#wait-for-data-text").text("No GPS data...");
+						}
+					} else {
+						noDataModal.hide();
+						u("#loading-modal").remove();
 					}
 					if (cb) cb();
 				}
@@ -3405,6 +3421,8 @@ function RCEvent(infoURL, clockURL, locale) {
 						}
 					}
 				}
+			} else {
+				competitor.odometer.textContent = "NO DATA";
 			}
 		}
 		// Create cluster
@@ -3511,6 +3529,11 @@ function RCEvent(infoURL, clockURL, locale) {
 	const locale = urlLanguage || storedLanguage || browserLanguage || "en";
 	document.documentElement.setAttribute("lang", locale);
 	dayjs.locale(locale);
+	document
+		.getElementById("no-data-modal")
+		.addEventListener("hide.bs.modal", (e) => {
+			e.preventDefault();
+		});
 	updateText(locale).then(() => {
 		u("#export-text").text(banana.i18n("export"));
 		u("#event-start-list-link").text(banana.i18n("start-list"));
