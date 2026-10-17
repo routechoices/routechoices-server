@@ -520,11 +520,12 @@ def delete_domain(domain):
         settings.BASE_DIR, "nginx", "custom_domains", f"{domain}.conf"
     )
     crt_file = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.crt")
+    lck_file = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.lock")
     key_file = os.path.join(settings.BASE_DIR, "nginx", "certs", f"{domain}.key")
     act_file = os.path.join(
         settings.BASE_DIR, "nginx", "certs", "accounts", f"{domain}.key"
     )
-    for file in (ngx_conf, crt_file, key_file, act_file):
+    for file in (ngx_conf, lck_file, crt_file, key_file, act_file):
         if os.path.exists(file):
             os.remove(file)
 

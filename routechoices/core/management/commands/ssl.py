@@ -10,6 +10,7 @@ from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from sewer.crypto import AcmeAccount, AcmeKey
 
+from routechoices.core.bg_tasks import provision_ssl_certificate
 from routechoices.core.models import Club
 from routechoices.lib.helpers import check_dns_records
 from routechoices.lib.ssl_certificates import (
@@ -57,20 +58,26 @@ class Command(BaseCommand):
         nginx_need_restart = False
         domains = options["domains"]
         if not domains:
-            clubs_w_domain = Club.objects.exclude(domain="").exclude(
-                domain__isnull=True
+            clubs_w_domain = (
+                Club.objects
+                .exclude(domain__isblank=True)
+                .exclude(domain__isnull=True)
+                .exclude(acme_challenge__isblank=True)
+                .exclude(acme_challenge__isnull=True)
             )
             for club in clubs_w_domain:
                 domain = club.domain
-                if (
-                    not Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists()
-                    and not Path(
+                lock_file = Path(
                         f"{settings.BASE_DIR}/nginx/certs/{domain}.lock"
-                    ).exists()
-                ):
-                    domains.append(domain)
+                    )
+                key_file = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
+
+                if (key_file.exists() or lock_file.exists()):
+                    continue
+                domains.append(domain)
             if not domains:
                 self.stderr.write("No clubs require certificates")
+        
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
@@ -90,44 +97,8 @@ class Command(BaseCommand):
                 club.domain = ""
                 club.save()
                 continue
-            
-            try:
-                acct_key = AcmeAccount.create("secp256r1")
-                write_account_ssl_key(domain, acct_key)
-            except Exception as e:
-                print(f"Could not generate account key ({str(e)})")
 
-            client = sewer.client.Client(
-                domain_name=domain,
-                provider=ClubAcmeProvider(club),
-                account=acct_key,
-                cert_key=AcmeKey.create("secp256r1"),
-                is_new_acct=True,
-                contact_email="raphael@routechoices.com",
-            )
-
-            Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").touch()
-            try:
-                certificate = client.get_certificate()
-            except Exception as e:
-                self.stderr.write(f"Failed to create certificate... ({str(e)})")
-                continue
-            finally:
-                Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").unlink()
-
-            cert_key = client.cert_key
-
-            cert_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.crt")
-            cert_key_filename = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
-
-            with open(cert_filename, "w", encoding="ascii") as fp:
-                fp.write(certificate)
-            os.chmod(cert_filename, 0o600)
-
-            cert_key.write_pem(cert_key_filename)
-            os.chmod(cert_key_filename, 0o600)
-
-            write_nginx_conf(domain)
+            provision_ssl_certificate(domain).now()
             nginx_need_restart = True
         
         if nginx_need_restart:

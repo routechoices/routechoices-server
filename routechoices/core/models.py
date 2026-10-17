@@ -13,9 +13,9 @@ from operator import itemgetter
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
-from routechoices.lib.helpers import check_dns_records
-from pathlib import Path
+from routechoices.core.management.commands.ssl import write_nginx_conf
 
+from django.template.loader import render_to_string
 import cv2
 import flag
 import gps_data_codec
@@ -428,13 +428,17 @@ class Club(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk:
+            self.domain = (self.domain or "").upper().lower()
             pre_save_self = Club.objects.get(pk=self.pk)
             if (
-                (requested_domain := self.domain.upper().lower())
-                and (pre_save_domain := pre_save_self.domain.upper().lower())
+                (requested_domain := self.domain)
+                and (pre_save_domain := pre_save_self.domain)
                 and requested_domain != pre_save_domain
             ):
                 delete_domain(pre_save_domain)
+                if requested_domain:
+                    write_nginx_conf(requested_domain)
+
             if pre_save_self.slug != self.slug:
                 self.slug_changed_from = pre_save_self.slug
                 self.slug_changed_at = now()
@@ -452,18 +456,6 @@ class Club(models.Model):
             if created:
                 self.analytics_site = analytics_site
         super().save(*args, **kwargs)
-        self.refresh_from_db()
-        if self.domain != "":
-            from .bg_tasks import provision_ssl_certificate
-            domain = self.domain
-            lockfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock")
-            keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
-            if not lockfile.exists() and not keyfile.exists():
-                if not check_dns_records(domain):
-                    self.domain = ""
-                    super().save(*args, **kwargs)
-                else:
-                    provision_ssl_certificate(self.domain.lower())
 
     def is_admin(self, user):
         return user.is_authenticated and self.admins.filter(id=user.id).exists()
