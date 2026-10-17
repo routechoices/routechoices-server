@@ -148,6 +148,11 @@ def provision_ssl_certificate(domain):
     )
 
     lockfile.touch()
+    conf_file_data = render_to_string(
+        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    conf_file = Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf")
+    conf_file.write_text(conf_file_data)
     certificate = client.get_certificate()
     keyfile.unlink()
 
@@ -163,8 +168,3 @@ def provision_ssl_certificate(domain):
     cert_key.write_pem(cert_key_filename)
     os.chmod(cert_key_filename, 0o600)
 
-    conf_file_data = render_to_string(
-        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
-    )
-    conf_file = Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf")
-    conf_file.write_text(conf_file_data)
