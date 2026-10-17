@@ -91,7 +91,7 @@ class Command(BaseCommand):
                 continue
 
             from routechoices.core.bg_tasks import provision_ssl_certificate
-            provision_ssl_certificate(domain).now()
+            provision_ssl_certificate.now(domain)
             nginx_need_restart = True
         
         if nginx_need_restart:
