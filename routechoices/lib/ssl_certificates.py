@@ -1,5 +1,6 @@
 import os
 import os.path
+import json
 
 import arrow
 from cryptography import x509
@@ -70,7 +71,15 @@ class ClubAcmeProvider(ProviderBase):
         self.chal_type = "http-01"
 
     def setup(self, challenges):
-        self.club.acme_challenge = challenges[0]["key_auth"]
+        challenges_dict = {}
+        
+        # Loop through ALL challenges provided by the ACME client
+        for chal in challenges:
+            token = chal["token"]
+            key_auth = chal["key_auth"]
+            challenges_dict[token] = key_auth
+
+        self.club.acme_challenge = json.dumps(challenges_dict)
         self.club.save()
         return []
 
@@ -78,6 +87,11 @@ class ClubAcmeProvider(ProviderBase):
         return []
 
     def clear(self, challenges):
-        self.club.acme_challenge = ""
+        # Clear only the tokens that were handled in this session
+        challenges_dict = json.loads(self.club.acme_challenge or "{}")
+        if challenges_dict:
+            for chal in challenges:
+                challenges_dict.pop(chal["token"], None)
+        self.club.acme_challenge = json.dumps(challenges_dict)
         self.club.save()
         return []
