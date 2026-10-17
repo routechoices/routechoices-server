@@ -2396,26 +2396,27 @@ function RCEvent(infoURL, clockURL, locale) {
 							competitorsTags.add(tag);
 						}
 					}
-					hasData = false;
-					for (const r of Object.values(competitorRoutes)) {
-						if (r) {
-							hasData = true;
-							break;
-						}
-					}
-					if (!hasData) {
-						noDataModal.show();
-						if (isLiveEvent && eventEnd >= clock.now()) {
-							u("#wait-for-data-text").text("Waiting for data...");
-						} else {
-							u("#wait-for-data-text").text("No GPS data...");
-						}
-					} else {
-						noDataModal.dispose();
-						u("#loading-modal").remove();
-					}
-					if (cb) cb();
 				}
+				hasData = false;
+				for (const r of Object.values(competitorRoutes)) {
+					if (r) {
+						hasData = true;
+						break;
+					}
+				}
+				if (!hasData) {
+					noDataModal.show();
+					if (isLiveEvent && eventEnd >= clock.now()) {
+						u("#wait-for-data-text").text("Waiting for data...");
+					} else {
+						u("#wait-for-data-text").text("No GPS data...");
+					}
+				} else {
+					noDataModal.dispose();
+					u("#loading-modal").remove();
+				}
+				
+			 if (cb) cb();
 				updateCompetitorList(response.competitors);
 				displayCompetitorList();
 				routesLastFetched = performance.now();
