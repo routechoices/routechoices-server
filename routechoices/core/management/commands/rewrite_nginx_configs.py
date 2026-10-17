@@ -22,7 +22,7 @@ class Command(BaseCommand):
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
-                self.stderr.write("No club with this domain")
+                self.stderr.write(f"No club with this domain ({domain})")
                 continue
             write_nginx_conf(domain)
             nginx_need_restart = True
