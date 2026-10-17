@@ -390,7 +390,7 @@ class Club(models.Model):
             validate_domain_name,
         ],
     )
-    acme_challenge = models.CharField(max_length=128, blank=True)
+    acme_challenge = models.CharField(max_length=1024, blank=True)
     website = models.URLField(max_length=200, blank=True)
     logo = models.ImageField(
         upload_to=logo_upload_path,
