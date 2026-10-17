@@ -59,12 +59,8 @@ class Command(BaseCommand):
             )
             for club in clubs_w_domain:
                 domain = club.domain
-                lock_file = Path(
-                        f"{settings.BASE_DIR}/nginx/certs/{domain}.lock"
-                    )
                 key_file = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
-
-                if (key_file.exists() or lock_file.exists()):
+                if key_file.exists():
                     continue
                 domains.append(domain)
             if not domains:

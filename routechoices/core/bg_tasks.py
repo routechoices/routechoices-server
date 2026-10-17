@@ -126,12 +126,7 @@ def rastilippu_update_event_url(event_id):
 @background(schedule=0)
 def provision_ssl_certificate(domain):
     club = Club.objects.get(domain=domain)
-    lockfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock")
     keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
-    if lockfile.exists():
-        raise ValueError(
-            f'Certificate creation for the domain "{domain}" already in progress…'
-        )
     if keyfile.exists():
         raise ValueError(f'Certificate for the domain "{domain}" already exists')
 
@@ -146,7 +141,6 @@ def provision_ssl_certificate(domain):
         contact_email="noreply@routechoices.com",
     )
 
-    lockfile.touch()
     certificate = client.get_certificate()
     keyfile.unlink()
 
