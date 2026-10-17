@@ -458,7 +458,7 @@ class Club(models.Model):
             domain = self.domain
             lockfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock")
             keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
-            if not lockfile.exists() and not keyfile.exists()
+            if not lockfile.exists() and not keyfile.exists():
                 if not check_dns_records(domain):
                     self.domain = ""
                     super().save(*args, **kwargs)
