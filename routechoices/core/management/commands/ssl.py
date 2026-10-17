@@ -54,8 +54,6 @@ class Command(BaseCommand):
                 Club.objects
                 .exclude(domain="")
                 .exclude(domain__isnull=True)
-                .exclude(acme_challenge="")
-                .exclude(acme_challenge__isnull=True)
             )
             for club in clubs_w_domain:
                 domain = club.domain
