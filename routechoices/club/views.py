@@ -458,14 +458,16 @@ def event_map_thumbnail(request, slug, extension=None):
 
 
 @x_robots_tag
-def acme_challenge(request, challenge):
+def acme_challenge(request, token):
     if not request.use_cname:
         raise Http404()
     club_slug = request.club_slug
     club = get_object_or_404(Club.objects.exclude(domain=""), slug__iexact=club_slug)
-    if challenge == club.acme_challenge.partition(".")[0]:
-        return HttpResponse(club.acme_challenge)
-    raise Http404()
+
+    key_auth = club.acme_challenges.get(token)
+    if not key_auth:
+        return HttpResponse(status=404)
+    return HttpResponse(key_auth, content_type="text/plain")
 
 
 def robots_txt(request):

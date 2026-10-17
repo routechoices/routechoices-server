@@ -478,6 +478,10 @@ class Club(models.Model):
         return user.is_authenticated and self.admins.filter(id=user.id).exists()
 
     @property
+    def acme_challenges(self):
+        return json.loads(self.acme_challenge or "{}")
+
+    @property
     def free_trial_end(self):
         return self.creation_date + timedelta(days=2)
 
