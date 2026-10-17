@@ -13,6 +13,9 @@ from operator import itemgetter
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
+from routechoices.lib.helpers import check_dns_records
+from pathlib import Path
+
 import cv2
 import flag
 import gps_data_codec
@@ -452,8 +455,15 @@ class Club(models.Model):
         self.refresh_from_db()
         if self.domain != "":
             from .bg_tasks import provision_ssl_certificate
-
-            provision_ssl_certificate(self.domain.lower())
+            domain = self.domain
+            lockfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock")
+            keyfile = Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key")
+            if not lockfile.exists() and not keyfile.exists()
+                if not check_dns_records(domain):
+                    self.domain = ""
+                    super().save(*args, **kwargs)
+                else:
+                    provision_ssl_certificate(self.domain.lower())
 
     def is_admin(self, user):
         return user.is_authenticated and self.admins.filter(id=user.id).exists()

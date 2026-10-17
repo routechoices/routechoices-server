@@ -10,7 +10,6 @@ from django.template.loader import render_to_string
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club, Event
-from routechoices.lib.helpers import check_dns_records
 from routechoices.lib.other_gps_services.gpsseuranta import GpsSeurantaNet
 from routechoices.lib.other_gps_services.livelox import Livelox
 from routechoices.lib.other_gps_services.loggator import Loggator
@@ -147,13 +146,6 @@ def provision_ssl_certificate(domain):
         is_new_acct=True,
         contact_email="raphael@routechoices.com",
     )
-
-    if not check_dns_records(domain):
-        club.domain = ""
-        club.save()
-        raise (
-            f'DNS Record for domain "{domain}" is not pointing to cname.routechoices.com anymore'
-        )
 
     lockfile.touch()
     certificate = client.get_certificate()
