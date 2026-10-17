@@ -2,8 +2,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand
 
-from routechoices.core.management.commands.ssl import write_nginx_conf
-from routechoices.core.models import Club
+from routechoices.core.models import Club, write_nginx_conf
 
 
 class Command(BaseCommand):

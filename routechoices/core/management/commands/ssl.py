@@ -7,7 +7,7 @@ from pathlib import Path
 import sewer.client
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.template.loader import render_to_string
+
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
@@ -18,13 +18,6 @@ from routechoices.lib.ssl_certificates import (
     read_account_ssl_key,
     write_account_ssl_key,
 )
-def write_nginx_conf(domain):
-    conf_file = render_to_string(
-        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
-    )
-    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
-        conf_file
-    )
 
 
 class Command(BaseCommand):

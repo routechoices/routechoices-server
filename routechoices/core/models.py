@@ -13,8 +13,6 @@ from operator import itemgetter
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
-from routechoices.core.management.commands.ssl import write_nginx_conf
-
 from django.template.loader import render_to_string
 import cv2
 import flag
@@ -117,6 +115,16 @@ BOTTOM_LEFT = 3
 TAGS_SEPARATOR = "\u2063"
 
 GLOBAL_MERCATOR = GlobalMercator()
+
+
+from django.template.loader import render_to_string
+def write_nginx_conf(domain):
+    conf_file = render_to_string(
+        "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
+    )
+    Path(f"{settings.BASE_DIR}/nginx/custom_domains/{domain}.conf").write_text(
+        conf_file
+    )
 
 
 class TooEarly(Exception):
