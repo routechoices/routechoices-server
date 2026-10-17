@@ -72,10 +72,6 @@ class Command(BaseCommand):
                 self.stderr.write("No club with this domain")
                 continue
 
-            if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.lock").exists():
-                self.stderr.write("Certificate creation for this domain in progress")
-                continue
-
             if Path(f"{settings.BASE_DIR}/nginx/certs/{domain}.key").exists():
                 self.stderr.write("Certificate for this domain already exists")
                 continue
