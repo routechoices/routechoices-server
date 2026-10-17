@@ -2411,7 +2411,7 @@ function RCEvent(infoURL, clockURL, locale) {
 							u("#wait-for-data-text").text("No GPS data...");
 						}
 					} else {
-						noDataModal.hide();
+						noDataModal.dispose();
 						u("#loading-modal").remove();
 					}
 					if (cb) cb();
