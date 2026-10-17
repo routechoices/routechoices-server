@@ -144,7 +144,7 @@ def provision_ssl_certificate(domain):
         account=acct_key,
         cert_key=AcmeKey.create("secp256r1"),
         is_new_acct=True,
-        contact_email="raphael@routechoices.com",
+        contact_email="noreply@routechoices.com",
     )
 
     lockfile.touch()
