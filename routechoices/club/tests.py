@@ -433,7 +433,7 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.club.acme_challenge = "hello.world"
+        self.club.acme_challenge = '{"hello": "hello.world}'
         self.club.save()
         response = client.get("/.well-known/acme-challenge/hello")
         self.assertEqual(response.content, b"hello.world")
