@@ -14,11 +14,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         nginx_need_restart = False
+        
         domains = options["domains"]
+        
         if not domains:
             domains = Club.objects.exclude(domain="")
             if not domains:
                 self.stderr.write("No clubs have setup custom domain")
+        
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
