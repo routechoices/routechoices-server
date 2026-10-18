@@ -22,8 +22,9 @@
                     <i class="fa-solid fa-floppy-disk"></i> <span>Save</span>
                 </button>
                 {% if context == 'edit' %}
-                    <a href="{% url 'dashboard_club:device:delete_view' device_id=ownership.device.aid club_slug=request.club.slug %}"
-                       class="btn btn-danger dashboard-link"><i class="fa-solid fa-trash"></i> <span>Delete</span></a>
+                    <a href="{% url 'dashboard_club:device:delete_view' device_id=ownership.device.aid club_slug=request.club.slug %}" class="btn btn-danger dashboard-link">
+                       <i class="fa-solid fa-trash"></i> <span>Delete</span>
+                    </a>
                 {% endif %}
             </form>
         </div>

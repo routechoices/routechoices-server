@@ -36,8 +36,9 @@
                     <i class="fa-solid fa-floppy-disk" ></i> <span>Save</span>
                 </button>
                 {% if context == 'edit' %}
-                    <a href="{% url 'dashboard_club:event_set:delete_view' event_set_id=event_set.aid club_slug=request.club.slug %}"
-                       class="btn btn-danger dashboard-link {% if event_set.external_id %}disabled{% endif %}"><i class="fa-solid fa-trash"></i> <span>Delete</span></a>
+                    <a href="{% url 'dashboard_club:event_set:delete_view' event_set_id=event_set.aid club_slug=request.club.slug %}" class="btn btn-danger dashboard-link {% if event_set.external_id %}disabled{% endif %}">
+                        <i class="fa-solid fa-trash"></i> <span>Delete</span>
+                    </a>
                 {% endif %}
             </form>
         </div>

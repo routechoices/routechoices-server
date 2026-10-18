@@ -87,8 +87,9 @@
                         <i class="fa-solid fa-floppy-disk"></i> <span>Save</span>
                     </button>
                     {% if map.id %}
-                        <a href="{% url 'dashboard_club:map:delete_view' map_id=map.aid club_slug=request.club.slug %}{% if event %}?next={% url 'dashboard_club:event:map_edit_view' event_id=event.aid club_slug=request.club.slug %}{% endif %}"
-                        class="btn btn-danger dashboard-link"><i class="fa-solid fa-trash"></i> <span>Delete</span></a>
+                        <a href="{% url 'dashboard_club:map:delete_view' map_id=map.aid club_slug=request.club.slug %}{% if event %}?next={% url 'dashboard_club:event:map_edit_view' event_id=event.aid club_slug=request.club.slug %}{% endif %}" class="btn btn-danger dashboard-link">
+                            <i class="fa-solid fa-trash"></i> <span>Delete</span>
+                        </a>
                     {% endif %}
                 </form>
             </div>

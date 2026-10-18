@@ -10,10 +10,10 @@ from array import array
 from datetime import timedelta
 from io import BytesIO
 from operator import itemgetter
+from pathlib import Path
 from urllib.parse import urlparse
 from zipfile import ZipFile
-from pathlib import Path
-from django.template.loader import render_to_string
+
 import cv2
 import flag
 import gps_data_codec
@@ -117,7 +117,6 @@ TAGS_SEPARATOR = "\u2063"
 GLOBAL_MERCATOR = GlobalMercator()
 
 
-from django.template.loader import render_to_string
 def write_nginx_conf(domain):
     conf_file = render_to_string(
         "nginx_domain.conf", {"base_dir": settings.BASE_DIR, "domain": domain}
@@ -516,19 +515,19 @@ class Club(models.Model):
         return f"{self.slug}.{settings.PARENT_HOST}"
 
     @property
+    def url_protocol(self):
+        return "https"
+
+    @property
     def has_ssl_certificate(self):
         cert_path = os.path.join(
             settings.BASE_DIR, "nginx", "certs", f"{self.domain}.crt"
         )
         return self.domain and os.path.exists(cert_path)
 
-    @property
-    def url_protocol(self):
-        return "https"
-
     @cached_property
     def nice_url(self):
-        if self.domain and self.has_ssl_certificate:
+        if self.has_ssl_certificate:
             return f"{self.url_protocol}://{self.domain}/"
         path = reverse(
             "club_view", host="clubs", host_kwargs={"club_slug": self.slug.lower()}
