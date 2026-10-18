@@ -1,6 +1,6 @@
 const makeFieldRandomizable = (id) => {
 	u(id)
-		.parent()
+		.parent().addClass("text-nowrap text-end")
 		.find(".form-text")
 		.text("")
 		.append(
