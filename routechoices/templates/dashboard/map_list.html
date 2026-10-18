@@ -38,7 +38,7 @@
                 <table class="table mb-3" style="vertical-align: middle;">
                     <thead>
                         <tr>
-                            <th>Map</th>
+                            <th>Title</th>
                             <th>Download</th>
                             <th>Actions</th>
                         </tr>
@@ -47,7 +47,7 @@
                     {% for map in maps %}
                         <tr class="collapsable">
                             <td>
-                                <button type="button" class="btn btn-primary dashboard-link" disabled><i class="fa-solid fa-map"></i> <span>{{ map.name }}</span></button>
+                                <i class="fa-solid fa-map"></i> <span>{{ map.name }}</span>
                             </td>
                             <td>
                                 {% if map.image %}

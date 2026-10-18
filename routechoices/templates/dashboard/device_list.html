@@ -27,8 +27,8 @@
             <table class="table mb-3">
                 <thead>
                     <tr>
-                        <th><a data-sort-name="device-id">Tracker</a></th>
                         <th><a data-sort-name="nickname">Nickname</a></th>
+                        <th><a data-sort-name="device-id">Tracker</a></th>
                         <th><a data-sort-name="seen">Last Seen</a> & <a data-sort-name="battery">Battery Level</a></th>
                         <th>Actions</th>
                     </tr>
@@ -37,15 +37,15 @@
                     {% for device_ownership in devices %}
                         {% with device=device_ownership.device %}
                             <tr class="collapsable">
-                                <td>
-                                    <button type="button" class="btn copy-btn btn-primary dashboard-link" data-value="{{ device.aid }}">
-                                        <i class="fa-solid fa-mobile"></i> <span>{{ device.aid }}</span>
-                                    </button>
-                                </td>
                                 <td class="{% if not device_ownership.nickname %}no-data{% endif %}" >
                                     {% if device_ownership.nickname %}
                                         <button class="btn btn-info dashboard-link" type="button" disabled><i class="fa-solid fa-at"></i> <span>{{ device_ownership.nickname }}</span></button>
                                     {% endif %}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn copy-btn btn-primary dashboard-link" data-value="{{ device.aid }}">
+                                        <i class="fa-solid fa-mobile"></i> <span>{{ device.aid }}</span>
+                                    </button>
                                 </td>
                                 <td>
                                     {% if device.last_location %}

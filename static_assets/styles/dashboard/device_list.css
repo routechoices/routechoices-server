@@ -24,14 +24,13 @@ th {
 	tr {
 		border: 1px solid #ccc;
 		border-radius: 5px;
-		margin-bottom: 5px;
+		margin-bottom: 15px;
 	}
 
 	.collapsable > td {
 		/* Behave  like a "row" */
 		border: none;
 		position: relative;
-		padding-left: 100px;
 	}
 
 	td:before {
@@ -43,30 +42,6 @@ th {
 		width: 120px;
 		padding-right: 10px;
 		white-space: nowrap;
-	}
-
-	/*
-Label the data
-*/
-	td:nth-of-type(1):before {
-		content: "Tracker";
-		font-weight: bold;
-	}
-	td:nth-of-type(2):before {
-		content: "Nickname";
-		font-weight: bold;
-	}
-	td:nth-of-type(3):before {
-		content: "Last Seen";
-		font-weight: bold;
-	}
-	td:nth-of-type(4):before {
-		content: "Battery %";
-		font-weight: bold;
-	}
-	td:nth-of-type(5):before {
-		content: "Actions";
-		font-weight: bold;
 	}
 }
 

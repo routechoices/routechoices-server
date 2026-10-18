@@ -47,17 +47,20 @@
                         {% for event in events %}
                             <tr class="collapsable">
                                 <td class="{% if not event.event_set %}no-bundle{% endif %}">
-
+                                    <p><i class="fa-solid fa-trophy"></i>
+                                    <span title="{{ event.country_name }}"></span>
+                                    <span>{{ event.name }}</span>
+                                    <a class="external-link" href="{{ event.get_absolute_url }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    </p>
                                     {% if event.event_set %}
+                                    <p>
+                                        <i class="fa-solid fa-folder-open"></i> <span>{{ event.event_set.name }}</span>
                                         {% if event.event_set.create_page %}
-                                        <a class="btn btn-primary dashboard-link external-link btn-sm" href="{{ event.event_set.url }}" ><i class="fa-solid fa-folder-open"></i> <span>{{ event.event_set.name }}</span></a>
-                                        {% else %}
-                                        <button type="button" disabled class="btn btn-primary dashboard-link btn-sm"><i class="fa-solid fa-folder-open"></i> <span>{{ event.event_set.name }}</span></button>
+                                        <a class="external-link" href="{{ event.event_set.url }}" ><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                         {% endif %}
+                                    </p>
                                     {% endif %}
-                                    <a class="btn btn-primary dashboard-link external-link" href="{{ event.get_absolute_url }}" target="_blank">
-                                        <i class="fa-solid fa-trophy"></i> <span title="{{ event.country_name }}"></span> <span>{{ event.name }}</span>
-                                    </a>
+
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-info dashboard-link" disabled>
@@ -73,10 +76,10 @@
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-info dashboard-link" disabled>
-                                        <i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> <span>{{ event.get_privacy_display }}</span>
+                                        <i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}clipboard-user{% endif %}"></i> <span>{{ event.get_privacy_display }}</span>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-info dashboard-link" disabled>{% if event.is_live %}
-                                        <i class="fa-solid fa-bolt"></i> <span>LIVE</span>
+                                        <i class="fa-solid fa-circle"></i> <span>LIVE</span>
                                     {% elif event.ended %}
                                         <i class="fa-solid fa-box-archive"></i> <span>Archived</span>
                                     {% else %}

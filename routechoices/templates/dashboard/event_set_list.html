@@ -32,10 +32,9 @@
                         {% for event_set in event_sets %}
                             <tr class="collapsable">
                                 <td>
+                                    <i class="fa-solid fa-folder-open"></i> <span>{{ event_set.name }}</span>
                                     {% if event_set.create_page %}
-                                    <a class="btn btn-primary dashboard-link external-link" href="{{ event_set.url }}" ><i class="fa-solid fa-folder-open"></i> <span>{{ event_set.name }}</span></a>
-                                    {% else %}
-                                    <button type="button" disabled class="btn btn-primary dashboard-link"><i class="fa-solid fa-folder-open"></i> <span>{{ event_set.name }}</span></button>
+                                    <a class="external-link" href="{{ event_set.url }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                     {% endif %}
                                 </td>
                                 <td><button type="button" class="btn btn-info dashboard dashboard-link" disabled><i class="fa-solid fa-trophy"></i> <span>{{ event_set.events.all.count }}</span></button></td>
