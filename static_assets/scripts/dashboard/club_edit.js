@@ -17,7 +17,7 @@
 			.parent()
 			.find("div div a")
 			.html(
-				`<br/><img alt="Current Banner" height="210" width="400" src="${window.local.clubNiceUrl}banner"/>`,
+				`<br/><img alt="Current Banner" height="210" width="400" style="aspect-ratio: 21/40; max-width: 100%;" src="${window.local.clubNiceUrl}banner"/>`,
 			);
 	}
 
