@@ -86,12 +86,12 @@
                    href="{% url 'dashboard_club:map:list_view' club_slug=request.club.slug %}"><i class="fa-solid fa-map"></i> <span>Maps</span></a>
             </li>
             <li>
-                <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:':21' == 'dashboard_club:event:' %}active{% endif %}"
-                   href="{% url 'dashboard_club:event:list_view' club_slug=request.club.slug %}"><i class="fa-solid fa-trophy"></i> <span>Events</span></a>
-            </li>
-            <li>
                 <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:':25' in 'dashboard_club:event_set:' %}active{% endif %}"
                    href="{% url 'dashboard_club:event_set:list_view' club_slug=request.club.slug %}"><i class="fa-solid fa-folder-open"></i> <span>Bundles</span></a>
+            </li>
+            <li>
+                <a class="flex-sm-fill text-sm-center nav-link {% if request.resolver_match.view_name|slice:':21' == 'dashboard_club:event:' %}active{% endif %}"
+                   href="{% url 'dashboard_club:event:list_view' club_slug=request.club.slug %}"><i class="fa-solid fa-trophy"></i> <span>Events</span></a>
             </li>
         </ul>
         {% block sub_sub_content %}

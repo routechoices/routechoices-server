@@ -101,12 +101,12 @@ class Migration(migrations.Migration):
             name="privacy",
             field=models.CharField(
                 choices=[
-                    ("public", "Published"),
+                    ("public", "Public"),
                     ("secret", "Secret"),
                     ("private", "Staff Only"),
                 ],
                 default="public",
-                help_text="Controls how we show the event, if it is published on our pages, or if it is kept secret while accessible to all, or if it is accessible only to its authenticated club staff members.",
+                help_text="Controls how we show the event, either it is public, or if it is kept secret while accessible to all, or if it is accessible only to its authenticated club staff members.",
                 max_length=8,
                 verbose_name="Visibility",
             ),
