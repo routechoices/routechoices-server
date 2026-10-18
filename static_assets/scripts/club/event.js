@@ -2407,9 +2407,9 @@ function RCEvent(infoURL, clockURL, locale) {
 				if (!hasData) {
 					noDataModal.show();
 					if (isLiveEvent && eventEnd >= clock.now()) {
-						u("#wait-for-data-text").text("Waiting for data…");
+						u("#wait-for-data-text").text(banana.i18n("waiting-for-data"));
 					} else {
-						u("#wait-for-data-text").text("No GPS data…");
+						u("#wait-for-data-text").text(banana.i18n("no-gps-data"));
 					}
 				} else {
 					noDataModal.dispose();
