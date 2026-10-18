@@ -1811,18 +1811,18 @@ class Event(models.Model, SomewhereOnEarth):
         through_fields=("event", "map"),
     )
     open_registration = models.BooleanField(
+        verbose_name="Allow self check-in",
         default=False,
-        help_text="Allow anyone to register themselves as participants of this event.",
     )
     acceptable_tags = models.CharField(
-        verbose_name="Participants accepted categories upon registration",
+        verbose_name="Categories allowed at self check-in",
         max_length=256,
         blank=True,
         default="",
     )
     allow_route_upload = models.BooleanField(
+        verbose_name="Allows users to upload their GPS file",
         default=False,
-        help_text="Allows the registered participants to upload their GPS file.",
     )
     send_interval = models.PositiveIntegerField(
         "Live upload interval (seconds)",

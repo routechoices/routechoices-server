@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 default="",
                 max_length=256,
-                verbose_name="Participants accepted categories upon registration",
+                verbose_name="Categories allowed at self check-in",
             ),
         ),
         migrations.AlterField(
