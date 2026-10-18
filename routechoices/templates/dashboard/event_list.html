@@ -54,7 +54,6 @@
                                         {% else %}
                                         <button type="button" disabled class="btn btn-primary dashboard-link btn-sm"><i class="fa-solid fa-folder-open"></i> <span>{{ event.event_set.name }}</span></button>
                                         {% endif %}
-                                        <br />
                                     {% endif %}
                                     <a class="btn btn-primary dashboard-link external-link" href="{{ event.get_absolute_url }}" target="_blank">
                                         <i class="fa-solid fa-trophy"></i> <span title="{{ event.country_name }}"></span> <span>{{ event.name }}</span>
