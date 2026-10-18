@@ -1499,13 +1499,13 @@ PRIVACY_CHOICES = (
 )
 
 
-VISIBILITY_LIVE = "live"
 VISIBILITY_PREVIEW = "preview"
+VISIBILITY_LIVE = "live"
 VISIBILITY_REPLAY = "replay"
 VISIBILITY_CHOICES = (
+    (VISIBILITY_PREVIEW, "Always available"),
     (VISIBILITY_LIVE, "From start date"),
     (VISIBILITY_REPLAY, "After completion"),
-    (VISIBILITY_PREVIEW, "Always available"),
 )
 
 

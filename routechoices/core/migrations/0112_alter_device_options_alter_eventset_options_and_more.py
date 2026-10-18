@@ -135,9 +135,9 @@ class Migration(migrations.Migration):
             name="visibility",
             field=models.CharField(
                 choices=[
+                    ("preview", "Always available"),
                     ("live", "From start date"),
                     ("replay", "After completion"),
-                    ("preview", "Always available"),
                 ],
                 default="live",
                 help_text="Controls when this event becomes visible to users.",
