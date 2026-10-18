@@ -64,5 +64,7 @@
 	"unit-imperial": "Imperiala",
 	"preview": "Förhandsvisning",
 	"sync-start": "Synk startar",
-	"state-synced": "Synkad"
+	"state-synced": "Synkad",
+	"waiting-for-data": "Väntar på data…",
+	"no-gps-data": "Ingen GPS-data…"
 }

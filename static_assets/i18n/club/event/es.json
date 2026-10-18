@@ -64,5 +64,7 @@
 	"unit-imperial": "Imperial",
 	"preview": "Previa",
 	"sync-start": "Inicio sinc.",
-	"state-synced": "Sincron."
+	"state-synced": "Sincron.",
+	"waiting-for-data": "Esperando datos…",
+	"no-gps-data": "Sin datos de GPS…"
 }

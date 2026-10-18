@@ -64,5 +64,7 @@
 	"unit-imperial": "Imperiaalinen",
 	"preview": "Ennakkokatsaus",
 	"sync-start": "Synkattu aloitus",
-	"state-synced": "Synkattu"
+	"state-synced": "Synkattu",
+	"waiting-for-data": "Odotetaan tietoja…",
+	"no-gps-data": "Ei GPS-tietoja…"
 }

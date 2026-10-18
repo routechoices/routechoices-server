@@ -64,5 +64,7 @@
 	"unit-imperial": "Imperiaal",
 	"preview": "Voorbeeld",
 	"sync-start": "Gesynct start",
-	"state-synced": "Gesynct"
+	"state-synced": "Gesynct",
+	"waiting-for-data": "Wachten op data…",
+	"no-gps-data": "Geen GPS-data…"
 }
