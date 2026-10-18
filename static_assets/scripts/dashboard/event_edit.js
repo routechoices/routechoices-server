@@ -122,8 +122,8 @@ const createColorWidget = (i) => {
 };
 
 const createStartTimeWidget = (i) => {
-	makeTimeFieldClearable(i);
 	makeFieldNowable(i);
+	makeTimeFieldClearable(i);
 	new tempusDominus.TempusDominus(i);
 	u(i).on([tempusDominus.Namespace.events.change, "change"], (e) => {
 		const value = dayjs(e.target.value).local().format("YYYY-MM-DD HH:mm:ss");
@@ -132,9 +132,7 @@ const createStartTimeWidget = (i) => {
 			return;
 		}
 		e.target.value = value;
-		showLocalTime(e.target);
 	});
-	showLocalTime(i);
 };
 
 function onAddedCompetitorRow(row) {
@@ -360,20 +358,6 @@ function onCsvParsed(result) {
 	u(".add-competitor-btn").first().click();
 }
 
-function showLocalTime(el) {
-	const val = u(el).val();
-	if (val) {
-		let local = dayjs(val).local(true).utc().format("YYYY-MM-DD HH:mm:ss");
-		local += local === "Invalid Date" ? "" : " UTC";
-		u(el).closest(":has(.local_time)").find(".local_time").text(local);
-	} else {
-		u(el)
-			.closest(":has(.local_time)")
-			.find(".local_time")
-			.html("&ZeroWidthSpace;");
-	}
-}
-
 (() => {
 	const announcementForm = u("#announcement_form").clone();
 	u("#announcement_form").remove();
@@ -535,8 +519,8 @@ function showLocalTime(el) {
 	// next line must come after formset initialization
 	u(".datetimepicker").each((el) => {
 		if (!el.disabled) {
-			makeTimeFieldClearable(el);
 			makeFieldNowable(el);
+			makeTimeFieldClearable(el);
 			new tempusDominus.TempusDominus(el);
 			el.autocomplete = "off";
 			u(el).on([tempusDominus.Namespace.events.change, "change"], (e) => {
@@ -548,11 +532,8 @@ function showLocalTime(el) {
 					return;
 				}
 				e.target.value = value;
-				showLocalTime(e.target);
 			});
 		}
-
-		showLocalTime(el);
 	});
 	const originalEventStart = u("#id_start_date").val();
 	let competitorsStartTimeElsWithSameStartAsEvents = u(
@@ -753,7 +734,7 @@ function showLocalTime(el) {
 		const deviceField = row.find('select[name$="-device"]').first();
 		if (deviceField.value) {
 			const cropBtn = u(
-				'<button type="button"class="btn btn-info btn-sm mt-1"><i class="fa-solid fa-scissors"></i> Crop GPS</button>',
+				'<div class="text-end"><button type="button"class="btn btn-info btn-sm mt-1 text-nowrap"><i class="fa-solid fa-scissors"></i> <span>Crop GPS</span></button></div>',
 			);
 			cropBtn.on("click", () => {
 				swal(

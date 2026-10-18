@@ -9,11 +9,11 @@
 {% block sub_sub_content %}
     <div class="row">
         <div class="col-12">
-            <h1>Add your device</h1>
+            <h1>Add your tracker</h1>
             <form action="" method="post">
                 {% csrf_token %}
                 {% bootstrap_form form %}
-                <input type="submit" value="Add" class="btn btn-primary mb-1">
+                <button type="submit" class="btn btn-primary mb-1 dashboard-link"><i class="fa-solid fa-plus"></i> <span>Add</span></button>
             </form>
             <hr />
             <h1>Batch Device Import</h1>
@@ -41,7 +41,7 @@
                         <a href="{% static 'assets/imei_devices.csv' %}">Download example file</a>
                     </div>
                 </div>
-                <input type="submit" value="Import" class="btn btn-primary mb-1">
+                <button type="submit" class="btn btn-primary mb-1 dashboard-link"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Import</span></button>
             </form>
         </div>
     </div>

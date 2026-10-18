@@ -35,20 +35,6 @@ const createTagWidget = (i) => {
 	});
 };
 
-function showLocalTime(el) {
-	const val = u(el).val();
-	if (val) {
-		let local = dayjs(val).local(true).utc().format("YYYY-MM-DD HH:mm:ss");
-		local += local === "Invalid Date" ? "" : " UTC";
-		u(el).closest(":has(.local_time)").find(".local_time").text(local);
-	} else {
-		u(el)
-			.closest(":has(.local_time)")
-			.find(".local_time")
-			.html("&ZeroWidthSpace;");
-	}
-}
-
 (() => {
 	const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	console.log(`User timezone: ${userTimezone}`);
@@ -67,14 +53,10 @@ function showLocalTime(el) {
 	});
 
 	u(".datetimepicker").each((el) => {
-		makeTimeFieldClearable(el);
 		makeFieldNowable(el);
+		makeTimeFieldClearable(el);
 		el.autocomplete = "off";
 		new tempusDominus.TempusDominus(el);
-		el.addEventListener(tempusDominus.TempusDominus, (e) => {
-			showLocalTime(e.target);
-		});
-		showLocalTime(el);
 	});
 
 	u('label[for$="-DELETE"]').parent(".form-group").hide();
@@ -200,7 +182,7 @@ function showLocalTime(el) {
 		const deviceField = row.find('select[name$="-device"]').first();
 		if (deviceField.value) {
 			const cropBtn = u(
-				'<button type="button"class="btn btn-info btn-sm mt-1"><i class="fa-solid fa-scissors"></i> Crop GPS</button>',
+				'<div class="text-end"><button type="button"class="btn btn-info btn-sm mt-1 text-nowrap"><i class="fa-solid fa-scissors"></i> <span>Crop GPS</span></button></div>',
 			);
 			cropBtn.on("click", () => {
 				const defaultEndDateIso = local.eventEndDate;

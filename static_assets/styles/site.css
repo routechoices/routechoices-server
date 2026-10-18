@@ -449,3 +449,32 @@ footer {
 	background-color: white !important;
 	color: var(--bs-body-color);
 }
+
+.www-footer div {
+	max-width: 50vw;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.www-footer .nav-link {
+	font-weight: bold;
+}
+
+[data-bs-theme="dark"] {
+	.www-footer .nav-link {
+		color: rgba(65, 124, 65, 0.8);
+	}
+
+	.www-footer .nav-link:hover {
+		color: rgb(65, 124, 65);
+	}
+}
+
+[data-bs-theme="light"] {
+	.www-footer .nav-link {
+		color: rgba(55, 183, 55, 0.8);
+	}
+	.www-footer .nav-link:hover {
+		color: rgb(55, 183, 55);
+	}
+}

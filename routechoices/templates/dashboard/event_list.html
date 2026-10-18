@@ -66,7 +66,6 @@
                                             data-date="{{ event.start_date|date:'c' }}"
                                             style="font-variant-numeric: tabular-nums">{{ event.start_date|date:'Y-m-d H:i:s' }} UTC</span>
                                     </button>
-                                    <br />
                                     <button type="button" class="btn btn-info btn-sm dashboard-link" disabled>
                                         <i class="fa-solid fa-hourglass-start"></i> <span class="text-nowrap"
                                             style="font-size:0.75em;
@@ -77,11 +76,10 @@
                                     <button type="button" class="btn btn-sm btn-info dashboard-link" disabled>
                                         <i class="fa-solid fa-{% if event.privacy == 'public' %}users{% elif event.privacy == 'secret' %}user-secret{% else %}ban{% endif %}"></i> <span>{{ event.get_privacy_display }}</span>
                                     </button>
-                                    <br />
                                     <button type="button" class="btn btn-sm btn-info dashboard-link" disabled>{% if event.is_live %}
                                         <i class="fa-solid fa-bolt"></i> <span>LIVE</span>
                                     {% elif event.ended %}
-                                        <i class="fa-solid fa-box-archive"></i> <span>Closed</span>
+                                        <i class="fa-solid fa-box-archive"></i> <span>Archived</span>
                                     {% else %}
                                         <i class="fa-solid fa-bell"></i> <span>Upcoming</span>
                                     {% endif %}

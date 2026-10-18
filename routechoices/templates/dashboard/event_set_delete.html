@@ -17,7 +17,7 @@
             <h1>
                 <i class="fa-solid fa-triangle-exclamation	"></i> Delete bundle <i>{{ event_set.name }}</i>?
             </h1>
-            <p>This will delete this bundle, however its events will not be deleted.</p>
+            <p>This will delete this bundle, however the events within will not be deleted.</p>
             <form action="" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -27,8 +27,8 @@
                            class="form-control"
                            autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-danger mb-1" id="submit-btn" disabled>
-                    <i class="fa-solid fa-trash"></i> <span>Delete</span>!
+                <button type="submit" class="btn btn-danger mb-1 dashboard-link" id="submit-btn" disabled>
+                    <i class="fa-solid fa-trash"></i> <span>Delete</span>
                 </button>
             </form>
         </div>

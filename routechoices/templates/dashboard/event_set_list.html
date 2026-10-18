@@ -38,7 +38,7 @@
                                     <button type="button" disabled class="btn btn-primary dashboard-link"><i class="fa-solid fa-folder-open"></i> <span>{{ event_set.name }}</span></button>
                                     {% endif %}
                                 </td>
-                                <td><button type="button" class="btn btn-info dashboard" disabled><span>{{ event_set.events.all.count }}</span> <i class="fa-solid fa-trophy"></i></button></td>
+                                <td><button type="button" class="btn btn-info dashboard dashboard-link" disabled><i class="fa-solid fa-trophy"></i> <span>{{ event_set.events.all.count }}</span></button></td>
                                 <td>
                                     <a class="btn btn-secondary dashboard-link"href="{% url 'dashboard_club:event_set:edit_view' event_set_id=event_set.aid club_slug=request.club.slug %}">
                                         <i class="fa-solid fa-pen-to-square"></i> <span>Edit</span>

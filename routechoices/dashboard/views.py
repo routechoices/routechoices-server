@@ -29,11 +29,11 @@ from django.utils.timezone import now
 from django.views.decorators.cache import cache_page
 from django_hosts.resolvers import reverse
 from hijack.views import ReleaseUserView
+from invitations.forms import InviteForm
 from kagi.views.backup_codes import BackupCodesView
 from oauth2_provider.models import AccessToken
 from user_sessions.views import SessionDeleteOtherView
 
-from invitations.forms import InviteForm
 from routechoices.api.views import device_ownership_api_view
 from routechoices.core.models import (
     PRIVACY_SECRET,
@@ -365,7 +365,7 @@ def device_list_view(request):
         .defer("device__locations_encoded")
         .order_by(*ordering)
     )
-    paginator = Paginator(device_owned_list, DEFAULT_PAGE_SIZE)
+    paginator = Paginator(device_owned_list, 100)
     page = request.GET.get("page")
     devices = paginator.get_page(page)
     devices_ids = devices.object_list.values_list("device__id")

@@ -6,8 +6,7 @@
             <h1>
                 <i class="fa-solid fa-triangle-exclamation"></i> Delete tracker <i>{{ ownership.nickname }}</i>?
             </h1>
-            <p>This will not actually remove the tracker and it device but just remove it from your tracker list.</p>
-            <p>You can re-add it to your tracker list later.</p>
+            <p>This will just remove it from your trackers list. You can re-add it to your tracker list later.</p>
             <form action="" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -19,7 +18,7 @@
                            autocomplete="off">
                 </div>
                 <button type="submit" class="btn btn-danger mb-1" id="submit-btn" disabled>
-                    <i class="fa-solid fa-trash"></i> <span>Delete</span>!
+                    <i class="fa-solid fa-trash"></i> <span>Delete</span>
                 </button>
             </form>
         </div>
