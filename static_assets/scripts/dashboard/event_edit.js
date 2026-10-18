@@ -500,8 +500,8 @@ function onCsvParsed(result) {
 
 	u('label[for$="-DELETE"]').parent(".form-group").hide();
 	$(".formset_row").formset({
-		addText: '<i class="fa-solid fa-circle-plus"></i> Add Competitor',
-		addCssClass: "btn btn-info add-competitor-btn",
+		addText: '<i class="fa-solid fa-plus"></i> Add Competitor',
+		addCssClass: "btn btn-info add-competitor-btn dashboard-link",
 		deleteCssClass: "btn btn-danger delete-row",
 		deleteText: '<i class="fa-solid fa-trash"></i>',
 		prefix: "competitors",

@@ -1,7 +1,8 @@
 const makeFieldRandomizable = (id) => {
 	u(id)
-		.parent().addClass("text-nowrap text-end")
+		.parent()
 		.find(".form-text")
+		.addClass("text-nowrap text-end")
 		.text("")
 		.append(
 			'<button class="randomize_btn btn btn-info btn-sm py-1 px-2" type="button"><i class="fa-solid fa-shuffle"></i> Randomize</button>',
@@ -23,11 +24,11 @@ const makeFieldRandomizable = (id) => {
 const makeFieldNowable = (el) => {
 	const localTimeDisplay = u(el)
 		.parent()
+		.find(".form-text")
 		.addClass("text-nowrap text-end")
-		.find(".local_time");
-	localTimeDisplay.before(
-		'<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2" type="button"><i class="fa-solid fa-clock"></i> Set Now</button>',
-	);
+		.append(
+			'<button class="set_time_now_btn btn btn-info btn-sm py-1 px-2" type="button"><i class="fa-solid fa-clock"></i> Set Now</button>',
+		);
 	u(el)
 		.parent()
 		.find(".set_time_now_btn")
@@ -42,11 +43,11 @@ const makeFieldNowable = (el) => {
 const makeTimeFieldClearable = (el) => {
 	const localTimeDisplay = u(el)
 		.parent()
+		.find(".form-text")
 		.addClass("text-nowrap text-end")
-		.find(".local_time");
-	localTimeDisplay.before(
-		'<button class="set_time_null_btn btn btn-info btn-sm py-1 px-2 ms-1" type="button"><i class="fa-solid fa-xmark"></i> Clear</button>',
-	);
+		.append(
+			'<button class="set_time_null_btn btn btn-info btn-sm py-1 px-2 ms-1" type="button"><i class="fa-solid fa-xmark"></i> Clear</button>',
+		);
 	u(el)
 		.parent()
 		.find(".set_time_null_btn")
