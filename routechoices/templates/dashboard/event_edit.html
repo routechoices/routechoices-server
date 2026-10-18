@@ -18,20 +18,22 @@
             {% if event %}
                 <h2>Event <i>{{ event.name }}</i></h2>
                 <div class="row">
-                    <div class="col-12 col-md-8">
+                    <div class="col-12">
                         <div class="mb-2">
                             <h6 class="fw-bold">Links for all</h6>
                             <a href="{{ event.get_absolute_url }}"
-                               class="btn btn-primary btn-sm mb-1 me-1"><i class="fa-solid fa-right-to-bracket"></i> Event Page</a>
+                               class="btn btn-primary btn-sm dashboard-link">
+                               <i class="fa-solid fa-right-to-bracket"></i> <span>Event Page</span>
+                            </a>
                             <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist"
-                               class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-list"></i> Start List</a>
+                               class="btn btn-sm btn-secondary dashboard-link"><i class="fa-solid fa-list"></i> Start List</a>
                             {% if not event.hidden %}
                                 <a href="{{ event.club.nice_url }}{{ event.slug }}/export"
-                                   class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-floppy-disk"></i> Export Page</a>
+                                   class="btn btn-sm btn-secondary dashboard-link"><i class="fa-solid fa-floppy-disk"></i> Export Page</a>
                             {% endif %}
                             {% if event.started and event.allow_route_upload or event.open_registration and not event.ended %}
                                 <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}"
-                                   class="btn btn-sm btn-secondary me-1 mb-1"><i class="fa-solid fa-circle-plus"></i> Competitor
+                                   class="btn btn-sm btn-secondary dashboard-link"><i class="fa-solid fa-circle-plus"></i> Competitor
                                     {% if event.open_registration and not event.ended %}registration{% endif %}
                                     {% if event.open_registration and event.allow_route_upload and event.started and not event.ended %}or{% endif %}
                                     {% if event.started and event.allow_route_upload %}route upload{% endif %}
@@ -42,26 +44,25 @@
                             <h6 class="fw-bold">Links for admins</h6>
                             {% if event.started %}
                                 <a href="{% url 'dashboard_club:event:route_upload_view' event_id=event.aid club_slug=request.club.slug %}"
-                                   class="btn btn-secondary btn-sm me-1 mb-1"
+                                   class="btn btn-secondary btn-sm dashboard-link"
                                    id="upload_route_btn"><i class="fa-solid fa-upload"></i> Upload Competitors Routes</a>
                             {% endif %}
                             <a href="{% url 'dashboard_club:event:competitors_printer_view' event_id=event.aid club_slug=request.club.slug %}"
-                               class="btn btn-secondary btn-sm me-1 mb-1"><i class="fa-solid fa-print"></i> Competitor List For Printing</a>
+                               class="btn btn-secondary btn-sm dashboard-link"><i class="fa-solid fa-print"></i> Competitor List For Printing</a>
                             <a href="{% url 'dashboard_club:event:competitors_csv_view' event_id=event.aid club_slug=request.club.slug %}"
-                                class="btn btn-secondary btn-sm me-1 mb-1"><i class="fa-solid fa-table"></i> Competitor List as CSV</a>
+                                class="btn btn-secondary btn-sm dashboard-link"><i class="fa-solid fa-table"></i> Competitor List as CSV</a>
                         </div>
                     </div>
                     {% if event.shortcut %}
-                        <div class="col-12 col-md-4">
-                            <div class="float-start float-md-end text-center d-flex">
-                                <div class="small">
-                                    <p class="small">
-                                        <a class="text-break small qrUrlText fw-bold"
-                                           href="{{ event.shortcut }}">
-                                            {% qr_from_text event.shortcut size="4" image_format="png" error_correction="l" %}
-                                        </a>
-                                    </p>
-                                </div>
+                        <div class="col-12">
+                            <div class="row">
+                                <p class="small text-center">
+                                    <a class="text-break small qrUrlText fw-bold"
+                                        href="{{ event.shortcut }}">
+                                        {% qr_from_text event.shortcut size="4" image_format="png" error_correction="l" %}
+                                        <br/><small>{{ event.shortcut }}</small>
+                                    </a>
+                                </p>
                             </div>
                         </div>
                     {% endif %}
