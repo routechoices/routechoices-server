@@ -316,12 +316,6 @@ function selectizeDeviceInput(field) {
 					input.parent().addClass("d-none");
 				}
 			}
-			if (
-				input.attr("type") === "hidden" ||
-				input.closest("div").hasClass("d-none")
-			) {
-				u("#id_race_complete").parent().hide();
-			}
 		});
 		u("#id_race_complete").trigger("change");
 		u("#id_gps_file").on("change", function (e) {
