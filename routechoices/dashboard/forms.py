@@ -456,6 +456,7 @@ class EventForm(ModelForm):
             "allow_route_upload",
             "privacy",
             "visibility",
+            "announcement",
             "send_interval",
             "tail_length",
             "emergency_contacts",
@@ -464,7 +465,6 @@ class EventForm(ModelForm):
             "map",
             "map_title",
             "map_tags",
-            "announcement",
             "timezone",
         )
         widgets = {
