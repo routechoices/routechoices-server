@@ -1058,7 +1058,6 @@ class RegisterForm(Form):
 
         if now < self.event.start_date or (not self.event.allow_route_upload):
             self.fields["gps_file"].widget = HiddenInput()
-            self.fields["race_complete"].widget = HiddenInput()
 
 
 class CompetitorUploadGPSForm(Form):
