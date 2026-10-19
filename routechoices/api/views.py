@@ -634,7 +634,7 @@ def event_detail(request, event_id):
         raise NotAuthenticated()
 
     event = (
-        Event.objects.select_related("club", "notice", "map")
+        Event.objects.select_related("club", "map")
         .prefetch_related(
             Prefetch(
                 "map_assignations",
@@ -683,9 +683,8 @@ def event_detail(request, event_id):
         "data_url": request.build_absolute_uri(
             reverse("event_data", host="api", kwargs={"event_id": event.aid})
         ),
+        "announcement": event.announcement,
     }
-
-    output["announcement"] = event.notice.text if event.has_notice else ""
 
     maps = []
     if event.could_display_maps(request.user):
@@ -1891,7 +1890,7 @@ def event_map_list(request, event_id):
         raise NotAuthenticated()
 
     event = (
-        Event.objects.select_related("club", "notice", "map")
+        Event.objects.select_related("club", "map")
         .prefetch_related(
             Prefetch(
                 "map_assignations",

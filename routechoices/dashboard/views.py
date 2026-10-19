@@ -45,7 +45,6 @@ from routechoices.core.models import (
     EventSet,
     ImeiDevice,
     Map,
-    Notice,
 )
 from routechoices.dashboard.forms import (
     ClubDomainForm,
@@ -59,7 +58,6 @@ from routechoices.dashboard.forms import (
     ExtraMapFormSet,
     MapForm,
     MergeMapsForm,
-    NoticeForm,
     RegisterForm,
     RequestInviteForm,
     UploadGPXForm,
@@ -958,13 +956,11 @@ def event_create_view(request):
         for mform in extra_maps_formset.forms:
             mform.fields["map"].queryset = map_list
 
-        notice_form = NoticeForm(request.POST)
         # check whether it's valid:
         if all(
             [
                 form.is_valid(),
                 competitors_formset.is_valid(),
-                notice_form.is_valid(),
                 extra_maps_formset.is_valid(),
             ]
         ):
@@ -973,9 +969,6 @@ def event_create_view(request):
             competitors_formset.save()
             extra_maps_formset.instance = event
             extra_maps_formset.save()
-            notice = notice_form.save(commit=False)
-            notice.event = event
-            notice.save()
             messages.success(request, "Event created successfully")
             if request.POST.get("save_continue"):
                 return redirect(
@@ -1003,8 +996,6 @@ def event_create_view(request):
 
         for mform in extra_maps_formset.forms:
             mform.fields["map"].queryset = map_list
-
-        notice_form = NoticeForm()
 
     devices_qs = (
         Device.objects.filter(id__in=all_devices_id)
@@ -1040,7 +1031,6 @@ def event_create_view(request):
             "form": form,
             "competitors_formset": competitors_formset,
             "extra_maps_formset": extra_maps_formset,
-            "notice_form": notice_form,
         },
     )
 
@@ -1053,7 +1043,7 @@ MAX_COMPETITORS_DISPLAYED_IN_EVENT = 100
 def event_edit_view(request, event_id):
     club = request.club
     event = get_object_or_404(
-        Event.objects.prefetch_related("notice", "competitors"),
+        Event.objects.prefetch_related("competitors"),
         aid=event_id,
     )
 
@@ -1094,35 +1084,16 @@ def event_edit_view(request, event_id):
             instance=event_copy,
         )
 
-        notice_form_args = {}
-        if event.has_notice:
-            notice_form_args["instance"] = event.notice
-        notice_form = NoticeForm(request.POST, **notice_form_args)
-
         if all(
             [
                 form.is_valid(),
                 competitors_formset.is_valid(),
                 extra_maps_formset.is_valid(),
-                notice_form.is_valid(),
             ]
         ):
             form.save()
             extra_maps_formset.save()
             competitors_formset.save()
-
-            prev_notice = ""
-            if event.has_notice:
-                notice_form.instance = event.notice
-                event.notice.refresh_from_db()
-                prev_notice = event.notice.text
-            if prev_notice != notice_form.cleaned_data["text"]:
-                if not event.has_notice:
-                    notice = Notice(event=event)
-                else:
-                    notice = event.notice
-                notice.text = notice_form.cleaned_data["text"]
-                notice.save()
 
             messages.success(request, "Changes saved successfully")
             if request.POST.get("save_continue"):
@@ -1155,11 +1126,6 @@ def event_edit_view(request, event_id):
         extra_maps_formset = ExtraMapFormSet(instance=event)
         for mform in extra_maps_formset.forms:
             mform.fields["map"].queryset = map_list
-
-        notice_form_args = {}
-        if event.has_notice:
-            notice_form_args["instance"] = event.notice
-        notice_form = NoticeForm(**notice_form_args)
 
     devices_qs = (
         Device.objects.filter(id__in=all_devices_id)
@@ -1205,7 +1171,6 @@ def event_edit_view(request, event_id):
             "form": form,
             "competitors_formset": competitors_formset,
             "extra_maps_formset": extra_maps_formset,
-            "notice_form": notice_form,
             "use_competitor_formset": use_competitor_formset,
         },
     )
@@ -1221,7 +1186,7 @@ def event_map_edit_view(request, event_id):
             "Your 2 days free trial has now expired, you cannot create or edit events anymore.",
         )
     event = get_object_or_404(
-        Event.objects.prefetch_related("notice", "competitors").select_related("map"),
+        Event.objects.prefetch_related("competitors").select_related("map"),
         aid=event_id,
     )
     form = MapForm()
@@ -1288,7 +1253,7 @@ COMPETITORS_PAGE_SIZE = 50
 def event_competitors_view(request, event_id):
     club = request.club
     event = get_object_or_404(
-        Event.objects.prefetch_related("notice", "competitors"),
+        Event.objects.prefetch_related("competitors"),
         aid=event_id,
     )
 
@@ -1421,7 +1386,6 @@ def event_competitors_printer_view(request, event_id):
     club = request.club
     event = get_object_or_404(
         Event.objects.prefetch_related(
-            "notice",
             Prefetch(
                 "competitors", queryset=Competitor.objects.select_related("device")
             ),

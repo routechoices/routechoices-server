@@ -46,7 +46,6 @@ from routechoices.core.models import (
     EventSet,
     Map,
     MapAssignation,
-    Notice,
 )
 from routechoices.lib.helpers import (
     check_dns_records,
@@ -304,7 +303,9 @@ class ClubDomainForm(ModelForm):
         if self.instance:
             matching_clubs = matching_clubs.exclude(pk=self.instance.pk)
             if self.instance.domain and not self.instance.has_ssl_certificate:
-                self.add_error("domain", f'"{domain}" HTTPS certificate provisioning in progress.')
+                self.add_error(
+                    "domain", f'"{domain}" HTTPS certificate provisioning in progress.'
+                )
         if matching_clubs.exists():
             self.add_error("domain", f'Domain "{domain}" already used by another club.')
         return domain.lower()
@@ -444,7 +445,7 @@ class EventForm(ModelForm):
 
     class Meta:
         model = Event
-        fields = [
+        fields = (
             "name",
             "slug",
             "event_set",
@@ -463,8 +464,9 @@ class EventForm(ModelForm):
             "map",
             "map_title",
             "map_tags",
+            "announcement",
             "timezone",
-        ]
+        )
         widgets = {
             "start_date": DateTimeInput(
                 attrs={"class": "datetimepicker", "autocomplete": "off"}
@@ -628,12 +630,6 @@ class EventForm(ModelForm):
             raise ValidationError("Invalid GeoJSON File")
         json_cleaned = json.dumps(json_data)
         return ContentFile(json_cleaned, "file.geojson")
-
-
-class NoticeForm(ModelForm):
-    class Meta:
-        model = Notice
-        fields = ("text",)
 
 
 class ExtraMapForm(ModelForm):

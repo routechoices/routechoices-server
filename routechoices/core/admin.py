@@ -41,7 +41,6 @@ from routechoices.core.models import (
     ImeiDevice,
     Map,
     MapAssignation,
-    Notice,
     TcpDeviceCommand,
 )
 from routechoices.lib.helpers import epoch_to_datetime, get_device_name
@@ -762,11 +761,6 @@ class CompetitorInline(admin.TabularInline):
     autocomplete_fields = ("device",)
 
 
-class NoticeInline(admin.TabularInline):
-    model = Notice
-    fields = ("text",)
-
-
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = (
@@ -793,7 +787,7 @@ class EventAdmin(admin.ModelAdmin):
         HasGeoJSONFilter,
     )
     search_fields = ("name", "event_set__name", "club__name")
-    inlines = [ExtraMapInline, NoticeInline, CompetitorInline]
+    inlines = [ExtraMapInline, CompetitorInline]
     show_facets = False
     autocomplete_fields = ("map", "club", "event_set")
     actions = [

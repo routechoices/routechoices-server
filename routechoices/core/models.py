@@ -1850,6 +1850,12 @@ class Event(models.Model, SomewhereOnEarth):
         on_delete=models.SET_NULL,
         help_text=("Event within the same bundle are listed together on our pages."),
     )
+    announcement = models.CharField(
+        max_length=280,
+        blank=True,
+        null=False,
+        help_text="Optional text that will be displayed on the event page",
+    )
     emergency_contacts = models.TextField(
         default="",
         blank=True,
@@ -2345,10 +2351,6 @@ class Event(models.Model, SomewhereOnEarth):
             DURATION_ONE_MONTH,
         )
 
-    @property
-    def has_notice(self):
-        return hasattr(self, "notice")
-
     def get_featured_image(self):
         if self.can_display_maps():
             raster_map = self.map
@@ -2550,19 +2552,6 @@ class Event(models.Model, SomewhereOnEarth):
         )
         cache.set(cache_key, response, cache_duration)
         return response, False, is_public
-
-
-class Notice(models.Model):
-    modification_date = models.DateTimeField(auto_now=True)
-    event = models.OneToOneField(Event, related_name="notice", on_delete=models.CASCADE)
-    text = models.CharField(
-        max_length=280,
-        blank=True,
-        help_text="Optional text that will be displayed on the event page",
-    )
-
-    def __str__(self):
-        return self.text
 
 
 class MapAssignation(models.Model):
