@@ -1039,7 +1039,7 @@ class RegisterForm(Form):
         label="Tracker ID",
         help_text="Optional - Leave blank if uploading a GPS File",
     )
-    race_complete = BooleanField(label="Race already complete")
+    race_complete = BooleanField(label="Race already complete", required=False)
     gps_file = FileField(
         label="GPS File",
         max_length=255,
@@ -1056,8 +1056,9 @@ class RegisterForm(Form):
         if now > self.event.end_date:
             self.fields["race_complete"].default = True
 
-        if now < self.event.start_date or not self.event.allow_route_upload:
+        if now < self.event.start_date or (not self.event.allow_route_upload):
             self.fields["gps_file"].widget = HiddenInput()
+            self.fields["race_complete"].widget = HiddenInput()
 
 
 class CompetitorUploadGPSForm(Form):
