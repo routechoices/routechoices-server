@@ -151,13 +151,13 @@
                                     <span class="me-2 text-muted">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <div>
-                                {% if event.open_registration %}
-                                <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
-                                {% endif %}
+                            {% if event.open_registration %}
+                            <div class="d-flex justify-content-end">
+                                <div class=position-relative style="z-index: 10001">
+                                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-user-plus"></i> <span>Sign Up</span></a>
+                                </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -221,13 +221,13 @@
                                     <span class="me-2 text-muted">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <div>
-                                {% if event.open_registration %}
-                                <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-user-plus"></i> Sign up</a>
-                                {% endif %}
-                                <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-list"></i> Check start list</a>
+                            <div class="d-flex justify-content-end">
+                                <div class=position-relative style="z-index: 10001">
+                                    {% if event.open_registration %}
+                                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-user-plus"></i> <span>Sign up</span></a>
+                                    {% endif %}
+                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/startlist" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-list"></i> Check start list</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -343,13 +343,13 @@
                                     <span class="me-2 text-muted">{{ event.competitors.count }} participant{{ event.competitors.count|pluralize:"s" }}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <div>
-                                {% if event.allow_route_upload %}
-                                <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-file-arrow-up"></i> Upload Your Route</a>
-                                {% endif %}
-                                <a href="{{ event.club.nice_url }}{{ event.slug }}/export" class="btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-file-export"></i> Export Files</a>
+                            <div class="d-flex justify-content-end">
+                                <div class=position-relative style="z-index: 10001">
+                                    {% if event.allow_route_upload %}
+                                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="me-1 btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-file-arrow-up"></i> Upload Your Route</a>
+                                    {% endif %}
+                                    <a href="{{ event.club.nice_url }}{{ event.slug }}/export" class="btn btn-sm btn-light text-nowrap" role="button"><i class="fa-solid fa-file-export"></i> Export Files</a>
+                                </div>
                             </div>
                         </div>
                     </div>
