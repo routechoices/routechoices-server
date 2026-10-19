@@ -1056,7 +1056,11 @@ class RegisterForm(Form):
         if now > self.event.end_date:
             self.fields["race_complete"].default = True
 
-        if now < self.event.start_date or (not self.event.allow_route_upload):
+        if now < self.event.start_date:
+            self.fields["race_complete"].widget = HiddenInput()
+            self.fields["gps_file"].widget = HiddenInput()
+
+        if not self.event.allow_route_upload:
             self.fields["gps_file"].widget = HiddenInput()
 
 
