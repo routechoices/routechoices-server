@@ -2406,11 +2406,11 @@ function RCEvent(infoURL, clockURL, locale) {
 				}
 				if (!hasData) {
 					noDataModal.show();
-					if (isLiveEvent && eventEnd >= clock.now()) {
-						u("#wait-for-data-text").text("Waiting for data…");
-					} else {
-						u("#wait-for-data-text").text("No GPS data…");
+					let errorMessage = "Waiting for data…";
+					if (!isLiveEvent || eventEnd < clock.now()) {
+						errorMessage = "No GPS data…";
 					}
+					u("#wait-for-data-text").text(errorMessage);
 				} else {
 					noDataModal.dispose();
 					u("#loading-modal").remove();
