@@ -3360,7 +3360,7 @@ class TcpDeviceCommand(models.Model):
     comment = models.CharField(blank=True, default="")
 
     class Meta:
-        ordering = ("-modification_date")
+        ordering = ("-modification_date",)
         verbose_name = "TCP command"
         verbose_name_plural = "TCP commands"
 
