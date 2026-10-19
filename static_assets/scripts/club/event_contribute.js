@@ -305,19 +305,18 @@ function selectizeDeviceInput(field) {
 			});
 		});
 		u("#id_race_complete").on("change", (e) => {
+			e.preventDefault();
 			const input = u("#id_gps_file");
-			if (u("#id_race_complete").nodes[0].checked) {
-				if (input.attr("type") !== "hidden") {
+			if (u("#id_gps_file").attr("type") !== "hidden")
+				if (u("#id_race_complete").nodes[0].checked) {
 					input.parent().removeClass("d-none");
-				}
-				input.val(null);
-				signUpRoute = null;
-			} else {
-				if (input.attr("type") !== "hidden") {
-					input.parent().addClass("d-none");
+				} else {
+					u("#id_gps_file").parent().addClass("d-none");
+					u("#id_gps_file").val(null);
+					signUpRoute = null;
 				}
 			}
-		});
+		);
 		u("#id_race_complete").trigger("change");
 		u("#id_gps_file").on("change", function (e) {
 			signUpRoute = {};
