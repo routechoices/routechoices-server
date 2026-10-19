@@ -312,6 +312,7 @@ function selectizeDeviceInput(field) {
 					input.parent().removeClass("d-none");
 				}
 				input.val(null);
+				signUpRoute = null;
 			} else {
 				if (input.attr("type") !== "hidden") {
 					input.parent().addClass("d-none");
