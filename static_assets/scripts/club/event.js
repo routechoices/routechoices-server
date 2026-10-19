@@ -2449,7 +2449,7 @@ function RCEvent(infoURL, clockURL, locale) {
 					}
 					u("#wait-for-data-text").text(errorMessage);
 				} else {
-					noDataModal.dispose();
+					noDataModal.hide();
 					u("#loading-modal").remove();
 				}
 
