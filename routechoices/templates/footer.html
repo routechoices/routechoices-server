@@ -3,7 +3,7 @@
 <div class="{{ request.host.name }}-footer footer bg-dark text-light py-4">
     <div class="container-fluid mb-3">
         <div class="row d-flex justify-content-between">
-            <div class="col col-auto d-flex">
+            <div class="row d-flex">
                 <div class="col col-auto d-flex flex-column">
                     <h5 class="text-nowrap">Get started</h5>
                     <ul class="nav flex-column">
@@ -52,23 +52,21 @@
 <div class="container-fluid www-footer end-credits">
     <div class="row mb-3 d-flex align-items-center justify-content-between">
         <div class="col col-12 d-flex flex-column flex-md-row justify-content-center align-items-center text-center mt-3 mb-5">
-            <div class="col col-auto d-flex align-items-center">
-                <div class="col-sm-5 d-flex align-self-end">
-                    <div class="d-flex align-items-center site-name mx-5 my-3">
-                        <img class="img me-2" src="{% static 'img/logo.svg' %}" alt="Routechoices Logo" height="40">
-                        <div>
-                            <div>ROUTECHOICES</div>
-                            <div>GPS TRACKING</div>
-                        </div>
+            <div class="row d-flex align-items-center">
+                <div class="d-flex align-items-center site-name mb-2 me-2">
+                    <img class="img pe-2" src="{% static 'img/logo.svg' %}" alt="Routechoices Logo" height="40">
+                    <div>
+                        <div>ROUTECHOICES</div>
+                        <div>GPS TRACKING</div>
                     </div>
                 </div>
             </div>
-            <div class="col col-auto d-flex flex-column justify-content-evenly align-items-center text-start">
-                <span>Designed by a French 👨‍🎤</span>
-                <span>Engineered in Finland 🦫</span>
-                <span>Running in Europe 🇪🇺</span>
-                <span>Used Worldwide 🌍</span>
-                <span>Powered by Open Source 🆓</span>
+            <div class="col col-auto d-flex flex-column justify-content-start align-items-start text-start">
+                <span class="text-nowrap">Designed by a French 👨‍🎤</span>
+                <span class="text-nowrap">Engineered in Finland 🦫</span>
+                <span class="text-nowrap">Running in Europe 🇪🇺</span>
+                <span class="text-nowrap">Used Worldwide 🌍</span>
+                <span class="text-nowrap">Powered by Open Source 🆓</span>
             </div>
         </div>
     </div>
