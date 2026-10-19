@@ -309,7 +309,7 @@ function selectizeDeviceInput(field) {
 			console.log(u("#id_race_complete").nodes[0].checked, input.attr("type"))
 			if (u("#id_race_complete").nodes[0].checked) {
 				if (input.attr("type") !== "hidden") {
-					input.parent().addClass("d-none");
+					input.parent().removeClass("d-none");
 				}
 				input.val(null);
 			} else {
