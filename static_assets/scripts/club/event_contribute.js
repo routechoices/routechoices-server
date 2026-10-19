@@ -315,8 +315,7 @@ function selectizeDeviceInput(field) {
 					u("#id_gps_file").val(null);
 					signUpRoute = null;
 				}
-			}
-		);
+		});
 		u("#id_race_complete").trigger("change");
 		u("#id_gps_file").on("change", function (e) {
 			signUpRoute = {};

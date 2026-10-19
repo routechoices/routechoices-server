@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0129_alter_club_acme_challenge'),
+        ("core", "0129_alter_club_acme_challenge"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='allow_route_upload',
-            field=models.BooleanField(default=False, verbose_name='Allows users to upload their GPS file'),
+            model_name="event",
+            name="allow_route_upload",
+            field=models.BooleanField(
+                default=False, verbose_name="Allows users to upload their GPS file"
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='open_registration',
-            field=models.BooleanField(default=False, verbose_name='Allow self check-in'),
+            model_name="event",
+            name="open_registration",
+            field=models.BooleanField(
+                default=False, verbose_name="Allow self check-in"
+            ),
         ),
     ]

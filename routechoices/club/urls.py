@@ -73,7 +73,7 @@ urlpatterns = [
         name="club_favicon",
     ),
     path(
-        '.well-known/acme-challenge/<str:token>',
+        ".well-known/acme-challenge/<str:token>",
         views.acme_challenge,
         name="acme_challenge",
     ),

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0128_remove_event_core_event_bgmap_valid_and_more'),
+        ("core", "0128_remove_event_core_event_bgmap_valid_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='club',
-            name='acme_challenge',
+            model_name="club",
+            name="acme_challenge",
             field=models.CharField(blank=True, max_length=1024),
         ),
     ]

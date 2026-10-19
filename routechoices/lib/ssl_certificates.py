@@ -1,6 +1,6 @@
+import json
 import os
 import os.path
-import json
 
 import arrow
 from cryptography import x509
@@ -72,7 +72,7 @@ class ClubAcmeProvider(ProviderBase):
 
     def setup(self, challenges):
         challenges_dict = {}
-        
+
         # Loop through ALL challenges provided by the ACME client
         for chal in challenges:
             token = chal["token"]
