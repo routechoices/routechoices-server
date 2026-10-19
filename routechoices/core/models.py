@@ -2288,7 +2288,7 @@ class Event(models.Model, SomewhereOnEarth):
         )
 
     def get_absolute_url(self):
-        return f"{self.club.nice_url}{self.slug}"
+        return f"{self.club.nice_url}{self.slug}/"
 
     def get_absolute_map_url(self):
         return f"{self.club.nice_url}{self.slug}/map"
