@@ -442,6 +442,22 @@ class Club(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def plan_display(self):
+        if self.order_id.startswith("RC"):
+            return "Partner Plan"
+        if self.order_id.startswith("RL-"):
+            return "Rastilippu Plan"
+        if self.order_id.startswith("LS-"):
+            if self.subscription_paused:
+                return "Paid Plan - Paused"
+            return "Paid Plan"
+        if self.upgraded:
+            return "System Club"
+        if self.free_trial_active:
+            return "Free Trial"
+        return "Free Trial - Expired"
+
     def save(self, *args, **kwargs):
         if self.pk:
             self.domain = (self.domain or "").upper().lower()
@@ -3344,7 +3360,7 @@ class TcpDeviceCommand(models.Model):
     comment = models.CharField(blank=True, default="")
 
     class Meta:
-        ordering = ["-modification_date"]
+        ordering = ("-modification_date")
         verbose_name = "TCP command"
         verbose_name_plural = "TCP commands"
 

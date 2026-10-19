@@ -53,13 +53,7 @@
                                            href="{% url 'dashboard_club:edit_view' club_slug=club.slug %}?next={{ next }}">{{ club.name }}</a>
                                     </div>
                                     <div>
-                                        <small class="text-muted">
-                                            {% if club.upgraded %}
-                                                Paid Plan{% if club.subscription_paused %} (Paused){% endif %}
-                                            {% else %}
-                                                Free Trial{% if not club.free_trial_active %} Expired{% endif %}
-                                            {% endif %}
-                                        </small>
+                                        <small class="text-muted">{{ club.plan_display }}</small>
                                     </div>
                                 </div>
                             </div>
