@@ -87,7 +87,7 @@
                                             <i class="fa-solid fa-forward"></i>
                                         </button>
                                     </div>
-                                    <span> &nbsp; </span>
+                                    <span>&nbsp;&nbsp;&nbsp;</span>
                                     <div class="replay_mode_buttons flex-row flex-nowrap d-inline-block ms-1">
                                         <div class="btn-group mb-1 text-nowrap me-1"
                                             role="group">
@@ -157,16 +157,16 @@
                         <i class="fa-solid fa-fw fa-users"></i>
                     </button>
                 </div>
-                {% if event.open_registration and not event.ended or event.allow_route_upload and event.started %}
-                    <div class="mb-1 mx-0" role="group">
-                        <a class="btn btn-lg"
-                           href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}"
-                           aria-label="Registration/Route Upload"
-                           type="button"
-                           target="_blank">
-                            <i class="fa-solid fa-fw fa-user-plus"></i>
-                        </a>
-                    </div>
+                {% if event.open_registration or event.allow_route_upload and event.started and event.competitors.count > 0 %}
+                <div class="mb-1 mx-0" role="group">
+                    <a class="btn btn-lg"
+                        href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}"
+                        aria-label="Registration/Route Upload"
+                        type="button"
+                        target="_blank">
+                        <i class="fa-solid fa-fw fa-user-plus"></i>
+                    </a>
+                </div>
                 {% endif %}
                 <div class="bottom-btn">
                     <div class="mt-1 mx-0" role="group">
@@ -224,8 +224,8 @@
     <div class="modal"
          tabindex="-1"
          role="dialog"
-         id="no-data-modal"
-         style="z-index: 10002">
+         id="waiting-data-modal"
+         style="z-index: 1100200">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body text-center">
@@ -240,6 +240,28 @@
                         </g>
                     </svg>
                     <h1 id="wait-for-data-text">Waiting for data...</h1>
+                    {% if event.open_registration or event.allow_route_upload and event.started and event.competitors.count > 0 %}
+                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal"
+         tabindex="-1"
+         role="dialog"
+         id="no-data-modal"
+         style="z-index: 10020">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div>
+                        <i class="fa-solid fa-triangle-exclamation fa-5x"></i>
+                    </div>
+                    <h1 id="no-data-text">No data...</h1>
+                    {% if event.open_registration or event.allow_route_upload and event.started and event.competitors.count > 0 %}
+                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
+                    {% endif %}
                 </div>
             </div>
         </div>

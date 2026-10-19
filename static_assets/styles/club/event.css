@@ -280,6 +280,7 @@ body {
 #future-event-modal,
 #loading-event-modal,
 #no-data-modal,
+#waiting-data-modal,
 #color-modal {
 	top: calc(var(--navbar-size));
 }

@@ -65,6 +65,7 @@
 	"preview": "Aperçu",
 	"sync-start": "Début synchro",
 	"state-synced": "Synchro",
-	"waiting-for-data": "En attente de données…",
-	"no-gps-data": "Aucune donnée GPS…"
+	"wait-for-data-text": "En attente de données…",
+	"no-data-text": "Aucune donnée GPS…",
+	"upload-your-route": "Envoyer votre itinéraire"
 }

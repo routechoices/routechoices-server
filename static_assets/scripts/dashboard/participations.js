@@ -267,7 +267,7 @@ function parseGpx(xmlstr) {
 	});
 
 	u(".edit-info-btn").on("click", (e) => {
-		const el = u(e.target).closest(".edit-info-btn");
+		const el = u(e.target).closest("button");
 		u("#id_name").val(el.attr("data-competitor-name"));
 		u("#id_short_name").val(el.attr("data-competitor-short-name"));
 		u("#id_id").val(el.attr("data-competitor-id"));
@@ -320,6 +320,9 @@ function parseGpx(xmlstr) {
 		if (u("#id_tag > option").nodes.length > 0) {
 			data.tags = tag;
 		}
+		if (deviceId === "GPS File") {
+			delete data.device_id;
+		}
 		reqwest({
 			url: `/competitors/${competitorId}/`,
 			method: "PATCH",
@@ -343,7 +346,7 @@ function parseGpx(xmlstr) {
 	});
 
 	u(".confirm-withdraw-btn").on("click", (e) => {
-		const el = u(e.target);
+		const el = u(e.target).closest("button");
 		const competitorId = el.attr("data-competitor-id");
 		const eventName = el.attr("data-event-name");
 		swal(

@@ -28,26 +28,40 @@
                             {% for p in participations %}
                                 <tr class="collapsable">
                                     <td>
-                                        <a href="{{ p.event.get_absolute_url }}" class="btn btn-primary dashboard-link external-link">
-                                            <i class="fa-solid fa-trophy"></i> <span><i>{{ p.event.name }}</i></span><br/>
-                                            <span>
-                                                <i class="fa-solid fa-flag"></i> <i>{{ p.event.club.name }}</i> – <i class="fa-solid fa-person"></i> <i>{{ p.name }} ({{ p.short_name }})</i>
-                                            </span>
-                                        </a></td>
+                                        <div class="text-nowrap">
+                                            <i class="fa-solid  fa-fw fa-trophy"></i> <span><i>{{ p.event.name }}</i></span>&nbsp;<a href="{{ p.event.get_absolute_url }}"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                        </div>
+                                        <div class="text-nowrap">
+                                            <i class="fa-brands fa-fw fa-font-awesome"></i> <span>{{ p.event.club.name }}</span>
+                                        </div>
+                                        <div class="text-nowrap">
+                                            <i class="fa-solid fa-fw fa-person-running"></i> <span>{{ p.name }} {% if p.short_name != p.name %}<small class="text-muted">{{ p.short_name }}</small>{% endif %}</span>
+                                        </div>
+                                    </td>
                                     <td>
-                                        <button data-competitor-name="{{ p.name }}"
-                                                data-competitor-short-name="{{ p.short_name }}"
-                                                data-competitor-id="{{ p.aid }}"
-                                                data-device-id="{{ p.device.aid }}"
-                                                data-competition-allowed-tags="{{ p.event.acceptable_tags }}"
-                                                data-competitor-tags="{{ p.tags }}"
-                                                class="me-1 mb-1 btn btn-secondary dashboard-link edit-info-btn"><i class="fa-solid fa-pen-to-square"></i> <span>Edit</span></button>
+                                        <button class="me-1 mb-1 btn btn-secondary dashboard-link edit-info-btn"
+                                            data-competitor-name="{{ p.name }}"
+                                            data-competitor-short-name="{{ p.short_name }}"
+                                            data-competitor-id="{{ p.aid }}"
+                                            data-device-id="{% if not p.device.virtual %}{{ p.device.aid }}{% else %}GPS File{% endif %}"
+                                            data-competition-allowed-tags="{{ p.event.acceptable_tags }}"
+                                            data-competitor-tags="{{ p.tags }}"
+                                        >
+                                            <i class="fa-solid fa-pen-to-square"></i> <span>Edit</span>
+                                        </button>
                                         {% if p.event.allow_route_upload %}
-                                            <button data-competitor-id="{{ p.aid }}"
-                                                    class="me-1 mb-1 btn btn-secondary dashboard-link open-upload-btn"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Route</span></button>
+                                        <button class="me-1 mb-1 btn btn-secondary dashboard-link open-upload-btn"
+                                                data-competitor-id="{{ p.aid }}"
+                                        >
+                                            <i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Route</span>
+                                        </button>
                                         {% endif %}
-                                            <button data-competitor-id="{{ p.aid }}" data-event-name="{{ p.event.name }}"
-                                                    class="mb-1 btn btn-danger dashboard-link confirm-withdraw-btn"><i class="fa-solid fa-door-open"></i> <span>Withdraw</span></button>
+                                        <button class="mb-1 btn btn-danger dashboard-link confirm-withdraw-btn"
+                                            data-competitor-id="{{ p.aid }}"
+                                            data-event-name="{{ p.event.name }}"
+                                        >
+                                            <i class="fa-solid fa-door-open"></i> <span>Withdraw</span>
+                                        </button>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -21,6 +21,7 @@ from django.core.files.images import get_image_dimensions
 from django.core.validators import FileExtensionValidator
 from django.db.models import Q
 from django.forms import (
+    BooleanField,
     CharField,
     ChoiceField,
     DateTimeInput,
@@ -1038,8 +1039,9 @@ class RegisterForm(Form):
         label="Tracker ID",
         help_text="Optional - Leave blank if uploading a GPS File",
     )
+    race_complete = BooleanField(label="Race already complete")
     gps_file = FileField(
-        label="GPS File ",
+        label="GPS File",
         max_length=255,
         help_text="Optional - GPX, FIT, or TCX, Can be uploaded later",
         validators=[FileExtensionValidator(allowed_extensions=["gpx", "tcx", "fit"])],
@@ -1049,10 +1051,12 @@ class RegisterForm(Form):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
-        if (
-            not self.event.allow_route_upload
-            or self.event.start_date > arrow.now().datetime
-        ):
+        now = arrow.now().datetime
+
+        if now > self.event.end_date:
+            self.fields["race_complete"].default = True
+
+        if now < self.event.start_date or not self.event.allow_route_upload:
             self.fields["gps_file"].widget = HiddenInput()
 
 

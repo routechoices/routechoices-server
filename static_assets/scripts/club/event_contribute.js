@@ -304,7 +304,15 @@ function selectizeDeviceInput(field) {
 				},
 			});
 		});
-
+		u("#id_race_complete").on("change", (e) => {
+			if (!u("#id_race_complete").nodes[0].checked) {
+				u("#id_gps_file").parent().addClass("d-none");
+				u("#id_gps_file").val(null);
+			} else {
+				u("#id_gps_file").parent().removeClass("d-none");
+			}
+		});
+		u("#id_race_complete").trigger("change");
 		u("#id_gps_file").on("change", function (e) {
 			signUpRoute = {};
 			if (this.files.length > 0) {
@@ -336,7 +344,7 @@ function selectizeDeviceInput(field) {
 		});
 
 		if (window.local.eventEnded) {
-			u("#id_device_id").parent().remove();
+			u("#id_device_id").parent().addClass("d-none");
 		} else {
 			const tsDevId = selectizeDeviceInput("select[name='device_id']");
 			const warningHTML = u("<div>")

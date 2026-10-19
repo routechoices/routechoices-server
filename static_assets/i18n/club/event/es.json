@@ -65,6 +65,7 @@
 	"preview": "Previa",
 	"sync-start": "Inicio sinc.",
 	"state-synced": "Sincron.",
-	"waiting-for-data": "Esperando datos…",
-	"no-gps-data": "Sin datos de GPS…"
+	"wait-for-data-text": "Esperando datos…",
+	"no-data-text": "Sin datos de GPS…",
+	"upload-your-route": "Sube tu ruta"
 }

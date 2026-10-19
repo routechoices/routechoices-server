@@ -27,7 +27,6 @@
 		/* Behave  like a "row" */
 		border: none;
 		position: relative;
-		padding-left: 100px;
 	}
 
 	td:before {
@@ -46,15 +45,5 @@ Label the data
 */
 	td.no-data {
 		display: none;
-	}
-
-	td:nth-of-type(1):before {
-		content: "Event";
-		font-weight: bold;
-		white-space: pre-line;
-	}
-	td:nth-of-type(2):before {
-		content: "Actions";
-		font-weight: bold;
 	}
 }

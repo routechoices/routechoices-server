@@ -923,6 +923,10 @@ function RCEvent(infoURL, clockURL, locale) {
 			document.getElementById("no-data-modal"),
 			{ backdrop: "static", keyboard: false },
 		);
+		waitingDataModal = new bootstrap.Modal(
+			document.getElementById("waiting-data-modal"),
+			{ backdrop: "static", keyboard: false },
+		);
 		window.addEventListener("resize", onAppResize);
 		window.addEventListener("fullscreenchange", () => {
 			onAppResize();
@@ -2442,13 +2446,16 @@ function RCEvent(infoURL, clockURL, locale) {
 					}
 				}
 				if (!hasData) {
-					noDataModal.show();
-					let errorMessage = "Waiting for data…";
+					const errorMessage = "Waiting for data…";
 					if (!isLiveEvent || eventEnd < clock.now()) {
-						errorMessage = "No GPS data…";
+						waitingDataModal.hide();
+						noDataModal.show();
+					} else {
+						noDataModal.hide();
+						waitingDataModal.show();
 					}
-					u("#wait-for-data-text").text(errorMessage);
 				} else {
+					waitingDataModal.hide();
 					noDataModal.hide();
 					u("#loading-modal").remove();
 				}
@@ -3574,6 +3581,10 @@ function RCEvent(infoURL, clockURL, locale) {
 		});
 	updateText(locale).then(() => {
 		u("#export-text").text(banana.i18n("export"));
+		u("#no-data-text").text(banana.i18n("no-data-text"));
+		u("#wait-for-data-text").text(banana.i18n("wait-for-data-text"));
+		u(".upload-link-verbose").text(banana.i18n("upload-your-route"));
+
 		u("#event-start-list-link").text(banana.i18n("start-list"));
 		u("#loading-text").text(banana.i18n("loading-text"));
 		u("#synced-starts-text").text(banana.i18n("sync-start"));

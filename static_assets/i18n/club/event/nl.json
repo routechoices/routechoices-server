@@ -65,6 +65,7 @@
 	"preview": "Voorbeeld",
 	"sync-start": "Gesynct start",
 	"state-synced": "Gesynct",
-	"waiting-for-data": "Wachten op data…",
-	"no-gps-data": "Geen GPS-data…"
+	"wait-for-data-text": "Wachten op data…",
+	"no-data-text": "Geen GPS-data…",
+	"upload-your-route": "Upload je route"
 }
