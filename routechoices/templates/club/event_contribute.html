@@ -89,7 +89,7 @@
                 <div class="mb-3">
                     {% for c in event.competitors.all %}
                         <div class="p-1 m-1 border-bottom d-flex justify-content-between">
-                            <div class="ms-2 fw-bold">{{ c.name }}{% if c.name != c.short_name %}<small class="text-muted">{{ c.short_name }}</small>{% endif %}</div>
+                            <div class="ms-2 fw-bold">{{ c.name }}{% if c.name != c.short_name %}&nbsp;<small class="text-muted">{{ c.short_name }}</small>{% endif %}</div>
                             {% if upload_form %}
                             <div>
                                 <button type="button"
