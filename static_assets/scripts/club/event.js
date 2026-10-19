@@ -14,6 +14,11 @@ function RCEvent(infoURL, clockURL, locale) {
 	let zoomControl;
 	let rotateControl;
 	let noDataModal;
+	const sortOrders = [
+		{ id: "start", icon: "arrow-down-9-1" },
+		{ id: "name", icon: "arrow-down-a-z" },
+	];
+	let currentSortOrder = 0;
 	// let scaleControl;
 	let runnerIconScale = 1;
 	let isLive = false;
@@ -2016,8 +2021,25 @@ function RCEvent(infoURL, clockURL, locale) {
 			});
 			u("#text-too-many-runners").removeClass("d-none").addClass("show");
 		}
+		const sortedCompetitorList = Object.fromEntries(
+			Object.entries(competitorList).sort((a, b) => {
+				const nameA = a[1].name.toUpperCase();
+				const nameB = b[1].name.toUpperCase();
+				const startA = new Date(a[1].start_time);
+				const startB = new Date(b[1].start_time);
+				if (currentSortOrder === 1) {
+					if (nameA < nameB) {
+						return -1;
+					}
+					if (nameA > nameB) {
+						return 1;
+					}
+				}
+				return startA - startB;
+			}),
+		);
 		loaded = true;
-		Object.values(competitorList).forEach((competitor, i) => {
+		Object.values(sortedCompetitorList).forEach((competitor, i) => {
 			if (
 				searchText === null ||
 				searchText === "" ||
@@ -2029,7 +2051,7 @@ function RCEvent(infoURL, clockURL, locale) {
 			}
 		});
 
-		if (Object.keys(competitorList).length === 0) {
+		if (Object.keys(sortedCompetitorList).length === 0) {
 			const div = u(
 				'<div class="no-competitor-warning text-center d-flex justify-content-center align-items-center"/>',
 			);
@@ -2046,7 +2068,7 @@ function RCEvent(infoURL, clockURL, locale) {
 			);
 			const topDiv = u("<div/>").attr("id", "filter-bar");
 			const searchBar = u("<form/>").addClass("row g-0 flex-nowrap");
-			if (Object.keys(competitorList).length) {
+			if (Object.keys(sortedCompetitorList).length) {
 				const toggleAllContent = u("<div/>")
 					.addClass(
 						"form-group",
@@ -2100,6 +2122,21 @@ function RCEvent(infoURL, clockURL, locale) {
 						.append(
 							u('<input class="form-control" type="search"/>')
 								.on("input", filterCompetitorList)
+								.attr("placeholder", banana.i18n("search-competitors"))
+								.val(searchText),
+						),
+				);
+				searchBar.append(
+					u("<div>")
+						.addClass("col-auto flex-fill ms-0 ps-0")
+						.append(
+							u(
+								`<button class="btn text-muted" type="button"><i class="fa-solid fa-${sortOrders[currentSortOrder].icon}"></i></button>`,
+							)
+								.on("click", (e) => {
+									currentSortOrder = (currentSortOrder + 1) % sortOrders.length;
+									displayCompetitorList();
+								})
 								.attr("placeholder", banana.i18n("search-competitors"))
 								.val(searchText),
 						),
