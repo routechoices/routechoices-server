@@ -306,7 +306,7 @@ function selectizeDeviceInput(field) {
 		});
 		u("#id_race_complete").on("change", (e) => {
 			const input = u("#id_gps_file");
-			console.log(u("#id_race_complete").nodes[0].checked)
+			console.log(u("#id_race_complete").nodes[0].checked, input.attr("type"))
 			if (u("#id_race_complete").nodes[0].checked) {
 				if (input.attr("type") !== "hidden") {
 					input.parent().addClass("d-none");
