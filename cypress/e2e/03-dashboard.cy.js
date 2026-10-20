@@ -22,7 +22,7 @@ context("Dashboard actions", () => {
 
 	it("Club page edit", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/kimito-sk");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk");
 		cy.contains(".admin-user-div", "test-user");
 		cy.get(".admin-user-div").should("have.length", 2);
 		cy.get(".remove-admin-btn").eq(1).click();
@@ -38,7 +38,7 @@ context("Dashboard actions", () => {
 
 	it("Contribution page", () => {
 		cy.visit(
-			"https://dashboard.rc.local.1hz.fi/contribute/kimito-sk/open-registration-upload-allowed/",
+			"https://dashboard.rtchs.localhost/contribute/kimito-sk/open-registration-upload-allowed/",
 		);
 		cy.contains("Register");
 		cy.get("#id_name").type("Thierry Gueorgiou");
@@ -59,7 +59,7 @@ context("Dashboard actions", () => {
 
 	it("Participation page", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/participations");
+		cy.visit("https://dashboard.rtchs.localhost/participations");
 		cy.contains("My event with open registration and upload allowed");
 		cy.contains("Kimito SK");
 		cy.contains("Aatos (A)");
@@ -80,7 +80,7 @@ context("Dashboard actions", () => {
 	});
 
 	it("Registration website", () => {
-		cy.visit("https://registration.rc.local.1hz.fi");
+		cy.visit("https://registration.rtchs.localhost");
 		cy.contains("My event with open registration and upload allowed");
 		cy.contains("My future event with open registration");
 		cy.contains("My future event with open registration and upload allowed");
@@ -88,7 +88,7 @@ context("Dashboard actions", () => {
 
 	it("Manage devices", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/");
 		cy.contains("Kimito SK").click();
 		cy.contains("Trackers").click();
 		cy.contains("Add Tracker").click();
@@ -124,7 +124,7 @@ context("Dashboard actions", () => {
 
 	it("Upgrade account", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/");
 		cy.contains("Kimito SK").click();
 		cy.contains("Upgrade to our paid plan!").click();
 		cy.location("pathname").should("eq", "/clubs/kimito-sk/upgrade");
@@ -137,12 +137,12 @@ context("Dashboard actions", () => {
 
 	it("Import map", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/");
 		cy.contains("Kimito SK").click();
 
 		for (const gpxFileName of ["trk", "waypoint", "waypoint+trk"]) {
 			cy.visit(
-				"https://dashboard.rc.local.1hz.fi/clubs/kimito-sk/maps/upload-gpx",
+				"https://dashboard.rtchs.localhost/clubs/kimito-sk/maps/upload-gpx",
 			);
 			cy.get("#id_gpx_file").selectFile(
 				`cypress/fixtures/gpx/${gpxFileName}.gpx`,
@@ -158,7 +158,7 @@ context("Dashboard actions", () => {
 			"maps/multiground.kml",
 			"maps/tiled.kmz",
 		]) {
-			cy.visit("https://dashboard.rc.local.1hz.fi/clubs/kimito-sk/maps/new");
+			cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/maps/new");
 			cy.get("#id_keyhole_file").selectFile(`cypress/fixtures/${kmzFileName}`);
 			cy.get("#kmz-form button:not([type]),button[type=submit]").click();
 			cy.get("#django-messages", { timeout: 10_000 }).contains(
@@ -169,10 +169,10 @@ context("Dashboard actions", () => {
 
 	it("Create map from image", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/");
 		cy.contains("Kimito SK").click();
 
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/kimito-sk/maps/new");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/maps/new");
 
 		cy.get("#id_name").type("Jukola 2019 - 1st Leg (manual calibration)");
 
@@ -235,14 +235,14 @@ context("Dashboard actions", () => {
 
 	it("Create events", () => {
 		cy.login();
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/");
 		cy.contains("Kimito SK").click();
 
 		// Create Map
 		cy.createMap();
 
 		// Create Event with minimal info
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/kimito-sk/events/");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/events/");
 		cy.get("a").contains("Setup new Event").click();
 		cy.location("pathname").should("eq", "/clubs/kimito-sk/events/new");
 
@@ -294,7 +294,7 @@ context("Dashboard actions", () => {
 		// Create second event with all fields info
 		cy.createMap("Another map");
 		cy.intercept("POST", "/clubs/kimito-sk/events/new").as("eventSubmit");
-		cy.visit("https://dashboard.rc.local.1hz.fi/clubs/kimito-sk/events/new");
+		cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/events/new");
 		cy.get("#id_name").type("Jukola 2019 - 2nd Leg");
 		cy.get("#id_event_set-ts-control").parent().click().wait(300);
 		cy.get("#id_event_set-ts-dropdown > .option").eq(1).click().wait(300);
@@ -328,8 +328,8 @@ context("Dashboard actions", () => {
 		cy.location("pathname").should("eq", "/clubs/kimito-sk/events/");
 
 		// test the event view
-		cy.visit("https://kimito-sk.rc.local.1hz.fi/Jukola-2019-2nd-leg");
-		cy.origin("https://kimito-sk.rc.local.1hz.fi", () => {
+		cy.visit("https://kimito-sk.rtchs.localhost/Jukola-2019-2nd-leg");
+		cy.origin("https://kimito-sk.rtchs.localhost", () => {
 			cy.contains("Björn Ekeberg", { timeout: 10_000 });
 			cy.contains("Another map", { timeout: 10_000 });
 		});
@@ -338,7 +338,7 @@ context("Dashboard actions", () => {
 	it("Player UI should work", () => {
 		// Test the event view
 		// TODO: remove depedency on previous other tests
-		cy.visit("https://kimito-sk.rc.local.1hz.fi/Jukola-2019-1st-leg");
+		cy.visit("https://kimito-sk.rtchs.localhost/Jukola-2019-1st-leg");
 		cy.contains("Niels Christian Hellerud", { timeout: 20_000 }); // in competitor list
 
 		//// toggle competitor

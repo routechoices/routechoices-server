@@ -25,7 +25,7 @@ from routechoices.core.models import (
 
 class EssentialDashboardBase(APITestCase):
     def setUp(self):
-        self.client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        self.client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
         self.club = Club.objects.create(name="My Club", slug="myclub")
         self.user = User.objects.create_user(
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
@@ -44,7 +44,7 @@ class EssentialDashboardBase(APITestCase):
         url = reverse(
             path, host="dashboard", kwargs=extra_kwargs, host_kwargs=host_kwargs
         )
-        self.assertEqual(url, f"//dashboard.rc.local.1hz.fi{expected}")
+        self.assertEqual(url, f"//dashboard.rtchs.localhost{expected}")
         return url
 
 
@@ -1179,7 +1179,7 @@ class TestDashboard(EssentialDashboardBase):
 
 class TestInviteFlow(APITestCase):
     def setUp(self):
-        self.client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        self.client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
         self.club = Club.objects.create(name="My Club", slug="myclub", upgraded=True)
         self.user = User.objects.create_user(
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
@@ -1288,7 +1288,7 @@ class TestInviteFlow(APITestCase):
         )
         res = self.client.post(accept_link)
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
-        self.assertRedirects(res, "https://dashboard.rc.local.1hz.fi/login")
+        self.assertRedirects(res, "https://dashboard.rtchs.localhost/login")
         self.assertFalse(self.club.admins.filter(id=self.user2.id).exists())
 
         # Wrong user try to accept
@@ -1323,6 +1323,6 @@ class TestInviteFlow(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_302_FOUND)
         self.assertRedirects(
             res,
-            "https://dashboard.rc.local.1hz.fi/login",
+            "https://dashboard.rtchs.localhost/login",
             target_status_code=status.HTTP_302_FOUND,
         )

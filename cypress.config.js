@@ -15,7 +15,7 @@ module.exports = defineConfig({
 			});
 			return require("./cypress/plugins/index.js")(on, config);
 		},
-		baseUrl: "https://dashboard.rc.local.1hz.fi",
+		baseUrl: "https://dashboard.rtchs.localhost",
 	},
 	component: {
 		devServer: {

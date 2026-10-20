@@ -32,7 +32,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.club.logo.save("logo.png", File(BytesIO(icon_bytes)))
         self.club.banner.save("banner.png", File(BytesIO(icon_bytes)))
 
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
 
         url = self.reverse_and_check(
             "club_logo",
@@ -112,7 +112,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.headers["Content-Range"], "bytes 10-20/286")
 
     def test_club_commons_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         s = EventSet.objects.create(
             club=self.club, name="Killa Cup", create_page=True, slug="kiila-cup"
         )
@@ -193,7 +193,7 @@ class ClubViewsTestCase(EssentialApiBase):
             end_date=arrow.now().shift(hours=1).datetime,
             event_set=s,
         )
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         url = self.reverse_and_check(
             "event_view",
             "/kiila-cup/",
@@ -213,7 +213,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_event_map_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         raster_map = Map.objects.create(
             club=self.club,
             name="Test map",
@@ -298,7 +298,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_event_pages_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         e = Event.objects.create(
             name="Kiila Cup 1",
             slug="kiila-cup-1",
@@ -339,7 +339,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Export event data")
 
-        client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
 
         url = self.reverse_and_check(
             "event_contribute_view",
@@ -371,7 +371,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertNotContains(response, ">Register<")
         self.assertContains(response, "Upload Route")
 
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         url = self.reverse_and_check(
             "event_view",
             "/kiila-cup-1/",
@@ -397,7 +397,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertContains(response, "Start List")
 
     def test_no_event_pages_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         url = self.reverse_and_check(
             "event_view",
             "/kiila-cup-69/",
@@ -450,7 +450,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_no_club_pages_load(self):
-        client = APIClient(HTTP_HOST="haldensk.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="haldensk.rtchs.localhost")
 
         response = client.get("/kiila-cup-69/does-not-exist")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -461,7 +461,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertIn("Club not found", response.content.decode())
 
     def test_future_event_pages_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
 
         Event.objects.create(
             name="Kiila Cup 2",
@@ -480,14 +480,14 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Export is not available yet")
 
-        client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
         response = client.get("/contribute/kiilat/kiila-cup-2")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
         self.assertNotContains(response, "Upload Route")
 
     def test_past_event_pages_load(self):
-        client = APIClient(HTTP_HOST="kiilat.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
 
         Event.objects.create(
             name="Kiila Cup 3",
@@ -506,7 +506,7 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Export event data")
 
-        client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
         response = client.get("/contribute/kiilat/kiila-cup-3")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
@@ -536,7 +536,7 @@ class ClubViewsTestCase(EssentialApiBase):
             event=event,
             device=device,
         )
-        client = APIClient(HTTP_HOST="myclub.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="myclub.rtchs.localhost")
         url = self.reverse_and_check(
             "event_gpsseuranta_data_view",
             "/myevent/data.lst",

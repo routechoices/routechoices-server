@@ -2,3 +2,4 @@
 set -e
 ./dc exec django coverage run ./manage.py test --buffer --shuffle --failfast
 ./dc exec django coverage xml
+q

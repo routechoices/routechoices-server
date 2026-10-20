@@ -31,7 +31,7 @@ from routechoices.lib.helpers import epoch_to_datetime
 
 class EssentialApiBase(APITestCase):
     def setUp(self):
-        self.client = APIClient(HTTP_HOST="api.rc.local.1hz.fi")
+        self.client = APIClient(HTTP_HOST="api.rtchs.localhost")
         self.user = User.objects.create_user(
             "alice", f"alice{random.randrange(1000)}@example.com", "pa$$word123"
         )
@@ -46,7 +46,7 @@ class EssentialApiBase(APITestCase):
         prefix=None,
     ):
         url = reverse(path, host=host, kwargs=extra_kwargs, host_kwargs=host_kwargs)
-        self.assertEqual(url, f"//{prefix or host}.rc.local.1hz.fi{expected}")
+        self.assertEqual(url, f"//{prefix or host}.rtchs.localhost{expected}")
         return url
 
     def get_device_id(self):
@@ -58,7 +58,7 @@ class EssentialApiTestCase1(EssentialApiBase):
     def test_api_root(self):
         self.assertFalse(settings.DEBUG)
         url = self.reverse_and_check("api_doc", "/")
-        res = self.client.get(url)
+        res = self.client.get(url, follow=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_get_time(self):
@@ -80,7 +80,7 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_create_device_id(self):
-        url = self.reverse_and_check("device_api", "/device/")
+        url = self.reverse_and_check("device_api", "/device")
         res = self.client.post(url)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -102,7 +102,7 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(len(dev_id), 8)
         self.assertTrue(dev_id != self.get_device_id())
 
-    @override_settings(SHORTCUT_URL="https://rtchcs.dev/")
+    @override_settings(SHORTCUT_URL="https://rtch.fi/")
     def test_list_events(self):
         club = Club.objects.create(name="Test club", slug="club")
         alt_club = Club.objects.create(
@@ -133,19 +133,19 @@ class EssentialApiTestCase1(EssentialApiBase):
             end_date=arrow.get().shift(hours=-1).datetime,
         )
 
-        e1b = Event.get_by_url("https://club.rc.local.1hz.fi/abc")
+        e1b = Event.get_by_url("https://club.rtchs.localhost/abc")
         self.assertEqual(e1, e1b)
         e3b = Event.get_by_url("https://example.com/ghi")
         self.assertEqual(e3, e3b)
-        e3c = Event.get_by_url("https://alt-club.rc.local.1hz.fi/ghi")
+        e3c = Event.get_by_url("https://alt-club.rtchs.localhost/ghi")
         self.assertEqual(e3, e3c)
         e3d = Event.get_by_url("https://rtchcs.dev/alt-club/ghi")
         self.assertEqual(e3, e3d)
         e = Event.get_by_url("https://www.rtchcs.dev/alt-club/ghi")
         self.assertIsNone(e)
-        e = Event.get_by_url("https://alt-club-rc.local.1hz.fi/ghi")
+        e = Event.get_by_url("https://alt-club-rtchs.localhost/ghi")
         self.assertIsNone(e)
-        e = Event.get_by_url("https://alt-club.rc.local.1hz.fi/abc")
+        e = Event.get_by_url("https://alt-club.rtchs.localhost/abc")
         self.assertIsNone(e)
         e = Event.get_by_url("https://google.com/abc")
         self.assertIsNone(e)
@@ -163,7 +163,7 @@ class EssentialApiTestCase1(EssentialApiBase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res_json = json.loads(res.content)
         self.assertEqual(len(res_json), 1)
-        res = self.client.get(f"{url}?event=https://club.rc.local.1hz.fi/def")
+        res = self.client.get(f"{url}?event=https://club.rtchs.localhost/def")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res_json = json.loads(res.content)
         self.assertEqual(len(res_json), 1)
@@ -870,7 +870,7 @@ class EventApiTestCase(EssentialApiBase):
             traveller.shift(5)
             url_delta = self.reverse_and_check(
                 "event_data_delta",
-                next_url[len("api.rc.local.1hz.fi") + 2 :],
+                next_url[len("api.rtchs.localhost") + 2 :],
                 "api",
                 {"event_id": event.aid, "previous_key": cache_ts},
             )
