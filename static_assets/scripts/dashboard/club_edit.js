@@ -82,11 +82,13 @@
 					},
 				);
 			};
-			d.append(
-				u(
-					'<button type="button" class="btn btn-close ms-1 btn-sm remove-admin-btn" aria-label="Remove admin"></button>',
-				).on("click", removeElFromAdmin),
-			);
+			if (u("#id_admins option[selected]").nodes.length > 1) {
+				d.append(
+					u(
+						'<button type="button" class="btn btn-close ms-1 btn-sm remove-admin-btn" aria-label="Remove admin"></button>',
+					).on("click", removeElFromAdmin),
+				);
+			}
 			return d;
 		}),
 	);

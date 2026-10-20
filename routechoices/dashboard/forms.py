@@ -138,9 +138,10 @@ class RequestInviteForm(Form):
 
 
 class ClubForm(ModelForm):
+
     class Meta:
         model = Club
-        fields = [
+        fields = (
             "name",
             "slug",
             "admins",
@@ -149,7 +150,7 @@ class ClubForm(ModelForm):
             "logo",
             "banner",
             "description",
-        ]
+        )
 
     def clean_admins(self):
         admins = self.cleaned_data["admins"]

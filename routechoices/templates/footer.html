@@ -7,9 +7,6 @@
                 <div class="col col-auto d-flex flex-column">
                     <h5 class="text-nowrap">Get started</h5>
                     <ul class="nav flex-column">
-                        <li class="nav-item list-unstyled">
-                            <a href="{% host_url 'site:landing_page' host 'www' %}" class="nav-link text-nowrap">Home</a>
-                        </li>
                         <li class="nav-item">
                             <a href="{% host_url 'site:public_events_view' host 'www' %}" class="nav-link text-nowrap">Featured Events</a>
                         </li>
@@ -17,10 +14,13 @@
                             <a href="{% host_url 'site:trackers_view' host 'www' %}" class="nav-link text-nowrap">About Trackers</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% host_url 'site:pricing_view' host 'www' %}" class="nav-link text-nowrap">Pricing</a>
+                            <a href="{% host_url 'site:tos_view' host 'www' %}" class="nav-link text-nowrap">Terms of Service</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% host_url 'site:tos_view' host 'www' %}" class="nav-link text-nowrap">Terms of Service</a>
+                            <a href="{% host_url 'site:pricing_view' host 'www' %}" class="nav-link text-nowrap">Pricing</a>
+                        </li>
+                        <li class="nav-item list-unstyled">
+                            <a href="{% host_url 'account_signup' host 'dashboard' %}" class="nav-link text-nowrap">Sign Up</a>
                         </li>
                     </ul>
                 </div>

@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-12">
             <div class="mb-3">
-                {% if not event_sets %}<p>You haven't created any event sets.</p>{% endif %}
+                {% if not event_sets %}<p>You haven't created any bundles.</p>{% endif %}
                 <a href="{% url 'dashboard_club:event_set:create_view' club_slug=request.club.slug %}"
                    class="btn btn-primary mb-1"><i class="fa-solid fa-circle-plus"></i> Create Bundle</a>
             </div>
