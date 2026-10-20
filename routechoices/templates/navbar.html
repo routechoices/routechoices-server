@@ -48,8 +48,13 @@
             <ul class="navbar-nav d-flex">
                 <span class="if-not-collapsed me-2"></span>
                 <li class="nav-item">
+                    <a href="{% host_url 'account_login' host 'dashboard' %}" class="text-nowrap nav-link mt-0 me-2">
+                        Sign In
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{% host_url 'account_login' host 'dashboard' %}" class="text-nowrap btn btn-primary navbar-btn loginBtn mt-0 me-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                        Get Started
                     </a>
                 </li>
                 <li class="nav-item">
