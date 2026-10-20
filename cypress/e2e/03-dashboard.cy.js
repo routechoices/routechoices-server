@@ -62,14 +62,16 @@ context("Dashboard actions", () => {
 		cy.visit("https://dashboard.rtchs.localhost/participations");
 		cy.contains("My event with open registration and upload allowed");
 		cy.contains("Kimito SK");
-		cy.contains("Aatos (A)");
+		cy.contains("Aatos");
+		cy.contains("å");
 		cy.get(".edit-info-btn").first().click();
 		cy.get("#id_name").clear().type("Kasper Harlem Fosser");
 		cy.get("#id_short_name").clear().type("🇳🇴 K.H.Fosser{enter}");
 		cy.contains("Info updated!");
 		cy.contains("My event with open registration and upload allowed");
 		cy.contains("Kimito SK");
-		cy.contains("Kasper Harlem Fosser (🇳🇴 K.H.Fosser)");
+		cy.contains("Kasper Harlem Fosser");
+		cy.contains("🇳🇴 K.H.Fosser");
 
 		cy.get(".open-upload-btn").first().click();
 		cy.get("#id_gpx_file").selectFile(
@@ -94,7 +96,7 @@ context("Dashboard actions", () => {
 		cy.contains("Add Tracker").click();
 		cy.get("#id_device-ts-control").type("10000000").wait(1000);
 		cy.get("#id_nickname").type("MyDevice");
-		cy.get("input").contains("Add").click();
+		cy.get("button").contains("Add").click();
 		cy.get("#django-messages").contains("Tracker added successfully");
 		cy.contains("MyDevice");
 		cy.contains("Edit").first().click();
@@ -118,7 +120,7 @@ context("Dashboard actions", () => {
 
 		cy.contains("Add Tracker").click();
 		cy.get("#csv_input").selectFile(`cypress/fixtures/IMEI.csv`);
-		cy.get("input").contains("Import").click();
+		cy.get("button").contains("Import").click();
 		cy.contains("4 devices imported");
 	});
 
@@ -253,15 +255,11 @@ context("Dashboard actions", () => {
 		cy.get("#id_start_date").focus().clear().type("2019-06-15T23:00:00");
 		cy.get("#id_end_date").focus().clear().type("2019-06-16T12:00:00");
 		cy.get("#id_map").select(1);
-		cy.get("button:not([type]),button[type=submit]").first().click();
+		cy.get("button:not([type]),button[type=submit]").eq(1).click();
 
 		// Edit event we just created
 		cy.location("pathname").should("eq", "/clubs/kimito-sk/events/");
-		cy.get("a")
-			.contains("Jukola 2019 - 1st Leg")
-			.closest("tr")
-			.contains("Edit")
-			.click();
+		cy.contains("Jukola 2019 - 1st Leg").closest("tr").contains("Edit").click();
 
 		cy.get("#csv_input").selectFile("cypress/fixtures/startlist.csv");
 		cy.get("#id_competitors-2-name").should("have.value", "Samuel Heinonen");
@@ -317,7 +315,7 @@ context("Dashboard actions", () => {
 			.focus()
 			.clear()
 			.type("2019-06-16T00:00:10");
-		cy.get("button:not([type]),button[type=submit]").first().click();
+		cy.get("button:not([type]),button[type=submit]").eq(1).click();
 
 		cy.wait("@eventSubmit").then(({ request, response }) => {
 			expect(response.statusCode).to.eq(302);
@@ -341,7 +339,7 @@ context("Dashboard actions", () => {
 		cy.visit("https://kimito-sk.rtchs.localhost/Jukola-2019-1st-leg");
 		cy.contains("Niels Christian Hellerud", { timeout: 20_000 }); // in competitor list
 
-		//// toggle competitor
+		// toggle competitor
 		cy.get("#toggleAllSwitch").uncheck();
 
 		cy.get(".competitor-switch").eq(2).check();
@@ -354,35 +352,35 @@ context("Dashboard actions", () => {
 
 		cy.get("#toggleAllSwitch").check();
 
-		//// change runner color
+		// change runner color
 		cy.get(".color-tag").eq(1).click();
 		cy.contains("Select new color for Samuel Heinonen");
 		cy.get(".IroWheel").first().should("be.visible").click(50, 50);
 		cy.get("#save-color").click();
 
-		//// center on runner
+		// center on runner
 		cy.get('[aria-label="Center"]').eq(1).click();
 		cy.wait(200);
 
-		//// move progress bar and focus on runner
+		// move progress bar and focus on runner
 		cy.get("#full_progress_bar").click(50, 7);
 		cy.get(".competitor-focus-btn").eq(1).click();
 		cy.wait(500);
 
-		//// toogle full route
+		// toogle full route
 		cy.get(".competitor-highlight-btn").eq(1).click();
 		cy.get(".competitor-full-route-btn").eq(1).click();
 		cy.wait(500);
 		cy.get(".competitor-highlight-btn").eq(1).click();
 		cy.get(".competitor-full-route-btn").eq(1).click();
 
-		//// random location mass start
+		// random location mass start
 		//cy.get("#synced-starts-check").should("be.checked").check();
 		cy.get("#map").dblclick(70, 90);
 		cy.wait(500);
 		cy.get("#synced-starts-check").should("be.checked");
 
-		//// Show grouping
+		// Show grouping
 		cy.get("#options_show_button").click();
 		cy.get("#toggleClusterSwitch").click();
 		cy.get(".leaflet-control-grouping").first().contains("Group A");
@@ -391,7 +389,7 @@ context("Dashboard actions", () => {
 		cy.contains("#map", "🇫🇮 Paimion Rasti").should("exist");
 		cy.get("#toggleClusterSwitch").click();
 
-		//// mass start simulation
+		// mass start simulation
 		cy.get("#synced-starts-check").should("be.checked").check();
 		cy.wait(100);
 	});

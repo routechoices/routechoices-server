@@ -1,15 +1,11 @@
 context("Events in future", () => {
-	after(() => {
-		cy.wait(100);
-	});
-
 	it("Future events are not listed", () => {
 		cy.visit("https://kimito-sk.rtchs.localhost/");
 		cy.contains("My Future").should("not.exist");
 	});
 
 	it("Can not see Event as in future", () => {
-		cy.visit("https://kimito-sk.rtchs.localhost/future-default");
+		cy.visit("https://kimito-sk.rtchs.localhost/future-default/");
 		cy.contains("Event has not yet started.");
 		cy.contains("Starting in").should("be.visible");
 	});

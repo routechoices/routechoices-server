@@ -1,10 +1,6 @@
 context("GPS Tracker ID generation", () => {
-	after(() => {
-		cy.wait(100);
-	});
-
-	it("Genereate an GPS Tracker ID", () => {
-		cy.visit("https:////www.rtchs.localhost/trackers");
+	it("Generate an GPS Tracker ID", () => {
+		cy.visit("https://www.rtchs.localhost/trackers");
 		cy.get("#dedicated-trackers-tab").click();
 
 		// Invalid too short IMEI

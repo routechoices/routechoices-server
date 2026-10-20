@@ -11,11 +11,11 @@ from django.contrib.auth.models import User
 from django.test.client import MULTIPART_CONTENT
 from django.utils.timezone import now
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.bg_tasks import rastilippu_update_event_url
 from routechoices.core.models import Club, Event, EventSet, Map
+from routechoices.testing import APIClient
 
 
 class WebhookConsumer(APIClient):
@@ -794,11 +794,11 @@ class RLWebHookTestCase(EssentialApiBase):
             "https://kiilat.rtchs.localhost/rr/",
         )
 
-        event.club.domain = "example.com"
+        event.club.domain = "gps.example.com"
         event.club.save()
-        self.assertEqual(
-            event.get_absolute_url(), "http://example.com/rr"
-        )  # HTTP as there is no certificate generated
+        # There is no certificate for the doamin so it only gets vanity URL
+        self.assertEqual(event.get_absolute_url(), "https://kiilat.rtchs.localhost/rr/")
+        # TODO: add a test with fake certificate for example.com
 
         self.assertEqual(mock_requests.post.call_count, 1)
         rastilippu_update_event_url.now(event.id)

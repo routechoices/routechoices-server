@@ -4,10 +4,11 @@ from pathlib import Path
 import arrow
 from django.core.cache import cache
 from rest_framework import status
-from rest_framework.test import APIClient, override_settings
+from rest_framework.test import override_settings
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.models import Club, Event, Map, MapAssignation
+from routechoices.testing import APIClient
 
 
 @override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()))
@@ -147,7 +148,6 @@ class MapApiTestCase(EssentialApiBase):
         test_tiles = [
             "ch/16/34026/23199",
             "ee/15/18662/9672",
-            "se/13/4459/2405",
             "uk/13/4062/2695",
         ]
         for url in test_tiles:

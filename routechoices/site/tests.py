@@ -2,10 +2,10 @@ import arrow
 from allauth.account.models import EmailAddress
 from django.core import mail
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.models import Club, Event, EventSet
+from routechoices.testing import APIClient
 
 
 class SiteViewsTestCase(EssentialApiBase):
