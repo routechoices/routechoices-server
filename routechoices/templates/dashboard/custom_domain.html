@@ -4,10 +4,10 @@
     <h3>Custom domain</h3>
     {% if club.domain %}
         <p>
-            Your club's pages are accessible at your custom domain <a href="{{ club.nice_url }}">{{ club.nice_url }}</a>
+            Your club's pages are currently accessible at your custom domain <a href="{{ club.nice_url }}">{{ club.nice_url }}</a>
         </p>
-        {% if club.domain and not club.has_ssl_certificate %}
-            <p>Our server is in process of providing you a HTTPS certificate, it might take a while...</p>
+        {% if not club.has_ssl_certificate %}
+            <p>Our server is in process of providing you a HTTPS certificate for a domain you have provided <i class="text-muted">{{ club.domain }}</i>, it might take a while...</p>
         {% endif %}
         <form method="post" class="post-form">
             {% csrf_token %}
@@ -17,7 +17,7 @@
                    class="form-control"
                    id="id_domain" />
             <button type="submit" class="save btn btn-secondary">
-                <i class="fa-solid fa-xmark"></i> Unset
+                <i class="fa-solid fa-xmark"></i> <span>{% if not club.has_ssl_certificate %}Abort{% else %}Unset{% endif %}</span>
             </button>
         </form>
     {% else %}
