@@ -1,0 +1,54 @@
+#!/bin/sh
+set -e
+
+run_python_tests() {
+    echo "Starting test environment..."
+    ./dc up -d db s3
+    cp .env.e2e ./.env
+
+    echo "Waiting for the database to be ready..."
+    until ./dc exec db pg_isready -U app_user -d e2e_db; do
+        sleep 1
+    done
+
+    echo "Starting Django..."
+    ./dc up -d django
+
+    until ./dc exec django python manage.py check; do
+        sleep 1
+    done
+
+    echo "Running Python tests..."
+    ./dc exec django coverage run ./manage.py test --buffer --shuffle --failfast
+    echo "Generating coverage report..."
+    ./dc exec django coverage xml
+}
+
+run_e2e_tests() {
+    if [ ! -x node_modules/cypress/bin/cypress ]; then
+        echo "Cypress is not installed. Run pnpm install first." >&2
+        exit 1
+    fi
+
+    TZ=Europe/Helsinki node_modules/cypress/bin/cypress run \
+        --browser "${CYPRESS_BROWSER:-chromium}"
+}
+
+echo "Running tests..."
+
+case "${1:-all}" in
+    all)
+        run_python_tests
+        run_e2e_tests
+        ;;
+    python)
+        run_python_tests
+        ;;
+    e2e)
+        run_e2e_tests
+        ;;
+    *)
+        echo "Usage: $0 [all|python|e2e]" >&2
+        exit 2
+        ;;
+esac
