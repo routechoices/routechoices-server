@@ -149,7 +149,7 @@
                               class="d-inline-block float-end"
                               tabindex="0"
                               data-bs-toggle="tooltip"
-                              title="First, select 4 distincts points on the raster map and on the world map!">
+                              title="First, select at least 3 distincts points on the raster map and on the world map!">
                             <button type="button"class="btn btn-primary disabled mb-1" disabled>
                                 <i class="fa-solid fa-magnifying-glass"></i> Preview Map
                             </button>
@@ -196,6 +196,7 @@
         <script src="{% static 'scripts/backdrop_maps.js' %}"></script>
         <script src="{% static 'scripts/dashboard/tooltips.js' %}"></script>
         <script src="{% static 'scripts/dashboard/map_edit.js' %}"></script>
+        <script src="{% static 'scripts/geopdf_parser.js' %}"></script>
         <script src="{% static 'scripts/submit-form-commons.js' %}"></script>
     {% endcompress %}
 {% endblock extra_body %}

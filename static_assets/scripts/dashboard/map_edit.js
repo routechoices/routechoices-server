@@ -14,17 +14,26 @@ const onPDF = (ev, filenameRaw) => {
 	pdfjsLib.GlobalWorkerOptions.workerSrc =
 		"/static/vendor/pdfjs-5.2.133/pdf.worker.js";
 	const loadingTask = pdfjsLib.getDocument({
-		data: new Uint8Array(ev.target.result),
+		data: new Uint8Array(ev.target.result.slice(0)),
 	});
-	loadingTask.promise.then((pdf) => {
-		pdf.getPage(1).then((page) => {
+	loadingTask.promise.then(async (pdf) => {
+		try {
+			const geospatialData = await GeoPdfParser.parse(ev.target.result);
+			if (geospatialData) {
+				u("#id_calibration_string_raw")
+					.val(geospatialData.coordinates.flat().join(","))
+					.trigger("change");
+			}
+		} catch (error) {
+			console.error("Could not read GeoPDF calibration metadata.", error);
+		}
+		pdf.getPage(1).then(async (page) => {
 			const PRINT_RESOLUTION = 300;
 			const PRINT_UNITS = PRINT_RESOLUTION / 72.0;
 			const CSS_UNITS = 96.0 / 72.0;
 			const viewport = page.getViewport({ scale: 1 });
 			const width = `${Math.floor(viewport.width * CSS_UNITS)}px`;
 			const height = `${Math.floor(viewport.height * CSS_UNITS)}px`;
-
 			// Prepare canvas using PDF page dimensions
 			const canvas = document.createElement("canvas");
 			canvas.height = Math.floor(viewport.height * PRINT_UNITS);
@@ -57,11 +66,30 @@ const onPDF = (ev, filenameRaw) => {
 							imgFileField.after(
 								'<div class="invalid-feedback">File is too big, maximum size: 20MB</div>',
 							);
-							imgSubmitBtn.addClass("disabled");
+							u("#submit-btn").addClass("disabled");
 							return;
 						}
 						u("#id_image").nodes[0].files = container.files;
 						u("#id_image").trigger("change");
+						u("#id_image").parent().find(".valid-feedback").remove();
+						u("#id_image").parent().find(".invalid-feedback").remove();
+						if (u("#id_calibration_string_raw").val()) {
+							u("#id_image")
+								.removeClass("is-invalid")
+								.addClass("is-valid")
+								.after(
+									'<div class="valid-feedback">File ready to upload!</div>',
+								);
+							u("#submit-btn").removeClass("disabled");
+						} else {
+							u("#id_image")
+								.addClass("is-invalid")
+								.removeClass("is-valid")
+								.after(
+									'<div class="invalid-feedback">You need to calibrate the image manually</div>',
+								);
+							u("#submit-btn").addClass("disabled");
+						}
 					},
 					"image/jpeg",
 					0.8,
@@ -658,8 +686,11 @@ function enableBtnToPreview() {
 
 	const imgSubmitBtn = u("#submit-btn");
 	const imgFileField = u("#id_image");
-	imgFileField.attr("accept", "image/*,application/pdf");
-	imgFileField.on("change", function () {
+	imgFileField.attr("accept", "image/*,application/pdf,.kmz");
+	imgFileField.on("change", async function () {
+		u("#id_calibration_string_raw").val("");
+		u("#id_name").val("").parent().removeClass("d-none");
+		u("#calibration-helper-opener").closest("p").removeClass("d-none");
 		if (
 			this.files.length > 0 &&
 			this.files[0].size > 2 * 1e7 &&
@@ -690,7 +721,7 @@ function enableBtnToPreview() {
 				};
 				pdfFileReader.readAsArrayBuffer(pdfFile);
 				return;
-			} else {
+			} else if (this.files[0].type.startsWith("image/")) {
 				const img = new Image();
 				img.onload = function () {
 					URL.revokeObjectURL(img.src);
@@ -706,10 +737,96 @@ function enableBtnToPreview() {
 					}
 				};
 				img.src = URL.createObjectURL(this.files[0]);
+			} else {
+				u("#id_calibration_string_raw").val("0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1");
+				u("#id_name").val("-kmz-").parent().addClass("d-none");
+				u("#calibration-helper-opener").closest("p").addClass("d-none");
+				const keyholeFileField = u("#id_image");
+				if (this.files.length > 0 && this.files[0].size > 2 * 1e7) {
+					keyholeFileField.removeClass("is-valid").addClass("is-invalid");
+					keyholeFileField.parent().find(".valid-feedback").remove();
+					keyholeFileField.parent().find(".invalid-feedback").remove();
+					keyholeFileField.after(
+						'<div class="invalid-feedback">File is too big, maximum size: 20MB</div>',
+					);
+					imgSubmitBtn.addClass("disabled");
+					return;
+				}
+				if (this.files.length > 0) {
+					let kml;
+					let zip;
+					try {
+						zip = await JSZip.loadAsync(this.files[0]);
+					} catch {
+						kml = await this.files[0].text();
+					}
+					if (
+						!kml &&
+						zip &&
+						zip.files &&
+						Object.keys(zip.files)
+							.map((x) => x.toUpperCase())
+							.includes("DOC.KML")
+					) {
+						const kmlDocFilename = Object.keys(zip.files).find(
+							(x) => x.toUpperCase() === "DOC.KML",
+						);
+						kml = await zip.file(kmlDocFilename).async("string");
+					}
+					if (!kml) {
+						keyholeFileField.removeClass("is-valid").addClass("is-invalid");
+						keyholeFileField.parent().find(".valid-feedback").remove();
+						keyholeFileField.parent().find(".invalid-feedback").remove();
+						keyholeFileField.after(
+							'<div class="invalid-feedback">Invalid file format!</div>',
+						);
+						imgSubmitBtn.addClass("disabled");
+						return;
+					}
+					let parsedText;
+					try {
+						const parser = new DOMParser();
+						parsedText = parser.parseFromString(kml, "text/xml");
+						const errorNode = parsedText.querySelector("parsererror");
+						if (errorNode) {
+							console.log(errorNode);
+							throw Error(errorNode);
+						}
+					} catch {
+						keyholeFileField.removeClass("is-valid").addClass("is-invalid");
+						keyholeFileField.parent().find(".valid-feedback").remove();
+						keyholeFileField.parent().find(".invalid-feedback").remove();
+						keyholeFileField.after(
+							'<div class="invalid-feedback">Invalid file format!</div>',
+						);
+						imgSubmitBtn.addClass("disabled");
+						return;
+					}
+					const nLayers =
+						parsedText.getElementsByTagName("GroundOverlay").length;
+					if (nLayers === 0) {
+						keyholeFileField.removeClass("is-valid").addClass("is-invalid");
+						keyholeFileField.parent().find(".valid-feedback").remove();
+						keyholeFileField.parent().find(".invalid-feedback").remove();
+						keyholeFileField.after(
+							'<div class="invalid-feedback">Invalid file format!</div>',
+						);
+						imgSubmitBtn.addClass("disabled");
+						return;
+					}
+					keyholeFileField.addClass("is-valid").removeClass("is-invalid");
+					keyholeFileField.parent().find(".valid-feedback").remove();
+					keyholeFileField.parent().find(".invalid-feedback").remove();
+					keyholeFileField.after(
+						'<div class="valid-feedback">File ready to upload!</div>',
+					);
+					u("#submit-btn").removeClass("disabled");
+				}
 			}
 			const bounds = extractCornersCoordsFromFilename(this.files[0].name);
 			if (bounds && !u("#id_calibration_string_raw").val()) {
 				u("#id_calibration_string_raw").val(bounds);
+				u("#id_name").val(this.files[0].name.split("_").slice(0, -9).join("_"));
 			}
 			u("#calibration_help button").removeClass("disabled");
 			u("#id_calibration_string_raw").trigger("change");
@@ -720,19 +837,52 @@ function enableBtnToPreview() {
 				imgSubmitBtn.addClass("disabled");
 			}
 		}
+		if (u("#id_image").val()) {
+			u("#id_image").parent().find(".valid-feedback").remove();
+			u("#id_image").parent().find(".invalid-feedback").remove();
+			if (u("#id_calibration_string_raw").val()) {
+				u("#id_image")
+					.removeClass("is-invalid")
+					.addClass("is-valid")
+					.after('<div class="valid-feedback">File ready to upload!</div>');
+				u("#submit-btn").removeClass("disabled");
+			} else {
+				u("#id_image")
+					.addClass("is-invalid")
+					.removeClass("is-valid")
+					.after(
+						'<div class="invalid-feedback">You need to calibrate the image manually</div>',
+					);
+				u("#submit-btn").addClass("disabled");
+			}
+		}
 	});
 
 	u("#id_calibration_string_raw").on("change", (e) => {
 		const val = e.target.value;
 		const found = isValidCalibString(val);
+		u("#id_image").parent().find(".valid-feedback").remove();
+		u("#id_image").parent().find(".invalid-feedback").remove();
 		if (
 			found &&
 			(u("#id_image").val() || u("#main-form").hasClass("edit-form"))
 		) {
 			u("#calibration_preview button").removeClass("disabled");
 			u("#submit-btn").removeClass("disabled");
+			u("#id_image")
+				.removeClass("is-invalid")
+				.addClass("is-valid")
+				.after('<div class="valid-feedback">File ready to upload!</div>');
+			u("#submit-btn").removeClass("disabled");
 		} else {
 			u("#calibration_preview button").addClass("disabled");
+			u("#id_image")
+				.addClass("is-invalid")
+				.removeClass("is-valid")
+				.after(
+					'<div class="invalid-feedback">You need to calibrate the image manually</div>',
+				);
+			u("#submit-btn").addClass("disabled");
 		}
 	});
 
@@ -797,89 +947,4 @@ function enableBtnToPreview() {
 	});
 
 	u("#back-from-preview-button").on("click", closePreview);
-
-	const kmzSubmitBtn = u("#kmz-submit-btn");
-	const keyholeFileField = u("#id_keyhole_file");
-	keyholeFileField.attr("accept", ".kml, .kmz");
-	keyholeFileField.on("change", async function () {
-		if (this.files.length > 0 && this.files[0].size > 2 * 1e7) {
-			keyholeFileField.removeClass("is-valid").addClass("is-invalid");
-			keyholeFileField.parent().find(".valid-feedback").remove();
-			keyholeFileField.parent().find(".invalid-feedback").remove();
-			keyholeFileField.after(
-				'<div class="invalid-feedback">File is too big, maximum size: 20MB</div>',
-			);
-			kmzSubmitBtn.addClass("disabled");
-			return;
-		}
-		if (this.files.length > 0) {
-			let kml;
-			let zip;
-			try {
-				zip = await JSZip.loadAsync(this.files[0]);
-			} catch {
-				kml = await this.files[0].text();
-			}
-			if (
-				!kml &&
-				zip &&
-				zip.files &&
-				Object.keys(zip.files)
-					.map((x) => x.toUpperCase())
-					.includes("DOC.KML")
-			) {
-				const kmlDocFilename = Object.keys(zip.files).find(
-					(x) => x.toUpperCase() === "DOC.KML",
-				);
-				kml = await zip.file(kmlDocFilename).async("string");
-			}
-			if (!kml) {
-				keyholeFileField.removeClass("is-valid").addClass("is-invalid");
-				keyholeFileField.parent().find(".valid-feedback").remove();
-				keyholeFileField.parent().find(".invalid-feedback").remove();
-				keyholeFileField.after(
-					'<div class="invalid-feedback">Invalid file format!</div>',
-				);
-				kmzSubmitBtn.addClass("disabled");
-				return;
-			}
-			let parsedText;
-			try {
-				const parser = new DOMParser();
-				parsedText = parser.parseFromString(kml, "text/xml");
-				const errorNode = parsedText.querySelector("parsererror");
-				if (errorNode) {
-					console.log(errorNode);
-					throw Error(errorNode);
-				}
-			} catch {
-				keyholeFileField.removeClass("is-valid").addClass("is-invalid");
-				keyholeFileField.parent().find(".valid-feedback").remove();
-				keyholeFileField.parent().find(".invalid-feedback").remove();
-				keyholeFileField.after(
-					'<div class="invalid-feedback">Invalid file format!</div>',
-				);
-				kmzSubmitBtn.addClass("disabled");
-				return;
-			}
-			const nLayers = parsedText.getElementsByTagName("GroundOverlay").length;
-			if (nLayers === 0) {
-				keyholeFileField.removeClass("is-valid").addClass("is-invalid");
-				keyholeFileField.parent().find(".valid-feedback").remove();
-				keyholeFileField.parent().find(".invalid-feedback").remove();
-				keyholeFileField.after(
-					'<div class="invalid-feedback">Invalid file format!</div>',
-				);
-				kmzSubmitBtn.addClass("disabled");
-				return;
-			}
-			keyholeFileField.addClass("is-valid").removeClass("is-invalid");
-			keyholeFileField.parent().find(".valid-feedback").remove();
-			keyholeFileField.parent().find(".invalid-feedback").remove();
-			keyholeFileField.after(
-				'<div class="valid-feedback">File ready to upload!</div>',
-			);
-		}
-	});
-	keyholeFileField.trigger("change");
 })();

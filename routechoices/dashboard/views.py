@@ -568,32 +568,27 @@ def map_list_view(request):
 def map_create_view(request):
     club = request.club
     if request.method == "POST":
-        if request.FILES.get("keyhole_file"):
-            kmz_form = UploadKmzForm(request.POST, request.FILES)
-            image_w_bound_form = MapForm()
-            if kmz_form.is_valid():
-                maps = kmz_form.cleaned_data["extracted_maps"]
-                new_map = maps[0]
-                if len(maps) > 1:
-                    new_map = new_map.merge(*maps[1:])
-                new_map.club = club
-                new_map.save()
-                messages.success(request, "Map successfully imported!")
-                return redirect(
-                    "dashboard_club:map:list_view", club_slug=request.club.slug
-                )
+        kmz_form = UploadKmzForm(request.POST, request.FILES)
+        image_w_bound_form = MapForm()
+        if kmz_form.is_valid():
+            maps = kmz_form.cleaned_data["extracted_maps"]
+            new_map = maps[0]
+            if len(maps) > 1:
+                new_map = new_map.merge(*maps[1:])
+            new_map.club = club
+            new_map.save()
+            messages.success(request, "Map successfully imported!")
+            return redirect("dashboard_club:map:list_view", club_slug=request.club.slug)
         else:
-            kmz_form = UploadKmzForm()
             image_w_bound_form = MapForm(request.POST, request.FILES)
             image_w_bound_form.instance.club = club
             if image_w_bound_form.is_valid():
                 image_w_bound_form.save()
-                messages.success(request, "Map successfully created!")
+                messages.success(request, "Map successfully imported!")
                 return redirect(
                     "dashboard_club:map:list_view", club_slug=request.club.slug
                 )
     else:
-        kmz_form = UploadKmzForm()
         image_w_bound_form = MapForm()
 
     return render(
@@ -602,7 +597,6 @@ def map_create_view(request):
         {
             "club": club,
             "image_w_bound_form": image_w_bound_form,
-            "kmz_form": kmz_form,
         },
     )
 
@@ -1190,27 +1184,25 @@ def event_map_edit_view(request, event_id):
         aid=event_id,
     )
     form = MapForm()
-    kmz_form = UploadKmzForm()
+    kmz_form = None
     if request.method == "POST" and club.can_modify_events:
-        if request.FILES.get("keyhole_file"):
-            kmz_form = UploadKmzForm(request.POST, request.FILES)
-            if kmz_form.is_valid():
-                maps = kmz_form.cleaned_data["extracted_maps"]
-                new_map = maps[0]
-                if len(maps) > 1:
-                    new_map = new_map.merge(*maps[1:])
-                new_map.club = club
-                new_map.save()
-                event.map = new_map
-                event.save()
-                messages.success(request, "Changes saved successfully!")
-                return redirect(
-                    "dashboard_club:event:map_edit_view",
-                    event_id=event.aid,
-                    club_slug=request.club.slug,
-                )
+        kmz_form = UploadKmzForm(request.POST, request.FILES)
+        if kmz_form.is_valid():
+            maps = kmz_form.cleaned_data["extracted_maps"]
+            new_map = maps[0]
+            if len(maps) > 1:
+                new_map = new_map.merge(*maps[1:])
+            new_map.club = club
+            new_map.save()
+            event.map = new_map
+            event.save()
+            messages.success(request, "Changes saved successfully!")
+            return redirect(
+                "dashboard_club:event:map_edit_view",
+                event_id=event.aid,
+                club_slug=request.club.slug,
+            )
         else:
-            kmz_form = UploadKmzForm()
             if raster_map := event.map:
                 raster_map_copy = deepcopy(raster_map)
                 form = MapForm(request.POST, request.FILES, instance=raster_map_copy)
@@ -1228,12 +1220,7 @@ def event_map_edit_view(request, event_id):
                     event_id=event.aid,
                     club_slug=request.club.slug,
                 )
-    data = {
-        "club": club,
-        "event": event,
-        "image_w_bound_form": form,
-        "kmz_form": kmz_form,
-    }
+    data = {"club": club, "event": event, "image_w_bound_form": form}
     if event.map:
         data["map"] = event.map
         data["image_w_bound_form"] = MapForm(instance=event.map)

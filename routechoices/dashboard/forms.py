@@ -334,9 +334,9 @@ class DeviceClubOwnershipForm(ModelForm):
 class MapForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["image"].help_text = "Image or PDF file"
-        self.fields["image"].widget.attrs["accept"] = "image/*, .pdf"
-        self.fields["image"].label = "Select Image"
+        self.fields["image"].help_text = "Image, KMZ or PDF file"
+        self.fields["image"].widget.attrs["accept"] = "image/*,.kml,.kmz,.pdf"
+        self.fields["image"].label = "Select File"
         self.fields["name"].label = "Map name"
 
     class Meta:
@@ -902,7 +902,7 @@ class UploadMapGPXForm(Form):
 
 
 class UploadKmzForm(Form):
-    keyhole_file = FileField(
+    image = FileField(
         label="Import KML/KMZ file",
         max_length=255,
         validators=[FileExtensionValidator(allowed_extensions=["kmz", "kml"])],
@@ -910,10 +910,10 @@ class UploadKmzForm(Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["keyhole_file"].widget.attrs["accept"] = ".kml, .kmz"
+        self.fields["image"].widget.attrs["accept"] = ".kml, .kmz"
 
-    def clean_keyhole_file(self):
-        file = self.cleaned_data["keyhole_file"]
+    def clean_image(self):
+        file = self.cleaned_data["image"]
         is_compressed = False
         new_maps = []
         with tempfile.TemporaryDirectory(suffix="_kmz") as tmp_extract_dir:
@@ -940,7 +940,8 @@ class UploadKmzForm(Form):
                     raise ValidationError("Could not extract maps from this file.")
             elif file.name.lower().endswith(".kml"):
                 kml = file.read()
-
+            else:
+                raise ValidationError("Not a keyhole file")
             try:
                 overlays = extract_ground_overlays_info(kml)
             except Exception:

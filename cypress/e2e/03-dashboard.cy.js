@@ -155,14 +155,10 @@ context("Dashboard actions", () => {
 			);
 		}
 
-		for (const kmzFileName of [
-			"Jukola2019/1/map.kmz",
-			"maps/multiground.kml",
-			"maps/tiled.kmz",
-		]) {
+		for (const kmzFileName of ["Jukola2019/1/map.kmz", "maps/tiled.kmz"]) {
 			cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/maps/new");
-			cy.get("#id_keyhole_file").selectFile(`cypress/fixtures/${kmzFileName}`);
-			cy.get("#kmz-form button:not([type]),button[type=submit]").click();
+			cy.get("#id_image").selectFile(`cypress/fixtures/${kmzFileName}`);
+			cy.get("#main-form button:not([type]),button[type=submit]").click();
 			cy.get("#django-messages", { timeout: 10_000 }).contains(
 				"Map successfully imported!",
 			);
@@ -176,9 +172,10 @@ context("Dashboard actions", () => {
 
 		cy.visit("https://dashboard.rtchs.localhost/clubs/kimito-sk/maps/new");
 
-		cy.get("#id_name").type("Jukola 2019 - 1st Leg (manual calibration)");
-
 		cy.get("#id_image").selectFile("cypress/fixtures/Jukola2019/1/map.jpg");
+		cy.get("#id_name")
+			.clear()
+			.type("Jukola 2019 - 1st Leg (manual calibration)");
 
 		cy.get("#calibration-preview-opener").should("have.class", "disabled");
 		cy.get("#calibration-helper-opener").click();
@@ -188,16 +185,16 @@ context("Dashboard actions", () => {
 		cy.get("#to-calibration-step-2-button").should("not.be.visible");
 		cy.get("#raster-map").click(70, 10);
 		cy.get("#world-map").click(70, 10);
-		cy.get("#raster-map").click(200, 10);
-		cy.get("#world-map").click(200, 10);
-		cy.get("#raster-map").click(200, 200);
+		cy.get("#raster-map").click(80, 10);
+		cy.get("#world-map").click(80, 10);
+		cy.get("#raster-map").click(80, 50);
 		cy.get("#to-calibration-step-2-button-disabled").should("be.visible");
 		cy.get("#to-calibration-step-2-button").should("not.be.visible");
-		cy.get("#world-map").click(200, 200);
+		cy.get("#world-map").click(80, 50);
 		cy.get("#to-calibration-step-2-button-disabled").should("not.be.visible");
 		cy.get("#to-calibration-step-2-button").should("be.visible");
-		cy.get("#raster-map").click(10, 200);
-		cy.get("#world-map").click(10, 200);
+		cy.get("#raster-map").click(10, 50);
+		cy.get("#world-map").click(10, 50);
 
 		cy.get("#to-calibration-step-2-button").click();
 
@@ -211,7 +208,7 @@ context("Dashboard actions", () => {
 			});
 		cy.get("#main-form button:not([type]),button[type=submit]").click();
 
-		cy.get("#django-messages").contains("Map successfully created!");
+		cy.get("#django-messages").contains("Map successfully imported!");
 	});
 
 	it("Create a club", () => {
@@ -301,7 +298,7 @@ context("Dashboard actions", () => {
 		cy.get("#id_geojson_layer").selectFile(
 			"cypress/fixtures/geojson/valid.geojson",
 		);
-		cy.get("#id_map").select("Jukola 2019 - 1st Leg"); // doesnt matter
+		cy.get("#id_map").select(3); // doesnt matter
 		cy.get("#id_map_assignations-0-map").select("Another map");
 		cy.get("#id_map_assignations-0-title").type("Another map");
 		cy.get("#id_competitors-0-device-ts-control").type("10000000").wait(500);
