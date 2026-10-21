@@ -391,13 +391,18 @@ function enableBtnToPreview() {
 	}
 
 	function isValidCalibString(s) {
-		return s.match(/^[-]?\d+(\.\d+)?(,[-]?\d+(\.\d+)?){7}$/);
+		return (
+			typeof s === "string" &&
+			/^[-]?\d+(\.\d+)?(,[-]?\d+(\.\d+)?){7}$/.test(s) &&
+			s.split(",").every((value) => Number.isFinite(Number(value)))
+		);
 	}
 
 	function loadCalibString() {
 		calibString = u("#id_calibration_string_raw").val();
 		if (!calibString || !isValidCalibString(calibString)) {
 			closePreview();
+			return false;
 		}
 		const vals = calibString.split(",").map((x) => Number.parseFloat(x));
 		cornersLatLng = [
@@ -406,6 +411,7 @@ function enableBtnToPreview() {
 			{ lat: vals[4], lng: vals[5] },
 			{ lat: vals[6], lng: vals[7] },
 		];
+		return true;
 	}
 
 	function displayRasterMap(image) {
@@ -942,7 +948,9 @@ function enableBtnToPreview() {
 		e.preventDefault();
 		u("#main").addClass("d-none");
 		u("#calibration-viewer").removeClass("d-none");
-		loadCalibString();
+		if (!loadCalibString()) {
+			return;
+		}
 		loadMapImagePreview();
 	});
 
