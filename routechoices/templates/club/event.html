@@ -241,7 +241,7 @@
                     </svg>
                     <h1 id="wait-for-data-text">Waiting for data...</h1>
                     {% if event.open_registration or event.allow_route_upload and event.started and event.competitors.count > 0 %}
-                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
+                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" target="_blank" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
                     {% endif %}
                 </div>
             </div>
@@ -260,7 +260,7 @@
                     </div>
                     <h1 id="no-data-text">No data...</h1>
                     {% if event.open_registration or event.allow_route_upload and event.started and event.competitors.count > 0 %}
-                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
+                    <a href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}" target="_blank" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;<span class="upload-link-verbose">Upload your route</span></a>
                     {% endif %}
                 </div>
             </div>
