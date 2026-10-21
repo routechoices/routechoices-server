@@ -694,8 +694,7 @@ function enableBtnToPreview() {
 	const imgFileField = u("#id_image");
 	imgFileField.attr("accept", "image/*,application/pdf,.kmz");
 	imgFileField.on("change", async function () {
-		u("#id_calibration_string_raw").val("");
-		u("#id_name").val("").parent().removeClass("d-none");
+		u("#id_name").parent().removeClass("d-none");
 		u("#calibration-helper-opener").closest("p").removeClass("d-none");
 		if (
 			this.files.length > 0 &&
@@ -795,7 +794,6 @@ function enableBtnToPreview() {
 						parsedText = parser.parseFromString(kml, "text/xml");
 						const errorNode = parsedText.querySelector("parsererror");
 						if (errorNode) {
-							console.log(errorNode);
 							throw Error(errorNode);
 						}
 					} catch {
