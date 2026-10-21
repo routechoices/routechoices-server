@@ -27,16 +27,16 @@
             {% if map.id and not event %}
             <div class="mb-3">
                 {% if used_in %}
-                <h4>Used in following events</h4>
-                <div>
+                <h3>Used in following events</h3>
+                <ul>
                     {% for event in used_in %}
-                    <a class="btn btn-primary dashboard-link me-1 external-link" href="{{ event.get_absolute_url }}" target="_blank" rel="noopener noreferrer">
-                        <i class="fa-solid fa-trophy"></i> <span>{{ event.name }}</span>
-                    </a>
+                    <li>
+                        <i class="fa-solid fa-trophy"></i> <span>{{ event.name }}</span> <a href="event.get_absolute_url" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </li>
                     {% endfor %}
-                </div>
+                </ul>
                 {% else %}
-                <h4>Not used in any events</h4>
+                <h3>Not used in any events</h3>
                 {% endif %}
             </div>
             {% endif %}
