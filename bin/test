@@ -1,23 +1,30 @@
 #!/bin/sh
 set -e
 
-run_python_tests() {
-    echo "Starting test environment..."
-    ./dc up -d db s3
+initialise_tests() {
     cp .env.e2e ./.env
 
+    echo "Starting test environment..."
+    ./dc up -d db s3
+
+
     echo "Waiting for the database to be ready..."
-    until ./dc exec db pg_isready -U app_user -d e2e_db; do
+    until ./dc exec db pg_isready -U app_user -d app_db; do
         sleep 1
     done
+
+    if [ "$(./dc exec db psql -U app_user -d app_db -tAc "SELECT 1 FROM pg_database WHERE datname = 'e2e_db'")" != "1" ]; then
+        ./dc exec db createdb -U app_user e2e_db
+    fi
 
     echo "Starting Django..."
     ./dc up -d django
-
     until ./dc exec django python manage.py check; do
         sleep 1
     done
+}
 
+run_python_tests() {
     echo "Running Python tests..."
     ./dc exec django coverage run ./manage.py test --buffer --shuffle --failfast
     echo "Generating coverage report..."
@@ -25,6 +32,8 @@ run_python_tests() {
 }
 
 run_e2e_tests() {
+    ./da migrate --noinput
+    ./da flush --noinput
     if [ ! -x node_modules/cypress/bin/cypress ]; then
         echo "Cypress is not installed. Run pnpm install first." >&2
         exit 1
@@ -34,18 +43,32 @@ run_e2e_tests() {
         --browser "${CYPRESS_BROWSER:-chromium}"
 }
 
+post_tests() {
+    cp .env.dev ./.env
+    ./dc restart django
+}
+
+initialise_tests
+
 echo "Running tests..."
 
 case "${1:-all}" in
     all)
+        initialise_tests
         run_python_tests
         run_e2e_tests
+        post_tests
         ;;
     python)
+        initialise_tests
         run_python_tests
+        post_tests
         ;;
     e2e)
+        initialise_tests
         run_e2e_tests
+        post_tests
+
         ;;
     *)
         echo "Usage: $0 [all|python|e2e]" >&2
