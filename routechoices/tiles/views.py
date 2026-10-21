@@ -19,7 +19,7 @@ GLOBAL_MERCATOR = GlobalMercator()
 def common_tile(function):
     def wrap(request, *args, **kwargs):
         get_params = {}
-        for key in request.GET.keys():
+        for key in request.GET:
             get_params[key.lower()] = request.GET[key]
 
         asked_mime = get_params.get("format", "image/png").lower()
@@ -104,7 +104,7 @@ def common_tile(function):
 
 def tile_etag(request):
     get_params = {}
-    for key in request.GET.keys():
+    for key in request.GET:
         get_params[key.lower()] = request.GET[key]
     key = request.raster_map.get_tile_cache_key(
         request.image_request["width"],
@@ -122,7 +122,7 @@ def tile_etag(request):
 @condition(etag_func=tile_etag)
 def serve_tile(request):
     get_params = {}
-    for key in request.GET.keys():
+    for key in request.GET:
         get_params[key.lower()] = request.GET[key]
     data_out, cache_hit = request.raster_map.get_tile(
         request.image_request["width"],

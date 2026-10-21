@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0130_alter_event_allow_route_upload_and_more'),
+        ("core", "0130_alter_event_allow_route_upload_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='announcement',
-            field=models.CharField(blank=True, help_text='Optional text that will be displayed on the event page', max_length=280),
+            model_name="event",
+            name="announcement",
+            field=models.CharField(
+                blank=True,
+                help_text="Optional text that will be displayed on the event page",
+                max_length=280,
+            ),
         )
     ]

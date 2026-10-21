@@ -7,7 +7,6 @@ from pathlib import Path
 import sewer.client
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
 from sewer.crypto import AcmeAccount, AcmeKey
 
 from routechoices.core.models import Club
@@ -50,10 +49,8 @@ class Command(BaseCommand):
         nginx_need_restart = False
         domains = options["domains"]
         if not domains:
-            clubs_w_domain = (
-                Club.objects
-                .exclude(domain="")
-                .exclude(domain__isnull=True)
+            clubs_w_domain = Club.objects.exclude(domain="").exclude(
+                domain__isnull=True
             )
             for club in clubs_w_domain:
                 domain = club.domain
@@ -63,7 +60,7 @@ class Command(BaseCommand):
                 domains.append(domain)
             if not domains:
                 self.stderr.write("No clubs require certificates")
-        
+
         for domain in domains:
             club = Club.objects.filter(domain=domain).first()
             if not club:
@@ -81,9 +78,10 @@ class Command(BaseCommand):
                 continue
 
             from routechoices.core.bg_tasks import provision_ssl_certificate
+
             provision_ssl_certificate.now(domain)
             nginx_need_restart = True
-        
+
         if nginx_need_restart:
             print("Reload nginx for changes to take effect...")
             if options["post-hook"]:

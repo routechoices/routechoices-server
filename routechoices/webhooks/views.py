@@ -205,7 +205,7 @@ def rastilippu_webhook(request):
                     sync_courses_data(event_uuid)
                 except Exception as e:
                     return HttpResponse(
-                        f"Rastilippu did not answer ({str(e)})",
+                        f"Rastilippu did not answer ({e!s})",
                         status=status.HTTP_503_SERVICE_UNAVAILABLE,
                     )
         else:
@@ -254,7 +254,7 @@ def lemonsqueezy_webhook(request):
             or data["data"]["attributes"].get("first_order_item", {}).get("variant_id")
         )
     except Exception:
-        pass
+        print("Invalid call on LemonSqueezy Webhook")
 
     # Club Upgrade
     if (

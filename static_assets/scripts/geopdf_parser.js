@@ -1,6 +1,5 @@
 const GeoPdfParser = (() => {
-	const isDelimiter = (character) =>
-		/\s|[()[\]<>/%]/.test(character);
+	const isDelimiter = (character) => /\s|[()[\]<>/%]/.test(character);
 
 	function tokenize(source) {
 		const tokens = [];
@@ -12,7 +11,11 @@ const GeoPdfParser = (() => {
 				continue;
 			}
 			if (character === "%") {
-				while (index < source.length && source[index] !== "\n" && source[index] !== "\r") {
+				while (
+					index < source.length &&
+					source[index] !== "\n" &&
+					source[index] !== "\r"
+				) {
 					index++;
 				}
 				continue;
@@ -33,9 +36,11 @@ const GeoPdfParser = (() => {
 					index++;
 				}
 				tokens.push({
-					name: source.slice(start, index).replace(/#([0-9a-f]{2})/gi, (_, hex) =>
-						String.fromCharCode(Number.parseInt(hex, 16)),
-					),
+					name: source
+						.slice(start, index)
+						.replace(/#([0-9a-f]{2})/gi, (_, hex) =>
+							String.fromCharCode(Number.parseInt(hex, 16)),
+						),
 				});
 				continue;
 			}
@@ -162,9 +167,13 @@ const GeoPdfParser = (() => {
 				throw new Error(`Unsupported GeoPDF stream filter: ${currentFilter}`);
 			}
 			if (typeof DecompressionStream === "undefined") {
-				throw new Error("This browser cannot decompress GeoPDF metadata streams.");
+				throw new Error(
+					"This browser cannot decompress GeoPDF metadata streams.",
+				);
 			}
-			const stream = new Blob([result]).stream().pipeThrough(new DecompressionStream("deflate"));
+			const stream = new Blob([result])
+				.stream()
+				.pipeThrough(new DecompressionStream("deflate"));
 			result = new Uint8Array(await new Response(stream).arrayBuffer());
 		}
 		return result;
@@ -180,9 +189,16 @@ const GeoPdfParser = (() => {
 	}
 
 	function resolve(value, objects, depth = 0) {
-		if (depth > 20) throw new Error("GeoPDF object references are too deeply nested.");
-		if (value && typeof value === "object" && !Array.isArray(value) && "ref" in value) {
-			if (!objects.has(value.ref)) throw new Error(`Missing PDF object ${value.ref}.`);
+		if (depth > 20)
+			throw new Error("GeoPDF object references are too deeply nested.");
+		if (
+			value &&
+			typeof value === "object" &&
+			!Array.isArray(value) &&
+			"ref" in value
+		) {
+			if (!objects.has(value.ref))
+				throw new Error(`Missing PDF object ${value.ref}.`);
 			return resolve(objects.get(value.ref), objects, depth + 1);
 		}
 		if (Array.isArray(value)) {
@@ -190,7 +206,10 @@ const GeoPdfParser = (() => {
 		}
 		if (value && typeof value === "object") {
 			return Object.fromEntries(
-				Object.entries(value).map(([key, item]) => [key, resolve(item, objects, depth + 1)]),
+				Object.entries(value).map(([key, item]) => [
+					key,
+					resolve(item, objects, depth + 1),
+				]),
 			);
 		}
 		return value;
@@ -221,9 +240,15 @@ const GeoPdfParser = (() => {
 			objects.set(id, value);
 
 			if (value?.Type === "ObjStm") {
-				const rawStream = streamBytes(source, bodyStart, match.index + match[0].length);
+				const rawStream = streamBytes(
+					source,
+					bodyStart,
+					match.index + match[0].length,
+				);
 				if (!rawStream) throw new Error("GeoPDF object stream has no data.");
-				const decoded = bytesToString(await decodeStream(rawStream, value.Filter));
+				const decoded = bytesToString(
+					await decodeStream(rawStream, value.Filter),
+				);
 				const count = resolve(value.N, objects);
 				const first = resolve(value.First, objects);
 				const header = decoded.slice(0, first).trim().split(/\s+/).map(Number);
@@ -234,13 +259,20 @@ const GeoPdfParser = (() => {
 					const objectId = header[index * 2];
 					const offset = header[index * 2 + 1];
 					const nextOffset =
-						index + 1 < count ? header[(index + 1) * 2 + 1] : decoded.length - first;
-					objects.set(objectId, parseObject(decoded.slice(first + offset, first + nextOffset)));
+						index + 1 < count
+							? header[(index + 1) * 2 + 1]
+							: decoded.length - first;
+					objects.set(
+						objectId,
+						parseObject(decoded.slice(first + offset, first + nextOffset)),
+					);
 				}
 			}
 		}
 
-		const catalog = [...objects.values()].find((value) => value?.Type === "Catalog");
+		const catalog = [...objects.values()].find(
+			(value) => value?.Type === "Catalog",
+		);
 		if (!catalog) return null;
 		const findFirstPage = (node, depth = 0) => {
 			if (depth > 20 || !node) return null;
@@ -267,7 +299,10 @@ const GeoPdfParser = (() => {
 				points.length < 4 ||
 				points.some(
 					(point) =>
-						point.length < 4 || point.slice(0, 4).some((coordinate) => !Number.isFinite(coordinate)),
+						point.length < 4 ||
+						point
+							.slice(0, 4)
+							.some((coordinate) => !Number.isFinite(coordinate)),
 				)
 			) {
 				continue;
@@ -306,7 +341,12 @@ const GeoPdfParser = (() => {
 			const measure = viewport?.Measure;
 			const gpts = measure?.GPTS;
 			const lpts = measure?.LPTS;
-			if (!Array.isArray(gpts) || !Array.isArray(lpts) || gpts.length !== 8 || lpts.length !== 8) {
+			if (
+				!Array.isArray(gpts) ||
+				!Array.isArray(lpts) ||
+				gpts.length !== 8 ||
+				lpts.length !== 8
+			) {
 				continue;
 			}
 			const localPoints = [];
@@ -328,7 +368,11 @@ const GeoPdfParser = (() => {
 				if (pointIndex === -1) return null;
 				return [gpts[pointIndex * 2], gpts[pointIndex * 2 + 1]];
 			});
-			if (coordinates.some((point) => !point || point.some((value) => !Number.isFinite(value)))) {
+			if (
+				coordinates.some(
+					(point) => !point || point.some((value) => !Number.isFinite(value)),
+				)
+			) {
 				continue;
 			}
 			return {

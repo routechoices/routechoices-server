@@ -94,7 +94,7 @@ class CustomCrsWms2WebMercatorWmtsProxy:
             ]
         )
 
-        coeffs, mask = cv2.findHomography(p2, p1, cv2.RANSAC, 5.0)
+        coeffs, _ = cv2.findHomography(p2, p1, cv2.RANSAC, 5.0)
         img = cv2.warpPerspective(
             img_alpha,
             coeffs,
@@ -277,7 +277,7 @@ class CustomCrsWmts2WebMercatorWmtsProxy:
                 )
             else:
                 cache_key = None
-        coeffs, mask = cv2.findHomography(p2, p1, cv2.RANSAC, 5.0)
+        coeffs, _ = cv2.findHomography(p2, p1, cv2.RANSAC, 5.0)
         img_alpha = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGRA)
         img = cv2.warpPerspective(
             img_alpha,

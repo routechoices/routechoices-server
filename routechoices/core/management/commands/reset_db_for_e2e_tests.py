@@ -1,6 +1,7 @@
 import arrow
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 from routechoices.core.models import Club, Competitor, Device, Event, FrontPageFeedback
@@ -10,6 +11,8 @@ class Command(BaseCommand):
     help = "Reset the DB before e2e tests"
 
     def handle(self, *args, **options):
+        call_command("migrate", "--noinput")
+        call_command("flush", "--noinput")
         s = Site.objects.first()
         s.domain = "rtchs.localhost"
         s.name = "Routechoices.com"

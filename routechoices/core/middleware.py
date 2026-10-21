@@ -360,18 +360,22 @@ class OAuth2GetTokenMiddleware:
         response = self.get_response(request)
         return response
 
+
 from django.http import HttpResponsePermanentRedirect
+
 
 class ACMEAwareSSLRedirectMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('/.well-known/acme-challenge/'):
+        if request.path.startswith("/.well-known/acme-challenge/"):
             return self.get_response(request)
 
         if not request.is_secure():
             host = request.get_host()
-            return HttpResponsePermanentRedirect(f"https://{host}{request.get_full_path()}")
+            return HttpResponsePermanentRedirect(
+                f"https://{host}{request.get_full_path()}"
+            )
 
         return self.get_response(request)

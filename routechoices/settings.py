@@ -43,7 +43,7 @@ BANNED_COUNTRIES = env.list("BANNED_COUNTRIES")
 GPSSEURANTA_SERVER_ADDR = env.str("GPSSEURANTA_SERVER_ADDR")
 
 DATABASES = {"default": env.db()}
-# DATABASES["default"]["CONN_MAX_AGE"] = env.int("DATABASE_CONN_MAX_AGE")
+
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 try:
     DATABASES["default"]["OPTIONS"]["pool"] = True
