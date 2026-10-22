@@ -10,9 +10,10 @@ const extractCornersCoordsFromFilename = (filename) => {
 	return coords.join(",");
 };
 
-const onPDF = (ev, filenameRaw) => {
-	pdfjsLib.GlobalWorkerOptions.workerSrc =
-		"/static/vendor/pdfjs-5.2.133/pdf.worker.js?v=2";
+const onPDF = async (ev, filenameRaw) => {
+	const pdfjsPath = "/static/vendor/pdfjs-6.4.299/";
+	const pdfjsLib = await import(`${pdfjsPath}pdf.js`);
+	pdfjsLib.GlobalWorkerOptions.workerSrc = `${pdfjsPath}pdf.worker.js`;
 	const loadingTask = pdfjsLib.getDocument({
 		data: new Uint8Array(ev.target.result.slice(0)),
 	});
