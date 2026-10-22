@@ -54,9 +54,15 @@ from routechoices.lib.helpers import (
     initial_of_name,
     is_valid_pil_image,
     is_valid_svg,
+    short_random_key,
 )
 from routechoices.lib.kmz import extract_ground_overlays_info
-from routechoices.lib.validators import validate_domain_name, validate_nice_slug
+from routechoices.lib.validators import (
+    validate_domain_name,
+    validate_latitude,
+    validate_longitude,
+    validate_nice_slug,
+)
 
 
 def get_timezone_choices():
@@ -1035,17 +1041,18 @@ class RegisterForm(Form):
         help_text="Optional - Will be derived from your name if blank",
     )
     tag = ChoiceField(label="Category", required=False, help_text="Optional")
-    device_id = ModelChoiceField(
+    device = ModelChoiceField(
         required=False,
-        queryset=Device.objects.none(),
+        queryset=Device.objects.filter(virtual=False),
         label="Tracker ID",
         help_text="Optional - Leave blank if uploading a GPS File",
+        to_field_name="aid",
     )
     race_complete = BooleanField(label="Race already complete", required=False)
     gps_file = FileField(
         label="GPS File",
         max_length=255,
-        help_text="Optional - GPX, FIT, or TCX, Can be uploaded later",
+        help_text="Optional - GPX, FIT, or TCX File - Can be uploaded later",
         validators=[FileExtensionValidator(allowed_extensions=["gpx", "tcx", "fit"])],
         required=False,
     )
@@ -1054,7 +1061,6 @@ class RegisterForm(Form):
         self.event = kwargs.pop("event", None)
         super().__init__(*args, **kwargs)
         now = arrow.now().datetime
-
         if now > self.event.end_date:
             self.fields["race_complete"].default = True
 
@@ -1064,6 +1070,111 @@ class RegisterForm(Form):
 
         if not self.event.allow_route_upload:
             self.fields["gps_file"].widget = HiddenInput()
+
+        if tags := self.event.acceptable_categories:
+            self.fields["tag"].choices = [(tag, tag) for tag in tags]
+        else:
+            del self.fields["tag"]
+        self.warnings = []
+
+    def save(self, request, *args, **kwargs):
+        competitor = Competitor(
+            event=self.event,
+            name=self.cleaned_data["name"],
+            short_name=self.cleaned_data["short_name"],
+        )
+        if tag := self.cleaned_data.get("tag"):
+            competitor.tag = tag
+
+        if self.cleaned_data["device"]:
+            competitor.device = self.cleaned_data["device"]
+        if gps_file := self.cleaned_data["gps_file"]:
+            gps_logger = Device.objects.create(
+                aid=f"{short_random_key()}_GPX",
+                user_agent=request.session.user_agent[:200],
+                virtual=True,
+            )
+            gps_logger.locations_encoded = gps_file.read()
+            gps_logger.save()
+            competitor.device = gps_logger
+        elif tracker := self.cleaned_data["device"]:
+            competitor.device = tracker
+        competitor.save()
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        if self.event.competitors.filter(name=name).exists():
+            raise ValidationError("Name already used in this event")
+        return name
+
+    def clean_short_name(self):
+        short_name = self.cleaned_data.get("short_name")
+        if not short_name and (name := self.data.get("name")):
+            short_name = initial_of_name(name)
+        return short_name
+
+    def clean_gps_file(self):
+        gps_file = self.cleaned_data.get("gps_file")
+        if not gps_file:
+            return None
+        if gps_file and not self.data.get("js_enabled"):
+            raise ValidationError("You must enable javascript to upload GPS files")
+
+        raw_data = gps_file.read()
+        json_data = json.loads(raw_data)
+
+        timestamps_raw = json_data.get("timestamps")
+        if not timestamps_raw:
+            raise ValidationError("GPS file does not contains timestamps")
+
+        latlngs_raw = json_data.get("latlngs")
+        if not latlngs_raw:
+            raise ValidationError("GPS file does not contains any coordinates")
+
+        try:
+            tmps = tuple(int(t) for t in timestamps_raw.split(","))
+        except ValueError:
+            raise ValidationError("GPS file contains invalid timestamps")
+
+        try:
+            latlngs = tuple(
+                tuple(float(coord) for coord in latlng_raw.split(" ", 1))
+                for latlng_raw in latlngs_raw.split(",")
+            )
+
+        except ValueError:
+            raise ValidationError("GPS file contains invalid coordinates")
+
+        if not tmps:
+            self.warnings.append("GPS file does not contains any points")
+
+        if len(tmps) != len(latlngs):
+            self.warnings.append(
+                "GPS file does not contains timestamps for all coordinates"
+            )
+
+        start_time = None
+        outside_range = False
+        locations = []
+        for t, (lat, lng) in zip(tmps, latlngs):
+            validate_latitude(lat)
+            validate_longitude(lng)
+            if not (
+                self.event.start_date.timestamp()
+                <= t
+                <= self.event.end_date.timestamp()
+            ):
+                outside_range = True
+            if not start_time or t < start_time:
+                start_time = t
+
+            locations.append([t, lat, lng])
+        if outside_range:
+            self.warnings.append("GPS file contains data outside event schedule")
+        logger = Device()
+        logger.add_locations(locations, save=False)
+        logger_data = logger.locations_encoded
+        return ContentFile(logger_data, name=gps_file.name)
 
 
 class CompetitorUploadGPSForm(Form):
@@ -1075,18 +1186,104 @@ class CompetitorUploadGPSForm(Form):
     )
 
     def __init__(self, *args, **kwargs):
+        self.warnings = []
         event = kwargs.pop("event", None)
+        self.event = event
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        competitors_who_can_upload = []
+        uploadable_competitors = []
+        if not event.allow_route_upload:
+            return []
         for competitor, from_date, end_date in event.iterate_competitors():
-            if competitor.device_id:
-                _, nb_pts = competitor.device.get_locations_between_dates(
-                    from_date, end_date, encode=True
-                )
-                if nb_pts == 0:
-                    competitors_who_can_upload.append(competitor)
-            else:
-                competitors_who_can_upload.append(competitor)
+            if competitor.user:
+                if user.is_authenticated and competitor.user == user:
+                    uploadable_competitors.append(competitor)
+                continue
+            if not competitor.device_id:
+                uploadable_competitors.append(competitor)
+                continue
+
+            _, nb_pts = competitor.device.get_locations_between_dates(
+                from_date, end_date, encode=True
+            )
+            if nb_pts == 0:
+                uploadable_competitors.append(competitor)
         self.fields["competitor_aid"].choices = [
-            (c.aid, c.name) for c in competitors_who_can_upload
+            (c.aid, c.name) for c in uploadable_competitors
         ]
+
+    def save(self, request, *args, **kwargs):
+        competitor = Competitor.objects.get(aid=self.cleaned_data["competitor_aid"])
+        if gps_file := self.cleaned_data["gpx_file"]:
+            gps_logger = Device.objects.create(
+                aid=f"{short_random_key()}_GPX",
+                user_agent=request.session.user_agent[:200],
+                virtual=True,
+            )
+            gps_logger.locations_encoded = gps_file.read()
+            gps_logger.save()
+            competitor.device = gps_logger
+        competitor.save()
+
+    def clean_gpx_file(self):
+        gps_file = self.cleaned_data.get("gpx_file")
+        if not gps_file:
+            return None
+        if gps_file and not self.data.get("js_enabled2"):
+            raise ValidationError("You must enable javascript to upload GPS files")
+
+        raw_data = gps_file.read()
+        json_data = json.loads(raw_data)
+
+        timestamps_raw = json_data.get("timestamps")
+        if not timestamps_raw:
+            raise ValidationError("GPS file does not contains timestamps")
+
+        latlngs_raw = json_data.get("latlngs")
+        if not latlngs_raw:
+            raise ValidationError("GPS file does not contains any coordinates")
+
+        try:
+            tmps = tuple(int(t) for t in timestamps_raw.split(","))
+        except ValueError:
+            raise ValidationError("GPS file contains invalid timestamps")
+
+        try:
+            latlngs = tuple(
+                tuple(float(coord) for coord in latlng_raw.split(" ", 1))
+                for latlng_raw in latlngs_raw.split(",")
+            )
+
+        except ValueError:
+            raise ValidationError("GPS file contains invalid coordinates")
+
+        if not tmps:
+            self.warnings.append("GPS file does not contains any points…")
+
+        if len(tmps) != len(latlngs):
+            self.warnings.append(
+                "GPS file does not contains timestamps for all coordinates…"
+            )
+
+        start_time = None
+        outside_range = False
+        locations = []
+        for t, (lat, lng) in zip(tmps, latlngs):
+            validate_latitude(lat)
+            validate_longitude(lng)
+            if not (
+                self.event.start_date.timestamp()
+                <= t
+                <= self.event.end_date.timestamp()
+            ):
+                outside_range = True
+            if not start_time or t < start_time:
+                start_time = t
+
+            locations.append([t, lat, lng])
+        if outside_range:
+            self.warnings.append("GPS file contains data outside event schedule…")
+        logger = Device()
+        logger.add_locations(locations, save=False)
+        logger_data = logger.locations_encoded
+        return ContentFile(logger_data, name=gps_file.name)

@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
+import arrow
 import cv2
 import flag
 import gps_data_codec
@@ -2083,6 +2084,19 @@ class Event(models.Model, SomewhereOnEarth):
                         end_date = start_time
                         break
             yield (competitor, from_date, end_date)
+
+    @property
+    def schedule_display(self):
+        start = arrow.get(self.start_date)
+        end = arrow.get(self.end_date)
+
+        time_distance = start.humanize(
+            end, only_distance=True, granularity=["hour", "minute"]
+        )
+
+        return (
+            f'{time_distance} after <span class="date-utc" date-date="{start.isoformat()}">{start.datetime} UTC</span>'
+        ).capitalize()
 
     @classmethod
     def get_map_at_index(cls, user, event_id, map_index, load_competitors=False):

@@ -28,38 +28,20 @@ function onGPXLoaded(e) {
 			}
 		}
 	}
-	onRouteLoaded(newRoute, missingTimeInfo);
+	return onRouteLoaded(newRoute, missingTimeInfo);
 }
-const onTCXParsed = (workout) => {
-	const newRoute = [];
-	let missingTimeInfo = false;
-	for (const lap of workout.laps) {
-		for (const pos of lap.track) {
-			if (pos.latitude) {
-				if (pos.datetime) {
-					newRoute.push({
-						time: +pos.datetime,
-						latLon: [pos.latitude, pos.longitude],
-					});
-				} else {
-					missingTimeInfo = true;
-				}
-			}
-		}
-	}
-	onRouteLoaded(newRoute, missingTimeInfo);
-};
 
 const onTCXLoaded = (e) => {
 	const xml = e.target.result;
 	try {
-		parseTCXString(xml, onTCXParsed);
+		return parseTCXString(xml, onTCXParsed);
 	} catch (e) {
 		swal({
 			text: "Error parsing your TCX file!",
 			title: "error",
 			type: "error",
 		});
+		return false;
 	}
 };
 
@@ -79,7 +61,7 @@ const onFitLoaded = (e) => {
 				title: "error",
 				type: "error",
 			});
-			return;
+			return false;
 		}
 		const newRoute = [];
 		let missingTimeInfo = false;
@@ -95,7 +77,7 @@ const onFitLoaded = (e) => {
 				}
 			}
 		}
-		onRouteLoaded(newRoute, missingTimeInfo);
+		return onRouteLoaded(newRoute, missingTimeInfo);
 	});
 };
 
@@ -114,12 +96,13 @@ function onRouteLoaded(newRoute, missingTimeInfo) {
 				type: "error",
 			});
 		}
-		return;
+		return false;
 	}
 	const ts = newRoute.map((pt) => Math.round(+pt.time / 1e3)).join(",");
-	const lats = newRoute.map((pt) => (+pt.latLon[0]).toFixed(5)).join(",");
-	const lons = newRoute.map((pt) => (+pt.latLon[1]).toFixed(5)).join(",");
-	route = { timestamps: ts, latitudes: lats, longitudes: lons };
+	const latlngs = newRoute
+		.map((pt) => `${+pt.latLon[0].toFixed(5)} ${+pt.latLon[1].toFixed(5)}`)
+		.join(",");
+	let route = { timestamps: ts, latlngs: latlngs };
 	if (JSON.stringify(route).length > 2 * 1e7) {
 		route = {};
 		u("#id_gpx_file").val("");
@@ -128,11 +111,10 @@ function onRouteLoaded(newRoute, missingTimeInfo) {
 			title: "error",
 			type: "error",
 		});
+		return false;
 	}
+	return route;
 }
-
-let route = {};
-let signUpRoute = {};
 
 function getGpxData(node, resultRaw) {
 	const result = resultRaw ?? { segments: [] };
@@ -171,6 +153,26 @@ function getGpxData(node, resultRaw) {
 	}
 	return result;
 }
+
+const onTCXParsed = (workout) => {
+	const newRoute = [];
+	let missingTimeInfo = false;
+	for (const lap of workout.laps) {
+		for (const pos of lap.track) {
+			if (pos.latitude) {
+				if (pos.datetime) {
+					newRoute.push({
+						time: +pos.datetime,
+						latLon: [pos.latitude, pos.longitude],
+					});
+				} else {
+					missingTimeInfo = true;
+				}
+			}
+		}
+	}
+	return onRouteLoaded(newRoute, missingTimeInfo);
+};
 
 function parseGpx(xmlstr) {
 	if (typeof DOMParser === "undefined") {
@@ -229,81 +231,7 @@ function selectizeDeviceInput(field) {
 }
 
 (() => {
-	const queryParams = window.location.search;
-	if (
-		queryParams.includes("competitor-added=1") ||
-		queryParams.includes("route-uploaded=1")
-	) {
-		window.history.pushState("-", null, window.location.pathname);
-	}
 	if (u("#registration-form").nodes.length) {
-		u("#registration-form").on("submit", (e) => {
-			e.preventDefault();
-			const submitButton = u("#registration-form").find(
-				"button:not([type]),button[type=submit]",
-			);
-			submitButton.attr("disabled", true);
-			submitButton
-				.find("i")
-				.removeClass("fa-file-signature")
-				.addClass("fa-spinner fa-spin");
-			const formData = new FormData(e.target);
-			const data = {
-				event_id: window.local.eventId,
-				name: formData.get("name"),
-				short_name: formData.get("short_name"),
-				route: signUpRoute,
-			};
-			if (formData.get("tag")) {
-				data.tag = formData.get("tag");
-			}
-			if (formData.get("device_id")) {
-				data.device_id = formData.get("device_id");
-			}
-			reqwest({
-				url: "/competitors/",
-				method: "post",
-				type: "json",
-				withCredentials: true,
-				crossOrigin: true,
-				data: data,
-				headers: {
-					"X-CSRFToken": window.local.csrfToken,
-				},
-				success: () => {
-					window.localStorage.setItem(
-						"userInfoRegistration",
-						JSON.stringify({
-							name: data.name,
-							shortName: data.short_name,
-							deviceId: data.device_id,
-						}),
-					);
-					window.location = `${window.location.href}?competitor-added=1`;
-					return false;
-				},
-				error: (err) => {
-					submitButton.attr("disabled", false);
-					submitButton
-						.find("i")
-						.removeClass("fa-spinner fa-spin")
-						.addClass("fa-file-signature");
-					if (err.status === 400) {
-						swal({
-							text: JSON.parse(err.responseText).join("\n"),
-							title: "error",
-							type: "error",
-						});
-					} else {
-						swal({
-							text: "Something went wrong",
-							title: "error",
-							type: "error",
-						});
-					}
-				},
-			});
-		});
 		u("#id_race_complete").on("change", (e) => {
 			e.preventDefault();
 			const input = u("#id_gps_file");
@@ -317,8 +245,8 @@ function selectizeDeviceInput(field) {
 				}
 		});
 		u("#id_race_complete").trigger("change");
-		u("#id_gps_file").on("change", function (e) {
-			signUpRoute = {};
+		u("#id_gps_file").on("change", function () {
+			u("id_js_enabled").val("");
 			if (this.files.length > 0) {
 				const gpsFile = this.files[0];
 				const filename = gpsFile.name;
@@ -334,11 +262,22 @@ function selectizeDeviceInput(field) {
 					onload = onGPXLoaded;
 				}
 				fr.onload = (e) => {
-					onload(e);
+					const route = onload(e);
 					const isEmpty = Object.keys(route).length === 0;
 					if (!isEmpty) {
-						signUpRoute = route;
-						const selectEl = document.getElementById("id_device_id");
+						const jsonBlob = new Blob([JSON.stringify(route)], {
+							type: "text/plain;charset=us-ascii",
+						});
+						const jsonFile = new File([jsonBlob], filename, {
+							type: "text/plain",
+						});
+						const dataTransfer = new DataTransfer();
+						dataTransfer.items.add(jsonFile);
+						const inputElement = document.getElementById("id_gps_file");
+						inputElement.files = dataTransfer.files;
+						u("id_js_enabled").val("on");
+						// Hide the Tracker ID selector
+						const selectEl = document.getElementById("id_device");
 						const control = selectEl?.tomselect;
 						control?.clear();
 					}
@@ -346,145 +285,97 @@ function selectizeDeviceInput(field) {
 				fr[readFunction](gpsFile);
 			}
 		});
-
-		if (window.local.eventEnded) {
-			u("#id_device_id").parent().addClass("d-none");
-		} else {
-			const tsDevId = selectizeDeviceInput("select[name='device_id']");
-			const warningHTML = u("<div>")
-				.append(u("#warning-if-device-id").html())
-				.addClass("d-none");
-			u("#id_device_id_helptext").append(warningHTML);
-			u("select[name='device_id']").on("change", (e) => {
-				if (e.target.value) {
-					signUpRoute = null;
-					u("#id_gps_file").val(null);
-					warningHTML.removeClass("d-none");
-				} else {
-					warningHTML.addClass("d-none");
-				}
-			});
-			let deviceIdfromHash = false;
-			if (window.location.hash) {
-				const hash = window.location.hash;
-				window.history.pushState("-", null, window.location.pathname);
-				const searchParams = new URLSearchParams(hash.slice(1));
-				const deviceId = searchParams.get("device_id");
-				if (deviceId) {
-					deviceIdfromHash = true;
-					tsDevId.clear();
-					tsDevId.clearOptions();
-					tsDevId.addOption({ device_id: deviceId });
-					tsDevId.setValue(deviceId);
-				}
+	}
+	// Selectize Device selector
+	{
+		const tsDevId = selectizeDeviceInput("select[name='device']");
+		const warningHTML = u("<div>")
+			.append(u("#warning-if-device-id").html())
+			.addClass("d-none");
+		u("#id_device_helptext").append(warningHTML);
+		u("select[name='device']").on("change", (e) => {
+			if (e.target.value) {
+				signUpRoute = null;
+				u("#id_gps_file").val(null);
+				warningHTML.removeClass("d-none");
+			} else {
+				warningHTML.addClass("d-none");
 			}
-			const savedRegistrationInfoRaw = window.localStorage.getItem(
-				"userInfoRegistration",
-			);
-			if (savedRegistrationInfoRaw) {
-				const savedRegistrationInfo = JSON.parse(savedRegistrationInfoRaw);
-				const { name, shortName, deviceId } = savedRegistrationInfo;
-				u("#id_name").val(name);
-				u("#id_short_name").val(shortName);
-				if (deviceId && !deviceIdfromHash) {
-					tsDevId.clear();
-					tsDevId.clearOptions();
-					tsDevId.addOption({ device_id: deviceId });
-					tsDevId.setValue(deviceId);
-					deviceIdfromHash = true;
-				}
+		});
+		let deviceIdfromHash = false;
+		if (window.location.hash) {
+			const hash = window.location.hash;
+			window.history.pushState("-", null, window.location.pathname);
+			const searchParams = new URLSearchParams(hash.slice(1));
+			const deviceId = searchParams.get("device_id");
+			if (deviceId) {
+				deviceIdfromHash = true;
+				tsDevId.clear();
+				tsDevId.clearOptions();
+				tsDevId.addOption({ device_id: deviceId });
+				tsDevId.setValue(deviceId);
+			}
+		}
+		const savedRegistrationInfoRaw = window.localStorage.getItem(
+			"userInfoRegistration",
+		);
+		if (savedRegistrationInfoRaw) {
+			const savedRegistrationInfo = JSON.parse(savedRegistrationInfoRaw);
+			const { name, shortName, deviceId } = savedRegistrationInfo;
+			u("#id_name").val(name);
+			u("#id_short_name").val(shortName);
+			if (deviceId && !deviceIdfromHash) {
+				tsDevId.clear();
+				tsDevId.clearOptions();
+				tsDevId.addOption({ device_id: deviceId });
+				tsDevId.setValue(deviceId);
+				deviceIdfromHash = true;
 			}
 		}
 	}
 
 	if (u("#id_gpx_file").nodes.length) {
 		u("#id_gpx_file").attr("accept", ".gpx,.tcx,.fit");
-		u("#id_gpx_file").on("change", function (e) {
+		u("#id_gpx_file").on("change", function () {
+			u("id_js_enabled2").val("");
 			if (this.files.length > 0) {
 				const gpsFile = this.files[0];
 				const filename = gpsFile.name;
 				const fr = new FileReader();
+				let onload = null;
+				let readFunction = "readAsText";
 				if (filename.toLowerCase().endsWith(".tcx")) {
-					fr.onload = onTCXLoaded;
+					onload = onTCXLoaded;
 				} else if (filename.toLowerCase().endsWith(".fit")) {
-					fr.onload = onFitLoaded;
-					fr.readAsArrayBuffer(gpsFile);
-					return;
+					onload = onFitLoaded;
+					readFunction = "readAsArrayBuffer";
 				} else {
-					fr.onload = onGPXLoaded;
+					onload = onGPXLoaded;
 				}
-				fr.readAsText(gpsFile);
+				fr.onload = (e) => {
+					const route = onload(e);
+					const isEmpty = Object.keys(route).length === 0;
+					if (!isEmpty) {
+						const jsonBlob = new Blob([JSON.stringify(route)], {
+							type: "text/plain;charset=us-ascii",
+						});
+						const jsonFile = new File([jsonBlob], filename, {
+							type: "text/plain",
+						});
+						const dataTransfer = new DataTransfer();
+						dataTransfer.items.add(jsonFile);
+						const inputElement = document.getElementById("id_gpx_file");
+						inputElement.files = dataTransfer.files;
+						u("id_js_enabled2").val("on");
+					}
+				};
+				fr[readFunction](gpsFile);
 			}
 		});
 	}
+
 	u(".date-utc").each((el) => {
 		$el = u(el);
 		$el.text(dayjs($el.data("date")).local().format("LLLL"));
 	});
-
-	if (u("#upload-form").nodes.length) {
-		u("#upload-form").on("submit", (e) => {
-			e.preventDefault();
-			const formData = new FormData(e.target);
-			const cmp_aid = formData.get("competitor_aid");
-			reqwest({
-				url: `/competitors/${cmp_aid}/route`,
-				method: "post",
-				type: "json",
-				withCredentials: true,
-				crossOrigin: true,
-				data: route,
-				headers: {
-					"X-CSRFToken": window.local.csrfToken,
-				},
-				success: () => {
-					window.location.href = `${window.location.href}?route-uploaded=1`;
-				},
-				error: (err) => {
-					if (err.status === 400) {
-						swal({
-							text: JSON.parse(err.responseText).join("\n"),
-							title: "error",
-							type: "error",
-						});
-					} else {
-						swal({
-							text: "Something went wrong",
-							title: "error",
-							type: "error",
-						});
-					}
-				},
-			});
-		});
-	}
-
-	const uploadModalDiv = document.getElementById("uploadRouteModal");
-	if (uploadModalDiv) {
-		const uploadModal = new bootstrap.Modal(uploadModalDiv);
-		const uploadCompetitorOptions = [
-			...document.getElementById("id_competitor_aid").options,
-		].map((o) => o.value);
-		u(".upload-route-btn").each((el) => {
-			if (
-				!uploadCompetitorOptions.includes(u(el).attr("data-competitor-aid"))
-			) {
-				u(el).attr({ disabled: true });
-				const wrapper = u(
-					'<div class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Already assigned a route">',
-				);
-				u(el).wrap(wrapper);
-				new bootstrap.Tooltip(wrapper.nodes[0]);
-			} else {
-				u(el).on("click", (e) => {
-					u("#id_competitor_aid").parent().hide();
-					u("#id_competitor_aid").val(u(el).attr("data-competitor-aid"));
-					u("#uploader-name").text(u(el).attr("data-competitor-name"));
-					uploadModal.show();
-				});
-			}
-		});
-	} else {
-		u(".upload-route-btn").hide();
-	}
 })();

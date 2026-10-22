@@ -1855,39 +1855,64 @@ def event_contribute_view(request, club_slug, slug):
         club__slug=club_slug,
         slug=slug,
     )
-
-    if request.GET.get("competitor-added", None):
-        messages.success(
-            request,
-            "Registration successful! Remember to start your GPS at the beginning of the event!",
-        )
-    if request.GET.get("route-uploaded", None):
-        messages.success(request, "Data uploaded!")
-
     can_upload = event.allow_route_upload and (event.start_date <= now())
     can_register = event.open_registration and (event.end_date >= now() or can_upload)
 
     if not (can_upload or can_register):
         raise Http404
 
-    register_form = None
-    if can_register:
-        register_form = RegisterForm(event=event)
-        if tags := event.acceptable_categories:
-            register_form.fields["tag"].choices = [(tag, tag) for tag in tags]
+    registration_form = RegisterForm(event=event) if can_register else None
+    if registration_form and request.method == "POST" and "signup-form" in request.POST:
+        registration_form = RegisterForm(request.POST, request.FILES, event=event)
+        if registration_form.is_valid():
+            registration_form.save(request)
+            messages.success(request, "Registration complete!")
+            for warnings in registration_form.warnings:
+                messages.warning(request, warnings)
+            return redirect(
+                reverse(
+                    "event_contribute_view",
+                    kwargs={"slug": event.slug, "club_slug": event.club.slug},
+                    host="dashboard",
+                )
+            )
+        messages.error(request, "Registration failed…")
+        if tracker := registration_form.cleaned_data["device"]:
+            registration_form.fields["device"].queryset = Device.objects.filter(
+                pk=tracker.pk
+            )
         else:
-            del register_form.fields["tag"]
+            registration_form.fields["device"].queryset = Device.objects.none()
 
-    upload_form = None
-    if can_upload:
-        upload_form = CompetitorUploadGPSForm(event=event)
+    upload_form = (
+        CompetitorUploadGPSForm(user=request.user, event=event) if can_upload else None
+    )
+    if upload_form and not upload_form.fields["competitor_aid"].choices:
+        upload_form = None
+    if upload_form and request.method == "POST" and "upload-form" in request.POST:
+        upload_form = CompetitorUploadGPSForm(
+            request.POST, request.FILES, user=request.user, event=event
+        )
+        if upload_form.is_valid():
+            upload_form.save(request)
+            messages.success(request, "Upload successful!")
+            for warnings in upload_form.warnings:
+                messages.warning(request, warnings)
+            return redirect(
+                reverse(
+                    "event_contribute_view",
+                    kwargs={"slug": event.slug, "club_slug": event.club.slug},
+                    host="dashboard",
+                )
+            )
+        messages.error(request, "Upload failed…")
 
     return render(
         request,
         "club/event_contribute.html",
         {
             "event": event,
-            "register_form": register_form,
+            "register_form": registration_form,
             "upload_form": upload_form,
             "event_ended": event.end_date < now(),
         },

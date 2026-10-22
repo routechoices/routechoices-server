@@ -19,7 +19,7 @@
                         <td>{{ key.created_at }}</td>
                         <td>
                             {% if key.last_used_at %}
-                                <span class="date-utc" data-date="{{ key.last_used_at|date:'c' }}">{{ key.last_used_at }} UTC</span>
+                                ≈{{ key.last_used_at|date:'c' }}">{{ key.last_used_at }} UTC</span>
                             {% else %}
                                 Never
                             {% endif %}
