@@ -2186,6 +2186,8 @@ class Event(models.Model, SomewhereOnEarth):
             if selected_year:
                 try:
                     selected_year = int(selected_year)
+                    if not (0 < selected_year < 10_000):
+                        raise ValueError("Year should be between 1 and 9999")
                 except Exception:
                     raise BadRequest("Invalid year")
             elif years:
