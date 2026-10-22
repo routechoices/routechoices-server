@@ -12,7 +12,7 @@ const extractCornersCoordsFromFilename = (filename) => {
 
 const onPDF = (ev, filenameRaw) => {
 	pdfjsLib.GlobalWorkerOptions.workerSrc =
-		"/static/vendor/pdfjs-5.2.133/pdf.worker.js";
+		"/static/vendor/pdfjs-5.2.133/pdf.worker.js?v=2";
 	const loadingTask = pdfjsLib.getDocument({
 		data: new Uint8Array(ev.target.result.slice(0)),
 	});
