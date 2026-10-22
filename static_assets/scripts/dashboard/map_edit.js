@@ -11,8 +11,7 @@ const extractCornersCoordsFromFilename = (filename) => {
 };
 
 const onPDF = async (ev, filenameRaw) => {
-	const pdfjsPath = "/static/vendor/pdfjs-6.4.299/";
-	pdfjsLib.GlobalWorkerOptions.workerSrc = `${pdfjsPath}pdf.worker.js`;
+	const pdfjsLib = await window.pdfjsLibReady;
 	const loadingTask = pdfjsLib.getDocument({
 		data: new Uint8Array(ev.target.result.slice(0)),
 	});
