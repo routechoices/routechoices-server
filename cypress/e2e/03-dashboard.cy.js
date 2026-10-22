@@ -43,18 +43,18 @@ context("Dashboard actions", () => {
 		cy.contains("Register");
 		cy.get("#id_name").type("Thierry Gueorgiou");
 		cy.get("#id_short_name").type("🇫🇷 T.Gueorgiou");
-		cy.get("#id_device_id-ts-control").type("123456").wait(1000).blur();
+		cy.get("#id_device-ts-control").type("123456").wait(1000).blur();
 		cy.get("button:not([type]),button[type=submit]").eq(0).click();
-		cy.contains("Registration successful!");
-		cy.get(".upload-route-btn").first().click();
+		cy.contains("Registration complete!");
 
+		cy.get("#id_competitor_aid").select(0);
 		cy.get("#id_gpx_file").selectFile({
 			contents: "cypress/fixtures/Jukola2019/1/gpx/HaldenSK.gpx",
 			fileName: "HaldenSK.gpx",
 			mimeType: "text/xml",
 		});
-		cy.get("#uploadRouteModal button:not([type]),button[type=submit]").click();
-		cy.contains("Data uploaded!");
+		cy.get("button:not([type]),button[type=submit]").eq(1).click();
+		cy.contains("Upload successful!");
 	});
 
 	it("Participation page", () => {

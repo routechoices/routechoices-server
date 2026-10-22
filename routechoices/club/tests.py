@@ -307,6 +307,11 @@ class ClubViewsTestCase(EssentialApiBase):
             start_date=arrow.now().shift(hours=-1).datetime,
             end_date=arrow.now().shift(hours=1).datetime,
         )
+        Competitor.objects.create(
+            event=e,
+            name="Alice",
+            short_name="A",
+        )
         url = self.reverse_and_check(
             "club_view",
             "/",
@@ -356,21 +361,21 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
-        self.assertNotContains(response, "Upload Route")
+        self.assertNotContains(response, "Upload GPS File")
 
         e.allow_route_upload = True
         e.save()
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
-        self.assertContains(response, "Upload Route")
+        self.assertContains(response, "Upload GPS File")
 
         e.open_registration = False
         e.save()
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertNotContains(response, ">Register<")
-        self.assertContains(response, "Upload Route")
+        self.assertContains(response, "Upload GPS File")
 
         client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
         url = self.reverse_and_check(
@@ -486,12 +491,12 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get("/contribute/kiilat/kiila-cup-2")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
-        self.assertNotContains(response, "Upload Route")
+        self.assertNotContains(response, "Upload GPS File")
 
     def test_past_event_pages_load(self):
         client = APIClient(HTTP_HOST="kiilat.rtchs.localhost")
 
-        Event.objects.create(
+        e = Event.objects.create(
             name="Kiila Cup 3",
             slug="kiila-cup-3",
             club=self.club,
@@ -499,6 +504,12 @@ class ClubViewsTestCase(EssentialApiBase):
             end_date=arrow.now().shift(hours=-1).datetime,
             open_registration=True,
             allow_route_upload=True,
+        )
+
+        Competitor.objects.create(
+            event=e,
+            name="Alice",
+            short_name="A",
         )
 
         response = client.get("/kiila-cup-3/")
@@ -512,7 +523,7 @@ class ClubViewsTestCase(EssentialApiBase):
         response = client.get("/contribute/kiilat/kiila-cup-3")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Register")
-        self.assertContains(response, "Upload Route")
+        self.assertContains(response, "Upload GPS File")
 
     def test_gpsseuranta_compat_pages_load(self):
         club = Club.objects.create(name="Test club", slug="myclub")
