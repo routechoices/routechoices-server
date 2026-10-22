@@ -1,6 +1,6 @@
-const pdfjsPath = "/vendor/pdfjs-5.7.284/";
+const pdfjsPath = "vendor/pdfjs-5.7.284/";
 
-window.pdfjsLibReady = import(`${pdfjsPath}pdf.min.js`).then((pdfjsLib) => {
-	pdfjsLib.GlobalWorkerOptions.workerSrc = `${pdfjsPath}pdf.worker.min.js`;
+window.pdfjsLibReady = import(`${window.local.staticRoot}${pdfjsPath}pdf.min.js`).then((pdfjsLib) => {
+	pdfjsLib.GlobalWorkerOptions.workerSrc = `${window.local.staticRoot}${pdfjsPath}pdf.worker.min.js`;
 	return pdfjsLib;
 });
