@@ -2204,8 +2204,8 @@ class Event(models.Model, SomewhereOnEarth):
             if selected_month:
                 try:
                     selected_month = int(selected_month)
-                    if selected_month < 1 or selected_month > 12:
-                        raise ValueError()
+                    if not (0 < selected_month < 13):
+                        raise ValueError("Month value should be between 1 and 12")
                 except Exception:
                     raise BadRequest("Invalid month")
             elif months:
