@@ -185,7 +185,7 @@
 {% block extra_body %}
     <script src="{% static 'scripts/load-local-variables.js' %}{{ engine_version_static_cache_buster }}"
             data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
-    <script type="module" src="{% static 'scripts/dashboard/pdfjs_init.js' %}"></script>
+    <script type="module" src="{% static 'scripts/dashboard/pdfjs_init.js' %}?v=2"></script>
     {% compress js %}
         <script src="{% static 'vendor/jszip-3.10.1/jszip.min.js' %}"></script>
         <script src="{% static 'vendor/umbrella-3.3.3/umbrella.min.js' %}"></script>
