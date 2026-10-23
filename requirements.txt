@@ -47,7 +47,7 @@ emoji-country-flag==2.1.0
 frozenlist==1.8.0
 geoip2==5.3.0
 geojson-validator==0.7.0
-gps-data-codec @ git+https://github.com/routechoiceslivegps/gps-data-codec@1e7cda1a0b2ad763ddafd43649cb98370eb85d7c
+gps-data-codec @ git+https://github.com/routechoiceslivegps/gps-data-codec@4114ae6b23e8a55252ecbc99d0152d75fb4b427e
 gpxpy==1.6.2
 gunicorn==26.2.0
 idna==3.20
@@ -66,7 +66,7 @@ oauthlib==4.0.0
 opencv-python-headless==5.0.0.93
 orjson==3.12.0
 packaging==26.3
-pillow==12.3.0
+pillow==13.0.0
 propcache==0.5.4
 psutil==7.2.2
 psycopg==3.3.6
