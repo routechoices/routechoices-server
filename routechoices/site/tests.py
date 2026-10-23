@@ -2,10 +2,10 @@ import arrow
 from allauth.account.models import EmailAddress
 from django.core import mail
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.models import Club, Event, EventSet
+from routechoices.testing import APIClient
 
 
 class SiteViewsTestCase(EssentialApiBase):
@@ -48,7 +48,7 @@ class SiteViewsTestCase(EssentialApiBase):
             end_date=arrow.now().shift(hours=-1).datetime,
         )
 
-        client = APIClient(HTTP_HOST="www.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="www.rtchs.localhost")
 
         url = self.reverse_and_check("site:public_events_view", "/events", host="www")
         response = client.get(url)
@@ -73,7 +73,7 @@ class SiteViewsTestCase(EssentialApiBase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_semi_static_pages_loads(self):
-        client = APIClient(HTTP_HOST="www.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="www.rtchs.localhost")
         url = self.reverse_and_check("site:landing_page", "/", host="www")
         response = client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -99,7 +99,7 @@ class SiteViewsTestCase(EssentialApiBase):
         EmailAddress.objects.create(
             user=self.user, email=self.user.email, primary=True, verified=True
         )
-        client = APIClient(HTTP_HOST="dashboard.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="dashboard.rtchs.localhost")
         client.force_login(self.user)
         url = self.reverse_and_check("contact_view", "/contact/", host="dashboard")
         response = client.post(

@@ -38,10 +38,11 @@
                     <a class="nav-link{% if request.resolver_match.view_name == 'contact_view' %} active{% endif %} text-nowrap"
                        href="{% host_url 'contact_view' host 'dashboard' %}"><i class="fa-solid fa-envelope"></i> Contact us</a>
                 </li>
+                {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <div class="dropdown me-2">
-                    <button class="nav-link btn dropdown-toggle" type="button" id="accountMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-circle-user"></i>
+                    <button class="nav-link btn" type="button" id="accountMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-circle-user"></i>&nbsp;Account
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="accountMenuBtn">
                         <li><a class="dropdown-item" href="{% url 'account_edit_view' %}"><i class="fa-solid fa-user"></i> Your Details</a></li>
@@ -52,17 +53,13 @@
                         <li><a class="dropdown-item text-danger" href="{% host_url 'account_logout' host 'dashboard' %}"><span>Logout</span> <i class="fa-solid fa-arrow-right-from-bracket"></i></a></li>
                     </ul>
                 </div>
+                {% endif %}
             </li>
             </ul>
             <div class="vr if-navbar-not-toggled"></div>
             <hr class="if-navbar-toggled mt-0 mb-2" />
             <ul class="navbar-nav d-flex">
                 <span class="if-not-collapsed me-2"></span>
-                <li class="nav-item">
-                    <a href="{% host_url 'account_login' host 'dashboard' %}" class="text-nowrap btn btn-primary navbar-btn loginBtn mt-0 me-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> Dashboard
-                    </a>
-                </li>
                 <li class="nav-item">
                     <button class="theme-selector" type="button" data-bs-toggle="tooltip">
                         <svg aria-hidden="true" class="theme-selector-icon">

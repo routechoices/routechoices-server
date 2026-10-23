@@ -118,7 +118,7 @@ class QueclinkConnection(GenericConnection):
                 try:
                     batt = int(batt_raw)
                 except Exception:
-                    pass
+                    print("Invalid battery level value")
             await self.on_data(pts, batt)
             if parts[0][8:] == "SOS":
                 sos_device_aid, sos_lat, sos_lon, sos_sent_to = await send_sos(

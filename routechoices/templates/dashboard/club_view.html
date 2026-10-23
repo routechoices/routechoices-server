@@ -46,12 +46,18 @@
             Your subscription is currently paused.
             <a href="{{ subscription_link }}" style="color:var(--bs-info)" target="_blank" rel="nofollow noopener" class="fw-bold">Resume your subscription</a> to re-enable all features.
         </p>
-    {% elif club.upgraded %}
+    {% elif club.upgraded and club.order_id|slice:":3" == "LS-" %}
         <p class="p-1 text-center"
         style="color: #000;
             background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
             Thank you for using our paid plan!
             <a href="{{ subscription_link }}" style="color:var(--bs-info)" target="_blank" rel="nofollow noopener" class="fw-bold">Manage your subscription</a>.
+        </p>
+    {% elif club.upgraded and club.order_id|slice:":3" == "RL-" %}
+        <p class="p-1 text-center"
+        style="color: #000;
+            background: linear-gradient(120deg, #98d6a6 0%, #98cdd6 100%)">
+            Your subscription is covered by the Finnish orienteering federation (SSL)
         </p>
     {% endif %}
     {% block pre_menu_content %}
@@ -79,18 +85,18 @@
         </ul>
         {% block sub_sub_content %}
             <p>
-                <a class="btn btn-info mb-1 me-1"
-                   href="{% url 'dashboard_club:custom_domain_view' club_slug=request.club.slug %}"><i class="fa-solid fa-link"></i> Custom Domain Management</a>
+                <a class="btn btn-info mb-1 dashboard-link"
+                   href="{% url 'dashboard_club:send_invite_view' club_slug=request.club.slug %}"><i class="fa-solid fa-user-plus"></i> <span>Invite more admins</span></a>
+                <a class="btn btn-info mb-1 me-1 dashboard-link"
+                   href="{% url 'dashboard_club:custom_domain_view' club_slug=request.club.slug %}"><i class="fa-solid fa-link"></i> <span>Custom Domain Management</span></a>
                 {% if club.analytics_site %}
-                    <a href="{{ club.analytics_site }}" class="btn btn-info mb-1"><i class="fa-solid fa-chart-pie"></i> Pages Analytics</a>
+                    <a href="{{ club.analytics_site }}" class="btn btn-info mb-1 dashboard-link">
+                        <i class="fa-solid fa-chart-pie"></i> <span>Pages Analytics</span></a>
                 {% endif %}
+            </p>
             </p>
             <hr />
             <h2>Edit info</h2>
-            <p id="invite-btn">
-                <a class="btn btn-info mb-1"
-                   href="{% url 'dashboard_club:send_invite_view' club_slug=request.club.slug %}"><i class="fa-solid fa-user-plus"></i> Invite more people</a>
-            </p>
             <form action=""
                   method="post"
                   enctype="multipart/form-data"

@@ -1228,7 +1228,9 @@ def competitor_route_upload(request, competitor_id):
         competitor.event.invalidate_cache()
 
     if len(loc_array) == 0:
-        raise ValidationError("No locations within event's schedule were detected")
+        raise ValidationError(
+            f"No locations within event's schedule were detected\n({event.schedule_display})"
+        )
 
     return Response(
         {

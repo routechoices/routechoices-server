@@ -27,16 +27,16 @@
             {% if map.id and not event %}
             <div class="mb-3">
                 {% if used_in %}
-                <h4>Used in following events</h4>
-                <div>
+                <h3>Used in following events</h3>
+                <ul>
                     {% for event in used_in %}
-                    <a class="btn btn-primary dashboard-link me-1 external-link" href="{{ event.get_absolute_url }}" target="_blank" rel="noopener noreferrer">
-                        <i class="fa-solid fa-trophy"></i> <span>{{ event.name }}</span>
-                    </a>
+                    <li>
+                        <i class="fa-solid fa-trophy"></i> <span>{{ event.name }}</span> <a href="event.get_absolute_url" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </li>
                     {% endfor %}
-                </div>
+                </ul>
                 {% else %}
-                <h4>Not used in any events</h4>
+                <h3>Not used in any events</h3>
                 {% endif %}
             </div>
             {% endif %}
@@ -149,7 +149,7 @@
                               class="d-inline-block float-end"
                               tabindex="0"
                               data-bs-toggle="tooltip"
-                              title="First, select 4 distincts points on the raster map and on the world map!">
+                              title="First, select at least 3 distincts points on the raster map and on the world map!">
                             <button type="button"class="btn btn-primary disabled mb-1" disabled>
                                 <i class="fa-solid fa-magnifying-glass"></i> Preview Map
                             </button>
@@ -184,8 +184,10 @@
 
 {% block extra_body %}
     <script src="{% static 'scripts/load-local-variables.js' %}{{ engine_version_static_cache_buster }}"
-            data-api-root="{% host_url 'api_doc' host 'api' %}"></script>
-    <script type="module" src="{% static 'vendor/pdfjs-5.2.133/pdf.js' %}"></script>
+            data-api-root="{% host_url 'api_doc' host 'api' %}"        
+            data-static-root="{% static '' %}"
+    ></script>
+    <script type="module" src="{% static 'scripts/dashboard/pdfjs_init.js' %}?v=3"></script>
     {% compress js %}
         <script src="{% static 'vendor/jszip-3.10.1/jszip.min.js' %}"></script>
         <script src="{% static 'vendor/umbrella-3.3.3/umbrella.min.js' %}"></script>
@@ -196,6 +198,7 @@
         <script src="{% static 'scripts/backdrop_maps.js' %}"></script>
         <script src="{% static 'scripts/dashboard/tooltips.js' %}"></script>
         <script src="{% static 'scripts/dashboard/map_edit.js' %}"></script>
+        <script src="{% static 'scripts/geopdf_parser.js' %}"></script>
         <script src="{% static 'scripts/submit-form-commons.js' %}"></script>
     {% endcompress %}
 {% endblock extra_body %}

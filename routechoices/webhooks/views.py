@@ -259,7 +259,7 @@ def lemonsqueezy_webhook(request):
             or data["data"]["attributes"].get("first_order_item", {}).get("variant_id")
         )
     except Exception:
-        pass
+        print("Invalid call on LemonSqueezy Webhook")
 
     # Club Upgrade
     if (

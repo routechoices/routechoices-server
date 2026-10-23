@@ -8,8 +8,8 @@
 {% endblock extra_head %}
 
 {% block content %}
-
 {% define request.user.club_set.all as clubs %}
+{% if request.resolver_match.view_name == 'home_view' %}
 <div class="row">
     <div class="col-12 mx-auto">
         <div class="card border-0 shadow rounded-3 my-2">
@@ -21,11 +21,11 @@
                                 Hello <i>{{ request.user.username }}</i>! <i class="fa-solid fa-hand" style="transform: rotate( 34deg);"></i>
                             </h1>
                             <div>
-                                <a class="btn btn-primary me-3" data-bs-toggle="tooltip" data-bs-title="Single person GPS tracking without custom maps starting immediately" href="{% url 'quick_start_view' %}">
-                                    <i class="fa-solid fa-play"></i> <span>Start tracking</span>
+                                <a class="btn btn-info me-3 dashboard-link" data-bs-toggle="tooltip" data-bs-title="Single person GPS tracking without custom maps starting immediately" href="{% url 'quick_start_view' %}">
+                                    <i class="fa-solid fa-flask-vial"></i> <span>Test your Tracker</span>
                                 </a>
-                                <a class="btn btn-secondary" href="{% url 'dashboard_participations_view' %}">
-                                    <i class="fa-solid fa-clock-rotate-left"></i> <span>See History</span>
+                                <a class="btn btn-info dashboard-link" href="{% url 'dashboard_participations_view' %}">
+                                    <i class="fa-solid fa-list-check"></i> <span>Manage Entries</span>
                                 </a>
                             </div>
                         </div>
@@ -35,6 +35,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 <div class="row">
     <div class="col-12 mx-auto">
         <div class="card border-0 shadow rounded-3 my-5">

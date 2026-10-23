@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 NAME=routechoicesLocal
-DOMAIN=rc.local.1hz.fi # Use your own domain name
+DOMAIN=rtchs.localhost # Use your own domain name
 
 mkdir -p "letsencrypt/live/${DOMAIN}/"
 cd "letsencrypt/live/${DOMAIN}/"

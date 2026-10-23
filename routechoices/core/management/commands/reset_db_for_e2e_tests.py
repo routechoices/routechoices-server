@@ -11,10 +11,10 @@ class Command(BaseCommand):
     help = "Reset the DB before e2e tests"
 
     def handle(self, *args, **options):
-        call_command("flush", "--noinput")
         call_command("migrate", "--noinput")
+        call_command("flush", "--noinput")
         s = Site.objects.first()
-        s.domain = "rc.local.1hz.fi"
+        s.domain = "rtchs.localhost"
         s.name = "Routechoices.com"
         s.save()
         Device.objects.create(aid=12345678)
@@ -75,7 +75,7 @@ class Command(BaseCommand):
             user=admin_user,
             event=ev,
             name="Aatos",
-            short_name="A",
+            short_name="å",
         )
 
         FrontPageFeedback.objects.create(

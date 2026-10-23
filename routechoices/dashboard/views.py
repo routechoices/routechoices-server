@@ -568,32 +568,27 @@ def map_list_view(request):
 def map_create_view(request):
     club = request.club
     if request.method == "POST":
-        if request.FILES.get("keyhole_file"):
-            kmz_form = UploadKmzForm(request.POST, request.FILES)
-            image_w_bound_form = MapForm()
-            if kmz_form.is_valid():
-                maps = kmz_form.cleaned_data["extracted_maps"]
-                new_map = maps[0]
-                if len(maps) > 1:
-                    new_map = new_map.merge(*maps[1:])
-                new_map.club = club
-                new_map.save()
-                messages.success(request, "Map successfully imported!")
-                return redirect(
-                    "dashboard_club:map:list_view", club_slug=request.club.slug
-                )
+        kmz_form = UploadKmzForm(request.POST, request.FILES)
+        image_w_bound_form = MapForm()
+        if kmz_form.is_valid():
+            maps = kmz_form.cleaned_data["extracted_maps"]
+            new_map = maps[0]
+            if len(maps) > 1:
+                new_map = new_map.merge(*maps[1:])
+            new_map.club = club
+            new_map.save()
+            messages.success(request, "Map successfully imported!")
+            return redirect("dashboard_club:map:list_view", club_slug=request.club.slug)
         else:
-            kmz_form = UploadKmzForm()
             image_w_bound_form = MapForm(request.POST, request.FILES)
             image_w_bound_form.instance.club = club
             if image_w_bound_form.is_valid():
                 image_w_bound_form.save()
-                messages.success(request, "Map successfully created!")
+                messages.success(request, "Map successfully imported!")
                 return redirect(
                     "dashboard_club:map:list_view", club_slug=request.club.slug
                 )
     else:
-        kmz_form = UploadKmzForm()
         image_w_bound_form = MapForm()
 
     return render(
@@ -602,7 +597,6 @@ def map_create_view(request):
         {
             "club": club,
             "image_w_bound_form": image_w_bound_form,
-            "kmz_form": kmz_form,
         },
     )
 
@@ -1190,27 +1184,25 @@ def event_map_edit_view(request, event_id):
         aid=event_id,
     )
     form = MapForm()
-    kmz_form = UploadKmzForm()
+    kmz_form = None
     if request.method == "POST" and club.can_modify_events:
-        if request.FILES.get("keyhole_file"):
-            kmz_form = UploadKmzForm(request.POST, request.FILES)
-            if kmz_form.is_valid():
-                maps = kmz_form.cleaned_data["extracted_maps"]
-                new_map = maps[0]
-                if len(maps) > 1:
-                    new_map = new_map.merge(*maps[1:])
-                new_map.club = club
-                new_map.save()
-                event.map = new_map
-                event.save()
-                messages.success(request, "Changes saved successfully!")
-                return redirect(
-                    "dashboard_club:event:map_edit_view",
-                    event_id=event.aid,
-                    club_slug=request.club.slug,
-                )
+        kmz_form = UploadKmzForm(request.POST, request.FILES)
+        if kmz_form.is_valid():
+            maps = kmz_form.cleaned_data["extracted_maps"]
+            new_map = maps[0]
+            if len(maps) > 1:
+                new_map = new_map.merge(*maps[1:])
+            new_map.club = club
+            new_map.save()
+            event.map = new_map
+            event.save()
+            messages.success(request, "Changes saved successfully!")
+            return redirect(
+                "dashboard_club:event:map_edit_view",
+                event_id=event.aid,
+                club_slug=request.club.slug,
+            )
         else:
-            kmz_form = UploadKmzForm()
             if raster_map := event.map:
                 raster_map_copy = deepcopy(raster_map)
                 form = MapForm(request.POST, request.FILES, instance=raster_map_copy)
@@ -1228,12 +1220,7 @@ def event_map_edit_view(request, event_id):
                     event_id=event.aid,
                     club_slug=request.club.slug,
                 )
-    data = {
-        "club": club,
-        "event": event,
-        "image_w_bound_form": form,
-        "kmz_form": kmz_form,
-    }
+    data = {"club": club, "event": event, "image_w_bound_form": form}
     if event.map:
         data["map"] = event.map
         data["image_w_bound_form"] = MapForm(instance=event.map)
@@ -1868,39 +1855,64 @@ def event_contribute_view(request, club_slug, slug):
         club__slug=club_slug,
         slug=slug,
     )
-
-    if request.GET.get("competitor-added", None):
-        messages.success(
-            request,
-            "Registration successful! Remember to start your GPS at the beginning of the event!",
-        )
-    if request.GET.get("route-uploaded", None):
-        messages.success(request, "Data uploaded!")
-
     can_upload = event.allow_route_upload and (event.start_date <= now())
     can_register = event.open_registration and (event.end_date >= now() or can_upload)
 
     if not (can_upload or can_register):
         raise Http404
 
-    register_form = None
-    if can_register:
-        register_form = RegisterForm(event=event)
-        if tags := event.acceptable_categories:
-            register_form.fields["tag"].choices = [(tag, tag) for tag in tags]
+    registration_form = RegisterForm(event=event) if can_register else None
+    if registration_form and request.method == "POST" and "signup-form" in request.POST:
+        registration_form = RegisterForm(request.POST, request.FILES, event=event)
+        if registration_form.is_valid():
+            registration_form.save(request)
+            messages.success(request, "Registration complete!")
+            for warnings in registration_form.warnings:
+                messages.warning(request, warnings)
+            return redirect(
+                reverse(
+                    "event_contribute_view",
+                    kwargs={"slug": event.slug, "club_slug": event.club.slug},
+                    host="dashboard",
+                )
+            )
+        messages.error(request, "Registration failed…")
+        if tracker := registration_form.cleaned_data["device"]:
+            registration_form.fields["device"].queryset = Device.objects.filter(
+                pk=tracker.pk
+            )
         else:
-            del register_form.fields["tag"]
+            registration_form.fields["device"].queryset = Device.objects.none()
 
-    upload_form = None
-    if can_upload:
-        upload_form = CompetitorUploadGPSForm(event=event)
+    upload_form = (
+        CompetitorUploadGPSForm(user=request.user, event=event) if can_upload else None
+    )
+    if upload_form and not upload_form.fields["competitor_aid"].choices:
+        upload_form = None
+    if upload_form and request.method == "POST" and "upload-form" in request.POST:
+        upload_form = CompetitorUploadGPSForm(
+            request.POST, request.FILES, user=request.user, event=event
+        )
+        if upload_form.is_valid():
+            upload_form.save(request)
+            messages.success(request, "Upload successful!")
+            for warnings in upload_form.warnings:
+                messages.warning(request, warnings)
+            return redirect(
+                reverse(
+                    "event_contribute_view",
+                    kwargs={"slug": event.slug, "club_slug": event.club.slug},
+                    host="dashboard",
+                )
+            )
+        messages.error(request, "Upload failed…")
 
     return render(
         request,
         "club/event_contribute.html",
         {
             "event": event,
-            "register_form": register_form,
+            "register_form": registration_form,
             "upload_form": upload_form,
             "event_ended": event.end_date < now(),
         },

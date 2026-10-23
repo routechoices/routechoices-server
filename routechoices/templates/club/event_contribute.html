@@ -30,112 +30,77 @@
 {% endblock extra_head %}
 
 {% block contentup %}
-    <div class="container p-0">
-        <div class="row mt-4">
-            <h2>
-                <a href="{{ event.club.nice_url }}{{ event.slug }}"
-                    class="fw-bold text-decoration-none">{{ event.name }}</a>
-            </h2>
-            <p>
-                Event
-                {% if not event.hidden %}
-                    started {{ event.start_date|timesince }} ago,
-                {% else %}
-                    starts in {{ event.start_date|timeuntil }},
-                {% endif %}
-                {% if event.ended %}
-                    ended {{ event.end_date|timesince }} ago.
-                {% else %}
-                    ends in {{ event.end_date|timeuntil }}.
-                {% endif %}
-            </p>
+<div class="container p-0">
+    <div class="row mt-4 px-2">
+        <h1>
+            {% if event.event_set %}
+            <span>{{ event.event_set.name }}</span><br/>
+            {% endif %}
+            <a href="{{ event.club.nice_url }}{{ event.slug }}" class="fw-bold text-decoration-none">{{ event.name }}</a>
+        </h1>
+        <p>
+            Event
+            {% if not event.hidden %}
+                started {{ event.start_date|timesince }} ago,
+            {% else %}
+                starts in {{ event.start_date|timeuntil }},
+            {% endif %}
+            last{% if not event.hidden %}ed{% endif %} {{ event.end_date|timeuntil:event.start_date }}.
+        </p>
     </div>
     <div class="container content">
         <div class="col-12">
             <div class="row">
-                {% if register_form %}
-                    <h4 class="padded-multiline">
-                        <span>Register</span>
-                    </h4>
-                    {% if not request.user.is_authenticated %}
-                    <div class="alert alert-danger" role="alert">
-                        You are not logged in!
-                        <br />
-                        <a href="https://www.routechoices.com/signup">Sign-Up</a> or <a href="https://www.routechoices.com/login">Log-In</a> to be able to manage your participations later on.
-                    </div>
-                    {% endif %}
-                    <div class="mb-3">
-                        <form action="" method="post" id="registration-form">
-                            {% csrf_token %}
-                            {% bootstrap_form register_form %}
-                            <p id="warning-if-device-id" class="d-none">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                                <span>
-                                    You can stream GPS data to only one competitor at a time. Registering this tracker will switch its stream to the new competitor
-                                {% if not event.hidden %}
-                                    immediately.
-                                {% else %}
-                                    at latest on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>.
-                                {% endif %}
-                                </span>
-                            </p>
-                            <button type="submit" class="btn btn-primary dashboard-link">
-                                <i class="fa-solid fa-file-signature"></i> <span>Register</span>
-                            </button>
-                        </form>
-                    </div>
+                {% if not request.user.is_authenticated %}
+                <div class="alert alert-danger" role="alert">
+                    You are not logged in!
+                    <br />
+                    <a href="https://www.routechoices.com/signup">Sign-Up</a> or <a href="https://www.routechoices.com/login">Log-In</a> to be able to manage your participations later on.
+                </div>
                 {% endif %}
+                {% if register_form %}
                 <h4 class="padded-multiline">
-                    <span>Registered competitors</span>
+                    <span>Register</span>
+                </h4>
+                <div class="mb-5">
+                    <form action="" method="post" id="registration-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form register_form %}
+                        <input id="id_js_enabled" name="js_enabled" type="hidden" value="off"/>
+                        <p id="warning-if-device-id" class="d-none">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>
+                                You can stream GPS data to only one competitor at a time. Registering this tracker will switch its stream to the new competitor
+                            {% if not event.hidden %}
+                                immediately.
+                            {% else %}
+                                at latest on <span class="date-utc" data-date="{{ event.start_date|date:'c' }}">{{ event.start_date }} UTC</span>.
+                            {% endif %}
+                            </span>
+                        </p>
+                        <button type="submit" class="btn btn-primary dashboard-link" name="signup-form">
+                            <i class="fa-solid fa-file-signature"></i> <span>Register</span>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+                {% if upload_form %}
+                <h4 class="padded-multiline">
+                    <span>Upload GPS File</span>
                 </h4>
                 <div class="mb-3">
-                    {% for c in event.competitors.all %}
-                        <div class="p-1 m-1 border-bottom d-flex justify-content-between">
-                            <div class="ms-2 fw-bold">{{ c.name }}{% if c.name != c.short_name %}&nbsp;<small class="text-muted">{{ c.short_name }}</small>{% endif %}</div>
-                            {% if upload_form %}
-                            <div>
-                                <button type="button"
-                                        class="btn btn-primary btn-sm upload-route-btn"
-                                        data-competitor-aid="{{ c.aid }}"
-                                        data-competitor-name="{{ c.name }}">
-                                    <i class="fa-solid fa-upload"></i> Upload Route
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                    {% empty %}
-                        <h4 class="text-muted">No one registered so far</h4>
-                    {% endfor %}
+                    <form action="" method="post" id="upload-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% bootstrap_form upload_form %}
+                    <input id="id_js_enabled2" name="js_enabled2" type="hidden" value="off"/>
+                    <button type="submit" class="btn btn-primary dashboard-link" name="upload-form">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload</span>
+                    </button>
+                     </form>
                 </div>
+                {% endif %}
             </div>
         </div>
-        {% if upload_form %}
-            <div class="modal" tabindex="-1" id="uploadRouteModal" style="top: 100px">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="" method="post" id="upload-form">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    Upload Route for <span id="uploader-name"></span>
-                                </h5>
-                                <button type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                {% csrf_token %}
-                                {% bootstrap_form upload_form %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Upload</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
 </div>
 {% endblock contentup %}

@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from zipfile import ZipFile
 
+import arrow
 import cv2
 import flag
 import gps_data_codec
@@ -2084,6 +2085,19 @@ class Event(models.Model, SomewhereOnEarth):
                         break
             yield (competitor, from_date, end_date)
 
+    @property
+    def schedule_display(self):
+        start = arrow.get(self.start_date)
+        end = arrow.get(self.end_date)
+
+        time_distance = start.humanize(
+            end, only_distance=True, granularity=["hour", "minute"]
+        )
+
+        return (
+            f'{time_distance} after <span class="date-utc" date-date="{start.isoformat()}">{start.datetime} UTC</span>'
+        ).capitalize()
+
     @classmethod
     def get_map_at_index(cls, user, event_id, map_index, load_competitors=False):
         """map_index is 1 based"""
@@ -2186,6 +2200,8 @@ class Event(models.Model, SomewhereOnEarth):
             if selected_year:
                 try:
                     selected_year = int(selected_year)
+                    if not (0 < selected_year < 10_000):
+                        raise ValueError("Year should be between 1 and 9999")
                 except Exception:
                     raise BadRequest("Invalid year")
             elif years:
@@ -2202,8 +2218,8 @@ class Event(models.Model, SomewhereOnEarth):
             if selected_month:
                 try:
                     selected_month = int(selected_month)
-                    if selected_month < 1 or selected_month > 12:
-                        raise ValueError()
+                    if not (0 < selected_month < 13):
+                        raise ValueError("Month value should be between 1 and 12")
                 except Exception:
                     raise BadRequest("Invalid month")
             elif months:

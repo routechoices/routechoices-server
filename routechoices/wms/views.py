@@ -129,7 +129,7 @@ def common_wms(function):
 
 def tile_etag(request):
     get_params = {}
-    for key in request.GET.keys():
+    for key in request.GET:
         get_params[key.lower()] = request.GET[key]
     if get_params.get("request", "").lower() == "getmap":
         key = request.raster_map.get_tile_cache_key(
@@ -149,7 +149,7 @@ def tile_etag(request):
 @condition(etag_func=tile_etag)
 def wms_service(request):
     get_params = {}
-    for key in request.GET.keys():
+    for key in request.GET:
         get_params[key.lower()] = request.GET[key]
     if get_params.get("request", "").lower() == "getmap":
         data_out, cache_hit = request.raster_map.get_tile(

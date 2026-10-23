@@ -9,9 +9,9 @@
 {% block sub_content %}
     <div class="row">
         <div class="col-12">
-            <h1>Publish a Tracking Page</h1>
+            <h1>Test your tracker</h1>
             <p class="text-muted">
-                Publish a secret GPS tracking page to share with others.
+                This will create a secret GPS tracking page you can share with others.
             </p>
             <form action="" id="quick-creation-form" method="POST">
                 {% csrf_token %}
@@ -55,8 +55,8 @@
                         <option value="360" selected>6 hours</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary mb-1" id="submit-btn">
-                    <i class="fa-solid fa-circle-plus"></i> Create Tracking Page
+                <button type="submit" class="btn btn-primary mb-1 dashboard-link" id="submit-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Create Tracking Page
                 </button>
             </form>
         </div>

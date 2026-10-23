@@ -4,16 +4,17 @@ from pathlib import Path
 import arrow
 from django.core.cache import cache
 from rest_framework import status
-from rest_framework.test import APIClient, override_settings
+from rest_framework.test import override_settings
 
 from routechoices.api.tests import EssentialApiBase
 from routechoices.core.models import Club, Event, Map, MapAssignation
+from routechoices.testing import APIClient
 
 
 @override_settings(MEDIA_ROOT=Path(tempfile.gettempdir()))
 class MapApiTestCase(EssentialApiBase):
     def test_get_tile(self):
-        client = APIClient(HTTP_HOST="wms.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="wms.rtchs.localhost")
         url = self.reverse_and_check("wms_service", "/", "wms")
         club = Club.objects.create(name="Test club", slug="club")
         raster_map = Map.objects.create(
@@ -171,7 +172,7 @@ class MapApiTestCase(EssentialApiBase):
 
     def test_should_hit_cache(self):
         cache.clear()
-        client = APIClient(HTTP_HOST="wms.rc.local.1hz.fi")
+        client = APIClient(HTTP_HOST="wms.rtchs.localhost")
         url = self.reverse_and_check("wms_service", "/", "wms")
         club = Club.objects.create(name="Test club", slug="club")
         raster_map = Map.objects.create(
