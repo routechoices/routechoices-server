@@ -203,9 +203,9 @@ def rastilippu_webhook(request):
             if course_id_set.symmetric_difference(external_ids):
                 try:
                     sync_courses_data(event_uuid)
-                except Exception as e:
+                except Exception:
                     return HttpResponse(
-                        f"Rastilippu did not answer ({e!s})",
+                        "Rastilippu did not answer",
                         status=status.HTTP_503_SERVICE_UNAVAILABLE,
                     )
         else:
