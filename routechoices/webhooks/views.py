@@ -20,7 +20,6 @@ from routechoices.lib.helpers import short_random_slug
 from routechoices.lib.lemonsqueezy import LEMONSQUEEZY_PREFIX
 from routechoices.lib.rastilippu import RASTILIPPU_PREFIX, sync_courses_data
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -208,7 +207,10 @@ def rastilippu_webhook(request):
                 try:
                     sync_courses_data(event_uuid)
                 except Exception:
-                    logger.exception("Failed to sync Rastilippu courses data for event %s", event_uuid)
+                    logger.exception(
+                        "Failed to sync Rastilippu courses data for event %s",
+                        event_uuid,
+                    )
                     return HttpResponse(
                         "Rastilippu did not answer",
                         status=status.HTTP_503_SERVICE_UNAVAILABLE,
