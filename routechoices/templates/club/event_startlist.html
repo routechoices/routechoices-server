@@ -74,7 +74,7 @@
         {% if not event.competitors.all.exists %}<h4>No competitors...</h4>{% endif %}
         {% if event.open_registration %}
             <a class="my-3 btn btn-primary"
-               href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}"><i class="fa-solid fa-user-plus"></i> Enter</a>
+               href="{% host_url 'event_contribute_view' slug=event.slug club_slug=event.club.slug host 'dashboard' %}"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
         {% endif %}
         {% if event.competitors.all.exists %}
             <table class="table competitor-table">
@@ -86,7 +86,7 @@
                 </thead>
                 {% for competitor in event.competitors.all %}
                     <tr class="competitor">
-                        <td>{{ competitor.name }}</td>
+                        <td><b>{{ competitor.name }}</b> <small class="text-muted">({{ competitor.short_name }})</small></td>
                         <td>
                             <span class="date-utc text-nowrap"
                                   data-date="{{ competitor.start_time|date:"c" }}">{{ competitor.start_time|date:'Y-m-d H:i:s' }} UTC</span>
