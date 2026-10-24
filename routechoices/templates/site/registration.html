@@ -15,7 +15,7 @@
     {% for event in events|dictsortreversed:"is_live" %}
     <div class="card border-0 shadow mb-3">
         <div class="card-body">
-        <h5 class="card-title fw-bold">{{ event.name }}</h5>
+        <h5 class="card-title fw-bold">{% if event.event_set %}<span class="text-muted">{{ event.event_set.name }}</span><br/>{% endif %}{{ event.name }}</h5>
         <p class="card-text">
         <small>
         {% if not event.hidden %}
